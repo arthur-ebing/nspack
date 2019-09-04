@@ -1,0 +1,187 @@
+---
+:dataminer_definition: labels
+# :dataminer_client_definitions:
+# srcc: labels_srcc
+:actions:
+  - :url: /labels/labels/labels/$:id$/edit
+    :text: Edit
+    :icon: edit
+    :hide_if_true: multi_label,completed
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_false: active
+  - :url: /labels/labels/labels/$:id$/clone
+    :text: Clone
+    :icon: copy
+    :popup: true
+    :hide_if_true: multi_label
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_false: active
+  - :separator: true
+  - :url: /labels/labels/labels/$:id$/properties
+    :text: Edit properties
+    :icon: edit
+    :title: Properties
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_false: active
+    :hide_if_true: completed
+  - :url: /labels/labels/labels/$:id$/background
+    :text: Background image
+    :icon: photo
+    :title_field: label_name
+    :popup: true
+  - :separator: true
+  - :url: /labels/labels/labels/$:id$/variable_list
+    :text: Variable List
+    :icon: information-solid
+    :title: Variables for $:label_name$
+    :popup: true
+  - :submenu:
+      :text: Preview and print
+      :items:
+      - :url: /labels/labels/labels/$:id$/preview
+        :text: Preview
+        :icon: view-show
+        :title: Preview - fill in variables
+        :popup: true
+      - :url: /labels/labels/labels/$:id$/print_preview
+        :text: Print Test Preview
+        :icon: printer
+        :title: Print preview - fill in variables
+        :popup: true
+      - :url: /labels/labels/labels/$:id$/email_preview
+        :text: Email preview
+        :icon: envelope
+        :title: Email preview - fill in variables
+        :popup: true
+        :hide_if_false: completed
+        :hide_if_true: multi_label
+      - :url: /labels/labels/labels/$:id$/batch_print
+        :text: Batch Print
+        :icon: play
+        :title: Batch Print - fill in variables
+        :popup: true
+        :hide_if_false: approved
+  - :submenu:
+      :text: Sub-labels
+      :items:
+      - :url: "/list/sub_labels/multi?key=sub_labels&id=$:id$&label_dimension=$:label_dimension$&variable_set=$:variable_set$"
+        :text: Select sub-labels
+        :icon: list
+        :popup: true
+        :hide_if_false: multi_label,active
+        :hide_if_true: completed
+        :auth:
+          :function: label designer
+          :program: designs
+          :permission: edit
+      - :url: /labels/labels/labels/$:id$/refresh_multi_label_variables
+        :text: Refresh preview values from sub-labels
+        :icon: code
+        :popup: true
+        :prompt: Are you sure you want to replace the preview values?
+        :hide_if_false: multi_label,active
+  - :separator: true
+  - :url: /labels/labels/labels/$:id$
+    :text: Delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_true: part_of_multi_label,completed
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_false: active
+  # - :url: /labels/labels/labels/$:id$/download
+  #   :text: Download
+  #   :icon: download
+  - :url: /labels/labels/labels/$:id$/export
+    :text: Export
+    :icon: save-disk
+    :hide_if_true: multi_label
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: export
+  - :url: /labels/labels/labels/$:id$/complete
+    :text: Complete
+    :icon: toggle-on
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_true: completed
+  - :url: /labels/labels/labels/$:id$/approve
+    :text: Approve/Reject
+    :icon: gavel
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: approve
+    :hide_if_false: completed
+    :hide_if_true: approved
+  - :url: /labels/labels/labels/$:id$/reopen
+    :text: Re-open for editing
+    :icon: toggle-off
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: approve
+    :hide_if_false: approved
+  - :url: /labels/labels/labels/$:id$/archive
+    :text: Archive
+    :icon: lock-closed
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_false: active
+  - :url: /labels/labels/labels/$:id$/un_archive
+    :text: Un-Archive
+    :icon: add
+    :popup: true
+    :auth:
+      :function: label designer
+      :program: designs
+      :permission: edit
+    :hide_if_true: active
+  - :separator: true
+  - :url: /development/statuses/list/labels/$:id$
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
+  - :url: "/list/label_publishing_history/with_params?key=standard&id=$:id$"
+    :text: Publishing history
+    :icon: list
+    :popup: true
+:page_controls:
+  - :control_type: :link
+    :url: /labels/labels/labels/new
+    :text: New label
+    :style: :button
+    :behaviour: :popup
+    :hide_for_key: inactive
+:conditions:
+  :active:
+    - :col: labels.active
+      :op: =
+      :val: true
+  :inactive:
+    - :col: labels.active
+      :op: =
+      :val: false

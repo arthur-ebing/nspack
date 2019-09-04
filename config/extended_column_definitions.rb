@@ -12,9 +12,41 @@ module Crossbeams
     # - masterlist_key: a list_type value from the master_lists table - used to populate a select box with options.
     class ExtendedColumnDefinitions
       EXTENDED_COLUMNS = {
+        labels: {
+          # 'srcc' => {
+          #   agent: { type: :string, required: true },
+          #   pack_week: { type: :integer, required: true },
+          #   srcc_order_nr: { type: :string },
+          #   receiver_client: { type: :string },
+          #   commodity: { type: :string, masterlist_key: 'commodity', required: true },
+          #   variety: { type: :string },
+          #   pack_code: { type: :string },
+          #   weight: { type: :string },
+          #   brand: { type: :boolean },
+          #   class: { type: :string, default: '1' },
+          #   lot_number: { type: :string },
+          #   comments: { type: :string }
+          # }
+        }
       }.freeze
 
       VALIDATIONS = {
+        labels: {
+          # 'srcc' => Dry::Validation.Params do
+          #   required(:agent).filled(:str?)
+          #   required(:pack_week).filled(:int?, gteq?: 1, lteq?: 52)
+          #   required(:srcc_order_nr).maybe(:str?)
+          #   required(:receiver_client).maybe(:str?)
+          #   required(:commodity).filled(:str?)
+          #   required(:variety).maybe(:str?)
+          #   required(:pack_code).maybe(:str?)
+          #   required(:weight).maybe(:str?)
+          #   required(:brand).maybe(:bool?)
+          #   required(:class).maybe(:str?)
+          #   required(:lot_number).maybe(:str?)
+          #   required(:comments).maybe(:str?)
+          # end
+        }
       }.freeze
 
       # Takes the configuration rules for an extended column

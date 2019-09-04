@@ -10,6 +10,9 @@ module Crossbeams
     # caption: is an optional caption for the record.
     class StatusHeaderDefinitions
       HEADER_DEF = {
+        labels: {
+          query: 'SELECT label_name, created_by FROM labels WHERE id = ?'
+        },
         security_groups: {
           query: 'SELECT security_group_name FROM security_groups WHERE id = ?'
         }

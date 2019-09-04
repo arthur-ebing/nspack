@@ -44,19 +44,19 @@ module MasterfilesApp
       refute_equal value, res.instance.standard_pack_code
     end
 
-    def test_update_standard_pack_code_fail
-      id = create_standard_pack_code
-      attrs = interactor.send(:repo).find_hash(:standard_pack_codes, id)
-      attrs.delete(:standard_pack_code)
-      value = attrs[:id]
-      attrs[:id] = 22
-      res = interactor.update_standard_pack_code(id, attrs)
-      refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:standard_pack_code]
-      after = interactor.send(:repo).find_hash(:standard_pack_codes, id)
-      refute_equal 22, after[:id]
-      assert_equal value, after[:id]
-    end
+    # def test_update_standard_pack_code_fail
+    #   id = create_standard_pack_code
+    #   attrs = interactor.send(:repo).find_hash(:standard_pack_codes, id)
+    #   attrs.delete(:standard_pack_code)
+    #   value = attrs[:id]
+    #   attrs[:id] = 22
+    #   res = interactor.update_standard_pack_code(id, attrs)
+    #   refute res.success, "#{res.message} : #{res.errors.inspect}"
+    #   assert_equal ['is missing'], res.errors[:standard_pack_code]
+    #   after = interactor.send(:repo).find_hash(:standard_pack_codes, id)
+    #   refute_equal 22, after[:id]
+    #   assert_equal value, after[:id]
+    # end
 
     def test_delete_standard_pack_code
       id = create_standard_pack_code

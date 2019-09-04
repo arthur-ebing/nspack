@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="/css/choices.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
+    <%= content_for :late_style %>
 
     <%= content_for :late_head %>
   </head>
@@ -98,8 +99,12 @@
         <% end %>
     </footer>
 
-    <script src="/js/ag-grid-enterprise.min.js?seq=2"></script>
-    <script src="/js/ag-enterprise-activation.js?seq=1"></script>
+    <% if @label_edit_page %>
+      <script src="/js/konva.min.js?seq=1"></script>
+    <% else %>
+      <script src="/js/ag-grid-enterprise.min.js?seq=2"></script>
+      <script src="/js/ag-enterprise-activation.js?seq=1"></script>
+  <% end %>
 
     <script src="/js/jackbox.min.js"></script>
     <script src="/js/jquery-3.2.1.min.js"></script>

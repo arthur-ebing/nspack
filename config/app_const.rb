@@ -2,6 +2,11 @@
 
 # A class for defining global constants in a central place.
 class AppConst
+  # Helper to create hash of label sizes from a 2D array.
+  def self.make_label_size_hash(array)
+    Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
+  end
+
   # Client-specific code
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
@@ -39,6 +44,22 @@ class AppConst
 
   # Labels
   SHARED_CONFIG_HOST_PORT = ENV.fetch('SHARED_CONFIG_HOST_PORT')
+  LABEL_VARIABLE_SETS = ENV.fetch('LABEL_VARIABLE_SETS').strip.split(',')
+  LABEL_PUBLISH_NOTIFY_URLS = ENV.fetch('LABEL_PUBLISH_NOTIFY_URLS', '').split(',')
+
+  # Label sizes. The arrays contain width then height.
+  DEFAULT_LABEL_DIMENSION = ENV.fetch('DEFAULT_LABEL_DIMENSION', '84x64')
+  LABEL_SIZES = if ENV['LABEL_SIZES']
+                  AppConst.make_label_size_hash(ENV['LABEL_SIZES'].split(';').map { |s| s.split(',') })
+                else
+                  AppConst.make_label_size_hash(
+                    [
+                      [84,   64], [84,  100], [97,   78], [78,   97], [77,  130], [100,  70],
+                      [100,  84], [100, 100], [105, 250], [130, 100], [145,  50], [100, 150]
+                    ]
+                  )
+                end
+
   # LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
   # LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
 
@@ -98,7 +119,9 @@ class AppConst
   ERROR_MAIL_PREFIX = ENV.fetch('ERROR_MAIL_PREFIX')
   SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
   EMAIL_REQUIRES_REPLY_TO = ENV.fetch('EMAIL_REQUIRES_REPLY_TO', 'N') == 'Y'
-  USER_EMAIL_GROUPS = [].freeze
+  EMAIL_GROUP_LABEL_APPROVERS = 'label_approvers'
+  EMAIL_GROUP_LABEL_PUBLISHERS = 'label_publishers'
+  USER_EMAIL_GROUPS = [EMAIL_GROUP_LABEL_APPROVERS, EMAIL_GROUP_LABEL_PUBLISHERS].freeze
 
   # Business Processes
   # PROCESS_DELIVERIES = 'DELIVERIES'

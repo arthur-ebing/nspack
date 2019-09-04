@@ -1,0 +1,15 @@
+---
+:dataminer_definition: labels
+:multiselect:
+  :standard:
+    :url: "/labels/publish/batch/publish"
+    :section_caption: "Choose labels for publishing"
+    :conditions: approved
+:conditions:
+  :approved:
+    - :col: approved
+      :op: =
+      :val: true
+    - :col: labels.active
+      :op: =
+      :val: true

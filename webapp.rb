@@ -350,6 +350,7 @@ class Nspack < Roda
                                      :ag_grid,
                                      :choices,
                                      :sortable,
+                                     :konva,
                                      :lodash,
                                      :multi,
                                      :sweetalert)
@@ -384,6 +385,75 @@ class Nspack < Roda
       # list_section/users/?user_id=123
       # open users yml & apply user_id param
       #
+    end
+
+    # LABEL DESIGNER
+    # ----------------------------------------------------------------------
+
+    r.on 'label_designer' do
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.is do
+        @label_edit_page = true
+        view(inline: interactor.label_designer_page(label_name: params[:label_name],
+                                                    label_dimension: params[:label_dimension],
+                                                    variable_set: params[:variable_set],
+                                                    px_per_mm: params[:px_per_mm]))
+      end
+    end
+
+    r.on 'save_label' do
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on :id do |id|
+        r.post do
+          repo = LabelApp::LabelRepo.new
+          changeset = { label_json: params[:label],
+                        variable_xml: params[:XMLString],
+                        png_image: Sequel.blob(interactor.image_from_param(params[:imageString])) }
+          DB.transaction do
+            repo.update_label(id, interactor.include_updated_by_in_changeset(changeset))
+            repo.log_action(user_name: current_user.user_name, context: 'update label', route_url: request.path)
+          end
+
+          flash[:notice] = 'Updated'
+          redirect_via_json "/labels/labels/labels/#{id}/edit"
+        end
+      end
+
+      r.post do
+        # if session new_label_attr nil? redirect to list with an error message
+        repo = LabelApp::LabelRepo.new
+        extra_attributes = session[:new_label_attributes] ### WHAT IF THESE nil? (as happened at SRCC at 00:40) <session cleared? problem if cloned? OR double-send? - 1st end has session data and second has it replaced with nil...>
+        extcols = interactor.select_extended_columns_params(extra_attributes)
+        from_id = extra_attributes[:cloned_from_id]
+        changeset = { label_json: params[:label],
+                      label_name: params[:labelName],
+                      label_dimension: params[:labelDimension],
+                      px_per_mm: params[:pixelPerMM],
+                      # container_type: extra_attributes[:container_type],
+                      # commodity: extra_attributes[:commodity],
+                      # market: extra_attributes[:market],
+                      # language: extra_attributes[:language],
+                      # category: extra_attributes[:category],
+                      # sub_category: extra_attributes[:sub_category],
+                      variable_set: extra_attributes[:variable_set],
+                      variable_xml: params[:XMLString],
+                      png_image: Sequel.blob(interactor.image_from_param(params[:imageString])) }
+
+        id = nil
+        DB.transaction do
+          id = repo.create_label(interactor.include_created_by_in_changeset(interactor.add_extended_columns_to_changeset(changeset, repo, extcols)))
+          if from_id.nil?
+            repo.log_status('labels', id, 'CREATED', user_name: current_user.user_name)
+          else
+            from_lbl = repo.find_label(from_id)
+            repo.log_status('labels', id, 'CLONED', comment: "from #{from_lbl.label_name}", user_name: current_user.user_name)
+          end
+          repo.log_action(user_name: current_user.user_name, context: 'create label', route_url: request.path)
+        end
+        session[:new_label_attributes] = nil
+        flash[:notice] = 'Created'
+        redirect_via_json "/labels/labels/labels/#{id}/edit"
+      end
     end
   end
 

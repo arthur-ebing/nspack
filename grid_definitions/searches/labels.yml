@@ -1,0 +1,42 @@
+---
+:dataminer_definition: labels
+:actions:
+  - :url: /label_designer/$:id$/edit
+    :text: Edit
+    :icon: edit
+  - :url: /label_designer/$:id$/clone
+    :text: Clone
+    :icon: copy
+    :popup: true
+  - :separator: true
+  - :url: /label_designer/$:id$/properties
+    :text: Edit Properties
+    :icon: edit
+    :title: Properties
+    :popup: true
+  - :url: /label_designer/$:id$/background
+    :text: Background Image
+    :icon: photo
+    :title_field: label_name
+    :popup: true
+  - :separator: true
+  - :url: /labels/labels/labels/$:id$/variable_list
+    :text: Variable Lists
+    :icon: information-solid
+    :title: Variables for $:label_name$
+    :popup: true
+  - :url: /label_designer/$:id$/preview
+    :text: Preview
+    :icon: view-show
+    :title: Preview - fill in variables
+    :popup: true
+  - :url: /label_designer/$:id$/print_preview
+    :text: Print Test Preview
+    :icon: printer
+    :title: Print preview - fill in variables
+    :popup: true
+  - :separator: true
+  - :url: /label_designer/$:id$
+    :text: Delete
+    :icon: delete
+    :is_delete: true
