@@ -332,6 +332,19 @@ module MasterfilesApp
       { success: true, id: party_role_id }
     end
 
+    def email_address_for_party_role(id)
+      query = <<~SQL
+        SELECT contact_methods.contact_method_code
+        FROM party_roles
+        JOIN party_contact_methods ON party_contact_methods.party_id = party_roles.party_id
+        JOIN contact_methods ON contact_methods.id = party_contact_methods.contact_method_id
+        JOIN contact_method_types ON contact_method_types.id = contact_methods.contact_method_type_id
+        WHERE party_roles.id = #{id}
+        AND contact_method_types.contact_method_type = 'Email'
+      SQL
+      DB[query].get(:contact_method_code)
+    end
+
     private
 
     def add_party_name(hash)
