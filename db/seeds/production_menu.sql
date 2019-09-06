@@ -58,3 +58,57 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Resources'
         'Resource Types',
         false,
         false);
+
+-- PROGRAM: Product Setup
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Product_setups', 1, (SELECT id FROM functional_areas
+                                              WHERE functional_area_name = 'Production'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps(program_id, webapp) VALUES (
+      (SELECT id FROM programs
+       WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+       'Nspack');
+
+-- LIST menu item
+-- PROGRAM FUNCTION Product_setup_templates
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Product Setup Templates', '/list/product_setup_templates', 1);
+
+-- SEARCH menu item
+-- PROGRAM FUNCTION Search Product_setup_templates
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Search Product Setup Templates', '/search/product_setup_templates', 2);
+
+
+-- LIST menu item
+-- PROGRAM FUNCTION Active Product_setups
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Active Product Setups', '/list/product_setups?key=active&product_setups.active = true', 3);
+
+-- LIST menu item
+-- PROGRAM FUNCTION Product_setups in Production
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Product Setups in Production', '/list/product_setups?key=in_production&product_setups.in_production = true', 4);
+
+-- SEARCH menu item
+-- PROGRAM FUNCTION Search Product_setups
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Search Product Setups', '/search/product_setups', 5);

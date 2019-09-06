@@ -21,13 +21,13 @@ module MasterfilesApp
                           order_by: :standard_pack_code
 
     build_for_select :std_fruit_size_counts,
-                     label: :size_count_description,
+                     label: :size_count_value,
                      value: :id,
-                     order_by: :size_count_description
+                     order_by: :size_count_value
     build_inactive_select :std_fruit_size_counts,
-                          label: :size_count_description,
+                          label: :size_count_value,
                           value: :id,
-                          order_by: :size_count_description
+                          order_by: :size_count_value
 
     build_for_select :fruit_actual_counts_for_packs,
                      label: :actual_count_for_pack,

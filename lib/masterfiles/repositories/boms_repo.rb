@@ -117,5 +117,28 @@ module MasterfilesApp
 
       PmBomsProduct.new(hash)
     end
+
+    def for_select_pm_subtype_pm_boms(pm_subtype_id)
+      DB[:pm_boms]
+        .join(:pm_boms_products, pm_bom_id: :id)
+        .join(:pm_products, id: :pm_product_id)
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .where(pm_subtype_id: pm_subtype_id)
+        .select(
+          Sequel[:pm_boms][:id],
+          Sequel[:pm_boms][:bom_code]
+        ).map { |r| [r[:bom_code], r[:id]] }
+    end
+
+    def pm_bom_products(id)
+      DB[:pm_products]
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .join(:pm_types, id: :pm_type_id)
+        .join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
+        .join(:uoms, id: :uom_id)
+        .where(pm_bom_id: id)
+        .order(:product_code)
+        .select_map(%i[product_code pm_type_code subtype_code uom_code quantity])
+    end
   end
 end

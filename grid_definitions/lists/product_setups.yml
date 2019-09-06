@@ -1,0 +1,35 @@
+---
+:dataminer_definition: product_setups
+:actions:
+- :url: "/production/product_setups/product_setups/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/product_setups/product_setups/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
+- :url: "/production/product_setups/product_setups/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:conditions:
+  :standard:
+    - :col: product_setups.product_setup_template_id
+      :op: =
+      :val: $:product_setups.product_setup_template_id$
+  :active:
+    - :col: product_setups.active
+      :op: =
+      :val: $:product_setups.active$
+  :in_production:
+    - :col: product_setups.in_production
+      :op: =
+      :val: $:product_setups.in_production$

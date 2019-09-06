@@ -42,7 +42,13 @@ module MasterfilesApp
     end
 
     def find_customer_variety_variety(id)
-      hash = find_hash(:customer_variety_varieties, id)
+      # hash = find_hash(:customer_variety_varieties, id)
+      hash = find_with_association(:customer_variety_varieties,
+                                   id,
+                                   parent_tables: [{ parent_table: :marketing_varieties,
+                                                     columns: [:marketing_variety_code],
+                                                     foreign_key: :marketing_variety_id,
+                                                     flatten_columns: { marketing_variety_code: :marketing_variety_code } }])
       return nil if hash.nil?
 
       OpenStruct.new(hash)
@@ -105,6 +111,13 @@ module MasterfilesApp
         .select_map(:marketing_variety_code)
     end
 
+    def find_customer_variety_marketing_variety(customer_variety_variety_id)
+      DB[:marketing_varieties]
+        .join(:customer_variety_varieties, marketing_variety_id: :id)
+        .where(id: customer_variety_variety_id)
+        .select_map(:marketing_variety_code)
+    end
+
     def for_select_group_marketing_varieties(variety_as_customer_variety_id)
       cultivar_group_id = marketing_variety_cultivar_group(variety_as_customer_variety_id)
       DB[:marketing_varieties]
@@ -140,6 +153,18 @@ module MasterfilesApp
 
     def available_to_clone_packed_tm_groups(variety_as_customer_variety_id)
       packed_tm_groups - marketing_variety_packed_tm_groups(variety_as_customer_variety_id)
+    end
+
+    def for_select_customer_variety_marketing_varieties(packed_tm_group_id, variety_as_customer_variety_id)
+      DB[:marketing_varieties]
+        .join(:customer_variety_varieties, marketing_variety_id: :id)
+        .join(:customer_varieties, id: :customer_variety_id)
+        .where(packed_tm_group_id: packed_tm_group_id)
+        .where(variety_as_customer_variety_id: variety_as_customer_variety_id)
+        .select(
+          Sequel[:customer_variety_varieties][:id],
+          :marketing_variety_code
+        ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
   end
 end

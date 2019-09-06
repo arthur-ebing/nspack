@@ -1,0 +1,24 @@
+---
+:dataminer_definition: product_setup_templates
+:actions:
+- :url: "/production/product_setups/product_setup_templates/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/product_setups/product_setup_templates/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/product_setups/product_setup_templates/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/product_setups/product_setup_templates/new"
+  :text: New Product Setup Template
+  :style: :button
+  :behaviour: :popup

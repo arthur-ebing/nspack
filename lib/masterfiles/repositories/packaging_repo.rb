@@ -30,13 +30,13 @@ module MasterfilesApp
                           order_by: :description
 
     build_for_select :cartons_per_pallet,
-                     label: :description,
+                     label: :cartons_per_pallet,
                      value: :id,
-                     order_by: :description
+                     order_by: :cartons_per_pallet
     build_inactive_select :cartons_per_pallet,
-                          label: :description,
+                          label: :cartons_per_pallet,
                           value: :id,
-                          order_by: :description
+                          order_by: :cartons_per_pallet
 
     crud_calls_for :pallet_bases, name: :pallet_base, wrapper: PalletBase
     crud_calls_for :pallet_stack_types, name: :pallet_stack_type, wrapper: PalletStackType

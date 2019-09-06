@@ -1,0 +1,115 @@
+---
+:caption: Product Setups
+:sql: SELECT product_setups.id, product_setups.product_setup_template_id, fn_party_role_name(id)
+  AS product_setup_code, product_setups.active, fn_product_setup_in_production(id) AS in_production
+  FROM product_setups
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: product_setups.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_template_id:
+    :name: product_setup_template_id
+    :sequence_no: 2
+    :caption: Product setup template
+    :namespaced_name: product_setups.product_setup_template_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_code:
+    :name: product_setup_code
+    :sequence_no: 3
+    :caption: Product setup code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 500
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 4
+    :caption: Active
+    :namespaced_name: product_setups.active
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  in_production:
+    :name: in_production
+    :sequence_no: 5
+    :caption: In production
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: product_setups.product_setup_template_id
+  :caption: Template name
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT template_name, id FROM product_setup_templates ORDER BY template_name
+- :column: product_setups.active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: true, false
+- :column: product_setups.in_production
+  :caption: In Production?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: true, false
