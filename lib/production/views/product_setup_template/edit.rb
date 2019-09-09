@@ -12,20 +12,31 @@ module Production
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: '/list/product_setup_templates',
+                                  style: :back_button)
+            end
             page.form do |form|
               form.caption 'Edit Product Setup Template'
               form.action "/production/product_setups/product_setup_templates/#{id}"
               form.remote!
               form.method :update
-              form.add_field :template_name
-              form.add_field :description
-              form.add_field :cultivar_group_id
-              form.add_field :cultivar_id
-              form.add_field :packhouse_resource_id
-              form.add_field :production_line_resource_id
-              form.add_field :season_group_id
-              form.add_field :season_id
-              form.add_field :active
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :template_name
+                  col.add_field :description
+                  col.add_field :cultivar_group_id
+                  col.add_field :cultivar_id
+                end
+                row.column do |col|
+                  col.add_field :packhouse_resource_id
+                  col.add_field :production_line_resource_id
+                  col.add_field :season_group_id
+                  col.add_field :season_id
+                end
+              end
             end
 
             page.section do |section|

@@ -13,6 +13,6 @@ module ProductionApp
     required(:production_line_resource_id, :integer).maybe(:int?)
     required(:season_group_id, :integer).maybe(:int?)
     required(:season_id, :integer).maybe(:int?)
-    required(:active, :bool).maybe(:bool?)
+    # required(:active, :bool).maybe(:bool?)
   end
 end

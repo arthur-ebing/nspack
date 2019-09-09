@@ -28,7 +28,7 @@ module Production
               form.add_field :pallet_format_id
               form.add_field :cartons_per_pallet_id
               form.add_field :pm_bom_id
-              form.add_field :extended_columns
+              # form.add_field :extended_columns
               form.add_field :client_size_reference
               form.add_field :client_product_code
               form.add_field :treatment_ids

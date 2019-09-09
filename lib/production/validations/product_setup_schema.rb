@@ -27,6 +27,6 @@ module ProductionApp
     required(:marketing_order_number, Types::StrippedString).maybe(:str?)
     required(:sell_by_code, Types::StrippedString).maybe(:str?)
     required(:pallet_label_name, Types::StrippedString).maybe(:str?)
-    required(:active, :bool).maybe(:bool?)
+    # required(:active, :bool).maybe(:bool?)
   end
 end

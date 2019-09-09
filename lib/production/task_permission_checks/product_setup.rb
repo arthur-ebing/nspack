@@ -14,7 +14,9 @@ module ProductionApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check
+        delete: :delete_check,
+        activate: :activate_check,
+        deactivate: :deactivate_check
       }.freeze
 
       def call
@@ -42,6 +44,22 @@ module ProductionApp
         # return failed_response 'ProductSetup has been completed' if completed?
 
         all_ok
+      end
+
+      def activate_check
+        return failed_response 'Product Setup is already Active' if active?
+
+        all_ok
+      end
+
+      def deactivate_check
+        return failed_response 'Product Setup has already been de-activated' unless active?
+
+        all_ok
+      end
+
+      def active?
+        @entity.active
       end
     end
   end

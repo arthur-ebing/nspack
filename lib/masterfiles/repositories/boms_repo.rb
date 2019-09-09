@@ -118,12 +118,13 @@ module MasterfilesApp
       PmBomsProduct.new(hash)
     end
 
-    def for_select_pm_subtype_pm_boms(pm_subtype_id)
+    def for_select_pm_subtype_pm_boms(pm_subtype_id)  # rubocop:disable Metrics/AbcSize
       DB[:pm_boms]
         .join(:pm_boms_products, pm_bom_id: :id)
         .join(:pm_products, id: :pm_product_id)
         .join(:pm_subtypes, id: :pm_subtype_id)
         .where(pm_subtype_id: pm_subtype_id)
+        .distinct(Sequel[:pm_boms][:id])
         .select(
           Sequel[:pm_boms][:id],
           Sequel[:pm_boms][:bom_code]

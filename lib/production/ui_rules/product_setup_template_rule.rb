@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ProductSetupTemplateRule < Base # rubocop:disable ClassLength
+  class ProductSetupTemplateRule < Base
     def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
@@ -10,7 +10,6 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
-      set_edit_fields if @mode == :edit
 
       add_behaviours if %i[new edit].include? @mode
 
@@ -77,10 +76,6 @@ module UiRules
                      searchable: true,
                      remove_search_for_small_list: false }
       }
-    end
-
-    def set_edit_fields
-      fields[:active] = { renderer: :checkbox }
     end
 
     def make_form_object

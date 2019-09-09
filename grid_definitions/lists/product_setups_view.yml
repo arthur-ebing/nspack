@@ -1,0 +1,15 @@
+---
+:dataminer_definition: product_setups
+:conditions:
+  :standard:
+    - :col: product_setups.product_setup_template_id
+      :op: =
+      :val: $:product_setups.product_setup_template_id$
+  :active:
+    - :col: product_setups.active
+      :op: =
+      :val: $:product_setups.active$
+  :in_production:
+    - :col: product_setups.in_production
+      :op: =
+      :val: $:product_setups.in_production$

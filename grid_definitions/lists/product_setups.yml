@@ -20,6 +20,24 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: "/production/product_setups/product_setups/$:id$/activate"
+  :text: Activate
+  :icon: check-square
+  :prompt: 'Are you sure you want to Activate this Product Setup?'
+  :hide_if_true: active
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
+- :url: "/production/product_setups/product_setups/$:id$/deactivate"
+  :text: De-activate
+  :icon: close-outline
+  :prompt: 'Are you sure you want to De-activate this Product Setup?'
+  :hide_if_false: active
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
 :conditions:
   :standard:
     - :col: product_setups.product_setup_template_id

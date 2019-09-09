@@ -15,7 +15,21 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { Production::ProductSetups::ProductSetupTemplate::Edit.call(id) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id) }
+      end
+
+      r.on 'activate' do
+        check_auth!('product_setups', 'edit')
+        interactor.assert_permission!(:activate, id)
+        interactor.activate_product_setup_template(id)
+        redirect_to_last_grid(r)
+      end
+
+      r.on 'deactivate' do
+        check_auth!('product_setups', 'edit')
+        interactor.assert_permission!(:deactivate, id)
+        interactor.deactivate_product_setup_template(id)
+        redirect_to_last_grid(r)
       end
 
       r.on 'product_setups' do # rubocop:disable Metrics/BlockLength
@@ -38,20 +52,28 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.on 'basic_pack_code_changed' do
-          basic_pack_code_id = params[:changed_value]
           std_fruit_size_count_id = params[:product_setup_std_fruit_size_count_id]
-          actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          if std_fruit_size_count_id.blank? || params[:changed_value].blank?
+            actual_counts = []
+          else
+            basic_pack_code_id = params[:changed_value]
+            actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_fruit_actual_counts_for_pack_id',
                                        options_array: actual_counts)])
         end
 
         r.on 'actual_count_changed' do
-          fruit_actual_counts_for_pack_id = params[:changed_value]
-          # fruit_actual_counts_for_pack_id = params[:product_setup_fruit_actual_counts_for_pack_id]
-          actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
-          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
-          size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
+          if params[:changed_value].blank?
+            standard_pack_codes = []
+            size_references = []
+          else
+            fruit_actual_counts_for_pack_id = params[:changed_value]
+            actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
+            standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
+            size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
+          end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_standard_pack_code_id',
                                        options_array: standard_pack_codes),
@@ -61,9 +83,13 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.on 'packed_tm_group_changed' do
-          packed_tm_group_id = params[:changed_value]
-          marketing_variety_id = params[:product_setup_marketing_variety_id]
-          customer_variety_varieties = interactor.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+          if params[:changed_value].blank?
+            customer_variety_varieties = []
+          else
+            packed_tm_group_id = params[:changed_value]
+            marketing_variety_id = params[:product_setup_marketing_variety_id]
+            customer_variety_varieties = interactor.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+          end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_customer_variety_variety_id',
                                        options_array: customer_variety_varieties)])
@@ -71,41 +97,60 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.on 'pallet_stack_type_changed' do
           pallet_base_id = params[:product_setup_pallet_base_id]
-          pallet_stack_type_id = params[:changed_value]
-          pallet_formats = interactor.for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
+          if pallet_base_id.blank? || params[:changed_value].blank?
+            pallet_formats = []
+          else
+            pallet_stack_type_id = params[:changed_value]
+            pallet_formats = interactor.for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
+          end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_pallet_format_id',
                                        options_array: pallet_formats)])
         end
 
         r.on 'pallet_format_changed' do
-          pallet_format_id = params[:product_setup_pallet_format_id]
           basic_pack_code_id = params[:product_setup_basic_pack_code_id]
-          cartons_per_pallets = interactor.for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
+          if basic_pack_code_id.blank? || params[:changed_value].blank?
+            cartons_per_pallets = []
+          else
+            pallet_format_id = params[:changed_value]
+            cartons_per_pallets = interactor.for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
+          end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_cartons_per_pallet_id',
                                        options_array: cartons_per_pallets)])
         end
 
         r.on 'pm_type_changed' do
-          pm_subtypes = interactor.for_select_pm_type_pm_subtypes(params[:changed_value])
+          pm_subtypes = if params[:changed_value].blank?
+                          []
+                        else
+                          interactor.for_select_pm_type_pm_subtypes(params[:changed_value])
+                        end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_pm_subtype_id',
                                        options_array: pm_subtypes)])
         end
 
         r.on 'pm_subtype_changed' do
-          pm_subtype_id = params[:product_setup_pm_subtype_id]
-          pm_boms = interactor.for_select_pm_subtype_pm_boms(pm_subtype_id)
+          pm_boms = if params[:changed_value].blank?
+                      []
+                    else
+                      interactor.for_select_pm_subtype_pm_boms(params[:changed_value])
+                    end
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'product_setup_pm_bom_id',
                                        options_array: pm_boms)])
         end
 
         r.on 'pm_bom_changed' do
-          pm_bom_id = params[:product_setup_pm_bom_id]
-          pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
-          pm_bom_products = interactor.pm_bom_products(pm_bom_id)
+          if params[:changed_value].blank?
+            pm_bom_products = []
+          else
+            pm_bom_id = params[:changed_value]
+            pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
+            pm_bom_products = interactor.pm_bom_products(pm_bom_id)
+          end
           json_actions([OpenStruct.new(type: :replace_input_value,
                                        dom_id: 'product_setup_description',
                                        value: pm_bom.description),
@@ -118,7 +163,11 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.on 'treatment_type_changed' do
-          treatments = interactor.for_select_treatment_type_treatments(params[:changed_value])
+          treatments = if params[:changed_value].blank?
+                         []
+                       else
+                         interactor.for_select_treatment_type_treatments(params[:changed_value])
+                       end
           json_actions([OpenStruct.new(type: :replace_multi_options,
                                        dom_id: 'product_setup_treatment_ids',
                                        options_array: treatments)])
@@ -153,7 +202,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('product_setups', 'read')
-          show_partial { Production::ProductSetups::ProductSetupTemplate::Show.call(id) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_product_setup_template(id, params[:product_setup_template])
@@ -250,6 +299,20 @@ class Nspack < Roda # rubocop:disable ClassLength
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial { Production::ProductSetups::ProductSetup::Edit.call(id) }
+      end
+
+      r.on 'activate' do
+        check_auth!('product_setups', 'edit')
+        interactor.assert_permission!(:activate, id)
+        interactor.activate_product_setup(id)
+        redirect_to_last_grid(r)
+      end
+
+      r.on 'deactivate' do
+        check_auth!('product_setups', 'edit')
+        interactor.assert_permission!(:deactivate, id)
+        interactor.deactivate_product_setup(id)
+        redirect_to_last_grid(r)
       end
 
       r.is do # rubocop:disable Metrics/BlockLength

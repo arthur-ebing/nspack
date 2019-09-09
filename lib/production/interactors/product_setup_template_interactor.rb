@@ -58,11 +58,37 @@ module ProductionApp
     end
 
     def for_select_packhouse_lines(packhouse_id)
-      ProductionApp::ResourceRepo.new.for_select_packhouse_lines(packhouse_id)
+      ProductionApp::ProductSetupRepo.new.for_select_packhouse_lines(packhouse_id)
     end
 
     def for_select_season_group_seasons(season_group_id)
       MasterfilesApp::CalendarRepo.new.for_select_seasons(where: { season_group_id: season_group_id })
+    end
+
+    def activate_product_setup_template(id)
+      repo.transaction do
+        repo.activate_product_setup_template(id)
+        log_status('product_setup_templates', id, 'ACTIVATED')
+        log_transaction
+      end
+      instance = product_setup_template(id)
+      success_response("Activated product setup template #{instance.template_name}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def deactivate_product_setup_template(id)
+      repo.transaction do
+        repo.deactivate_product_setup_template(id)
+        log_status('product_setup_templates', id, 'DEACTIVATED')
+        log_transaction
+      end
+      instance = product_setup_template(id)
+      success_response("De-activated product setup template #{instance.template_name}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private

@@ -56,10 +56,10 @@ module Production
                 fold.add_field :erp_bom_code
                 fold.add_field :pm_boms_products
               end
-              form.fold_up do |fold|
-                fold.caption 'Custom fields'
-                fold.add_field :extended_columns
-              end
+              # form.fold_up do |fold|
+              #   fold.caption 'Custom fields'
+              #   fold.add_field :extended_columns
+              # end
               form.fold_up do |fold|
                 fold.caption 'Treatment Details'
                 fold.add_field :treatment_type_id

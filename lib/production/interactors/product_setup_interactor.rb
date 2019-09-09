@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductSetupInteractor < BaseInteractor
+  class ProductSetupInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -102,6 +102,32 @@ module ProductionApp
 
     def for_select_treatment_type_treatments(treatment_type_id)
       MasterfilesApp::FruitRepo.new.for_select_treatments(where: { treatment_type_id: treatment_type_id })
+    end
+
+    def activate_product_setup(id)
+      repo.transaction do
+        repo.activate_product_setup(id)
+        log_status('product_setups', id, 'ACTIVATED')
+        log_transaction
+      end
+      instance = product_setup(id)
+      success_response("Activated product setup #{instance.id}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def deactivate_product_setup(id)
+      repo.transaction do
+        repo.deactivate_product_setup(id)
+        log_status('product_setups', id, 'DEACTIVATED')
+        log_transaction
+      end
+      instance = product_setup(id)
+      success_response("De-activated product setup  #{instance.id}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private

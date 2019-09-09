@@ -10,7 +10,6 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
-      set_edit_fields if @mode == :edit
 
       add_behaviours if %i[new edit].include? @mode
 
@@ -63,6 +62,7 @@ module UiRules
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
+      commodity_id = @repo.commodity_id(cultivar_group_id)
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
@@ -74,7 +74,7 @@ module UiRules
                         searchable: true,
                         remove_search_for_small_list: false },
         marketing_variety_id: { renderer: :select,
-                                options: @repo.for_select_template_cultivar_marketing_varieties(cultivar_group_id),
+                                options: @repo.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id),
                                 disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
                                 caption: 'Marketing Variety',
                                 required: true,
@@ -127,7 +127,7 @@ module UiRules
                     searchable: true,
                     remove_search_for_small_list: false },
         marketing_org_party_role_id: { renderer: :select,
-                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles('MARKETING_ORG'),
+                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles('MARKETER'),
                                        caption: 'Marketing Org.',
                                        required: true,
                                        prompt: 'Select Marketing Org.',
@@ -236,10 +236,6 @@ module UiRules
       }
     end
 
-    def set_edit_fields
-      fields[:active] = { renderer: :checkbox }
-    end
-
     def make_form_object
       if @mode == :new
         make_new_form_object
@@ -281,15 +277,14 @@ module UiRules
     private
 
     def add_behaviours  # rubocop:disable Metrics/AbcSize
-      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
+      behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/commodity_changed" }]
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/basic_pack_code_changed",
                                              param_keys: %i[product_setup_std_fruit_size_count_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/actual_count_changed",
-                                             param_keys: %i[product_setup_fruit_actual_counts_for_pack_id] }]
+                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/actual_count_changed" }]
         behaviour.dropdown_change :packed_tm_group_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/packed_tm_group_changed",
                                              param_keys: %i[product_setup_marketing_variety_id] }]
@@ -298,15 +293,13 @@ module UiRules
                                              param_keys: %i[product_setup_pallet_base_id] }]
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pallet_format_changed",
-                                             param_keys: %i[product_setup_pallet_format_id product_setup_basic_pack_code_id] }]
+                                             param_keys: %i[product_setup_basic_pack_code_id] }]
         behaviour.dropdown_change :pm_type_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_type_changed" }]
         behaviour.dropdown_change :pm_subtype_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_subtype_changed",
-                                             param_keys: %i[product_setup_pm_subtype_id] }]
+                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_subtype_changed" }]
         behaviour.dropdown_change :pm_bom_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_bom_changed",
-                                             param_keys: %i[product_setup_pm_bom_id] }]
+                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_bom_changed" }]
         behaviour.dropdown_change :treatment_type_id,
                                   notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/treatment_type_changed" }]
       end
