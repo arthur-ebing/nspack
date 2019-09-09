@@ -33,8 +33,12 @@ class Nspack < Roda
   plugin :content_for, append: true
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
-  plugin :csrf, raise: true, skip_if: ->(req) { ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? { |path| req.path == path } } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+  plugin :csrf, raise: true,
+                csrf_header: 'X-CSRF-Token',
+                skip_if: ->(req) { ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? { |path| req.path == path } } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
   plugin :json_parser
+  plugin :message_bus
+  plugin :status_handler
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
@@ -363,6 +367,11 @@ class Nspack < Roda
       view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
     end
 
+    r.on 'terminus' do
+      r.message_bus
+      # view(inline: 'Maybe we show all unattended messages for a user here')
+    end
+
     # - :url: "/list/users/multi?key=program_users&id=$:id$/"
 
     # In-page grids (no last grid_url)
@@ -376,6 +385,10 @@ class Nspack < Roda
       # open users yml & apply user_id param
       #
     end
+  end
+
+  status_handler(404) do
+    view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
   end
 end
 # rubocop:enable Metrics/ClassLength
