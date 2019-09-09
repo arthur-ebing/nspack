@@ -35,6 +35,7 @@ module UiRules
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
+      cultivar_group_id = @repo.find_product_setup_template(@options[:id])&.cultivar_group_id || @repo.cultivar_group_id
       {
         template_name: { required: true },
         description: {},
@@ -45,7 +46,7 @@ module UiRules
                              required: true,
                              searchable: true,
                              remove_search_for_small_list: false },
-        cultivar_id: { renderer: :select, options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
+        cultivar_id: { renderer: :select, options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: cultivar_group_id }),
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                        caption: 'Cultivar',
                        prompt: 'Select Cultivar',

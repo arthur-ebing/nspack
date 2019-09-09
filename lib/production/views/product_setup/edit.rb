@@ -5,7 +5,7 @@ module Production
     module ProductSetup
       class Edit
         def self.call(id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:product_setups, :edit, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:product_setup, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength

@@ -31,6 +31,7 @@ class AppConst
   # ROLE_CUSTOMER = 'CUSTOMER'
   # ROLE_SUPPLIER = 'SUPPLIER'
   # ROLE_TRANSPORTER = 'TRANSPORTER'
+  ROLE_MARKETER = 'MARKETER'
 
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [].freeze

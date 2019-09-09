@@ -245,12 +245,20 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'packhouse_resource_changed' do
-        packhouse_resource_lines = interactor.for_select_packhouse_lines(params[:changed_value])
+        packhouse_resource_lines = if params[:changed_value].blank?
+                                     []
+                                   else
+                                     interactor.for_select_packhouse_lines(params[:changed_value])
+                                   end
         json_replace_select_options('product_setup_template_production_line_resource_id', packhouse_resource_lines)
       end
 
       r.on 'season_group_changed' do
-        seasons = interactor.for_select_season_group_seasons(params[:changed_value])
+        seasons = if params[:changed_value].blank?
+                    []
+                  else
+                    interactor.for_select_season_group_seasons(params[:changed_value])
+                  end
         json_replace_select_options('product_setup_template_season_id', seasons)
       end
 

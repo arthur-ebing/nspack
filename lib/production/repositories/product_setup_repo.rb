@@ -86,22 +86,28 @@ module ProductionApp
         .join(:cultivar_groups, id: :cultivar_group_id)
         .left_join(:product_setup_templates, cultivar_id: :id)
         .where(Sequel[:cultivars][:cultivar_group_id] => cultivar_group_id)
-        .distinct(Sequel[:commodities][:id])
+        .distinct(Sequel[:commodities][:code])
         .select(
           Sequel[:commodities][:id],
           Sequel[:commodities][:code]
-        ).map { |r| [r[:code], r[:id]] }
+        )
+        .order(:code)
+        .map { |r| [r[:code], r[:id]] }
     end
 
-    def commodity_id(cultivar_group_id)
+    def commodity_id(cultivar_group_id)  # rubocop:disable Metrics/AbcSize
       DB[:commodities]
         .join(:cultivars, commodity_id: :id)
         .join(:cultivar_groups, id: :cultivar_group_id)
         .left_join(:product_setup_templates, cultivar_id: :id)
         .where(Sequel[:cultivars][:cultivar_group_id] => cultivar_group_id)
+        .distinct(Sequel[:commodities][:code])
         .select(
-          Sequel[:commodities][:id]
-        ).first[:id]
+          Sequel[:commodities][:id],
+          Sequel[:commodities][:code]
+        )
+        .order(:code)
+        .first[:id]
     end
 
     def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id)  # rubocop:disable Metrics/AbcSize
@@ -161,6 +167,16 @@ module ProductionApp
 
     def deactivate_product_setup(id)
       deactivate(:product_setups, id)
+    end
+
+    def cultivar_group_id
+      DB[:cultivar_groups]
+        .select(
+          Sequel[:cultivar_groups][:id],
+          Sequel[:cultivar_groups][:cultivar_group_code]
+        )
+        .order(:cultivar_group_code)
+        .first[:id]
     end
   end
 end

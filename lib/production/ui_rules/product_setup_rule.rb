@@ -62,7 +62,7 @@ module UiRules
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
-      commodity_id = @repo.commodity_id(cultivar_group_id)
+      commodity_id = @options[:commodity_id] || @repo.commodity_id(cultivar_group_id)
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
@@ -127,7 +127,7 @@ module UiRules
                     searchable: true,
                     remove_search_for_small_list: false },
         marketing_org_party_role_id: { renderer: :select,
-                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles('MARKETER'),
+                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
                                        caption: 'Marketing Org.',
                                        required: true,
                                        prompt: 'Select Marketing Org.',

@@ -21,12 +21,12 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_product_setup_template(id, params) # rubocop:disable Metrics/AbcSize
+    def update_product_setup_template(id, params)
       res = validate_product_setup_template_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        repo.update_product_setup_template(id, res.to_h)
+        repo.update_product_setup_template(id, res)
         log_transaction
       end
       instance = product_setup_template(id)

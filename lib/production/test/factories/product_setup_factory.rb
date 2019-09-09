@@ -32,7 +32,7 @@ module ProductionApp
       standard_pack_code_id = create_standard_pack_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       fruit_size_reference_id = create_fruit_size_reference
-      party_role_id = create_party_role('O', 'MARKETER')[:id]
+      party_role_id = create_party_role('O', AppConst::ROLE_MARKETER)[:id]
       mark_id = create_mark
       inventory_code_id = create_inventory_code
       pallet_format_id = create_pallet_format
