@@ -502,3 +502,56 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Marketing'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Masterfiles')),
          'Search Customer Variety Marketing Varieties', '/search/customer_variety_varieties', 4);
+
+-- LIST menu item
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Farms'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Masterfiles')),
+         'Rmt_container_types', '/list/rmt_container_types', 2);
+
+-- LIST menu item
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Farms'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Masterfiles')),
+         'Rmt_container_material_types', '/list/rmt_container_material_types', 2);
+
+
+
+-- NEW functional area
+INSERT INTO functional_areas (functional_area_name) VALUES ('Raw Materials');
+
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Deliveries', 1, (SELECT id FROM functional_areas
+                                              WHERE functional_area_name = 'Raw Materials'));
+
+INSERT INTO programs_webapps(program_id, webapp) VALUES (
+      (SELECT id FROM programs
+       WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+       'Nspack');
+
+-- NEW menu item
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+         'New Delivery', '/raw_materials/deliveries/rmt_deliveries/new', 1);
+
+
+-- LIST menu item
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+         'Deliveries', '/list/rmt_deliveries', 2);
+
+-- SEARCH menu item
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+         'Search Deliveries', '/search/rmt_deliveries', 2);

@@ -8,6 +8,16 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { LOGFULLMESSERVERCALLS: 'Dev mode: Log full payload of HTTP calls to MesServer. Only do this if debugging.' },
     { RUN_FOR_RMD: 'Dev mode: Force the server to act as if it is being called from a Registered Mobile Device' },
     { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' },
+    { DEFAULT_FARM: 'Many pack houses will receive fruit from only one farm. System should therefore allow for a default value.' },
+    { CAPTURE_INNER_BINS: 'qty_inner_bins only applicable to certain clients.' },
+    { CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION: 'In future, Some packhouse may want to integrate a physical scale so that weights can be obtained directly from the scale.' },
+    { CAPTURE_CONTAINER_MATERIAL: 'rmt_container_material_type not applicable to all clients.' },
+    { CAPTURE_CONTAINER_MATERIAL_OWNER: 'rmt_container_material_owner not applicable to all clients.' },
+    { USE_DELIVERY_DESTINATION: 'not applicable to many clients.' },
+    { CAPTURE_DAMAGED_BINS: 'not applicable to many clients.' },
+    { CAPTURE_EMPTY_BINS: 'not applicable to many clients.' },
+    { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'optional, not applicable to many clients.' },
+    { SCAN_RMT_BIN_ASSET_NUMBERS: 'Capture deliveries with permanently barcoded bins.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' }
   ].freeze
 
@@ -22,6 +32,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DATABASE_URL: 'Database connection string in the format "postgres://USER:PASSS@HOST:PORT/DATABASE_NAME".' },
     { IMPLEMENTATION_OWNER: 'The name of the implementation client.' },
     { SHARED_CONFIG_HOST_PORT: 'IP address of shared_config in the format HOST:PORT' },
+    { DEFAULT_RMT_CONTAINER_TYPE: 'This should be set behind the scenes, since it will almost always be the same thing, e.g. ‘bins’, for a given packhouse.' },
     { CHRUBY_STRING: 'The version of chruby used in development. Used in Rake tasks.' }
   ].freeze
 

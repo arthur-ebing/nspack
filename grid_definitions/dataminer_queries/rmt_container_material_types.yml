@@ -3,7 +3,7 @@
 :sql: SELECT "rmt_container_material_types"."id", "rmt_container_material_types"."rmt_container_type_id",
   "rmt_container_material_types"."container_material_type_code", "rmt_container_material_types"."description",
   "rmt_container_material_types"."active", "rmt_container_material_types"."created_at",
-  "rmt_container_material_types"."updated_at", "rmt_container_types"."container_type_code",
+  "rmt_container_material_types"."updated_at", "rmt_container_types"."container_type_code","rmt_container_material_types"."tare_weight",
   fn_current_status('rmt_container_material_types', "rmt_container_material_types"."id")
   AS status FROM "rmt_container_material_types" JOIN "rmt_container_types" ON "rmt_container_types"."id"
   = "rmt_container_material_types"."rmt_container_type_id"

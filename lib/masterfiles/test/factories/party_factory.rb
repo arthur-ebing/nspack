@@ -59,9 +59,12 @@ module MasterfilesApp
       }
     end
 
-    def create_party_role(party_type = 'O', role = nil, opts = {})
+    def create_party_role(party_type = 'O', role = nil, opts = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       party_id = create_party(party_type: party_type)
-      role_id = opts[:role_id] || role ? create_role(name: role)[:id] : create_role[:id]
+      # role_id = opts[:role_id] || role ? create_role(name: role)[:id] : create_role[:id]
+      role_id = opts[:role_id] if opts[:role_id]
+      role_id = DB[:roles].where(name: role).get(:id) || create_role(name: role)[:id] if role_id.nil? && role # opts[:role_id] || role ? create_role(name: role)[:id] : create_role[:id]
+      role_id = create_role[:id] if role_id.nil?
       default = {
         party_id: party_id,
         role_id: role_id,

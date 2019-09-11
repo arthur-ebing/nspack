@@ -1,0 +1,13 @@
+---
+:dataminer_definition: rmt_bins
+:actions:
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:conditions:
+  :standard:
+    - :col: rmt_bins.rmt_delivery_id
+      :op: =
+      :val: $:rmt_bins.delivery_id$
