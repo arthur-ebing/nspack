@@ -14,7 +14,11 @@ module MasterfilesApp
     crud_calls_for :rmt_container_material_types, name: :rmt_container_material_type, wrapper: RmtContainerMaterialType
 
     def for_select_party_roles
-      DB[:party_roles].select(:id, Sequel.function(:fn_rmt_container_owners, :id)).map { |r| [r[:fn_rmt_container_owners], r[:id]] }
+      DB["SELECT pr.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS party_name
+      FROM party_roles pr
+      LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
+      LEFT OUTER JOIN people p ON p.id = pr.person_id
+      LEFT OUTER JOIN roles r ON r.id = pr.role_id"].map { |o| [o[:party_name], o[:id]] }
     end
 
     def find_rmt_container_material_type(id)
@@ -27,12 +31,23 @@ module MasterfilesApp
     end
 
     def party_role_ids(rmt_container_material_type_id)
-      DB[:party_roles].where(id: DB[:rmt_container_material_owners].where(rmt_container_material_type_id: rmt_container_material_type_id).select(:rmt_material_owner_party_role_id)).select(:id, Sequel.function(:fn_rmt_container_owners, :id)).map { |r| r[:id] }
+      DB["SELECT pr.id
+                FROM rmt_container_material_owners co
+                JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
+                LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
+                LEFT OUTER JOIN people p ON p.id = pr.person_id
+                LEFT OUTER JOIN roles r ON r.id = pr.role_id
+                WHERE co.rmt_container_material_type_id = ?", rmt_container_material_type_id].map { |o| o[:id] }
     end
 
     def container_material_owners(rmt_container_material_type_id)
-      # DB[:organizations].where(id: DB[:party_roles].where(id: DB[:rmt_container_material_owners].where(rmt_container_material_type_id: rmt_container_material_type_id).select(:rmt_material_owner_party_role_id)).select(:organization_id)).map { |r| r[:short_description] }
-      DB[:party_roles].where(id: DB[:rmt_container_material_owners].where(rmt_container_material_type_id: rmt_container_material_type_id).select(:rmt_material_owner_party_role_id)).select(:id, Sequel.function(:fn_rmt_container_owners, :id)).map { |r| r[:fn_rmt_container_owners] }
+      DB["SELECT co.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
+          FROM rmt_container_material_owners co
+          JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
+          LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
+          LEFT OUTER JOIN people p ON p.id = pr.person_id
+          LEFT OUTER JOIN roles r ON r.id = pr.role_id
+          WHERE co.rmt_container_material_type_id = ?", rmt_container_material_type_id].map { |r| r[:container_material_owner] }
     end
 
     def get_current_rmt_material_container_owners(rmt_container_material_type_id)
