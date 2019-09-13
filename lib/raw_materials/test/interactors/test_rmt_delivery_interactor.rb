@@ -6,6 +6,10 @@ module RawMaterialsApp
   class TestRmtDeliveryInteractor < MiniTestWithHooks
     include RmtDeliveryFactory
     include MasterfilesApp::PartyFactory
+    include MasterfilesApp::CommodityFactory
+    include MasterfilesApp::CultivarFactory
+    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::CalendarFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -79,7 +83,7 @@ module RawMaterialsApp
       cultivar_id = create_cultivar
       rmt_delivery_destination_id = create_rmt_delivery_destination
       season_id = create_season
-      farm_id = create_farm
+      farm_id = create_farm[:id]
       puc_id = create_puc
 
       {

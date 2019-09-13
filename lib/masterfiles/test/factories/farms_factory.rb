@@ -4,7 +4,7 @@ module MasterfilesApp
   module FarmsFactory
     def create_production_region(opts = {})
       default = {
-        production_region_code: Faker::Lorem.word,
+        production_region_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true
       }

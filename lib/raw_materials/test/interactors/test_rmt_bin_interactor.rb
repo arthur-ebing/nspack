@@ -6,6 +6,12 @@ module RawMaterialsApp
   class TestRmtBinInteractor < MiniTestWithHooks
     include RmtBinFactory
     include MasterfilesApp::PartyFactory
+    include MasterfilesApp::CommodityFactory
+    include MasterfilesApp::CultivarFactory
+    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::CalendarFactory
+    include MasterfilesApp::RmtContainerMaterialTypeFactory
+    include RawMaterialsApp::RmtDeliveryFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -75,7 +81,7 @@ module RawMaterialsApp
       season_id = create_season
       cultivar_id = create_cultivar
       orchard_id = create_orchard
-      farm_id = create_farm
+      farm_id = create_farm[:id]
       rmt_class_id = create_rmt_class
       rmt_container_material_owner_id = create_rmt_container_material_owner
       rmt_container_type_id = create_rmt_container_type
