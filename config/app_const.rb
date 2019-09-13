@@ -33,6 +33,12 @@ class AppConst
   # ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_MARKETER = 'MARKETER'
 
+  # Target Market Type: 'PACKED'
+  PACKED_TM_GROUP = 'PACKED'
+
+  # Product Setup default marketing organization
+  DEFAULT_MARKETING_ORG = ENV['DEFAULT_MARKETING_ORG']
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [].freeze
 
