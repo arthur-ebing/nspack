@@ -241,7 +241,8 @@ class Nspack < Roda # rubocop:disable ClassLength
       interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'commodity_changed' do
         commodity_id = params[:changed_value]
-        marketing_varieties = interactor.for_select_template_commodity_marketing_varieties(id, commodity_id)
+        product_setup_template_id = params[:product_setup_product_setup_template_id]
+        marketing_varieties = interactor.for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id)
         size_counts = interactor.for_select_template_commodity_size_counts(commodity_id)
         requires_standard_counts = MasterfilesApp::CommodityRepo.new.find_commodity(commodity_id).requires_standard_counts
         json_actions([OpenStruct.new(type: :replace_select_options,
@@ -354,7 +355,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         else
           pm_bom_id = params[:changed_value]
           pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
-          pm_bom_products = interactor.pm_bom_products(pm_bom_id)
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id)
         end
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',

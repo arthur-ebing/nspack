@@ -317,7 +317,8 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/commodity_changed' }]
+                                  notify: [{ url: '/production/product_setups/product_setups/commodity_changed',
+                                             param_keys: %i[product_setup_product_setup_template_id] }]
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: '/production/product_setups/product_setups/basic_pack_code_changed',
                                              param_keys: %i[product_setup_std_fruit_size_count_id] }]

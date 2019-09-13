@@ -106,8 +106,8 @@ module ProductionApp
       MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(pm_subtype_id)
     end
 
-    def pm_bom_products(pm_bom_id)
-      MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id)
+    def pm_bom_products_table(pm_bom_id)
+      Crossbeams::Layout::Table.new([], MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id), []).render
     end
 
     def for_select_treatment_type_treatments(treatment_type_id)
