@@ -1,14 +1,14 @@
 ---
 :caption: Labels
-:sql: "SELECT id, label_name, fn_current_status('labels', id) AS status, label_dimension,
-  px_per_mm, completed,\r\napproved, multi_label, variable_set,\r\n
-  (SELECT string_agg(label_name,
-  '; ')\r\n        FROM (SELECT l.label_name FROM multi_labels m\r\n              JOIN
-  labels l ON l.id = m.sub_label_id\r\n              WHERE m.label_id = labels.id
-  ORDER BY m.print_sequence) subq) AS sub_labels,\r\n       created_at, created_by,
-  updated_at, updated_by,\r\n       EXISTS(SELECT label_id FROM multi_labels WHERE
-  sub_label_id = labels.id) AS part_of_multi_label, active\r\n  FROM labels\r\n ORDER
-  BY label_name, id;\r\n\r\n  "
+:sql: "SELECT id, label_name, fn_current_status('labels', id) AS status, extended_columns
+  ->> 'label_type' AS label_type,\r\nlabel_dimension, px_per_mm, completed,\r\napproved,
+  multi_label, variable_set,\r\n (SELECT string_agg(label_name, '; ')\r\n        FROM
+  (SELECT l.label_name FROM multi_labels m\r\n              JOIN labels l ON l.id
+  = m.sub_label_id\r\n              WHERE m.label_id = labels.id ORDER BY m.print_sequence)
+  subq) AS sub_labels,\r\n       created_at, created_by, updated_at, updated_by,\r\n
+  \      EXISTS(SELECT label_id FROM multi_labels WHERE sub_label_id = labels.id)
+  AS part_of_multi_label, active\r\n  FROM labels\r\n ORDER BY label_name, id;\r\n\r\n
+  \ "
 :limit: 
 :offset: 
 :external_settings: {}
@@ -56,6 +56,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  label_type:
+    :name: label_type
+    :sequence_no: 4
+    :caption: Label type
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -127,7 +143,7 @@
     :group_max: false
   multi_label:
     :name: multi_label
-    :sequence_no: 4
+    :sequence_no: 9
     :caption: Multi?
     :namespaced_name: multi_label
     :data_type: :boolean
@@ -143,7 +159,7 @@
     :group_max: false
   variable_set:
     :name: variable_set
-    :sequence_no: 15
+    :sequence_no: 10
     :caption: Variable set
     :namespaced_name: variable_set
     :data_type: :string
@@ -159,7 +175,7 @@
     :group_max: false
   sub_labels:
     :name: sub_labels
-    :sequence_no: 16
+    :sequence_no: 11
     :caption: Sub labels
     :namespaced_name: 
     :data_type: :string
@@ -175,7 +191,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 17
+    :sequence_no: 12
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
@@ -191,7 +207,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 18
+    :sequence_no: 13
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -207,7 +223,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 19
+    :sequence_no: 14
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :datetime
@@ -223,7 +239,7 @@
     :group_max: false
   updated_by:
     :name: updated_by
-    :sequence_no: 20
+    :sequence_no: 15
     :caption: Updated by
     :namespaced_name: updated_by
     :data_type: :string
@@ -239,7 +255,7 @@
     :group_max: false
   part_of_multi_label:
     :name: part_of_multi_label
-    :sequence_no: 21
+    :sequence_no: 16
     :caption: Part of multi label
     :namespaced_name: 
     :data_type: :boolean
@@ -255,7 +271,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 22
+    :sequence_no: 17
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean

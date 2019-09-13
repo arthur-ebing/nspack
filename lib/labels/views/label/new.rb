@@ -19,17 +19,8 @@ module Labels
               form.add_field :label_dimension
               form.add_field :px_per_mm
               form.add_field :variable_set
-              # form.add_field :container_type
-              # form.add_field :commodity
-              # form.add_field :market
-              # form.add_field :language
-              # form.add_field :category
-              # form.add_field :sub_category
               form.add_field :multi_label
-              form.fold_up do |fold|
-                fold.caption 'Extended attributes'
-                Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, fold)
-              end
+              Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, form)
             end
           end
 

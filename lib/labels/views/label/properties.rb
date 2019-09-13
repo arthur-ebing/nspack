@@ -4,7 +4,7 @@ module Labels
   module Labels
     module Label
       class Properties
-        def self.call(id, form_values = nil, form_errors = nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values = nil, form_errors = nil)
           ui_rule = UiRules::Compiler.new(:label, :properties, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -17,17 +17,8 @@ module Labels
               form.remote!
               form.method :update
               form.add_field :label_name
-              # form.add_field :container_type
-              # form.add_field :commodity
-              # form.add_field :market
-              # form.add_field :language
-              # form.add_field :category
-              # form.add_field :sub_category
               form.add_field :variable_set
-              form.fold_up do |fold|
-                fold.caption 'Extended attributes'
-                Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, fold)
-              end
+              Crossbeams::Config::ExtendedColumnDefinitions.extended_columns_for_view(:labels, form)
             end
           end
 
