@@ -14,7 +14,7 @@ module RawMaterialsApp
       rmt_class_id = create_rmt_class
       rmt_container_material_owner_id = create_rmt_container_material_owner
       season_id = create_season
-      farm_id = create_farm[:id]
+      farm_id = create_farm
       puc_id = create_puc
       orchard_id = create_orchard
       cultivar_id = create_cultivar

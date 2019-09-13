@@ -83,7 +83,7 @@ module RawMaterialsApp
       cultivar_id = create_cultivar
       rmt_delivery_destination_id = create_rmt_delivery_destination
       season_id = create_season
-      farm_id = create_farm[:id]
+      farm_id = create_farm
       puc_id = create_puc
 
       {

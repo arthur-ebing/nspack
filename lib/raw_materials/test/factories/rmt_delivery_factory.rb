@@ -9,12 +9,12 @@
 
 module RawMaterialsApp
   module RmtDeliveryFactory
-    def create_rmt_delivery(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_rmt_delivery(opts = {})
       orchard_id = create_orchard
       cultivar_id = create_cultivar
       rmt_delivery_destination_id = create_rmt_delivery_destination
       season_id = create_season
-      farm_id = create_farm[:id]
+      farm_id = create_farm
       puc_id = create_puc
 
       default = {
