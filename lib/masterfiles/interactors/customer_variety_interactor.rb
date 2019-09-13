@@ -78,7 +78,7 @@ module MasterfilesApp
     end
 
     def clone_customer_variety(id, packed_tm_group_ids)
-      return validation_failed_response(OpenStruct.new(messages: { packed_tm_group_ids: ['You did not choose a packed tm grou'] })) if packed_tm_group_ids.empty?
+      return validation_failed_response(OpenStruct.new(messages: { packed_tm_group_ids: ['You did not choose a packed tm group'] })) if packed_tm_group_ids.empty?
 
       repo.transaction do
         repo.clone_customer_variety(id, packed_tm_group_ids)

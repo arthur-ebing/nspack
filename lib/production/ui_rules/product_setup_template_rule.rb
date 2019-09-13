@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ProductSetupTemplateRule < Base
+  class ProductSetupTemplateRule < Base # rubocop:disable ClassLength
     def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
+      set_clone_fields if %i[clone].include? @mode
 
       set_show_fields if %i[show reopen].include? @mode
 
@@ -79,12 +80,19 @@ module UiRules
       }
     end
 
+    def set_clone_fields
+      fields[:cultivar_group_id] = { renderer: :hidden, value: @form_object[:cultivar_group_id] }
+      fields[:cultivar_group_code] = { renderer: :label, with_value: @form_object[:cultivar_group_code], caption: 'Cultivar Group' }
+    end
+
     def make_form_object
       if @mode == :new
         make_new_form_object
         return
+      elsif @mode == :clone
+        @form_object = @repo.find_product_setup_template(@options[:id]).to_h.reject { |k, _| k == :template_name }
+        return
       end
-
       @form_object = @repo.find_product_setup_template(@options[:id])
     end
 

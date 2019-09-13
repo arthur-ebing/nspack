@@ -40,6 +40,7 @@ module ProductionApp
       pm_bom_id = create_pm_bom
       target_market_group_id = create_target_market_group
       treatment_ids = create_treatment
+      grade_id = create_grade
 
       default = {
         product_setup_template_id: product_setup_template_id,
@@ -64,6 +65,8 @@ module ProductionApp
         marketing_order_number: Faker::Lorem.word,
         sell_by_code: Faker::Lorem.word,
         pallet_label_name: Faker::Lorem.word,
+        grade_id: grade_id,
+        product_chars: Faker::Lorem.unique.word,
         active: true
       }
       DB[:product_setups].insert(default.merge(opts))

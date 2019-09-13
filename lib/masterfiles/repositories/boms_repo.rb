@@ -132,14 +132,17 @@ module MasterfilesApp
     end
 
     def pm_bom_products(id)
-      DB[:pm_products]
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .join(:pm_types, id: :pm_type_id)
-        .join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
-        .join(:uoms, id: :uom_id)
-        .where(pm_bom_id: id)
-        .order(:product_code)
-        .select_map(%i[product_code pm_type_code subtype_code uom_code quantity])
+      query = <<~SQL
+        SELECT product_code,pm_type_code, subtype_code, uom_code, quantity
+        FROM pm_products
+        JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        JOIN pm_boms_products ON pm_products.id = pm_boms_products.pm_product_id
+        JOIN uoms ON uoms.id = pm_boms_products.uom_id
+        WHERE pm_bom_id = #{id}
+        ORDER BY product_code
+      SQL
+      DB[query].all
     end
   end
 end

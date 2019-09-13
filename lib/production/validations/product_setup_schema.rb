@@ -20,13 +20,15 @@ module ProductionApp
     required(:pallet_format_id, :integer).filled(:int?)
     required(:cartons_per_pallet_id, :integer).filled(:int?)
     required(:pm_bom_id, :integer).maybe(:int?)
-    required(:extended_columns, :hash).maybe(:hash?)
+    # required(:extended_columns, :hash).maybe(:hash?)
     required(:client_size_reference, Types::StrippedString).maybe(:str?)
     required(:client_product_code, Types::StrippedString).maybe(:str?)
-    required(:treatment_ids, :array).maybe(:array?) { each(:int?) }
+    required(:treatment_ids, Types::IntArray).filled { each(:int?) }
     required(:marketing_order_number, Types::StrippedString).maybe(:str?)
     required(:sell_by_code, Types::StrippedString).maybe(:str?)
     required(:pallet_label_name, Types::StrippedString).maybe(:str?)
+    required(:grade_id, :integer).maybe(:int?)
+    required(:product_chars, Types::StrippedString).maybe(:str?)
     # required(:active, :bool).maybe(:bool?)
   end
 end

@@ -16,5 +16,10 @@ module MasterfilesApp
     def find_label_template_by_name(label_template_name)
       where(:label_templates, LabelTemplate, label_template_name: label_template_name)
     end
+
+    def select_label_template_names
+      DB[:label_templates]
+        .select_map(:label_template_name)
+    end
   end
 end

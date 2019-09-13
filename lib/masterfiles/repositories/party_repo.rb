@@ -345,6 +345,13 @@ module MasterfilesApp
       DB[query].get(:contact_method_code)
     end
 
+    def find_party_role_from_party_role_name(party_role_name)
+      default_mkting_org = DB[:party_roles]
+                           .where(Sequel.function(:fn_party_role_name, :id) => party_role_name)
+                           .select_map(:id)
+      default_mkting_org[0] unless default_mkting_org.empty?
+    end
+
     private
 
     def add_party_name(hash)

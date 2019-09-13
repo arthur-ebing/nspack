@@ -33,7 +33,17 @@ module ProductionApp
         pallet_label_name: 'ABC',
         active: true,
         product_setup_code: 'ABC',
-        in_production: true
+        in_production: true,
+        commodity_id: 1,
+        grade_id: 1,
+        product_chars: 1,
+        pallet_base_id: 1,
+        pallet_stack_type_id: 1,
+        pm_type_id: 1,
+        pm_subtype_id: 1,
+        description: 'ABC',
+        erp_bom_code: 'ABC',
+        treatment_type_id: 1
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end

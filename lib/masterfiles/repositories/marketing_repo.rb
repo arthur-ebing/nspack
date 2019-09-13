@@ -141,7 +141,7 @@ module MasterfilesApp
     def packed_tm_groups
       DB[:target_market_groups]
         .join(:target_market_group_types, id: :target_market_group_type_id)
-        .where(target_market_group_type_code: 'PACKED')
+        .where(target_market_group_type_code: AppConst::PACKED_TM_GROUP)
         .select_map(Sequel[:target_market_groups][:id])
     end
 
@@ -153,6 +153,27 @@ module MasterfilesApp
 
     def available_to_clone_packed_tm_groups(variety_as_customer_variety_id)
       packed_tm_groups - marketing_variety_packed_tm_groups(variety_as_customer_variety_id)
+    end
+
+    def for_select_customer_variety_varieties
+      DB[:marketing_varieties]
+        .join(:customer_variety_varieties, marketing_variety_id: :id)
+        .join(:customer_varieties, id: :customer_variety_id)
+        .select(
+          Sequel[:customer_variety_varieties][:id],
+          :marketing_variety_code
+        ).map { |r| [r[:marketing_variety_code], r[:id]] }
+    end
+
+    def for_select_inactive_customer_variety_varieties
+      DB[:marketing_varieties]
+        .join(:customer_variety_varieties, marketing_variety_id: :id)
+        .join(:customer_varieties, id: :customer_variety_id)
+        .where(Sequel[:customer_variety_varieties][:active] => false)
+        .select(
+          Sequel[:customer_variety_varieties][:id],
+          :marketing_variety_code
+        ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
 
     def for_select_customer_variety_marketing_varieties(packed_tm_group_id, variety_as_customer_variety_id)

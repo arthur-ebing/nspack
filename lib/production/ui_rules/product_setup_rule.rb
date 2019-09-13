@@ -7,6 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:show_basic_pack] = (AppConst::CLIENT_CODE == 'hb')
+
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
@@ -23,15 +25,22 @@ module UiRules
       std_fruit_size_count_id_label = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
       basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
       standard_pack_code_id_label = @repo.find_hash(:standard_pack_codes, @form_object.standard_pack_code_id)[:standard_pack_code]
-      fruit_actual_counts_for_pack_id_label = MasterfilesApp::FruitSizeRepo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
+      fruit_actual_counts_for_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
       fruit_size_reference_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
-      marketing_org_party_role_id_label = @repo.find_hash(:party_roles, @form_object.marketing_org_party_role_id)[:id]
+      marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
       mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
       cartons_per_pallet_id_label = @repo.find_hash(:cartons_per_pallet, @form_object.cartons_per_pallet_id)[:cartons_per_pallet]
       pm_bom_id_label = MasterfilesApp::BomsRepo.new.find_pm_bom(@form_object.pm_bom_id)&.bom_code
+      commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
+      grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
+      pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
+      pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
+      pm_type_id_label = MasterfilesApp::BomsRepo.new.find_pm_type(@form_object.pm_type_id)&.pm_type_code
+      pm_subtype_id_label = MasterfilesApp::BomsRepo.new.find_pm_subtype(@form_object.pm_subtype_id)&.subtype_code
+      treatment_type_id_label = MasterfilesApp::FruitRepo.new.find_treatment_type(@form_object.treatment_type_id)&.treatment_type_code
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_variety_id] = { renderer: :label, with_value: customer_variety_variety_id_label, caption: 'Customer Variety Variety' }
@@ -55,6 +64,16 @@ module UiRules
       fields[:pallet_label_name] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments'  }
+      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
+      fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
+      fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
+      fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
+      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
+      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype' }
+      fields[:treatment_type_id] = { renderer: :label, with_value: treatment_type_id_label, caption: 'Treatment Type' }
+      fields[:description] = { renderer: :label }
+      fields[:erp_bom_code] = { renderer: :label }
+      fields[:product_chars] = { renderer: :label }
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
@@ -63,6 +82,7 @@ module UiRules
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
       commodity_id = @options[:commodity_id] || @repo.commodity_id(cultivar_group_id)
+      default_mkting_org_id = MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
@@ -95,7 +115,9 @@ module UiRules
                               required: true,
                               prompt: 'Select Basic Pack',
                               searchable: true,
-                              remove_search_for_small_list: false },
+                              remove_search_for_small_list: false,
+                              hide_on_load: @rules[:show_basic_pack] ? false : true },
+
         standard_pack_code_id: { renderer: :select,
                                  options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
                                  disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
@@ -128,13 +150,14 @@ module UiRules
                     remove_search_for_small_list: false },
         marketing_org_party_role_id: { renderer: :select,
                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
+                                       selected: default_mkting_org_id,
                                        caption: 'Marketing Org.',
                                        required: true,
                                        prompt: 'Select Marketing Org.',
                                        searchable: true,
                                        remove_search_for_small_list: false },
         packed_tm_group_id: { renderer: :select,
-                              options: MasterfilesApp::TargetMarketRepo.new.for_select_target_market_groups('PACKED'),
+                              options: MasterfilesApp::TargetMarketRepo.new.for_select_target_market_groups(AppConst::PACKED_TM_GROUP),
                               disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
                               caption: 'Packed TM Group',
                               required: true,
@@ -150,6 +173,13 @@ module UiRules
                    prompt: 'Select Mark',
                    searchable: true,
                    remove_search_for_small_list: false },
+        product_chars: { renderer: :select,
+                         options: @repo.for_select_chemical_levels,
+                         caption: 'Chemical Levels',
+                         required: true,
+                         prompt: 'Select Chemical Level',
+                         searchable: true,
+                         remove_search_for_small_list: false },
         inventory_code_id: { renderer: :select,
                              options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
                              disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_inventory_codes,
@@ -158,8 +188,8 @@ module UiRules
                              searchable: true,
                              remove_search_for_small_list: false },
         customer_variety_variety_id: { renderer: :select,
-                                       options: MasterfilesApp::MarketingRepo.new.for_select_customer_varieties,
-                                       disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
+                                       options: MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties,
+                                       disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_variety_varieties,
                                        caption: 'Customer Variety Variety',
                                        prompt: 'Select Customer Variety Variety',
                                        searchable: true,
@@ -188,7 +218,12 @@ module UiRules
                             prompt: 'Select Pallet Format',
                             searchable: true,
                             remove_search_for_small_list: false },
-        pallet_label_name: {},
+        pallet_label_name: { renderer: :select,
+                             options: MasterfilesApp::LabelTemplateRepo.new.select_label_template_names,
+                             caption: 'Label Name',
+                             prompt: 'Select Label Name',
+                             searchable: true,
+                             remove_search_for_small_list: false },
         cartons_per_pallet_id: { renderer: :select,
                                  options: MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet,
                                  disabled_options: MasterfilesApp::PackagingRepo.new.for_select_inactive_cartons_per_pallet,
@@ -218,10 +253,11 @@ module UiRules
                      prompt: 'Select PM BOM',
                      searchable: true,
                      remove_search_for_small_list: false },
-        pm_boms_products: { renderer: :list,
-                            items: [] },
+        description: { readonly: true },
+        erp_bom_code: { readonly: true },
+        pm_boms_products: { readonly: true },
         active: { renderer: :checkbox },
-        extended_columns: {},
+        # extended_columns: {},
         treatment_type_id: { renderer: :select,
                              options: MasterfilesApp::FruitRepo.new.for_select_treatment_types,
                              disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_treatment_types,
@@ -267,7 +303,9 @@ module UiRules
                                     treatment_ids: nil,
                                     marketing_order_number: nil,
                                     sell_by_code: nil,
-                                    pallet_label_name: nil)
+                                    pallet_label_name: nil,
+                                    grade_id: nil,
+                                    product_chars: nil)
     end
 
     def treatment_codes
@@ -276,32 +314,32 @@ module UiRules
 
     private
 
-    def add_behaviours  # rubocop:disable Metrics/AbcSize
+    def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/commodity_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/commodity_changed' }]
         behaviour.dropdown_change :basic_pack_code_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/basic_pack_code_changed",
+                                  notify: [{ url: '/production/product_setups/product_setups/basic_pack_code_changed',
                                              param_keys: %i[product_setup_std_fruit_size_count_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/actual_count_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/actual_count_changed' }]
         behaviour.dropdown_change :packed_tm_group_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/packed_tm_group_changed",
+                                  notify: [{ url: '/production/product_setups/product_setups/packed_tm_group_changed',
                                              param_keys: %i[product_setup_marketing_variety_id] }]
         behaviour.dropdown_change :pallet_stack_type_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pallet_stack_type_changed",
+                                  notify: [{ url: '/production/product_setups/product_setups/pallet_stack_type_changed',
                                              param_keys: %i[product_setup_pallet_base_id] }]
         behaviour.dropdown_change :pallet_format_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pallet_format_changed",
+                                  notify: [{ url: '/production/product_setups/product_setups/pallet_format_changed',
                                              param_keys: %i[product_setup_basic_pack_code_id] }]
         behaviour.dropdown_change :pm_type_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_type_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/pm_type_changed' }]
         behaviour.dropdown_change :pm_subtype_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_subtype_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/pm_subtype_changed' }]
         behaviour.dropdown_change :pm_bom_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/pm_bom_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/pm_bom_changed' }]
         behaviour.dropdown_change :treatment_type_id,
-                                  notify: [{ url: "/production/product_setups/product_setup_templates/#{@options[:product_setup_template_id]}/product_setups/treatment_type_changed" }]
+                                  notify: [{ url: '/production/product_setups/product_setups/treatment_type_changed' }]
       end
     end
   end

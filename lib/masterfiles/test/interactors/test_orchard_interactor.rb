@@ -75,7 +75,7 @@ module MasterfilesApp
     private
 
     def orchard_attrs
-      farm_id = create_farm[:id]
+      farm_id = create_farm
       puc_id = create_puc
       cultivar_id = create_cultivar
 

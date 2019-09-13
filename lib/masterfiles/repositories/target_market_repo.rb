@@ -92,7 +92,7 @@ module MasterfilesApp
       DB[:target_markets_for_countries].join(:destination_countries, id: :destination_country_id).where(target_market_id: target_market_id).select_map(:country_name).sort
     end
 
-    def for_select_target_market_groups(group_type = 'PACKED')
+    def for_select_target_market_groups(group_type = AppConst::PACKED_TM_GROUP)
       DB[:target_market_groups].where(
         target_market_group_type_id: DB[:target_market_group_types].where(target_market_group_type_code: group_type).select(:id)
       ).select(

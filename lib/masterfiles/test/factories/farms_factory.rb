@@ -36,7 +36,6 @@ module MasterfilesApp
       party_role_id = create_party_role('O')[:id].to_i
       production_region_id = create_production_region
       farm_group_id = create_farm_group
-      puc_id = create_puc
 
       default = {
         owner_party_role_id: party_role_id,
@@ -44,18 +43,13 @@ module MasterfilesApp
         farm_group_id: farm_group_id,
         farm_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true,
-        puc_id: puc_id
+        active: true
       }
-      default.delete(:puc_id)
-      id = DB[:farms].insert(default.merge(opts))
-      {
-        id: id
-      }
+      DB[:farms].insert(default.merge(opts))
     end
 
     def create_orchard(opts = {})
-      farm_id = create_farm[:id]
+      farm_id = create_farm
       puc_id = create_puc
       cultivar_id = create_cultivar
 

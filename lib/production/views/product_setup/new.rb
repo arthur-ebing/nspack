@@ -8,13 +8,15 @@ module Production
           ui_rule = UiRules::Compiler.new(:product_setup, :new, product_setup_template_id: product_setup_template_id, form_values: form_values)
           rules   = ui_rule.compile
 
+          pm_boms_products = []
+
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form| # rubocop:disable Metrics/BlockLength
               form.caption 'New Product Setup'
-              form.action "/production/product_setups/product_setup_templates/#{product_setup_template_id}/product_setups/new"
+              form.action "/production/product_setups/product_setup_templates/#{product_setup_template_id}/product_setups"
               form.remote! if remote
               form.add_field :product_setup_template
               form.add_field :product_setup_template_id
@@ -41,6 +43,7 @@ module Production
                 fold.add_field :customer_variety_variety_id
                 fold.add_field :client_product_code
                 fold.add_field :client_size_reference
+                fold.add_field :marketing_order_number
               end
               form.fold_up do |fold|
                 fold.caption 'Packaging details'
@@ -54,7 +57,10 @@ module Production
                 fold.add_field :pm_bom_id
                 fold.add_field :description
                 fold.add_field :erp_bom_code
-                fold.add_field :pm_boms_products
+                fold.add_table pm_boms_products,
+                               %i[product_code pm_type_code subtype_code uom_code quantity],
+                               dom_id: 'product_setup_pm_boms_products',
+                               alignment: { quantity: :right }
               end
               # form.fold_up do |fold|
               #   fold.caption 'Custom fields'

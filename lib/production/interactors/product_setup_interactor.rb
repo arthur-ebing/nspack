@@ -5,10 +5,15 @@ module ProductionApp
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(OpenStruct.new(messages: { size_reference_id: ['You did not choose a Size Reference or Actual Count'] })) if params[:fruit_size_reference_id].nil? && params[:fruit_actual_counts_for_pack_id].nil?
+
+      attrs = res.to_h
+      treatment_ids = attrs.delete(:treatment_ids)
+      attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
       id = nil
       repo.transaction do
-        id = repo.create_product_setup(res)
+        id = repo.create_product_setup(attrs)
         log_status('product_setups', id, 'CREATED')
         log_transaction
       end
@@ -21,12 +26,17 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_product_setup(id, params)
+    def update_product_setup(id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(OpenStruct.new(messages: { size_reference_id: ['You did not choose a Size Reference or Actual Count'] })) if params[:fruit_size_reference_id].nil? && params[:fruit_actual_counts_for_pack_id].nil?
+
+      attrs = res.to_h
+      treatment_ids = attrs.delete(:treatment_ids)
+      attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
       repo.transaction do
-        repo.update_product_setup(id, res)
+        repo.update_product_setup(id, attrs)
         log_transaction
       end
       instance = product_setup(id)
@@ -71,7 +81,7 @@ module ProductionApp
     end
 
     def for_select_actual_count_size_references(size_reference_ids)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: [[:id, size_reference_ids.map { |r| r }]])
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: [[:id, size_reference_ids.map { |r| r }]]) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
     end
 
     def for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
@@ -125,6 +135,19 @@ module ProductionApp
       end
       instance = product_setup(id)
       success_response("De-activated product setup  #{instance.id}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def clone_product_setup(id)
+      repo.transaction do
+        repo.clone_product_setup(id)
+        log_status('product_setups', id, 'CLONED')
+        log_transaction
+      end
+      instance = product_setup(id)
+      success_response("Cloned product setup #{instance.id}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

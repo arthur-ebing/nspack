@@ -11,6 +11,25 @@
   :icon: edit
   :title: Edit
   :popup: true
+  :hide_if_true: in_production
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
+- :url: "/production/product_setups/product_setups/$:id$/edit_active_run_setup"
+  :text: edit active run setup
+  :icon: edit
+  :title: Edit Active Run Setup
+  :popup: true
+  :hide_if_false: in_production
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
+- :url: "/production/product_setups/product_setups/$:id$/clone"
+  :text: clone
+  :icon: copy
+  :title: Clone
   :auth:
     :function: production
     :program: product_setups
@@ -20,6 +39,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: in_production
 - :url: "/production/product_setups/product_setups/$:id$/activate"
   :text: Activate
   :icon: check-square
@@ -34,6 +54,7 @@
   :icon: close-outline
   :prompt: 'Are you sure you want to De-activate this Product Setup?'
   :hide_if_false: active
+  :hide_if_true: in_production
   :auth:
     :function: production
     :program: product_setups

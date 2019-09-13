@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductSetupTemplateInteractor < BaseInteractor
+  class ProductSetupTemplateInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_product_setup_template(params) # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_template_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -86,6 +86,23 @@ module ProductionApp
       end
       instance = product_setup_template(id)
       success_response("De-activated product setup template #{instance.template_name}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def clone_product_setup_template(id, params)  # rubocop:disable Metrics/AbcSize
+      res = validate_product_setup_template_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        new_product_setup_template_id = repo.create_product_setup_template(res)
+        repo.clone_product_setup_template(id, new_product_setup_template_id)
+        log_status('product_setup_templates', id, 'CLONED')
+        log_transaction
+      end
+      instance = product_setup_template(id)
+      success_response("Cloned product setup template #{instance.template_name}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

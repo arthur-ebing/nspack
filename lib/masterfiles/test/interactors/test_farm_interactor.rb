@@ -34,7 +34,7 @@ module MasterfilesApp
     end
 
     def test_update_farm
-      id = create_farm[:id]
+      id = create_farm
       attrs = interactor.send(:repo).find_farm(id)
       attrs = attrs.to_h
       value = attrs[:farm_code]
@@ -48,7 +48,7 @@ module MasterfilesApp
     end
 
     def test_update_farm_fail
-      id = create_farm[:id]
+      id = create_farm
       attrs = interactor.send(:repo).find_farm(id)
       attrs = attrs.to_h
       attrs.delete(:farm_code)
@@ -64,7 +64,7 @@ module MasterfilesApp
     end
 
     def test_delete_farm
-      id = create_farm[:id]
+      id = create_farm
       assert_count_changed(:farms, -1) do
         res = interactor.delete_farm(id)
         assert res.success, res.message

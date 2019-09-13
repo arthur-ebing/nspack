@@ -52,8 +52,18 @@ module ProductionApp
     end
 
     def find_product_setup(id)
-      hash = DB['SELECT product_setups.* , fn_product_setup_code(?) AS product_setup_code, fn_product_setup_in_production(?) AS in_production
-                 FROM product_setups WHERE product_setups.id = ?', id].first
+      hash = DB["SELECT product_setups.* ,std_fruit_size_counts.commodity_id, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
+                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code, treatments.treatment_type_id,
+                 fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
+                 FROM product_setups
+                 LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
+                 LEFT JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
+                 LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id
+                 LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = product_setups.pm_bom_id
+                 LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+                 LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+                 LEFT JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
+                 WHERE product_setups.id = ?", id].first
       return nil if hash.nil?
 
       ProductSetup.new(hash)
@@ -136,8 +146,7 @@ module ProductionApp
     end
 
     def activate_product_setup_template(id)
-      product_setup_ids = DB[:product_setups]
-                          .where(product_setup_template_id: id)
+      product_setup_ids = product_setup_template_product_setup_ids(id)
       unless product_setup_ids.empty?
         DB.execute(<<~SQL)
           UPDATE product_setups set active = true
@@ -152,9 +161,13 @@ module ProductionApp
     end
 
     def deactivate_product_setup_template(id)
-      product_setup_ids = DB[:product_setups]
-                          .where(product_setup_template_id: id)
-      deactivate(:product_setups, product_setup_ids) unless product_setup_ids.empty?
+      product_setup_ids = product_setup_template_product_setup_ids(id)
+      unless product_setup_ids.empty?
+        DB.execute(<<~SQL)
+          UPDATE product_setups set active = false
+          WHERE product_setup_template_id IN (#{product_setup_ids.join(',')});
+        SQL
+      end
       deactivate(:product_setup_templates, id)
     end
 
@@ -169,6 +182,34 @@ module ProductionApp
       deactivate(:product_setups, id)
     end
 
+    def clone_product_setup_template(id, product_setup_template_id)
+      product_setup_ids = product_setup_template_product_setup_ids(id)
+      return if product_setup_ids.empty?
+
+      product_setup_ids.each do |product_setup_id|
+        attrs = find_hash(:product_setups, product_setup_id).reject { |k, _| %i[id product_setup_template_id].include?(k) }
+        attrs[:product_setup_template_id] = product_setup_template_id
+        DB[:product_setups].insert(attrs)
+      end
+    end
+
+    def clone_product_setup(id)
+      attrs = find_hash(:product_setups, id).reject { |k, _| k == :id }
+      DB[:product_setups].insert(attrs)
+    end
+
+    def delete_product_setup_template(id)
+      DB[:product_setups].where(product_setup_template_id: id).delete
+      DB[:product_setup_templates].where(id: id).delete
+      { success: true }
+    end
+
+    def product_setup_template_product_setup_ids(product_setup_template_id)
+      DB[:product_setups]
+        .where(product_setup_template_id: product_setup_template_id)
+        .select_map(:id)
+    end
+
     def cultivar_group_id
       DB[:cultivar_groups]
         .select(
@@ -177,6 +218,17 @@ module ProductionApp
         )
         .order(:cultivar_group_code)
         .first[:id]
+    end
+
+    def for_select_chemical_levels
+      [{ code: 'LC', desc: 'Low Chem' },
+       { code: 'SC', desc: 'Std Chem' }]
+        .map { |r| [r[:desc], r[:code]] }
+    end
+
+    def pm_boms_products(product_setup_id)
+      pm_bom = find_product_setup(product_setup_id)
+      MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
     end
   end
 end
