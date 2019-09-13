@@ -21,12 +21,9 @@ Sequel.migration do
                    :updated_at,
                    function_name: :multi_labels_set_updated_at,
                    trigger_name: :set_updated_at)
-
-    add_column :labels, :multi_label, TrueClass, default: false
   end
 
   down do
-    drop_column :labels, :multi_label
     drop_trigger(:multi_labels, :set_created_at)
     drop_function(:multi_labels_set_created_at)
     drop_trigger(:multi_labels, :set_updated_at)
