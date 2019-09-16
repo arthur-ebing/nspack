@@ -311,7 +311,7 @@ Render a table. The table renders with thin borders and highlights each row on h
 e.g.
 [source,ruby]
 ----
-neg_check = ->(a) { a && a.negative? ? 'red' : '' }
+neg_check = ->(a) { a&.negative? ? 'red' : '' }
 
 section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    { keys: 'b', values: 2, amounts: 33 }],
@@ -319,7 +319,7 @@ section.add_table [{ keys: 'a', values: 1, amounts: 22 },
                    alignment: { amounts: :right },
                    cell_classes: { amounts: neg_check },
                    cell_transformers: {
-                     keys: ->(a) { a && a.upcase },
+                     keys: ->(a) { a&.upcase },
                      amounts: :decimal
                    },
                    header_captions: { values: 'Value' }

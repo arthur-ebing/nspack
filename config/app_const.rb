@@ -2,6 +2,10 @@
 
 # A class for defining global constants in a central place.
 class AppConst
+  def self.development?
+    ENV['RACK_ENV'] == 'development'
+  end
+
   # Helper to create hash of label sizes from a 2D array.
   def self.make_label_size_hash(array)
     Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
