@@ -60,7 +60,8 @@ module Production
                 fold.add_table pm_boms_products,
                                %i[product_code pm_type_code subtype_code uom_code quantity],
                                dom_id: 'product_setup_pm_boms_products',
-                               alignment: { quantity: :right }
+                               alignment: { quantity: :right },
+                               cell_transformers: { quantity: :decimal }
               end
               # form.fold_up do |fold|
               #   fold.caption 'Custom fields'
