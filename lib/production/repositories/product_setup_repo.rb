@@ -52,12 +52,19 @@ module ProductionApp
     end
 
     def find_product_setup(id)
-      hash = DB["SELECT product_setups.* ,std_fruit_size_counts.commodity_id, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code, treatments.treatment_type_id,
+      hash = DB["SELECT product_setups.* ,COALESCE(ps_cultivar.commodity_id, cultivars.commodity_id) AS commodity_id, pallet_formats.pallet_base_id,
+                 pallet_formats.pallet_stack_type_id, pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code,
+                 treatments.treatment_type_id,
                  fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
                  FROM product_setups
+                 JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+                 JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
+                 LEFT JOIN cultivars ON cultivar_groups.id = cultivars.cultivar_group_id
+                 LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+                 LEFT JOIN cultivars ps_cultivar ON ps_cultivar.cultivar_group_id = product_setup_templates.cultivar_group_id AND ps_cultivar.id = product_setup_templates.cultivar_id
+                 LEFT JOIN commodities ps_commodity ON ps_commodity.id = ps_cultivar.commodity_id
                  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
-                 LEFT JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
+                 JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
                  LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id
                  LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = product_setups.pm_bom_id
                  LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
@@ -90,12 +97,13 @@ module ProductionApp
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end
 
-    def for_select_template_cultivar_commodities(cultivar_group_id)  # rubocop:disable Metrics/AbcSize
-      DB[:commodities]
-        .join(:cultivars, commodity_id: :id)
+    def for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
+      DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
-        .left_join(:product_setup_templates, cultivar_id: :id)
-        .where(Sequel[:cultivars][:cultivar_group_id] => cultivar_group_id)
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:commodities, id: :commodity_id)
+        .where(Sequel[:product_setup_templates][:cultivar_group_id] => cultivar_group_id)
+        .where(Sequel[:product_setup_templates][:cultivar_id] => cultivar_id)
         .distinct(Sequel[:commodities][:code])
         .select(
           Sequel[:commodities][:id],
@@ -105,12 +113,13 @@ module ProductionApp
         .map { |r| [r[:code], r[:id]] }
     end
 
-    def commodity_id(cultivar_group_id)  # rubocop:disable Metrics/AbcSize
-      DB[:commodities]
-        .join(:cultivars, commodity_id: :id)
+    def commodity_id(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
+      DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
-        .left_join(:product_setup_templates, cultivar_id: :id)
-        .where(Sequel[:cultivars][:cultivar_group_id] => cultivar_group_id)
+        .join(:cultivars, cultivar_group_id: :id)
+        .join(:commodities, id: :commodity_id)
+        .where(Sequel[:product_setup_templates][:cultivar_group_id] => cultivar_group_id)
+        .where(Sequel[:product_setup_templates][:cultivar_id] => cultivar_id)
         .distinct(Sequel[:commodities][:code])
         .select(
           Sequel[:commodities][:id],

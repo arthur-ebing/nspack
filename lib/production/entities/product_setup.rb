@@ -38,7 +38,5 @@ module ProductionApp
     attribute :description, Types::String
     attribute :erp_bom_code, Types::String
     attribute :treatment_type_id, Types::Integer
-    # attribute :grade_id, Types::Integer
-    # attribute :grade_id, Types::Integer
   end
 end

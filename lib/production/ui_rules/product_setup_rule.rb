@@ -7,7 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:show_basic_pack] = (AppConst::CLIENT_CODE == 'hb')
+      @rules[:hide_basic_pack] = (AppConst::CLIENT_CODE == 'kr')
+      @rules[:require_packaging_bom] = (AppConst::REQUIRE_PACKAGING_BOM == 'true')
 
       common_values_for_fields common_fields
 
@@ -45,7 +46,7 @@ module UiRules
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_variety_id] = { renderer: :label, with_value: customer_variety_variety_id_label, caption: 'Customer Variety Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code', hide_on_load: @rules[:hide_basic_pack] ? true : false }
       fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code' }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
@@ -55,7 +56,7 @@ module UiRules
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
       fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'Pm Bom' }
+      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'Pm Bom', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:extended_columns] = { renderer: :label }
       fields[:client_size_reference] = { renderer: :label }
       fields[:client_product_code] = { renderer: :label }
@@ -69,7 +70,7 @@ module UiRules
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
       fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
-      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype' }
+      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:treatment_type_id] = { renderer: :label, with_value: treatment_type_id_label, caption: 'Treatment Type' }
       fields[:description] = { renderer: :label }
       fields[:erp_bom_code] = { renderer: :label }
@@ -81,13 +82,15 @@ module UiRules
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
-      commodity_id = @options[:commodity_id] || @repo.commodity_id(cultivar_group_id)
+      cultivar_id = product_setup_template&.cultivar_id
+      commodity_id = @options[:commodity_id] || @repo.commodity_id(cultivar_group_id, cultivar_id)
       default_mkting_org_id = MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
+      default_pm_type_id = MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
         commodity_id: { renderer: :select,
-                        options: @repo.for_select_template_cultivar_commodities(cultivar_group_id),
+                        options: @repo.for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id),
                         disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
                         caption: 'Commodity',
                         required: true,
@@ -116,7 +119,7 @@ module UiRules
                               prompt: 'Select Basic Pack',
                               searchable: true,
                               remove_search_for_small_list: false,
-                              hide_on_load: @rules[:show_basic_pack] ? false : true },
+                              hide_on_load: @rules[:hide_basic_pack] ? true : false },
 
         standard_pack_code_id: { renderer: :select,
                                  options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
@@ -235,27 +238,30 @@ module UiRules
         pm_type_id: { renderer: :select,
                       options: MasterfilesApp::BomsRepo.new.for_select_pm_types,
                       disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_types,
+                      selected: default_pm_type_id,
                       caption: 'PM Type',
                       prompt: 'Select PM Type',
                       searchable: true,
                       remove_search_for_small_list: false },
         pm_subtype_id: { renderer: :select,
-                         options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes,
+                         options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: default_pm_type_id }),
                          disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_subtypes,
                          caption: 'PM Subtype',
                          prompt: 'Select PM Subtype',
                          searchable: true,
-                         remove_search_for_small_list: false },
+                         remove_search_for_small_list: false,
+                         hide_on_load: @rules[:require_packaging_bom] ? false : true },
         pm_bom_id: { renderer: :select,
                      options: MasterfilesApp::BomsRepo.new.for_select_pm_boms,
                      disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
                      caption: 'PM BOM',
                      prompt: 'Select PM BOM',
                      searchable: true,
-                     remove_search_for_small_list: false },
+                     remove_search_for_small_list: false,
+                     hide_on_load: @rules[:require_packaging_bom] ? false : true },
         description: { readonly: true },
         erp_bom_code: { readonly: true },
-        pm_boms_products: { readonly: true },
+        # pm_boms_products: { readonly: true },
         active: { renderer: :checkbox },
         # extended_columns: {},
         treatment_type_id: { renderer: :select,

@@ -43,6 +43,10 @@ class AppConst
   # Product Setup default marketing organization
   DEFAULT_MARKETING_ORG = ENV['DEFAULT_MARKETING_ORG']
 
+  # Defaults for Packaging
+  DEFAULT_FG_PACKAGING_TYPE = ENV['DEFAULT_FG_PACKAGING_TYPE']
+  REQUIRE_PACKAGING_BOM = ENV['REQUIRE_PACKAGING_BOM']
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [].freeze
 

@@ -142,7 +142,7 @@ module MasterfilesApp
         WHERE pm_bom_id = #{id}
         ORDER BY product_code
       SQL
-      DB[query].all
+      DB[query].all unless id.nil?
     end
   end
 end
