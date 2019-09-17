@@ -1,0 +1,207 @@
+---
+:caption: Peripherals
+:sql: "SELECT plant_resources.id, system_resource_id, plant_resource_code, system_resource_code,\r\nplant_resources.description,
+  plant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
+  AS plant_resource_type_description,\r\nsystem_resource_types.system_resource_type_code,\r\nsystem_resource_types.description
+  AS system_resource_type_description,\r\nplant_resources.active, plant_resources.created_at,
+  plant_resources.updated_at\r\nFROM plant_resources\r\nJOIN system_resources ON system_resources.id
+  = plant_resources.system_resource_id\r\nJOIN system_resource_types ON system_resource_types.id
+  = system_resources.system_resource_type_id\r\nJOIN plant_resource_types ON plant_resource_types.id
+  = plant_resources.plant_resource_type_id\r\nWHERE system_resource_types.peripheral\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: plant_resources.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_id:
+    :name: system_resource_id
+    :sequence_no: 2
+    :caption: System resource
+    :namespaced_name: system_resource_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 3
+    :caption: Plant resource code
+    :namespaced_name: plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_code:
+    :name: system_resource_code
+    :sequence_no: 4
+    :caption: System resource code
+    :namespaced_name: system_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 5
+    :caption: Description
+    :namespaced_name: plant_resources.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_type_code:
+    :name: plant_resource_type_code
+    :sequence_no: 6
+    :caption: Plant resource type code
+    :namespaced_name: plant_resource_types.plant_resource_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_type_description:
+    :name: plant_resource_type_description
+    :sequence_no: 7
+    :caption: Plant resource type description
+    :namespaced_name: plant_resource_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_type_code:
+    :name: system_resource_type_code
+    :sequence_no: 8
+    :caption: System resource type code
+    :namespaced_name: system_resource_types.system_resource_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_type_description:
+    :name: system_resource_type_description
+    :sequence_no: 9
+    :caption: System resource type description
+    :namespaced_name: system_resource_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 10
+    :caption: Active
+    :namespaced_name: plant_resources.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 11
+    :caption: Created at
+    :namespaced_name: plant_resources.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 12
+    :caption: Updated at
+    :namespaced_name: plant_resources.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

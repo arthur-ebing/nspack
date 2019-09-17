@@ -199,6 +199,32 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    r.on 'peripherals' do
+      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('resources', 'new')
+        show_partial_or_page(r) { Production::Resources::Peripheral::New.call(remote: fetch?(r)) }
+      end
+
+      r.on 'next_code' do
+        json_replace_input_value('peripheral_plant_resource_code', interactor.next_peripheral_code(params[:changed_value]))
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_peripheral(params[:peripheral])
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: '/production/resources/peripherals/new') do
+            Production::Resources::Peripheral::New.call(form_values: params[:peripheral],
+                                                        form_errors: res.errors,
+                                                        remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

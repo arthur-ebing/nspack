@@ -36,9 +36,9 @@ module Crossbeams
 
       SYSTEM_RESOURCE_RULES = {
         SERVER => { description: 'Server', attributes: { ip_address: :string } },
-        MODULE => { description: 'Module', attributes: { ip_address: :string, sub_types: [CLM_ROBOT, QC_ROBOT, SCALE_ROBOT, FORKLIFT_ROBOT, PALLETIZING_ROBOT, BINTIPPING_ROBOT] } },
-        MODULE_BUTTON => { description: 'Module button', attributes: { ip_address: :string, sub_types: [ROBOT_BUTTON] } },
-        PERIPHERAL => { description: 'Peripheral', attributes: { ip_address: :string } }
+        MODULE => { description: 'Module', computing_device: true, attributes: { ip_address: :string, sub_types: [CLM_ROBOT, QC_ROBOT, SCALE_ROBOT, FORKLIFT_ROBOT, PALLETIZING_ROBOT, BINTIPPING_ROBOT] } },
+        MODULE_BUTTON => { description: 'Module button', computing_device: true, attributes: { ip_address: :string, sub_types: [ROBOT_BUTTON] } },
+        PERIPHERAL => { description: 'Peripheral', peripheral: true, attributes: { ip_address: :string } }
       }.freeze
 
       PLANT_RESOURCE_RULES = {
@@ -106,13 +106,13 @@ module Crossbeams
                              icon: { file: 'cube', colour: '#80b8e0' } },
         SCALE => { description: 'Scale',
                    allowed_children: [],
-                   create_with_system_resource: 'PERIPHERAL',
+                   create_with_system_resource: PERIPHERAL,
                    icon: { file: 'balance-scale', colour: '#9580e0' },
                    code_prefix: 'SCL-' },
         PRINTER => { description: 'Printer',
                      allowed_children: [],
                      icon: { file: 'printer', colour: '#234722' },
-                     create_with_system_resource: 'PERIPHERAL',
+                     create_with_system_resource: PERIPHERAL,
                      code_prefix: 'PRN-' },
         BIN_TIPPING_STATION => { description: 'Bin-tipping station',
                                  allowed_children: [BINTIPPING_ROBOT],
@@ -124,7 +124,7 @@ module Crossbeams
       # What happens if XML config has srv-01:clm-01 and srv-02:clm-04 and clm-01 is renamed to clm-03 and clm-04 becomes clm-01 ?
       # MODULE could be CLM, SCM, QCM.. (get prefix from plant - "P:" or module_type..)
 
-      def self.refresh_plant_resource_types # rubocop:disable Metrics/AbcSize
+      def self.refresh_plant_resource_types # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
         cnt = 0
         repo = BaseRepo.new
         PLANT_RESOURCE_RULES.each_key do |key|
@@ -145,7 +145,8 @@ module Crossbeams
           repo.create(:system_resource_types,
                       system_resource_type_code: key,
                       icon: 'microchip',
-                      # system_resource: true)
+                      computing_device: SYSTEM_RESOURCE_RULES[key][:computing_device] || false,
+                      peripheral: SYSTEM_RESOURCE_RULES[key][:peripheral] || false,
                       description: SYSTEM_RESOURCE_RULES[key][:description])
           cnt += 1
         end
@@ -160,6 +161,10 @@ module Crossbeams
 
       def self.can_have_children?(plant_resource_type_code)
         !PLANT_RESOURCE_RULES[plant_resource_type_code][:allowed_children].empty?
+      end
+
+      def self.peripheral_type_codes
+        PLANT_RESOURCE_RULES.select { |_, v| v[:create_with_system_resource] == PERIPHERAL }.keys
       end
     end
   end

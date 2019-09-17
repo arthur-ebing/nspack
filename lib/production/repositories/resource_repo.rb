@@ -41,6 +41,11 @@ module ProductionApp
       DB[:plant_resource_types].where(plant_resource_type_code: possible_codes).select_map(%i[plant_resource_type_code id])
     end
 
+    def for_select_peripheral_types
+      possible_codes = Crossbeams::Config::ResourceDefinitions.peripheral_type_codes
+      DB[:plant_resource_types].where(plant_resource_type_code: possible_codes).select_map(%i[plant_resource_type_code id])
+    end
+
     def create_plant_resource_type(attrs)
       new_attrs = attrs.to_h
       new_attrs[:attribute_rules] = hash_for_jsonb_col(attrs[:attribute_rules])
@@ -91,6 +96,14 @@ module ProductionApp
       create(:plant_resources, new_attrs)
     end
 
+    def create_peripheral_resource(params)
+      sys_id = create_twin_system_resource(nil, params)
+      raise 'bummer' if sys_id.nil?
+
+      attrs = params.to_h.merge(system_resource_id: sys_id)
+      create_plant_resource(attrs)
+    end
+
     def delete_plant_resource(id)
       DB[:tree_plant_resources].where(ancestor_plant_resource_id: id).or(descendant_plant_resource_id: id).delete
       system_resource_id = find_plant_resource(id)&.system_resource_id
@@ -100,6 +113,14 @@ module ProductionApp
 
     def plant_resource_type_code_for(plant_resource_id)
       DB[:plant_resources].join(:plant_resource_types, id: :plant_resource_type_id).where(Sequel[:plant_resources][:id] => plant_resource_id).get(:plant_resource_type_code)
+    end
+
+    def next_peripheral_code(plant_resource_type_id)
+      rules = plant_resource_definition(plant_resource_type_id)
+      system_resource_type = rules[:create_with_system_resource]
+      raise Crossbeams::FrameworkError, 'Plant peripheral resource type must link to system peripheral type' unless system_resource_type
+
+      resolve_system_code(nil, rules[:code_prefix], plant_resource_type_id)
     end
 
     private
