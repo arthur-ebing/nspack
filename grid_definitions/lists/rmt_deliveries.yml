@@ -11,11 +11,13 @@
   :icon: edit
   :title: Edit
   :popup: false
+  :hide_if_true: delivery_tipped
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
-  :popup: true
+  :popup: false
+  :hide_if_true: delivery_tipped
 #- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/complete"
 #  :text: Complete
 #  :icon: toggle-on

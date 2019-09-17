@@ -57,7 +57,7 @@ module RawMaterialsApp
     end
 
     def rmt_container_type_by_container_type_code(container_type_code)
-      DB[:rmt_container_types].where(container_type_code: container_type_code).first
+      DB[:rmt_container_types].where(container_type_code: container_type_code).map { |p| p[:id] }.first
     end
 
     def rmt_container_type_rmt_inner_container_type(container_type_id)
@@ -98,6 +98,10 @@ module RawMaterialsApp
 
     def find_rmt_delivery_by_bin_id(id)
       OpenStruct.new DB[:rmt_deliveries].where(id: DB[:rmt_bins].where(id: id).select(:rmt_delivery_id)).first
+    end
+
+    def find_bin_by_asset_number(bin_asset_number)
+      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).first
     end
   end
 end

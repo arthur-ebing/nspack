@@ -40,7 +40,11 @@ module RawMaterials
 
             unless is_update
               page.section do |section|
-                section.add_control(control_type: :link, text: 'New Rmt Bin', url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new", style: :button, behaviour: :popup)
+                if rules[:scan_rmt_bin_asset_numbers]
+                  section.add_control(control_type: :link, text: 'New Rmt Bin', url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new", style: :button, behaviour: false)
+                else
+                  section.add_control(control_type: :link, text: 'New Rmt Bin', url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new", style: :button, behaviour: :popup)
+                end
                 section.add_grid('rmt_bins_deliveries',
                                  "/list/rmt_bins/grid?key=standard&rmt_bins.delivery_id=#{id}",
                                  caption: 'Bins')

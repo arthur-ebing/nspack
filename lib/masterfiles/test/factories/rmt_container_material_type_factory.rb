@@ -26,7 +26,7 @@ module MasterfilesApp
 
     def create_rmt_container_type(opts = {})
       default = {
-        container_type_code: Faker::Lorem.word,
+        container_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',

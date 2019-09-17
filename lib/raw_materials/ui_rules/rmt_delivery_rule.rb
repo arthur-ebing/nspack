@@ -13,6 +13,7 @@ module UiRules
       @rules[:show_qty_damaged_bins] = AppConst::DELIVERY_CAPTURE_DAMAGED_BINS == 'true'
       @rules[:show_qty_empty_bins] = AppConst::DELIVERY_CAPTURE_EMPTY_BINS == 'true'
       @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION == 'true'
+      @rules[:scan_rmt_bin_asset_numbers] = AppConst::SCAN_RMT_BIN_ASSET_NUMBERS == 'true'
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode
@@ -77,9 +78,9 @@ module UiRules
       }
 
       if %i[edit].include? @mode
-        fields[:puc_id][:options] = MasterfilesApp::FarmRepo.new.for_select_pucs(where: { id: @form_object.puc_id })
-        fields[:orchard_id][:options] = MasterfilesApp::FarmRepo.new.for_select_orchards(where: { id: @form_object.orchard_id })
-        fields[:cultivar_id][:options] = MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: @form_object.cultivar_id })
+        fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id)
+        fields[:orchard_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchards(@form_object.farm_id, @form_object.puc_id)
+        fields[:cultivar_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(@form_object.orchard_id)
       elsif %i[new].include? @mode
         fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id)
       end

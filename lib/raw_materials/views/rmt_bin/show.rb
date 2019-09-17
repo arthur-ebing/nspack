@@ -13,6 +13,7 @@ module RawMaterials
             page.form do |form|
               form.caption 'Rmt Bin'
               form.view_only!
+              form.add_field :bin_asset_number
               form.add_field :orchard_id
               form.add_field :season_id
               form.add_field :cultivar_id

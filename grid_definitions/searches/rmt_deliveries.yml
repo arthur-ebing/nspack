@@ -5,17 +5,19 @@
   :text: view
   :icon: view-show
   :title: View
-  :popup: true
+  :popup: false
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
-  :popup: true
+  :popup: false
+  :hide_if_true: delivery_tipped
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
-  :popup: true
+  :popup: false
+  :hide_if_true: delivery_tipped
 :page_controls:
 - :control_type: :link
   :url: "/raw_materials/deliveries/rmt_deliveries/new"

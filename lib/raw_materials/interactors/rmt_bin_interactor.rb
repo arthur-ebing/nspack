@@ -3,6 +3,8 @@
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
+      return failed_response("Asset Number:#{params[:bin_asset_number]} is already in stock") if in_stock_bin_for_asset_number?(params[:bin_asset_number])
+
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       res = validate_rmt_bin_params(params)
@@ -21,6 +23,10 @@ module RawMaterialsApp
       validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def in_stock_bin_for_asset_number?(bin_asset_number)
+      !repo.find_bin_by_asset_number(bin_asset_number).nil?
     end
 
     def get_header_inherited_field(delivery, container_type_id)
