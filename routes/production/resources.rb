@@ -85,7 +85,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # RESOURCES
+    # PLANT RESOURCES
     # --------------------------------------------------------------------------
     r.on 'plant_resources', Integer do |id|
       interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path }, {})
@@ -119,6 +119,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                                              form_errors: res.errors,
                                                              remote: fetch?(r))
             end
+          end
+        end
+      end
+
+      r.on 'link_peripherals' do
+        r.post do
+          res = interactor.link_peripherals(id, multiselect_grid_choices(params))
+          if fetch?(r)
+            update_grid_row(id, changes: { linked_resources: res.instance }, notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
           end
         end
       end

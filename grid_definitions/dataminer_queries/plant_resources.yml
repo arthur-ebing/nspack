@@ -2,19 +2,24 @@
 :caption: Plant Resources
 :sql: "SELECT plant_resources.id, plant_resources.plant_resource_type_id,\r\nplant_resource_types.icon,
   plant_resources.plant_resource_code, plant_resources.description,\r\nsystem_resources.system_resource_code,
-  plant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
+  \r\n(SELECT string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code
+  \r\n  FROM plant_resources_system_resources prs\r\n  JOIN system_resources pr ON
+  pr.id = prs.system_resource_id\r\n  WHERE prs.plant_resource_id = plant_resources.id)
+  sub) AS linked_resources,\r\nplant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
   AS type_description,\r\n(SELECT array_agg(cc.plant_resource_code) as path\r\n  FROM
   (SELECT c.plant_resource_code\r\n         FROM plant_resources AS c \r\n        JOIN
   tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id\r\n       WHERE
   t1.descendant_plant_resource_id = plant_resources.id\r\n       ORDER BY t1.path_length
   DESC) AS cc) AS path_array,\r\n(SELECT MAX(path_length)\r\n   FROM tree_plant_resources\r\n
-  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level \r\nFROM
+  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,\r\nplant_resources.system_resource_id\r\nFROM
   plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nLEFT
-  OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\nORDER
-  BY (SELECT string_agg(\"cc\".\"plant_resource_code\", ';') AS path \r\n    FROM
-  (SELECT \"c\".\"plant_resource_code\" FROM \"plant_resources\" c JOIN \"tree_plant_resources\"
-  t1 ON \"t1\".\"ancestor_plant_resource_id\" = \"c\".\"id\" \r\n    WHERE \"t1\".\"descendant_plant_resource_id\"
-  = \"plant_resources\".\"id\" \r\n    ORDER BY \"t1\".\"path_length\" DESC) cc)"
+  OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\nWHERE
+  EXISTS(SELECT ancestor_plant_resource_id FROM tree_plant_resources WHERE descendant_plant_resource_id
+  = plant_resources.id)\r\nORDER BY (SELECT string_agg(\"cc\".\"plant_resource_code\",
+  ';') AS path \r\n    FROM (SELECT \"c\".\"plant_resource_code\" FROM \"plant_resources\"
+  c JOIN \"tree_plant_resources\" t1 ON \"t1\".\"ancestor_plant_resource_id\" = \"c\".\"id\"
+  \r\n    WHERE \"t1\".\"descendant_plant_resource_id\" = \"plant_resources\".\"id\"
+  \r\n    ORDER BY \"t1\".\"path_length\" DESC) cc)"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -115,9 +120,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  linked_resources:
+    :name: linked_resources
+    :sequence_no: 7
+    :caption: Linked resources
+    :namespaced_name: 
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: plant_resources.active
     :data_type: :boolean
@@ -133,7 +154,7 @@
     :group_max: false
   plant_resource_type_code:
     :name: plant_resource_type_code
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Plant resource type code
     :namespaced_name: plant_resource_types.plant_resource_type_code
     :data_type: :string
@@ -149,7 +170,7 @@
     :group_max: false
   type_description:
     :name: type_description
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Type description
     :namespaced_name: plant_resource_types.description
     :data_type: :string
@@ -165,7 +186,7 @@
     :group_max: false
   path_array:
     :name: path_array
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Path array
     :namespaced_name: 
     :data_type: :string
@@ -181,13 +202,29 @@
     :group_max: false
   level:
     :name: level
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Level
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_id:
+    :name: system_resource_id
+    :sequence_no: 13
+    :caption: System resource
+    :namespaced_name: plant_resources.system_resource_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

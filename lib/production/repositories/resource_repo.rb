@@ -123,6 +123,32 @@ module ProductionApp
       resolve_system_code(nil, rules[:code_prefix], plant_resource_type_id)
     end
 
+    def link_peripherals(plant_resource_id, peripheral_ids)
+      existing_ids = existing_system_resource_ids_for_plant_resource(plant_resource_id)
+      old_ids = existing_ids - peripheral_ids
+      new_ids = peripheral_ids - existing_ids
+
+      DB[:plant_resources_system_resources].where(plant_resource_id: plant_resource_id).where(system_resource_id: old_ids).delete
+      new_ids.each do |new_id|
+        DB[:plant_resources_system_resources].insert(plant_resource_id: plant_resource_id, system_resource_id: new_id)
+      end
+
+      linked_peripheral_codes_for(plant_resource_id)
+    end
+
+    def linked_peripheral_codes_for(plant_resource_id)
+      DB[:plant_resources_system_resources]
+        .join(:system_resources, id: :system_resource_id)
+        .where(plant_resource_id: plant_resource_id)
+        .select(Sequel[:system_resources][:system_resource_code])
+        .map { |r| r[:system_resource_code] }
+        .join('; ')
+    end
+
+    def existing_system_resource_ids_for_plant_resource(plant_resource_id)
+      DB[:plant_resources_system_resources].where(plant_resource_id: plant_resource_id).select_map(:system_resource_id)
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res)

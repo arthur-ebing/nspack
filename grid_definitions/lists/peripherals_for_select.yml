@@ -1,0 +1,9 @@
+---
+:dataminer_definition: peripherals_for_select
+:multiselect:
+  :standard:
+    :url: "/production/resources/plant_resources/$:id$/link_peripherals"
+    :preselect: "SELECT system_resource_id AS id FROM plant_resources_system_resources WHERE plant_resource_id = $:id$"
+    :section_caption: "SELECT 'Link peripherals to ' || description FROM plant_resources WHERE id = $:id$"
+    :can_be_cleared: true
+    :multiselect_save_method: remote

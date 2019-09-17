@@ -97,6 +97,14 @@ module ProductionApp
       repo.next_peripheral_code(plant_resource_type_id)
     end
 
+    def link_peripherals(plant_resource_id, peripheral_ids)
+      linked_items = nil
+      repo.transaction do
+        linked_items = repo.link_peripherals(plant_resource_id, peripheral_ids)
+      end
+      success_response('Linked peripherals to resource', linked_items)
+    end
+
     private
 
     def repo
