@@ -45,7 +45,8 @@ module UiRules
       rmt_container_material_owner_id_label = @repo.find_rmt_container_material_owner(@form_object.rmt_container_material_owner_id)[:container_material_owner]
       rmt_inner_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_inner_container_type_id)&.container_type_code
       rmt_inner_container_material_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_inner_container_material_id)&.container_material_type_code
-      # # farm_id_label = @repo.find(:farms, RawMaterialsApp::Farm, @form_object.farm_id)&.farm_code # TO DO:
+      # farm_id_label = @repo.find(:farms, MasterfilesApp::Farm, @form_object.farm_id)&.farm_code
+      farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
 
       fields[:bin_asset_number] = { renderer: :label, hide_on_load: @rules[:scan_rmt_bin_asset_numbers] ? false : true }
       fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
@@ -60,7 +61,7 @@ module UiRules
       fields[:rmt_container_material_owner_id] = { renderer: :label, with_value: rmt_container_material_owner_id_label, caption: 'Container Material Owner' }
       fields[:rmt_inner_container_type_id] = { renderer: :label, with_value: rmt_inner_container_type_id_label, caption: 'Inner Container Type' }
       fields[:rmt_inner_container_material_id] = { renderer: :label, with_value: rmt_inner_container_material_id_label, caption: 'Inner Container Material Type' }
-      # # fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' } # TO DO:
+      fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:bin_received_date_time] = { renderer: :label }
     end
 

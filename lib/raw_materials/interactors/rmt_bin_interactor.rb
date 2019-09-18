@@ -30,15 +30,15 @@ module RawMaterialsApp
     end
 
     def get_header_inherited_field(delivery, container_type_id)
-      # TO DO: rmt_inner_container_material_id #HANS : There's more than one value. Which one to set
-      # Are the farm_id and puc_id also inherited from delivery header???
+      # rmt_inner_container_type_id: repo.rmt_inner_container_type_rmt_inner_container_material_type(rmt_inner_container_type_id)
+      rmt_inner_container_type_id = repo.rmt_container_type_rmt_inner_container_type(container_type_id)
       { rmt_delivery_id: delivery.id,
         orchard_id: delivery.orchard_id,
         season_id: delivery.season_id,
-        bin_received_date_time: delivery.date_delivered.to_s, # TO DO: ask James
+        bin_received_date_time: delivery.date_delivered.to_s,
         farm_id: delivery.farm_id,
         puc_id: delivery.puc_id,
-        rmt_inner_container_type_id: repo.rmt_container_type_rmt_inner_container_type(container_type_id) }
+        rmt_inner_container_type_id: rmt_inner_container_type_id }
     end
 
     def update_rmt_bin(id, params) # rubocop:disable Metrics/AbcSize

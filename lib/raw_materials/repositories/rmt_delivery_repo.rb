@@ -64,6 +64,10 @@ module RawMaterialsApp
       DB[:rmt_container_types].where(id: container_type_id).map { |r| r[:rmt_inner_container_type_id] }.first
     end
 
+    def rmt_inner_container_type_rmt_inner_container_material_type(rmt_inner_container_type_id)
+      DB[:rmt_container_material_types].where(rmt_container_type_id: rmt_inner_container_type_id).map { |r| r[:id] }
+    end
+
     def default_farm_puc
       default_farm = AppConst::DELIVERY_DEFAULT_FARM
       return { farm_id: nil, puc_id: nil } if default_farm.nil?
@@ -74,8 +78,6 @@ module RawMaterialsApp
       { farm_id: farm_pucs[0][:farm_id], puc_id: nil }
     end
 
-    # TO DO: Should this be OR are only dealing with organizations????
-    # LEFT OUTER JOIN people p ON p.id = pr.person_id
     def find_container_material_owners_by_container_material_type(container_material_type_id)
       DB["SELECT co.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS party_name
           FROM rmt_container_material_owners co
