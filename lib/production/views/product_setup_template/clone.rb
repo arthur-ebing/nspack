@@ -8,6 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:product_setup_template, :clone, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
+          cloned_from = ProductionApp::ProductSetupRepo.new.find_product_setup_template(id)&.template_name
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -17,6 +18,7 @@ module Production
                                   text: 'Back',
                                   url: '/list/product_setup_templates',
                                   style: :back_button)
+              section.add_text("Cloned from Product Setup Template: #{cloned_from}", wrapper: :h3)
             end
             page.form do |form|
               form.caption 'Clone Product Setup Template'
@@ -24,11 +26,13 @@ module Production
               form.remote!
               form.row do |row|
                 row.column do |col|
+                  col.add_field :id
                   col.add_field :template_name
                   col.add_field :description
                   col.add_field :cultivar_group_id
                   col.add_field :cultivar_group_code
                   col.add_field :cultivar_id
+                  col.add_field :cultivar_name
                 end
                 row.column do |col|
                   col.add_field :packhouse_resource_id

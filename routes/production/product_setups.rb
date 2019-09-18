@@ -107,8 +107,49 @@ class Nspack < Roda # rubocop:disable ClassLength
       interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'cultivar_group_changed' do
-        cultivars = interactor.for_select_cultivar_group_cultivars(params[:changed_value])
-        json_replace_select_options('product_setup_template_cultivar_id', cultivars)
+        if params[:changed_value].blank?
+          cultivars = []
+        else
+          cultivar_group_id = params[:changed_value]
+          template_name = params[:product_setup_template_template_name]
+          cannot_edit_cultivar = ProductionApp::ProductSetupRepo.new.invalidates_any_product_setups_marketing_varieties?(template_name, "WHERE cultivars.cultivar_group_id = #{cultivar_group_id}")
+          cultivars = interactor.for_select_cultivar_group_cultivars(cultivar_group_id)
+        end
+        if cannot_edit_cultivar
+          old_cultivar_group_id = ProductionApp::ProductSetupRepo.new.find_product_setup_template(params[:product_setup_template_id])&.cultivar_group_id
+          json_actions([OpenStruct.new(type: :change_select_value,
+                                       dom_id: 'product_setup_template_cultivar_group_id',
+                                       value: old_cultivar_group_id)],
+                       'Cannot change Cultivar Group. Selection invalidates product setup marketing varieties.',
+                       keep_dialog_open: true)
+        else
+          json_actions([OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'product_setup_template_cultivar_id',
+                                       options_array: cultivars)])
+        end
+      end
+
+      r.on 'cultivar_changed' do
+        cultivar_group_id = params[:product_setup_template_cultivar_group_id]
+        if cultivar_group_id.blank? || params[:changed_value].blank?
+          cultivar_id = nil
+        else
+          cultivar_id = params[:changed_value]
+          template_name = params[:product_setup_template_template_name]
+          cannot_edit_cultivar = ProductionApp::ProductSetupRepo.new.invalidates_any_product_setups_marketing_varieties?(template_name, "WHERE cultivars.cultivar_group_id = #{cultivar_group_id} AND cultivars.id = #{cultivar_id}")
+        end
+        if cannot_edit_cultivar
+          old_cultivar_id = ProductionApp::ProductSetupRepo.new.find_product_setup_template(params[:product_setup_template_id])&.cultivar_id
+          json_actions([OpenStruct.new(type: :change_select_value,
+                                       dom_id: 'product_setup_template_cultivar_id',
+                                       value: old_cultivar_id)],
+                       'Cannot change Cultivar. Selection invalidates product setup marketing varieties.',
+                       keep_dialog_open: true)
+        else
+          json_actions([OpenStruct.new(type: :change_select_value,
+                                       dom_id: 'product_setup_template_cultivar_id',
+                                       value: cultivar_id)])
+        end
       end
 
       r.on 'packhouse_resource_changed' do

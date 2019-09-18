@@ -239,5 +239,60 @@ module ProductionApp
       pm_bom = find_product_setup(product_setup_id)
       MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
     end
+
+    def disable_cultivar_fields(product_setup_template_id)
+      referenced_by_closed_or_inspected_runs?(product_setup_template_id)
+    end
+
+    def referenced_by_closed_or_inspected_runs?(_id)
+      # query = <<~SQL
+      #   SELECT EXISTS(
+      #     SELECT id from production_runs WHERE product_setup_template_id = #{id} AND is_closed
+      #     UNION ALL
+      #     SELECT id from production_runs WHERE product_setup_template_id = #{id} AND govt_inspection_id IS NOT NULL
+      #   )
+      # SQL
+      # DB[query].single_value
+      false
+    end
+
+    def invalidates_any_product_setups_marketing_varieties?(template_name, where_clause)
+      query = <<~SQL
+        SELECT EXISTS(
+           SELECT product_setups.id FROM product_setups
+           JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+           WHERE product_setup_templates.template_name = '#{template_name}'
+           AND marketing_variety_id NOT IN (
+              SELECT DISTINCT marketing_varieties.id
+              FROM marketing_varieties
+              JOIN marketing_varieties_for_cultivars ON marketing_varieties_for_cultivars.marketing_variety_id = marketing_varieties.id
+              JOIN cultivars ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id
+              JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+              JOIN product_setup_templates ON product_setup_templates.cultivar_group_id = cultivar_groups.id
+              #{where_clause}
+           )
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def update_product_setup_template(id, attrs)
+      # production_run_ids = product_setup_template_production_run_ids(id)
+      # DB[:cartons].where(production_run_id: production_run_ids)
+      #             .update(cultivar_id: attrs[:cultivar_id])
+      # DB[:pallet_sequences].where(production_run_id: production_run_ids)
+      #                      .update(cultivar_id: attrs[:cultivar_id])
+      # DB[:bins].where(production_run_rebin_id: production_run_ids)
+      #          .update(cultivar_id: attrs[:cultivar_id])
+      # DB[:production_runs].where(product_setup_template_id: id)
+      #                     .update(cultivar_id: attrs[:cultivar_id])
+      update(:product_setup_templates, id, attrs)
+    end
+
+    def product_setup_template_production_run_ids(product_setup_template_id)
+      DB[:production_runs]
+        .where(product_setup_template_id: product_setup_template_id)
+        .select_map(:id)
+    end
   end
 end

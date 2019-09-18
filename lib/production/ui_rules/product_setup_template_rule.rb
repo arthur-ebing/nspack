@@ -2,17 +2,19 @@
 
 module UiRules
   class ProductSetupTemplateRule < Base # rubocop:disable ClassLength
-    def generate_rules
+    def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
 
+      disable_cultivar_fields = disable_cultivar_fields(@options[:id]) if %i[edit clone].include? @mode
       common_values_for_fields common_fields
       set_clone_fields if %i[clone].include? @mode
+      set_disable_cultivar_fields if disable_cultivar_fields
 
       set_show_fields if %i[show reopen].include? @mode
 
-      add_behaviours if %i[new edit].include? @mode
+      add_behaviours if %i[new edit clone].include? @mode
 
       form_name 'product_setup_template'
     end
@@ -38,8 +40,15 @@ module UiRules
     def common_fields  # rubocop:disable Metrics/AbcSize
       cultivar_group_id = @repo.find_product_setup_template(@options[:id])&.cultivar_group_id || @repo.cultivar_group_id
       {
+        id: { renderer: :hidden, value: @options[:id] },
         template_name: { required: true },
         description: {},
+        cultivar_group_code: { renderer: :label,
+                               caption: 'Cultivar Group',
+                               hide_on_load: true },
+        cultivar_name: { renderer: :label,
+                         caption: 'Cultivar',
+                         hide_on_load: true },
         cultivar_group_id: { renderer: :select,
                              options: MasterfilesApp::CultivarRepo.new.for_select_cultivar_groups,
                              disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivar_groups,
@@ -85,6 +94,13 @@ module UiRules
       fields[:cultivar_group_code] = { renderer: :label, with_value: @form_object[:cultivar_group_code], caption: 'Cultivar Group' }
     end
 
+    def set_disable_cultivar_fields
+      fields[:cultivar_group_id] = { renderer: :hidden, value: @form_object[:cultivar_group_id] }
+      fields[:cultivar_group_code] = { renderer: :label, with_value: @form_object[:cultivar_group_code], caption: 'Cultivar Group' }
+      fields[:cultivar_id] = { renderer: :hidden, value: @form_object[:cultivar_id] }
+      fields[:cultivar_name] = { renderer: :label, with_value: @form_object[:cultivar_name], caption: 'Cultivar' }
+    end
+
     def make_form_object
       if @mode == :new
         make_new_form_object
@@ -112,12 +128,20 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :cultivar_group_id,
-                                  notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_group_changed' }]
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_group_changed',
+                                             param_keys: %i[product_setup_template_template_name product_setup_template_id] }]
+        behaviour.dropdown_change :cultivar_id,
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_changed',
+                                             param_keys: %i[product_setup_template_template_name product_setup_template_cultivar_group_id product_setup_template_id] }]
         behaviour.dropdown_change :packhouse_resource_id,
                                   notify: [{ url: '/production/product_setups/product_setup_templates/packhouse_resource_changed' }]
         behaviour.dropdown_change :season_group_id,
                                   notify: [{ url: '/production/product_setups/product_setup_templates/season_group_changed' }]
       end
+    end
+
+    def disable_cultivar_fields(product_setup_template_id)
+      @repo.disable_cultivar_fields(product_setup_template_id)
     end
   end
 end

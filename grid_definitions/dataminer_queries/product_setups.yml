@@ -80,7 +80,7 @@
     :name: in_production
     :sequence_no: 5
     :caption: In production
-    :namespaced_name: 
+    :namespaced_name: in_production
     :data_type: :boolean
     :width: 120
     :format: 
@@ -125,7 +125,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: true, false
-- :column: product_setups.in_production
+- :column: in_production
   :caption: In Production?
   :data_type: :boolean
   :control_type: :list

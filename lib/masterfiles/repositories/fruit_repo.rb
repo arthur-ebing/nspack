@@ -65,7 +65,34 @@ module MasterfilesApp
     end
 
     def find_treatment_type_treatment_codes(id)
-      DB[:treatments].join(:treatment_types, id: :treatment_type_id).where(treatment_type_id: id).order(:treatment_code).select_map(:treatment_code)
+      DB[:treatments]
+        .join(:treatment_types, id: :treatment_type_id)
+        .where(treatment_type_id: id)
+        .order(:treatment_code)
+        .select_map(:treatment_code)
+    end
+
+    def for_select_treatments
+      DB[:treatments]
+        .join(:treatment_types, id: :treatment_type_id)
+        .order(:treatment_code)
+        .select(
+          Sequel[:treatments][:id],
+          :treatment_type_code,
+          :treatment_code
+        ).map { |r| ["#{r[:treatment_type_code]} - #{r[:treatment_code]}", r[:id]] }
+    end
+
+    def for_select_treatment_type_treatment_codes(treatment_type_id)
+      DB[:treatments]
+        .join(:treatment_types, id: :treatment_type_id)
+        .where(treatment_type_id: treatment_type_id)
+        .order(:treatment_code)
+        .select(
+          Sequel[:treatments][:id],
+          :treatment_type_code,
+          :treatment_code
+        ).map { |r| ["#{r[:treatment_type_code]} - #{r[:treatment_code]}", r[:id]] }
     end
   end
 end

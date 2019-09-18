@@ -25,10 +25,13 @@ module Production
               form.method :update
               form.row do |row|
                 row.column do |col|
+                  col.add_field :id
                   col.add_field :template_name
                   col.add_field :description
                   col.add_field :cultivar_group_id
+                  col.add_field :cultivar_group_code
                   col.add_field :cultivar_id
+                  col.add_field :cultivar_name
                 end
                 row.column do |col|
                   col.add_field :packhouse_resource_id
