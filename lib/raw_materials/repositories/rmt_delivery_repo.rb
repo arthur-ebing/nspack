@@ -57,7 +57,7 @@ module RawMaterialsApp
     end
 
     def rmt_container_type_by_container_type_code(container_type_code)
-      DB[:rmt_container_types].where(container_type_code: container_type_code).map { |p| p[:id] }.first
+      DB[:rmt_container_types].where(container_type_code: container_type_code).first
     end
 
     def rmt_container_type_rmt_inner_container_type(container_type_id)

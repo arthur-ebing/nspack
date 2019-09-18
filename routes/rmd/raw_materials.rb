@@ -13,10 +13,10 @@ class Nspack < Roda
 
       r.on 'new' do # rubocop:disable Metrics/BlockLength    # NEW
         delivery = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(id)
-        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
         details = { cultivar_id: delivery.cultivar_id, qty_bins: 1, bin_fullness: :Full }
 
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true' && !default_rmt_container_type_id.nil?
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true' && !default_rmt_container_type[:id].nil?
         capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION == 'true'
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
@@ -34,7 +34,7 @@ class Nspack < Roda
         end
 
         form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(delivery.orchard_id), required: true, prompt: true)
-        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type_id,
+        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         # TO DO: Are these qtys neccessary for option B or they default=1?
         form.add_field(:qty_bins, 'Qty Bins', data_type: :number)
@@ -43,7 +43,7 @@ class Nspack < Roda
         form.add_field(:nett_weight, 'Nett Weight', required: false, prompt: true) if capture_nett_weight
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
-                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type_id }),
+                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
                           required: true, prompt: true)
         end
         form.add_select(:rmt_container_material_owner_id, 'Container Material Owner', items: [], required: true, prompt: true) if capture_container_material && capture_container_material_owner
