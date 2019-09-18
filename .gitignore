@@ -48,3 +48,6 @@ prestyle.css
 config/mail_settings.rb
 config/dataminer_connections.yml
 prepared_reports/*.yml
+/app_reports/
+/sys_prepared_reports/
+/app_prepared_reports/
