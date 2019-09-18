@@ -40,25 +40,6 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def create_peripheral(params) # rubocop:disable Metrics/AbcSize
-      res = validate_plant_resource_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
-
-      id = nil
-      repo.transaction do
-        id = repo.create_peripheral_resource(res)
-        log_status('plant_resources', id, 'CREATED')
-        log_transaction
-      end
-      instance = plant_resource(id)
-      success_response("Created peripheral #{instance.plant_resource_code}",
-                       instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { plant_resource_code: ['This peripheral already exists'] }))
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
     def update_plant_resource(id, params)
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -92,9 +73,10 @@ module ProductionApp
     end
 
     def next_peripheral_code(plant_resource_type_id)
-      return '' if plant_resource_type_id.blank?
+      return success_response('ok', next_code: '', readonly: false) if plant_resource_type_id.blank?
 
-      repo.next_peripheral_code(plant_resource_type_id)
+      code = repo.next_peripheral_code(plant_resource_type_id)
+      success_response('ok', next_code: code, readonly: !code.empty?)
     end
 
     def link_peripherals(plant_resource_id, peripheral_ids)

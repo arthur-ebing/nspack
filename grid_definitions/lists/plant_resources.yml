@@ -27,11 +27,13 @@
   :icon: add-solid
   :title: New sub-resource
   :popup: true
+  :hide_if_true: peripheral
 - :url: "/list/peripherals_for_select/multi?key=standard&id=$:id$"
   :text: Link peripherals
   :icon: list
   :popup: true
   :hide_if_null: system_resource_id
+  :hide_if_true: peripheral
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/plant_resources/new"

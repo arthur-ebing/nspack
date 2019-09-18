@@ -10,6 +10,9 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      set_edit_fields if @mode == :edit
+
+      add_behaviours if @mode == :new
 
       form_name 'plant_resource'
     end
@@ -21,6 +24,11 @@ module UiRules
       fields[:system_resource_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+    end
+
+    def set_edit_fields
+      rules = @repo.plant_resource_definition(@form_object.plant_resource_type_id)
+      fields[:plant_resource_code][:readonly] = true if rules[:non_editable_code]
     end
 
     def common_fields
@@ -66,6 +74,12 @@ module UiRules
                                     plant_resource_code: nil,
                                     # plant_resource_attributes: nil,
                                     description: nil)
+    end
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :plant_resource_type_id, notify: [{ url: '/production/resources/plant_resources/next_code' }]
+      end
     end
   end
 end

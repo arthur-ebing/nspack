@@ -96,14 +96,6 @@ module ProductionApp
       create(:plant_resources, new_attrs)
     end
 
-    def create_peripheral_resource(params)
-      sys_id = create_twin_system_resource(nil, params)
-      raise 'bummer' if sys_id.nil?
-
-      attrs = params.to_h.merge(system_resource_id: sys_id)
-      create_plant_resource(attrs)
-    end
-
     def delete_plant_resource(id)
       DB[:tree_plant_resources].where(ancestor_plant_resource_id: id).or(descendant_plant_resource_id: id).delete
       system_resource_id = find_plant_resource(id)&.system_resource_id
@@ -117,6 +109,8 @@ module ProductionApp
 
     def next_peripheral_code(plant_resource_type_id)
       rules = plant_resource_definition(plant_resource_type_id)
+      return '' unless rules[:non_editable_code]
+
       system_resource_type = rules[:create_with_system_resource]
       raise Crossbeams::FrameworkError, 'Plant peripheral resource type must link to system peripheral type' unless system_resource_type
 

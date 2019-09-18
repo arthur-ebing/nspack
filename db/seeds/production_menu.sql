@@ -59,19 +59,6 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Resources'
         false,
         false);
 
--- PROGRAM FUNCTION Peripherals
-INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
-                               group_name, restricted_user_access, show_in_iframe)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Resources'
-          AND functional_area_id = (SELECT id FROM functional_areas
-                                    WHERE functional_area_name = 'Production')),
-        'Peripherals',
-        '/list/peripherals',
-        4,
-        NULL,
-        false,
-        false);
-
 -- PROGRAM: Product Setup
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Product_setups', 1, (SELECT id FROM functional_areas

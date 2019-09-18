@@ -11,9 +11,10 @@
   tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id\r\n       WHERE
   t1.descendant_plant_resource_id = plant_resources.id\r\n       ORDER BY t1.path_length
   DESC) AS cc) AS path_array,\r\n(SELECT MAX(path_length)\r\n   FROM tree_plant_resources\r\n
-  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,\r\nplant_resources.system_resource_id\r\nFROM
+  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,\r\nplant_resources.system_resource_id,\r\nsystem_resource_types.peripheral\r\nFROM
   plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nLEFT
-  OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\nWHERE
+  OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\nLEFT
+  OUTER JOIN system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE
   EXISTS(SELECT ancestor_plant_resource_id FROM tree_plant_resources WHERE descendant_plant_resource_id
   = plant_resources.id)\r\nORDER BY (SELECT string_agg(\"cc\".\"plant_resource_code\",
   ';') AS path \r\n    FROM (SELECT \"c\".\"plant_resource_code\" FROM \"plant_resources\"
@@ -221,7 +222,23 @@
     :sequence_no: 13
     :caption: System resource
     :namespaced_name: plant_resources.system_resource_id
-    :data_type: :string
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  peripheral:
+    :name: peripheral
+    :sequence_no: 14
+    :caption: Peripheral
+    :namespaced_name: system_resource_types.peripheral
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: true

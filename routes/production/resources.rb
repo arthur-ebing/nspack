@@ -169,6 +169,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('resources', 'new')
         show_partial_or_page(r) { Production::Resources::PlantResource::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'next_code' do
+        res = interactor.next_peripheral_code(params[:changed_value])
+        json_actions(
+          [
+            OpenStruct.new(type: :replace_input_value, dom_id: 'plant_resource_plant_resource_code', value: res.instance[:next_code]),
+            OpenStruct.new(type: :set_readonly, dom_id: 'plant_resource_plant_resource_code', readonly: res.instance[:readonly])
+          ]
+        )
+      end
+
       r.post do        # CREATE
         res = interactor.create_root_plant_resource(params[:plant_resource])
         if res.success
@@ -207,32 +218,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             delete_grid_row(id, notice: res.message)
           else
             show_json_error(res.message, status: 200)
-          end
-        end
-      end
-    end
-
-    r.on 'peripherals' do
-      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path }, {})
-      r.on 'new' do    # NEW
-        check_auth!('resources', 'new')
-        show_partial_or_page(r) { Production::Resources::Peripheral::New.call(remote: fetch?(r)) }
-      end
-
-      r.on 'next_code' do
-        json_replace_input_value('peripheral_plant_resource_code', interactor.next_peripheral_code(params[:changed_value]))
-      end
-
-      r.post do        # CREATE
-        res = interactor.create_peripheral(params[:peripheral])
-        if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-        else
-          re_show_form(r, res, url: '/production/resources/peripherals/new') do
-            Production::Resources::Peripheral::New.call(form_values: params[:peripheral],
-                                                        form_errors: res.errors,
-                                                        remote: fetch?(r))
           end
         end
       end
