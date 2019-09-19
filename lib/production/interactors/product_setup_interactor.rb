@@ -5,7 +5,7 @@ module ProductionApp
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      return failed_response(OpenStruct.new(messages: { size_reference_id: ['You did not choose a Size Reference or Actual Count'] })) if params[:fruit_size_reference_id].nil? && params[:fruit_actual_counts_for_pack_id].nil?
+      return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].blank? && params[:fruit_actual_counts_for_pack_id].blank?
 
       attrs = res.to_h
       treatment_ids = attrs.delete(:treatment_ids)
@@ -29,7 +29,7 @@ module ProductionApp
     def update_product_setup(id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-      return failed_response(OpenStruct.new(messages: { size_reference_id: ['You did not choose a Size Reference or Actual Count'] })) if params[:fruit_size_reference_id].nil? && params[:fruit_actual_counts_for_pack_id].nil?
+      return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].blank? && params[:fruit_actual_counts_for_pack_id].blank?
 
       attrs = res.to_h
       treatment_ids = attrs.delete(:treatment_ids)
