@@ -6,7 +6,7 @@ Sequel.migration do
       primary_key :id
       foreign_key :orchard_id, :orchards, type: :integer, null: false
       foreign_key :cultivar_id, :cultivars, type: :integer, null: false
-      foreign_key :rmt_delivery_destination_id, :rmt_delivery_destinations, type: :integer, null: false
+      foreign_key :rmt_delivery_destination_id, :rmt_delivery_destinations, type: :integer
       foreign_key :season_id, :seasons, type: :integer, null: false
       foreign_key :farm_id, :farms, type: :integer, null: false
       foreign_key :puc_id, :pucs, type: :integer, null: false

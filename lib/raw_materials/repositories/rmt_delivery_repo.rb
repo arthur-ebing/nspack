@@ -103,7 +103,9 @@ module RawMaterialsApp
     end
 
     def find_bin_by_asset_number(bin_asset_number)
-      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).first
+      DB["SELECT *
+          FROM rmt_bins
+          WHERE (bin_asset_number = '#{bin_asset_number}') AND (exit_ref is Null)"].first
     end
   end
 end

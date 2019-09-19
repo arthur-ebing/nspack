@@ -29,8 +29,8 @@ class Nspack < Roda
                                        button_caption: 'Submit')
 
         form.behaviours do |behaviour|
-          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_container_type_combo_changed' }]
-          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/container_material_type_combo_changed' }]
+          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_container_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/container_material_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
         end
 
         form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(delivery.orchard_id), required: true, prompt: true)
@@ -38,7 +38,7 @@ class Nspack < Roda
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)
         form.add_label(:qty_inner_bins, 'Qty Inner Bins', 1, 1, hide_on_load: capture_inner_bins ? false : true)
-        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three Quarters Full], prompt: true)
+        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
         form.add_field(:nett_weight, 'Nett Weight', required: false, prompt: true) if capture_nett_weight
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
@@ -70,27 +70,38 @@ class Nspack < Roda
     end
 
     r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
-      r.on 'rmt_container_type_combo_changed' do
+      r.on 'rmt_container_type_combo_changed' do # rubocop:disable Metrics/BlockLength
+        actions = []
         if !params[:changed_value].to_s.empty?
           rmt_container_material_type_ids = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-          json_actions([OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
-                                       options_array: rmt_container_material_type_ids),
-                        OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'rmt_bin_rmt_container_material_owner_id',
-                                       options_array: []),
-                        OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true' ? :show_element : :hide_element,
-                                       dom_id: 'rmt_bin_qty_inner_bins_row')],
-                       'Container Type has changed')
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+            actions << OpenStruct.new(type: :replace_select_options,
+                                      dom_id: 'rmt_bin_rmt_container_material_type_id',
+                                      options_array: rmt_container_material_type_ids)
+          end
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+            actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
+                                      dom_id: 'rmt_bin_qty_inner_bins_row')
+          end
         else
-          json_actions([OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
-                                       options_array: []),
-                        OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'rmt_bin_rmt_container_material_owner_id',
-                                       options_array: [])],
-                       'Container Type has changed')
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+            actions << OpenStruct.new(type: :replace_select_options,
+                                      dom_id: 'rmt_bin_rmt_container_material_type_id',
+                                      options_array: [])
+          end
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+            actions << OpenStruct.new(type: :hide_element,
+                                      dom_id: 'rmt_bin_qty_inner_bins_row')
+          end
         end
+
+        if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'rmt_bin_rmt_container_material_owner_id',
+                                    options_array: [])
+        end
+
+        json_actions(actions)
       end
 
       r.on 'container_material_type_combo_changed' do

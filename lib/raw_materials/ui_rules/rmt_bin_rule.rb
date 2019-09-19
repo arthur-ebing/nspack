@@ -42,7 +42,7 @@ module UiRules
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       rmt_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_container_type_id)&.container_type_code
       rmt_container_material_type_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_container_material_type_id)&.container_material_type_code
-      rmt_container_material_owner_id_label = @repo.find_rmt_container_material_owner(@form_object.rmt_container_material_owner_id)[:container_material_owner]
+      rmt_container_material_owner_id_label = (@repo.find_rmt_container_material_owner(@form_object.rmt_container_material_owner_id) || {})[:container_material_owner]
       rmt_inner_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_inner_container_type_id)&.container_type_code
       rmt_inner_container_material_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_inner_container_material_id)&.container_material_type_code
       # farm_id_label = @repo.find(:farms, MasterfilesApp::Farm, @form_object.farm_id)&.farm_code
@@ -54,7 +54,7 @@ module UiRules
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:rmt_container_type_id] = { renderer: :label, with_value: rmt_container_type_id_label, caption: 'Container Type' }
       fields[:qty_bins] = { renderer: :label }
-      fields[:qty_inner_bins] = { renderer: :label }
+      fields[:qty_inner_bins] = { renderer: :label, hide_on_load: @rules[:capture_inner_bins] ? false : true }
       fields[:bin_fullness] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: rmt_container_material_type_id_label, caption: 'Container Material Type' }
@@ -134,7 +134,7 @@ module UiRules
 
       behaviours do |behaviour|
         behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/rmt_container_type_combo_changed' }]
-        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }]
+        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
       end
     end
 

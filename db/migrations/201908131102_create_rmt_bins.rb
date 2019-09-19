@@ -10,9 +10,9 @@ Sequel.migration do
       foreign_key :orchard_id, :orchards, type: :integer, null: false
       foreign_key :farm_id, :farms, type: :integer, null: false
       foreign_key :rmt_class_id, :rmt_classes, type: :integer
-      foreign_key :rmt_container_material_owner_id, :rmt_container_material_owners, type: :integer, null: false
+      foreign_key :rmt_container_material_owner_id, :rmt_container_material_owners, type: :integer
       foreign_key :rmt_container_type_id, :rmt_container_types, type: :integer, null: false
-      foreign_key :rmt_container_material_type_id, :rmt_container_material_types, type: :integer, null: false
+      foreign_key :rmt_container_material_type_id, :rmt_container_material_types, type: :integer
       foreign_key :cultivar_group_id, :cultivar_groups, type: :integer
       foreign_key :puc_id, :pucs, type: :integer
       String :status
@@ -41,7 +41,7 @@ Sequel.migration do
       DateTime :bin_tipping_started_date_time
       DateTime :rebin_created_at
 
-      index [:bin_asset_number], name: :rmt_bins_unique_bin_asset_number, unique: true
+      # index [:bin_asset_number], name: :rmt_bins_unique_bin_asset_number, unique: true
     end
 
     pgt_created_at(:rmt_bins,

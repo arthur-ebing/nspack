@@ -77,13 +77,9 @@ module UiRules
         date_delivered: { renderer: :date }
       }
 
-      if %i[edit].include? @mode
-        fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id)
-        fields[:orchard_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchards(@form_object.farm_id, @form_object.puc_id)
-        fields[:cultivar_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(@form_object.orchard_id)
-      elsif %i[new].include? @mode
-        fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id)
-      end
+      fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?
+      fields[:orchard_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchards(@form_object.farm_id, @form_object.puc_id) unless @form_object.puc_id.nil_or_empty?
+      fields[:cultivar_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(@form_object.orchard_id) unless @form_object.orchard_id.nil_or_empty?
       fields
     end
 

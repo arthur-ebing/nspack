@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Edit
-        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -28,11 +28,11 @@ module RawMaterials
                   end
 
                   row.column do |col|
-                    col.add_field :qty_damaged_bins
-                    col.add_field :qty_empty_bins
+                    form.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
+                    form.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
                     col.add_field :date_delivered
                     col.add_field :date_picked
-                    col.add_field :truck_registration_number
+                    form.add_field :truck_registration_number if rules[:show_truck_registration_number]
                   end
                 end
               end

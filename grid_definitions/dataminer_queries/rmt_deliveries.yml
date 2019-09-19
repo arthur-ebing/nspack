@@ -7,12 +7,11 @@
   "rmt_deliveries"."date_picked", "rmt_deliveries"."date_delivered", "rmt_deliveries"."tipping_complete_date_time",
   "rmt_deliveries"."created_at", "rmt_deliveries"."updated_at", "cultivars"."cultivar_name",
   "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code", "rmt_delivery_destinations"."delivery_destination_code",
-  "seasons"."season_code", fn_current_status('rmt_deliveries', "rmt_deliveries"."id")
-  AS status FROM "rmt_deliveries" JOIN "cultivars" ON "cultivars"."id" = "rmt_deliveries"."cultivar_id"
+  "seasons"."season_code" FROM "rmt_deliveries" JOIN "cultivars" ON "cultivars"."id" = "rmt_deliveries"."cultivar_id"
   JOIN "farms" ON "farms"."id" = "rmt_deliveries"."farm_id" JOIN "orchards" ON "orchards"."id"
   = "rmt_deliveries"."orchard_id" JOIN "pucs" ON "pucs"."id" = "rmt_deliveries"."puc_id"
-  JOIN "rmt_delivery_destinations" ON "rmt_delivery_destinations"."id" = "rmt_deliveries"."rmt_delivery_destination_id"
-  JOIN "seasons" ON "seasons"."id" = "rmt_deliveries"."season_id"
+  LEFT OUTER JOIN "rmt_delivery_destinations" ON "rmt_delivery_destinations"."id" = "rmt_deliveries"."rmt_delivery_destination_id"
+  JOIN "seasons" ON "seasons"."id" = "rmt_deliveries"."season_id" order by "rmt_deliveries"."id" desc
 :limit: 
 :offset: 
 :external_settings: {}
@@ -380,22 +379,6 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 24
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
