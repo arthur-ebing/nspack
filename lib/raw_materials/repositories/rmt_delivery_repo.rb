@@ -73,6 +73,7 @@ module RawMaterialsApp
       return { farm_id: nil, puc_id: nil } if default_farm.nil?
 
       farm_pucs = DB[:farms_pucs].where(farm_id: DB[:farms].where(farm_code: default_farm).select(:id)).all
+      return { farm_id: nil, puc_id: nil } if farm_pucs.empty?
       return farm_pucs[0] if farm_pucs.length == 1
 
       { farm_id: farm_pucs[0][:farm_id], puc_id: nil }
