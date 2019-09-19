@@ -21,7 +21,9 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },
     { DEFAULT_FG_PACKAGING_TYPE: 'Default fg packaging type pm_type_code for Product Setups. Habata will be BIN while Matrooz will be CARTON' },
-    { REQUIRE_PACKAGING_BOM: 'Require packaging bom for Product Setups. Display PM Subtype and PM BOM if true' }
+    { REQUIRE_PACKAGING_BOM: 'Require packaging bom for Product Setups. Display PM Subtype and PM BOM if true' },
+    { DEFAULT_LABEL_DIMENSION: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
+    { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' }
   ].freeze
 
   NO_OVERRIDE = [
@@ -41,6 +43,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
 
   MUST_OVERRIDE = [
     { LABEL_SERVER_URI: 'HTTP address of MesServer in the format http://IP:2080/ NOTE: the trailing "/" is required.' },
+    { LABEL_PUBLISH_NOTIFY_URLS: 'HTTP address of the publish notify urls separated by ",". e.g. http://localhost:9296/masterfiles/config/label_templates/published' },
     { JASPER_REPORTING_ENGINE_PATH: 'Full path to dir containing JasperReportPrinter.jar' },
     { JASPER_REPORTS_PATH: "Full path to client's Jasper report definitions." },
     { SYSTEM_MAIL_SENDER: 'Email address for "FROM" address in the format NAME<email>' },
