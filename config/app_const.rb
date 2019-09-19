@@ -48,7 +48,9 @@ class AppConst
   REQUIRE_PACKAGING_BOM = ENV['REQUIRE_PACKAGING_BOM']
 
   # Routes that do not require login:
-  BYPASS_LOGIN_ROUTES = [].freeze
+  BYPASS_LOGIN_ROUTES = [
+    '/masterfiles/config/label_templates/published'
+  ].freeze
 
   # Menu
   FUNCTIONAL_AREA_RMD = 'RMD'
@@ -85,11 +87,11 @@ class AppConst
   PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'
   PRINTER_USE_OFFICE = 'OFFICE'
 
-  # PRINT_APP_LOCATION = 'Location'
+  PRINT_APP_BIN = 'Bin'
   # PRINT_APP_MR_SKU_BARCODE = 'Material Resource SKU Barcode'
 
   PRINTER_APPLICATIONS = [
-    # PRINT_APP_LOCATION,
+    PRINT_APP_BIN
     # PRINT_APP_MR_SKU_BARCODE
   ].freeze
 
@@ -98,7 +100,7 @@ class AppConst
     # location: { format: 'LC%d', fields: [:id] },
     # sku: { format: 'SK%d', fields: [:sku_number] },
     # delivery: { format: 'DN%d', fields: [:delivery_number] },
-    # stock_adjustment: { format: 'SA%d', fields: [:stock_adjustment_number] }
+    bin: { format: 'BN%d', fields: [:id] }
   }.freeze
 
   BARCODE_SCAN_RULES = [
@@ -107,7 +109,7 @@ class AppConst
     # { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     # { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
-    # { regex: '^SA(\\d+)', type: 'stock_adjustment', field: 'stock_adjustment_number' }
+    { regex: '^BN(\\d+)', type: 'bin', field: 'id' }
   ].freeze
 
   # Per scan type, per field, set attributes for displaying a lookup value below a scan field.

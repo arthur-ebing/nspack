@@ -6,7 +6,7 @@ module MasterfilesApp
 
     def initialize(params)
       @printer_type = params[:printer_type]
-      @labels = params[:labels].select { |l| l[:variable_set] == 'Pack Material' }
+      @labels = params[:labels].select { |l| l[:variable_set] == 'NS Packhouse' }
     end
 
     def call
