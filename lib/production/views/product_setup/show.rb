@@ -12,9 +12,16 @@ module Production
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: "/production/product_setups/product_setup_templates/#{ui_rule.form_object.product_setup_template_id}/edit",
+                                  style: :back_button)
+            end
             page.form do |form| # rubocop:disable Metrics/BlockLength
               # form.caption 'Product Setup'
               form.view_only!
+              form.no_submit!
               form.add_field :product_setup_template_id
               form.expand_collapse button: true, mini: false
               form.fold_up do |fold|

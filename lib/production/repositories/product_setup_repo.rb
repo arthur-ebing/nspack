@@ -86,13 +86,15 @@ module ProductionApp
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end
 
-    def for_select_packhouse_lines(packhouse_id)
+    def for_select_packhouse_lines(packhouse_id)  # rubocop:disable Metrics/AbcSize
       DB[:plant_resources]
         .join(:tree_plant_resources, descendant_plant_resource_id: :id)
+        .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
         .where(ancestor_plant_resource_id: packhouse_id)
+        .where(plant_resource_type_code: Crossbeams::Config::ResourceDefinitions::LINE)
         .where { path_length.> 0 } # rubocop:disable Style/NumericPredicate
         .select(
-          :id,
+          Sequel[:plant_resources][:id],
           :plant_resource_code
         ).map { |r| [r[:plant_resource_code], r[:id]] }
     end

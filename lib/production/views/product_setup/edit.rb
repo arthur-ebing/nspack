@@ -14,6 +14,12 @@ module Production
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: "/production/product_setups/product_setup_templates/#{ui_rule.form_object.product_setup_template_id}/edit",
+                                  style: :back_button)
+            end
             page.form do |form| # rubocop:disable Metrics/BlockLength
               form.caption 'Edit Product Setup'
               form.action "/production/product_setups/product_setups/#{id}"

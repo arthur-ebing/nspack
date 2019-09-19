@@ -4,7 +4,7 @@ module Production
   module ProductSetups
     module ProductSetupTemplate
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
+        def self.call(id, is_update: nil, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:product_setup_template, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -42,15 +42,16 @@ module Production
               end
             end
 
-            page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'New Product Setup',
-                                  url: "/production/product_setups/product_setup_templates/#{id}/product_setups/new",
-                                  behaviour: :popup,
-                                  style: :button)
-              section.add_grid('product_setups',
-                               "/list/product_setups/grid?key=standard&product_setups.product_setup_template_id=#{id}",
-                               caption: 'Product Setups')
+            unless is_update
+              page.section do |section|
+                section.add_control(control_type: :link,
+                                    text: 'New Product Setup',
+                                    url: "/production/product_setups/product_setup_templates/#{id}/product_setups/new",
+                                    style: :button)
+                section.add_grid('product_setups',
+                                 "/list/product_setups/grid?key=standard&product_setups.product_setup_template_id=#{id}",
+                                 caption: 'Product Setups')
+              end
             end
           end
 

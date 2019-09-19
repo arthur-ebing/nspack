@@ -5,12 +5,10 @@
   :text: view
   :icon: view-show
   :title: View
-  :popup: true
 - :url: "/production/product_setups/product_setups/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
-  :popup: true
   :hide_if_true: in_production
   :auth:
     :function: production
@@ -20,7 +18,6 @@
   :text: edit active run setup
   :icon: edit
   :title: Edit Active Run Setup
-  :popup: true
   :hide_if_false: in_production
   :auth:
     :function: production

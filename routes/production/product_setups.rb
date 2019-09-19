@@ -64,9 +64,9 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.create_product_setup(params[:product_setup])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+            r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
           else
-            re_show_form(r, res, url: "/production/product_setups/product_setup_templates#{id}/product_setups/new") do
+            re_show_form(r, res, url: "/production/product_setups/product_setup_templates/#{id}/product_setups/new") do
               Production::ProductSetups::ProductSetup::New.call(id,
                                                                 form_values: params[:product_setup],
                                                                 form_errors: res.errors,
@@ -84,8 +84,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do     # UPDATE
           res = interactor.update_product_setup_template(id, params[:product_setup_template])
           if res.success
-            flash[:notice] = res.message
-            redirect_via_json("/production/product_setups/product_setup_templates/#{id}/edit")
+            show_partial(notice: res.message) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id, is_update: true) }
           else
             re_show_form(r, res) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id, form_values: params[:product_setup_template], form_errors: res.errors) }
           end
@@ -214,13 +213,13 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { Production::ProductSetups::ProductSetup::Edit.call(id) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id) }
       end
 
       r.on 'edit_active_run_setup' do   # EDIT Active Run Setup
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { Production::ProductSetups::ProductSetup::Edit.call(id) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id) }
       end
 
       r.on 'clone' do   # CLONE
@@ -247,20 +246,16 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('product_setups', 'read')
-          show_partial { Production::ProductSetups::ProductSetup::Show.call(id) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id) }
         end
         r.patch do     # UPDATE
           res = interactor.update_product_setup(id, params[:product_setup])
           if res.success
-            row_keys = %i[
-              product_setup_code
-              active
-              in_production
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            flash[:notice] = res.message
+            redirect_via_json("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
           else
             re_show_form(r, res) { Production::ProductSetups::ProductSetup::Edit.call(id, form_values: params[:product_setup], form_errors: res.errors) }
           end
@@ -318,7 +313,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         else
           fruit_actual_counts_for_pack_id = params[:changed_value]
           actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
-          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
+          standard_pack_codes = actual_count.standard_pack_code_ids.empty? ? [] : interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
           size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
