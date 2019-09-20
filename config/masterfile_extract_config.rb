@@ -35,7 +35,7 @@ module Crossbeams
       target_market_group_types
       target_markets
       treatment_types
-      uoms
+      uom_types
       user_email_groups
     ].freeze
 
@@ -63,6 +63,7 @@ module Crossbeams
       plant_resources_system_resources
       tree_plant_resources
       marketing_varieties_for_cultivars
+      uoms
       pm_subtypes
       pm_products
       pm_boms_products
@@ -98,7 +99,7 @@ module Crossbeams
     # The subquery is the subquery to be injected in the INSERT statement.
     # The values gets the key value to be used in the subquery for a particular row.
     MF_LKP_RULES = {
-      address_id: { subquery: 'SELECT id FROM addresses WHERE address_type_id = (SELECT id FROM address_types where address_type_code = ?) AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT t.address_type_code, a.address_line_1, a.address_line_2, a.city FROM addresses a JOIN address_types t ON t.id = a.address_type_id WHERE a.id = ?' },
+      address_id: { subquery: 'SELECT id FROM addresses WHERE address_type_id = (SELECT id FROM address_types where address_type = ?) AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT t.address_type, a.address_line_1, a.address_line_2, a.city FROM addresses a JOIN address_types t ON t.id = a.address_type_id WHERE a.id = ?' },
       address_type_id: { subquery: 'SELECT id FROM address_types WHERE address_type = ?', values: 'SELECT address_type FROM address_types WHERE id = ?' },
       contact_method_type_id: { subquery: 'SELECT id FROM contact_method_types WHERE contact_method_type = ?', values: 'SELECT contact_method_type FROM contact_method_types WHERE id = ?' },
       contact_method_id: { subquery: 'SELECT id FROM contact_methods WHERE contact_method_type_id = (SELECT id FROM contact_method_types WHERE contact_method_type = ?) AND contact_method_code = ?', values: 'SELECT t.contact_method_type, c.contact_method_code FROM contact_methods c JOIN contact_method_types t ON t.id = c.contact_method_type_id WHERE c.id = ?' },
@@ -133,13 +134,14 @@ module Crossbeams
       pm_subtype_id: { subquery: 'SELECT id FROM pm_subtypes WHERE subtype_code = ?', values: 'SELECT subtype_code FROM pm_subtypes WHERE id = ?' },
       pm_product_id: { subquery: 'SELECT id FROM pm_products WHERE product_code = ?', values: 'SELECT product_code FROM pm_products WHERE id = ?' },
       pm_bom_id: { subquery: 'SELECT id FROM pm_boms WHERE bom_code = ?', values: 'SELECT bom_code FROM pm_boms WHERE id = ?' },
-      uom_id: { subquery: 'SELECT id FROM uoms WHERE uom_code = ?', values: 'SELECT uom_code FROM uoms WHERE id = ?' },
+      uom_type_id: { subquery: 'SELECT id FROM uom_types WHERE code = ?', values: 'SELECT code FROM uom_types WHERE id = ?' },
+      uom_id: { subquery: 'SELECT id FROM uoms WHERE uom_type_id = (SELECT id FROM uom_types WHERE code = ?) AND uom_code = ?', values: 'SELECT t.code, u.uom_code FROM uoms u JOIN uom_types t ON t.id = u.uom_type_id WHERE u.id = ?' },
       season_group_id: { subquery: 'SELECT id FROM season_groups WHERE season_group_code = ?', values: 'SELECT season_group_code FROM season_groups WHERE id = ?' },
       target_market_group_type_id: { subquery: 'SELECT id FROM target_market_group_types WHERE target_market_group_type_code = ?', values: 'SELECT target_market_group_type_code FROM target_market_group_types WHERE id = ?' },
       target_market_id: { subquery: 'SELECT id FROM target_markets WHERE target_market_name = ?', values: 'SELECT target_market_name FROM target_markets WHERE id = ?' },
       target_market_group_id: { subquery: 'SELECT id FROM target_market_groups WHERE target_market_group_name = ? AND target_market_group_type_id = (SELECT id FROM target_market_group_types WHERE target_market_group_type_code = ?)', values: 'SELECT g.target_market_group_name, t.target_market_group_type_code FROM target_market_groups g JOIN target_market_group_types t ON t.id = g.target_market_group_type_id WHERE g.id = ?' },
       treatment_type_id: { subquery: 'SELECT id FROM treatment_types WHERE treatment_type_code = ?', values: 'SELECT treatment_type_code FROM treatment_types WHERE id = ?' },
-      customer_variety_id: { subquery: 'SELECT id FROM marketing_varieties WHERE marketing_variety_code = ?', values: 'SELECT marketing_variety_code FROM marketing_varieties WHERE id = ?' },
+      customer_variety_id: { subquery: 'SELECT id FROM customer_varieties WHERE variety_as_customer_variety_id = (SELECT id FROM marketing_varieties WHERE marketing_variety_code = ?) AND packed_tm_group_id = (SELECT id FROM target_market_groups WHERE target_market_group_name = ? AND target_market_group_type_id = (SELECT id FROM target_market_group_types WHERE target_market_group_type_code = ?))', values: 'SELECT m.marketing_variety_code, g.target_market_group_name, t.target_market_group_type_code FROM customer_varieties c JOIN marketing_varieties m ON m.id = c.variety_as_customer_variety_id JOIN target_market_groups g ON g.id = c.packed_tm_group_id JOIN target_market_group_types t ON t.id = g.target_market_group_type_id WHERE c.id = ?' },
       variety_as_customer_variety_id: { subquery: 'SELECT id FROM marketing_varieties WHERE marketing_variety_code = ?', values: 'SELECT marketing_variety_code FROM marketing_varieties WHERE id = ?' },
       packed_tm_group_id: { subquery: 'SELECT id FROM target_market_groups WHERE target_market_group_name = ? AND target_market_group_type_id = (SELECT id FROM target_market_group_types WHERE target_market_group_type_code = ?)', values: 'SELECT g.target_market_group_name, t.target_market_group_type_code FROM target_market_groups g JOIN target_market_group_types t ON t.id = g.target_market_group_type_id WHERE g.id = ?' },
       puc_id: { subquery: 'SELECT id FROM pucs WHERE puc_code = ?', values: 'SELECT puc_code FROM pucs WHERE id = ?' },
