@@ -75,8 +75,8 @@ module SecurityApp
     end
 
     def lookup_party(val)
-      org = DB[:organizations].where(party_id: val).get(:short_description)
-      if org
+      org_code = DB[:organizations].where(party_id: val).get(:short_description)
+      if org_code
         "(SELECT party_id FROM organizations WHERE short_description = '#{org_code}')"
       else
         surname, first_name = DB[:people].where(party_id: val).get(%i[surname first_name])

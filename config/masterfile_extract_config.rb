@@ -96,7 +96,7 @@ module Crossbeams
     # The subquery is the subquery to be injected in the INSERT statement.
     # The values gets the key value to be used in the subquery for a particular row.
     MF_LKP_RULES = {
-      address_id: { subquery: 'SELECT id FROM addresss WHERE address_type_id = ? AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT address_type_id, address_line_1, address_line_2, city FROM addresss WHERE id = ?' },
+      address_id: { subquery: 'SELECT id FROM addresses WHERE address_type_id = ? AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT address_type_id, address_line_1, address_line_2, city FROM addresses WHERE id = ?' },
       address_type_id: { subquery: 'SELECT id FROM address_types WHERE address_type = ?', values: 'SELECT address_type FROM address_types WHERE id = ?' },
       contact_method_type_id: { subquery: 'SELECT id FROM contact_method_types WHERE contact_method_type = ?', values: 'SELECT contact_method_type FROM contact_method_types WHERE id = ?' },
       commodity_group_id: { subquery: 'SELECT id FROM commodity_groups WHERE code = ?', values: 'SELECT code FROM commodity_groups WHERE id = ?' },
