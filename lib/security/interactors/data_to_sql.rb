@@ -12,7 +12,7 @@ module SecurityApp
     # @param table [Symbol] a table name. Can be :functional_areas, :programs or :program_functions.
     # @return [String] The SQL script.
     def sql_for(table, id)
-      if private_methods.include?(table)
+      if private_methods.include?(table) # create for org & person...
         send(table, id)
       else
         @columns = Hash[dev_repo.table_columns(table)]
@@ -23,16 +23,6 @@ module SecurityApp
     end
 
     private
-
-    # Store these in config - per application
-    # The subquery is the subquery to be injected in the INSERT statement.
-    # The values gets the key value to be used in the subquery for a particular row.
-    LKP_RULES = {
-      commodity_group_id: { subquery: 'SELECT id FROM commodity_groups WHERE code = ?', values: 'SELECT code FROM commodity_groups WHERE id = ?' },
-      commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
-      cultivar_group_id: { subquery: 'SELECT id FROM cultivar_groups WHERE cultivar_group_code = ?', values: 'SELECT cultivar_group_code FROM cultivar_groups WHERE id = ?' },
-      cultivar_id: { subquery: 'SELECT id FROM cultivars WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' } # && commodity?
-    }.freeze
 
     def make_extract(table, id)
       table_records(table, id).each do |rec|
@@ -53,8 +43,10 @@ module SecurityApp
     def get_insert_value(rec, col) # rubocop:disable Metrics/AbcSize
       return 'NULL' if rec[col].nil?
 
-      if LKP_RULES.keys.include?(col)
+      if Crossbeams::Config::MF_LKP_RULES.keys.include?(col)
         lookup(col, rec[col])
+      elsif Crossbeams::Config::MF_LKP_ARRAY_RULES.keys.include?(col)
+        lookup_array(col, rec[col])
       elsif %i[integer decimal float].include?(@columns[col][:type])
         rec[col].to_s
       elsif @columns[col][:type] == :boolean
@@ -65,9 +57,41 @@ module SecurityApp
     end
 
     def lookup(col, val)
-      qry = LKP_RULES[col][:values]
-      lkp_val = DB[qry, val].get
-      "(#{DB[LKP_RULES[col][:subquery], lkp_val].sql})"
+      qry = Crossbeams::Config::MF_LKP_RULES[col][:values]
+      lkp_val = DB[qry, val].first.values
+      "(#{DB[Crossbeams::Config::MF_LKP_RULES[col][:subquery], *lkp_val].sql})"
+    end
+
+    def lookup_array(col, val)
+      qry = Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:values]
+      lkp_val = DB[qry, val.to_a].select_map
+      "(#{DB[Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:subquery], lkp_val].sql})"
+    end
+
+    def combined_party(table, party_type, id) # rubocop:disable Metrics/AbcSize
+      @columns = Hash[dev_repo.table_columns(table)]
+      column_names = dev_repo.table_col_names(table).reject { |c| %i[id active created_at updated_at].include?(c) }
+      insert_stmt = "INSERT INTO #{table} (#{column_names.map(&:to_s).join(', ')}) VALUES("
+      table_records(table, id).each do |rec|
+        values = []
+        column_names.each do |col|
+          values << if col == :party_id
+                      '(SELECT MAX(id) FROM parties)'
+                    else
+                      get_insert_value(rec, col)
+                    end
+        end
+        puts "INSERT INTO parties (party_type) VALUES('#{party_type}');"
+        puts "#{insert_stmt}#{values.join(', ')});"
+      end
+    end
+
+    def organizations(id)
+      combined_party(:organizations, 'O', id)
+    end
+
+    def people(id)
+      combined_party(:people, 'P', id)
     end
 
     def functional_areas(id)
@@ -104,6 +128,10 @@ module SecurityApp
 
     def dev_repo
       @dev_repo ||= DevelopmentApp::DevelopmentRepo.new
+    end
+
+    def party_repo
+      @party_repo ||= MasterfilesApp::PartyRepo.new
     end
 
     def sql_for_f(functional_area)
