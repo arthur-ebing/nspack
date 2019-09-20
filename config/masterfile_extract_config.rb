@@ -40,17 +40,7 @@ module Crossbeams
       user_email_groups
     ].freeze
 
-    # These are all complicated by the party model
-    # MF_TABLES_IN_SEQ = %i[
-    #   party_addresses
-    #   party_contact_methods
-    #   party_roles
-    #   farm_groups
-    #   farms
-    #   rmt_container_material_owners
-    # ].freeze
-
-    #   rmt_container_types :: where inner NULL; where inner not null
+    # rmt_container_types :: where inner NULL; where inner not null
     MF_TABLES_SELF_REF = [
       { table: :rmt_container_types, key: :rmt_inner_container_type_id }
     ].freeze
@@ -85,11 +75,14 @@ module Crossbeams
       customer_variety_varieties
       organizations
       people
-
+      party_roles
+      farm_groups
+      farms
       farms_pucs
       rmt_container_material_types
       orchards
-
+      party_addresses
+      party_contact_methods
       fruit_actual_counts_for_packs
       treatments
     ].freeze
@@ -110,7 +103,6 @@ module Crossbeams
       commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
       cultivar_group_id: { subquery: 'SELECT id FROM cultivar_groups WHERE cultivar_group_code = ?', values: 'SELECT cultivar_group_code FROM cultivar_groups WHERE id = ?' },
       cultivar_id: { subquery: 'SELECT id FROM cultivars WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' }, # && commodity?
-      # party_id: { subquery: 'SELECT id FROM parties WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' }
       pallet_base_id: { subquery: 'SELECT id FROM pallet_bases WHERE pallet_base_code = ?', values: 'SELECT pallet_base_code FROM pallet_bases WHERE id = ?' },
       pallet_stack_type_id: { subquery: 'SELECT id FROM pallet_stack_types WHERE pallet_stack_type_code = ?', values: 'SELECT pallet_stack_type_code FROM pallet_stack_types WHERE id = ?' },
       pallet_format_id: { subquery: 'SELECT id FROM pallet_formats WHERE pallet_base_id = (SELECT id FROM pallet_bases WHERE paller_base_code = ?) AND pallet_stack_type_id = (SELECT id FROM pallet_stack_types WHERE pallet_stack_type_code = ?)', values: 'SELECT b.pallet_base_code, s.pallet_stack_type_code FROM pallet_formats f JOIN pallet_bases b ON b.id = f.pallet_base_id JOIN pallet_stack_types s ON s.id = f.pallet_stack_type_id WHERE id = ?' },
@@ -149,11 +141,21 @@ module Crossbeams
       packed_tm_group_id: { subquery: 'SELECT id FROM target_market_groups WHERE target_market_group_name = ? AND target_market_group_type_id = (SELECT id FROM target_market_group_types WHERE target_market_group_type_code = ?)', values: 'SELECT g.target_market_group_name, t.target_market_group_type_code FROM target_market_groups g JOIN target_market_group_types t ON t.id = g.target_market_group_type_id WHERE g.id = ?' },
       puc_id: { subquery: 'SELECT id FROM pucs WHERE puc_code = ?', values: 'SELECT puc_code FROM pucs WHERE id = ?' },
       farm_id: { subquery: 'SELECT id FROM farms WHERE farm_code = ?', values: 'SELECT farm_code FROM farms WHERE id = ?' },
+      farm_group_id: { subquery: 'SELECT id FROM farm_groups WHERE farm_group_code = ?', values: 'SELECT farm_group_code FROM farm_groups WHERE id = ?' },
       rmt_container_type_id: { subquery: 'SELECT id FROM rmt_container_types WHERE container_type_code = ?', values: 'SELECT container_type_code FROM rmt_container_types WHERE id = ?' },
       rmt_inner_container_type_id: { subquery: 'SELECT id FROM rmt_container_types WHERE container_type_code = ?', values: 'SELECT container_type_code FROM rmt_container_types WHERE id = ?' },
       std_fruit_size_count_id: { subquery: 'SELECT id FROM std_fruit_size_counts WHERE size_count_value = ? AND commodity_id = (SELECT id FROM commodities WHERE code = ?)', values: 'SELECT s.size_count_value, c.code FROM std_fruit_size_counts s JOIN commodities c ON c.id = s.commodity_id WHERE s.id = ?' },
       # standard_pack_code_ids, size_reference_ids, cultivar_ids
+      role_id: { subquery: 'SELECT id FROM roles WHERE name = ?', values: 'SELECT name FROM roles WHERE id = ?' },
+      organization_id: { subquery: 'SELECT id FROM organizations WHERE short_description = ?', values: 'SELECT short_description FROM organizations WHERE id = ?' },
+      person_id: { subquery: 'SELECT id FROM people WHERE surname = ? AND first_name = ?', values: 'SELECT surname, first_name FROM people WHERE id = ?' },
+      pdn_region_id: { subquery: 'SELECT id FROM destination_regions WHERE destination_region_name = ?', values: 'SELECT destination_region_name FROM destination_regions WHERE id = ?' },
       zzz: {}
     }.freeze
+
+    MF_LKP_PARTY_ROLES = %i[
+      owner_party_role_id
+      rmt_material_owner_party_role_id
+    ].freeze
   end
 end

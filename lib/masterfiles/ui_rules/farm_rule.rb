@@ -44,7 +44,7 @@ module UiRules
       farm_pucs = @options[:id] ? @repo.selected_farm_pucs(@options[:id]) : @repo.select_unallocated_pucs
       {
         owner_party_role_id: { renderer: :select,
-                               options: MasterfilesApp::PartyRepo.new.for_select_party_roles('FARM_OWNER'),
+                               options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FARM_OWNER),
                                required: true,
                                caption: 'Farm Owner' },
         pdn_region_id: { renderer: :select,

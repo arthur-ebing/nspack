@@ -40,13 +40,17 @@ module SecurityApp
       end
     end
 
-    def get_insert_value(rec, col) # rubocop:disable Metrics/AbcSize
+    def get_insert_value(rec, col) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       return 'NULL' if rec[col].nil?
 
       if Crossbeams::Config::MF_LKP_RULES.keys.include?(col)
         lookup(col, rec[col])
       elsif Crossbeams::Config::MF_LKP_ARRAY_RULES.keys.include?(col)
         lookup_array(col, rec[col])
+      elsif Crossbeams::Config::MF_LKP_PARTY_ROLES.include?(col)
+        lookup_party_role(rec[col])
+      elsif col == :party_id
+        lookup_party(rec[col])
       elsif %i[integer decimal float].include?(@columns[col][:type])
         rec[col].to_s
       elsif @columns[col][:type] == :boolean
@@ -58,7 +62,9 @@ module SecurityApp
 
     def lookup(col, val)
       qry = Crossbeams::Config::MF_LKP_RULES[col][:values]
-      lkp_val = DB[qry, val].first.values
+      lkp_val = DB[qry, val].first&.values
+      return 'NULL' if lkp_val.nil?
+
       "(#{DB[Crossbeams::Config::MF_LKP_RULES[col][:subquery], *lkp_val].sql})"
     end
 
@@ -68,15 +74,40 @@ module SecurityApp
       "(#{DB[Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:subquery], lkp_val].sql})"
     end
 
+    def lookup_party(val)
+      org = DB[:organizations].where(party_id: val).get(:short_description)
+      if org
+        "(SELECT party_id FROM organizations WHERE short_description = '#{org_code}')"
+      else
+        surname, first_name = DB[:people].where(party_id: val).get(%i[surname first_name])
+        "(SELECT party_id  FROM people WHERE surname = '#{surname}' AND first_name = '#{first_name}')"
+      end
+    end
+
+    def lookup_party_role(val)
+      pr = dev_repo.where_hash(:party_roles, id: val)
+      sel = if pr[:organization_id]
+              org_code = DB[:organizations].where(id: pr[:organization_id]).get(:short_description)
+              "(SELECT id FROM party_roles WHERE organization_id = (SELECT id FROM organizations WHERE short_description = '#{org_code}'))"
+            else
+              surname, first_name = DB[:people].where(id: pr[:person_id]).get(%i[surname first_name])
+              "(SELECT id FROM party_roles WHERE person_id = (SELECT id  FROM people WHERE surname = '#{surname}' AND first_name = '#{first_name}'))"
+            end
+      sel
+    end
+
     def combined_party(table, party_type, id) # rubocop:disable Metrics/AbcSize
       @columns = Hash[dev_repo.table_columns(table)]
       column_names = dev_repo.table_col_names(table).reject { |c| %i[id active created_at updated_at].include?(c) }
       insert_stmt = "INSERT INTO #{table} (#{column_names.map(&:to_s).join(', ')}) VALUES("
-      table_records(table, id).each do |rec|
+      table_records(table, id).each do |rec| # should sort orgs by parent_id null first
         values = []
         column_names.each do |col|
           values << if col == :party_id
                       '(SELECT MAX(id) FROM parties)'
+                    elsif col == :parent_id
+                      parent_code = DB[:organizations].where(id: rec[col]).get(:short_description)
+                      "(SELECT id FROM  organizations WHERE short_description = '#{parent_code}')"
                     else
                       get_insert_value(rec, col)
                     end
@@ -92,6 +123,50 @@ module SecurityApp
 
     def people(id)
       combined_party(:people, 'P', id)
+    end
+
+    def party_roles(id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+      table = :party_roles
+      @columns = Hash[dev_repo.table_columns(table)]
+      column_names = dev_repo.table_col_names(table).reject { |c| %i[id active created_at updated_at].include?(c) }
+      insert_stmt = "INSERT INTO #{table} (#{column_names.map(&:to_s).join(', ')}) VALUES("
+      recs = if id.nil?
+               dev_repo.all_hash(table, person_id: nil)
+             else
+               [dev_repo.where_hash(table, id: id)]
+             end
+      recs.each do |rec|
+        org_code = DB[:organizations].where(id: rec[:organization_id]).get(:short_description)
+        values = []
+        column_names.each do |col|
+          values << if col == :party_id
+                      "(SELECT party_id FROM organizations WHERE short_description = '#{org_code}')"
+                    else
+                      get_insert_value(rec, col)
+                    end
+        end
+        puts "#{insert_stmt}#{values.join(', ')});"
+      end
+
+      return unless id.nil?
+
+      recs = if id.nil?
+               dev_repo.all_hash(table, organization_id: nil)
+             else
+               [dev_repo.where_hash(table, id: id)]
+             end
+      recs.each do |rec|
+        surname, first_name = DB[:people].where(id: rec[:person_id]).get(%i[surname first_name])
+        values = []
+        column_names.each do |col|
+          values << if col == :party_id
+                      "(SELECT party_id FROM people WHERE surname = '#{surname}' AND first_name = '#{first_name}')"
+                    else
+                      get_insert_value(rec, col)
+                    end
+        end
+        puts "#{insert_stmt}#{values.join(', ')});"
+      end
     end
 
     def functional_areas(id)
