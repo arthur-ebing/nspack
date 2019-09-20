@@ -565,7 +565,7 @@ class Nspack < Roda
               std_fruit_size_count
               basic_pack_code
               actual_count_for_pack
-              standard_pack_codes
+              standard_packs
               size_references
               active
             ]

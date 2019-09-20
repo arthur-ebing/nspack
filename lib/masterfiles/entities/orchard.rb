@@ -11,5 +11,9 @@ module MasterfilesApp
     attribute :puc_code, Types::String
     attribute :cultivar_names, Types::String
     attribute? :active, Types::Bool
+    attribute :cultivars, Types::Array.default([]) do
+      attribute :id, Types::Integer
+      attribute :cultivar_name, Types::String
+    end
   end
 end

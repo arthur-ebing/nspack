@@ -42,7 +42,6 @@ module MasterfilesApp
     end
 
     def find_customer_variety_variety(id)
-      # hash = find_hash(:customer_variety_varieties, id)
       hash = find_with_association(:customer_variety_varieties,
                                    id,
                                    parent_tables: [{ parent_table: :marketing_varieties,

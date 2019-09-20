@@ -79,22 +79,26 @@ module MasterfilesApp
     end
 
     def find_fruit_actual_counts_for_pack(id)
-      hash = DB["SELECT fruit_actual_counts_for_packs.*, std_fruit_size_counts.size_count_description AS std_fruit_size_count,
-                 basic_pack_codes.basic_pack_code, spc.standard_pack_codes, fsr.size_references
-                 FROM fruit_actual_counts_for_packs
-                 JOIN std_fruit_size_counts ON std_fruit_size_counts.id = fruit_actual_counts_for_packs.std_fruit_size_count_id
-                 JOIN basic_pack_codes ON basic_pack_codes.id = fruit_actual_counts_for_packs.basic_pack_code_id
-                 JOIN (SELECT fruit_actual_counts_for_packs.id AS fruit_actual_counts_for_packs_id,string_agg(standard_pack_codes.standard_pack_code, ', ') AS standard_pack_codes
-                       FROM standard_pack_codes
-                       JOIN fruit_actual_counts_for_packs ON standard_pack_codes.id = ANY (fruit_actual_counts_for_packs.standard_pack_code_ids)
-                       GROUP BY fruit_actual_counts_for_packs.id) spc ON spc.fruit_actual_counts_for_packs_id = fruit_actual_counts_for_packs.id
-                 JOIN (SELECT fruit_actual_counts_for_packs.id AS fruit_actual_counts_for_packs_id,string_agg(fruit_size_references.size_reference, ', ') AS size_references
-                       FROM fruit_size_references
-                       JOIN fruit_actual_counts_for_packs ON fruit_size_references.id = ANY (fruit_actual_counts_for_packs.size_reference_ids)
-                       GROUP BY fruit_actual_counts_for_packs.id) fsr ON fsr.fruit_actual_counts_for_packs_id = fruit_actual_counts_for_packs.id
-                 WHERE fruit_actual_counts_for_packs.id = ?", id].first
+      hash = find_with_association(:fruit_actual_counts_for_packs,
+                                   id,
+                                   parent_tables: [{ parent_table: :std_fruit_size_counts,
+                                                     columns: [:size_count_description],
+                                                     flatten_columns: { size_count_description: :std_fruit_size_count } },
+                                                   { parent_table: :basic_pack_codes,
+                                                     columns: [:basic_pack_code],
+                                                     flatten_columns: { basic_pack_code: :basic_pack_code } }],
+                                   sub_tables: [{ sub_table: :fruit_size_references,
+                                                  id_keys_column: :size_reference_ids,
+                                                  columns: %i[id size_reference] },
+                                                { sub_table: :standard_pack_codes,
+                                                  id_keys_column: :standard_pack_code_ids,
+                                                  columns: %i[id standard_pack_code] }],
+                                   lookup_functions: [],
+                                   wrapper: nil)
       return nil if hash.nil?
 
+      hash[:standard_packs] = hash[:standard_pack_codes].map { |r| r[:standard_pack_code] }.sort.join(',')
+      hash[:size_references] = hash[:fruit_size_references].map { |r| r[:size_reference] }.sort.join(',')
       FruitActualCountsForPack.new(hash)
     end
 

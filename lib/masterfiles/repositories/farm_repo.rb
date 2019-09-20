@@ -54,54 +54,39 @@ module MasterfilesApp
     crud_calls_for :pucs, name: :puc, wrapper: Puc
 
     def find_farm(id)
-      # hash = find_hash(:farms, id)
-      hash = DB['SELECT farms.* , farm_groups.farm_group_code, fn_party_role_name(farms.owner_party_role_id) AS owner_party_role,
-                production_regions.production_region_code AS pdn_region_production_region_code
-                FROM farms
-                LEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id
-                JOIN production_regions ON production_regions.id = farms.pdn_region_id
-                WHERE farms.id = ?', id].first
+      hash = find_with_association(:farms,
+                                   id,
+                                   parent_tables: [{ parent_table: :farm_groups,
+                                                     columns: [:farm_group_code],
+                                                     flatten_columns: { farm_group_code: :farm_group_code } },
+                                                   { parent_table: :production_regions,
+                                                     columns: [:production_region_code],
+                                                     foreign_key: :pdn_region_id,
+                                                     flatten_columns: { production_region_code: :pdn_region_production_region_code } }],
+                                   lookup_functions: [{ function: :fn_party_role_name,
+                                                        args: [:owner_party_role_id],
+                                                        col_name: :owner_party_role }])
       return nil if hash.nil?
 
       hash[:puc_id] = farm_primary_puc_id(id)
       Farm.new(hash)
     end
 
-    # def find_orchard(id)
-    #   # hash = find_hash(:orchards, id)
-    #   hash = find_with_association(:orchards,
-    #                                id,
-    #                                parent_tables: [{ parent_table: :farms,
-    #                                                  columns: [:farm_code],
-    #                                                  flatten_columns: { farm_code: :farm }},
-    #                                                { parent_table: :pucs,
-    #                                                  columns: [:puc_code],
-    #                                                  flatten_columns: { puc_code: :puc_code }
-    #                                                }],
-    #                                sub_tables: [{ sub_table: :cultivars,
-    #                                               columns: [:cultivar_name],
-    #                                               uses_join_table: true
-    #                                             }],
-    #                                lookup_functions: [],
-    #                                wrapper: nil)
-    #   return nil if hash.nil?
-    #
-    #   Orchard.new(hash)
-    # end
-
     def find_orchard(id)
-      # hash = find_hash(:orchards, id)
-      hash = DB["SELECT orchards.*, farms.farm_code as farm, pucs.puc_code, orchard_cultivars.cultivar_names
-                 FROM orchards
-                 JOIN farms ON farms.id = orchards.farm_id
-                 JOIN pucs ON pucs.id = orchards.puc_id
-                 JOIN (SELECT orchards.id as orchard_id,string_agg(cultivars.cultivar_name, ', ') AS cultivar_names
-                       FROM cultivars
-                       JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
-                       GROUP BY orchards.id) orchard_cultivars ON orchard_cultivars.orchard_id = orchards.id
-                 WHERE orchards.id = ?", id].first
+      hash = find_with_association(:orchards,
+                                   id,
+                                   parent_tables: [{ parent_table: :farms,
+                                                     columns: [:farm_code],
+                                                     flatten_columns: { farm_code: :farm } },
+                                                   { parent_table: :pucs,
+                                                     columns: [:puc_code],
+                                                     flatten_columns: { puc_code: :puc_code } }],
+                                   sub_tables: [{ sub_table: :cultivars,
+                                                  id_keys_column: :cultivar_ids,
+                                                  columns: %i[id cultivar_name] }])
       return nil if hash.nil?
 
+      hash[:cultivar_names] = hash[:cultivars].map { |r| r[:cultivar_name] }.sort.join(',')
       Orchard.new(hash)
     end
 

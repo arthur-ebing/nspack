@@ -1,23 +1,25 @@
 ---
 :caption: Fruit Actual Counts For Packs
 :sql: SELECT fruit_actual_counts_for_packs.id, fruit_actual_counts_for_packs.std_fruit_size_count_id,
-  fruit_actual_counts_for_packs.basic_pack_code_id, fruit_actual_counts_for_packs.actual_count_for_pack,
-  fruit_actual_counts_for_packs.created_at, fruit_actual_counts_for_packs.updated_at, fruit_actual_counts_for_packs.active,
-  fruit_actual_counts_for_packs.standard_pack_code_ids, fruit_actual_counts_for_packs.size_reference_ids,
-  std_fruit_size_counts.size_count_description AS std_fruit_size_count, basic_pack_codes.basic_pack_code,
-  spc.standard_pack_codes, fsr.size_references FROM fruit_actual_counts_for_packs
-  JOIN std_fruit_size_counts ON std_fruit_size_counts.id = fruit_actual_counts_for_packs.std_fruit_size_count_id
-  JOIN basic_pack_codes ON basic_pack_codes.id = fruit_actual_counts_for_packs.basic_pack_code_id
-  JOIN (SELECT fruit_actual_counts_for_packs.id AS fruit_actual_counts_for_packs_id,string_agg(standard_pack_codes.standard_pack_code,
-  ', ') AS standard_pack_codes FROM standard_pack_codes JOIN fruit_actual_counts_for_packs
-  ON standard_pack_codes.id = ANY (fruit_actual_counts_for_packs.standard_pack_code_ids)
-  GROUP BY fruit_actual_counts_for_packs.id) spc ON spc.fruit_actual_counts_for_packs_id
-  = fruit_actual_counts_for_packs.id JOIN (SELECT fruit_actual_counts_for_packs.id
-  AS fruit_actual_counts_for_packs_id,string_agg(fruit_size_references.size_reference,
-  ', ') AS size_references FROM fruit_size_references JOIN fruit_actual_counts_for_packs
-  ON fruit_size_references.id = ANY (fruit_actual_counts_for_packs.size_reference_ids)
-  GROUP BY fruit_actual_counts_for_packs.id) fsr ON fsr.fruit_actual_counts_for_packs_id
-  = fruit_actual_counts_for_packs.id
+      fruit_actual_counts_for_packs.basic_pack_code_id, fruit_actual_counts_for_packs.actual_count_for_pack,
+      fruit_actual_counts_for_packs.created_at, fruit_actual_counts_for_packs.updated_at, fruit_actual_counts_for_packs.active,
+      fruit_actual_counts_for_packs.standard_pack_code_ids, fruit_actual_counts_for_packs.size_reference_ids,
+      std_fruit_size_counts.size_count_description AS std_fruit_size_count, basic_pack_codes.basic_pack_code,
+      (SELECT array_agg(fruit_spc.standard_pack_code)
+      FROM (SELECT spc.standard_pack_code
+      FROM standard_pack_codes spc
+      JOIN fruit_actual_counts_for_packs fac ON spc.id = ANY (fac.standard_pack_code_ids)
+      WHERE fac.id = fruit_actual_counts_for_packs.id
+      ORDER BY spc.standard_pack_code) AS fruit_spc) AS standard_packs,
+      (SELECT array_agg(fruit_sr.size_reference)
+      FROM (SELECT sr.size_reference
+      FROM fruit_size_references sr
+      JOIN fruit_actual_counts_for_packs fac ON sr.id = ANY (fac.size_reference_ids)
+      WHERE fac.id = fruit_actual_counts_for_packs.id
+      ORDER BY sr.size_reference) AS fruit_sr) AS size_references
+      FROM fruit_actual_counts_for_packs
+      JOIN std_fruit_size_counts ON std_fruit_size_counts.id = fruit_actual_counts_for_packs.std_fruit_size_count_id
+      JOIN basic_pack_codes ON basic_pack_codes.id = fruit_actual_counts_for_packs.basic_pack_code_id
 :limit: 
 :offset: 
 :external_settings: {}
@@ -182,11 +184,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  standard_pack_codes:
-    :name: standard_pack_codes
+  standard_packs:
+    :name: standard_packs
     :sequence_no: 4
     :caption: Standard pack codes
-    :namespaced_name: spc.standard_pack_codes
+    :namespaced_name: standard_packs
     :data_type: :string
     :width: 
     :format: 
@@ -202,7 +204,7 @@
     :name: size_references
     :sequence_no: 5
     :caption: Size references
-    :namespaced_name: fsr.size_references
+    :namespaced_name: size_references
     :data_type: :string
     :width: 
     :format: 

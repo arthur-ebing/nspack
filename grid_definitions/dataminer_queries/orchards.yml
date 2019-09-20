@@ -1,14 +1,16 @@
 ---
 :caption: Orchards
-:sql: "SELECT orchards.id, orchards.farm_id,orchards.puc_id,orchards.orchard_code,orchards.description,orchards.cultivar_ids,
-         	  orchard_cultivars.cultivar_names, orchards.active,orchards.created_at,orchards.updated_at,farms.farm_code,pucs.puc_code
-       FROM orchards
-       JOIN farms ON farms.id = orchards.farm_id
-       JOIN pucs ON pucs.id = orchards.puc_id
-       JOIN (SELECT orchards.id as orchard_id,string_agg(cultivars.cultivar_name, ', ') AS cultivar_names
-             FROM cultivars
-             JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
-             GROUP BY orchards.id) orchard_cultivars ON orchard_cultivars.orchard_id = orchards.id"
+:sql: SELECT orchards.id, orchards.farm_id,orchards.puc_id,orchards.orchard_code,orchards.description,orchards.cultivar_ids,
+      orchards.active,orchards.created_at,orchards.updated_at,farms.farm_code,pucs.puc_code,
+      (SELECT array_agg(orchard_cultivars.cultivar_name) as oc
+      FROM (SELECT c.cultivar_name
+      FROM cultivars c
+      JOIN orchards o ON c.id = ANY (o.cultivar_ids)
+      WHERE o.id = orchards.id
+      ORDER BY c.cultivar_name) AS orchard_cultivars) AS cultivar_names
+      FROM orchards
+      JOIN farms ON farms.id = orchards.farm_id
+      JOIN pucs ON pucs.id = orchards.puc_id
 :limit: 
 :offset: 
 :external_settings: {}

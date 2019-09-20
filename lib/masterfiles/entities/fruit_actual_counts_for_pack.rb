@@ -10,8 +10,16 @@ module MasterfilesApp
     attribute :size_reference_ids, Types::Array
     attribute :std_fruit_size_count, Types::String
     attribute :basic_pack_code, Types::String
-    attribute :standard_pack_codes, Types::String
+    attribute :standard_packs, Types::String
     attribute :size_references, Types::String
     attribute? :active, Types::Bool
+    attribute :fruit_size_references, Types::Array.default([]) do
+      attribute :id, Types::Integer
+      attribute :size_reference, Types::String
+    end
+    attribute :standard_pack_codes, Types::Array.default([]) do
+      attribute :id, Types::Integer
+      attribute :standard_pack_code, Types::String
+    end
   end
 end
