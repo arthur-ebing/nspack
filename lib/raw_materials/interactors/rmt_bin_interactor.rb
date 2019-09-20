@@ -87,6 +87,15 @@ module RawMaterialsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def get_bin_label_data(bin_id)
+      repo.find_bin_label_data(bin_id)
+    end
+
+    def print_bin_barcode(id, params)
+      instance = get_bin_label_data(id)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_BIN_BARCODE, instance, params)
+    end
+
     private
 
     def repo

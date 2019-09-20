@@ -1,6 +1,7 @@
 ---
 :caption: Rmt Bins
 :sql: SELECT "rmt_bins"."id", "rmt_bins"."rmt_delivery_id", "rmt_bins"."season_id",
+  case when "rmt_bins"."qty_bins"=1 then true else false end as discrete_bin,
   "rmt_bins"."cultivar_id", "rmt_bins"."orchard_id", "rmt_bins"."farm_id", "rmt_bins"."rmt_class_id",
   "rmt_bins"."rmt_container_material_owner_id", "rmt_bins"."rmt_container_type_id",
   "rmt_bins"."rmt_container_material_type_id", "rmt_bins"."cultivar_group_id", "rmt_bins"."puc_id",

@@ -4,6 +4,7 @@ module UiRules
   class RmtBinRule < Base # rubocop:disable ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @print_repo = LabelApp::PrinterRepo.new
       @delivery = if @options[:delivery_id].nil?
                     @repo.find_rmt_delivery_by_bin_id(@options[:id])
                   else
@@ -27,6 +28,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      set_print_fields if @mode == :print_barcode
       add_behaviours if %i[new edit].include? @mode
       # set_complete_fields if @mode == :complete
       # set_approve_fields if @mode == :approve
@@ -34,6 +36,21 @@ module UiRules
       # add_approve_behaviours if @mode == :approve
 
       form_name 'rmt_bin'
+    end
+
+    def set_print_fields # rubocop:disable Metrics/AbcSize
+      farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
+      orchard_id_label = MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code
+      season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
+      cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
+
+      fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
+      fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
+      fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
+      fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
+      fields[:printer] = { renderer: :select,
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_BIN),
+                           required: true }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -45,7 +62,6 @@ module UiRules
       rmt_container_material_owner_id_label = (@repo.find_rmt_container_material_owner(@form_object.rmt_container_material_owner_id) || {})[:container_material_owner]
       rmt_inner_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_inner_container_type_id)&.container_type_code
       rmt_inner_container_material_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_inner_container_material_id)&.container_material_type_code
-      # farm_id_label = @repo.find(:farms, MasterfilesApp::Farm, @form_object.farm_id)&.farm_code
       farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
 
       fields[:bin_asset_number] = { renderer: :label, hide_on_load: @rules[:scan_rmt_bin_asset_numbers] ? false : true }
@@ -88,6 +104,7 @@ module UiRules
       end
 
       @form_object = @repo.find_rmt_bin(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_BIN), no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object

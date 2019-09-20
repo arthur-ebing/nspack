@@ -261,6 +261,20 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
       end
+
+      r.on 'print_barcode' do # BARCODE
+        r.get do
+          show_partial { RawMaterials::Deliveries::RmtBin::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_bin_barcode(id, params[:rmt_bin])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtBin::PrintBarcode.call(id, form_values: params[:rmt_bin], form_errors: res.errors) }
+          end
+        end
+      end
     end
 
     r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength

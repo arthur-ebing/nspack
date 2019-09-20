@@ -16,12 +16,6 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: "/raw_materials/deliveries/rmt_bins/$:id$/print_barcode"
-  :text: print
-  :icon: print
-  :title: Print
-  :popup: true
-  :hide_if_false: discrete_bin
 :conditions:
   :standard:
     - :col: rmt_bins.rmt_delivery_id

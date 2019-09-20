@@ -108,5 +108,13 @@ module RawMaterialsApp
           FROM rmt_bins
           WHERE (bin_asset_number = '#{bin_asset_number}') AND (exit_ref is Null)"].first
     end
+
+    def find_bin_label_data(bin_id)
+      DB["select b.id, o.orchard_code, c.cultivar_name
+          from rmt_bins b
+          join orchards o on o.id=b.orchard_id
+          join cultivars c on c.id=b.cultivar_id
+          WHERE b.id = ?", bin_id].first
+    end
   end
 end
