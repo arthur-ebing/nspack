@@ -34,10 +34,20 @@ module SecurityApp
 
     def table_records(table, id)
       if id.nil?
-        dev_repo.all_hash(table)
+        if Crossbeams::Config::MF_TABLES_SELF_REF.keys.include?(table)
+          table_sequenced(table, Crossbeams::Config::MF_TABLES_SELF_REF[table])
+        else
+          dev_repo.all_hash(table)
+        end
       else
         [dev_repo.where_hash(table, id: id)]
       end
+    end
+
+    def table_sequenced(table, key)
+      part1 = dev_repo.all_hash(table, key => nil)
+      part2 = dev_repo.all_hash(table, Sequel.~(key => nil))
+      part1 + part2
     end
 
     def get_insert_value(rec, col) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -71,7 +81,11 @@ module SecurityApp
     def lookup_array(col, val)
       qry = Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:values]
       lkp_val = DB[qry, val.to_a].select_map
-      "(#{DB[Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:subquery], lkp_val].sql})"
+      if lkp_val.empty?
+        "'{}'"
+      else
+        "(#{DB[Crossbeams::Config::MF_LKP_ARRAY_RULES[col][:subquery], lkp_val].sql})"
+      end
     end
 
     def lookup_party(val)

@@ -21,7 +21,6 @@ module Crossbeams
       master_lists
       pallet_bases
       pallet_stack_types
-      parties
       plant_resource_types
       pm_boms
       pm_types
@@ -40,10 +39,11 @@ module Crossbeams
       user_email_groups
     ].freeze
 
-    # rmt_container_types :: where inner NULL; where inner not null
-    MF_TABLES_SELF_REF = [
-      { table: :rmt_container_types, key: :rmt_inner_container_type_id }
-    ].freeze
+    # self-referential tables. First insert all where the key is NULL, then the rest.
+    # This hash is in the form: table_name: self-referencing key
+    MF_TABLES_SELF_REF = {
+      rmt_container_types: :rmt_inner_container_type_id
+    }.freeze
 
     MF_TABLES_IN_SEQ = %i[
       addresses
@@ -79,6 +79,7 @@ module Crossbeams
       farm_groups
       farms
       farms_pucs
+      rmt_container_types
       rmt_container_material_types
       orchards
       party_addresses
@@ -90,22 +91,24 @@ module Crossbeams
     # For arrays of ids
     MF_LKP_ARRAY_RULES = {
       cultivar_ids: { subquery: 'SELECT array_agg(id) FROM cultivars WHERE cultivar_name IN ?', values: 'SELECT cultivar_name FROM cultivars WHERE id IN ?' }, # && commodity? :cultivar_id
-      standard_pack_code_ids: { subquery: 'SELECT array_agg(id) FROM standard_pack_codes WHERE standard_pack_code IN ?', values: 'SELECT standard_pack_code FROM standard_pack_codes WHERE id IN ?' }
+      standard_pack_code_ids: { subquery: 'SELECT array_agg(id) FROM standard_pack_codes WHERE standard_pack_code IN ?', values: 'SELECT standard_pack_code FROM standard_pack_codes WHERE id IN ?' },
+      size_reference_ids: { subquery: 'SELECT array_agg(id) FROM fruit_size_references WHERE size_reference IN ?', values: 'SELECT size_reference FROM fruit_size_references WHERE id IN ?' }
     }.freeze
 
     # The subquery is the subquery to be injected in the INSERT statement.
     # The values gets the key value to be used in the subquery for a particular row.
     MF_LKP_RULES = {
-      address_id: { subquery: 'SELECT id FROM addresses WHERE address_type_id = ? AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT address_type_id, address_line_1, address_line_2, city FROM addresses WHERE id = ?' },
+      address_id: { subquery: 'SELECT id FROM addresses WHERE address_type_id = (SELECT id FROM address_types where address_type_code = ?) AND address_line_1 = ? AND address_line_2 = ? AND city = ?', values: 'SELECT t.address_type_code, a.address_line_1, a.address_line_2, a.city FROM addresses a JOIN address_types t ON t.id = a.address_type_id WHERE a.id = ?' },
       address_type_id: { subquery: 'SELECT id FROM address_types WHERE address_type = ?', values: 'SELECT address_type FROM address_types WHERE id = ?' },
       contact_method_type_id: { subquery: 'SELECT id FROM contact_method_types WHERE contact_method_type = ?', values: 'SELECT contact_method_type FROM contact_method_types WHERE id = ?' },
+      contact_method_id: { subquery: 'SELECT id FROM contact_methods WHERE contact_method_type_id = (SELECT id FROM contact_method_types WHERE contact_method_type = ?) AND contact_method_code = ?', values: 'SELECT t.contact_method_type, c.contact_method_code FROM contact_methods c JOIN contact_method_types t ON t.id = c.contact_method_type_id WHERE c.id = ?' },
       commodity_group_id: { subquery: 'SELECT id FROM commodity_groups WHERE code = ?', values: 'SELECT code FROM commodity_groups WHERE id = ?' },
       commodity_id: { subquery: 'SELECT id FROM commodities WHERE code = ?', values: 'SELECT code FROM commodities WHERE id = ?' },
       cultivar_group_id: { subquery: 'SELECT id FROM cultivar_groups WHERE cultivar_group_code = ?', values: 'SELECT cultivar_group_code FROM cultivar_groups WHERE id = ?' },
       cultivar_id: { subquery: 'SELECT id FROM cultivars WHERE cultivar_name = ?', values: 'SELECT cultivar_name FROM cultivars WHERE id = ?' }, # && commodity?
       pallet_base_id: { subquery: 'SELECT id FROM pallet_bases WHERE pallet_base_code = ?', values: 'SELECT pallet_base_code FROM pallet_bases WHERE id = ?' },
-      pallet_stack_type_id: { subquery: 'SELECT id FROM pallet_stack_types WHERE pallet_stack_type_code = ?', values: 'SELECT pallet_stack_type_code FROM pallet_stack_types WHERE id = ?' },
-      pallet_format_id: { subquery: 'SELECT id FROM pallet_formats WHERE pallet_base_id = (SELECT id FROM pallet_bases WHERE paller_base_code = ?) AND pallet_stack_type_id = (SELECT id FROM pallet_stack_types WHERE pallet_stack_type_code = ?)', values: 'SELECT b.pallet_base_code, s.pallet_stack_type_code FROM pallet_formats f JOIN pallet_bases b ON b.id = f.pallet_base_id JOIN pallet_stack_types s ON s.id = f.pallet_stack_type_id WHERE id = ?' },
+      pallet_stack_type_id: { subquery: 'SELECT id FROM pallet_stack_types WHERE stack_type_code = ?', values: 'SELECT stack_type_code FROM pallet_stack_types WHERE id = ?' },
+      pallet_format_id: { subquery: 'SELECT id FROM pallet_formats WHERE pallet_base_id = (SELECT id FROM pallet_bases WHERE paller_base_code = ?) AND pallet_stack_type_id = (SELECT id FROM pallet_stack_types WHERE stack_type_code = ?)', values: 'SELECT b.pallet_base_code, s.stack_type_code FROM pallet_formats f JOIN pallet_bases b ON b.id = f.pallet_base_id JOIN pallet_stack_types s ON s.id = f.pallet_stack_type_id WHERE f.id = ?' },
       basic_pack_id: { subquery: 'SELECT id FROM basic_pack_codes WHERE basic_pack_code = ?', values: 'SELECT basic_pack_code FROM basic_pack_codes WHERE id = ?' },
       basic_pack_code_id: { subquery: 'SELECT id FROM basic_pack_codes WHERE basic_pack_code = ?', values: 'SELECT basic_pack_code FROM basic_pack_codes WHERE id = ?' },
       destination_region_id: { subquery: 'SELECT id FROM destination_regions WHERE destination_region_name = ?', values: 'SELECT destination_region_name FROM destination_regions WHERE id = ?' },
@@ -149,7 +152,7 @@ module Crossbeams
       role_id: { subquery: 'SELECT id FROM roles WHERE name = ?', values: 'SELECT name FROM roles WHERE id = ?' },
       organization_id: { subquery: 'SELECT id FROM organizations WHERE short_description = ?', values: 'SELECT short_description FROM organizations WHERE id = ?' },
       person_id: { subquery: 'SELECT id FROM people WHERE surname = ? AND first_name = ?', values: 'SELECT surname, first_name FROM people WHERE id = ?' },
-      pdn_region_id: { subquery: 'SELECT id FROM destination_regions WHERE destination_region_name = ?', values: 'SELECT destination_region_name FROM destination_regions WHERE id = ?' },
+      pdn_region_id: { subquery: 'SELECT id FROM production_regions WHERE production_region_code = ?', values: 'SELECT production_region_code FROM production_regions WHERE id = ?' },
       zzz: {}
     }.freeze
 
