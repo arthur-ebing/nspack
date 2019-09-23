@@ -50,6 +50,9 @@ class AppConst
   DEFAULT_FG_PACKAGING_TYPE = ENV['DEFAULT_FG_PACKAGING_TYPE']
   REQUIRE_PACKAGING_BOM = ENV['REQUIRE_PACKAGING_BOM']
 
+  # Default UOM TYPE
+  UOM_TYPE = 'INVENTORY'
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published'

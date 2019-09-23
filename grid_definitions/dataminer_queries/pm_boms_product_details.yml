@@ -344,7 +344,7 @@
   :ordered_list: true
   :ui_priority: 4
   :list_def: SELECT uom_code, uoms.id FROM uoms JOIN uom_types ON uom_types.id = uoms.uom_type_id
-    WHERE uom_types.code = 'PACK MATERIAL' ORDER BY uom_code
+    WHERE uom_types.code = 'INVENTORY' ORDER BY uom_code
 - :column: pm_products.pm_subtype_id
   :caption: Pm subtype
   :data_type: :integer

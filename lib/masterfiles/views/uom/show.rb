@@ -13,7 +13,6 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Uom'
               form.view_only!
-              form.add_field :uom_type_id
               form.add_field :uom_code
               form.add_field :active
             end

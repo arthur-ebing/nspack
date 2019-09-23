@@ -22,11 +22,7 @@ module UiRules
 
     def common_fields
       {
-        uom_type_id: { renderer: :select,
-                       options: @repo.for_select_uom_types,
-                       disabled_options: @repo.for_select_inactive_uom_types,
-                       caption: 'UOM Type',
-                       required: true },
+        uom_type_id: { renderer: :hidden, value: default_uom_type_id },
         uom_code: { required: true, caption: 'UOM Code' }
       }
     end
@@ -38,8 +34,14 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(uom_type_id: nil,
+      @form_object = OpenStruct.new(uom_type_id: default_uom_type_id,
                                     uom_code: nil)
+    end
+
+    def default_uom_type_id
+      MasterfilesApp::GeneralRepo.new.find_uom_type(DB[:uom_types]
+                                                        .where(code: AppConst::UOM_TYPE)
+                                                        .select_map(:id))&.id
     end
   end
 end

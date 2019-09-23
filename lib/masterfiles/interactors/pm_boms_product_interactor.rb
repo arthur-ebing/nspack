@@ -16,7 +16,7 @@ module MasterfilesApp
       success_response("Created pm boms product #{instance.id}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This pm boms product already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { uom_id: ['This pm boms product already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

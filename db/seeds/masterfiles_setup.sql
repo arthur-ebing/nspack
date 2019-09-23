@@ -10,11 +10,11 @@ VALUES ('General', 1, (SELECT id FROM functional_areas WHERE functional_area_nam
 INSERT INTO programs_webapps(program_id, webapp)
 VALUES ((SELECT id FROM programs WHERE program_name = 'General' AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles')), 'Nspack');
 
-INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'General'
-                                   AND functional_area_id = (SELECT id FROM functional_areas
-                                                             WHERE functional_area_name = 'Masterfiles')),
-        'UOM Types', 'Units of Measure', '/list/uom_types', 2);
+--INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
+--VALUES ((SELECT id FROM programs WHERE program_name = 'General'
+--                                   AND functional_area_id = (SELECT id FROM functional_areas
+--                                                             WHERE functional_area_name = 'Masterfiles')),
+--        'UOM Types', 'Units of Measure', '/list/uom_types', 2);
 
 INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
 VALUES ((SELECT id FROM programs WHERE program_name = 'General'

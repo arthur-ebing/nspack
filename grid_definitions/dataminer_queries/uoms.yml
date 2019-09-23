@@ -18,7 +18,7 @@
     :hide: true
     :pinned: 
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -29,12 +29,12 @@
     :caption: UOM Type
     :namespaced_name: uoms.uom_type_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -93,12 +93,12 @@
     :caption: Uoms type code
     :namespaced_name: uom_types.code
     :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
+    :width:
+    :format:
+    :hide: true
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -124,7 +124,7 @@
   :caption: UOM type
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT code, id FROM uom_types ORDER BY code

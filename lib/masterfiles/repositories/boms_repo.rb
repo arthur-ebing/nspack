@@ -69,13 +69,13 @@ module MasterfilesApp
         .select_map(:product_code)
     end
 
-    def for_select_pm_uoms(uom_type = 'PACK MATERIAL')
-      DB[:uoms].where(
-        uom_type_id: DB[:uom_types].where(code: uom_type).select(:id)
-      ).select(
-        :id,
-        :uom_code
-      ).map { |r| [r[:uom_code], r[:id]] }
+    def for_select_pm_uoms(uom_type)
+      DB[:uoms]
+        .where(uom_type_id: DB[:uom_types].where(code: uom_type).select(:id))
+        .select(
+          :id,
+          :uom_code
+        ).map { |r| [r[:uom_code], r[:id]] }
     end
 
     def find_pm_subtype(id)
