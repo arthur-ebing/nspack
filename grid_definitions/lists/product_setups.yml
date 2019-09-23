@@ -66,6 +66,6 @@
       :op: =
       :val: $:product_setups.active$
   :in_production:
-    - :col: in_production
+    - :col: fn_product_setup_in_production(product_setups.id)
       :op: =
-      :val: $:product_setups.in_production$
+      :val: $:in_production$

@@ -95,7 +95,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
-         'Active Product Setups', '/list/product_setups?key=active&product_setups.active = true', 3);
+         'Active Product Setups', '/list/product_setups/with_params?key=active&product_setups.active=true', 3);
 
 -- LIST menu item
 -- PROGRAM FUNCTION Product_setups in Production
@@ -103,7 +103,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
-         'Product Setups in Production', '/list/product_setups?key=in_production&product_setups.in_production = true', 4);
+         'Product Setups in Production', '/production/product_setups/product_setups/list_product_setups_in_production', 4);
 
 -- SEARCH menu item
 -- PROGRAM FUNCTION Search Product_setups

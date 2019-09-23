@@ -125,7 +125,7 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: true, false
-- :column: in_production
+- :column: fn_product_setup_in_production(product_setups.id)
   :caption: In Production?
   :data_type: :boolean
   :control_type: :list
