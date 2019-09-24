@@ -190,7 +190,8 @@ module DevelopmentApp
         integer: '(:int?)',
         string: '(:str?)',
         boolean: '(:bool?)',
-        datetime: '(:date_time?)',
+        # datetime: '(:date_time?)',
+        datetime: '(:time?)',
         date: '(:date?)',
         time: '(:time?)',
         float: '(:float?)',
@@ -1237,7 +1238,6 @@ module DevelopmentApp
       def test_interactor
         ent = columnise.join(",\n        ")
         req_col = opts.table_meta.likely_label_field || '???'
-        str_col = opts.table_meta.string_field
         <<~RUBY
           # frozen_string_literal: true
 
@@ -1291,8 +1291,6 @@ module DevelopmentApp
                 res = interactor.update_#{opts.singlename}(id, attrs)
                 refute res.success, "\#{res.message} : \#{res.errors.inspect}"
                 assert_equal ['is missing'], res.errors[:#{req_col}]
-                after = interactor.send(:repo).find_hash(:#{opts.table}, id)
-                refute_equal 'a_change', after[:#{str_col}]
               end
 
               def test_delete_#{opts.singlename}

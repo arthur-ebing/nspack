@@ -175,7 +175,7 @@ GEM
       ffi (~> 1.0)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.23.0)
+    roda (3.24.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -184,7 +184,7 @@ GEM
     rodauth (1.20.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.10.0)
+    rouge (3.11.0)
     rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
