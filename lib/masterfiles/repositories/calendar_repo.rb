@@ -22,5 +22,15 @@ module MasterfilesApp
 
     crud_calls_for :season_groups, name: :season_group, wrapper: SeasonGroup
     crud_calls_for :seasons, name: :season, wrapper: Season
+
+    def for_select_seasons_for_cultivar_group(cultivar_group_id)
+      DB[:seasons]
+        .join(:cultivars, commodity_id: :commodity_id)
+        .where(cultivar_group_id: cultivar_group_id)
+        .where(season_year: Time.now.year)
+        .order(:season_code)
+        .distinct
+        .select_map([:season_code, Sequel[:seasons][:id]])
+    end
   end
 end

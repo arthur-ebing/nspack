@@ -1,0 +1,12 @@
+---
+:dataminer_definition: product_setup_templates_for_runs
+:lookups:
+  :standard:
+    :url: /production/runs/production_runs/selected_template
+    :section_caption: Select a Product setup template
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: production_runs.id
+      :op: =
+      :val: $:run_id$

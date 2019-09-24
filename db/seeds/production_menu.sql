@@ -112,3 +112,33 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
          'Search Product Setups', '/search/product_setups', 5);
+
+-- PROGRAM: Runs
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Runs', 1, (SELECT id FROM functional_areas
+                                              WHERE functional_area_name = 'Production'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps(program_id, webapp) VALUES (
+      (SELECT id FROM programs
+       WHERE program_name = 'Runs'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+       'Nspack');
+
+-- LIST menu item
+-- PROGRAM FUNCTION Production_runs
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Production_runs', '/list/production_runs', 2);
+
+-- SEARCH menu item
+-- PROGRAM FUNCTION Search Production_runs
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Production')),
+         'Search Production_runs', '/search/production_runs', 2);

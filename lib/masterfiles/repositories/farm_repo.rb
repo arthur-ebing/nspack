@@ -136,6 +136,14 @@ module MasterfilesApp
       DB[:orchards].join(:farms, id: :farm_id).where(farm_id: id).order(:orchard_code).select_map(:orchard_code)
     end
 
+    def selected_farm_orchard_codes(farm_id, puc_id)
+      DB[:orchards]
+        .where(farm_id: farm_id)
+        .where(puc_id: puc_id)
+        .order(:orchard_code)
+        .select_map(%i[orchard_code id])
+    end
+
     def selected_farm_pucs(farm_id)
       DB[:pucs].join(:farms_pucs, puc_id: :id).where(farm_id: farm_id).order(:puc_code).select_map(%i[puc_code puc_id])
     end

@@ -32,6 +32,23 @@ module ProductionApp
     crud_calls_for :system_resource_types, name: :system_resource_type, wrapper: SystemResourceType
     crud_calls_for :system_resources, name: :system_resource, wrapper: SystemResource
 
+    def for_select_plant_resources_of_type(plant_resource_type_code, active: true)
+      type = where_hash(:plant_resource_types, plant_resource_type_code: plant_resource_type_code, active: active)
+      return [] if type.nil?
+
+      for_select_plant_resources(where: { plant_resource_type_id: type[:id] })
+    end
+
+    def packhouse_lines(packhouse_id, active: true) # rubocop:disable Metrics/AbcSize
+      DB[:plant_resources]
+        .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
+        .join(:plant_resource_types, id: Sequel[:plant_resources][:plant_resource_type_id])
+        .where(Sequel[:tree_plant_resources][:ancestor_plant_resource_id] => packhouse_id)
+        .where(Sequel[:plant_resource_types][:plant_resource_type_code] => Crossbeams::Config::ResourceDefinitions::LINE)
+        .where(Sequel[:plant_resources][:active] => active)
+        .select_map([:plant_resource_code, Sequel[:plant_resources][:id]])
+    end
+
     def for_select_plant_resource_types(plant_resource_type_code)
       possible_codes = if plant_resource_type_code.nil?
                          Crossbeams::Config::ResourceDefinitions::ROOT_PLANT_RESOURCE_TYPES
