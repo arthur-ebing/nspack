@@ -55,5 +55,13 @@ module ProductionApp
     attribute? :active, Types::Bool
     attribute :template_name, Types::String
     attribute :production_run_code, Types::String
+    attribute :cultivar_group_code, Types::String
+    attribute :cultivar_name, Types::String
+    attribute :farm_code, Types::String
+    attribute :puc_code, Types::String
+    attribute :orchard_code, Types::String
+    attribute :season_code, Types::String
+    attribute :packhouse_code, Types::String
+    attribute :line_code, Types::String
   end
 end

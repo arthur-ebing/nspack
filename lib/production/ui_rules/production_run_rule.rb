@@ -65,6 +65,25 @@ module UiRules
                                              hidden_fields: %i[product_setup_template_id],
                                              show_field: :template_name,
                                              caption: 'Select Template' }
+      compact_header(columns: %i[production_run_code template_name packhouse_code
+                                 line_code farm_code puc_code orchard_code season_code
+                                 cultivar_group_code cultivar_name allow_cultivar_mixing
+                                 allow_orchard_mixing],
+                     # display_columns: 2,
+                     header_captions: {
+                       production_run_code: 'Run',
+                       template_name: 'Template',
+                       packhouse_code: 'Packhouse',
+                       line_code: 'Line',
+                       farm_code: 'Farm',
+                       puc_code: 'PUC',
+                       orchard_code: 'Orchard',
+                       season_code: 'Season',
+                       cultivar_group_code: 'Cultivar group',
+                       cultivar_code: 'Cultivar',
+                       allow_cultivar_mixing: 'Mix Cultivar?',
+                       allow_orchard_mixing: 'Mix Orchard?'
+                     })
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
