@@ -15,7 +15,8 @@ module MasterfilesApp
     end
 
     def create_uom(params) # rubocop:disable Metrics/AbcSize
-      res = validate_uom_params(params)
+      attrs = params.to_h.merge(uom_type_id: repo.default_uom_type_id)
+      res = validate_uom_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -31,8 +32,9 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { uom_code: ['This uom already exists'] }))
     end
 
-    def update_uom(id, params)
-      res = validate_uom_params(params)
+    def update_uom(id, params)  # rubocop:disable Metrics/AbcSize
+      attrs = params.to_h.merge(uom_type_id: repo.default_uom_type_id)
+      res = validate_uom_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do

@@ -17,7 +17,6 @@ module Masterfiles
               form.action "/masterfiles/general/uoms/#{id}"
               form.remote!
               form.method :update
-              form.add_field :uom_type_id
               form.add_field :uom_code
             end
           end

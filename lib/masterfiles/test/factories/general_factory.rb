@@ -15,7 +15,7 @@ module MasterfilesApp
 
     def create_uom_type(opts = {})
       default = {
-        code: Faker::Lorem.word,
+        code: AppConst::UOM_TYPE,
         active: true
       }
       DB[:uom_types].insert(default.merge(opts))

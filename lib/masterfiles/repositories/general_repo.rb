@@ -28,5 +28,9 @@ module MasterfilesApp
                             parent_tables: [{ parent_table: :uom_types, flatten_columns: { code: :uom_type_code } }],
                             wrapper: MasterfilesApp::Uom)
     end
+
+    def default_uom_type_id
+      DB[:uom_types].where(code: AppConst::UOM_TYPE).select_map(:id).first
+    end
   end
 end

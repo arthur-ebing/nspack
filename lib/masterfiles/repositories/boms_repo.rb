@@ -72,10 +72,7 @@ module MasterfilesApp
     def for_select_pm_uoms(uom_type)
       DB[:uoms]
         .where(uom_type_id: DB[:uom_types].where(code: uom_type).select(:id))
-        .select(
-          :id,
-          :uom_code
-        ).map { |r| [r[:uom_code], r[:id]] }
+        .select_map(%i[uom_code id])
     end
 
     def find_pm_subtype(id)

@@ -46,16 +46,10 @@ module MasterfilesApp
 
     def test_update_uom_fail
       id = create_uom
-      attrs = interactor.send(:repo).find_hash(:uoms, id)
-      value = attrs[:uom_code]
-      attrs.delete(:uom_type_id)
-      attrs[:uom_code] = 'a_change'
+      attrs = interactor.send(:repo).find_hash(:uoms, id).reject { |k, _| %i[id uom_code].include?(k) }
       res = interactor.update_uom(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:uom_type_id]
-      after = interactor.send(:repo).find_hash(:uoms, id)
-      refute_equal 'a_change', after[:uom_code]
-      assert_equal value, after[:uom_code]
+      assert_equal ['is missing'], res.errors[:uom_code]
     end
 
     def test_delete_uom
