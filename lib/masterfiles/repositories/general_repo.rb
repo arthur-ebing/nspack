@@ -30,7 +30,7 @@ module MasterfilesApp
     end
 
     def default_uom_type_id
-      DB[:uom_types].where(code: AppConst::UOM_TYPE).select_map(:id).first
+      DB[:uom_types].where(code: AppConst::UOM_TYPE).get(:id)
     end
   end
 end

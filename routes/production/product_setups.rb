@@ -414,11 +414,6 @@ class Nspack < Roda # rubocop:disable ClassLength
                                      dom_id: 'product_setup_treatment_ids',
                                      options_array: treatments)])
       end
-
-      r.on 'list_product_setups_in_production' do
-        check_auth!('product_setups', 'edit')
-        r.redirect '/list/product_setups/with_params?key=in_production&in_production=true'
-      end
     end
   end
 end

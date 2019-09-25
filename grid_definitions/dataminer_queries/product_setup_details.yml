@@ -1,7 +1,7 @@
 ---
 :caption: Product Setup Details
 :sql: SELECT product_setup_templates.template_name, fn_product_setup_code(product_setups.id) AS product_setup_code,
-      fn_product_setup_in_production(product_setups.id)  AS in_production, commodities.code AS commodity_code,
+      fn_product_setup_in_production(product_setups.id) AS in_production, commodities.code AS commodity_code,
       marketing_varieties.marketing_variety_code, standard_pack_codes.standard_pack_code AS standard_pack,
       basic_pack_codes.basic_pack_code AS pack_code, std_fruit_size_counts.size_count_value AS size_count,
       fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count, fruit_size_references.size_reference,
@@ -82,7 +82,7 @@
     :name: in_production
     :sequence_no: 30
     :caption: In production
-    :namespaced_name: 
+    :namespaced_name: in_production
     :data_type: :boolean
     :width: 
     :format: 
@@ -603,3 +603,19 @@
   :ordered_list: true
   :ui_priority: 7
   :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: product_setups.active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def: [true, false]
+- :column: fn_product_setup_in_production(product_setups.id)
+  :caption: in_production
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def: [true, false]
