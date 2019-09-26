@@ -9,6 +9,7 @@ Sequel.migration do
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
+      unique :target_market_group_type_code
     end
     pgt_created_at(:target_market_group_types, :created_at, function_name: :target_market_group_types_set_created_at, trigger_name: :set_created_at)
     pgt_updated_at(:target_market_group_types, :updated_at, function_name: :target_market_group_types_set_updated_at, trigger_name: :set_updated_at)

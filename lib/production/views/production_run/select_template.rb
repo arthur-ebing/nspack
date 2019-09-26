@@ -14,7 +14,6 @@ module Production
             page.form_errors form_errors
             page.add_text rules[:compact_header]
             page.form do |form|
-              form.caption 'New Production Run'
               form.action "/production/runs/production_runs/#{id}/select_template"
               form.remote! if remote
               form.add_field :product_setup_template_id

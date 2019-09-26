@@ -132,7 +132,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
-         'Production_runs', '/list/production_runs', 2);
+         'List Production runs', '/list/production_runs', 2);
 
 -- SEARCH menu item
 -- PROGRAM FUNCTION Search Production_runs
@@ -141,4 +141,4 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
-         'Search Production_runs', '/search/production_runs', 2);
+         'Search Production runs', '/search/production_runs', 2);
