@@ -16,7 +16,7 @@
   :text: delete
   :icon: delete
   :is_delete: true
-  :popup: false
+  :popup: true
   :hide_if_true: delivery_tipped
 #- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/complete"
 #  :text: Complete

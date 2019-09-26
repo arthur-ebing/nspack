@@ -48,13 +48,12 @@ module RawMaterialsApp
     end
 
     def delete_rmt_delivery(id)
-      name = rmt_delivery(id).truck_registration_number
       repo.transaction do
         repo.delete_rmt_delivery(id)
         log_status('rmt_deliveries', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt delivery #{name}")
+      success_response('Deleted rmt delivery')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

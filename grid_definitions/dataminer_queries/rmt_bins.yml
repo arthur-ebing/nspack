@@ -17,7 +17,9 @@
   "orchards"."orchard_code", "pucs"."puc_code", "rmt_classes"."rmt_class_code", "rmt_container_material_owners"."id"
   AS rmt_container_material_owners_id, "rmt_container_material_types"."container_material_type_code",
   "rmt_container_types"."container_type_code", "rmt_deliveries"."truck_registration_number"
-  AS rmt_delivery_truck_registration_number, "seasons"."season_code" FROM "rmt_bins" LEFT OUTER JOIN "cultivar_groups" ON "cultivar_groups"."id"
+  AS rmt_delivery_truck_registration_number, "seasons"."season_code",
+  CASE WHEN bin_tipped THEN 'gray' ELSE NULL END AS colour_rule
+  FROM "rmt_bins" LEFT OUTER JOIN "cultivar_groups" ON "cultivar_groups"."id"
   = "rmt_bins"."cultivar_group_id" LEFT OUTER JOIN "cultivars" ON "cultivars"."id" = "rmt_bins"."cultivar_id"
   LEFT OUTER JOIN "farms" ON "farms"."id" = "rmt_bins"."farm_id" LEFT OUTER JOIN "orchards" ON "orchards"."id"
   = "rmt_bins"."orchard_id" LEFT OUTER JOIN "pucs" ON "pucs"."id" = "rmt_bins"."puc_id" LEFT OUTER JOIN
