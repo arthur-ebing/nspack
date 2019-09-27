@@ -62,6 +62,11 @@
     :url: "/production/product_setups/product_setup_templates/$:product_setups.product_setup_template_id$/product_setups/new"
     :text: New Product Setup
     :style: :button
+:captions:
+  :grid_caption:
+  :conditions:
+    :active: Active Product Setups
+    :in_production: Product Setups in production
 :conditions:
   :standard:
     - :col: product_setups.product_setup_template_id

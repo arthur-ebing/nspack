@@ -277,7 +277,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           else
             re_show_form(r, res) do
               Production::ProductSetups::ProductSetup::Edit.call(id,
-                                                                 back_url: "/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage",
+                                                                 back_url: "/production/product_setups/product_setup_templates/#{res.instance[:product_setup_template_id]}/manage",
                                                                  form_values: params[:product_setup],
                                                                  form_errors: res.errors)
             end

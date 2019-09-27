@@ -57,6 +57,11 @@
     :function: production
     :program: product_setups
     :permission: edit
+:captions:
+  :grid_caption:
+  :conditions:
+    :active: Active Product Setups
+    :in_production: Product Setups in production
 :conditions:
   :standard:
     - :col: product_setups.product_setup_template_id
