@@ -274,6 +274,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [string] - the URL
   def back_button_url
     url = request.referer
+    return '/' if url.nil?
+
     url = url.sub(%r{/run$}, '?back=y') if url.include?('/search/') && url.end_with?('/run')
     url
   end
