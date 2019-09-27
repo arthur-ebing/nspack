@@ -1,24 +1,66 @@
 ---
 :dataminer_definition: product_setup_templates
 :actions:
-- :url: "/production/product_setups/product_setup_templates/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
-- :url: "/production/product_setups/product_setup_templates/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/production/product_setups/product_setup_templates/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
+  - :url: "/production/product_setups/product_setup_templates/$:id$"
+    :text: view
+    :icon: view-show
+    :title: View
+    :popup: true
+  - :url: "/production/product_setups/product_setup_templates/$:id$/edit"
+    :text: edit
+    :icon: edit
+    :title: Edit
+    :popup: true
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setup_templates/$:id$/clone_product_setup_template/clone"
+    :text: clone
+    :icon: copy
+    :title: Clone
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setup_templates/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_true: in_production
+  - :url: "/production/product_setups/product_setup_templates/$:id$/activate"
+    :text: Activate
+    :icon: check-square
+    :prompt: 'Are you sure you want to Activate this Template?'
+    :hide_if_true: active
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setup_templates/$:id$/deactivate"
+    :text: De-activate
+    :icon: close-outline
+    :prompt: 'Are you sure you want to De-activate this Template?'
+    :hide_if_false: active
+    :hide_if_true: in_production
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :separator: true
+  - :url: "/production/product_setups/product_setup_templates/$:id$/manage"
+    :text: Product Setups
+    :icon: list
+    :title: Product Setups
+    :hide_if_false: active
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
 :page_controls:
-- :control_type: :link
-  :url: "/production/product_setups/product_setup_templates/new"
-  :text: New Product Setup Template
-  :style: :button
-  :behaviour: :popup
+  - :control_type: :link
+    :url: "/production/product_setups/product_setup_templates/new"
+    :text: New Product Setup Template
+    :style: :button
+    :behaviour: :popup

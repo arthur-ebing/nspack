@@ -1,8 +1,19 @@
+# rubocop:disable Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/PerceivedComplexity
 # frozen_string_literal: true
 
 module ProductionApp
   class ProductSetupInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
+      if AppConst::CLIENT_CODE == 'kr'
+        if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?
+          standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
+          return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
+
+          params = params.merge(standard_pack_code_id: standard_pack_code_id)
+        end
+      end
+
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -26,7 +37,27 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)
+      if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
+        standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
+        return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
+      else
+        standard_pack_code_id = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
+        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_id.size.==1
+      end
+      standard_pack_code_id
+    end
+
     def update_product_setup(id, params)  # rubocop:disable Metrics/AbcSize
+      if AppConst::CLIENT_CODE == 'kr'
+        if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?
+          standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
+          return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
+
+          params = params.merge(standard_pack_code_id: standard_pack_code_id)
+        end
+      end
+
       res = validate_product_setup_params(params)
       return validation_failed_response(res) unless res.messages.empty?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -37,6 +68,7 @@ module ProductionApp
 
       repo.transaction do
         repo.update_product_setup(id, attrs)
+        log_status('product_setups', id, 'UPDATED') if repo.product_setup_in_production?(id)
         log_transaction
       end
       instance = product_setup(id)
@@ -48,6 +80,8 @@ module ProductionApp
 
     def delete_product_setup(id)
       name = product_setup(id).product_setup_code
+      return failed_response("You cannot delete product setup #{name}. It is on an active production run") if repo.product_setup_in_production?(id)
+
       repo.transaction do
         repo.delete_product_setup(id)
         log_status('product_setups', id, 'DELETED')
@@ -77,6 +111,8 @@ module ProductionApp
     end
 
     def for_select_actual_count_standard_pack_codes(standard_pack_code_ids)
+      return [] if standard_pack_code_ids.empty?
+
       MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: [[:id, standard_pack_code_ids.map { |r| r }]])
     end
 
@@ -110,10 +146,6 @@ module ProductionApp
       Crossbeams::Layout::Table.new([], MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id), [],
                                     alignment: { quantity: :right },
                                     cell_transformers: { quantity: :decimal }).render
-    end
-
-    def for_select_treatment_type_treatments(treatment_type_id)
-      MasterfilesApp::FruitRepo.new.for_select_treatment_type_treatment_codes(treatment_type_id)
     end
 
     def activate_product_setup(id)
@@ -170,3 +202,5 @@ module ProductionApp
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/PerceivedComplexity

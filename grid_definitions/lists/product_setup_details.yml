@@ -18,6 +18,7 @@
   :text: edit active run setup
   :icon: edit
   :title: Edit Active Run Setup
+  :prompt: 'Are you sure you want to Edit this Active Run Setup?'
   :hide_if_false: in_production
   :auth:
     :function: production

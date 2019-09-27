@@ -18,6 +18,12 @@ class Nspack < Roda # rubocop:disable ClassLength
         show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id) }
       end
 
+      r.on 'manage' do   # EDIT
+        check_auth!('product_setups', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id, back_url: request.referer) }
+      end
+
       r.on 'activate' do
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:activate, id)
@@ -58,16 +64,17 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.on 'new' do    # NEW
           check_auth!('product_setups', 'new')
-          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::New.call(id, remote: fetch?(r)) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::New.call(id, back_url: request.referer, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_product_setup(params[:product_setup])
           if res.success
             flash[:notice] = res.message
-            r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+            r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage")
           else
             re_show_form(r, res, url: "/production/product_setups/product_setup_templates/#{id}/product_setups/new") do
               Production::ProductSetups::ProductSetup::New.call(id,
+                                                                back_url: "/production/product_setups/product_setup_templates/#{id}/manage",
                                                                 form_values: params[:product_setup],
                                                                 form_errors: res.errors,
                                                                 remote: fetch?(r))
@@ -76,7 +83,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('product_setups', 'read')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Show.call(id) }
@@ -84,7 +91,18 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do     # UPDATE
           res = interactor.update_product_setup_template(id, params[:product_setup_template])
           if res.success
-            show_partial(notice: res.message) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id, is_update: true) }
+            row_keys = %i[
+              template_name
+              description
+              cultivar_group_code
+              cultivar_name
+              packhouse_resource_code
+              production_line_resource_code
+              season_group_code
+              season_code
+              active
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::ProductSetups::ProductSetupTemplate::Edit.call(id, form_values: params[:product_setup_template], form_errors: res.errors) }
           end
@@ -213,13 +231,13 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: request.referer) }
       end
 
       r.on 'edit_active_run_setup' do   # EDIT Active Run Setup
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: request.referer) }
       end
 
       r.on 'clone' do   # CLONE
@@ -227,7 +245,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:edit, id)
         res = interactor.clone_product_setup(id)
         flash[:notice] = res.message
-        r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+        r.redirect(request.referer)
       end
 
       r.on 'activate' do
@@ -235,7 +253,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:activate, id)
         res = interactor.activate_product_setup(id)
         flash[:notice] = res.message
-        r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+        r.redirect(request.referer)
       end
 
       r.on 'deactivate' do
@@ -243,21 +261,26 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:deactivate, id)
         res = interactor.deactivate_product_setup(id)
         flash[:notice] = res.message
-        r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+        r.redirect(request.referer)
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('product_setups', 'read')
-          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id, back_url: request.referer) }
         end
         r.patch do     # UPDATE
           res = interactor.update_product_setup(id, params[:product_setup])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/edit")
+            redirect_via_json("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage")
           else
-            re_show_form(r, res) { Production::ProductSetups::ProductSetup::Edit.call(id, form_values: params[:product_setup], form_errors: res.errors) }
+            re_show_form(r, res) do
+              Production::ProductSetups::ProductSetup::Edit.call(id,
+                                                                 back_url: "/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage",
+                                                                 form_values: params[:product_setup],
+                                                                 form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE
@@ -313,7 +336,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         else
           fruit_actual_counts_for_pack_id = params[:changed_value]
           actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
-          standard_pack_codes = actual_count.standard_pack_code_ids.empty? ? [] : interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
+          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
           size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
@@ -402,17 +425,6 @@ class Nspack < Roda # rubocop:disable ClassLength
                       OpenStruct.new(type: :replace_inner_html,
                                      dom_id: 'product_setup_pm_boms_products',
                                      value: pm_bom_products)])
-      end
-
-      r.on 'treatment_type_changed' do
-        treatments = if params[:changed_value].blank?
-                       []
-                     else
-                       interactor.for_select_treatment_type_treatments(params[:changed_value])
-                     end
-        json_actions([OpenStruct.new(type: :replace_multi_options,
-                                     dom_id: 'product_setup_treatment_ids',
-                                     options_array: treatments)])
       end
     end
   end

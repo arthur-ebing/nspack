@@ -18,6 +18,7 @@
   :text: edit active run setup
   :icon: edit
   :title: Edit Active Run Setup
+  :prompt: 'Are you sure you want to Edit this Active Run Setup?'
   :hide_if_false: in_production
   :auth:
     :function: production
@@ -56,6 +57,11 @@
     :function: production
     :program: product_setups
     :permission: edit
+:page_controls:
+  - :control_type: :link
+    :url: "/production/product_setups/product_setup_templates/$:product_setups.product_setup_template_id$/product_setups/new"
+    :text: New Product Setup
+    :style: :button
 :conditions:
   :standard:
     - :col: product_setups.product_setup_template_id

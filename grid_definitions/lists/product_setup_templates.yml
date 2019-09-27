@@ -5,10 +5,12 @@
   :text: view
   :icon: view-show
   :title: View
+  :popup: true
 - :url: "/production/product_setups/product_setup_templates/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
+  :popup: true
   :auth:
     :function: production
     :program: product_setups
@@ -42,6 +44,16 @@
   :prompt: 'Are you sure you want to De-activate this Template?'
   :hide_if_false: active
   :hide_if_true: in_production
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
+- :separator: true
+- :url: "/production/product_setups/product_setup_templates/$:id$/manage"
+  :text: Product Setups
+  :icon: list
+  :title: Product Setups
+  :hide_if_false: active
   :auth:
     :function: production
     :program: product_setups

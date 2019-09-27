@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/CyclomaticComplexity
 # frozen_string_literal: true
 
 module UiRules
@@ -13,6 +14,7 @@ module UiRules
       set_disable_cultivar_fields if disable_cultivar_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      set_manage_template_setups if @mode == :manage
 
       add_behaviours if %i[new edit clone].include? @mode
 
@@ -101,6 +103,22 @@ module UiRules
       fields[:cultivar_name] = { renderer: :label, with_value: @form_object[:cultivar_name], caption: 'Cultivar' }
     end
 
+    def set_manage_template_setups
+      compact_header(columns: %i[template_name description cultivar_group_code cultivar_name
+                                 packhouse_resource_code production_line_resource_code
+                                 season_group_code season_code],
+                     header_captions: {
+                       template_name: 'Template',
+                       description: 'Template Description',
+                       cultivar_group_code: 'Cultivar group',
+                       cultivar_name: 'Cultivar',
+                       packhouse_resource_code: 'Packhouse',
+                       production_line_resource_code: 'Line',
+                       season_group_code: 'Season Group',
+                       season_code: 'Season'
+                     })
+    end
+
     def make_form_object
       if @mode == :new
         make_new_form_object
@@ -145,3 +163,4 @@ module UiRules
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity

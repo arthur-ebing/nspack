@@ -54,7 +54,6 @@ module ProductionApp
     def find_product_setup(id)
       hash = DB["SELECT product_setups.* ,COALESCE(ps_cultivar.commodity_id, cultivars.commodity_id) AS commodity_id, pallet_formats.pallet_base_id,
                  pallet_formats.pallet_stack_type_id, pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code,
-                 treatments.treatment_type_id,
                  fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
                  FROM product_setups
                  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
@@ -231,15 +230,23 @@ module ProductionApp
         .first[:id]
     end
 
-    def for_select_chemical_levels
-      [{ code: 'LC', desc: 'Low Chem' },
-       { code: 'SC', desc: 'Std Chem' }]
-        .map { |r| [r[:desc], r[:code]] }
-    end
-
     def pm_boms_products(product_setup_id)
       pm_bom = find_product_setup(product_setup_id)
       MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
+    end
+
+    def product_setup_in_production?(id)
+      query = <<~SQL
+        SELECT fn_product_setup_in_production(product_setups.id) FROM product_setups where id = #{id}
+      SQL
+      DB[query].single_value
+    end
+
+    def product_setup_template_in_production?(id)
+      query = <<~SQL
+        SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = #{id}
+      SQL
+      DB[query].single_value
     end
 
     def disable_cultivar_fields(product_setup_template_id)
@@ -295,6 +302,17 @@ module ProductionApp
       DB[:production_runs]
         .where(product_setup_template_id: product_setup_template_id)
         .select_map(:id)
+    end
+
+    def actual_count_standard_pack_code_id(standard_pack_code_ids)
+      DB[:standard_pack_codes].where(id: standard_pack_code_ids).get(:id)
+    end
+
+    def basic_pack_standard_pack_code_id(basic_pack_code_id)
+      DB[:standard_pack_codes]
+        .join(:basic_pack_codes, basic_pack_code: :standard_pack_code)
+        .where(Sequel[:basic_pack_codes][:id] => basic_pack_code_id)
+        .get(Sequel[:standard_pack_codes][:id])
     end
   end
 end

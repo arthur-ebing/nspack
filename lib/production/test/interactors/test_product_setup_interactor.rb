@@ -91,6 +91,7 @@ module ProductionApp
       pallet_format_id = create_pallet_format
       cartons_per_pallet_id = create_cartons_per_pallet
       grade_id = create_grade
+      fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
 
       {
         id: 1,
@@ -100,7 +101,7 @@ module ProductionApp
         std_fruit_size_count_id: nil,
         basic_pack_code_id: basic_pack_code_id,
         standard_pack_code_id: standard_pack_code_id,
-        fruit_actual_counts_for_pack_id: nil,
+        fruit_actual_counts_for_pack_id: fruit_actual_counts_for_pack_id,
         fruit_size_reference_id: fruit_size_reference_id,
         marketing_org_party_role_id: marketing_org_party_role_id,
         packed_tm_group_id: packed_tm_group_id,
@@ -127,8 +128,7 @@ module ProductionApp
         pm_type_id: 1,
         pm_subtype_id: 1,
         description: 'ABC',
-        erp_bom_code: 'ABC',
-        treatment_type_id: 1
+        erp_bom_code: 'ABC'
       }
     end
 

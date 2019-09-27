@@ -43,7 +43,8 @@ class TestProductSetupTemplateRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_product_setup_template).returns(ok_response(instance: row_vals))
-    post 'production/product_setups/product_setup_templates/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    patch_as_fetch 'production/product_setups/product_setup_templates/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_json_update_grid
   end
 
   def test_update_fail

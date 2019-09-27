@@ -38,6 +38,8 @@ module ProductionApp
 
     def delete_product_setup_template(id)
       name = product_setup_template(id).template_name
+      return failed_response("You cannot delete product setup template #{name}. It is on an active production run") if repo.product_setup_template_in_production?(id)
+
       repo.transaction do
         repo.delete_product_setup_template(id)
         log_status('product_setup_templates', id, 'DELETED')
@@ -92,7 +94,7 @@ module ProductionApp
     end
 
     def clone_product_setup_template(id, params)  # rubocop:disable Metrics/AbcSize
-      res = validate_product_setup_template_params(params)
+      res = validate_product_setup_template_params(params.to_h.reject { |k, _| k == :id })
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do

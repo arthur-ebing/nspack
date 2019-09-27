@@ -1,24 +1,59 @@
 ---
 :dataminer_definition: product_setup_details
 :actions:
-- :url: "/production/product_setups/product_setups/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
-- :url: "/production/product_setups/product_setups/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/production/product_setups/product_setups/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/production/product_setups/product_setups/new"
-  :text: New Product Setup
-  :style: :button
-  :behaviour: :popup
+  - :url: "/production/product_setups/product_setups/$:id$"
+    :text: view
+    :icon: view-show
+    :title: View
+  - :url: "/production/product_setups/product_setups/$:id$/edit"
+    :text: edit
+    :icon: edit
+    :title: Edit
+    :hide_if_true: in_production
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setups/$:id$/edit_active_run_setup"
+    :text: edit active run setup
+    :icon: edit
+    :title: Edit Active Run Setup
+    :prompt: 'Are you sure you want to Edit this Active Run Setup?'
+    :hide_if_false: in_production
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setups/$:id$/clone"
+    :text: clone
+    :icon: copy
+    :title: Clone
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setups/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_true: in_production
+  - :url: "/production/product_setups/product_setups/$:id$/activate"
+    :text: Activate
+    :icon: check-square
+    :prompt: 'Are you sure you want to Activate this Product Setup?'
+    :hide_if_true: active
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit
+  - :url: "/production/product_setups/product_setups/$:id$/deactivate"
+    :text: De-activate
+    :icon: close-outline
+    :prompt: 'Are you sure you want to De-activate this Product Setup?'
+    :hide_if_false: active
+    :hide_if_true: in_production
+    :auth:
+      :function: production
+      :program: product_setups
+      :permission: edit

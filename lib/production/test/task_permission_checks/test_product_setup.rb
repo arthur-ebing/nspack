@@ -42,8 +42,7 @@ module ProductionApp
         pm_type_id: 1,
         pm_subtype_id: 1,
         description: 'ABC',
-        erp_bom_code: 'ABC',
-        treatment_type_id: 1
+        erp_bom_code: 'ABC'
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end

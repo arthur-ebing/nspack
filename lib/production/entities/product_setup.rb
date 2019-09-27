@@ -37,6 +37,5 @@ module ProductionApp
     attribute :pm_subtype_id, Types::Integer
     attribute :description, Types::String
     attribute :erp_bom_code, Types::String
-    attribute :treatment_type_id, Types::Integer
   end
 end
