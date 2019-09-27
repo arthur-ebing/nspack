@@ -10,12 +10,12 @@ Clicking this button should take the user to the page they were on regardless of
 
 To make this work without knowing which url to use in the link, do the following:
 
-In the route, pass the `request.referer` as an argument named `back_url`:
+In the route, pass the result of the `back_button_url` helper as an argument named `back_url`:
 [source, ruby]
 ----
 r.get do
   # ..
-  show_partial_or_page(r) { App::Prog::Det::Show.call(id, back_url: request.referer) }
+  show_partial_or_page(r) { App::Prog::Det::Show.call(id, back_url: back_button_url) }
 end
 ----
 
