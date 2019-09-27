@@ -21,7 +21,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'manage' do   # EDIT
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id, back_url: request.referer) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Manage.call(id, back_url: back_button_url) }
       end
 
       r.on 'activate' do
@@ -64,7 +64,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.on 'new' do    # NEW
           check_auth!('product_setups', 'new')
-          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::New.call(id, back_url: request.referer, remote: fetch?(r)) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::New.call(id, back_url: back_button_url, remote: fetch?(r)) }
         end
         r.post do        # CREATE
           res = interactor.create_product_setup(params[:product_setup])
@@ -231,13 +231,13 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: request.referer) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: back_button_url) }
       end
 
       r.on 'edit_active_run_setup' do   # EDIT Active Run Setup
         check_auth!('product_setups', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: request.referer) }
+        show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Edit.call(id, back_url: back_button_url) }
       end
 
       r.on 'clone' do   # CLONE
@@ -245,7 +245,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:edit, id)
         res = interactor.clone_product_setup(id)
         flash[:notice] = res.message
-        r.redirect(request.referer)
+        r.redirect(back_button_url)
       end
 
       r.on 'activate' do
@@ -253,7 +253,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:activate, id)
         res = interactor.activate_product_setup(id)
         flash[:notice] = res.message
-        r.redirect(request.referer)
+        r.redirect(back_button_url)
       end
 
       r.on 'deactivate' do
@@ -261,13 +261,13 @@ class Nspack < Roda # rubocop:disable ClassLength
         interactor.assert_permission!(:deactivate, id)
         res = interactor.deactivate_product_setup(id)
         flash[:notice] = res.message
-        r.redirect(request.referer)
+        r.redirect(back_button_url)
       end
 
       r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('product_setups', 'read')
-          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id, back_url: request.referer) }
+          show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id, back_url: back_button_url) }
         end
         r.patch do     # UPDATE
           res = interactor.update_product_setup(id, params[:product_setup])
