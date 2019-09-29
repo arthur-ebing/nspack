@@ -40,6 +40,7 @@ require './lib/base_interactor'
 require './lib/base_service'
 require './lib/base_step'
 require './lib/document_sequence'
+require './lib/help_index_builder'
 require './lib/http_calls'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/rmd_form'

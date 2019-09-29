@@ -158,9 +158,7 @@ class Nspack < Roda
         <% content_for :late_head do %>
           <link rel="stylesheet" href="/css/asciidoc.css">
         <% end %>
-        <div id="asciidoc-content">
-          #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style', 'imagesdir' => '/documentation_images' })}
-        </div>
+        #{render_asciidoc(content)}
       HTML
     end
 
@@ -459,6 +457,14 @@ class Nspack < Roda
 
   status_handler(404) do
     view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
+  end
+
+  def render_asciidoc(content, image_dir = '/documentation_images')
+    <<~HTML
+      <div id="asciidoc-content">
+        #{Asciidoctor.convert(content, safe: :safe, attributes: { 'source-highlighter' => 'coderay', 'coderay-css' => 'style', 'imagesdir' => image_dir })}
+      </div>
+    HTML
   end
 end
 # rubocop:enable Metrics/ClassLength
