@@ -1,0 +1,19 @@
+---
+:dataminer_definition: production_run_allocated_setups
+:actions:
+- :url: "/production/product_setups/product_setups/$:product_setup_id$"
+  :text: view product setup
+  :icon: view-show
+  :title: View
+  :hide_if_null: product_setup_id
+:conditions:
+  :standard:
+    - :col: r.id
+      :op: =
+      :val: $:production_run_id$
+:edit_rules:
+  :url: /production/runs/production_runs/choose_setup/$:id$
+  :editable_fields:
+    product_setup_code:
+      :editor: :select
+      :value_sql: SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)

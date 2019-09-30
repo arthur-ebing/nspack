@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/CyclomaticComplexity
+# rubocop:disable Metrics/PerceivedComplexity
 # frozen_string_literal: true
 
 module UiRules
@@ -7,7 +9,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:hide_basic_pack] = (AppConst::CLIENT_CODE == 'kr')
+      @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = (AppConst::REQUIRE_PACKAGING_BOM == 'true')
 
       common_values_for_fields common_fields
@@ -41,13 +43,12 @@ module UiRules
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
       pm_type_id_label = MasterfilesApp::BomsRepo.new.find_pm_type(@form_object.pm_type_id)&.pm_type_code
       pm_subtype_id_label = MasterfilesApp::BomsRepo.new.find_pm_subtype(@form_object.pm_subtype_id)&.subtype_code
-      treatment_type_id_label = MasterfilesApp::FruitRepo.new.find_treatment_type(@form_object.treatment_type_id)&.treatment_type_code
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_variety_id] = { renderer: :label, with_value: customer_variety_variety_id_label, caption: 'Customer Variety Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code', hide_on_load: @rules[:hide_basic_pack] ? true : false }
-      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code' }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
+      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code', hide_on_load: @rules[:hide_some_fields] ? true : false }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
       fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org Party Role' }
@@ -64,16 +65,15 @@ module UiRules
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_label_name] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments'  }
+      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments', hide_on_load: @rules[:hide_some_fields] ? true : false  }
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
       fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
-      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
+      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype', hide_on_load: @rules[:require_packaging_bom] ? false : true }
-      fields[:treatment_type_id] = { renderer: :label, with_value: treatment_type_id_label, caption: 'Treatment Type' }
-      fields[:description] = { renderer: :label }
-      fields[:erp_bom_code] = { renderer: :label }
+      fields[:description] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:erp_bom_code] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:product_chars] = { renderer: :label }
     end
 
@@ -107,7 +107,7 @@ module UiRules
         std_fruit_size_count_id: { renderer: :select,
                                    options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts,
                                    disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_std_fruit_size_counts,
-                                   caption: 'Size Count',
+                                   caption: 'Std Size Count',
                                    prompt: 'Select Size Count',
                                    searchable: true,
                                    remove_search_for_small_list: false },
@@ -118,9 +118,7 @@ module UiRules
                               required: true,
                               prompt: 'Select Basic Pack',
                               searchable: true,
-                              remove_search_for_small_list: false,
-                              hide_on_load: @rules[:hide_basic_pack] ? true : false },
-
+                              remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
                                  options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
                                  disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
@@ -128,7 +126,8 @@ module UiRules
                                  required: true,
                                  prompt: 'Select Standard Pack',
                                  searchable: true,
-                                 remove_search_for_small_list: false },
+                                 remove_search_for_small_list: false,
+                                 hide_on_load: @rules[:hide_some_fields] ? true : false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
                                            options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs,
                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_actual_counts_for_packs,
@@ -176,13 +175,7 @@ module UiRules
                    prompt: 'Select Mark',
                    searchable: true,
                    remove_search_for_small_list: false },
-        product_chars: { renderer: :select,
-                         options: @repo.for_select_chemical_levels,
-                         caption: 'Chemical Levels',
-                         required: true,
-                         prompt: 'Select Chemical Level',
-                         searchable: true,
-                         remove_search_for_small_list: false },
+        product_chars: {},
         inventory_code_id: { renderer: :select,
                              options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
                              disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_inventory_codes,
@@ -242,7 +235,8 @@ module UiRules
                       caption: 'PM Type',
                       prompt: 'Select PM Type',
                       searchable: true,
-                      remove_search_for_small_list: false },
+                      remove_search_for_small_list: false,
+                      hide_on_load: @rules[:require_packaging_bom] ? false : true },
         pm_subtype_id: { renderer: :select,
                          options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: default_pm_type_id }),
                          disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_subtypes,
@@ -259,22 +253,17 @@ module UiRules
                      searchable: true,
                      remove_search_for_small_list: false,
                      hide_on_load: @rules[:require_packaging_bom] ? false : true },
-        description: { readonly: true },
-        erp_bom_code: { readonly: true },
-        # pm_boms_products: { readonly: true },
+        description: { readonly: true,
+                       hide_on_load: @rules[:require_packaging_bom] ? false : true },
+        erp_bom_code: { readonly: true,
+                        hide_on_load: @rules[:require_packaging_bom] ? false : true },
         active: { renderer: :checkbox },
         # extended_columns: {},
-        treatment_type_id: { renderer: :select,
-                             options: MasterfilesApp::FruitRepo.new.for_select_treatment_types,
-                             disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_treatment_types,
-                             caption: 'Treatment Type',
-                             prompt: 'Select Treatment Type',
-                             searchable: true,
-                             remove_search_for_small_list: false },
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
-                         caption: 'Treatments' }
+                         caption: 'Treatments',
+                         hide_on_load: @rules[:hide_some_fields] ? true : false }
       }
     end
 
@@ -345,9 +334,9 @@ module UiRules
                                   notify: [{ url: '/production/product_setups/product_setups/pm_subtype_changed' }]
         behaviour.dropdown_change :pm_bom_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pm_bom_changed' }]
-        behaviour.dropdown_change :treatment_type_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/treatment_type_changed' }]
       end
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity
+# rubocop:enable Metrics/PerceivedComplexity

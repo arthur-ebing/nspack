@@ -421,3 +421,11 @@
   :ordered_list: true
   :ui_priority: 7
   :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
+- :column: product_setup_templates.active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def: [true, false]

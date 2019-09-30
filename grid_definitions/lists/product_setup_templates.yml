@@ -5,10 +5,12 @@
   :text: view
   :icon: view-show
   :title: View
+  :popup: true
 - :url: "/production/product_setups/product_setup_templates/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
+  :popup: true
   :auth:
     :function: production
     :program: product_setups
@@ -46,9 +48,27 @@
     :function: production
     :program: product_setups
     :permission: edit
+- :separator: true
+- :url: "/production/product_setups/product_setup_templates/$:id$/manage"
+  :text: Product Setups
+  :icon: list
+  :title: Product Setups
+  :hide_if_false: active
+  :auth:
+    :function: production
+    :program: product_setups
+    :permission: edit
 :page_controls:
 - :control_type: :link
   :url: "/production/product_setups/product_setup_templates/new"
   :text: New Product Setup Template
   :style: :button
   :behaviour: :popup
+:captions:
+  :conditions:
+    :active: Active Product Setup Templates
+:conditions:
+  :active:
+    - :col: product_setup_templates.active
+      :op: =
+      :val: $:product_setup_templates.active$

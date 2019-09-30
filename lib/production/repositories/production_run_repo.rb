@@ -50,5 +50,33 @@ module ProductionApp
                                                  col_name: :production_run_code }],
                             wrapper: ProductionRunFlat)
     end
+
+    def prepare_run_allocation_targets(id)
+      insert_ds = DB[<<~SQL, id]
+        INSERT INTO product_resource_allocations (production_run_id, plant_resource_id)
+        SELECT r.id, p.id
+        FROM production_runs r
+        JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id
+        JOIN plant_resources p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')
+        WHERE r.id = ?
+        AND NOT EXISTS(SELECT id FROM product_resource_allocations a WHERE a.production_run_id = r.id AND a.plant_resource_id = p.id)
+      SQL
+
+      insert_ds.insert
+      ok_response
+    end
+
+    def allocate_product_setup(product_resource_allocation_id, product_setup_code)
+      run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
+      qry = <<~SQL
+        SELECT id
+        FROM product_setups
+        WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id}) AND fn_product_setup_code(id) = '#{product_setup_code}'
+      SQL
+      product_setup_id = DB[qry].get(:id)
+      update(:product_resource_allocations, product_resource_allocation_id, product_setup_id: product_setup_id)
+
+      success_response("Allocted #{product_setup_code}", product_setup_id: product_setup_id)
+    end
   end
 end

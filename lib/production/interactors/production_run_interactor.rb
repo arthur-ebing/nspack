@@ -69,6 +69,15 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def prepare_run_allocation_targets(id)
+      assert_permission!(:allocate_setups, id)
+      repo.prepare_run_allocation_targets(id)
+    end
+
+    def allocate_product_setup(product_resource_allocation_id, params)
+      repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::ProductionRun.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success

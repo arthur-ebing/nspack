@@ -17,6 +17,10 @@
   :title: Select Product Setup Template
   :popup: true
   :hide_if_true: setup_complete
+- :url: "/production/runs/production_runs/$:id$/allocate_setups"
+  :text: allocate product setups
+  :icon: list
+  :hide_if_null: product_setup_template_id
 - :url: "/production/runs/production_runs/$:id$"
   :text: delete
   :icon: delete

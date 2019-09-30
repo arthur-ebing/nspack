@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductionRunRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductionRunRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
@@ -14,6 +14,8 @@ module UiRules
 
       set_show_fields if %i[show reopen template].include? @mode
       set_select_template_fields if @mode == :template
+      make_header_table if @mode == :template
+      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if @mode == :allocate_setups
 
       add_new_behaviours if @mode == :new
 
@@ -57,19 +59,12 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def set_select_template_fields
-      fields[:product_setup_template_id] = { renderer: :lookup,
-                                             lookup_name: :product_setup_templates_for_runs,
-                                             lookup_key: :standard,
-                                             param_values: { run_id: @options[:id] },
-                                             hidden_fields: %i[product_setup_template_id],
-                                             show_field: :template_name,
-                                             caption: 'Select Template' }
-      compact_header(columns: %i[production_run_code template_name packhouse_code
-                                 line_code farm_code puc_code orchard_code season_code
-                                 cultivar_group_code cultivar_name allow_cultivar_mixing
-                                 allow_orchard_mixing],
-                     # display_columns: 2,
+    def make_header_table(columns = nil, display_columns = 2)
+      compact_header(columns: columns || %i[production_run_code template_name packhouse_code
+                                            line_code farm_code puc_code orchard_code season_code
+                                            cultivar_group_code cultivar_name allow_cultivar_mixing
+                                            allow_orchard_mixing],
+                     display_columns: display_columns,
                      header_captions: {
                        production_run_code: 'Run',
                        template_name: 'Template',
@@ -84,6 +79,16 @@ module UiRules
                        allow_cultivar_mixing: 'Mix Cultivar?',
                        allow_orchard_mixing: 'Mix Orchard?'
                      })
+    end
+
+    def set_select_template_fields
+      fields[:product_setup_template_id] = { renderer: :lookup,
+                                             lookup_name: :product_setup_templates_for_runs,
+                                             lookup_key: :standard,
+                                             param_values: { run_id: @options[:id] },
+                                             hidden_fields: %i[product_setup_template_id],
+                                             show_field: :template_name,
+                                             caption: 'Select Template' }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize

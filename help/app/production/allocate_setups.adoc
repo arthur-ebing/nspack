@@ -1,0 +1,7 @@
+== Allocate setups
+
+In the `Product setup code` column of the grid, double-click to bring up a list of possible setups and choose one.
+
+Do the same for `Label template name`
+
+Once a product setup has been chosen for a robot button, you can view the setup details from the row's menu.
