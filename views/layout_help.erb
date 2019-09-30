@@ -18,15 +18,10 @@
     <meta name="theme-color" content="#ffffff">
     <!-- FAVICON end -->
 
-    <!-- link rel="stylesheet" href="/css/jackbox.css" -->
     <link rel="stylesheet" href="/css/tachyons.min.css">
-    <!-- link rel="stylesheet" href="/css/sweetalert2.min.css" -->
-    <!-- link rel="stylesheet" href="/css/jquery.contextMenu.min.css" -->
-    <!-- link rel="stylesheet" href="/css/menu.css" -->
-    <!-- link rel="stylesheet" href="/css/skin.css" -->
-    <!-- link rel="stylesheet" href="/css/choices.min.css" -->
-    <!-- link rel="stylesheet" href="/css/multi.min.css" -->
-    <link rel="stylesheet" href="/css/asciidoc.css">
+    <% unless @search_page %>
+      <link rel="stylesheet" href="/css/asciidoc.css">
+    <% end %>
     <%= assets(:css) %>
     <style>
       #container {
@@ -50,6 +45,9 @@
     </div>
   </header>
     <div id="container" class="container">
+      <form action="/help/search" class="absolute">
+        <input id="search_term" type="search" name="search_term" placeholder="Search help" />
+      </form>
       <%= yield %>
     </div>
 

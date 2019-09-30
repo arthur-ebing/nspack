@@ -43,7 +43,7 @@ class HelpIndexBuilder
     content.keys.each do |group|
       ar << "\n== #{group}\n"
       content[group].each do |file|
-        ar << "link:/#{file}[#{File.basename(file).delete_suffix('.adoc').gsub('_', ' ').capitalize}]"
+        ar << "* link:/#{file}[#{File.basename(file).delete_suffix('.adoc').gsub('_', ' ').capitalize}]\n"
       end
     end
     ar

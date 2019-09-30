@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route('help') do |r|
     r.on 'system' do
@@ -31,5 +32,13 @@ class Nspack < Roda
       help = File.read(File.join(ENV['ROOT'], 'help/app', "#{file.chomp('.adoc')}.adoc"))
       view(inline: render_asciidoc(header + help, '/help/app_images'), layout: 'layout_help')
     end
+
+    r.on 'search' do
+      search = DocSearch.new(:help)
+      content = search.search_for(params[:search_term])
+      @search_page = true
+      view(inline: content, layout: 'layout_help')
+    end
   end
 end
+# rubocop:enable Metrics/BlockLength
