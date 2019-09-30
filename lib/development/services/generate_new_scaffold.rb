@@ -985,7 +985,7 @@ module DevelopmentApp
 
       def create_success
         if opts.new_from_menu
-          row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n    ")
+          row_keys = opts.table_meta.columns_without(%i[created_at updated_at]).map(&:to_s).join("\n    ")
           <<~RUBY
             if fetch?(r)
               row_keys = %i[
@@ -999,7 +999,7 @@ module DevelopmentApp
             end
           RUBY
         else
-          row_keys = opts.table_meta.columns_without(%i[created_at updated_at active]).map(&:to_s).join("\n  ")
+          row_keys = opts.table_meta.columns_without(%i[created_at updated_at]).map(&:to_s).join("\n  ")
           <<~RUBY
             row_keys = %i[
               #{row_keys}

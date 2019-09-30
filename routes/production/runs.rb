@@ -40,59 +40,16 @@ class Nspack < Roda
         end
       end
 
-      # r.on 'complete' do
-      #   r.get do
-      #     check_auth!('runs', 'edit')
-      #     interactor.assert_permission!(:complete, id)
-      #     show_partial { Production::Runs::ProductionRun::Complete.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.complete_a_production_run(id, params[:production_run])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Production::Runs::ProductionRun::Complete.call(id, params[:production_run], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'approve' do
-      #   r.get do
-      #     check_auth!('runs', 'approve')
-      #     interactor.assert_permission!(:approve, id)
-      #     show_partial { Production::Runs::ProductionRun::Approve.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.approve_or_reject_a_production_run(id, params[:production_run])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Production::Runs::ProductionRun::Approve.call(id, params[:production_run], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('runs', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { Production::Runs::ProductionRun::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_production_run(id, params[:production_run])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Production::Runs::ProductionRun::Reopen.call(id, params[:production_run], res.errors) }
-      #     end
-      #   end
-      # end
+      r.on 'allocate_setups' do
+        check_auth!('runs', 'edit')
+        res = interactor.prepare_run_allocation_targets(id)
+        if res.success
+          show_page { Production::Runs::ProductionRun::AllocateSetups.call(id) }
+        else
+          flash[:error] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
 
       r.is do
         r.get do       # SHOW
@@ -152,10 +109,20 @@ class Nspack < Roda
         show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(remote: fetch?(r)) }
       end
 
+      r.on 'choose_setup', Integer do |product_resource_allocation_id|
+        res = interactor.allocate_product_setup(product_resource_allocation_id, params)
+        if res.success
+          json_actions([OpenStruct.new(type: :update_grid_row,
+                                       ids: product_resource_allocation_id,
+                                       changes: { product_setup_id: res.instance[:product_setup_id] })],
+                       "Allocated #{params[:column_value]}.")
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warn)
+        end
+      end
+
       r.on 'selected_template', Integer do |id|
         show_json_notice("GOT #{id}")
-        # show template
-        # set hidden
         res = interactor.selected_template(id)
         if res.success
           json_actions(

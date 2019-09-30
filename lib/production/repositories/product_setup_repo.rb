@@ -236,17 +236,24 @@ module ProductionApp
     end
 
     def product_setup_in_production?(id)
-      query = <<~SQL
-        SELECT fn_product_setup_in_production(product_setups.id) FROM product_setups where id = #{id}
-      SQL
-      DB[query].single_value
+      # query = <<~SQL
+      #   SELECT fn_product_setup_in_production(product_setups.id) FROM product_setups where id = #{id}
+      # SQL
+      # DB[query].single_value
+      DB[Sequel.function(:fn_product_setup_in_production, id)].single_value
     end
 
     def product_setup_template_in_production?(id)
-      query = <<~SQL
-        SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = #{id}
-      SQL
-      DB[query].single_value
+      # query = <<~SQL
+      #   SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = #{id}
+      # SQL
+      # DB[query].single_value
+
+      # query = <<~SQL
+      #   SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = ?
+      # SQL
+      # DB[query, id].single_value
+      DB[Sequel.function(:fn_product_setup_template_in_production, id)].single_value
     end
 
     def disable_cultivar_fields(product_setup_template_id)

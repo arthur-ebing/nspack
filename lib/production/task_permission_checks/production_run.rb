@@ -14,7 +14,8 @@ module ProductionApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check
+        delete: :delete_check,
+        allocate_setups: :allocate_setups_check
       }.freeze
 
       def call
@@ -37,6 +38,12 @@ module ProductionApp
       end
 
       def delete_check
+        all_ok
+      end
+
+      def allocate_setups_check
+        return failed_response 'No product setup template has been set' if @entity.product_setup_template_id.nil?
+
         all_ok
       end
     end
