@@ -32,6 +32,27 @@ e.g. `help/app/production/allocate_setups`
 
 If the help topic is quite long and has several headings, it is a good idea to put `:toc:` in the first line so the page will be displayed with a table of contents.
 
+==== Images
+
+Images can be included in help topics, but should be used sparingly. Screenshots should be avoided where possible because they easily become outdated when the UI is altered for any reason (new field added to a form, change of design etc.).
+
+For system help topics, images must be stored in `public/help/system_images` and for app help topics, they must be stored in `public/help/app_images`. Name files carefully so that their name ties them to their help context and they are unique.
+
+Images should typically be `.png` files.
+
+Example:
+    
+    .The image caption here
+    image::the_image_file_name_without_path.png[alt title goes here]
+
+Where the first line starting with a `.` will be displayed below the image as a caption.
+
+The second line is made up of three parts:
+
+* `image::` -- tells asciidoc to display an image
+* `xxx.png` -- the name of the image file and
+* `[xxx]` -- the alt title for the image.
+
 === Linking to help
 
 To render a help button for `help/app/production/allocate_setups`, create a help link like this:
