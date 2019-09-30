@@ -58,7 +58,6 @@
     :program: product_setups
     :permission: edit
 :captions:
-  :grid_caption:
   :conditions:
     :active: Active Product Setups
     :in_production: Product Setups in production

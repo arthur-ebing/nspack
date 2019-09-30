@@ -63,7 +63,6 @@
     :text: New Product Setup
     :style: :button
 :captions:
-  :grid_caption:
   :conditions:
     :active: Active Product Setups
     :in_production: Product Setups in production

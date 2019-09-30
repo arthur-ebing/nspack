@@ -1,7 +1,6 @@
 ---
 :dataminer_definition: product_setups
 :captions:
-  :grid_caption:
   :conditions:
     :active: Active Product Setups
     :in_production: Product Setups in production

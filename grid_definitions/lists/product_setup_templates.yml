@@ -65,7 +65,6 @@
   :style: :button
   :behaviour: :popup
 :captions:
-  :grid_caption:
   :conditions:
     :active: Active Product Setup Templates
 :conditions:
