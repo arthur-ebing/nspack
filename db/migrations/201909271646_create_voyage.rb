@@ -38,14 +38,14 @@ Sequel.migration do
       foreign_key :voyage_id, :voyages, type: :integer, null: false
       foreign_key :port_id, :ports, type: :integer, null: false
       foreign_key :trans_shipment_vessel_id, :vessels, type: :integer
-      DateTime :arrival_date
-      DateTime :departure_date
+      DateTime :ata
+      DateTime :atd
       DateTime :eta
       DateTime :etd
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
-      index [:id], name: :voyage_ports_unique_code, unique: true
+      index [:voyage_id, :port_id], name: :voyage_ports_unique_code
     end
 
     pgt_created_at(:voyage_ports,
