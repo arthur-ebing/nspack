@@ -555,3 +555,101 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Raw Materials')),
          'Search Deliveries', '/search/rmt_deliveries', 2);
+
+-- PROGRAM: Shipping
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Shipping', 1,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'Masterfiles'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+                   WHERE program_name = 'Shipping'
+                     AND functional_area_id = (SELECT id
+                                               FROM functional_areas
+                                               WHERE functional_area_name = 'Masterfiles')),
+                                               'Nspack');
+
+
+-- PROGRAM FUNCTION Voyage Types
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Voyage Types',
+        '/list/voyage_types',
+        1,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Port Types
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Port Types',
+        '/list/port_types',
+        2,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Ports
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Ports',
+        '/list/ports',
+        3,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Vessel Types
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Vessel Types',
+        '/list/vessel_types',
+        4,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Vessels
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Vessels',
+        '/list/vessels',
+        5,
+        NULL,
+        false,
+        false);
+
+
+-- PROGRAM FUNCTION Vehicle Types
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+          AND functional_area_id = (SELECT id FROM functional_areas
+                                    WHERE functional_area_name = 'Masterfiles')),
+        'Vehicle Types',
+        '/list/vehicle_types',
+        6,
+        NULL,
+        false,
+        false);

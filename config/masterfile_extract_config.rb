@@ -24,6 +24,7 @@ module Crossbeams
       plant_resource_types
       pm_boms
       pm_types
+      port_types
       production_regions
       pucs
       rmt_classes
@@ -37,6 +38,8 @@ module Crossbeams
       treatment_types
       uom_types
       user_email_groups
+      vehicle_types
+      voyage_types
     ].freeze
 
     # self-referential tables. First insert all where the key is NULL, then the rest.
@@ -87,6 +90,8 @@ module Crossbeams
       party_contact_methods
       fruit_actual_counts_for_packs
       treatments
+      vessel_types
+      vessels
     ].freeze
 
     # For arrays of ids
@@ -155,6 +160,8 @@ module Crossbeams
       organization_id: { subquery: 'SELECT id FROM organizations WHERE short_description = ?', values: 'SELECT short_description FROM organizations WHERE id = ?' },
       person_id: { subquery: 'SELECT id FROM people WHERE surname = ? AND first_name = ?', values: 'SELECT surname, first_name FROM people WHERE id = ?' },
       pdn_region_id: { subquery: 'SELECT id FROM production_regions WHERE production_region_code = ?', values: 'SELECT production_region_code FROM production_regions WHERE id = ?' },
+      voyage_type_id: { subquery: 'SELECT id FROM voyage_types WHERE voyage_type_code = ?', values: 'SELECT voyage_type_code FROM voyage_types WHERE id = ?' },
+      vessel_type_id: { subquery: 'SELECT id FROM vessel_types WHERE vessel_type_code = ?', values: 'SELECT vessel_type_code FROM vessel_types WHERE id = ?' },
       zzz: {}
     }.freeze
 

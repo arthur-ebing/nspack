@@ -1,4 +1,5 @@
 *.gem
+
 /.config
 /coverage/
 /hold/
@@ -35,6 +36,7 @@ public/js/ag-enterprise-activation.js
 ## Rubymine
 .idea/
 .rake_tasks~
+.rakeTasks
 
 ## Vim
 tags
