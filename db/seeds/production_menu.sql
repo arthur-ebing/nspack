@@ -78,7 +78,7 @@ INSERT INTO program_functions (program_id, program_function_name, url, program_f
 VALUES ((SELECT id FROM programs WHERE program_name = 'Product_setups'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
-         'Product Setup Templates', '/list/product_setup_templates', 1);
+         'Product Setup Templates', '/list/product_setup_templates/with_params?key=active&product_setup_templates.active=true', 1);
 
 -- SEARCH menu item
 -- PROGRAM FUNCTION Search Product_setup_templates

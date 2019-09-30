@@ -64,3 +64,12 @@
   :text: New Product Setup Template
   :style: :button
   :behaviour: :popup
+:captions:
+  :grid_caption:
+  :conditions:
+    :active: Active Product Setup Templates
+:conditions:
+  :active:
+    - :col: product_setup_templates.active
+      :op: =
+      :val: $:product_setup_templates.active$
