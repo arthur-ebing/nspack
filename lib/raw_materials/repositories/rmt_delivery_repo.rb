@@ -116,5 +116,13 @@ module RawMaterialsApp
           join cultivars c on c.id=b.cultivar_id
           WHERE b.id = ?", bin_id].first
     end
+
+    def find_rmt_container_material_type_tare_weight(rmt_container_material_type_id)
+      DB[:rmt_container_material_types].where(id: rmt_container_material_type_id).map { |o| o[:tare_weight] }.first
+    end
+
+    def find_rmt_container_type_tare_weight(rmt_container_type_id)
+      DB[:rmt_container_types].where(id: rmt_container_type_id).map { |o| o[:tare_weight] }.first
+    end
   end
 end

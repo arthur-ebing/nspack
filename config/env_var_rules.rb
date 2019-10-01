@@ -18,6 +18,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_EMPTY_BINS: 'not applicable to many clients.' },
     { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'optional, not applicable to many clients.' },
     { SCAN_RMT_BIN_ASSET_NUMBERS: 'Capture deliveries with permanently barcoded bins.' },
+    { USE_PERMANENT_RMT_BIN_BARCODES: 'use when bins have permanent barcodes.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },
     { DEFAULT_FG_PACKAGING_TYPE: 'Default fg packaging type pm_type_code for Product Setups. Habata will be BIN while Matrooz will be CARTON' },
