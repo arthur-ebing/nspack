@@ -698,8 +698,8 @@ module DevelopmentApp
                             popup: true,
                             hide_if_true: 'completed',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'edit'
                             } }
         list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/approve",
@@ -709,8 +709,8 @@ module DevelopmentApp
                             hide_if_false: 'completed',
                             hide_if_true: 'approved',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'approve'
                             } }
         list[:actions] << { url: "/#{opts.applet}/#{opts.program}/#{opts.table}/$:id$/reopen",
@@ -719,8 +719,8 @@ module DevelopmentApp
                             popup: true,
                             hide_if_false: 'approved',
                             auth: {
-                              function: opts.applet,
-                              program: opts.program,
+                              function: make_caption(opts.applet),
+                              program: opts.program_text,
                               permission: 'edit'
                             } }
         list[:actions] << { separator: true }
@@ -736,6 +736,10 @@ module DevelopmentApp
                                   style: :button,
                                   behaviour: :popup }
         list.to_yaml
+      end
+
+      def make_caption(value)
+        opts.inflector.humanize(value.to_s).gsub(/\s\D/, &:upcase)
       end
     end
 
