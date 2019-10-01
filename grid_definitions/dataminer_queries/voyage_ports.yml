@@ -1,0 +1,246 @@
+---
+:caption: Voyage Ports
+:sql: "SELECT \"voyage_ports\".\"id\", \"voyage_ports\".\"voyage_id\", \"voyage_ports\".\"port_id\",
+  \"voyage_ports\".\"trans_shipment_vessel_id\", \"voyage_ports\".\"ata\", \"voyage_ports\".\"atd\",
+  \"voyage_ports\".\"eta\", \"voyage_ports\".\"etd\", \"voyage_ports\".\"active\",
+  \"voyage_ports\".\"created_at\", \"voyage_ports\".\"updated_at\", \"ports\".\"port_code\",
+  \"vessels\".\"vessel_code\" AS trans_shipment_vessel\r\nFROM \"voyage_ports\"
+  JOIN \"ports\" ON \"ports\".\"id\" = \"voyage_ports\".\"port_id\" LEFT JOIN \"vessels\"
+  ON \"vessels\".\"id\" = \"voyage_ports\".\"trans_shipment_vessel_id\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: voyage_ports.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_id:
+    :name: voyage_id
+    :sequence_no: 2
+    :caption: Voyage
+    :namespaced_name: voyage_ports.voyage_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  port_id:
+    :name: port_id
+    :sequence_no: 3
+    :caption: Port
+    :namespaced_name: voyage_ports.port_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  trans_shipment_vessel_id:
+    :name: trans_shipment_vessel_id
+    :sequence_no: 4
+    :caption: Trans shipment vessel
+    :namespaced_name: voyage_ports.trans_shipment_vessel_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ata:
+    :name: ata
+    :sequence_no: 5
+    :caption: Ata
+    :namespaced_name: voyage_ports.ata
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  atd:
+    :name: atd
+    :sequence_no: 6
+    :caption: Atd
+    :namespaced_name: voyage_ports.atd
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  eta:
+    :name: eta
+    :sequence_no: 7
+    :caption: Eta
+    :namespaced_name: voyage_ports.eta
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  etd:
+    :name: etd
+    :sequence_no: 8
+    :caption: Etd
+    :namespaced_name: voyage_ports.etd
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: voyage_ports.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: voyage_ports.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: voyage_ports.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  port_code:
+    :name: port_code
+    :sequence_no: 12
+    :caption: Port code
+    :namespaced_name: ports.port_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  trans_shipment_vessel:
+    :name: trans_shipment_vessel
+    :sequence_no: 13
+    :caption: Trans shipment vessel
+    :namespaced_name: vessels.vessel_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: voyage_ports.voyage_id
+  :caption: Voyage
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT voyage_number, id FROM voyages ORDER BY voyage_number
+- :column: voyage_ports.port_id
+  :caption: Port
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT port_code, id FROM ports ORDER BY port_code
+- :column: voyage_ports.trans_shipment_vessel_id
+  :caption: Trans shipment vessel
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vessel_code, id FROM vessels ORDER BY vessel_code

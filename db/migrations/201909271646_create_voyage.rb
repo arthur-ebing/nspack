@@ -10,7 +10,7 @@ Sequel.migration do
       foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
       String :voyage_number, null: false
       String :voyage_code, null: false
-      Integer :year
+      Integer :year, null: false
       TrueClass :completed, default: false
       DateTime :completed_at
       TrueClass :active, default: true
@@ -45,7 +45,7 @@ Sequel.migration do
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
-      index [:voyage_id, :port_id], name: :voyage_ports_unique_code
+      index [:voyage_id, :port_id], name: :voyage_ports_unique_code, unique: true
     end
 
     pgt_created_at(:voyage_ports,

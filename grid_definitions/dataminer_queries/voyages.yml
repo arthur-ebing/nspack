@@ -1,0 +1,262 @@
+---
+:caption: Voyages
+:sql: SELECT "voyages"."id", "voyages"."vessel_id", "voyages"."voyage_type_id", "voyages"."voyage_number",
+  "voyages"."voyage_code", "voyages"."year", "voyages"."completed", "voyages"."completed_at",
+  "voyages"."active", "voyages"."created_at", "voyages"."updated_at", "vessels"."vessel_code",
+  "voyage_types"."voyage_type_code", fn_current_status('voyages', "voyages"."id")
+  AS status FROM "voyages" JOIN "vessels" ON "vessels"."id" = "voyages"."vessel_id"
+  JOIN "voyage_types" ON "voyage_types"."id" = "voyages"."voyage_type_id"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: voyages.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel_id:
+    :name: vessel_id
+    :sequence_no: 2
+    :caption: Vessel
+    :namespaced_name: voyages.vessel_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_type_id:
+    :name: voyage_type_id
+    :sequence_no: 5
+    :caption: Voyage type
+    :namespaced_name: voyages.voyage_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_number:
+    :name: voyage_number
+    :sequence_no: 6
+    :caption: Voyage number
+    :namespaced_name: voyages.voyage_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_code:
+    :name: voyage_code
+    :sequence_no: 7
+    :caption: Voyage code
+    :namespaced_name: voyages.voyage_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  year:
+    :name: year
+    :sequence_no: 8
+    :caption: Year
+    :namespaced_name: voyages.year
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 9
+    :caption: Completed
+    :namespaced_name: voyages.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 10
+    :caption: Completed at
+    :namespaced_name: voyages.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: voyages.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: voyages.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: voyages.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel_code:
+    :name: vessel_code
+    :sequence_no: 3
+    :caption: Vessel code
+    :namespaced_name: vessels.vessel_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_type_code:
+    :name: voyage_type_code
+    :sequence_no: 4
+    :caption: Voyage type code
+    :namespaced_name: voyage_types.voyage_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 11
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: voyages.vessel_id
+  :caption: Vessel
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vessel_code, id FROM vessels ORDER BY vessel_code
+- :column: voyages.voyage_type_id
+  :caption: Voyage type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT voyage_type_code, id FROM voyage_types ORDER BY voyage_type_code
+- :column: voyages.voyage_code
+  :caption: Voyage code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

@@ -92,7 +92,7 @@ Sequel.migration do
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
-      index [:booking_reference], name: :load_voyages_unique_code, unique: true
+      index [:load_id, :voyage_id], name: :load_voyages_unique_code, unique: true
     end
 
     pgt_created_at(:load_voyages,
