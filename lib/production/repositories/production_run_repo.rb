@@ -78,5 +78,16 @@ module ProductionApp
 
       success_response("Allocted #{product_setup_code}", product_setup_id: product_setup_id)
     end
+
+    # Find Production runs on a line in various states (tipping/labeling)
+    def find_production_runs_for_line_in_state(line_id, running: true, tipping: false, labeling: false)
+      ds = DB[:production_runs].where(production_line_id: line_id).where(running: running)
+      ds.where(tipping: true) if tipping
+      ds.where(labeling: true) if labeling
+      runs = ds.select_map(:id)
+      return failed_response('No runs in this state') if runs.empty?
+
+      success_response('ok', runs)
+    end
   end
 end

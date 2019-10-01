@@ -8,7 +8,7 @@ Sequel.migration do
           SELECT id
           FROM production_runs
           WHERE product_setup_template_id = in_id
-          AND active)
+          AND running)
       $BODY$
       LANGUAGE sql VOLATILE
       COST 100;
@@ -25,7 +25,7 @@ Sequel.migration do
           FROM product_resource_allocations a
           JOIN production_runs p ON p.id = a.production_run_id
           WHERE a.product_setup_id = in_id
-          AND p.active)
+          AND p.running)
       $BODY$
       LANGUAGE sql VOLATILE
       COST 100;

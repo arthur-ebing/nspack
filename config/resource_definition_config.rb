@@ -17,7 +17,7 @@ module Crossbeams
       SCALE_ROBOT = 'SCALE_ROBOT'
       FORKLIFT_ROBOT = 'FORKLIFT_ROBOT'
       PALLETIZING_ROBOT = 'PALLETIZING_ROBOT'
-      BINTIPPING_ROBOT = 'BINTIPPING_ROBOT'
+      BIN_TIPPING_ROBOT = 'BINTIPPING_ROBOT'
       FORKLIFT = 'FORKLIFT'
       PALLETIZING_BAY = 'PALLETIZING_BAY'
       BIN_TIPPING_STATION = 'BIN_TIPPING_STATION'
@@ -36,7 +36,7 @@ module Crossbeams
 
       SYSTEM_RESOURCE_RULES = {
         SERVER => { description: 'Server', attributes: { ip_address: :string } },
-        MODULE => { description: 'Module', computing_device: true, attributes: { ip_address: :string, sub_types: [CLM_ROBOT, QC_ROBOT, SCALE_ROBOT, FORKLIFT_ROBOT, PALLETIZING_ROBOT, BINTIPPING_ROBOT] } },
+        MODULE => { description: 'Module', computing_device: true, attributes: { ip_address: :string, sub_types: [CLM_ROBOT, QC_ROBOT, SCALE_ROBOT, FORKLIFT_ROBOT, PALLETIZING_ROBOT, BIN_TIPPING_ROBOT] } },
         MODULE_BUTTON => { description: 'Module button', computing_device: true, attributes: { ip_address: :string, sub_types: [ROBOT_BUTTON] } },
         PERIPHERAL => { description: 'Peripheral', peripheral: true, attributes: { ip_address: :string } }
       }.freeze
@@ -46,7 +46,7 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM],
                   icon: { file: 'globe', colour: '#90c6b0' } },
         PACKHOUSE => { description: 'Packhouse',
-                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER],
+                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER],
                        icon: { file: 'factory', colour: '#c791bc' } },
         ROOM => { description: 'Room',
                   allowed_children: [QC_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
@@ -93,11 +93,11 @@ module Crossbeams
                                icon: { file: 'server3', colour: '#c9665f' },
                                create_with_system_resource: 'MODULE',
                                code_prefix: 'PTM-' },
-        BINTIPPING_ROBOT => { description: 'Bintipping Robot',
-                              allowed_children: [],
-                              icon: { file: 'server3', colour: '#c9bb5f' },
-                              create_with_system_resource: 'MODULE',
-                              code_prefix: 'BTM-' },
+        BIN_TIPPING_ROBOT => { description: 'Bintipping Robot',
+                               allowed_children: [],
+                               icon: { file: 'server3', colour: '#c9bb5f' },
+                               create_with_system_resource: 'MODULE',
+                               code_prefix: 'BTM-' },
         FORKLIFT => { description: 'Forklift',
                       allowed_children: [FORKLIFT_ROBOT],
                       icon: { file: 'forkishlift', colour: '#c79191' } },
@@ -117,7 +117,7 @@ module Crossbeams
                      non_editable_code: true,
                      code_prefix: 'PRN-' },
         BIN_TIPPING_STATION => { description: 'Bin-tipping station',
-                                 allowed_children: [BINTIPPING_ROBOT],
+                                 allowed_children: [BIN_TIPPING_ROBOT, SCALE],
                                  icon: { file: 'cog', colour: '#9580e0' } }
       }.freeze
 

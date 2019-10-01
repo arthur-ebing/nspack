@@ -160,6 +160,22 @@ module ProductionApp
       DB[:plant_resources_system_resources].where(plant_resource_id: plant_resource_id).select_map(:system_resource_id)
     end
 
+    # Given a system resource, find its parent of a particular plant type.
+    def plant_resource_parent_of_system_resource(plant_resource_type, system_resource_code)
+      query = <<~SQL
+        SELECT p.id
+        FROM system_resources sys
+        JOIN plant_resources bintip ON bintip.system_resource_id = sys.id
+        JOIN tree_plant_resources t ON t.descendant_plant_resource_id = bintip.id
+        JOIN plant_resources p ON p.id = t.ancestor_plant_resource_id AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = ?)
+        WHERE sys.system_resource_code = ?
+      SQL
+      id = DB[query, plant_resource_type, system_resource_code].get(:id)
+      return failed_response(%(No "#{plant_resource_type}" found for system resource "#{system_resource_code}")) if id.nil?
+
+      success_response('ok', id)
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res)

@@ -26,6 +26,8 @@ Sequel.migration do
       TrueClass :setup_complete, default: false
       TrueClass :running, default: false
       TrueClass :completed, default: false
+      TrueClass :tipping, default: false
+      TrueClass :labeling, default: false
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
