@@ -8,6 +8,9 @@
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;
 }
+.ag-theme-balham .ag-rich-select .ag-rich-select-list {
+  width: auto !important;
+}
 /* Style for cells in popup display of selected row */
 .selected-grid-row-display.ag-numeric-cell {
   text-align: right;

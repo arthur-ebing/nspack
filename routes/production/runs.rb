@@ -131,7 +131,7 @@ class Nspack < Roda
                              dom_id: 'production_run_product_setup_template_id',
                              value: res.instance[:id]),
               OpenStruct.new(type: :replace_input_value,
-                             dom_id: 'production_run_pst',
+                             dom_id: 'production_run_template_name',
                              value: res.instance[:template_name])
             ]
           )

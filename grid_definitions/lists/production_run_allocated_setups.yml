@@ -16,4 +16,5 @@
   :editable_fields:
     product_setup_code:
       :editor: :select
+      :width: 600
       :value_sql: SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
