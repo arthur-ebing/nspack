@@ -27,7 +27,7 @@ module UiRules
       puc_id_label = @farm_repo.find_puc(@form_object.puc_id)&.puc_code
       packhouse_resource_id_label = @resource_repo.find_plant_resource(@form_object.packhouse_resource_id)&.plant_resource_code
       production_line_id_label = @resource_repo.find_plant_resource(@form_object.production_line_id)&.plant_resource_code
-      season_id_label = @repo.find(:seasons, MasterfilesApp::Season, @form_object.season_id)&.season_code
+      season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       orchard_id_label = @farm_repo.find_orchard(@form_object.orchard_id)&.orchard_code
       cultivar_group_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
