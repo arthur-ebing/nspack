@@ -60,6 +60,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             season_group_code
             description
             season_group_year
+            active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -98,13 +99,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_season(id, params[:season])
           if res.success
             row_keys = %i[
-              season_group_id
-              commodity_id
+              season_group_code
+              commodity_code
               season_code
               description
               season_year
               start_date
               end_date
+              active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -126,6 +128,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'seasons' do
       interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      r.on 'start_date_changed' do
+        end_date = if params[:changed_value].blank?
+                     nil
+                   else
+                     interactor.one_year_from_start_date(params[:changed_value])
+                   end
+        json_replace_input_value('season_end_date', end_date)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('calendar', 'new')
         show_partial_or_page(r) { Masterfiles::Calendar::Season::New.call(remote: fetch?(r)) }
@@ -135,13 +147,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            season_group_id
-            commodity_id
+            season_group_code
+            commodity_code
             season_code
             description
             season_year
             start_date
             end_date
+            active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

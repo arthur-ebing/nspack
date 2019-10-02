@@ -13,10 +13,12 @@ module MasterfilesApp
         commodity_id: 1,
         season_code: 'ABC',
         description: 'ABC',
-        season_year: 1,
-        start_date: '2010-01-01 12:00',
-        end_date: '2010-01-01 12:00',
-        active: true
+        season_year: '2010',
+        start_date: '2010-01-01',
+        end_date: '2010-01-01',
+        active: true,
+        season_group_code: 'ABC',
+        commodity_code: 'ABC'
       }
       MasterfilesApp::Season.new(base_attrs.merge(attrs))
     end

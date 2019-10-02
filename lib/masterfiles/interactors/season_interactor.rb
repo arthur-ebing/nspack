@@ -2,20 +2,10 @@
 
 module MasterfilesApp
   class SeasonInteractor < BaseInteractor
-    def repo
-      @repo ||= CalendarRepo.new
-    end
-
-    def season(id)
-      repo.find_season(id)
-    end
-
-    def validate_season_params(params)
-      SeasonSchema.call(params)
-    end
-
     def create_season(params) # rubocop:disable Metrics/AbcSize
-      res = validate_season_params(params)
+      params[:season_year] = season_year(params[:start_date])
+      attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
+      res = validate_season_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -28,13 +18,15 @@ module MasterfilesApp
       success_response("Created season #{instance.season_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { season_code: ['This season already exists'] }))
+      failed_response("This season code #{res[:season_code]} already exists")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_season(id, params)
-      res = validate_season_params(params)
+    def update_season(id, params) # rubocop:disable Metrics/AbcSize
+      params[:season_year] = season_year(params[:start_date])
+      attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
+      res = validate_season_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
@@ -63,6 +55,32 @@ module MasterfilesApp
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::Season.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def season_code(season_year, commodity_id)
+      repo.season_code(season_year, commodity_id)
+    end
+
+    def one_year_from_start_date(start_date)
+      repo.one_year_from_start_date(start_date)
+    end
+
+    def season_year(start_date)
+      Date.parse(start_date.to_s).year
+    end
+
+    private
+
+    def repo
+      @repo ||= CalendarRepo.new
+    end
+
+    def season(id)
+      repo.find_season(id)
+    end
+
+    def validate_season_params(params)
+      SeasonSchema.call(params)
     end
   end
 end

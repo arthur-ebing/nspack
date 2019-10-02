@@ -11,6 +11,8 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
+      add_behaviours if %i[new edit].include? @mode
+
       form_name 'season'
     end
 
@@ -29,13 +31,20 @@ module UiRules
 
     def common_fields
       {
-        season_group_id: { renderer: :select, options: @repo.for_select_season_groups, disabled_options: @repo.for_select_inactive_season_groups },
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities, disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities },
-        season_code: { required: true },
+        season_group_id: { renderer: :select,
+                           options: @repo.for_select_season_groups,
+                           disabled_options: @repo.for_select_inactive_season_groups,
+                           required: true },
+        commodity_id: { renderer: :select,
+                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
+                        disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
+                        required: true },
+        season_code: { renderer: :hidden, required: true },
         description: {},
-        season_year: { renderer: :integer },
+        season_year: { renderer: :hidden, subtype: :integer },
         start_date: { renderer: :input, subtype: :date },
-        end_date: { renderer: :input, subtype: :date },
+        end_date: { renderer: :input, subtype: :date,
+                    required: true },
         active: { renderer: :checkbox }
       }
     end
@@ -54,10 +63,17 @@ module UiRules
                                     commodity_id: nil,
                                     season_code: nil,
                                     description: nil,
-                                    season_year: nil,
-                                    start_date: nil,
-                                    end_date: nil,
+                                    season_year: Time.now.year,
+                                    start_date: Time.now,
+                                    end_date: Time.now + (60 * 60 * 24 * 365),
                                     active: true)
+    end
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.lose_focus :start_date,
+                             notify: [{ url: '/masterfiles/calendar/seasons/start_date_changed' }]
+      end
     end
   end
 end

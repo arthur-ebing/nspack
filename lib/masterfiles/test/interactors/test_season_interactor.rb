@@ -27,33 +27,37 @@ module MasterfilesApp
     end
 
     def test_create_season_fail
-      attrs = fake_season(season_code: nil).to_h.reject { |k, _| k == :id }
+      attrs = fake_season(season_code: nil).to_h.reject { |k, _| k == :season_group_id }
       res = interactor.create_season(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:season_code]
+      assert_equal ['is missing'], res.errors[:season_group_id]
     end
 
     def test_update_season
       id = create_season
-      attrs = interactor.send(:repo).find_hash(:seasons, id).reject { |k, _| k == :id }
-      value = attrs[:season_code]
-      attrs[:season_code] = 'a_change'
+      attrs = interactor.send(:repo).find_season(id)
+      attrs = attrs.to_h
+      value = attrs[:description]
+      attrs[:description] = 'a_change'
       res = interactor.update_season(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(Season, res.instance)
-      assert_equal 'a_change', res.instance.season_code
-      refute_equal value, res.instance.season_code
+      assert_equal 'a_change', res.instance.description
+      refute_equal value, res.instance.description
     end
 
     def test_update_season_fail
       id = create_season
-      attrs = interactor.send(:repo).find_hash(:seasons, id).reject { |k, _| %i[id season_code].include?(k) }
+      attrs = interactor.send(:repo).find_season(id)
+      attrs = attrs.to_h
+      attrs.delete(:season_group_id)
       value = attrs[:description]
       attrs[:description] = 'a_change'
       res = interactor.update_season(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:season_code]
-      after = interactor.send(:repo).find_hash(:seasons, id)
+      assert_equal ['is missing'], res.errors[:season_group_id]
+      after = interactor.send(:repo).find_season(id)
+      after = after.to_h
       refute_equal 'a_change', after[:description]
       assert_equal value, after[:description]
     end
@@ -78,10 +82,12 @@ module MasterfilesApp
         commodity_id: commodity_id,
         season_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        season_year: 1,
+        season_year: 2010,
         start_date: '2010-01-01',
         end_date: '2010-01-01',
-        active: true
+        active: true,
+        season_group_code: 'ABC',
+        commodity_code: 'ABC'
       }
     end
 

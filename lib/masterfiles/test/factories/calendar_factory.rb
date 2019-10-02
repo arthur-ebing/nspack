@@ -21,7 +21,9 @@ module MasterfilesApp
         commodity_id: commodity_id,
         season_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        season_year: Time.now.year,
+        season_year: '2010',
+        start_date: '2010-01-01',
+        end_date: '2010-01-01',
         active: true
       }
       DB[:seasons].insert(default.merge(opts))

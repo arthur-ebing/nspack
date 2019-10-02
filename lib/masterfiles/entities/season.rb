@@ -11,5 +11,7 @@ module MasterfilesApp
     attribute :start_date, Types::Date
     attribute :end_date, Types::Date
     attribute? :active, Types::Bool
+    attribute :season_group_code, Types::String
+    attribute :commodity_code, Types::String
   end
 end
