@@ -79,6 +79,13 @@ module ProductionApp
       success_response("Allocted #{product_setup_code}", product_setup_id: product_setup_id)
     end
 
+    def label_for_allocation(product_resource_allocation_id, label_template_name)
+      label_template_id = MasterfilesApp::LabelTemplateRepo.new.find_label_template_by_name(label_template_name)&.id
+      update(:product_resource_allocations, product_resource_allocation_id, label_template_id: label_template_id)
+
+      success_response("Applied #{label_template_name}", label_template_name: label_template_name)
+    end
+
     # Find Production runs on a line in various states (tipping/labeling)
     def find_production_runs_for_line_in_state(line_id, running: true, tipping: nil, labeling: nil)
       ds = DB[:production_runs].where(production_line_id: line_id).where(running: running)

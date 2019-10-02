@@ -12,9 +12,13 @@
       :op: =
       :val: $:production_run_id$
 :edit_rules:
-  :url: /production/runs/production_runs/choose_setup/$:id$
+  :url: /production/runs/production_runs/inline_edit_alloc/$:id$
   :editable_fields:
     product_setup_code:
       :editor: :select
       :width: 600
       :value_sql: SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
+    label_template_name:
+      :editor: :select
+      :width: 300
+      :value_sql: SELECT label_template_name, id FROM label_templates WHERE application = 'Carton'

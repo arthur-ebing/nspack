@@ -75,7 +75,25 @@ module ProductionApp
     end
 
     def allocate_product_setup(product_resource_allocation_id, params)
-      repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
+      res = repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { product_setup_id: res.instance[:product_setup_id] } }
+      res
+    end
+
+    def label_for_allocation(product_resource_allocation_id, params)
+      res = repo.label_for_allocation(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { label_template_name: res.instance[:label_template_name] } }
+      res
+    end
+
+    def inline_edit_alloc(product_resource_allocation_id, params)
+      if params[:column_name] == 'product_setup_code'
+        allocate_product_setup(product_resource_allocation_id, params)
+      elsif params[:column_name] == 'label_template_name'
+        label_for_allocation(product_resource_allocation_id, params)
+      else
+        failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
+      end
     end
 
     def assert_permission!(task, id = nil)

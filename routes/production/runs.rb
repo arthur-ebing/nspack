@@ -109,20 +109,19 @@ class Nspack < Roda
         show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(remote: fetch?(r)) }
       end
 
-      r.on 'choose_setup', Integer do |product_resource_allocation_id|
-        res = interactor.allocate_product_setup(product_resource_allocation_id, params)
+      r.on 'inline_edit_alloc', Integer do |product_resource_allocation_id|
+        res = interactor.inline_edit_alloc(product_resource_allocation_id, params)
         if res.success
           json_actions([OpenStruct.new(type: :update_grid_row,
                                        ids: product_resource_allocation_id,
-                                       changes: { product_setup_id: res.instance[:product_setup_id] })],
-                       "Allocated #{params[:column_value]}.")
+                                       changes: res.instance[:changes])],
+                       res.message)
         else
-          undo_grid_inline_edit(message: res.message, message_type: :warn)
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
       end
 
       r.on 'selected_template', Integer do |id|
-        show_json_notice("GOT #{id}")
         res = interactor.selected_template(id)
         if res.success
           json_actions(
