@@ -36,6 +36,8 @@ module MasterfilesApp
       instance = season(id)
       success_response("Updated season #{instance.season_code}",
                        instance)
+    rescue Sequel::UniqueConstraintViolation
+      failed_response("This season code #{res[:season_code]} already exists")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
