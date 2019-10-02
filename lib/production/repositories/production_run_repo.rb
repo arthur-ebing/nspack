@@ -80,10 +80,11 @@ module ProductionApp
     end
 
     # Find Production runs on a line in various states (tipping/labeling)
-    def find_production_runs_for_line_in_state(line_id, running: true, tipping: false, labeling: false)
+    def find_production_runs_for_line_in_state(line_id, running: true, tipping: nil, labeling: nil)
       ds = DB[:production_runs].where(production_line_id: line_id).where(running: running)
-      ds.where(tipping: true) if tipping
-      ds.where(labeling: true) if labeling
+      ds = ds.where(tipping: tipping) unless tipping.nil?
+      ds = ds.where(labeling: true) unless labeling.nil?
+
       runs = ds.select_map(:id)
       return failed_response('No runs in this state') if runs.empty?
 
