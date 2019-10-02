@@ -3,7 +3,7 @@
 module MasterfilesApp
   class SeasonInteractor < BaseInteractor
     def create_season(params) # rubocop:disable Metrics/AbcSize
-      params[:season_year] = season_year(params[:start_date])
+      params[:season_year] = season_year(params[:end_date])
       attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
       res = validate_season_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
@@ -24,7 +24,7 @@ module MasterfilesApp
     end
 
     def update_season(id, params) # rubocop:disable Metrics/AbcSize
-      params[:season_year] = season_year(params[:start_date])
+      params[:season_year] = season_year(params[:end_date])
       attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
       res = validate_season_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
@@ -67,8 +67,8 @@ module MasterfilesApp
       repo.one_year_from_start_date(start_date)
     end
 
-    def season_year(start_date)
-      Date.parse(start_date.to_s).year
+    def season_year(end_date)
+      Date.parse(end_date.to_s).year
     end
 
     private
