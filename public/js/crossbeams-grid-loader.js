@@ -1280,7 +1280,6 @@ const crossbeamsGridStaticLoader = {
             crossbeamsUtils.alert({ prompt: `${col[attr]} is not a recognised cellEditor`, type: 'error' });
           }
         } else if (attr === 'cellEditorParams') {
-          // hs[:cellEditorParams] = { values: values }
           if (col[attr].selectWidth) {
             newCol.cellEditorParams = {
               values: col[attr].values,
