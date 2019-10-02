@@ -49,7 +49,7 @@ module MasterfilesApp
 
     def one_year_from_start_date(start_date)
       dte = Date.parse start_date
-      dte + 364
+      UtilityFunctions.days_since(dte, 365)
     end
 
     def season_code(season_year, commodity_id)
