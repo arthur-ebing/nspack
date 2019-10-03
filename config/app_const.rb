@@ -95,11 +95,11 @@ class AppConst
   PRINTER_USE_OFFICE = 'OFFICE'
 
   PRINT_APP_BIN = 'Bin'
-  # PRINT_APP_MR_SKU_BARCODE = 'Material Resource SKU Barcode'
+  PRINT_APP_CARTON = 'Carton'
 
   PRINTER_APPLICATIONS = [
-    PRINT_APP_BIN
-    # PRINT_APP_MR_SKU_BARCODE
+    PRINT_APP_BIN,
+    PRINT_APP_CARTON
   ].freeze
 
   # These will need to be configured per installation...
