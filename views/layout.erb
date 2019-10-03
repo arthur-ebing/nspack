@@ -22,13 +22,200 @@
     <link rel="stylesheet" href="/css/tachyons.min.css">
     <link rel="stylesheet" href="/css/sweetalert2.min.css">
     <link rel="stylesheet" href="/css/jquery.contextMenu.min.css">
-    <link rel="stylesheet" href="/css/menu.css">
-    <link rel="stylesheet" href="/css/skin.css">
+    <link rel="stylesheet" href="/css/menu.css?seq=1">
+    <link rel="stylesheet" href="/css/skin.css?seq=1">
     <link rel="stylesheet" href="/css/choices.min.css">
     <link rel="stylesheet" href="/css/multi.min.css">
     <%= assets(:css) %>
     <%= content_for :late_style %>
 
+    <style>
+      @media ( max-width: 40rem ) {
+        #menuSearch { display: none }
+        .container {
+          margin-top: 15px;
+        }
+        div.functional-area-menu {
+          margin-top: 25px;
+          white-space: nowrap; /* [1] */
+          overflow-x: auto; /* [2] */
+          -webkit-overflow-scrolling: touch; /* [3] */
+          -ms-overflow-style: -ms-autohiding-scrollbar; /* [4] */
+          background-color: #3A5974;
+        }
+
+        #functional-area-menu {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+        }
+        .menu-prog-selected {
+          background: none;
+        }
+        /*
+        li.-hasSubmenu a {
+        color: orange;
+        border-bottom: thin solid yellow;
+        } */
+        .-hasSubmenu {
+          list-style: none;
+          pointer-events: none;
+        }
+        #menu #programs-menu a[data-menu-level2] {
+          color: orange;
+          border-bottom: thin solid orange;
+          padding: 10px;
+        }
+        [data-menu-level3] {
+          pointer-events: all;
+        }
+        #functional-area-menu li {
+          display: inline-block;
+          color: white;
+          padding: 20px 10px;
+        }
+        #functional-area-menu li a {
+          text-decoration: none;
+          /* background-color: cornsilk; */
+          display: inline-block;
+          height: 30px;
+          color: white;
+        }
+
+        /*
+        div.scrollmenu {
+        background-color: #333;
+        overflow: auto;
+        white-space: nowrap;
+        }
+
+        div.scrollmenu a {
+        display: inline-block;
+        color: white;
+        text-align: center;
+        padding: 14px;
+        text-decoration: none;
+        }
+
+        div.scrollmenu a:hover {
+        background-color: #777;
+        }
+         */
+        /* NAV (MENU) BUTTON */
+        #nav button {
+          display: block;
+          position: absolute;
+          top: 25px;
+          left: 10px;
+          border: 0;
+          height: 32px;
+          width: 32px;
+          background: none;
+          color: #107db5;
+          font-size: 0rem;
+          padding: 0;
+          transition: 0.2s 0.5s color ease-in-out;
+        }
+
+        #nav button svg {
+          display: block;
+          pointer-events: none;
+          stroke: currentcolor;
+          vertical-align: middle;
+          height: 32px;
+          width: 32px;
+          transition: 0.2s 0.5s stroke ease-in-out;
+        }
+
+        #nav button::before {
+          content: ' ';
+          position: absolute;
+          border-radius: 200vh;
+          opacity: 0;
+          left: calc(-130vmax + 50%);
+          top: calc(-130vmax + 50%);
+          width: 260vmax;
+          height: 260vmax;
+          background: #107db5;
+          display: block;
+          z-index: -1;
+          transform: scale3d(0, 0, 0);
+          transform-origin: 50% 50%;
+          transition: 0.5s ease-in-out transform, 0.2s 0.4s ease-in-out opacity;
+        }
+
+        #nav button[aria\-expanded=true] {
+          color: #fff;
+        }
+
+        #nav button[aria\-expanded=true]::before {
+          opacity: 1;
+          transform: scale3d(1, 1, 1);
+          transition: 0.5s ease-in-out transform, 0.1s ease-in-out opacity;
+        }
+
+        #menu #programs-menu {
+          padding: 0;
+        }
+        #menu #programs-menu ul {
+          /* pointer-events: none; */
+          list-style: none;
+          width: 100vw;
+          /* height: 100vh; */
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-around;
+          padding: 0;
+        }
+
+        #menu #programs-menu a {
+          text-decoration: none;
+          font-weight: bold;
+          color: #fff;
+          /* opacity: 0; */
+          display: block;
+          transform: translateY(-10px);
+          transition: 0.2s 0.5s ease-out opacity, 0.2s 0.5s ease-out transform;
+          padding: 10px;
+        }
+
+        #programs-menu li:nth-child(2) a {
+          transition: 0.2s 0.7s ease-out opacity, 0.2s 0.7s ease-out transform;
+        }
+
+        #programs-menu li:nth-child(3) a {
+          transition: 0.2s 0.9s ease-out opacity, 0.2s 0.9s ease-out transform;
+        }
+
+        #programs-menu li:nth-child(4) a {
+          transition: 0.2s 1.1s ease-out opacity, 0.2s 1.1s ease-out transform;
+        }
+
+        #menu:not([hidden]) {
+          pointer-events: all;
+        }
+
+        #menu:not([hidden]) a {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media ( min-width: 40rem ) {
+        #nav button { display: none }
+        #menu { display: block } /* NB: we have important! on [hidden] in styles.css, so this will not work... */
+        #menuSearch {
+          display: inline-block;
+          /* -webkit-appearance: textfield;
+          outline-offset: -2px; */
+        }
+        .container {
+          margin-top: 90px;
+        }
+        /* #menuSearch { display: block } */
+      }
+    </style>
     <%= content_for :late_head %>
   </head>
   <body class="site" data-utf-8-ensurer="О">
@@ -171,6 +358,31 @@
         }
       });
       // MessageBus handling --- END
+
+      // MENU SHAPING FOR RESPONSIVE CONDITIONS -- START
+      const toggleMenu = document.querySelector(".navigation button");
+      // const menu = document.querySelector(".navigation ul");
+      const menu = document.querySelector("#menu");
+
+      toggleMenu.addEventListener("click", function () {
+        const open = JSON.parse(toggleMenu.getAttribute("aria-expanded"));
+        toggleMenu.setAttribute("aria-expanded", !open);
+        menu.hidden = !menu.hidden;
+      });
+
+      // Javascript to react to media query change:
+      function menuForMinWidth(x) {
+        if (x.matches) { // If media query matches
+          menu.hidden = false;
+        } else {
+          menu.hidden = true;
+        }
+      }
+
+      var min40 = window.matchMedia("(min-width: 40rem)")
+      menuForMinWidth(min40) // Call listener function at run time
+      min40.addListener(menuForMinWidth) // Attach listener function on state changes
+      // MENU SHAPING FOR RESPONSIVE CONDITIONS -- END
     </script>
     <script src="/js/crossbeams-menu-handler.js"></script>
     <%= content_for :late_javascript %>
