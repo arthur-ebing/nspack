@@ -41,7 +41,7 @@
           overflow-x: auto; /* [2] */
           -webkit-overflow-scrolling: touch; /* [3] */
           -ms-overflow-style: -ms-autohiding-scrollbar; /* [4] */
-          background-color: #3A5974;
+          background-color: #2368A2;
         }
 
         #functional-area-menu {
@@ -52,11 +52,6 @@
         .menu-prog-selected {
           background: none;
         }
-        /*
-        li.-hasSubmenu a {
-        color: orange;
-        border-bottom: thin solid yellow;
-        } */
         .-hasSubmenu {
           list-style: none;
           pointer-events: none;
@@ -72,8 +67,8 @@
           align-items: start;
         }
         #menu #programs-menu a[data-menu-level2] {
-          color: orange;
-          border-bottom: thin solid orange;
+          color: #8C6D1F;
+          border-bottom: thin solid #8C6D1F; /* #a3754d */
           padding: 10px;
         }
         [data-menu-level3] {
@@ -81,16 +76,15 @@
         }
         #functional-area-menu li {
           display: inline-block;
-          color: white;
+          color: #F0F2F4;
           font-weight: bold;
           padding: 20px 10px;
         }
         #functional-area-menu li a {
           text-decoration: none;
-          /* background-color: cornsilk; */
           display: inline-block;
           height: 30px;
-          color: white;
+          color: #F0F2F4;
         }
 
         /* NAV (MENU) BUTTON */
@@ -128,7 +122,7 @@
           top: calc(-130vmax + 50%);
           width: 260vmax;
           height: 260vmax;
-          background: #107db5;
+          background: #AAD4F5;
           display: block;
           z-index: -1;
           transform: scale3d(0, 0, 0);
@@ -150,13 +144,10 @@
           padding: 0;
         }
         #menu #programs-menu ul {
-          /* pointer-events: none; */
           list-style: none;
           width: 100vw;
-          /* height: 100vh; */
           display: flex;
           flex-direction: column;
-          /* align-items: center; */
           justify-content: space-around;
           padding: 0;
         }
@@ -170,27 +161,13 @@
         #menu #programs-menu a {
           text-decoration: none;
           font-weight: bold;
-          color: #fff;
+          color: #2368A2;
           /* opacity: 0; */
           display: block;
           transform: translateY(-10px);
           /* transition: 0.2s 0.5s ease-out opacity, 0.2s 0.5s ease-out transform; */
           padding: 10px;
         }
-
-        /*
-        #programs-menu li:nth-child(2) a {
-          transition: 0.2s 0.7s ease-out opacity, 0.2s 0.7s ease-out transform;
-        }
-
-        #programs-menu li:nth-child(3) a {
-          transition: 0.2s 0.9s ease-out opacity, 0.2s 0.9s ease-out transform;
-        }
-
-        #programs-menu li:nth-child(4) a {
-          transition: 0.2s 1.1s ease-out opacity, 0.2s 1.1s ease-out transform;
-        }
-        */
 
         #menu:not([hidden]) {
           pointer-events: all;
@@ -207,13 +184,10 @@
         #menu { display: block } /* NB: we have important! on [hidden] in styles.css, so this will not work... */
         #menuSearch {
           display: inline-block;
-          /* -webkit-appearance: textfield;
-          outline-offset: -2px; */
         }
         .container {
           margin-top: 90px;
         }
-        /* #menuSearch { display: block } */
       }
     </style>
     <%= content_for :late_head %>
