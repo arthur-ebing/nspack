@@ -44,7 +44,7 @@ class TestVoyageRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_voyage).returns(ok_response(instance: row_vals))
     patch_as_fetch 'finished_goods/dispatch/voyages/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_update_grid
+    expect_flash_notice
   end
 
   def test_update_fail

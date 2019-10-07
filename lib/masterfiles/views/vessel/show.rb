@@ -13,7 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Vessel'
               form.view_only!
-              form.add_field :voyage_type_id
+              form.add_field :vessel_type_id
               form.add_field :vessel_code
               form.add_field :description
               form.add_field :active

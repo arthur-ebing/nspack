@@ -16,8 +16,14 @@ module MasterfilesApp
     def find_vessel_flat(id)
       find_with_association(:vessels,
                             id,
-                            parent_tables: [{ parent_table: :voyage_types, columns: [:voyage_type_code], flatten_columns: { voyage_type_code: :voyage_type_code } }],
+                            parent_tables: [{ parent_table: :vessel_types,
+                                              columns: [:vessel_type_code],
+                                              flatten_columns: { vessel_type_code: :vessel_type_code } }],
                             wrapper: VesselFlat)
+    end
+
+    def for_select_vessels_by_voyage_type_id(id)
+      DB[:vessels].join(:vessel_types, id: :vessel_type_id).where(voyage_type_id: id).order(:vessel_type_code).select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
     end
   end
 end

@@ -2,8 +2,8 @@
 
 module FinishedGoodsApp
   class VoyagePortInteractor < BaseInteractor
-    def create_voyage_port(params) # rubocop:disable Metrics/AbcSize
-      res = validate_voyage_port_params(params)
+    def create_voyage_port(voyage_id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_voyage_port_params(params.merge(voyage_id: voyage_id))
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -16,7 +16,7 @@ module FinishedGoodsApp
       success_response("Created voyage port #{instance.id}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This voyage port already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { port_id: ['Port already in voyage'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

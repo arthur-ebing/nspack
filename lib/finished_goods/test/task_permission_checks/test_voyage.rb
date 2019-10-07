@@ -31,54 +31,22 @@ module FinishedGoodsApp
       FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:edit, 1)
       assert res.success, 'Should be able to edit a voyage'
-
-      # FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed voyage'
     end
 
     def test_delete
       FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:delete, 1)
       assert res.success, 'Should be able to delete a voyage'
-
-      # FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed voyage'
     end
 
-    # def test_complete
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a voyage'
+    def test_complete
+      FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
+      res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:complete, 1)
+      assert res.success, 'Should be able to complete a voyage'
 
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed voyage'
-    # end
-
-    # def test_approve
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true, approved: false))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed voyage'
-
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed voyage'
-
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved voyage'
-    # end
-
-    # def test_reopen
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a voyage that has not been approved'
-
-    #   FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved voyage'
-    # end
+      FinishedGoodsApp::VoyageRepo.any_instance.stubs(:find_voyage).returns(entity(completed: true))
+      res = FinishedGoodsApp::TaskPermissionCheck::Voyage.call(:complete, 1)
+      refute res.success, 'Should not be able to complete an already completed voyage'
+    end
   end
 end

@@ -6,6 +6,8 @@ module FinishedGoodsApp
   class TestVoyagePortInteractor < MiniTestWithHooks
     include VoyagePortFactory
     include VoyageFactory
+    include MasterfilesApp::VesselFactory
+    include MasterfilesApp::PortFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -20,7 +22,8 @@ module FinishedGoodsApp
 
     def test_create_voyage_port
       attrs = fake_voyage_port.to_h.reject { |k, _| k == :id }
-      res = interactor.create_voyage_port(attrs)
+      voyage_id = attrs[:voyage_id]
+      res = interactor.create_voyage_port(voyage_id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(VoyagePortFlat, res.instance)
       assert res.instance.id.nonzero?
@@ -28,7 +31,8 @@ module FinishedGoodsApp
 
     def test_create_voyage_port_fail
       attrs = fake_voyage_port(id: nil).to_h.reject { |k, _| k == :voyage_id }
-      res = interactor.create_voyage_port(attrs)
+      voyage_id = attrs[:voyage_id]
+      res = interactor.create_voyage_port(voyage_id, attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:id]
     end
@@ -36,13 +40,14 @@ module FinishedGoodsApp
     def test_update_voyage_port
       id = create_voyage_port
       attrs = interactor.send(:repo).find_hash(:voyage_ports, id).reject { |k, _| k == :id }
-      value = attrs[:ata]
-      attrs[:ata] = '1999-01-01 12:00'
+      value = attrs[:port_id]
+      updated_port_id = create_port
+      attrs[:port_id] = updated_port_id
       res = interactor.update_voyage_port(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(VoyagePortFlat, res.instance)
-      assert_equal '1999-01-01 12:00:00 +0200', res.instance.ata.to_s
-      refute_equal value, res.instance.id
+      assert_equal updated_port_id, res.instance.port_id
+      refute_equal value, res.instance.port_id
     end
 
     def test_update_voyage_port_fail

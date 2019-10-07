@@ -16,8 +16,8 @@ module FinishedGoods
               form.caption 'New Voyage'
               form.action '/finished_goods/dispatch/voyages'
               form.remote! if remote
-              form.add_field :vessel_id
               form.add_field :voyage_type_id
+              form.add_field :vessel_id
               form.add_field :voyage_number
               form.add_field :voyage_code
               form.add_field :year

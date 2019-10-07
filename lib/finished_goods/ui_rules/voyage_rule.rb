@@ -11,17 +11,12 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
       # set_complete_fields if @mode == :complete
-      # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
-
+      add_behaviours
       form_name 'voyage'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      # vessel_id_label = FinishedGoodsApp::VesselRepo.new.find_vessel(@form_object.vessel_id)&.vessel_code
       vessel_id_label = @repo.find(:vessels, MasterfilesApp::Vessel, @form_object.vessel_id)&.vessel_code
-      # voyage_type_id_label = FinishedGoodsApp::VoyageTypeRepo.new.find_voyage_type(@form_object.voyage_type_id)&.voyage_type_code
       voyage_type_id_label = @repo.find(:voyage_types, MasterfilesApp::VoyageType, @form_object.voyage_type_id)&.voyage_type_code
       fields[:vessel_id] = { renderer: :label, with_value: vessel_id_label, caption: 'Vessel' }
       fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_id_label, caption: 'Voyage Type' }
@@ -33,12 +28,6 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    # def set_approve_fields
-    #   set_show_fields
-    #   fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
-    #   fields[:reject_reason] = { renderer: :textarea, disabled: true }
-    # end
-
     # def set_complete_fields
     #   set_show_fields
     #   user_repo = DevelopmentApp::UserRepo.new
@@ -47,11 +36,18 @@ module UiRules
 
     def common_fields
       {
-        vessel_id: { renderer: :select, options: MasterfilesApp::VesselRepo.new.for_select_vessels, disabled_options: MasterfilesApp::VesselRepo.new.for_select_inactive_vessels, caption: 'Vessel', required: true },
-        voyage_type_id: { renderer: :select, options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types, disabled_options: MasterfilesApp::VoyageTypeRepo.new.for_select_inactive_voyage_types, caption: 'Voyage Type', required: true },
+        voyage_type_id: { renderer: :select,
+                          options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types,
+                          caption: 'Voyage Type',
+                          required: true },
+        vessel_id: { renderer: :select,
+                     options: MasterfilesApp::VesselRepo.new.for_select_vessels,
+                     caption: 'Vessel',
+                     required: true },
+
         voyage_number: { required: true },
-        voyage_code: { required: true },
-        year: {},
+        voyage_code: {},
+        year: { readonly: true },
         completed: { renderer: :checkbox },
         completed_at: { renderer: :label }
       }
@@ -71,17 +67,17 @@ module UiRules
                                     voyage_type_id: nil,
                                     voyage_number: nil,
                                     voyage_code: nil,
-                                    year: nil,
+                                    year: DateTime.now.year,
                                     completed: nil,
                                     completed_at: nil)
     end
 
-    # private
+    private
 
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/voyages/voyage_type_changed' }]
+      end
+    end
   end
 end

@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Voyage
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:voyage, :show, id: id)
           rules   = ui_rule.compile
 
@@ -13,12 +13,13 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: '/list/voyages',
+                                  url: back_url,
                                   style: :back_button)
             end
             page.form do |form|
-              form.caption 'Voyage'
+              # form.caption 'Voyage'
               form.view_only!
+              form.no_submit!
               form.row do |row|
                 row.column do |col|
                   col.add_field :vessel_id

@@ -5,24 +5,24 @@ Sequel.migration do
 
     create_table(:loads, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :depot_location_id, :locations, type: :integer, null: false
       foreign_key :customer_party_role_id, :party_roles, type: :integer, null: false
       foreign_key :consignee_party_role_id, :party_roles, type: :integer, null: false
       foreign_key :billing_client_party_role_id, :party_roles, type: :integer, null: false
       foreign_key :exporter_party_role_id, :party_roles, type: :integer, null: false
-      foreign_key :final_receiver_party_role_id, :party_roles, type: :integer, null: false
+      foreign_key :final_receiver_party_role_id, :party_roles, type: :integer
       foreign_key :final_destination_id, :destination_cities, type: :integer, null: false
+      foreign_key :depot_id, :destination_depots, type: :integer, null: false
       foreign_key :pol_voyage_port_id, :voyage_ports, type: :integer, null: false
       foreign_key :pod_voyage_port_id, :voyage_ports, type: :integer, null: false
       String :order_number, null: false
       String :edi_file_name
-      String :customer_order_number, null: false
+      String :customer_order_number
       String :customer_reference
       String :exporter_certificate_code
       DateTime :shipped_date, null: false
       TrueClass :shipped, default: false
       TrueClass :transfer_load, default: false
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
@@ -60,7 +60,7 @@ Sequel.migration do
       BigDecimal :verified_gross_mass
       DateTime :verified_gross_mass_date
       String :stack_type
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
@@ -84,11 +84,11 @@ Sequel.migration do
       primary_key :id
       foreign_key :load_id, :loads, type: :integer, null: false
       foreign_key :voyage_id, :voyages, type: :integer, null: false
-      foreign_key :shipping_line_party_role_id, :party_roles, type: :integer, null: false
-      foreign_key :shipper_party_role_id, :party_roles, type: :integer, null: false
-      String :booking_reference, null: false
+      foreign_key :shipping_line_party_role_id, :party_roles, type: :integer
+      foreign_key :shipper_party_role_id, :party_roles, type: :integer
+      String :booking_reference
       String :memo_pad
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
@@ -117,7 +117,7 @@ Sequel.migration do
       BigDecimal :vehicle_weight_out
       String :cooling_type
       String :dispatch_consignment_note_number
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 

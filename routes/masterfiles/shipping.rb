@@ -319,7 +319,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_vessel_type(id, params[:vessel_type])
           if res.success
-            update_grid_row(id, changes: { voyage_type_id: res.instance[:voyage_type_id],
+            update_grid_row(id, changes: { vessel_type_id: res.instance[:vessel_type_id],
                                            vessel_type_code: res.instance[:vessel_type_code],
                                            description: res.instance[:description] }, notice: res.message)
           else
@@ -350,7 +350,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            voyage_type_id
+            vessel_type_id
             vessel_type_code
             voyage_type_code
             description
@@ -394,7 +394,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               id
-              voyage_type_id
+              vessel_type_id
               vessel_code
               description
               voyage_type_code
@@ -429,7 +429,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            voyage_type_id
+            vessel_type_id
             vessel_code
             description
             voyage_type_code

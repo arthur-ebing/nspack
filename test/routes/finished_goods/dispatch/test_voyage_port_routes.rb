@@ -77,7 +77,6 @@ class TestVoyagePortRoutes < RouteTester
   def test_new
     authorise_pass!
     ensure_exists!(VOYAGEINTERACTOR)
-    VOYAGEINTERACTOR.any_instance.stubs(:create_voyage).returns(ok_response)
     ensure_exists!(INTERACTOR)
     FinishedGoods::Dispatch::VoyagePort::New.stub(:call, bland_page) do
       get  'finished_goods/dispatch/voyages/1/voyage_ports/new', {}, 'rack.session' => { user_id: 1 }
@@ -89,33 +88,29 @@ class TestVoyagePortRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     ensure_exists!(VOYAGEINTERACTOR)
-    VOYAGEINTERACTOR.any_instance.stubs(:create_voyage).returns(ok_response)
     ensure_exists!(INTERACTOR)
     get 'finished_goods/dispatch/voyages/1/voyage_ports/new', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
-  # def test_create_remotely
-  #   authorise_pass!
-  #   ensure_exists!(VOYAGEINTERACTOR)
-  #   VOYAGEINTERACTOR.any_instance.stubs(:create_voyage).returns(ok_response)
-  #   ensure_exists!(INTERACTOR)
-  #   row_vals = Hash.new(1)
-  #   INTERACTOR.any_instance.stubs(:create_voyage_port).returns(ok_response(instance: row_vals))
-  #
-  #   post_as_fetch 'finished_goods/dispatch/voyage_ports/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_json_add_to_grid(has_notice: true)
-  # end
+  def test_create_remotely
+    authorise_pass!
+    ensure_exists!(VOYAGEINTERACTOR)
+    ensure_exists!(INTERACTOR)
+    row_vals = Hash.new(1)
+    INTERACTOR.any_instance.stubs(:create_voyage_port).returns(ok_response(instance: row_vals))
+    post_as_fetch 'finished_goods/dispatch/voyages/1/voyage_ports', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_json_add_to_grid(has_notice: true)
+  end
 
-  # def test_create_remotely_fail
-  #   authorise_pass!
-  #   ensure_exists!(VOYAGEINTERACTOR)
-  #   VOYAGEINTERACTOR.any_instance.stubs(:create_voyage).returns(ok_response)
-  #   ensure_exists!(INTERACTOR)
-  #   INTERACTOR.any_instance.stubs(:create_voyage_port).returns(bad_response)
-  #   FinishedGoods::Dispatch::VoyagePort::New.stub(:call, bland_page) do
-  #     post_as_fetch 'finished_goods/dispatch/voyage_ports', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   end
-  #   expect_json_replace_dialog
-  # end
+  def test_create_remotely_fail
+    authorise_pass!
+    ensure_exists!(VOYAGEINTERACTOR)
+    ensure_exists!(INTERACTOR)
+    INTERACTOR.any_instance.stubs(:create_voyage_port).returns(bad_response)
+    FinishedGoods::Dispatch::VoyagePort::New.stub(:call, bland_page) do
+      post_as_fetch 'finished_goods/dispatch/voyages/1/voyage_ports', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    end
+    expect_json_replace_dialog
+  end
 end

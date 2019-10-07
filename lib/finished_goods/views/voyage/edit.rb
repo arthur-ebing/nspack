@@ -5,7 +5,7 @@ module FinishedGoods
   module Dispatch
     module Voyage
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:voyage, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -16,19 +16,19 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: '/list/voyages',
+                                  url: back_url,
                                   style: :back_button)
             end
 
             page.form do |form|
-              form.caption 'Edit Voyage'
+              # form.caption 'Edit Voyage'
               form.action "/finished_goods/dispatch/voyages/#{id}"
-              form.remote!
+              # form.remote!
               form.method :update
               form.row do |row|
                 row.column do |col|
-                  col.add_field :vessel_id
                   col.add_field :voyage_type_id
+                  col.add_field :vessel_id
                   col.add_field :voyage_number
                   col.add_field :voyage_code
                 end

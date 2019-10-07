@@ -11,9 +11,9 @@ module MasterfilesApp
   end
   class PortFlat < Dry::Struct
     attribute :id, Types::Integer
+    attribute :port_code, Types::String
     attribute :port_type_id, Types::Integer
     attribute :voyage_type_id, Types::Integer
-    attribute :port_code, Types::String
     attribute :description, Types::String
     attribute :port_type_code, Types::String
     attribute :voyage_type_code, Types::String

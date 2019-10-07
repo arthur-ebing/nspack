@@ -1,0 +1,290 @@
+---
+:caption: Load Voyages
+:sql: SELECT "load_voyages"."id", "load_voyages"."load_id", "load_voyages"."voyage_id",
+  "load_voyages"."shipping_line_party_role_id", "load_voyages"."shipper_party_role_id",
+  "load_voyages"."booking_reference", "load_voyages"."memo_pad", "load_voyages"."active",
+  "load_voyages"."created_at", "load_voyages"."updated_at", "loads"."order_number",
+  fn_party_role_name("load_voyages"."shipper_party_role_id") AS shipper_party_role,
+  fn_party_role_name("load_voyages"."shipping_line_party_role_id") AS shipping_line_party_role,
+  "voyages"."voyage_number", fn_current_status('load_voyages', "load_voyages"."id")
+  AS status FROM "load_voyages" JOIN "loads" ON "loads"."id" = "load_voyages"."load_id"
+  JOIN "voyages" ON "voyages"."id" = "load_voyages"."voyage_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: load_voyages.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 2
+    :caption: Load
+    :namespaced_name: load_voyages.load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_id:
+    :name: voyage_id
+    :sequence_no: 3
+    :caption: Voyage
+    :namespaced_name: load_voyages.voyage_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipping_line_party_role_id:
+    :name: shipping_line_party_role_id
+    :sequence_no: 4
+    :caption: Shipping line party role
+    :namespaced_name: load_voyages.shipping_line_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipper_party_role_id:
+    :name: shipper_party_role_id
+    :sequence_no: 5
+    :caption: Shipper party role
+    :namespaced_name: load_voyages.shipper_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  booking_reference:
+    :name: booking_reference
+    :sequence_no: 6
+    :caption: Booking reference
+    :namespaced_name: load_voyages.booking_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  memo_pad:
+    :name: memo_pad
+    :sequence_no: 7
+    :caption: Memo pad
+    :namespaced_name: load_voyages.memo_pad
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 8
+    :caption: Active
+    :namespaced_name: load_voyages.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: load_voyages.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: load_voyages.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 11
+    :caption: Order number
+    :namespaced_name: loads.order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipper_party_role:
+    :name: shipper_party_role
+    :sequence_no: 12
+    :caption: Shipper party role
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipping_line_party_role:
+    :name: shipping_line_party_role
+    :sequence_no: 13
+    :caption: Shipping line party role
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_number:
+    :name: voyage_number
+    :sequence_no: 14
+    :caption: Voyage number
+    :namespaced_name: voyages.voyage_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: load_voyages.load_id
+  :caption: Load
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT order_number, id FROM loads ORDER BY order_number
+- :column: load_voyages.voyage_id
+  :caption: Voyage
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT voyage_number, id FROM voyages ORDER BY voyage_number
+- :column: load_voyages.shipping_line_party_role_id
+  :caption: Shipping line party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: load_voyages.shipper_party_role_id
+  :caption: Shipper party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')

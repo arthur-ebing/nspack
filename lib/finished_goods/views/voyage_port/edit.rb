@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module VoyagePort
       class Edit
-        def self.call(id, form_values: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:voyage_port, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -17,12 +17,14 @@ module FinishedGoods
               form.action "/finished_goods/dispatch/voyage_ports/#{id}"
               form.remote!
               form.method :update
+              form.add_field :voyage_id
+              form.add_field :port_type_id
               form.add_field :port_id
-              form.add_field :trans_shipment_vessel_id
-              form.add_field :ata
-              form.add_field :atd
               form.add_field :eta
+              form.add_field :ata
               form.add_field :etd
+              form.add_field :atd
+              form.add_field :trans_shipment_vessel_id
             end
           end
 

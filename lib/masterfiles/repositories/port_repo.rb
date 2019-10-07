@@ -16,9 +16,18 @@ module MasterfilesApp
     def find_port_flat(id)
       find_with_association(:ports,
                             id,
-                            parent_tables: [{ parent_table: :voyage_types, columns: [:voyage_type_code], flatten_columns: { voyage_type_code: :voyage_type_code } },
-                                            { parent_table: :port_types, columns: [:port_type_code], flatten_columns: { port_type_code: :port_type_code } }],
+                            parent_tables: [{ parent_table: :voyage_types,
+                                              columns: %i[voyage_type_code],
+                                              flatten_columns: { voyage_type_code: :voyage_type_code } },
+                                            { parent_table: :port_types,
+                                              columns: %i[port_type_code],
+                                              flatten_columns: { port_type_code: :port_type_code } }],
                             wrapper: PortFlat)
+    end
+
+    def for_select_ports_by_type_id(port_type_id)
+      port_type_id = port_type_id.to_s.empty? ? '0' : port_type_id
+      DB[:ports].where(port_type_id: port_type_id).order(:port_code).select_map(%i[port_code id])
     end
   end
 end
