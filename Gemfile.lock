@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-dataminer.git
-  revision: c0d846e07f17faa8d422bfa19732ff2d17a5e24b
+  revision: 9faad3957e198fa9b330820b2e4de3b159a93991
   specs:
-    crossbeams-dataminer (0.1.8)
-      pg_query (= 1.0.2)
+    crossbeams-dataminer (0.2.0)
+      pg_query (= 1.1.0)
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-label_designer.git
@@ -146,7 +146,7 @@ GEM
     parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (1.1.4)
-    pg_query (1.0.2)
+    pg_query (1.1.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
