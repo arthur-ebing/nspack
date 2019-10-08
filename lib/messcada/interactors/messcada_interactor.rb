@@ -13,16 +13,18 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def tip_rmt_bin(params)
+    def tip_rmt_bin(params) # rubocop:disable Metrics/AbcSize
       res = validate_tip_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      MesscadaApp::TipBin.new(res).call
-      # id = nil
-      # repo.transaction do
-      #   log_status('rmt_bins', id, 'BIN_WEIGHED')
-      #   log_transaction
-      # end
+      repo.transaction do
+        res = MesscadaApp::TipBin.new(res).call
+        if res.success
+          log_status('rmt_bins', res.instance[:rmt_bin_id], 'TIPPED')
+          log_transaction
+        end
+        res
+      end
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
@@ -31,9 +33,9 @@ module MesscadaApp
 
     private
 
-    # def repo
-    #   @repo ||= MesscadaRepo.new
-    # end
+    def repo
+      @repo ||= MesscadaRepo.new
+    end
 
     def validate_update_rmt_bin_weights_params(params)
       UpdateRmtBinWeightsSchema.call(params)
