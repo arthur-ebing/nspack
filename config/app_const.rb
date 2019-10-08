@@ -18,8 +18,6 @@ class AppConst
   # General
   DEFAULT_KEY = 'DEFAULT'
 
-  LABEL_BIN_BARCODE = 'MAIN_BIN'
-
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
   DELIVERY_CAPTURE_INNER_BINS = ENV['CAPTURE_INNER_BINS']
   DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION = ENV['CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION']
@@ -87,32 +85,35 @@ class AppConst
                   )
                 end
 
-  # LABEL_LOCATION_BARCODE = 'KR_PM_LOCATION' # From ENV? / Big config gem?
-  # LABEL_SKU_BARCODE = 'KR_PM_SKU' # From ENV? / Big config gem?
+  # Label names for barcode printing:
+  LABEL_LOCATION_BARCODE = 'NSPACK_LOCATION'
+  LABEL_BIN_BARCODE = 'MAIN_BIN'
 
   # Printers
   PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'
   PRINTER_USE_OFFICE = 'OFFICE'
 
+  PRINT_APP_LOCATION = 'Location'
   PRINT_APP_BIN = 'Bin'
   PRINT_APP_CARTON = 'Carton'
 
   PRINTER_APPLICATIONS = [
+    PRINT_APP_LOCATION,
     PRINT_APP_BIN,
     PRINT_APP_CARTON
   ].freeze
 
   # These will need to be configured per installation...
   BARCODE_PRINT_RULES = {
-    # location: { format: 'LC%d', fields: [:id] },
+    location: { format: 'LC%d', fields: [:id] },
     # sku: { format: 'SK%d', fields: [:sku_number] },
     # delivery: { format: 'DN%d', fields: [:delivery_number] },
     bin: { format: 'BN%d', fields: [:id] }
   }.freeze
 
   BARCODE_SCAN_RULES = [
-    # { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
-    # { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
+    { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
+    { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
     # { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     # { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
