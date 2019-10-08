@@ -10,7 +10,7 @@ Sequel.migration do
   end
 
   down do
-    alter_table(:fruit_size_references) do
+    alter_table(:seasons) do
       set_column_allow_null :season_year
       set_column_allow_null :start_date
       set_column_allow_null :end_date
