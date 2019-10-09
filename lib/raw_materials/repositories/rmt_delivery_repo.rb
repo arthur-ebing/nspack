@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryRepo < BaseRepo
+  class RmtDeliveryRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :rmt_deliveries,
                      label: :truck_registration_number,
                      value: :id,
@@ -22,6 +22,13 @@ module RawMaterialsApp
 
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
+
+    def find_rmt_bin_flat(id)
+      find_with_association(:rmt_bins,
+                            id,
+                            parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } }],
+                            wrapper: RmtBinFlat)
+    end
 
     def farm_pucs(farm_id)
       DB[:pucs].where(id: DB[:farms_pucs].where(farm_id: farm_id).select(:puc_id)).map { |p| [p[:puc_code], p[:id]] }
