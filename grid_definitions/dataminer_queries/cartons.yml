@@ -1,0 +1,888 @@
+---
+:caption: Cartons
+:sql: SELECT COALESCE(cartons.id, carton_labels.id) AS carton_id, carton_labels.production_run_id, carton_labels.created_at AS label_created_at,
+  ABS(date_part('epoch', current_timestamp - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS carton_verified_at,
+  ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int AS carton_age_hrs,
+  packhouses.plant_resource_code AS packhouse, lines.plant_resource_code AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code AS print_device,
+  carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code AS puc, orchards.orchard_code AS orchard, commodities.code as commodity,
+  cultivar_groups.cultivar_group_code AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code AS variety,
+  cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value AS std_size, fruit_size_references.size_reference AS size_ref,
+  fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack,
+  standard_pack_codes.standard_pack_code AS std_pack, fn_party_role_name(carton_labels.marketing_org_party_role_id) AS marketer,
+  marks.mark_code AS mark, inventory_codes.inventory_code, carton_labels.product_resource_allocation_id AS resource_allocation_id,
+  product_resource_allocations.product_setup_id, product_setup_templates.template_name AS product_setup_template, pm_boms.bom_code AS pm_bom,
+  (SELECT array_agg(clt.treatment_code) FROM
+  (SELECT t.treatment_code FROM treatments t JOIN carton_labels cl ON t.id = ANY (cl.treatment_ids) WHERE cl.id = carton_labels.id ORDER BY t.treatment_code DESC) AS clt) AS treatments,
+  carton_labels.client_size_reference AS client_size_ref, carton_labels.client_product_code, carton_labels.marketing_order_number,
+  target_market_groups.target_market_group_name AS packed_tm_group, seasons.season_code, pm_subtypes.subtype_code, pm_types.pm_type_code,
+  cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight, cartons.nett_weight,
+  CASE WHEN EXISTS(SELECT id FROM cartons WHERE cartons.carton_label_id= carton_labels.id) THEN 'ok' ELSE NULL END AS colour_rule
+  FROM carton_labels
+  LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id
+  JOIN production_runs ON production_runs.id = carton_labels.production_run_id
+  JOIN product_resource_allocations ON product_resource_allocations.id = carton_labels.product_resource_allocation_id
+  JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
+  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+  JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
+  JOIN plant_resources lines ON lines.id = carton_labels.production_line_resource_id
+  JOIN system_resources ON system_resources.id = carton_labels.resource_id
+  JOIN plant_resources packpoints ON packpoints.system_resource_id = system_resources.id
+  JOIN farms ON farms.id = carton_labels.farm_id
+  JOIN pucs ON pucs.id = carton_labels.puc_id
+  JOIN orchards ON orchards.id = carton_labels.orchard_id
+  JOIN cultivar_groups ON cultivar_groups.id = carton_labels.cultivar_group_id
+  LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
+  LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+  JOIN marketing_varieties ON marketing_varieties.id = carton_labels.marketing_variety_id
+  LEFT JOIN customer_variety_varieties ON customer_variety_varieties.id = carton_labels.customer_variety_variety_id
+  LEFT JOIN marketing_varieties cvv ON cvv.id = customer_variety_varieties.marketing_variety_id
+  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = carton_labels.std_fruit_size_count_id
+  LEFT JOIN fruit_size_references ON fruit_size_references.id = carton_labels.fruit_size_reference_id
+  LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = carton_labels.fruit_actual_counts_for_pack_id
+  JOIN basic_pack_codes ON basic_pack_codes.id = carton_labels.basic_pack_code_id
+  JOIN standard_pack_codes ON standard_pack_codes.id = carton_labels.standard_pack_code_id
+  JOIN marks ON marks.id = carton_labels.mark_id
+  JOIN inventory_codes ON inventory_codes.id = carton_labels.inventory_code_id
+  LEFT JOIN pm_boms ON pm_boms.id = carton_labels.pm_bom_id
+  LEFT JOIN pm_subtypes ON pm_subtypes.id = carton_labels.pm_subtype_id
+  LEFT JOIN pm_types ON pm_types.id = carton_labels.pm_type_id
+  JOIN target_market_groups ON target_market_groups.id = carton_labels.packed_tm_group_id
+  JOIN seasons ON seasons.id = carton_labels.season_id
+  JOIN cartons_per_pallet ON cartons_per_pallet.id = carton_labels.cartons_per_pallet_id
+  LEFT JOIN pm_products ON pm_products.id = carton_labels.fruit_sticker_pm_product_id
+  JOIN pallet_formats ON pallet_formats.id = carton_labels.pallet_format_id
+  ORDER BY carton_labels.created_at DESC
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+  :colour_key:
+    ok: carton verified
+:columns:
+  carton_id:
+    :name: carton_id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  production_run_id:
+    :name: production_run_id
+    :sequence_no: 2
+    :caption: Production run
+    :namespaced_name: carton_labels.production_run_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  label_created_at:
+    :name: label_created_at
+    :sequence_no: 3
+    :caption: Label created at
+    :namespaced_name: carton_labels.created_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  label_age_hrs:
+    :name: label_age_hrs
+    :sequence_no: 4
+    :caption: Label age hrs
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_verified_at:
+    :name: carton_verified_at
+    :sequence_no: 5
+    :caption: Carton verified at
+    :namespaced_name: cartons.created_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_age_hrs:
+    :name: carton_age_hrs
+    :sequence_no: 6
+    :caption: Carton age hrs
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse:
+    :name: packhouse
+    :sequence_no: 7
+    :caption: Packhouse
+    :namespaced_name: packhouses.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  line:
+    :name: line
+    :sequence_no: 8
+    :caption: Line
+    :namespaced_name: lines.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packpoint:
+    :name: packpoint
+    :sequence_no: 9
+    :caption: Packpoint
+    :namespaced_name: packpoints.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  print_device:
+    :name: print_device
+    :sequence_no: 10
+    :caption: Print device
+    :namespaced_name: system_resources.system_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  label:
+    :name: label
+    :sequence_no: 11
+    :caption: Label
+    :namespaced_name: carton_labels.label_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm:
+    :name: farm
+    :sequence_no: 12
+    :caption: Farm
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc:
+    :name: puc
+    :sequence_no: 13
+    :caption: Puc
+    :namespaced_name: pucs.puc_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard:
+    :name: orchard
+    :sequence_no: 14
+    :caption: Orchard
+    :namespaced_name: orchards.orchard_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity:
+    :name: commodity
+    :sequence_no: 15
+    :caption: Commodity
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group:
+    :name: cultivar_group
+    :sequence_no: 16
+    :caption: Cultivar group
+    :namespaced_name: cultivar_groups.cultivar_group_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar:
+    :name: cultivar
+    :sequence_no: 17
+    :caption: Cultivar
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variety:
+    :name: variety
+    :sequence_no: 18
+    :caption: Variety
+    :namespaced_name: marketing_varieties.marketing_variety_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cust_variety:
+    :name: cust_variety
+    :sequence_no: 19
+    :caption: Cust variety
+    :namespaced_name: cvv.marketing_variety_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_size:
+    :name: std_size
+    :sequence_no: 20
+    :caption: Std size
+    :namespaced_name: std_fruit_size_counts.size_count_value
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_ref:
+    :name: size_ref
+    :sequence_no: 21
+    :caption: Size ref
+    :namespaced_name: fruit_size_references.size_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_count:
+    :name: actual_count
+    :sequence_no: 22
+    :caption: Actual count
+    :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack:
+    :name: basic_pack
+    :sequence_no: 23
+    :caption: Basic pack
+    :namespaced_name: basic_pack_codes.basic_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_pack:
+    :name: std_pack
+    :sequence_no: 24
+    :caption: Std pack
+    :namespaced_name: standard_pack_codes.standard_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketer:
+    :name: marketer
+    :sequence_no: 25
+    :caption: Marketer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark:
+    :name: mark
+    :sequence_no: 26
+    :caption: Mark
+    :namespaced_name: marks.mark_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code:
+    :name: inventory_code
+    :sequence_no: 27
+    :caption: Inventory code
+    :namespaced_name: inventory_codes.inventory_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  resource_allocation_id:
+    :name: resource_allocation_id
+    :sequence_no: 28
+    :caption: Resource allocation
+    :namespaced_name: carton_labels.product_resource_allocation_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_id:
+    :name: product_setup_id
+    :sequence_no: 29
+    :caption: Product setup
+    :namespaced_name: product_resource_allocations.product_setup_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_template:
+    :name: product_setup_template
+    :sequence_no: 30
+    :caption: Product setup template
+    :namespaced_name: product_setup_templates.template_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom:
+    :name: pm_bom
+    :sequence_no: 31
+    :caption: Pm bom
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatments:
+    :name: treatments
+    :sequence_no: 32
+    :caption: Treatments
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_size_ref:
+    :name: client_size_ref
+    :sequence_no: 33
+    :caption: Client size ref
+    :namespaced_name: carton_labels.client_size_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_product_code:
+    :name: client_product_code
+    :sequence_no: 34
+    :caption: Client product code
+    :namespaced_name: carton_labels.client_product_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_order_number:
+    :name: marketing_order_number
+    :sequence_no: 35
+    :caption: Marketing order number
+    :namespaced_name: carton_labels.marketing_order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 36
+    :caption: Packed tm group
+    :namespaced_name: target_market_groups.target_market_group_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 37
+    :caption: Season code
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  subtype_code:
+    :name: subtype_code
+    :sequence_no: 38
+    :caption: Subtype code
+    :namespaced_name: pm_subtypes.subtype_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_type_code:
+    :name: pm_type_code
+    :sequence_no: 39
+    :caption: Pm type code
+    :namespaced_name: pm_types.pm_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cartons_per_pallet:
+    :name: cartons_per_pallet
+    :sequence_no: 40
+    :caption: Cartons per pallet
+    :namespaced_name: cartons_per_pallet.cartons_per_pallet
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_code:
+    :name: product_code
+    :sequence_no: 41
+    :caption: Product code
+    :namespaced_name: pm_products.product_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 42
+    :caption: Gross weight
+    :namespaced_name: cartons.gross_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 43
+    :caption: Nett weight
+    :namespaced_name: cartons.nett_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 44
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: COALESCE(cartons.id, carton_labels.id)
+  :caption: Id
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT COALESCE(cartons.id, carton_labels.id) AS carton_id FROM carton_labels
+    LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id ORDER BY 1
+- :column: carton_labels.production_run_id
+  :caption: production run id
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: SELECT id FROM production_runs
+- :column: carton_labels.created_at
+  :caption: Label created at
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: SELECT id FROM production_runs
+- :column: cartons.created_at
+  :caption: Label verified at
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: SELECT id FROM production_runs
+- :column: packhouses.plant_resource_code
+  :caption: Packhouce
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 6
+  :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
+    plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
+    WHERE plant_resource_type_code = 'PACKHOUSE' ORDER BY plant_resource_code
+- :column: lines.plant_resource_code
+  :caption: Line
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 7
+  :list_def: SELECT plant_resources.plant_resource_code FROM plant_resources JOIN
+    plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
+    WHERE plant_resource_type_code = 'LINE' ORDER BY plant_resource_code
+- :column: packpoints.plant_resource_code
+  :caption: Packpoint
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 8
+  :list_def: SELECT DISTINCT plant_resources.plant_resource_code FROM carton_labels
+    JOIN system_resources ON system_resources.id = carton_labels.resource_id JOIN
+    plant_resources ON plant_resources.system_resource_id = system_resources.id ORDER
+    BY plant_resource_code
+- :column: system_resources.system_resource_code
+  :caption: Print Device
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 9
+  :list_def: SELECT DISTINCT system_resources.system_resource_code FROM system_resources
+    JOIN carton_labels ON system_resources.id = carton_labels.resource_id ORDER BY
+    system_resource_code
+- :column: carton_labels.label_name
+  :caption: Label
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 10
+  :list_def: SELECT label_name FROM labels ORDER BY label_name
+- :column: farms.farm_code
+  :caption: Farm
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 11
+  :list_def: SELECT farm_code FROM farms ORDER BY farm_code
+- :column: pucs.puc_code
+  :caption: Puc
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 12
+  :list_def: SELECT puc_code FROM pucs ORDER BY puc_code
+- :column: orchards.orchard_code
+  :caption: Orchard
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 13
+  :list_def: SELECT orchard_code FROM orchards ORDER BY orchard_code
+- :column: "ABS(date_part('epoch', current_timestamp - carton_labels.created_at) / 3600)::int"
+  :caption: Label age (hrs)
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def: 
+- :column: "ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int"
+  :caption: Carton age (hrs)
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def: 

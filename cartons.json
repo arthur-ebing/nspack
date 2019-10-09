@@ -1,0 +1,86 @@
+{
+    "CLM-01-B01": {
+        "1": {
+            "print_command": "F1='test' F2='testing' F3='testing 123' F4='' F5='' F6=''",
+            "setup_data": {
+                "marketing_variety_id": 2,
+                "customer_variety_variety_id": 31,
+                "std_fruit_size_count_id": 7,
+                "basic_pack_code_id": 2,
+                "standard_pack_code_id": 2,
+                "fruit_actual_counts_for_pack_id": 13,
+                "fruit_size_reference_id": 3,
+                "marketing_org_party_role_id": 6,
+                "packed_tm_group_id": 1,
+                "mark_id": 3,
+                "inventory_code_id": 2,
+                "pallet_format_id": 1,
+                "cartons_per_pallet_id": 2,
+                "pm_bom_id": 2,
+                "client_size_reference": "test",
+                "client_product_code": "test",
+                "treatment_ids": [13, 16],
+                "marketing_order_number": "test",
+                "fruit_sticker_pm_product_id": 1,
+                "pm_type_id": 2,
+                "pm_subtype_id": 2
+            },
+            "production_run_data": {
+                "production_run_id": 1,
+                "farm_id": 4,
+                "puc_id": 1,
+                "orchard_id": 1,
+                "cultivar_group_id": 1,
+                "cultivar_id": 8,
+                "product_resource_allocation_id": 1,
+                "packhouse_resource_id": 2,
+                "production_line_resource_id": 3,
+                "season_id": 2,
+                "resource_id": 2,
+                "label_name": "test"
+            }
+        }
+    },
+    "CLM-01-B02": {
+            "2": {
+                "print_command": "F1='test' F2='testing' F3='testing 123' F4='' F5='' F6=''",
+                "setup_data": {
+                    "marketing_variety_id": 1,
+                    "customer_variety_variety_id": 1,
+                    "std_fruit_size_count_id": 1,
+                    "basic_pack_code_id": 1,
+                    "standard_pack_code_id": 1,
+                    "fruit_actual_counts_for_pack_id": 1,
+                    "fruit_size_reference_id": 1,
+                    "marketing_org_party_role_id": 1,
+                    "packed_tm_group_id": 1,
+                    "mark_id": 1,
+                    "inventory_code_id": 1,
+                    "pallet_format_id": 1,
+                    "cartons_per_pallet_id": 1,
+                    "pm_bom_id": 1,
+                    "client_size_reference": "test",
+                    "client_product_code": "test",
+                    "treatment_ids": [1, 2],
+                    "marketing_order_number": "test",
+                    "fruit_sticker_pm_product_id": 1,
+                    "pm_type_id": 1,
+                    "pm_subtype_id": 1
+                },
+                "production_run_data": {
+                    "production_run_id": 2,
+                    "farm_id": 4,
+                    "puc_id": 1,
+                    "orchard_id": 1,
+                    "cultivar_group_id": 1,
+                    "cultivar_id": 8,
+                    "product_resource_allocation_id": 6,
+                    "packhouse_resource_id": 2,
+                    "production_line_resource_id": 3,
+                    "season_id": 2,
+                    "resource_id": 4,
+                    "label_name": "test"
+                }
+            }
+        }
+}
