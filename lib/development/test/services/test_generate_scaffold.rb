@@ -25,4 +25,15 @@ class GenerateNewScaffoldTest < MiniTestWithHooks
     repo = SecurityApp::SecurityGroupRepo.new
     assert 1, repo.create_security_group(security_group_name: 'a_test')
   end
+
+  # def test_gen
+  #   params = { table: 'users',
+  #              short_name: 'users',
+  #              applet: 'masterfiles',
+  #              nested_route_parent: '',
+  #              new_from_menu: nil,
+  #              program: 'abc' }
+  #   scaff = DevelopmentApp::GenerateNewScaffold.call(params, 'Nspack')
+  #   # p scaff
+  # end
 end

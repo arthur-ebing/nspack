@@ -21,6 +21,10 @@ module Crossbeams
       FORKLIFT = 'FORKLIFT'
       PALLETIZING_BAY = 'PALLETIZING_BAY'
       BIN_TIPPING_STATION = 'BIN_TIPPING_STATION'
+      BIN_VERIFICATION_STATION = 'BIN_VERIFICATION_STATION'
+      BIN_VERIFICATION_ROBOT = 'BIN_VERIFICATION_ROBOT'
+      PRINT_STATION = 'PRINT_STATION'
+      PRINT_STATION_ROBOT = 'PRINT_STATION_ROBOT'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -46,13 +50,13 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM],
                   icon: { file: 'globe', colour: '#90c6b0' } },
         PACKHOUSE => { description: 'Packhouse',
-                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER],
+                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER, BIN_VERIFICATION_STATION],
                        icon: { file: 'factory', colour: '#c791bc' } },
         ROOM => { description: 'Room',
                   allowed_children: [QC_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
                   icon: { file: 'home', colour: '#a8364c' } },
         LINE => { description: 'Line',
-                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER],
+                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
                   icon: { file: 'packline', colour: '#a8364c' } },
         DROP => { description: 'Drop',
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
@@ -67,6 +71,7 @@ module Crossbeams
                           allowed_children: [],
                           icon: { file: 'circle-o', colour: '#c9665f' },
                           create_with_system_resource: 'MODULE_BUTTON',
+                          sequence_without_zero_padding: true,  ## spec no zeros.... (default == 1)
                           code_prefix: '${CODE}-B' }, # prefixed by module name followed by....
         CLM_ROBOT => { description: 'CLM Robot',
                        allowed_children: [ROBOT_BUTTON],
@@ -118,7 +123,23 @@ module Crossbeams
                      code_prefix: 'PRN-' },
         BIN_TIPPING_STATION => { description: 'Bin-tipping station',
                                  allowed_children: [BIN_TIPPING_ROBOT, SCALE],
-                                 icon: { file: 'cog', colour: '#9580e0' } }
+                                 icon: { file: 'cog', colour: '#9580e0' } },
+        BIN_VERIFICATION_STATION => { description: 'Bin-verification station',
+                                      allowed_children: [BIN_VERIFICATION_ROBOT, PRINTER],
+                                      icon: { file: 'tag', colour: '#326699' } },
+        BIN_VERIFICATION_ROBOT => { description: 'Bin verification Robot',
+                                    allowed_children: [ROBOT_BUTTON],
+                                    icon: { file: 'server3', colour: '#329932' },
+                                    create_with_system_resource: 'MODULE',
+                                    code_prefix: 'BVM-' },
+        PRINT_STATION => { description: 'Print station',
+                           allowed_children: [PRINT_STATION_ROBOT, PRINTER],
+                           icon: { file: 'square-o', colour: '#993299' } },
+        PRINT_STATION_ROBOT => { description: 'Print station Robot',
+                                 allowed_children: [],
+                                 icon: { file: 'server3', colour: '#326699' },
+                                 create_with_system_resource: 'MODULE',
+                                 code_prefix: 'PSM-' }
       }.freeze
 
       # FTP..
