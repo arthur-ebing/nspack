@@ -33,9 +33,17 @@ class Nspack < Roda
   plugin :content_for, append: true
   plugin :symbolized_params    # - automatically converts all keys of params to symbols.
   plugin :flash
-  plugin :csrf, raise: true,
+  plugin :csrf, raise: true, # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
                 csrf_header: 'X-CSRF-Token',
-                skip_if: ->(req) { ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? { |path| req.path == path } } # , :skip => ['POST:/report_error'] # FIXME: Remove the +raise+ param when going live!
+                skip_if: ->(req) do # rubocop:disable Style/Lambda
+                  ENV['RACK_ENV'] == 'test' || AppConst::BYPASS_LOGIN_ROUTES.any? do |path|
+                    if path.end_with?('*')
+                      req.path.match?(/#{path}/)
+                    else
+                      req.path == path
+                    end
+                  end
+                end
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
@@ -133,7 +141,13 @@ class Nspack < Roda
     #   end
     # end
 
-    unless AppConst::BYPASS_LOGIN_ROUTES.any? { |path| request.path == path } # Might have to be more nuanced for params in path...
+    unless AppConst::BYPASS_LOGIN_ROUTES.any? do |path|
+      if path.end_with?('*')
+        request.path.match?(/#{path}/)
+      else
+        request.path == path
+      end
+    end
       r.rodauth
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id

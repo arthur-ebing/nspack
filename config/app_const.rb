@@ -61,7 +61,8 @@ class AppConst
 
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
-    '/masterfiles/config/label_templates/published'
+    '/masterfiles/config/label_templates/published',
+    '/messcada/.*'
   ].freeze
 
   # Menu
