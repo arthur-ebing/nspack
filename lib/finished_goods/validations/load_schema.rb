@@ -5,7 +5,7 @@ module FinishedGoodsApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:depot_location_id, :integer).filled(:int?)
+    required(:depot_id, :integer).filled(:int?)
     required(:customer_party_role_id, :integer).filled(:int?)
     required(:consignee_party_role_id, :integer).filled(:int?)
     required(:billing_client_party_role_id, :integer).filled(:int?)

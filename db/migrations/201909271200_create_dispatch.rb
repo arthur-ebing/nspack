@@ -4,30 +4,30 @@ Sequel.migration do
     extension :pg_triggers
 
     # --- depots
-    create_table(:destination_depots, ignore_index_errors: true) do
+    create_table(:depots, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :destination_city_id, :destination_cities, type: :integer, null: false
+      foreign_key :city_id, :destination_cities, type: :integer
       String :depot_code, null: false
       String :description
       String :edi_code
       TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
-      index [:depot_code], name: :destination_depot_unique_code, unique: true
+      index [:depot_code], name: :depot_unique_code, unique: true
     end
 
-    pgt_created_at(:destination_depots,
+    pgt_created_at(:depots,
                    :created_at,
-                   function_name: :destination_depots_set_created_at,
+                   function_name: :depots_set_created_at,
                    trigger_name: :set_created_at)
 
-    pgt_updated_at(:destination_depots,
+    pgt_updated_at(:depots,
                    :updated_at,
-                   function_name: :destination_depots_set_updated_at,
+                   function_name: :depots_set_updated_at,
                    trigger_name: :set_updated_at)
 
     # Log changes to this table. Exclude changes to the updated_at column.
-    run "SELECT audit.audit_table('destination_depots', true, true, '{updated_at}'::text[]);"
+    run "SELECT audit.audit_table('depots', true, true, '{updated_at}'::text[]);"
 
     # --- vehicle_types
     create_table(:vehicle_types, ignore_index_errors: true) do
@@ -242,13 +242,13 @@ Sequel.migration do
     drop_table(:vehicle_types)
 
     # Drop logging for destination_depots table.
-    drop_trigger(:destination_depots, :audit_trigger_row)
-    drop_trigger(:destination_depots, :audit_trigger_stm)
+    drop_trigger(:depots, :audit_trigger_row)
+    drop_trigger(:depots, :audit_trigger_stm)
 
-    drop_trigger(:destination_depots, :set_created_at)
-    drop_function(:destination_depots_set_created_at)
-    drop_trigger(:destination_depots, :set_updated_at)
-    drop_function(:destination_depots_set_updated_at)
-    drop_table(:destination_depots)
+    drop_trigger(:depots, :set_created_at)
+    drop_function(:depots_set_created_at)
+    drop_trigger(:depots, :set_updated_at)
+    drop_function(:depots_set_updated_at)
+    drop_table(:depots)
   end
 end

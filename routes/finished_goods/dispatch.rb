@@ -327,7 +327,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_load(id, params[:load])
           if res.success
             row_keys = %i[
-              depot_location_id
+              depot_id
               customer_party_role_id
               consignee_party_role_id
               billing_client_party_role_id

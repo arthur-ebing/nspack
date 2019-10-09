@@ -10,7 +10,7 @@ module FinishedGoodsApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        depot_location_id: 1,
+        depot_id: 1,
         customer_party_role_id: 1,
         consignee_party_role_id: 1,
         billing_client_party_role_id: 1,

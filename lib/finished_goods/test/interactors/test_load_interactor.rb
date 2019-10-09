@@ -68,19 +68,19 @@ module FinishedGoodsApp
     private
 
     def load_attrs
-      location_id = create_location
       customer_party_role_id = create_party_role[:id]
       consignee_party_role_id = create_party_role[:id]
       billing_client_party_role_id = create_party_role[:id]
       exporter_party_role_id = create_party_role[:id]
       final_receiver_party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
+      destination_depot_id = create_depot
       pol_voyage_port_id = create_voyage_port
       pod_voyage_port_id = create_voyage_port
 
       {
         id: 1,
-        depot_location_id: location_id,
+        depot_id: destination_depot_id,
         customer_party_role_id: customer_party_role_id,
         consignee_party_role_id: consignee_party_role_id,
         billing_client_party_role_id: billing_client_party_role_id,

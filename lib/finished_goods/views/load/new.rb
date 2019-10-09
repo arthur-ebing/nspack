@@ -4,7 +4,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class New
-        def self.call(back_url:, form_values: nil, form_errors: nil, remote: true ) # rubocop:disable Metrics/AbcSize
+        def self.call(back_url, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -28,7 +28,7 @@ module FinishedGoods
               form.add_field :billing_client_party_role_id
               form.add_field :exporter_party_role_id
               form.add_field :final_receiver_party_role_id
-              form.add_field :depot_location_id
+              form.add_field :depot_id
               form.add_field :final_destination_id
             end
             page.form do |form|

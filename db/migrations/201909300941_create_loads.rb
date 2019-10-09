@@ -11,7 +11,7 @@ Sequel.migration do
       foreign_key :exporter_party_role_id, :party_roles, type: :integer, null: false
       foreign_key :final_receiver_party_role_id, :party_roles, type: :integer
       foreign_key :final_destination_id, :destination_cities, type: :integer, null: false
-      foreign_key :depot_id, :destination_depots, type: :integer, null: false
+      foreign_key :depot_id, :depots, type: :integer, null: false
       foreign_key :pol_voyage_port_id, :voyage_ports, type: :integer, null: false
       foreign_key :pod_voyage_port_id, :voyage_ports, type: :integer, null: false
       String :order_number, null: false

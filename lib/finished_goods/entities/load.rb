@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   class Load < Dry::Struct
     attribute :id, Types::Integer
-    attribute :depot_location_id, Types::Integer
+    attribute :depot_id, Types::Integer
     attribute :customer_party_role_id, Types::Integer
     attribute :consignee_party_role_id, Types::Integer
     attribute :billing_client_party_role_id, Types::Integer

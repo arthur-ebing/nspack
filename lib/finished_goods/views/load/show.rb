@@ -13,7 +13,7 @@ module FinishedGoods
             page.form do |form|
               # form.caption 'Load'
               form.view_only!
-              form.add_field :depot_location_id
+              form.add_field :depot_id
               form.add_field :customer_party_role_id
               form.add_field :consignee_party_role_id
               form.add_field :billing_client_party_role_id

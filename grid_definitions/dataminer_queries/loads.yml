@@ -1,6 +1,6 @@
 ---
 :caption: Loads
-:sql: "SELECT loads.id,\r\n       loads.depot_location_id,\r\n       loads.customer_party_role_id,\r\n
+:sql: "SELECT loads.id,\r\n       loads.depot_id,\r\n       loads.customer_party_role_id,\r\n
   \      loads.consignee_party_role_id,\r\n       loads.billing_client_party_role_id,\r\n
   \      loads.exporter_party_role_id,\r\n       loads.final_receiver_party_role_id,\r\n
   \      loads.final_destination_id,\r\n       loads.pol_voyage_port_id,\r\n       loads.pod_voyage_port_id,\r\n
@@ -16,7 +16,7 @@
   \      locations.location_long_code AS depot_location_location_long_code,\r\n       destination_cities.city_name
   AS final_destination_city_name,\r\n       pol_port.port_code AS pol_voyage_ports_code,\r\n
   \      pod_port.port_code AS pod_voyage_ports_code,\r\n       fn_current_status('loads',
-  loads.id) AS status\r\n\r\nFROM loads\r\nJOIN locations ON locations.id = loads.depot_location_id\r\nJOIN
+  loads.id) AS status\r\n\r\nFROM loads\r\nJOIN locations ON locations.id = loads.depot_id\r\nJOIN
   destination_cities ON destination_cities.id = loads.final_destination_id\r\nJOIN
   voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pod_voyage_port_id\r\nJOIN
   voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pol_voyage_port_id\r\nJOIN
@@ -42,11 +42,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  depot_location_id:
-    :name: depot_location_id
+  depot_id:
+    :name: depot_id
     :sequence_no: 2
-    :caption: Depot location
-    :namespaced_name: loads.depot_location_id
+    :caption: Depot
+    :namespaced_name: loads.depot_id
     :data_type: :integer
     :width: 
     :format: 

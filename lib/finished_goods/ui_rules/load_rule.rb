@@ -19,8 +19,8 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      # depot_location_label = FinishedGoodsApp::LocationRepo.new.find_location(@form_object.depot_location_id)&.location_long_code
-      depot_location_label = @repo.find(:locations, MasterfilesApp::Location, @form_object.depot_location_id)&.location_long_code
+      # depot_location_label = FinishedGoodsApp::DestinationRepo.new.find_destination_depot(@form_object.depot_id)&.depot_code
+      depot_label = @repo.find(:destination_depots, MasterfilesApp::DestinationRepo, @form_object.depot_id)&.depot_code
       # customer_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.customer_party_role_id)&.id
       customer_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.customer_party_role_id)&.id
       # consignee_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.consignee_party_role_id)&.id
@@ -37,7 +37,7 @@ module UiRules
       pol_voyage_port_label = @repo.find(:voyage_ports, FinishedGoodsApp::VoyagePortFlat, @form_object.pol_voyage_port_id)&.port_code
       # pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port(@form_object.pod_voyage_port_id)&.id
       pod_voyage_port_label = @repo.find(:voyage_ports, FinishedGoodsApp::VoyagePortFlat, @form_object.pod_voyage_port_id)&.port_code
-      fields[:depot_location_id] = { renderer: :label, with_value: depot_location_label, caption: 'Depot Location' }
+      fields[:depot__id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:customer_party_role_id] = { renderer: :label, with_value: customer_label, caption: 'Customer' }
       fields[:consignee_party_role_id] = { renderer: :label, with_value: consignee_label, caption: 'Consignee' }
       fields[:billing_client_party_role_id] = { renderer: :label, with_value: billing_client_label, caption: 'Billing Client' }
@@ -71,7 +71,7 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        depot_location_id: { renderer: :select, options: MasterfilesApp::LocationRepo.new.for_select_locations, caption: 'Depot Location', required: true },
+        depot_id: { renderer: :select, options: MasterfilesApp::DestinationRepo.new.for_select_destination_depots, caption: 'Depot', required: true },
         customer_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER), caption: 'Customer', required: true },
         consignee_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE), caption: 'Consignee', required: true },
         billing_client_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT), caption: 'Billing Client', required: true },
@@ -92,16 +92,13 @@ module UiRules
     end
 
     def make_form_object
-      if @mode == :new
-        make_new_form_object
-        return
-      end
+      make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_load(@options[:id])
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_location_id: nil,
+      @form_object = OpenStruct.new(depot_id: nil,
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,

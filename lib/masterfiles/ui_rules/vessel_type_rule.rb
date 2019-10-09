@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'vessel_type'
     end
@@ -31,10 +31,7 @@ module UiRules
     end
 
     def make_form_object
-      if @mode == :new
-        make_new_form_object
-        return
-      end
+      make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_vessel_type(@options[:id])
     end

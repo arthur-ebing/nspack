@@ -3,9 +3,7 @@
 module FinishedGoodsApp
   class LoadInteractor < BaseInteractor
     def create_load(params) # rubocop:disable Metrics/AbcSize
-      p params
       res = validate_load_params(params)
-      p res
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
