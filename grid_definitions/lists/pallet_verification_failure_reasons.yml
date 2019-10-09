@@ -1,0 +1,24 @@
+---
+:dataminer_definition: pallet_verification_failure_reasons
+:actions:
+- :url: "/masterfiles/quality/pallet_verification_failure_reasons/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/pallet_verification_failure_reasons/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/pallet_verification_failure_reasons/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/pallet_verification_failure_reasons/new"
+  :text: New Pallet Verification Failure Reason
+  :style: :button
+  :behaviour: :popup
