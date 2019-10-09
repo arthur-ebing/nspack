@@ -17,7 +17,6 @@ module MesscadaApp
       update_bin
 
       run_stats_bins_tipped = repo.production_run_stats(@run_id)
-
       success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
 
@@ -26,7 +25,6 @@ module MesscadaApp
     def update_bin
       updates = { bin_tipped_date_time: Time.now, production_run_tipped_id: @run_id, exit_ref_date_time: Time.now, bin_tipped: true, exit_ref: 'TIPPED'  }
       updates.merge!(tipped_asset_number: bin_number, bin_asset_number: nil) unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES != 'true'
-
       RawMaterialsApp::RmtDeliveryRepo.new.update_rmt_bin(@rmt_bin_id, updates)
     end
 
