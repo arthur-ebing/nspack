@@ -415,9 +415,13 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_standard_pack_code(id, params[:standard_pack_code])
           if res.success
-            update_grid_row(id,
-                            changes: { standard_pack_code: res.instance[:standard_pack_code] },
-                            notice: res.message)
+            row_keys = %i[
+              standard_pack_code
+              material_mass
+              plant_resource_button_indicator
+              active
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::StandardPackCode::Edit.call(id, params[:standard_pack_code], res.errors) }
           end

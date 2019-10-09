@@ -72,7 +72,9 @@ module MasterfilesApp
       {
         id: 1,
         standard_pack_code: Faker::Lorem.unique.word,
-        active: true
+        active: true,
+        material_mass: 1.0,
+        plant_resource_button_indicator: 'ABC'
       }
     end
 

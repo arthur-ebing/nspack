@@ -56,7 +56,9 @@ module MasterfilesApp
     def create_standard_pack_code(opts = {})
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
-        active: true
+        active: true,
+        material_mass: Faker::Number.decimal,
+        plant_resource_button_indicator: Faker::Lorem.word
       }
       DB[:standard_pack_codes].insert(default.merge(opts))
     end

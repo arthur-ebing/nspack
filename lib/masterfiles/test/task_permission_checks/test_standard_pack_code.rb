@@ -9,7 +9,10 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        standard_pack_code: Faker::Lorem.unique.word
+        standard_pack_code: Faker::Lorem.unique.word,
+        material_mass: 1.0,
+        plant_resource_button_indicator: 'ABC',
+        active: true
       }
       MasterfilesApp::StandardPackCode.new(base_attrs.merge(attrs))
     end

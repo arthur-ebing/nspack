@@ -16,6 +16,8 @@ module Masterfiles
               form.action '/masterfiles/fruit/standard_pack_codes'
               form.remote! if remote
               form.add_field :standard_pack_code
+              form.add_field :material_mass
+              form.add_field :plant_resource_button_indicator
             end
           end
 
