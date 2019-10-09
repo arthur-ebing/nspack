@@ -21,7 +21,7 @@ module MesscadaApp
     required(:basic_pack_code_id, :integer).filled(:int?)
     required(:standard_pack_code_id, :integer).filled(:int?)
     required(:fruit_actual_counts_for_pack_id, :integer).maybe(:int?)
-    required(:fruit_size_reference_id, :integer).maybe(:int?)
+    required(:fruit_size_reference_id, :integer).filled(:int?)
     required(:marketing_org_party_role_id, :integer).filled(:int?)
     required(:packed_tm_group_id, :integer).filled(:int?)
     required(:mark_id, :integer).filled(:int?)

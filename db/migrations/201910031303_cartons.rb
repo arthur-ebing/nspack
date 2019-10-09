@@ -20,7 +20,7 @@ Sequel.migration do
       foreign_key :basic_pack_code_id, :basic_pack_codes, type: :integer, null: false
       foreign_key :standard_pack_code_id, :standard_pack_codes, type: :integer, null: false
       foreign_key :fruit_actual_counts_for_pack_id, :fruit_actual_counts_for_packs, type: :integer
-      foreign_key :fruit_size_reference_id, :fruit_size_references, type: :integer
+      foreign_key :fruit_size_reference_id, :fruit_size_references, type: :integer, null: false
       foreign_key :marketing_org_party_role_id, :party_roles, type: :integer, null: false
       foreign_key :packed_tm_group_id, :target_market_groups, type: :integer, null: false
       foreign_key :mark_id, :marks, type: :integer, null: false
