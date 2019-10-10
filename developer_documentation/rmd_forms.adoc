@@ -188,6 +188,11 @@ form.add_field(:from_location, 'From location', scan: 'key248_all',
 |String
 |`text`
 
+|options - :force_uppercase
+|Should typed in values be forced to uppercase? **NB** This only applies to typed-in text, not scanned-in text.
+|Boolean
+|`false`
+
 |options - :width
 |The width in `rem` of the input field.
 |Integer
