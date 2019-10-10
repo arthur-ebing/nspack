@@ -5,11 +5,12 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module FinishedGoodsApp
   class TestLoadInteractor < MiniTestWithHooks
     include LoadFactory
+    include VoyageFactory
+    include VoyagePortFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::VesselFactory
     include MasterfilesApp::PortFactory
-    include VoyageFactory
-    include VoyagePortFactory
+    include MasterfilesApp::DepotFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -74,19 +75,19 @@ module FinishedGoodsApp
       exporter_party_role_id = create_party_role[:id]
       final_receiver_party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
-      destination_depot_id = create_depot
+      depot_id = create_depot
       pol_voyage_port_id = create_voyage_port
       pod_voyage_port_id = create_voyage_port
 
       {
         id: 1,
-        depot_id: destination_depot_id,
         customer_party_role_id: customer_party_role_id,
         consignee_party_role_id: consignee_party_role_id,
         billing_client_party_role_id: billing_client_party_role_id,
         exporter_party_role_id: exporter_party_role_id,
         final_receiver_party_role_id: final_receiver_party_role_id,
         final_destination_id: destination_city_id,
+        depot_id: depot_id,
         pol_voyage_port_id: pol_voyage_port_id,
         pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,

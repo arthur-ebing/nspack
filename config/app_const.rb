@@ -178,6 +178,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
 
+  # Depots: Depot Code
+  DEPOT_LOCATION_CODE = ENV.fetch('DEPOT_LOCATION_CODE')
+
+  # Constants for port types:
+  PORT_TYPE_POL = 'POL'
+  PORT_TYPE_POD = 'POD'
+
+
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
   BIG_ZERO = BigDecimal('0')

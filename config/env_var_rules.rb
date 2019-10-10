@@ -54,6 +54,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SYSTEM_MAIL_SENDER: 'Email address for "FROM" address in the format NAME<email>' },
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
+    { DEPOT_LOCATION_CODE: 'Default Depot for new dispatch loads.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of 2-digit GLN or line numbers.' },
     { COMPANY_PREFIX: 'The company prefix used in generating pallet numbers. This should be the 10-digit SSCC company code or a shorter numeric code.' }

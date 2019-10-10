@@ -1,27 +1,25 @@
 ---
 :caption: Loads
-:sql: "SELECT loads.id,\r\n       loads.depot_id,\r\n       loads.customer_party_role_id,\r\n
-  \      loads.consignee_party_role_id,\r\n       loads.billing_client_party_role_id,\r\n
-  \      loads.exporter_party_role_id,\r\n       loads.final_receiver_party_role_id,\r\n
-  \      loads.final_destination_id,\r\n       loads.pol_voyage_port_id,\r\n       loads.pod_voyage_port_id,\r\n
-  \      loads.order_number,\r\n       loads.edi_file_name,\r\n       loads.customer_order_number,\r\n
-  \      loads.customer_reference,\r\n       loads.exporter_certificate_code,\r\n
-  \      loads.shipped_date,\r\n       loads.shipped,\r\n       loads.transfer_load,\r\n
-  \      loads.active,\r\n       loads.created_at,\r\n       loads.updated_at,\r\n
-  \      fn_party_role_name(loads.billing_client_party_role_id) AS billing_client_party_role,\r\n
-  \      fn_party_role_name(loads.consignee_party_role_id) AS consignee_party_role,\r\n
-  \      fn_party_role_name(loads.customer_party_role_id) AS customer_party_role,\r\n
-  \      fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver_party_role,\r\n
-  \      fn_party_role_name(loads.exporter_party_role_id) AS exporter_party_role,\r\n
-  \      locations.location_long_code AS depot_location_location_long_code,\r\n       destination_cities.city_name
-  AS final_destination_city_name,\r\n       pol_port.port_code AS pol_voyage_ports_code,\r\n
-  \      pod_port.port_code AS pod_voyage_ports_code,\r\n       fn_current_status('loads',
-  loads.id) AS status\r\n\r\nFROM loads\r\nJOIN locations ON locations.id = loads.depot_id\r\nJOIN
-  destination_cities ON destination_cities.id = loads.final_destination_id\r\nJOIN
-  voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pod_voyage_port_id\r\nJOIN
-  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pol_voyage_port_id\r\nJOIN
-  ports pol_port ON pol_port.id = pol_voyage_ports.id\r\nJOIN ports pod_port ON pod_port.id
-  = pod_voyage_ports.id"
+:sql: "SELECT\r\n    loads.id,\r\n    loads.customer_party_role_id,\r\n    loads.consignee_party_role_id,\r\n
+  \   loads.billing_client_party_role_id,\r\n    loads.exporter_party_role_id,\r\n
+  \   loads.final_receiver_party_role_id,\r\n    loads.final_destination_id,\r\n    loads.depot_id,\r\n
+  \   loads.pol_voyage_port_id,\r\n    loads.pod_voyage_port_id,\r\n    loads.order_number,\r\n
+  \   loads.edi_file_name,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
+  \   loads.exporter_certificate_code,\r\n    loads.shipped_date,\r\n    loads.shipped,\r\n
+  \   loads.transfer_load,\r\n    loads.active,\r\n    loads.created_at,\r\n    loads.updated_at,\r\n
+  \   fn_party_role_name(loads.billing_client_party_role_id) AS billing_client_party_role,\r\n
+  \   fn_party_role_name(loads.consignee_party_role_id) AS consignee_party_role,\r\n
+  \   fn_party_role_name(loads.customer_party_role_id) AS customer_party_role,\r\n
+  \   fn_party_role_name(loads.exporter_party_role_id) AS exporter_party_role,\r\n
+  \   fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver_party_role,\r\n
+  \   destination_cities.city_name AS final_destination_city_name,\r\n    depots.depot_code,\r\n
+  \   pol_port.port_code AS pol_voyage_ports_code,\r\n    pod_port.port_code AS pod_voyage_ports_code,\r\n
+  \   fn_current_status('loads', loads.id) AS status\r\nFROM loads\r\nJOIN depots
+  \ ON depots.id = loads.depot_id\r\nJOIN destination_cities  ON destination_cities.id
+  = loads.final_destination_id\r\nJOIN voyage_ports pol_voyage_port ON pol_voyage_port.id
+  = loads.pod_voyage_port_id\r\nJOIN voyage_ports pod_voyage_port ON pod_voyage_port.id
+  = loads.pol_voyage_port_id\r\nJOIN ports pol_port ON pol_port.id = pol_voyage_port.port_id\r\nJOIN
+  ports pod_port ON pod_port.id = pod_voyage_port.port_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -42,25 +40,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  depot_id:
-    :name: depot_id
-    :sequence_no: 2
-    :caption: Depot
-    :namespaced_name: loads.depot_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   customer_party_role_id:
     :name: customer_party_role_id
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Customer party role
     :namespaced_name: loads.customer_party_role_id
     :data_type: :integer
@@ -76,7 +58,7 @@
     :group_max: false
   consignee_party_role_id:
     :name: consignee_party_role_id
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Consignee party role
     :namespaced_name: loads.consignee_party_role_id
     :data_type: :integer
@@ -92,7 +74,7 @@
     :group_max: false
   billing_client_party_role_id:
     :name: billing_client_party_role_id
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Billing client party role
     :namespaced_name: loads.billing_client_party_role_id
     :data_type: :integer
@@ -108,7 +90,7 @@
     :group_max: false
   exporter_party_role_id:
     :name: exporter_party_role_id
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Exporter party role
     :namespaced_name: loads.exporter_party_role_id
     :data_type: :integer
@@ -124,7 +106,7 @@
     :group_max: false
   final_receiver_party_role_id:
     :name: final_receiver_party_role_id
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Final receiver party role
     :namespaced_name: loads.final_receiver_party_role_id
     :data_type: :integer
@@ -140,9 +122,25 @@
     :group_max: false
   final_destination_id:
     :name: final_destination_id
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Final destination
     :namespaced_name: loads.final_destination_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot_id:
+    :name: depot_id
+    :sequence_no: 8
+    :caption: Depot
+    :namespaced_name: loads.depot_id
     :data_type: :integer
     :width: 
     :format: 
@@ -188,7 +186,7 @@
     :group_max: false
   order_number:
     :name: order_number
-    :sequence_no: 20
+    :sequence_no: 11
     :caption: Order number
     :namespaced_name: loads.order_number
     :data_type: :string
@@ -204,7 +202,7 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 22
+    :sequence_no: 12
     :caption: Edi file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
@@ -220,7 +218,7 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 21
+    :sequence_no: 13
     :caption: Customer order number
     :namespaced_name: loads.customer_order_number
     :data_type: :string
@@ -236,7 +234,7 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 23
+    :sequence_no: 14
     :caption: Customer reference
     :namespaced_name: loads.customer_reference
     :data_type: :string
@@ -252,7 +250,7 @@
     :group_max: false
   exporter_certificate_code:
     :name: exporter_certificate_code
-    :sequence_no: 24
+    :sequence_no: 15
     :caption: Exporter certificate code
     :namespaced_name: loads.exporter_certificate_code
     :data_type: :string
@@ -268,7 +266,7 @@
     :group_max: false
   shipped_date:
     :name: shipped_date
-    :sequence_no: 27
+    :sequence_no: 16
     :caption: Shipped date
     :namespaced_name: loads.shipped_date
     :data_type: :datetime
@@ -284,7 +282,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 28
+    :sequence_no: 17
     :caption: Shipped
     :namespaced_name: loads.shipped
     :data_type: :boolean
@@ -300,7 +298,7 @@
     :group_max: false
   transfer_load:
     :name: transfer_load
-    :sequence_no: 25
+    :sequence_no: 18
     :caption: Transfer load
     :namespaced_name: loads.transfer_load
     :data_type: :boolean
@@ -316,7 +314,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 31
+    :sequence_no: 19
     :caption: Active
     :namespaced_name: loads.active
     :data_type: :boolean
@@ -332,7 +330,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 30
+    :sequence_no: 20
     :caption: Created at
     :namespaced_name: loads.created_at
     :data_type: :datetime
@@ -348,7 +346,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 29
+    :sequence_no: 21
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
@@ -364,7 +362,7 @@
     :group_max: false
   billing_client_party_role:
     :name: billing_client_party_role
-    :sequence_no: 11
+    :sequence_no: 22
     :caption: Billing client
     :namespaced_name: 
     :data_type: :string
@@ -380,7 +378,7 @@
     :group_max: false
   consignee_party_role:
     :name: consignee_party_role
-    :sequence_no: 12
+    :sequence_no: 23
     :caption: Consignee
     :namespaced_name: 
     :data_type: :string
@@ -396,24 +394,8 @@
     :group_max: false
   customer_party_role:
     :name: customer_party_role
-    :sequence_no: 13
+    :sequence_no: 24
     :caption: Customer
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  final_receiver_party_role:
-    :name: final_receiver_party_role
-    :sequence_no: 14
-    :caption: Final receiver
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -428,7 +410,7 @@
     :group_max: false
   exporter_party_role:
     :name: exporter_party_role
-    :sequence_no: 15
+    :sequence_no: 25
     :caption: Exporter
     :namespaced_name: 
     :data_type: :string
@@ -442,11 +424,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  depot_location_location_long_code:
-    :name: depot_location_location_long_code
-    :sequence_no: 16
-    :caption: Depot location long code
-    :namespaced_name: locations.location_long_code
+  final_receiver_party_role:
+    :name: final_receiver_party_role
+    :sequence_no: 26
+    :caption: Final receiver
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -460,7 +442,7 @@
     :group_max: false
   final_destination_city_name:
     :name: final_destination_city_name
-    :sequence_no: 17
+    :sequence_no: 27
     :caption: Final destination city
     :namespaced_name: destination_cities.city_name
     :data_type: :string
@@ -474,9 +456,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  depot_code:
+    :name: depot_code
+    :sequence_no: 28
+    :caption: Depot code
+    :namespaced_name: depots.depot_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pol_voyage_ports_code:
     :name: pol_voyage_ports_code
-    :sequence_no: 18
+    :sequence_no: 29
     :caption: POL voyage ports code
     :namespaced_name: pol_port.port_code
     :data_type: :string
@@ -492,7 +490,7 @@
     :group_max: false
   pod_voyage_ports_code:
     :name: pod_voyage_ports_code
-    :sequence_no: 19
+    :sequence_no: 30
     :caption: POD voyage ports code
     :namespaced_name: pod_port.port_code
     :data_type: :string
@@ -508,7 +506,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 26
+    :sequence_no: 31
     :caption: Status
     :namespaced_name: 
     :data_type: :string

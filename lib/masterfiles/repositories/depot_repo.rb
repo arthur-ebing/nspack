@@ -22,5 +22,9 @@ module MasterfilesApp
                                               flatten_columns: { city_name: :city_name } }],
                             wrapper: DepotFlat)
     end
+
+    def depot_id_from_depot_code(depot_code)
+      DB[:depots].where(depot_code: depot_code).get(:id)
+    end
   end
 end

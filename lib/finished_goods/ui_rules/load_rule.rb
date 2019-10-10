@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LoadRule < Base
+  class LoadRule < Base # rubocop:disable ClassLength
     def generate_rules
       @repo = FinishedGoodsApp::LoadRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
+
       make_form_object
       apply_form_values
 
@@ -12,31 +14,21 @@ module UiRules
       set_show_fields if %i[show reopen].include? @mode
       # set_complete_fields if @mode == :complete
       # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
+      add_behaviours if @mode == :new
 
       form_name 'load'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      # depot_location_label = FinishedGoodsApp::DestinationRepo.new.find_destination_depot(@form_object.depot_id)&.depot_code
-      depot_label = @repo.find(:destination_depots, MasterfilesApp::DestinationRepo, @form_object.depot_id)&.depot_code
-      # customer_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.customer_party_role_id)&.id
-      customer_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.customer_party_role_id)&.id
-      # consignee_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.consignee_party_role_id)&.id
-      consignee_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.consignee_party_role_id)&.id
-      # billing_client_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.billing_client_party_role_id)&.id
-      billing_client_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.billing_client_party_role_id)&.id
-      # exporter_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.exporter_party_role_id)&.id
-      exporter_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.exporter_party_role_id)&.id
-      # final_receiver_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.final_receiver_party_role_id)&.id
-      final_receiver_label = @repo.find(:party_roles, MasterfilesApp::PartyRepo, @form_object.final_receiver_party_role_id)&.id
-      # final_destination_label = MasterfilesApp::DestinationRepo.new.find_destination_city(@form_object.final_destination_id)&.city_name
-      final_destination_label = @repo.find(:destination_cities, MasterfilesApp::DestinationRepo, @form_object.final_destination_id)&.city_name
-      # pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port(@form_object.pol_voyage_port_id)&.id
-      pol_voyage_port_label = @repo.find(:voyage_ports, FinishedGoodsApp::VoyagePortFlat, @form_object.pol_voyage_port_id)&.port_code
-      # pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port(@form_object.pod_voyage_port_id)&.id
-      pod_voyage_port_label = @repo.find(:voyage_ports, FinishedGoodsApp::VoyagePortFlat, @form_object.pod_voyage_port_id)&.port_code
+      depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
+      customer_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.customer_party_role_id)&.id
+      consignee_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.consignee_party_role_id)&.id
+      billing_client_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.billing_client_party_role_id)&.id
+      exporter_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.exporter_party_role_id)&.id
+      final_receiver_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.final_receiver_party_role_id)&.id
+      final_destination_label = MasterfilesApp::DestinationRepo.new.find_destination_city(@form_object.final_destination_id)&.city_name
+      pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_code
+      pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_code
       fields[:depot__id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:customer_party_role_id] = { renderer: :label, with_value: customer_label, caption: 'Customer' }
       fields[:consignee_party_role_id] = { renderer: :label, with_value: consignee_label, caption: 'Consignee' }
@@ -71,15 +63,49 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        depot_id: { renderer: :select, options: MasterfilesApp::DestinationRepo.new.for_select_destination_depots, caption: 'Depot', required: true },
-        customer_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER), caption: 'Customer', required: true },
-        consignee_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE), caption: 'Consignee', required: true },
-        billing_client_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT), caption: 'Billing Client', required: true },
-        exporter_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_EXPORTER), caption: 'Exporter', required: true },
-        final_receiver_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER), caption: 'Final Receiver', required: true },
-        final_destination_id: { renderer: :select, options: MasterfilesApp::DestinationRepo.new.for_select_destination_cities, caption: 'Final Destination', required: true },
-        pol_voyage_port_id: { renderer: :select, options: FinishedGoodsApp::VoyagePortRepo.new.for_select_voyage_ports, caption: 'POL Voyage Port', required: true },
-        pod_voyage_port_id: { renderer: :select, options: FinishedGoodsApp::VoyagePortRepo.new.for_select_voyage_ports, caption: 'POD Voyage Port', required: true },
+
+        customer_party_role_id: { renderer: :select,
+                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER),
+                                  caption: 'Customer',
+                                  required: true,
+                                  prompt: true },
+        consignee_party_role_id: { renderer: :select,
+                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE),
+                                   caption: 'Consignee',
+                                   required: true,
+                                   prompt: true },
+        billing_client_party_role_id: { renderer: :select,
+                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT),
+                                        caption: 'Billing Client',
+                                        required: true,
+                                        prompt: true },
+        exporter_party_role_id: { renderer: :select,
+                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_EXPORTER),
+                                  caption: 'Exporter',
+                                  required: true,
+                                  prompt: true },
+        final_receiver_party_role_id: { renderer: :select,
+                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                        caption: 'Final Receiver',
+                                        required: true,
+                                        prompt: true },
+        depot_id: { renderer: :select,
+                    options: MasterfilesApp::DepotRepo.new.for_select_depots,
+                    selected: MasterfilesApp::DepotRepo.new.depot_id_from_depot_code(AppConst::DEPOT_LOCATION_CODE),
+                    caption: 'Depot',
+                    required: true },
+        final_destination_id: { renderer: :select,
+                                options: MasterfilesApp::DestinationRepo.new.for_select_destination_cities,
+                                caption: 'Final Destination',
+                                required: true },
+        pol_voyage_port_id: { renderer: :select,
+                              options: FinishedGoodsApp::VoyagePortRepo.new.for_select_voyage_ports_by_port_type(AppConst::PORT_TYPE_POL),
+                              caption: 'POL Voyage Port',
+                              required: true },
+        pod_voyage_port_id: { renderer: :select,
+                              options: FinishedGoodsApp::VoyagePortRepo.new.for_select_voyage_ports_by_port_type(AppConst::PORT_TYPE_POD),
+                              caption: 'POD Voyage Port',
+                              required: true },
         order_number: {},
         edi_file_name: {},
         customer_order_number: {},
@@ -117,12 +143,13 @@ module UiRules
                                     transfer_load: nil)
     end
 
-    # private
+    private
 
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :consignee_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/consignee_changed' }]
+        behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }]
+      end
+    end
   end
 end

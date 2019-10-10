@@ -3,13 +3,13 @@
 module FinishedGoodsApp
   module LoadFactory
     def create_load(opts = {}) # rubocop:disable Metrics/AbcSize
-      destination_depot_id = create_depot
       customer_party_role_id = create_party_role[:id]
       consignee_party_role_id = create_party_role[:id]
       billing_client_party_role_id = create_party_role[:id]
       exporter_party_role_id = create_party_role[:id]
       final_receiver_party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
+      depot_id = create_depot
       pol_voyage_port_id = create_voyage_port
       pod_voyage_port_id = create_voyage_port
       default = {
@@ -19,7 +19,7 @@ module FinishedGoodsApp
         exporter_party_role_id: exporter_party_role_id,
         final_receiver_party_role_id: final_receiver_party_role_id,
         final_destination_id: destination_city_id,
-        depot_id: destination_depot_id,
+        depot_id: depot_id,
         pol_voyage_port_id: pol_voyage_port_id,
         pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,

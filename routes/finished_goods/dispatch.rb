@@ -61,21 +61,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'voyage_ports' do
       r.on 'port_type_changed' do
-        actions = []
-        port_list = MasterfilesApp::PortRepo.new.for_select_ports_by_type_id(params[:changed_value])
-        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'voyage_port_port_id', options_array: port_list)
-        port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code
-        port_type_code = port_type_code.nil? ? 'stub' : port_type_code
-        dom_id_hash = { 'voyage_port_trans_shipment_vessel_id_field_wrapper': %([TRANSSHIP]),
-                        'voyage_port_atd_field_wrapper': %([TRANSSHIP POD]),
-                        'voyage_port_etd_field_wrapper': %([TRANSSHIP POD]),
-                        'voyage_port_ata_field_wrapper': %([TRANSSHIP POL]),
-                        'voyage_port_eta_field_wrapper': %([TRANSSHIP POL]),
-                        'voyage_port_port_id_field_wrapper': %([TRANSSHIP POL POD]) }
-        dom_id_hash.each do |dom_id, port_type|
-          actions << OpenStruct.new(type: port_type.include?(port_type_code) ? :show_element : :hide_element, dom_id: dom_id.to_s)
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          actions = []
+          port_list = MasterfilesApp::PortRepo.new.for_select_ports_by_type_id(params[:changed_value])
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'voyage_port_port_id', options_array: port_list)
+          port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code
+          port_type_code = port_type_code.nil? ? 'stub' : port_type_code
+          dom_id_hash = { 'voyage_port_trans_shipment_vessel_id_field_wrapper': %([TRANSSHIP]),
+                          'voyage_port_atd_field_wrapper': %([TRANSSHIP POD]),
+                          'voyage_port_etd_field_wrapper': %([TRANSSHIP POD]),
+                          'voyage_port_ata_field_wrapper': %([TRANSSHIP POL]),
+                          'voyage_port_eta_field_wrapper': %([TRANSSHIP POL]),
+                          'voyage_port_port_id_field_wrapper': %([TRANSSHIP POL POD]) }
+          dom_id_hash.each do |dom_id, port_type|
+            actions << OpenStruct.new(type: port_type.include?(port_type_code) ? :show_element : :hide_element, dom_id: dom_id.to_s)
+          end
+          json_actions(actions)
         end
-        json_actions(actions)
       end
     end
 
@@ -181,12 +185,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'voyage_type_changed' do
-        actions = []
-        vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels_by_voyage_type_id(params[:changed_value])
-        actions << OpenStruct.new(type: :replace_select_options,
-                                  dom_id: 'voyage_vessel_id',
-                                  options_array: vessel_list)
-        json_actions(actions)
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels_by_voyage_type_id(params[:changed_value])
+          json_replace_select_options('voyage_vessel_id', vessel_list)
+        end
       end
 
       r.on 'new' do    # NEW
@@ -315,7 +319,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, back_url: request.referer) }
       end
 
       r.is do
@@ -365,6 +369,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      r.on 'consignee_changed' do
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
+          value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
+          json_change_select_value('load_final_receiver_party_role_id', value)
+        end
+      end
+      r.on 'exporter_changed' do
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
+          value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_BILLING_CLIENT, party_id)
+          json_change_select_value('load_billing_client_party_role_id', value)
+        end
+      end
+
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
         show_page { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
