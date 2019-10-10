@@ -679,9 +679,9 @@ module DevelopmentApp
           rules = [opts.table_meta.column_dry_validation_expect_type(col), max, opts.table_meta.column_dry_validation_array_extra(col)].compact.join(', ')
           rules = rules.sub(/,\s+{/, ' {')
           attr << if col == :id
-                    "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col, true)}).#{fill_opt}#{rules}"
+                    "optional(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
                   else
-                    "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col)}).#{fill_opt}#{rules}"
+                    "required(:#{col}, #{opts.table_meta.column_dry_validation_type(col, detail[:allow_null])}).#{fill_opt}#{rules}"
                   end
         end
         attr
