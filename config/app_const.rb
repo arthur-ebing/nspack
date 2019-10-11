@@ -185,7 +185,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'
 
-
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
   BIG_ZERO = BigDecimal('0')

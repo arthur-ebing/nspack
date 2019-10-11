@@ -30,9 +30,9 @@ module FinishedGoods
                   col.add_field :voyage_type_id
                   col.add_field :vessel_id
                   col.add_field :voyage_number
-                  col.add_field :voyage_code
                 end
                 row.column do |col|
+                  col.add_field :voyage_code
                   col.add_field :year
                   col.add_field :completed
                   col.add_field :completed_at
@@ -41,12 +41,18 @@ module FinishedGoods
             end
             page.section do |section|
               section.add_control(control_type: :link,
+                                  text: 'Complete Voyage',
+                                  url: 'complete',
+                                  behaviour: :popup,
+                                  visible: rules[:can_complete],
+                                  style: :button)
+              section.add_control(control_type: :link,
                                   text: 'Add Port',
                                   url: "/finished_goods/dispatch/voyages/#{id}/voyage_ports/new",
                                   behaviour: :popup,
                                   grid_id: 'voyage_ports',
+                                  visible: rules[:is_complete],
                                   style: :button)
-
               section.add_grid('voyage_ports',
                                "/list/voyage_ports/grid?key=standard&voyage_id=#{id}",
                                caption: 'Voyage Ports')

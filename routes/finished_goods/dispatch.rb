@@ -144,7 +144,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.complete_a_voyage(id, params[:voyage])
+          res = interactor.complete_a_voyage(id)
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)

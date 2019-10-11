@@ -1,11 +1,14 @@
 ---
 :caption: Voyages
-:sql: SELECT "voyages"."id", "voyages"."vessel_id", "voyages"."voyage_type_id", "voyages"."voyage_number",
-  "voyages"."voyage_code", "voyages"."year", "voyages"."completed", "voyages"."completed_at",
-  "voyages"."active", "voyages"."created_at", "voyages"."updated_at", "vessels"."vessel_code",
-  "voyage_types"."voyage_type_code", fn_current_status('voyages', "voyages"."id")
-  AS status FROM "voyages" JOIN "vessels" ON "vessels"."id" = "voyages"."vessel_id"
-  JOIN "voyage_types" ON "voyage_types"."id" = "voyages"."voyage_type_id"
+:sql: "SELECT\r\n   voyages.id,\r\n   voyages.vessel_id,\r\n   voyages.voyage_type_id,\r\n
+  \  voyages.voyage_number,\r\n   voyages.voyage_code,\r\n   voyages.year,\r\n   voyages.completed,\r\n
+  \  voyages.completed_at,\r\n   voyages.active,\r\n   voyages.created_at,\r\n   voyages.updated_at,\r\n
+  \  vessels.vessel_code,\r\n   voyage_types.voyage_type_code,\r\n   string_agg(ports.port_code,
+  ', ') AS ports,\r\n   fn_current_status('voyages', voyages.id) AS status\r\nFROM
+  voyages\r\nLEFT JOIN vessels ON vessels.id = voyages.vessel_id\r\nLEFT JOIN voyage_types
+  ON voyage_types.id = voyages.voyage_type_id\r\nLEFT JOIN voyage_ports ON voyage_ports.voyage_id
+  = voyages.id\r\nLEFT JOIN ports ON ports.id = voyage_ports.port_id\r\nGROUP BY voyages.id,
+  voyages.created_at, vessels.id, voyage_types.id\r\nORDER BY voyages.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -45,7 +48,7 @@
     :group_max: false
   voyage_type_id:
     :name: voyage_type_id
-    :sequence_no: 5
+    :sequence_no: 3
     :caption: Voyage type
     :namespaced_name: voyages.voyage_type_id
     :data_type: :integer
@@ -109,7 +112,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 9
+    :sequence_no: 12
     :caption: Completed
     :namespaced_name: voyages.completed
     :data_type: :boolean
@@ -125,7 +128,7 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 10
+    :sequence_no: 13
     :caption: Completed at
     :namespaced_name: voyages.completed_at
     :data_type: :datetime
@@ -141,7 +144,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Active
     :namespaced_name: voyages.active
     :data_type: :boolean
@@ -157,13 +160,13 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 13
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: voyages.created_at
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -173,7 +176,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 14
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: voyages.updated_at
     :data_type: :datetime
@@ -189,7 +192,7 @@
     :group_max: false
   vessel_code:
     :name: vessel_code
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Vessel code
     :namespaced_name: vessels.vessel_code
     :data_type: :string
@@ -219,9 +222,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  ports:
+    :name: ports
+    :sequence_no: 9
+    :caption: Ports
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 15
     :caption: Status
     :namespaced_name: 
     :data_type: :string

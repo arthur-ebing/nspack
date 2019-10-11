@@ -15,6 +15,7 @@ module MasterfilesApp
     attribute :vessel_code, Types::String
     attribute :description, Types::String
     attribute :vessel_type_code, Types::String
+    attribute :voyage_type_code, Types::String
     attribute? :active, Types::Bool
   end
 end

@@ -1,12 +1,13 @@
 ---
 :caption: Voyage Ports
-:sql: "SELECT\r\n       voyage_ports.id,\r\n       voyage_ports.voyage_id,\r\n       voyage_ports.port_id,\r\n
-  \      voyage_ports.trans_shipment_vessel_id,\r\n       voyage_ports.ata,\r\n       voyage_ports.atd,\r\n
-  \      voyage_ports.eta,\r\n       voyage_ports.etd,\r\n       voyage_ports.active,\r\n
-  \      voyage_ports.created_at,\r\n       voyage_ports.updated_at,\r\n       ports.port_code,\r\n
-  \      port_types.port_type_code,\r\n       vessels.vessel_code AS trans_shipment_vessel\r\nFROM
-  voyage_ports\r\n    JOIN ports ON ports.id = voyage_ports.port_id\r\n    JOIN port_types
-  ON port_types.id = ports.port_type_id\r\n    LEFT JOIN vessels ON vessels.id = voyage_ports.trans_shipment_vessel_id"
+:sql: "SELECT\r\n    voyage_ports.id,\r\n    voyage_ports.voyage_id,\r\n    voyage_ports.port_id,\r\n
+  \   voyage_ports.trans_shipment_vessel_id,\r\n    voyage_ports.ata,\r\n    voyage_ports.atd,\r\n
+  \   voyage_ports.eta,\r\n    voyage_ports.etd,\r\n    voyage_ports.active,\r\n    voyage_ports.created_at,\r\n
+  \   voyage_ports.updated_at,\r\n    ports.port_code,\r\n    port_types.port_type_code,\r\n
+  \   voyages.completed,\r\n    vessels.vessel_code AS trans_shipment_vessel\r\nFROM
+  voyage_ports\r\nJOIN ports ON ports.id = voyage_ports.port_id\r\nJOIN port_types
+  ON port_types.id = ports.port_type_id\r\nJOIN voyages ON voyages.id = voyage_ports.voyage_id\r\nLEFT
+  JOIN vessels ON vessels.id = voyage_ports.trans_shipment_vessel_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -46,7 +47,7 @@
     :group_max: false
   port_id:
     :name: port_id
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Port
     :namespaced_name: voyage_ports.port_id
     :data_type: :integer
@@ -190,7 +191,7 @@
     :group_max: false
   port_code:
     :name: port_code
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Port code
     :namespaced_name: ports.port_code
     :data_type: :string
@@ -206,13 +207,29 @@
     :group_max: false
   port_type_code:
     :name: port_type_code
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Port type code
     :namespaced_name: port_types.port_type_code
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 15
+    :caption: Completed
+    :namespaced_name: voyages.completed
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

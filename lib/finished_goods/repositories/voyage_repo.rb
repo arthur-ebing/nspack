@@ -20,5 +20,9 @@ module FinishedGoodsApp
                                             { parent_table: :vessels, columns: [:vessel_code], flatten_columns: { vessel_code: :vessel_code } }],
                             wrapper: VoyageFlat)
     end
+
+    def last_voyage_created(vessel_id)
+      DB[:voyages].where(vessel_id: vessel_id).max(:id)
+    end
   end
 end

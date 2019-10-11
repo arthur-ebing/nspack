@@ -7,10 +7,15 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      if @mode == :edit
+        common_fields_hash = common_fields
+        common_fields_hash[:voyage_type_id][:disabled_options] = common_fields_hash[:voyage_type_id].delete(:options)
+        common_values_for_fields common_fields_hash
+      else
+        common_values_for_fields common_fields
+      end
 
-      set_show_fields if %i[show reopen].include? @mode
-      # set_complete_fields if @mode == :complete
+      set_show_fields if %i[show complete].include? @mode
       add_behaviours
       form_name 'voyage'
     end
@@ -24,32 +29,33 @@ module UiRules
       fields[:voyage_code] = { renderer: :label }
       fields[:year] = { renderer: :label }
       fields[:completed] = { renderer: :label, as_boolean: true }
-      fields[:completed_at] = { renderer: :label }
+      fields[:completed_at] = { renderer: :label, hide_on_load: @mode == :complete }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
-
-    # def set_complete_fields
-    #   set_show_fields
-    #   user_repo = DevelopmentApp::UserRepo.new
-    #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_VOYAGE_APPROVERS), caption: 'Email address of person to notify', required: true }
-    # end
 
     def common_fields
       {
         voyage_type_id: { renderer: :select,
                           options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types,
                           caption: 'Voyage Type',
-                          required: true },
+                          prompt: true,
+                          required: true,
+                          disabled: false },
         vessel_id: { renderer: :select,
-                     options: MasterfilesApp::VesselRepo.new.for_select_vessels,
+                     options: MasterfilesApp::VesselRepo.new.for_select_vessels_by_voyage_type_id(@form_object.voyage_type_id),
                      caption: 'Vessel',
+                     prompt: true,
                      required: true },
-
         voyage_number: { required: true },
-        voyage_code: {},
-        year: { readonly: true },
-        completed: { renderer: :checkbox },
-        completed_at: { renderer: :label }
+        voyage_code: { readonly: true,
+                       hide_on_load: @mode == :new },
+        year: {},
+        completed: { renderer: :checkbox,
+                     disabled: !@form_object.completed,
+                     hide_on_load: @mode == :new },
+        completed_at: { renderer: :label,
+                        disabled: true,
+                        hide_on_load: @mode == :new }
       }
     end
 
@@ -65,7 +71,7 @@ module UiRules
                                     voyage_number: nil,
                                     voyage_code: nil,
                                     year: DateTime.now.year,
-                                    completed: nil,
+                                    completed: false,
                                     completed_at: nil)
     end
 
@@ -75,6 +81,11 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/voyages/voyage_type_changed' }]
       end
+
+      # res = SalesApp::TaskPermissionCheck::Order.call(:complete, @options[:id], @options[:current_user])
+      # #res.success
+      rules[:can_complete] = !(true & @form_object.completed)
+      rules[:is_complete] = !@form_object.completed
     end
   end
 end

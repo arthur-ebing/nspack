@@ -6,16 +6,19 @@
   :icon: view-show
   :title: View
   :popup: true
+  :hide_if_true: completed
 - :url: "/finished_goods/dispatch/voyage_ports/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
   :popup: true
+  :hide_if_true: completed
 - :url: "/finished_goods/dispatch/voyage_ports/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: completed
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/dispatch/voyage_ports/new"

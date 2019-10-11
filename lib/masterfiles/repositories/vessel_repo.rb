@@ -17,8 +17,11 @@ module MasterfilesApp
       find_with_association(:vessels,
                             id,
                             parent_tables: [{ parent_table: :vessel_types,
-                                              columns: [:vessel_type_code],
-                                              flatten_columns: { vessel_type_code: :vessel_type_code } }],
+                                              columns: %i[vessel_type_code voyage_type_id],
+                                              flatten_columns: { vessel_type_code: :vessel_type_code, voyage_type_id: :voyage_type_id } },
+                                            { parent_table: :voyage_types,
+                                              columns: [:voyage_type_code],
+                                              flatten_columns: { voyage_type_code: :voyage_type_code } }],
                             wrapper: VesselFlat)
     end
 

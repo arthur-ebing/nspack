@@ -18,15 +18,14 @@ module FinishedGoods
               form.remote!
               form.submit_captions 'Complete'
               form.add_text 'Are you sure you want to complete this voyage?', wrapper: :h3
-              form.add_field :to
-              form.add_field :vessel_id
               form.add_field :voyage_type_id
+              form.add_field :vessel_id
               form.add_field :voyage_number
               form.add_field :voyage_code
               form.add_field :year
-              form.add_field :completed
-              form.add_field :completed_at
-              form.add_field :active
+              # form.add_field :completed
+              # form.add_field :completed_at
+              # form.add_field :active
             end
           end
 

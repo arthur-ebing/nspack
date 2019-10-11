@@ -36,25 +36,38 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_voyage(id)
+    def delete_voyage(id) # rubocop:disable Metrics/AbcSize
       name = voyage(id).voyage_number
-      repo.transaction do
-        repo.delete_voyage(id)
-        log_status('voyages', id, 'DELETED')
-        log_transaction
+      vessel_id = voyage(id).vessel_id
+      if id == FinishedGoodsApp::VoyageRepo.new.last_voyage_created(vessel_id)
+        repo.transaction do
+          repo.delete_voyage(id)
+          log_status('voyages', id, 'DELETED')
+          log_transaction
+        end
+        success_response("Deleted voyage #{name}")
+      else
+        repo.transaction do
+          repo.update_voyage(id,  active: false)
+          log_status('voyages', id, 'DEACTIVATED')
+          log_transaction
+        end
+        success_response("Deactivated voyage #{name}")
       end
-      success_response("Deleted voyage #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def complete_a_voyage(id, params)
-      res = complete_a_record(:voyages, id, params.merge(enqueue_job: false))
-      if res.success
-        success_response(res.message, voyage(id))
-      else
-        failed_response(res.message, voyage(id))
+    def complete_a_voyage(id)
+      name = voyage(id).voyage_number
+      repo.transaction do
+        repo.update_voyage(id, completed_at: DateTime.now.to_s)
+        complete_a_record(:voyages, id, enqueue_job: false)
+        log_transaction
       end
+      success_response("Completed voyage #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def assert_permission!(task, id = nil)
