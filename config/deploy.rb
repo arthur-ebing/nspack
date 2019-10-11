@@ -100,7 +100,7 @@ namespace :devops do
 
       # Copy over dataminer connections and automatically set up the "system" connection:
       upload! 'config/dataminer_connections.yml.example', "#{shared_path}/config/dataminer_connections.yml"
-      execute :sed, "-i 's/$DBNAME/#{application}/g' #{shared_path}/config/dataminer_connections.yml"
+      execute :sed, "-i 's/$DBNAME/#{fetch(:application)}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :sed, "-i 's/$CURRENT/#{current_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :sed, "-i 's/$SHARED/#{shared_path.to_s.gsub('/', '\/')}/g' #{shared_path}/config/dataminer_connections.yml"
       execute :mkdir, "#{shared_path}/sys_prepared_reports"
