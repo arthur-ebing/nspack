@@ -548,6 +548,12 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
                                    WHERE functional_area_name = 'Raw Materials')),
          'Deliveries', '/list/rmt_deliveries', 2);
 
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+         'List Bins', '/list/rmt_bins', 2);
+
 -- SEARCH menu item
 
 INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
@@ -555,6 +561,12 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Raw Materials')),
          'Search Deliveries', '/search/rmt_deliveries', 2);
+
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
+         AND functional_area_id = (SELECT id FROM functional_areas
+                                   WHERE functional_area_name = 'Raw Materials')),
+         'Search Bins', '/search/rmt_bins', 2);
 
 -- PROGRAM: Shipping
 INSERT INTO programs (program_name, program_sequence, functional_area_id)

@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Edit
-        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+        def self.call(id, back_url:, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -12,7 +12,11 @@ module RawMaterials
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: back_url,
+                                  style: :back_button)
               section.form do |form|
                 form.caption 'Edit Rmt Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"

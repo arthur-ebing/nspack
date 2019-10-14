@@ -76,5 +76,9 @@ module RawMaterialsApp
     attribute :rebin_created_at, Types::DateTime
     attribute? :active, Types::Bool
     attribute :orchard_code, Types::String
+    attribute :farm_code, Types::String
+    attribute :puc_code, Types::String
+    attribute :cultivar_name, Types::String
+    attribute :season_code, Types::String
   end
 end

@@ -26,7 +26,11 @@ module RawMaterialsApp
     def find_rmt_bin_flat(id)
       find_with_association(:rmt_bins,
                             id,
-                            parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } }],
+                            parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } },
+                                            { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
+                                            { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
+                                            { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
+                                            { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
                             wrapper: RmtBinFlat)
     end
 
@@ -124,12 +128,15 @@ module RawMaterialsApp
           WHERE b.id = ?", bin_id].first
     end
 
-    def find_rmt_container_material_type_tare_weight(rmt_container_material_type_id)
-      DB[:rmt_container_material_types].where(id: rmt_container_material_type_id).map { |o| o[:tare_weight] }.first
+    def get_rmt_bin_tare_weight(rmt_bin)
+      tare_weight = DB[:rmt_container_material_types].where(id: rmt_bin[:rmt_container_material_type_id]).map { |o| o[:tare_weight] }.first
+      return tare_weight unless tare_weight.nil?
+
+      DB[:rmt_container_types].where(id: rmt_bin[:rmt_container_type_id]).map { |o| o[:tare_weight] }.first
     end
 
-    def find_rmt_container_type_tare_weight(rmt_container_type_id)
-      DB[:rmt_container_types].where(id: rmt_container_type_id).map { |o| o[:tare_weight] }.first
+    def find_bins_by_delivery_id(id)
+      DB[:rmt_bins].where(rmt_delivery_id: id).all
     end
   end
 end

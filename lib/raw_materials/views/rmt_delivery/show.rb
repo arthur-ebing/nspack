@@ -4,16 +4,21 @@ module RawMaterials
   module Deliveries
     module RmtDelivery
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id, back_url:) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :show, id: id)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: back_url,
+                                  style: :back_button)
               section.form do |form|
                 # form.caption 'Rmt Delivery'
                 form.view_only!
+                form.no_submit!
                 form.row do |row|
                   row.column do |col|
                     col.add_field :farm_id
