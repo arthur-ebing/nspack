@@ -23,6 +23,7 @@ module Production
               form.add_field :description
               form.add_field :location_id
               form.add_field :gln
+              form.add_field :packhouse_no
             end
           end
 

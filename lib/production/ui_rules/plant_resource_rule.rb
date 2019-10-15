@@ -26,7 +26,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def set_edit_fields
+    def set_edit_fields # rubocop:disable Metrics/AbcSize
       rules = @repo.plant_resource_definition(@form_object.plant_resource_type_id)
       fields[:plant_resource_code][:readonly] = true if rules[:non_editable_code]
 
@@ -45,6 +45,9 @@ module UiRules
                        prompt: true,
                        parent_field: :resource_properties,
                        invisible: !at_gln_level }
+      fields[:packhouse_no] = { renderer: :integer,
+                                parent_field: :resource_properties,
+                                invisible: !at_ph_level }
     end
 
     def common_fields
