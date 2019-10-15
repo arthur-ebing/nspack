@@ -46,6 +46,7 @@ module UiRules
                        parent_field: :resource_properties,
                        invisible: !at_gln_level }
       fields[:packhouse_no] = { renderer: :integer,
+                                required: true,
                                 parent_field: :resource_properties,
                                 invisible: !at_ph_level }
     end
