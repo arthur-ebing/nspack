@@ -80,12 +80,11 @@ class Nspack < Roda # rubocop:disable ClassLength
               orchard_id
               farm_id
               rmt_class_id
-              rmt_container_material_owner_id
-              rmt_container_type_id
-              rmt_container_material_type_id
+              rmt_material_owner_party_role_id
+              container_type_code
+              container_material_type_code
               cultivar_group_id
               puc_id
-              status
               exit_ref
               qty_bins
               bin_asset_number
@@ -238,12 +237,11 @@ class Nspack < Roda # rubocop:disable ClassLength
               orchard_id
               farm_id
               rmt_class_id
-              rmt_container_material_owner_id
-              rmt_container_type_id
-              rmt_container_material_type_id
+              rmt_material_owner_party_role_id
+              container_type_code
+              container_material_type_code
               cultivar_group_id
               puc_id
-              status
               exit_ref
               qty_bins
               bin_asset_number
@@ -329,7 +327,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
           actions << OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'rmt_bin_rmt_container_material_owner_id',
+                                    dom_id: 'rmt_bin_rmt_material_owner_party_role_id',
                                     options_array: [])
         end
 
@@ -345,9 +343,9 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         if filter_value
           container_material_owners = interactor.find_container_material_owners_by_container_material_type(filter_value)
-          json_replace_select_options('rmt_bin_rmt_container_material_owner_id', container_material_owners)
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', container_material_owners)
         else
-          json_replace_select_options('rmt_bin_rmt_container_material_owner_id', [])
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', [])
         end
       end
     end

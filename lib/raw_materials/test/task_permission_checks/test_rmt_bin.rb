@@ -16,7 +16,7 @@ module RawMaterialsApp
         orchard_id: 1, # orchard_id,
         farm_id: 1, # farm_id,
         rmt_class_id: 1, # rmt_class_id,
-        rmt_container_material_owner_id: 1, # rmt_container_material_owner_id,
+        rmt_material_owner_party_role_id: 1, # rmt_material_owner_party_role_id,
         rmt_container_type_id: 1, # rmt_container_type_id,
         rmt_container_material_type_id: 1, # rmt_container_material_type_id,
         cultivar_group_id: 1, # cultivar_group_id,

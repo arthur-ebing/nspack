@@ -12,7 +12,7 @@ module RawMaterialsApp
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class
-      rmt_container_material_owner_id = create_rmt_container_material_owner
+      rmt_material_owner_party_role_id = create_party_role('O')[:id]
       season_id = create_season
       farm_id = create_farm
       puc_id = create_puc
@@ -29,12 +29,11 @@ module RawMaterialsApp
         orchard_id: orchard_id,
         farm_id: farm_id,
         rmt_class_id: rmt_class_id,
-        rmt_container_material_owner_id: rmt_container_material_owner_id,
+        rmt_material_owner_party_role_id: rmt_material_owner_party_role_id,
         rmt_container_type_id: rmt_container_type_id,
         rmt_container_material_type_id: rmt_container_material_type_id,
         cultivar_group_id: cultivar_group_id,
         puc_id: puc_id,
-        status: Faker::Lorem.unique.word,
         exit_ref: Faker::Lorem.word,
         qty_bins: Faker::Number.number(4),
         bin_asset_number: Faker::Number.number(4),
@@ -75,15 +74,15 @@ module RawMaterialsApp
       DB[:rmt_classes].insert(default.merge(opts))
     end
 
-    def create_rmt_container_material_owner(opts = {})
-      rmt_container_material_type_id = create_rmt_container_material_type
-      rmt_material_owner_party_role_id = create_party_role[:id]
-
-      default = {
-        rmt_container_material_type_id: rmt_container_material_type_id,
-        rmt_material_owner_party_role_id: rmt_material_owner_party_role_id
-      }
-      DB[:rmt_container_material_owners].insert(default.merge(opts))
-    end
+    # def create_rmt_container_material_owner(opts = {})
+    #   rmt_container_material_type_id = create_rmt_container_material_type
+    #   rmt_material_owner_party_role_id = create_party_role[:id]
+    #
+    #   default = {
+    #     rmt_container_material_type_id: rmt_container_material_type_id,
+    #     rmt_material_owner_party_role_id: rmt_material_owner_party_role_id
+    #   }
+    #   DB[:rmt_container_material_owners].insert(default.merge(opts))
+    # end
   end
 end

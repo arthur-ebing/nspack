@@ -17,7 +17,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_bin(id)
-      success_response("Created rmt bin #{instance.status}",
+      success_response('Created rmt bin',
                        instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
@@ -52,20 +52,19 @@ module RawMaterialsApp
         log_transaction
       end
       instance = rmt_bin(id)
-      success_response("Updated rmt bin #{instance.status}",
+      success_response('Updated rmt bin',
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_rmt_bin(id)
-      name = rmt_bin(id).status
       repo.transaction do
         repo.delete_rmt_bin(id)
         log_status('rmt_bins', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted rmt bin #{name}")
+      success_response('Deleted rmt bin')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

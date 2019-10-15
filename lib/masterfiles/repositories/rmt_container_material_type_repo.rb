@@ -41,7 +41,7 @@ module MasterfilesApp
     end
 
     def container_material_owners(rmt_container_material_type_id)
-      DB["SELECT co.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
+      DB["SELECT co.rmt_material_owner_party_role_id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
           FROM rmt_container_material_owners co
           JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
           LEFT OUTER JOIN organizations o ON o.id = pr.organization_id

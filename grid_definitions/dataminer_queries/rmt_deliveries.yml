@@ -11,7 +11,7 @@
   JOIN "farms" ON "farms"."id" = "rmt_deliveries"."farm_id" JOIN "orchards" ON "orchards"."id"
   = "rmt_deliveries"."orchard_id" JOIN "pucs" ON "pucs"."id" = "rmt_deliveries"."puc_id"
   LEFT OUTER JOIN "rmt_delivery_destinations" ON "rmt_delivery_destinations"."id" = "rmt_deliveries"."rmt_delivery_destination_id"
-  JOIN "seasons" ON "seasons"."id" = "rmt_deliveries"."season_id" JOIN "rmt_bins" ON "rmt_bins".rmt_delivery_id="rmt_deliveries".id
+  JOIN "seasons" ON "seasons"."id" = "rmt_deliveries"."season_id" LEFT OUTER JOIN "rmt_bins" ON "rmt_bins".rmt_delivery_id="rmt_deliveries".id
   GROUP BY "rmt_deliveries"."id", "rmt_deliveries"."orchard_id", "rmt_deliveries"."cultivar_id",
   "rmt_deliveries"."rmt_delivery_destination_id", "rmt_deliveries"."season_id", "rmt_deliveries"."farm_id",
   "rmt_deliveries"."puc_id", "rmt_deliveries"."truck_registration_number", "rmt_deliveries"."qty_damaged_bins",

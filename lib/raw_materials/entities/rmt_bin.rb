@@ -9,12 +9,11 @@ module RawMaterialsApp
     attribute :orchard_id, Types::Integer
     attribute :farm_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
-    attribute :rmt_container_material_owner_id, Types::Integer
+    attribute :rmt_material_owner_party_role_id, Types::Integer
     attribute :rmt_container_type_id, Types::Integer
     attribute :rmt_container_material_type_id, Types::Integer
     attribute :cultivar_group_id, Types::Integer
     attribute :puc_id, Types::Integer
-    attribute :status, Types::String
     attribute :exit_ref, Types::String
     attribute :qty_bins, Types::Integer
     attribute :bin_asset_number, Types::Integer
@@ -47,12 +46,11 @@ module RawMaterialsApp
     attribute :orchard_id, Types::Integer
     attribute :farm_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
-    attribute :rmt_container_material_owner_id, Types::Integer
+    attribute :rmt_material_owner_party_role_id, Types::Integer
     attribute :rmt_container_type_id, Types::Integer
     attribute :rmt_container_material_type_id, Types::Integer
     attribute :cultivar_group_id, Types::Integer
     attribute :puc_id, Types::Integer
-    attribute :status, Types::String
     attribute :exit_ref, Types::String
     attribute :qty_bins, Types::Integer
     attribute :bin_asset_number, Types::Integer
@@ -80,5 +78,8 @@ module RawMaterialsApp
     attribute :puc_code, Types::String
     attribute :cultivar_name, Types::String
     attribute :season_code, Types::String
+    attribute :container_type_code, Types::String
+    attribute :container_material_type_code, Types::String
+    # attribute :container_material_owner_code, Types::String
   end
 end

@@ -19,7 +19,7 @@ module UiRules
       @rules[:capture_container_material_owner] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
 
       @rules[:show_rmt_container_material_type_id] = !@form_object.rmt_container_material_type_id.nil?
-      @rules[:show_rmt_container_material_owner_id] = !@form_object.rmt_container_material_owner_id.nil?
+      @rules[:show_rmt_material_owner_party_role_id] = !@form_object.rmt_material_owner_party_role_id.nil?
       @rules[:show_rmt_inner_container_type_id] = !@form_object.rmt_inner_container_type_id.nil?
       @rules[:show_rmt_inner_container_material_id] = !@form_object.rmt_inner_container_material_id.nil?
 
@@ -59,7 +59,7 @@ module UiRules
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       rmt_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_container_type_id)&.container_type_code
       rmt_container_material_type_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_container_material_type_id)&.container_material_type_code
-      rmt_container_material_owner_id_label = (@repo.find_rmt_container_material_owner(@form_object.rmt_container_material_owner_id) || {})[:container_material_owner]
+      rmt_material_owner_party_role_id_label = (@repo.find_rmt_container_material_owner(@form_object.rmt_material_owner_party_role_id, @form_object.rmt_container_material_type_id) || {})[:container_material_owner]
       rmt_inner_container_type_id_label = MasterfilesApp::RmtContainerTypeRepo.new.find_rmt_container_type(@form_object.rmt_inner_container_type_id)&.container_type_code
       rmt_inner_container_material_id_label = MasterfilesApp::RmtContainerMaterialTypeRepo.new.find_rmt_container_material_type(@form_object.rmt_inner_container_material_id)&.container_material_type_code
       farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
@@ -74,7 +74,7 @@ module UiRules
       fields[:bin_fullness] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: rmt_container_material_type_id_label, caption: 'Container Material Type' }
-      fields[:rmt_container_material_owner_id] = { renderer: :label, with_value: rmt_container_material_owner_id_label, caption: 'Container Material Owner' }
+      fields[:rmt_material_owner_party_role_id] = { renderer: :label, with_value: rmt_material_owner_party_role_id_label, caption: 'Container Material Owner' }
       fields[:rmt_inner_container_type_id] = { renderer: :label, with_value: rmt_inner_container_type_id_label, caption: 'Inner Container Type' }
       fields[:rmt_inner_container_material_id] = { renderer: :label, with_value: rmt_inner_container_material_id_label, caption: 'Inner Container Material Type' }
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
@@ -92,7 +92,7 @@ module UiRules
         rmt_container_material_type_id: { renderer: :select, options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }),
                                           disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
                                           caption: 'Container Material Type', required: true, prompt: true },
-        rmt_container_material_owner_id: { renderer: :select, options: !@form_object.rmt_container_material_type_id.to_s.empty? ? @repo.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true },
+        rmt_material_owner_party_role_id: { renderer: :select, options: !@form_object.rmt_container_material_type_id.to_s.empty? ? @repo.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true },
         qty_inner_bins: { renderer: :integer, hide_on_load: @rules[:capture_inner_bins] ? false : true }
       }
     end
@@ -115,7 +115,7 @@ module UiRules
                                     orchard_id: @delivery.orchard_id,
                                     farm_id: nil,
                                     rmt_class_id: nil,
-                                    rmt_container_material_owner_id: nil,
+                                    rmt_material_owner_party_role_id: nil,
                                     rmt_container_type_id: (@default_rmt_container_type || {})[:id],
                                     rmt_container_material_type_id: nil,
                                     cultivar_group_id: nil,
@@ -154,11 +154,5 @@ module UiRules
         behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
       end
     end
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
   end
 end

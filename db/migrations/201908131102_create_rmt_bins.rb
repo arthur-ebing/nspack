@@ -10,7 +10,7 @@ Sequel.migration do
       foreign_key :orchard_id, :orchards, type: :integer, null: false
       foreign_key :farm_id, :farms, type: :integer, null: false
       foreign_key :rmt_class_id, :rmt_classes, type: :integer
-      foreign_key :rmt_container_material_owner_id, :rmt_container_material_owners, type: :integer
+      foreign_key :rmt_material_owner_party_role_id, :party_roles, type: :integer
       foreign_key :rmt_container_type_id, :rmt_container_types, type: :integer, null: false
       foreign_key :rmt_container_material_type_id, :rmt_container_material_types, type: :integer
       foreign_key :cultivar_group_id, :cultivar_groups, type: :integer

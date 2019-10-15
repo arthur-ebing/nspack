@@ -30,6 +30,9 @@ module RawMaterialsApp
                                             { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
                                             { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
                                             { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
+                                            { parent_table: :rmt_container_types, columns: [:container_type_code], flatten_columns: { container_type_code: :container_type_code } },
+                                            { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
+                                            # { parent_table: :party_roles, columns: [:container_material_owner_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
                                             { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
                             wrapper: RmtBinFlat)
     end
@@ -91,7 +94,7 @@ module RawMaterialsApp
     end
 
     def find_container_material_owners_by_container_material_type(container_material_type_id)
-      DB["SELECT co.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS party_name
+      DB["SELECT pr.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS party_name
           FROM rmt_container_material_owners co
           JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
           LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
@@ -100,14 +103,14 @@ module RawMaterialsApp
           WHERE co.rmt_container_material_type_id = ?", container_material_type_id].map { |o| [o[:party_name], o[:id]] }
     end
 
-    def find_rmt_container_material_owner(id)
-      DB["SELECT co.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
+    def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
+      DB["SELECT pr.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
           FROM rmt_container_material_owners co
           JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
           LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
           LEFT OUTER JOIN people p ON p.id = pr.person_id
           LEFT OUTER JOIN roles r ON r.id = pr.role_id
-          WHERE co.id = ?", id].first
+          WHERE co.rmt_material_owner_party_role_id = #{rmt_material_owner_party_role_id} and co.rmt_container_material_type_id = #{rmt_container_material_type_id}"].first
     end
 
     def find_rmt_delivery_by_bin_id(id)

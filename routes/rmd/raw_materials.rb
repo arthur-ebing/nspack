@@ -46,7 +46,7 @@ class Nspack < Roda
                           required: true, prompt: true)
         end
         if capture_container_material && capture_container_material_owner
-          form.add_select(:rmt_container_material_owner_id, 'Container Material Owner',
+          form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
                           items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
                           required: true, prompt: true)
         end
@@ -97,7 +97,7 @@ class Nspack < Roda
 
         if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
           actions << OpenStruct.new(type: :replace_select_options,
-                                    dom_id: 'rmt_bin_rmt_container_material_owner_id',
+                                    dom_id: 'rmt_bin_rmt_material_owner_party_role_id',
                                     options_array: [])
         end
 
@@ -107,9 +107,9 @@ class Nspack < Roda
       r.on 'container_material_type_combo_changed' do
         if !params[:changed_value].to_s.empty?
           container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
-          json_replace_select_options('rmt_bin_rmt_container_material_owner_id', container_material_owners)
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', container_material_owners)
         else
-          json_replace_select_options('rmt_bin_rmt_container_material_owner_id', [])
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', [])
         end
       end
     end
