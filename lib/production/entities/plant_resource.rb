@@ -7,15 +7,21 @@ module ProductionApp
     attribute :system_resource_id, Types::Integer
     attribute :plant_resource_code, Types::String
     attribute :description, Types::String
+    attribute :location_id, Types::Integer
+    attribute? :resource_properties, Types::JSON::Hash
     attribute? :active, Types::Bool
   end
-  class PlantResourceWithSystem < Dry::Struct
+  class PlantResourceFlat < Dry::Struct
     attribute :id, Types::Integer
     attribute :plant_resource_type_id, Types::Integer
+    attribute :plant_resource_type_code, Types::String
     attribute :system_resource_id, Types::Integer
     attribute :plant_resource_code, Types::String
     attribute :description, Types::String
     attribute :system_resource_code, Types::String
+    attribute :location_id, Types::Integer
+    attribute :location_long_code, Types::String
+    attribute? :resource_properties, Types::JSON::Hash
     attribute? :active, Types::Bool
   end
 end

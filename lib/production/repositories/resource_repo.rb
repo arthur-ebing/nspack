@@ -63,6 +63,21 @@ module ProductionApp
       DB[:plant_resource_types].where(plant_resource_type_code: possible_codes).select_map(%i[plant_resource_type_code id])
     end
 
+    def find_plant_resource_flat(id)
+      find_with_association(:plant_resources,
+                            id,
+                            parent_tables: [{ parent_table: :system_resources,
+                                              columns: [:system_resource_code],
+                                              flatten_columns: { system_resource_code: :system_resource_code } },
+                                            { parent_table: :plant_resource_types,
+                                              columns: [:plant_resource_type_code],
+                                              flatten_columns: { plant_resource_type_code: :plant_resource_type_code } },
+                                            { parent_table: :locations,
+                                              columns: [:location_long_code],
+                                              flatten_columns: { location_long_code: :location_long_code } }],
+                            wrapper: PlantResourceFlat)
+    end
+
     def create_plant_resource_type(attrs)
       new_attrs = attrs.to_h
       new_attrs[:attribute_rules] = hash_for_jsonb_col(attrs[:attribute_rules])
@@ -71,7 +86,11 @@ module ProductionApp
     end
 
     def create_root_plant_resource(params)
-      id = create_plant_resource(params)
+      id = if Crossbeams::Config::ResourceDefinitions::SITE == plant_resource_type_code(params[:plant_resource_type_id])
+             create_plant_resource(params.to_h.merge(resource_properties: { company_prefix: AppConst::COMPANY_PREFIX }))
+           else
+             create_plant_resource(params)
+           end
       DB[:tree_plant_resources].insert(ancestor_plant_resource_id: id,
                                        descendant_plant_resource_id: id,
                                        path_length: 0)
@@ -98,6 +117,10 @@ module ProductionApp
       id
     end
 
+    def plant_resource_type_code(plant_resource_type_id)
+      DB[:plant_resource_types].where(id: plant_resource_type_id).get(:plant_resource_type_code)
+    end
+
     def system_resource_type_id_from_code(system_resource_type)
       DB[:system_resource_types].where(system_resource_type_code: system_resource_type).get(:id)
     end
@@ -109,8 +132,30 @@ module ProductionApp
 
     def create_plant_resource(attrs)
       new_attrs = attrs.to_h
-      new_attrs[:plant_resource_attributes] = hash_for_jsonb_col(attrs[:plant_resource_attributes]) if attrs.to_h[:plant_resource_attributes]
+      new_attrs[:resource_properties] = hash_for_jsonb_col(attrs[:resource_properties]) if attrs.to_h[:resource_properties]
       create(:plant_resources, new_attrs)
+    end
+
+    def update_plant_resource(id, attrs)
+      new_attrs = attrs.to_h
+      properties_present = new_attrs.keys.include?(:resource_properties)
+      check_or_create_gln_sequence(new_attrs[:resource_properties][:gln]) if properties_present && new_attrs[:resource_properties][:gln]
+      new_attrs[:resource_properties] = hash_for_jsonb_col(attrs[:resource_properties]) if properties_present
+      update(:plant_resources, id, new_attrs)
+    end
+
+    def check_for_duplicate_gln(id, gln)
+      return ok_response if gln.empty?
+
+      query = <<~SQL
+        SELECT id FROM plant_resources
+        WHERE resource_properties ->> 'gln' = ?
+        AND id <> ?
+      SQL
+      rec = DB[query, gln, id].first
+      return ok_response if rec.nil?
+
+      failed_response("GLN #{gln} has already been used")
     end
 
     def delete_plant_resource(id)
@@ -219,6 +264,16 @@ module ProductionApp
       else
         "#{base}01"
       end
+    end
+
+    def check_or_create_gln_sequence(gln)
+      return if gln.nil? || gln.empty?
+
+      seq_name = "gln_seq_for_#{gln}"
+      query = "SELECT EXISTS(SELECT 0 FROM pg_class where relname = '#{seq_name}')"
+      return if DB[query].single_value
+
+      DB.run("CREATE SEQUENCE #{seq_name}")
     end
   end
 end

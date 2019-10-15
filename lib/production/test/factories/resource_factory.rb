@@ -11,6 +11,8 @@ module ProductionApp
         system_resource_id: system_resource_id,
         plant_resource_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
+        location_id: nil,
+        resource_properties: nil,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

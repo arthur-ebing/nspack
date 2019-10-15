@@ -180,6 +180,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         )
       end
 
+      r.on 'lookup_location', Integer do |location_id|
+        res = interactor.get_location_lookup(location_id)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'plant_resource_location_id',
+                                     value: location_id),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'plant_resource_location_long_code',
+                                     value: res.instance.location_long_code)],
+                     'Selected location')
+      end
+
       r.post do        # CREATE
         res = interactor.create_root_plant_resource(params[:plant_resource])
         if res.success

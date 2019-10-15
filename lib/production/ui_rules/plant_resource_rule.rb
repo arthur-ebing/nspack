@@ -29,6 +29,22 @@ module UiRules
     def set_edit_fields
       rules = @repo.plant_resource_definition(@form_object.plant_resource_type_id)
       fields[:plant_resource_code][:readonly] = true if rules[:non_editable_code]
+
+      at_ph_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::PACKHOUSE
+      at_gln_level = @form_object.plant_resource_type_code == AppConst::GLN_LEVEL
+      fields[:location_id] = { renderer: :lookup,
+                               lookup_name: :plant_resource_locations,
+                               lookup_key: :standard,
+                               # param_values: { plant_resource_id: @options[:id] },
+                               hidden_fields: %i[location_id],
+                               show_field: :location_long_code,
+                               caption: 'Select Location',
+                               invisible: !at_ph_level }
+      fields[:gln] = { renderer: :select,
+                       options: AppConst::GLN_OR_LINE_NUMBERS,
+                       prompt: true,
+                       parent_field: :resource_properties,
+                       invisible: !at_gln_level }
     end
 
     def common_fields
@@ -59,13 +75,7 @@ module UiRules
         make_new_form_object
         return
       end
-
-      @form_object = @repo.find_with_association(:plant_resources,
-                                                 @options[:id],
-                                                 parent_tables: [{ parent_table: :system_resources,
-                                                                   columns: [:system_resource_code],
-                                                                   flatten_columns: { system_resource_code: :system_resource_code } }],
-                                                 wrapper: ProductionApp::PlantResourceWithSystem)
+      @form_object = @repo.find_plant_resource_flat(@options[:id])
     end
 
     def make_new_form_object

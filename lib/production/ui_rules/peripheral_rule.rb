@@ -48,12 +48,7 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_with_association(:plant_resources,
-                                                 @options[:id],
-                                                 parent_tables: [{ parent_table: :system_resources,
-                                                                   columns: [:system_resource_code],
-                                                                   flatten_columns: { system_resource_code: :system_resource_code } }],
-                                                 wrapper: ProductionApp::PlantResourceWithSystem)
+      @form_object = @repo.find_plant_resource_flat(@options[:id])
     end
 
     def make_new_form_object

@@ -1,0 +1,15 @@
+---
+:dataminer_definition: locations
+:lookups:
+  :standard:
+    :url: /production/resources/plant_resources/lookup_location/$:id$
+    :section_caption: Select a Location
+    # :conditions: standard
+# :conditions:
+#   :standard:
+#     - :col: mr_skus.sku_number
+#       :op: in
+#       :val: $:allowed_sku_numbers$
+#     - :col: mr_sku_locations.location_id
+#       :op: in
+#       :val: $:allowed_locations$

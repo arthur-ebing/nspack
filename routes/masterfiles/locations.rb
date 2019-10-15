@@ -97,6 +97,20 @@ class Nspack < Roda
         end
       end
 
+      r.on 'print_barcode_via_robot' do # BARCODE
+        r.get do
+          show_partial { Masterfiles::Locations::Location::PrintBarcodeRobot.call(id) }
+        end
+        r.patch do
+          res = interactor.print_location_barcode_via_robot(id, request.ip, params[:location])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Locations::Location::PrintBarcodeRobot.call(id, form_values: params[:location], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'preview_barcode' do # BARCODE
         res = interactor.preview_location_barcode(id)
         if res.success

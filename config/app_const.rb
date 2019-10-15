@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A class for defining global constants in a central place.
-class AppConst
+class AppConst # rubocop:disable Metrics/ClassLength
   def self.development?
     ENV['RACK_ENV'] == 'development'
   end
@@ -37,6 +37,9 @@ class AppConst
   DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION = ENV['CAPTURE_TRUCK_AT_FRUIT_RECEPTION']
   SCAN_RMT_BIN_ASSET_NUMBERS = ENV['SCAN_RMT_BIN_ASSET_NUMBERS']
   USE_PERMANENT_RMT_BIN_BARCODES = ENV['USE_PERMANENT_RMT_BIN_BARCODES']
+  GLN_LEVEL = ENV.fetch('GLN_LEVEL')
+  COMPANY_PREFIX = ENV.fetch('COMPANY_PREFIX')
+  GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
 
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
