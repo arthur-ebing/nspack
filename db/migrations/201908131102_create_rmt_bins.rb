@@ -15,7 +15,6 @@ Sequel.migration do
       foreign_key :rmt_container_material_type_id, :rmt_container_material_types, type: :integer
       foreign_key :cultivar_group_id, :cultivar_groups, type: :integer
       foreign_key :puc_id, :pucs, type: :integer
-      String :status
       String :exit_ref
       String :bin_fullness
       Integer :qty_bins
@@ -31,8 +30,8 @@ Sequel.migration do
       Decimal :nett_weight
       Decimal :gross_weight
       TrueClass :active, default: true
-      TrueClass :bin_tipped
-      TrueClass :tipping
+      TrueClass :bin_tipped, default: false
+      TrueClass :tipping, default: false
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       DateTime :bin_received_date_time

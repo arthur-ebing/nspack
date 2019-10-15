@@ -14,7 +14,7 @@ Sequel.migration do
       Integer :qty_damaged_bins
       Integer :qty_empty_bins
       TrueClass :active, default: true
-      TrueClass :delivery_tipped
+      TrueClass :delivery_tipped, default: false
       Date :date_picked
       DateTime :date_delivered
       DateTime :tipping_complete_date_time

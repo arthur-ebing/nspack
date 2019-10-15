@@ -16,21 +16,32 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('deliveries', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id) }
+        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
+      end
+
+      r.on 'recalc_nett_weight' do   # EDIT
+        res = interactor.recalc_rmt_bin_nett_weight(id)
+        if res.success
+          # Ask James - I want to show success msg
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
+        else
+          # Ask James - I want to show error msg
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, form_errors: res.errors) }
+        end
       end
 
       r.is do
         r.get do       # SHOW
           check_auth!('deliveries', 'read')
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id) }
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
         end
 
         r.patch do     # UPDATE
           res = interactor.update_rmt_delivery(id, params[:rmt_delivery])
           if res.success
-            show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true) }
+            show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true) }
           else
-            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
           end
         end
 
@@ -59,6 +70,11 @@ class Nspack < Roda # rubocop:disable ClassLength
             row_keys = %i[
               id
               rmt_delivery_id
+              orchard_code
+              farm_code
+              puc_code
+              cultivar_name
+              season_code
               season_id
               cultivar_id
               orchard_id
@@ -210,7 +226,13 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.update_rmt_bin(id, params[:rmt_bin])
           if res.success
             row_keys = %i[
+              id
               rmt_delivery_id
+              orchard_code
+              farm_code
+              puc_code
+              cultivar_name
+              season_code
               season_id
               cultivar_id
               orchard_id

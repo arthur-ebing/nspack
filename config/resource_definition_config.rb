@@ -29,6 +29,7 @@ module Crossbeams
       # Peripherals
       SCALE = 'SCALE'
       PRINTER = 'PRINTER'
+      # SCN- : SCANNER (not required as a plant resource)
 
       # System resource types
       SERVER = 'SERVER'

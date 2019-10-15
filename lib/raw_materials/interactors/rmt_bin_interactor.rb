@@ -103,7 +103,7 @@ module RawMaterialsApp
     end
 
     def rmt_bin(id)
-      repo.find_rmt_bin(id)
+      repo.find_rmt_bin_flat(id)
     end
 
     def validate_rmt_bin_params(params)

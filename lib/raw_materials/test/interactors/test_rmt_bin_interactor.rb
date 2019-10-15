@@ -19,7 +19,7 @@ module RawMaterialsApp
     end
 
     def test_rmt_bin
-      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(fake_rmt_bin)
+      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin_flat).returns(fake_rmt_bin)
       entity = interactor.send(:rmt_bin, 1)
       assert entity.is_a?(RmtBin)
     end
@@ -29,7 +29,7 @@ module RawMaterialsApp
       attrs = fake_rmt_bin.to_h.reject { |k, _| k == :id }
       res = interactor.create_rmt_bin(delivery_id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(RmtBin, res.instance)
+      assert_instance_of(RmtBinFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -48,7 +48,7 @@ module RawMaterialsApp
       attrs[:qty_bins] = 99
       res = interactor.update_rmt_bin(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(RmtBin, res.instance)
+      assert_instance_of(RmtBinFlat, res.instance)
       assert_equal 99, res.instance.qty_bins
       refute_equal value, res.instance.qty_bins
     end

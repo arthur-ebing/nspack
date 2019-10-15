@@ -58,6 +58,23 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/AbcSize
+      # Ask Hans - Why this condition???
+      # return failed_response('No bin nett weights were calculated') unless AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+
+      repo.transaction do
+        rmt_bins = repo.find_bins_by_delivery_id(id)
+        rmt_bins.each do |rmt_bin|
+          tare_weight = repo.get_rmt_bin_tare_weight(rmt_bin)
+          # Ask Hans - Do calc for tipped bins????
+          repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight)) if rmt_bin[:gross_weight] && tare_weight && !rmt_bin[:nett_weight]
+        end
+      end
+      success_response('Bin nett weight calculated successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def lookup_farms_pucs(farm_id)
       repo.farm_pucs(farm_id)
     end

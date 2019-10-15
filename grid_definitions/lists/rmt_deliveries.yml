@@ -17,7 +17,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: delivery_tipped
+  :hide_if_true: recalc_nett_weight
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/recalc_nett_weight"
+  :text: recalc_nett_weight
+  :icon: recalc
+  :popup: false
 #- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/complete"
 #  :text: Complete
 #  :icon: toggle-on
