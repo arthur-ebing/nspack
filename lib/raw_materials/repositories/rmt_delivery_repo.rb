@@ -23,6 +23,19 @@ module RawMaterialsApp
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
 
+    def update_rmt_bins_inherited_field(id, res)
+      # Ask hans:
+      # selection/change of delivery.orchard affects the options for rmt_bin.cultivar drop_down. What should happen to
+      # rmt_bin.cultivar on delivery.orchard????
+      updates = { orchard_id: res.output[:orchard_id],
+                  season_id: res.output[:season_id],
+                  bin_received_date_time: res.output[:date_delivered].to_s,
+                  farm_id: res.output[:farm_id],
+                  puc_id: res.output[:puc_id] }
+
+      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false).update(updates)
+    end
+
     def find_rmt_bin_flat(id)
       find_with_association(:rmt_bins,
                             id,

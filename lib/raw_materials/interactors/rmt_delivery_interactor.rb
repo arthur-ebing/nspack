@@ -38,6 +38,7 @@ module RawMaterialsApp
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
+        repo.update_rmt_bins_inherited_field(id, res)
         log_transaction
       end
       instance = rmt_delivery(id)

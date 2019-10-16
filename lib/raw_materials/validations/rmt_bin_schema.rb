@@ -9,6 +9,7 @@ module RawMaterialsApp
     required(:rmt_delivery_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).filled(:int?)
+    required(:puc_id, :integer).filled(:int?)
     required(:qty_bins, :integer).maybe(:int?)
     optional(:qty_inner_bins, :integer).maybe(:int?)
     optional(:nett_weight, :decimal).maybe(:decimal?)
