@@ -34,6 +34,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               edi_in_pallet_base
               edi_out_pallet_base
               cartons_per_layer
+              material_mass
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -72,6 +73,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             edi_in_pallet_base
             edi_out_pallet_base
             cartons_per_layer
+            material_mass
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

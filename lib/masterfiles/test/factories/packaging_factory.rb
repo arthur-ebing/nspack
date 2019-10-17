@@ -11,6 +11,7 @@ module MasterfilesApp
         edi_in_pallet_base: Faker::Lorem.word,
         edi_out_pallet_base: Faker::Lorem.word,
         cartons_per_layer: Faker::Number.number(4),
+        material_mass: Faker::Number.decimal,
         active: true
       }
       DB[:pallet_bases].insert(default.merge(opts))

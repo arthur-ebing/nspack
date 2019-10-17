@@ -24,6 +24,7 @@ module Masterfiles
               form.add_field :edi_in_pallet_base
               form.add_field :edi_out_pallet_base
               form.add_field :cartons_per_layer
+              form.add_field :material_mass
             end
           end
 

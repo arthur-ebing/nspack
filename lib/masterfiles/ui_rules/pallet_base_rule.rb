@@ -22,6 +22,7 @@ module UiRules
       fields[:edi_in_pallet_base] = { renderer: :label }
       fields[:edi_out_pallet_base] = { renderer: :label }
       fields[:cartons_per_layer] = { renderer: :label }
+      fields[:material_mass] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pallet_formats] = { renderer: :list, items: pallet_base_pallet_formats }
     end
@@ -34,7 +35,8 @@ module UiRules
         width: { renderer: :integer, required: true },
         edi_in_pallet_base: {},
         edi_out_pallet_base: {},
-        cartons_per_layer: { renderer: :integer, required: true }
+        cartons_per_layer: { renderer: :integer, required: true },
+        material_mass: { renderer: :numeric }
       }
     end
 
@@ -54,7 +56,8 @@ module UiRules
                                     width: nil,
                                     edi_in_pallet_base: nil,
                                     edi_out_pallet_base: nil,
-                                    cartons_per_layer: nil)
+                                    cartons_per_layer: nill,
+                                    material_mass: nil)
     end
 
     def pallet_base_pallet_formats

@@ -10,6 +10,7 @@ module MasterfilesApp
     attribute :edi_in_pallet_base, Types::String
     attribute :edi_out_pallet_base, Types::String
     attribute :cartons_per_layer, Types::Integer
+    attribute :material_mass, Types::Decimal
     attribute? :active, Types::Bool
   end
 end

@@ -1,9 +1,10 @@
 ---
 :caption: Pallet Bases
-:sql: SELECT "pallet_bases"."id", "pallet_bases"."pallet_base_code", "pallet_bases"."description",
-  "pallet_bases"."length", "pallet_bases"."width", "pallet_bases"."edi_in_pallet_base",
-  "pallet_bases"."edi_out_pallet_base", "pallet_bases"."cartons_per_layer", "pallet_bases"."active",
-  "pallet_bases"."created_at", "pallet_bases"."updated_at" FROM "pallet_bases"
+:sql: SELECT "pallet_bases"."id", "pallet_bases"."pallet_base_code", "pallet_bases"."description", "pallet_bases"."length",
+  "pallet_bases"."width", "pallet_bases"."edi_in_pallet_base", "pallet_bases"."edi_out_pallet_base",
+  "pallet_bases"."cartons_per_layer", "pallet_bases"."material_mass", "pallet_bases"."active",
+  "pallet_bases"."created_at", "pallet_bases"."updated_at"
+  FROM "pallet_bases"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -136,9 +137,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  material_mass:
+    :name: material_mass
+    :sequence_no: 9
+    :caption: Material mass
+    :namespaced_name: pallet_bases.material_mass
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Active
     :namespaced_name: pallet_bases.active
     :data_type: :boolean
@@ -154,7 +171,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: pallet_bases.created_at
     :data_type: :datetime
@@ -170,7 +187,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: pallet_bases.updated_at
     :data_type: :datetime

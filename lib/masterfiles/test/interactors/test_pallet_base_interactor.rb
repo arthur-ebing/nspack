@@ -77,6 +77,7 @@ module MasterfilesApp
         edi_in_pallet_base: 'ABC',
         edi_out_pallet_base: 'ABC',
         cartons_per_layer: 1,
+        material_mass: 1.0,
         active: true
       }
     end
