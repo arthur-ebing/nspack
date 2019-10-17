@@ -25,8 +25,15 @@ module MasterfilesApp
                             wrapper: VesselFlat)
     end
 
-    def for_select_vessels_by_voyage_type_id(id)
-      DB[:vessels].join(:vessel_types, id: :vessel_type_id).where(voyage_type_id: id).order(:vessel_type_code).select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
+    def for_select_vessels(voyage_type_id: nil, voyage_type_code: nil)
+      # return nil if voyage_type_id.to_s.empty? & voyage_type_code.to_s.empty?
+
+      ds = DB[:vessels]
+      ds = ds.join(:vessel_types, id: :vessel_type_id)
+      ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil?
+      ds = ds.where(voyage_type_code: voyage_type_code) unless voyage_type_code.nil?
+      ds = ds.order(:vessel_type_code)
+      ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
     end
   end
 end

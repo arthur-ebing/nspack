@@ -21,6 +21,7 @@ module Masterfiles
               form.add_field :voyage_type_id
               form.add_field :port_code
               form.add_field :description
+              form.add_field :city_id
             end
           end
 

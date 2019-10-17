@@ -132,6 +132,7 @@ Sequel.migration do
       primary_key :id
       foreign_key :port_type_id, :port_types, type: :integer, null: false
       foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
+      foreign_key :city_id, :destination_cities, type: :integer
       String :port_code, null: false
       String :description
       TrueClass :active, null: false, default: true

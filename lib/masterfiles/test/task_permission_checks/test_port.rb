@@ -12,6 +12,7 @@ module MasterfilesApp
         id: 1,
         port_type_id: 1,
         voyage_type_id: 1,
+        city_id: 1,
         port_code: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true

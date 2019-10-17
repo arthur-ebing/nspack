@@ -19,7 +19,7 @@ Sequel.migration do
       String :customer_order_number
       String :customer_reference
       String :exporter_certificate_code
-      DateTime :shipped_date, null: false
+      DateTime :shipped_date
       TrueClass :shipped, default: false
       TrueClass :transfer_load, default: false
       TrueClass :active, null: false, default: true

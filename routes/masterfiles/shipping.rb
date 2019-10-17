@@ -241,6 +241,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               port_type_id
               voyage_type_id
               port_code
+              city_name
               description
               port_type_code
               voyage_type_code
@@ -278,6 +279,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             port_type_id
             voyage_type_id
             port_code
+            city_name
             description
             port_type_code
             voyage_type_code
@@ -397,6 +399,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               vessel_type_id
               vessel_code
               description
+              vessel_type_code
               voyage_type_code
               active
             ]
@@ -433,6 +436,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             vessel_code
             description
             vessel_type_code
+            voyage_type_code
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys), notice: res.message)
