@@ -142,35 +142,3 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
          AND functional_area_id = (SELECT id FROM functional_areas
                                    WHERE functional_area_name = 'Production')),
          'Search Production runs', '/search/production_runs', 2);
-
--- Grouped in List Objects
-INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
-         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
-        'Cartons', 'List Objects', '/list/cartons', 3);
-
---INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
---VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
---         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
---        'Bins', 'List Objects', '/list/bins', 4);
---
---INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
---VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
---         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
---        'Pallets', 'List Objects', '/list/pallets', 5);
-
--- Grouped in Search Objects
-INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
-VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
-         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
-        'Cartons', 'Search Objects', '/search/cartons', 6);
-
---INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
---VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
---         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
---        'Bins', 'Search Objects', '/search/bins', 7);
---
---INSERT INTO program_functions (program_id, program_function_name, group_name, url, program_function_sequence)
---VALUES ((SELECT id FROM programs WHERE program_name = 'Runs'
---         AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = 'Production')),
---        'Pallets', 'Search Objects', '/search/pallets', 8);

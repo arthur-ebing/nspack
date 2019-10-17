@@ -1,0 +1,69 @@
+---
+:dataminer_definition: pallet_sequences
+:captions:
+  :conditions:
+    :active: Active Pallet Sequences
+    :daily_pack: Daily Pack Pallet Sequences
+    :in_stock: Pallet Sequences in stock
+    :allocated_stock: Allocated Pallet Sequences
+    :unallocated_stock: Unallocated Pallet Sequences
+    :shipped: Shipped Pallet Sequences
+    :scrapped: Scrapped Pallet Sequences
+    :failed_inspections: Failed Inspections Pallet Sequences
+    :failed_verifications: Failed Verifications Pallet Sequences
+:conditions:
+  :standard:
+    - :col: id
+      :op: =
+      :val: $:id$
+  :active:
+    - :col: active
+      :op: =
+      :val: $:active$
+  :daily_pack:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+  :in_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+  :allocated_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: allocated
+      :op: =
+      :val: $:allocated$
+  :unallocated_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: allocated
+      :op: =
+      :val: $:allocated$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: $:shipped$
+  :scrapped:
+    - :col: scrapped
+      :op: =
+      :val: $:scrapped$
+  :failed_inspections:
+    - :col: inspected
+      :op: =
+      :val: $:inspected$
+    - :col: govt_inspection_passed
+      :op: =
+      :val: $:govt_inspection_passed$
+  :failed_verifications:
+    - :col: verified
+      :op: =
+      :val: $:verified$
+    - :col: verification_passed
+      :op: =
+      :val: $:verification_passed$
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$

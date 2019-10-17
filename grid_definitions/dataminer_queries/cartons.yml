@@ -788,7 +788,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 3
-  :list_def: SELECT id FROM production_runs
+  :list_def:
 - :column: cartons.created_at
   :caption: Label verified at
   :data_type: :date
@@ -796,7 +796,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 4
-  :list_def: SELECT id FROM production_runs
+  :list_def:
 - :column: packhouses.plant_resource_code
   :caption: Packhouce
   :data_type: :string

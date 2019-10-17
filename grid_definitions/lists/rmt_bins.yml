@@ -29,6 +29,11 @@
     - :col: rmt_bins.rmt_delivery_id
       :op: =
       :val: $:rmt_bins.delivery_id$
+  :tipped:
+    - :col: rmt_bins.bin_tipped
+      :op: =
+      :val: $:tipped$
+
 
 #- :url: "/raw_materials/deliveries/rmt_bins/$:id$/complete"
 #  :text: Complete

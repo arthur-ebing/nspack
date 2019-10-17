@@ -1,0 +1,819 @@
+---
+:caption: Pallets
+:sql: SELECT id, pallet_number, pallet_age, shipped, in_stock, inspected,
+  palletized, created_at, exit_ref, palletized_at, govt_first_inspection_at, shipped_at,
+  govt_reinspection_at, allocated_at, cold_age, ambient_age, gross_weight, nett_weight,
+  gross_weight_measured_at, phc, scrapped, scrapped_at, partially_palletized, partially_palletized_at,
+  reinspected, status, build_status, fruit_sticker, govt_inspection_passed, internal_inspection_passed,
+  inspection_age, internal_inspection_at, internal_reinspection_at, stock_age, stock_created_at,
+  intake_created_at, first_cold_storage_at, allocated, pallet_verification_failed,
+  plt_packhouse, plt_line, active
+  FROM vw_pallet_sequence_flat
+  WHERE pallet_sequence_number = (SELECT MIN(pallet_sequence_number)
+  FROM pallets p JOIN pallet_sequences ps ON p.id = ps.pallet_id
+  WHERE NOT scrapped AND p.id = vw_pallet_sequence_flat.id)
+  ORDER BY id DESC
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 2
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_age:
+    :name: pallet_age
+    :sequence_no: 3
+    :caption: Pallet age
+    :namespaced_name: pallet_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 4
+    :caption: Shipped
+    :namespaced_name: shipped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  in_stock:
+    :name: in_stock
+    :sequence_no: 5
+    :caption: In stock
+    :namespaced_name: in_stock
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected:
+    :name: inspected
+    :sequence_no: 6
+    :caption: Inspected
+    :namespaced_name: inspected
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletized:
+    :name: palletized
+    :sequence_no: 7
+    :caption: Palletized
+    :namespaced_name: palletized
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 8
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exit_ref:
+    :name: exit_ref
+    :sequence_no: 9
+    :caption: Exit ref
+    :namespaced_name: exit_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletized_at:
+    :name: palletized_at
+    :sequence_no: 10
+    :caption: Palletized at
+    :namespaced_name: palletized_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_first_inspection_at:
+    :name: govt_first_inspection_at
+    :sequence_no: 11
+    :caption: Govt first inspection at
+    :namespaced_name: govt_first_inspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 12
+    :caption: Shipped at
+    :namespaced_name: shipped_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_reinspection_at:
+    :name: govt_reinspection_at
+    :sequence_no: 13
+    :caption: Govt reinspection at
+    :namespaced_name: govt_reinspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_at:
+    :name: allocated_at
+    :sequence_no: 14
+    :caption: Allocated at
+    :namespaced_name: allocated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cold_age:
+    :name: cold_age
+    :sequence_no: 15
+    :caption: Cold age
+    :namespaced_name: cold_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ambient_age:
+    :name: ambient_age
+    :sequence_no: 16
+    :caption: Ambient age
+    :namespaced_name: ambient_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 17
+    :caption: Gross weight
+    :namespaced_name: gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 18
+    :caption: Nett weight
+    :namespaced_name: nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight_measured_at:
+    :name: gross_weight_measured_at
+    :sequence_no: 19
+    :caption: Gross weight measured at
+    :namespaced_name: gross_weight_measured_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  phc:
+    :name: phc
+    :sequence_no: 20
+    :caption: Phc
+    :namespaced_name: phc
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped:
+    :name: scrapped
+    :sequence_no: 21
+    :caption: Scrapped
+    :namespaced_name: scrapped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped_at:
+    :name: scrapped_at
+    :sequence_no: 22
+    :caption: Scrapped at
+    :namespaced_name: scrapped_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  partially_palletized:
+    :name: partially_palletized
+    :sequence_no: 23
+    :caption: Partially palletized
+    :namespaced_name: partially_palletized
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  partially_palletized_at:
+    :name: partially_palletized_at
+    :sequence_no: 24
+    :caption: Partially palletized at
+    :namespaced_name: partially_palletized_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reinspected:
+    :name: reinspected
+    :sequence_no: 25
+    :caption: Reinspected
+    :namespaced_name: reinspected
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 26
+    :caption: Status
+    :namespaced_name: status
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  build_status:
+    :name: build_status
+    :sequence_no: 27
+    :caption: Build status
+    :namespaced_name: build_status
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker:
+    :name: fruit_sticker
+    :sequence_no: 28
+    :caption: Fruit sticker
+    :namespaced_name: fruit_sticker
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_inspection_passed:
+    :name: govt_inspection_passed
+    :sequence_no: 29
+    :caption: Govt inspection passed
+    :namespaced_name: govt_inspection_passed
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_inspection_passed:
+    :name: internal_inspection_passed
+    :sequence_no: 30
+    :caption: Internal inspection passed
+    :namespaced_name: internal_inspection_passed
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_age:
+    :name: inspection_age
+    :sequence_no: 31
+    :caption: Inspection age
+    :namespaced_name: inspection_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_inspection_at:
+    :name: internal_inspection_at
+    :sequence_no: 32
+    :caption: Internal inspection at
+    :namespaced_name: internal_inspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_reinspection_at:
+    :name: internal_reinspection_at
+    :sequence_no: 33
+    :caption: Internal reinspection at
+    :namespaced_name: internal_reinspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_age:
+    :name: stock_age
+    :sequence_no: 34
+    :caption: Stock age
+    :namespaced_name: stock_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_created_at:
+    :name: stock_created_at
+    :sequence_no: 35
+    :caption: Stock created at
+    :namespaced_name: stock_created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  intake_created_at:
+    :name: intake_created_at
+    :sequence_no: 36
+    :caption: Intake created at
+    :namespaced_name: intake_created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  first_cold_storage_at:
+    :name: first_cold_storage_at
+    :sequence_no: 37
+    :caption: First cold storage at
+    :namespaced_name: first_cold_storage_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated:
+    :name: allocated
+    :sequence_no: 38
+    :caption: Allocated
+    :namespaced_name: allocated
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_verification_failed:
+    :name: pallet_verification_failed
+    :sequence_no: 39
+    :caption: Pallet verification failed
+    :namespaced_name: pallet_verification_failed
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plt_packhouse:
+    :name: plt_packhouse
+    :sequence_no: 40
+    :caption: Plt packhouse
+    :namespaced_name: plt_packhouse
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plt_line:
+    :name: plt_line
+    :sequence_no: 41
+    :caption: Plt line
+    :namespaced_name: plt_line
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 42
+    :caption: Active
+    :namespaced_name: active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: id
+  :caption: Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: pallet_number
+  :caption: Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: 
+- :column: in_stock
+  :caption: In Stock?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def:
+  - true
+  - false
+- :column: allocated
+  :caption: Allocated?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def:
+  - true
+  - false
+- :column: shipped
+  :caption: Shipped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def:
+  - true
+  - false
+- :column: scrapped
+  :caption: Scrapped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def:
+  - true
+  - false
+- :column: inspected
+  :caption: Inspected?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def:
+  - true
+  - false
+- :column: reinspected
+  :caption: Reinspected?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 6
+  :list_def:
+  - true
+  - false
+- :column: palletized
+  :caption: Palletized?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 7
+  :list_def:
+  - true
+  - false
+- :column: partially_palletized
+  :caption: Partially Palletized?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def:
+  - true
+  - false
+- :column: pallet_verification_failed
+  :caption: Pallet Verified?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def:
+  - true
+  - false
+- :column: govt_inspection_passed
+  :caption: Govt inspection passed?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 10
+  :list_def:
+  - true
+  - false
+- :column: active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 11
+  :list_def:
+  - true
+  - false

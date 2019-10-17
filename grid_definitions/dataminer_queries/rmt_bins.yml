@@ -953,3 +953,13 @@
 #  :ordered_list: false
 #  :ui_priority: 1
 #  :list_def:
+- :column: rmt_bins.bin_tipped
+  :caption: Tipped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 7
+  :list_def:
+    - true
+    - false
