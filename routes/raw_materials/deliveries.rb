@@ -22,12 +22,11 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'recalc_nett_weight' do   # EDIT
         res = interactor.recalc_rmt_bin_nett_weight(id)
         if res.success
-          # Ask James - I want to show success msg
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
+          flash[:notice] = res.message
         else
-          # Ask James - I want to show error msg
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, form_errors: res.errors) }
+          flash[:error] = res.message
         end
+        r.redirect(" /raw_materials/deliveries/rmt_deliveries/#{id}/edit")
       end
 
       r.is do
@@ -39,6 +38,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do     # UPDATE
           res = interactor.update_rmt_delivery(id, params[:rmt_delivery])
           if res.success
+            # Ask james: how to refresh bins grid
             show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true) }
           else
             re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }

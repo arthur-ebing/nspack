@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryInteractor < BaseInteractor
+  class RmtDeliveryInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
       assert_permission!(:create)
       if !params[:cultivar_id].nil_or_empty? && !params[:date_delivered].nil_or_empty?
@@ -32,9 +32,12 @@ module RawMaterialsApp
     end
 
     def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
-      params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered])
+      params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered]) unless params[:cultivar_id].nil_or_empty? || params[:date_delivered].to_s.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      validation = child_bins_cultivars_still_valid?(id, params[:orchard_id])
+      return failed_response('Delivery could not be updated: delivery orchard is out of sync with bins orchard') unless validation
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
@@ -48,6 +51,13 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def child_bins_cultivars_still_valid?(id, delivery_orchard_id)
+      delivery_cultivars = lookup_orchard_cultivars(delivery_orchard_id).map { |p| p[1] }
+      bins_cultivars = repo.find_delivery_untipped_bins(id).map { |p| p[:cultivar_id] }
+
+      (bins_cultivars.uniq - delivery_cultivars).empty?
+    end
+
     def delete_rmt_delivery(id)
       repo.transaction do
         repo.delete_rmt_delivery(id)
@@ -59,16 +69,19 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/AbcSize
-      # Ask Hans - Why this condition???
-      # return failed_response('No bin nett weights were calculated') unless AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
-
+    def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize, Metrics/PerceivedComplexity
       repo.transaction do
         rmt_bins = repo.find_bins_by_delivery_id(id)
         rmt_bins.each do |rmt_bin|
           tare_weight = repo.get_rmt_bin_tare_weight(rmt_bin)
-          # Ask Hans - Do calc for tipped bins????
-          repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight)) if rmt_bin[:gross_weight] && tare_weight && !rmt_bin[:nett_weight]
+
+          if !rmt_bin[:bin_tipped] && rmt_bin[:gross_weight] && tare_weight
+            # override nett_weight
+            repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight))
+          elsif rmt_bin[:bin_tipped] && rmt_bin[:gross_weight] && tare_weight && !rmt_bin[:nett_weight]
+            # only set nett weight if it is null
+            repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight))
+          end
         end
       end
       success_response('Bin nett weight calculated successfully')

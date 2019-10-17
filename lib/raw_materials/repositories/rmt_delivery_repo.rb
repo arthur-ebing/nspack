@@ -33,7 +33,11 @@ module RawMaterialsApp
                   farm_id: res.output[:farm_id],
                   puc_id: res.output[:puc_id] }
 
-      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false).update(updates)
+      find_delivery_untipped_bins(id).update(updates)
+    end
+
+    def find_delivery_untipped_bins(id)
+      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false)
     end
 
     def find_rmt_bin_flat(id)
