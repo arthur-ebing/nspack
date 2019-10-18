@@ -42,14 +42,14 @@ module UiRules
                           required: true,
                           disabled: false },
         vessel_id: { renderer: :select,
-                     options: MasterfilesApp::VesselRepo.new.for_select_vessels_by_voyage_type_id(@form_object.voyage_type_id),
+                     options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id),
                      caption: 'Vessel',
                      prompt: true,
                      required: true },
         voyage_number: { required: true },
         voyage_code: { readonly: true,
                        hide_on_load: @mode == :new },
-        year: {},
+        year: { renderer: :input, subtype: :integer },
         completed: { renderer: :checkbox,
                      disabled: !@form_object.completed,
                      hide_on_load: @mode == :new },
@@ -82,8 +82,6 @@ module UiRules
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/voyages/voyage_type_changed' }]
       end
 
-      # res = SalesApp::TaskPermissionCheck::Order.call(:complete, @options[:id], @options[:current_user])
-      # #res.success
       rules[:can_complete] = !(true & @form_object.completed)
       rules[:is_complete] = !@form_object.completed
     end

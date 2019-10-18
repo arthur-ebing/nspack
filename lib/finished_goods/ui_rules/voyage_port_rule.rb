@@ -32,6 +32,8 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
+      voyage_id = @options[:voyage_id].nil? ? @form_object.voyage_id : @options[:voyage_id]
+      voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(voyage_id)&.voyage_type_id
       {
         port_type_id: { renderer: :select,
                         options: MasterfilesApp::PortTypeRepo.new.for_select_port_types,
@@ -45,7 +47,7 @@ module UiRules
                      required: true },
         port_id: { hide_on_load: rules[:item_visibility][:port_id],
                    renderer: :select,
-                   options: MasterfilesApp::PortRepo.new.for_select_ports_by_type_id(:port_type_id),
+                   options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
                    caption: 'Port',
                    prompt: true,
                    required: true },
@@ -69,7 +71,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(voyage_id: nil,
-                                    port_type_code: nil,
+                                    port_type_id: nil,
                                     port_id: nil,
                                     trans_shipment_vessel_id: nil,
                                     ata: nil,
@@ -96,7 +98,8 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :port_type_id, notify: [{ url: '/finished_goods/dispatch/voyage_ports/port_type_changed' }]
+        behaviour.dropdown_change :port_type_id, notify: [{ url: '/finished_goods/dispatch/voyage_ports/port_type_changed',
+                                                            param_keys: %i[voyage_port_voyage_id] }]
       end
     end
   end

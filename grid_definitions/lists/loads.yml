@@ -5,12 +5,10 @@
   :text: view
   :icon: view-show
   :title: View
-#  :popup: true
 - :url: "/finished_goods/dispatch/loads/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
-#  :popup: true
 - :url: "/finished_goods/dispatch/loads/$:id$"
   :text: delete
   :icon: delete
@@ -21,4 +19,3 @@
   :url: "/finished_goods/dispatch/loads/new"
   :text: New Load
   :style: :button
-#  :behaviour: :popup

@@ -23,6 +23,21 @@ module FinishedGoodsApp
                                               columns: %i[port_type_code],
                                               foreign_key: :port_type_id,
                                               flatten_columns: { port_type_code: :port_type_code } },
+                                            { parent_table: :voyages,
+                                              columns: %i[voyage_type_id vessel_id voyage_number year],
+                                              foreign_key: :voyage_id,
+                                              flatten_columns: { voyage_type_id: :voyage_type_id,
+                                                                 vessel_id: :vessel_id,
+                                                                 voyage_number: :voyage_number,
+                                                                 year: :year } },
+                                            { parent_table: :voyage_types,
+                                              columns: %i[voyage_type_code],
+                                              foreign_key: :voyage_type_id,
+                                              flatten_columns: { voyage_type_code: :voyage_type_code } },
+                                            { parent_table: :vessels,
+                                              columns: %i[vessel_code],
+                                              foreign_key: :vessel_id,
+                                              flatten_columns: { vessel_code: :vessel_code } },
                                             { parent_table: :vessels,
                                               columns: %i[vessel_code],
                                               foreign_key: :trans_shipment_vessel_id,
@@ -30,12 +45,12 @@ module FinishedGoodsApp
                             wrapper: VoyagePortFlat)
     end
 
-    def for_select_voyage_ports_by_port_type(port_type_code)
-      DB[:voyage_ports]
-        .join(:ports, id: :port_id)
-        .join(:port_types, id: :port_type_id)
-        .where(port_type_code: port_type_code)
-        .select_map([Sequel[:ports][:port_code], Sequel[:voyage_ports][:id]])
+    def lookup_voyage_port(voyage_id: nil, port_id: nil)
+      ds = DB[:voyage_ports]
+      ds = ds.where(voyage_id: voyage_id)
+      ds = ds.where(port_id: port_id)
+      ds = ds.where(active: true)
+      ds.first.nil? ? nil : ds.first[:id]
     end
   end
 end

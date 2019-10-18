@@ -5,12 +5,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module FinishedGoodsApp
   class TestLoadVoyageInteractor < MiniTestWithHooks
     include LoadVoyageFactory
-    include LoadFactory
     include MasterfilesApp::PartyFactory
-    include MasterfilesApp::VesselFactory
-    include MasterfilesApp::PortFactory
-    include VoyageFactory
-    include VoyagePortFactory
 
     def test_repo
       repo = interactor.send(:repo)

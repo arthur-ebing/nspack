@@ -26,6 +26,12 @@ module FinishedGoodsApp
     attribute :port_code, Types::String
     attribute :port_type_id, Types::Integer
     attribute :port_type_code, Types::String
+    attribute :voyage_type_id, Types::Integer
+    attribute :voyage_type_code, Types::String
+    attribute :vessel_id, Types::Integer
+    attribute :vessel_code, Types::String
+    attribute :year, Types::Integer
+    attribute :voyage_number, Types::String
     attribute? :active, Types::Bool
   end
 end

@@ -5,12 +5,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module FinishedGoodsApp
   class TestLoadInteractor < MiniTestWithHooks
     include LoadFactory
-    include VoyageFactory
-    include VoyagePortFactory
     include MasterfilesApp::PartyFactory
-    include MasterfilesApp::VesselFactory
-    include MasterfilesApp::PortFactory
-    include MasterfilesApp::DepotFactory
+    # include VoyageFactory
+    # include VoyagePortFactory
+    # include MasterfilesApp::PartyFactory
+    # include MasterfilesApp::VesselFactory
+    # include MasterfilesApp::PortFactory
+    # include MasterfilesApp::DepotFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -40,7 +41,7 @@ module FinishedGoodsApp
 
     def test_update_load
       id = create_load
-      attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| k == :id }
+      attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| %i[id shipped_date].include?(k) }
       value = attrs[:order_number]
       attrs[:order_number] = 'a_change'
       res = interactor.update_load(id, attrs)
@@ -95,7 +96,7 @@ module FinishedGoodsApp
         customer_order_number: 'ABC',
         customer_reference: 'ABC',
         exporter_certificate_code: 'ABC',
-        shipped_date: '2010-01-01 12:00',
+        shipped_date: '2010-01-01',
         shipped: false,
         transfer_load: false,
         active: true

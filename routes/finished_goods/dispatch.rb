@@ -65,7 +65,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           blank_json_response
         else
           actions = []
-          port_list = MasterfilesApp::PortRepo.new.for_select_ports_by_type_id(params[:changed_value])
+          voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(params[:voyage_port_voyage_id])&.voyage_type_id
+          port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_id: params[:changed_value], voyage_type_id: voyage_type_id)
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'voyage_port_port_id', options_array: port_list)
           port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code
           port_type_code = port_type_code.nil? ? 'stub' : port_type_code
@@ -107,7 +108,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
         r.post do        # CREATE
           res = interactor.create_voyage_port(id, params[:voyage_port])
-
           if res.success
             row_keys = %i[
               id
@@ -188,7 +188,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if params[:changed_value].to_s.empty?
           blank_json_response
         else
-          vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels_by_voyage_type_id(params[:changed_value])
+          vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: params[:changed_value])
           json_replace_select_options('voyage_vessel_id', vessel_list)
         end
       end
@@ -325,38 +325,63 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id) }
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id, back_url: request.referer) }
         end
         r.patch do     # UPDATE
-          res = interactor.update_load(id, params[:load])
-          if res.success
-            row_keys = %i[
-              depot_id
-              customer_party_role_id
-              consignee_party_role_id
-              billing_client_party_role_id
-              exporter_party_role_id
-              final_receiver_party_role_id
-              final_destination_id
-              pol_voyage_port_id
-              pod_voyage_port_id
-              order_number
-              edi_file_name
-              customer_order_number
-              customer_reference
-              exporter_certificate_code
-              shipped_date
-              shipped
-              transfer_load
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-          else
-            re_show_form(r, res) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
+          # UPDATE OR CREATE VOYAGE
+          params[:voyage] = params[:load].select { |key, _value| %i[voyage_type_id vessel_id voyage_number year].include?(key) }
+          voyage_id = FinishedGoodsApp::VoyageRepo.new.lookup_voyage(params[:voyage])
+          if voyage_id.nil?
+            voyage_interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+            res = voyage_interactor.create_voyage(params[:voyage])
+            raise StandardError unless res.success
+
+            voyage_id = res.instance.id
           end
+
+          # UPDATE OR CREATE VOYAGE_PORT
+          params[:voyage_port] = { pol_voyage_port_id: params[:load][:pol_port_id], pod_voyage_port_id: params[:load][:pod_port_id] }
+          params[:voyage_port].each do |key, port_id|
+            voyage_port_id = FinishedGoodsApp::VoyagePortRepo.new.lookup_voyage_port(voyage_id: voyage_id, port_id: port_id)
+            if voyage_port_id.nil?
+              voyage_port_interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
+              res = voyage_port_interactor.create_voyage_port(voyage_id, port_id: port_id)
+              raise StandardError unless res.success
+
+              voyage_port_id = res.instance.id
+            end
+            params[:load][key] = voyage_port_id.to_s
+          end
+
+          # UPDATE LOAD_VOYAGE
+          params[:load_voyage] = params[:load].select { |key, _value| %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad].include?(key) }
+          params[:load_voyage][:voyage_id] = voyage_id
+          params[:load_voyage][:load_id] = id
+          load_voyage_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage_id(load_id: id)
+          load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+          res = load_voyage_interactor.update_load_voyage(load_voyage_id, params[:load_voyage])
+          raise StandardError unless res.success
+
+          # UPDATE LOAD
+          res = interactor.update_load(id, params[:load])
+          raise StandardError unless res.success
+
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+
+        rescue StandardError
+          flash[:notice] = res.errors.to_s
+          re_show_form(r, res) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
         end
+
         r.delete do    # DELETE
           check_auth!('dispatch', 'delete')
           interactor.assert_permission!(:delete, id)
+
+          load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+          load_voyage_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage_id(load_id: id)
+          load_voyage_interactor.delete_load_voyage(load_voyage_id)
+
           res = interactor.delete_load(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -369,6 +394,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'voyage_type_changed' do
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          actions = []
+
+          vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: params[:changed_value])
+          pol_port_list = MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: params[:changed_value], port_type_code: AppConst::PORT_TYPE_POL)
+          pod_port_list = MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: params[:changed_value], port_type_code: AppConst::PORT_TYPE_POD)
+
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_vessel_id', options_array: vessel_list)
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pol_port_id', options_array: pol_port_list)
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pod_port_id', options_array: pod_port_list)
+          json_actions(actions)
+        end
+      end
 
       r.on 'consignee_changed' do
         if params[:changed_value].to_s.empty?
@@ -394,18 +435,53 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_page { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
       end
 
-      r.post do        # CREATE
-        res = interactor.create_load(params[:load])
-        if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-        else
-          re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
-            FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
-                                                    form_values: params[:load],
-                                                    form_errors: res.errors,
-                                                    remote: fetch?(r))
+      r.post do        # CREATE LOAD
+        # CREATE VOYAGE
+        params[:voyage] = params[:load].select { |key, _value| %i[voyage_type_id vessel_id voyage_number year].include?(key) }
+        voyage_id = FinishedGoodsApp::VoyageRepo.new.lookup_voyage(params[:voyage])
+        if voyage_id.nil?
+          voyage_interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+          res = voyage_interactor.create_voyage(params[:voyage])
+          raise StandardError unless res.success
+
+          voyage_id = res.instance.id
+        end
+
+        # CREATE VOYAGE_PORT
+        params[:voyage_port] = { pol_voyage_port_id: params[:load][:pol_port_id], pod_voyage_port_id: params[:load][:pod_port_id] }
+        params[:voyage_port].each do |key, port_id|
+          voyage_port_id = FinishedGoodsApp::VoyagePortRepo.new.lookup_voyage_port(voyage_id: voyage_id, port_id: port_id)
+          if voyage_port_id.nil?
+            voyage_port_interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
+            res = voyage_port_interactor.create_voyage_port(voyage_id, port_id: port_id)
+            raise StandardError unless res.success
+
+            voyage_port_id = res.instance.id
           end
+          params[:load][key] = voyage_port_id.to_s
+        end
+
+        # CREATE LOAD
+        res = interactor.create_load(params[:load])
+        raise StandardError unless res.success
+
+        load_id = res.instance.id
+
+        # CREATE LOAD_VOYAGE
+        params[:load_voyage] = params[:load].select { |key, _value| %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad].include?(key) }
+        params[:load_voyage][:voyage_id] = voyage_id
+        params[:load_voyage][:load_id] = load_id
+        load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+        res = load_voyage_interactor.create_load_voyage(params[:load_voyage])
+        raise StandardError unless res.success
+
+        flash[:notice] = res.message.to_s
+        redirect_to_last_grid(r)
+
+      rescue StandardError
+        flash[:notice] = res.errors.to_s
+        re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
+          FinishedGoods::Dispatch::Load::New.call(back_url: request.referer, form_values: params[:load], form_errors: res.errors, remote: fetch?(r))
         end
       end
     end

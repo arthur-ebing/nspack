@@ -37,13 +37,12 @@ module FinishedGoodsApp
     end
 
     def delete_load_voyage(id)
-      name = load_voyage(id).booking_reference
       repo.transaction do
         repo.delete_load_voyage(id)
         log_status('load_voyages', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted load voyage #{name}")
+      success_response('Deleted load voyage')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
