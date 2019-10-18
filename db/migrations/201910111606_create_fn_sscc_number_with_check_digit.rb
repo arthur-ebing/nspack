@@ -50,7 +50,7 @@ Sequel.migration do
 
   down do
     run <<~SQL
-      DROP FUNCTION public.fn_sscc_number_with_check_digit();
+      DROP FUNCTION public.fn_sscc_number_with_check_digit(text);
     SQL
   end
 end
