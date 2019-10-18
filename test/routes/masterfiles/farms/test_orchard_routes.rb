@@ -77,7 +77,7 @@ class TestOrchardRoutes < RouteTester
     authorise_pass!
     ensure_exists!(MasterfilesApp::FarmInteractor)
     Masterfiles::Farms::Orchard::New.stub(:call, bland_page) do
-      get  'masterfiles/farms/farms/1/orchards/add_orchards', {}, 'rack.session' => { user_id: 1 }
+      get  'masterfiles/farms/farms/1/orchards/new', {}, 'rack.session' => { user_id: 1 }
     end
     expect_bland_page
   end
@@ -85,7 +85,7 @@ class TestOrchardRoutes < RouteTester
   def test_new_fail
     authorise_fail!
     ensure_exists!(MasterfilesApp::FarmInteractor)
-    get 'masterfiles/farms/farms/1/orchards/add_orchards', {}, 'rack.session' => { user_id: 1 }
+    get 'masterfiles/farms/farms/1/orchards/new', {}, 'rack.session' => { user_id: 1 }
     expect_permission_error
   end
 
@@ -94,7 +94,7 @@ class TestOrchardRoutes < RouteTester
     ensure_exists!(MasterfilesApp::FarmInteractor)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_orchard).returns(ok_response(instance: row_vals))
-    post_as_fetch 'masterfiles/farms/farms/1/orchards/new', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    post_as_fetch 'masterfiles/farms/farms/1/orchards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_json_add_to_grid(has_notice: true)
   end
 
@@ -103,7 +103,7 @@ class TestOrchardRoutes < RouteTester
     ensure_exists!(MasterfilesApp::FarmInteractor)
     INTERACTOR.any_instance.stubs(:create_orchard).returns(bad_response)
     Masterfiles::Farms::Orchard::New.stub(:call, bland_page) do
-      post_as_fetch 'masterfiles/farms/farms/1/orchards/new', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+      post_as_fetch 'masterfiles/farms/farms/1/orchards', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
     expect_json_replace_dialog
   end

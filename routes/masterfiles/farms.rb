@@ -181,7 +181,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'orchards' do
         interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path }, {})
-        r.on 'add_orchards' do
+        r.on 'new' do
           check_auth!('farms', 'new')
           show_partial_or_page(r) { Masterfiles::Farms::Orchard::New.call(id, remote: fetch?(r)) }
         end
@@ -200,10 +200,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               puc_code
               cultivar_names
             ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                         notice: res.message)
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'orchard_orchard_code',
+                                         value: ''),
+                          OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'orchard_description',
+                                         value: ''),
+                          OpenStruct.new(type: :clear_form_validation,
+                                         dom_id: 'orchard_form'),
+                          OpenStruct.new(type: :add_grid_row,
+                                         attrs: select_attributes(res.instance, row_keys))],
+                         res.message,
+                         keep_dialog_open: true)
           else
-            re_show_form(r, res, url: "/masterfiles/farms/farms/#{id}/orchards/add_orchards") do
+            re_show_form(r, res, url: "/masterfiles/farms/farms/#{id}/orchards/new") do
               Masterfiles::Farms::Orchard::New.call(id,
                                                     form_values: params[:orchard],
                                                     form_errors: res.errors,
