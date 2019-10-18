@@ -18,7 +18,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/farms/farms/$:orchards.farm_id$/orchards/add_orchards"
+  :url: "/masterfiles/farms/farms/$:orchards.farm_id$/orchards/new"
   :text: New Orchard
   :style: :button
   :behaviour: :popup
