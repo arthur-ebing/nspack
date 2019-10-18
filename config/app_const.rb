@@ -41,6 +41,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   COMPANY_PREFIX = ENV.fetch('COMPANY_PREFIX')
   GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
 
+  # Constants for pallet statuses:
+  PALLETIZED_NEW_PALLET = 'PALLETIZED_NEW_PALLET'
+
   # Constants for roles:
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
   ROLE_CUSTOMER = 'CUSTOMER'
