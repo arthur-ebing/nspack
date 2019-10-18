@@ -203,6 +203,7 @@ module UiRules
         behaviour.dropdown_change :consignee_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/consignee_changed' }] if @mode == :new
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }]
+        behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
       end
     end
   end

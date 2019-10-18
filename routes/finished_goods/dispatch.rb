@@ -394,6 +394,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
+
       r.on 'voyage_type_changed' do
         if params[:changed_value].to_s.empty?
           blank_json_response
@@ -411,6 +412,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'pod_port_changed' do
+        if params[:changed_value].to_s.empty?
+          blank_json_response
+        else
+          value = MasterfilesApp::PortRepo.new.find_port_flat(params[:changed_value])&.city_id
+          json_change_select_value('load_final_destination_id', value)
+        end
+      end
+
       r.on 'consignee_changed' do
         if params[:changed_value].to_s.empty?
           blank_json_response
@@ -420,6 +430,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           json_change_select_value('load_final_receiver_party_role_id', value)
         end
       end
+
       r.on 'exporter_changed' do
         if params[:changed_value].to_s.empty?
           blank_json_response
