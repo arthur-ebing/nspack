@@ -366,6 +366,7 @@ Sequel.migration do
 
     # Log changes to this table. Exclude changes to the updated_at column.
     run "SELECT audit.audit_table('voyage_ports', true, true, '{updated_at}'::text[]);"
+
     create_table(:loads, ignore_index_errors: true) do
       primary_key :id
       foreign_key :customer_party_role_id, :party_roles, type: :integer, null: false
@@ -499,12 +500,7 @@ Sequel.migration do
 
     # Log changes to this table. Exclude changes to the updated_at column.
     run "SELECT audit.audit_table('load_vehicles', true, true, '{updated_at}'::text[]);"
-
   end
-
-
-
-
 
   down do
   end
