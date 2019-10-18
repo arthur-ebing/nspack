@@ -35,7 +35,34 @@ Sequel.migration do
   end
 
   down do
-    run 'DROP FUNCTION public.fn_product_setup_in_production(integer);'
-    run 'DROP FUNCTION public.fn_product_setup_template_in_production(integer);'
+    run "
+    CREATE OR REPLACE FUNCTION public.fn_product_setup_in_production(in_id integer)
+    RETURNS bool AS
+    $BODY$
+      SELECT
+          CASE WHEN bool_and((id % 2) = 0) THEN false
+          ELSE true END
+      FROM product_setups ps
+      WHERE ps.id = in_id
+    $BODY$
+    LANGUAGE sql VOLATILE
+    COST 100;
+    ALTER FUNCTION public.fn_product_setup_in_production(integer)
+    OWNER TO postgres;"
+
+    run "
+    CREATE OR REPLACE FUNCTION public.fn_product_setup_template_in_production(in_id integer)
+    RETURNS bool AS
+    $BODY$
+      SELECT
+          CASE WHEN bool_and((id % 2) = 0) THEN false
+          ELSE true END
+      FROM product_setup_templates pst
+      WHERE pst.id = in_id
+    $BODY$
+    LANGUAGE sql VOLATILE
+    COST 100;
+    ALTER FUNCTION public.fn_product_setup_template_in_production(integer)
+    OWNER TO postgres;"
   end
 end
