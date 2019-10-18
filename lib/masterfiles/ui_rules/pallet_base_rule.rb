@@ -56,7 +56,7 @@ module UiRules
                                     width: nil,
                                     edi_in_pallet_base: nil,
                                     edi_out_pallet_base: nil,
-                                    cartons_per_layer: nill,
+                                    cartons_per_layer: nil,
                                     material_mass: nil)
     end
 
