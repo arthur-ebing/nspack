@@ -568,6 +568,52 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Deliveries'
                                    WHERE functional_area_name = 'Raw Materials')),
          'Search Bins', '/search/rmt_bins', 2);
 
+INSERT INTO functional_areas (functional_area_name)
+VALUES ('Finished Goods');
+
+-- PROGRAM: Finished Goods
+INSERT INTO programs (program_name, program_sequence, functional_area_id)
+VALUES ('Dispatch', 1,
+        (SELECT id FROM functional_areas WHERE functional_area_name = 'Finished Goods'));
+
+-- LINK program to webapp
+INSERT INTO programs_webapps (program_id, webapp)
+VALUES ((SELECT id FROM programs
+         WHERE program_name = 'Dispatch'
+           AND functional_area_id = (SELECT id
+                                     FROM functional_areas
+                                     WHERE functional_area_name = 'Finished Goods')),
+        'Nspack');
+
+
+-- PROGRAM FUNCTION Loads
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Dispatch'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Finished Goods')),
+        'Loads',
+        '/list/loads',
+        1,
+        NULL,
+        false,
+        false);
+
+-- PROGRAM FUNCTION Voyages
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Dispatch'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Finished Goods')),
+        'Voyages',
+        '/list/voyages',
+        1,
+        NULL,
+        false,
+        false);
+
+
+
 -- PROGRAM: Shipping
 INSERT INTO programs (program_name, program_sequence, functional_area_id)
 VALUES ('Shipping', 1,
@@ -662,6 +708,19 @@ VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
         'Vehicle Types',
         '/list/vehicle_types',
         6,
+        NULL,
+        false,
+        false);
+
+-- PROGRAM FUNCTION Depots
+INSERT INTO program_functions (program_id, program_function_name, url, program_function_sequence,
+                               group_name, restricted_user_access, show_in_iframe)
+VALUES ((SELECT id FROM programs WHERE program_name = 'Shipping'
+                                   AND functional_area_id = (SELECT id FROM functional_areas
+                                                             WHERE functional_area_name = 'Masterfiles')),
+        'Depots',
+        '/list/depots',
+        7,
         NULL,
         false,
         false);
