@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonVerificationAndWeighing < BaseService
-    attr_reader :repo, :create_pallet, :provide_pack_type, :carton_label_id, :resource_code, :gross_weight, :uom,
+    attr_reader :repo, :carton_is_pallet, :provide_pack_type, :carton_label_id, :resource_code, :gross_weight, :uom,
                 :plant_resource_button_indicator, :params
 
     def initialize(params)
@@ -15,7 +15,7 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
-      @create_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
+      @carton_is_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
       @provide_pack_type = (AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION == 'true')
       @plant_resource_button_indicator = resource_code.split('-').last
 
@@ -71,7 +71,7 @@ module MesscadaApp
 
     def update_carton(id, attrs)
       repo.update_carton(id, attrs)
-      # DB[:pallet_sequences].where(scanned_from_carton_id: id).update(attrs) if create_pallet
+      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(attrs) if carton_is_pallet
       # ProductionApp::RunStatsUpdateJob.enqueue(id, nett_weight, 'CARTONS_PACKED_WEIGHT')
     end
   end

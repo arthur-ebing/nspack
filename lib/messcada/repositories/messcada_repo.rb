@@ -4,6 +4,8 @@ module MesscadaApp
   class MesscadaRepo < BaseRepo
     crud_calls_for :carton_labels, name: :carton_label, wrapper: CartonLabel
     crud_calls_for :cartons, name: :carton, wrapper: Carton
+    crud_calls_for :pallets, name: :pallet, wrapper: Pallet
+    crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
 
     def carton_label_exists?(carton_label_id)
       exists?(:carton_labels, id: carton_label_id)
@@ -39,6 +41,45 @@ module MesscadaApp
 
     def find_standard_pack_code_material_mass(plant_resource_button_indicator)
       DB[:standard_pack_codes].where(plant_resource_button_indicator: plant_resource_button_indicator).get(:material_mass)
+    end
+
+    def find_resource_location_id(id)
+      DB[:plant_resources].where(id: id).get(:location_id)
+    end
+
+    def find_resource_phc(id)
+      DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'phc'").as(:phc)).first[:phc].to_s
+    end
+
+    def find_resource_packhouse_no(id)
+      DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'packhouse_no'").as(:packhouse_no)).first[:packhouse_no].to_s
+    end
+
+    def find_cartons_per_pallet(id)
+      DB[:cartons_per_pallet].where(id: id).get(:cartons_per_pallet)
+    end
+
+    def create_pallet_and_sequences(pallet, pallet_sequence)
+      id = DB[:pallets].insert(pallet)
+
+      pallet_sequence = pallet_sequence.merge(pallet_params(id))
+      DB[:pallet_sequences].insert(pallet_sequence)
+
+      log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
+      # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
+
+      { success: true }
+    end
+
+    def pallet_params(pallet_id)
+      {
+        pallet_id: pallet_id,
+        pallet_number: find_pallet_number(pallet_id)
+      }
+    end
+
+    def find_pallet_number(id)
+      DB[:pallets].where(id: id).get(:pallet_number)
     end
 
     # def find_rmt_container_type_tare_weight(rmt_container_type_id)
