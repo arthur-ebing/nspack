@@ -241,6 +241,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               port_type_id
               voyage_type_id
               port_code
+              city_name
               description
               port_type_code
               voyage_type_code
@@ -278,6 +279,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             port_type_id
             voyage_type_id
             port_code
+            city_name
             description
             port_type_code
             voyage_type_code
@@ -319,7 +321,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_vessel_type(id, params[:vessel_type])
           if res.success
-            update_grid_row(id, changes: { voyage_type_id: res.instance[:voyage_type_id],
+            update_grid_row(id, changes: { vessel_type_id: res.instance[:vessel_type_id],
                                            vessel_type_code: res.instance[:vessel_type_code],
                                            description: res.instance[:description] }, notice: res.message)
           else
@@ -350,7 +352,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            voyage_type_id
+            vessel_type_id
             vessel_type_code
             voyage_type_code
             description
@@ -394,9 +396,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               id
-              voyage_type_id
+              vessel_type_id
               vessel_code
               description
+              vessel_type_code
               voyage_type_code
               active
             ]
@@ -429,9 +432,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            voyage_type_id
+            vessel_type_id
             vessel_code
             description
+            vessel_type_code
             voyage_type_code
             active
           ]
@@ -441,6 +445,85 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             Masterfiles::Shipping::Vessel::New.call(form_values: params[:vessel],
                                                     form_errors: res.errors,
                                                     remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # DEPOTS
+    # --------------------------------------------------------------------------
+    r.on 'depots', Integer do |id|
+      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:depots, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('shipping', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Shipping::Depot::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('shipping', 'read')
+          show_partial { Masterfiles::Shipping::Depot::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_depot(id, params[:depot])
+          if res.success
+            row_keys = %i[
+              city_id
+              city_name
+              depot_code
+              description
+              edi_code
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Shipping::Depot::Edit.call(id, form_values: params[:depot], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('shipping', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_depot(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'depots' do
+      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('shipping', 'new')
+        show_partial_or_page(r) { Masterfiles::Shipping::Depot::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_depot(params[:depot])
+        if res.success
+          row_keys = %i[
+            id
+            city_id
+            depot_code
+            description
+            edi_code
+            city_name
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/shipping/depots/new') do
+            Masterfiles::Shipping::Depot::New.call(form_values: params[:depot],
+                                                   form_errors: res.errors,
+                                                   remote: fetch?(r))
           end
         end
       end

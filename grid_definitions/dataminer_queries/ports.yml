@@ -1,10 +1,11 @@
 ---
 :caption: Ports
-:sql: SELECT "ports"."id", "ports"."port_type_id", "ports"."voyage_type_id", "ports"."port_code",
-  "ports"."description", "ports"."active", "ports"."created_at", "ports"."updated_at",
-  "port_types"."port_type_code", "voyage_types"."voyage_type_code" FROM "ports" JOIN
-  "port_types" ON "port_types"."id" = "ports"."port_type_id" JOIN "voyage_types" ON
-  "voyage_types"."id" = "ports"."voyage_type_id"
+:sql: "SELECT\r\n    ports.id,\r\n    voyage_types.voyage_type_code,\r\n    port_types.port_type_code,\r\n
+  \   ports.port_code,\r\n    ports.description,\r\n    destination_cities.city_name
+  AS city_name,\r\n    ports.active,\r\n    ports.created_at,\r\n    ports.updated_at\r\nFROM
+  ports\r\nLEFT JOIN destination_cities ON destination_cities.id = ports.city_id\r\nJOIN
+  port_types ON port_types.id = ports.port_type_id\r\nJOIN voyage_types ON voyage_types.id
+  = ports.voyage_type_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -25,33 +26,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  port_type_id:
-    :name: port_type_id
+  voyage_type_code:
+    :name: voyage_type_code
     :sequence_no: 2
-    :caption: Port type
-    :namespaced_name: ports.port_type_id
-    :data_type: :integer
+    :caption: Voyage type code
+    :namespaced_name: voyage_types.voyage_type_code
+    :data_type: :string
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  voyage_type_id:
-    :name: voyage_type_id
+  port_type_code:
+    :name: port_type_code
     :sequence_no: 3
-    :caption: Voyage type
-    :namespaced_name: ports.voyage_type_id
-    :data_type: :integer
+    :caption: Port type code
+    :namespaced_name: port_types.port_type_code
+    :data_type: :string
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -89,9 +90,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  city_name:
+    :name: city_name
+    :sequence_no: 6
+    :caption: City name
+    :namespaced_name: destination_cities.city_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: ports.active
     :data_type: :boolean
@@ -107,7 +124,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: ports.created_at
     :data_type: :datetime
@@ -123,7 +140,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: ports.updated_at
     :data_type: :datetime
@@ -132,38 +149,6 @@
     :hide: true
     :pinned: 
     :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  port_type_code:
-    :name: port_type_code
-    :sequence_no: 9
-    :caption: Port type code
-    :namespaced_name: port_types.port_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  voyage_type_code:
-    :name: voyage_type_code
-    :sequence_no: 10
-    :caption: Voyage type code
-    :namespaced_name: voyage_types.voyage_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -186,6 +171,14 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT voyage_type_code, id FROM voyage_types ORDER BY voyage_type_code
+- :column: ports.city_id
+  :caption: City
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT city_name, id FROM destination_cities ORDER BY city_name
 - :column: ports.port_code
   :caption: Port code
   :data_type: :string

@@ -1,24 +1,24 @@
 ---
-:dataminer_definition: vessel_types
+:dataminer_definition: depots
 :actions:
-- :url: "/masterfiles/shipping/vessel_types/$:id$"
+- :url: "/masterfiles/shipping/depots/$:id$"
   :text: view
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/masterfiles/shipping/vessel_types/$:id$/edit"
+- :url: "/masterfiles/shipping/depots/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/shipping/vessel_types/$:id$"
+- :url: "/masterfiles/shipping/depots/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/shipping/vessel_types/new"
-  :text: New Vessel Type
+  :url: "/masterfiles/shipping/depots/new"
+  :text: New Depot
   :style: :button
   :behaviour: :popup

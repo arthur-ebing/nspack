@@ -1,24 +1,24 @@
 ---
-:dataminer_definition: voyage_types
+:dataminer_definition: loads
 :actions:
-- :url: "/masterfiles/shipping/voyage_types/$:id$"
+- :url: "/finished_goods/dispatch/loads/$:id$"
   :text: view
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/masterfiles/shipping/voyage_types/$:id$/edit"
+- :url: "/finished_goods/dispatch/loads/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/masterfiles/shipping/voyage_types/$:id$"
+- :url: "/finished_goods/dispatch/loads/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/shipping/voyage_types/new"
-  :text: New Voyage Type
+  :url: "/finished_goods/dispatch/loads/new"
+  :text: New Load
   :style: :button
   :behaviour: :popup
