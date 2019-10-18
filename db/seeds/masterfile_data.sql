@@ -9,11 +9,18 @@ INSERT INTO public.address_types(address_type) VALUES ('Delivery Address');
 
 -- ROLES
 INSERT INTO roles (name) VALUES ('IMPLEMENTATION_OWNER');
--- INSERT INTO roles (name) VALUES ('TRANSPORTER');
+INSERT INTO roles (name) VALUES ('TRANSPORTER');
 INSERT INTO roles (name) VALUES ('OTHER');
--- INSERT INTO roles (name) VALUES ('CUSTOMER');
--- INSERT INTO roles (name) VALUES ('SUPPLIER');
+INSERT INTO roles (name) VALUES ('CUSTOMER');
+INSERT INTO roles (name) VALUES ('SUPPLIER');
 INSERT INTO roles (name) VALUES ('MARKETER');
+INSERT INTO roles (name) VALUES ('SHIPPING_LINE');
+INSERT INTO roles (name) VALUES ('SHIPPER');
+INSERT INTO roles (name) VALUES ('FINAL_RECEIVER');
+INSERT INTO roles (name) VALUES ('EXPORTER');
+INSERT INTO roles (name) VALUES ('BILLING_CLIENT');
+INSERT INTO roles (name) VALUES ('CONSIGNEE');
+INSERT INTO roles (name) VALUES ('HAULIER');
 
 
 -- UNITS OF MEASURE TYPE

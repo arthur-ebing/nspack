@@ -5,7 +5,7 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:voyage_type_id, :integer).filled(:int?)
+    required(:vessel_type_id, :integer).filled(:int?)
     required(:vessel_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
   end

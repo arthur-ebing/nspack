@@ -15,8 +15,8 @@ module UiRules
     end
 
     def set_show_fields
-      voyage_type_id_label = @repo.find(:voyage_types, MasterfilesApp::VoyageType, @form_object.voyage_type_id)&.voyage_type_code
-      fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_id_label, caption: 'Voyage Type' }
+      vessel_type_id_label = @repo.find(:vessel_types, MasterfilesApp::VesselType, @form_object.vessel_type_id)&.vessel_type_code
+      fields[:vessel_type_id] = { renderer: :label, with_value: vessel_type_id_label, caption: 'Vessel Type' }
       fields[:vessel_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -24,8 +24,10 @@ module UiRules
 
     def common_fields
       {
-        voyage_type_id: { renderer: :select, options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types, disabled_options: MasterfilesApp::VoyageTypeRepo.new.for_select_inactive_voyage_types, caption: 'Voyage Type', required: true },
-        vessel_code: { required: true, force_uppercase: true },
+        vessel_type_id: { renderer: :select,
+                          options: MasterfilesApp::VesselTypeRepo.new.for_select_vessel_types,
+                          caption: 'Vessel Type', required: true },
+        vessel_code: { required: true },
         description: {}
       }
     end
@@ -36,11 +38,11 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_vessel(@options[:id])
+      @form_object = @repo.find_vessel_flat(@options[:id])
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(voyage_type_id: nil,
+      @form_object = OpenStruct.new(vessel_type_id: nil,
                                     vessel_code: nil,
                                     description: nil)
     end

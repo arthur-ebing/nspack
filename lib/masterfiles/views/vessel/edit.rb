@@ -17,7 +17,7 @@ module Masterfiles
               form.action "/masterfiles/shipping/vessels/#{id}"
               form.remote!
               form.method :update
-              form.add_field :voyage_type_id
+              form.add_field :vessel_type_id
               form.add_field :vessel_code
               form.add_field :description
             end

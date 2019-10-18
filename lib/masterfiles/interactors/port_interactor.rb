@@ -9,7 +9,6 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_port(res)
-        log_transaction
       end
       instance = port(id)
       success_response("Created port #{instance.port_code}",
@@ -26,7 +25,6 @@ module MasterfilesApp
 
       repo.transaction do
         repo.update_port(id, res)
-        log_transaction
       end
       instance = port(id)
       success_response("Updated port #{instance.port_code}",
@@ -39,7 +37,6 @@ module MasterfilesApp
       name = port(id).port_code
       repo.transaction do
         repo.delete_port(id)
-        log_transaction
       end
       success_response("Deleted port #{name}")
     rescue Crossbeams::InfoError => e

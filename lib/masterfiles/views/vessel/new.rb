@@ -16,7 +16,7 @@ module Masterfiles
               form.caption 'New Vessel'
               form.action '/masterfiles/shipping/vessels'
               form.remote! if remote
-              form.add_field :voyage_type_id
+              form.add_field :vessel_type_id
               form.add_field :vessel_code
               form.add_field :description
             end

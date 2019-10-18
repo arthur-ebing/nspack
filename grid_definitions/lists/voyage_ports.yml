@@ -1,0 +1,32 @@
+---
+:dataminer_definition: voyage_ports
+:actions:
+- :url: "/finished_goods/dispatch/voyage_ports/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+  :hide_if_true: completed
+- :url: "/finished_goods/dispatch/voyage_ports/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: completed
+- :url: "/finished_goods/dispatch/voyage_ports/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: completed
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/dispatch/voyage_ports/new"
+  :text: New Voyage Port
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: voyage_ports.voyage_id
+      :op: =
+      :val: $:voyage_id$

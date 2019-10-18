@@ -1,0 +1,375 @@
+---
+:caption: Voyages
+:sql: "SELECT\r\n    voyages.id,\r\n    voyage_types.voyage_type_code,\r\n    vessels.vessel_code,\r\n
+  \   voyages.voyage_number,\r\n    voyages.voyage_code,\r\n    voyages.year,\r\n
+  \   string_agg(distinct pol_ports.port_code, ', ') AS POL,\r\n    string_agg(distinct
+  pod_ports.port_code, ', ') AS POD,\r\n    string_agg(distinct pod_voyage_ports.eta::character
+  varying, ', ') AS eta,\r\n    string_agg(distinct pod_voyage_ports.ata::character
+  varying, ', ') AS ata,\r\n    string_agg(distinct pol_voyage_ports.etd::character
+  varying, ', ') AS etd,\r\n    string_agg(distinct pol_voyage_ports.atd::character
+  varying, ', ') AS atd,\r\n    string_agg(distinct loads.id::character varying, ',
+  ') AS load_id,\r\n    string_agg(distinct depots.depot_code, ', ') AS depot_code,\r\n
+  \   voyages.created_at,\r\n    voyages.updated_at,\r\n    voyages.completed,\r\n
+  \   voyages.completed_at,\r\n    voyages.active,\r\n    fn_current_status('voyages',
+  voyages.id) AS status\r\nFROM voyages\r\nLEFT JOIN vessels ON vessels.id = voyages.vessel_id\r\nLEFT
+  JOIN voyage_types ON voyage_types.id = voyages.voyage_type_id\r\nLEFT JOIN voyage_ports
+  pol_voyage_ports ON pol_voyage_ports.voyage_id = voyages.id\r\nLEFT JOIN voyage_ports
+  pod_voyage_ports ON pod_voyage_ports.voyage_id = voyages.id\r\nLEFT JOIN ports pol_ports
+  ON pol_ports.id = pol_voyage_ports.port_id\r\nLEFT JOIN ports pod_ports ON pod_ports.id
+  = pod_voyage_ports.port_id\r\nLEFT JOIN loads ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\nLEFT
+  JOIN depots ON loads.depot_id = depots.id\r\nWHERE pol_voyage_ports.port_id IN (SELECT
+  ports.id FROM ports JOIN port_types ON port_types.id = ports.port_type_id WHERE
+  port_type_code = 'POL')\r\n  AND pod_voyage_ports.port_id IN (SELECT ports.id FROM
+  ports JOIN port_types ON port_types.id = ports.port_type_id WHERE port_type_code
+  = 'POD')\r\nGROUP BY voyages.id, voyages.created_at, vessels.id, voyage_types.id\r\nORDER
+  BY voyages.created_at DESC"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: voyages.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_type_code:
+    :name: voyage_type_code
+    :sequence_no: 2
+    :caption: Voyage type code
+    :namespaced_name: voyage_types.voyage_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel_code:
+    :name: vessel_code
+    :sequence_no: 3
+    :caption: Vessel code
+    :namespaced_name: vessels.vessel_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_number:
+    :name: voyage_number
+    :sequence_no: 4
+    :caption: Voyage number
+    :namespaced_name: voyages.voyage_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_code:
+    :name: voyage_code
+    :sequence_no: 5
+    :caption: Voyage code
+    :namespaced_name: voyages.voyage_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  year:
+    :name: year
+    :sequence_no: 6
+    :caption: Year
+    :namespaced_name: voyages.year
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pol:
+    :name: pol
+    :sequence_no: 7
+    :caption: Pol
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pod:
+    :name: pod
+    :sequence_no: 8
+    :caption: Pod
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  eta:
+    :name: eta
+    :sequence_no: 9
+    :caption: Eta
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ata:
+    :name: ata
+    :sequence_no: 10
+    :caption: Ata
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  etd:
+    :name: etd
+    :sequence_no: 11
+    :caption: Etd
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  atd:
+    :name: atd
+    :sequence_no: 12
+    :caption: Atd
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 13
+    :caption: Load
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot_code:
+    :name: depot_code
+    :sequence_no: 14
+    :caption: Depot code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 15
+    :caption: Created at
+    :namespaced_name: voyages.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 16
+    :caption: Updated at
+    :namespaced_name: voyages.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 17
+    :caption: Completed
+    :namespaced_name: voyages.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 18
+    :caption: Completed at
+    :namespaced_name: voyages.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 19
+    :caption: Active
+    :namespaced_name: voyages.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 20
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: voyages.vessel_id
+  :caption: Vessel
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vessel_code, id FROM vessels ORDER BY vessel_code
+- :column: voyages.voyage_type_id
+  :caption: Voyage type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT voyage_type_code, id FROM voyage_types ORDER BY voyage_type_code
+- :column: voyages.voyage_code
+  :caption: Voyage code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

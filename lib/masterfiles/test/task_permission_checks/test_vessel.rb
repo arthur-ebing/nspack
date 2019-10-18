@@ -10,7 +10,7 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        voyage_type_id: 1,
+        vessel_type_id: 1,
         vessel_code: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true

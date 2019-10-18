@@ -3,13 +3,39 @@ Sequel.migration do
   up do
     extension :pg_triggers
 
+    # --- depots
+    create_table(:depots, ignore_index_errors: true) do
+      primary_key :id
+      foreign_key :city_id, :destination_cities, type: :integer
+      String :depot_code, null: false
+      String :description
+      String :edi_code
+      TrueClass :active, null: false, default: true
+      DateTime :created_at, null: false
+      DateTime :updated_at, null: false
+      index [:depot_code], name: :depot_unique_code, unique: true
+    end
+
+    pgt_created_at(:depots,
+                   :created_at,
+                   function_name: :depots_set_created_at,
+                   trigger_name: :set_created_at)
+
+    pgt_updated_at(:depots,
+                   :updated_at,
+                   function_name: :depots_set_updated_at,
+                   trigger_name: :set_updated_at)
+
+    # Log changes to this table. Exclude changes to the updated_at column.
+    run "SELECT audit.audit_table('depots', true, true, '{updated_at}'::text[]);"
+
     # --- vehicle_types
     create_table(:vehicle_types, ignore_index_errors: true) do
       primary_key :id
       String :vehicle_type_code, null: false
       String :description
       TrueClass :has_container, default: false
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:vehicle_type_code], name: :vehicle_types_unique_code, unique: true
@@ -33,7 +59,7 @@ Sequel.migration do
       primary_key :id
       String :voyage_type_code, null: false
       String :description
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:voyage_type_code], name: :voyage_types_unique_code, unique: true
@@ -57,7 +83,7 @@ Sequel.migration do
       primary_key :id
       String :port_type_code, null: false
       String :description
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       # index [:port_type_code], name: :port_types_unique_code, unique: true
@@ -82,7 +108,7 @@ Sequel.migration do
       foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
       String :vessel_type_code, null: false
       String :description
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:vessel_type_code], name: :vessel_types_unique_code, unique: true
@@ -106,9 +132,10 @@ Sequel.migration do
       primary_key :id
       foreign_key :port_type_id, :port_types, type: :integer, null: false
       foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
+      foreign_key :city_id, :destination_cities, type: :integer
       String :port_code, null: false
       String :description
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:port_code], name: :ports_unique_code, unique: true
@@ -130,10 +157,10 @@ Sequel.migration do
     # --- vessels
     create_table(:vessels, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
+      foreign_key :vessel_type_id, :vessel_types, type: :integer, null: false
       String :vessel_code, null: false
       String :description
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:vessel_code], name: :vessels_unique_code, unique: true
@@ -214,5 +241,15 @@ Sequel.migration do
     drop_trigger(:vehicle_types, :set_updated_at)
     drop_function(:vehicle_types_set_updated_at)
     drop_table(:vehicle_types)
+
+    # Drop logging for destination_depots table.
+    drop_trigger(:depots, :audit_trigger_row)
+    drop_trigger(:depots, :audit_trigger_stm)
+
+    drop_trigger(:depots, :set_created_at)
+    drop_function(:depots_set_created_at)
+    drop_trigger(:depots, :set_updated_at)
+    drop_function(:depots_set_updated_at)
+    drop_table(:depots)
   end
 end

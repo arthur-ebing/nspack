@@ -9,11 +9,11 @@ Sequel.migration do
       foreign_key :vessel_id, :vessels, type: :integer, null: false
       foreign_key :voyage_type_id, :voyage_types, type: :integer, null: false
       String :voyage_number, null: false
-      String :voyage_code, null: false
-      Integer :year
+      String :voyage_code
+      Integer :year, null: false
       TrueClass :completed, default: false
       DateTime :completed_at
-      TrueClass :active, default: true
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
       index [:voyage_code], name: :voyages_unique_code, unique: true
@@ -38,14 +38,14 @@ Sequel.migration do
       foreign_key :voyage_id, :voyages, type: :integer, null: false
       foreign_key :port_id, :ports, type: :integer, null: false
       foreign_key :trans_shipment_vessel_id, :vessels, type: :integer
-      DateTime :ata
-      DateTime :atd
-      DateTime :eta
-      DateTime :etd
-      TrueClass :active, default: true
+      Date :ata
+      Date :atd
+      Date :eta
+      Date :etd
+      TrueClass :active, null: false, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
-      index [:voyage_id, :port_id], name: :voyage_ports_unique_code
+      index [:voyage_id, :port_id], name: :voyage_ports_unique_code, unique: true
     end
 
     pgt_created_at(:voyage_ports,

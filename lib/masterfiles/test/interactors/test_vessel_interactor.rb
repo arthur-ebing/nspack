@@ -63,11 +63,11 @@ module MasterfilesApp
     private
 
     def vessel_attrs
-      voyage_type_id = create_voyage_type
+      vessel_type_id = create_vessel_type
 
       {
         id: 1,
-        voyage_type_id: voyage_type_id,
+        vessel_type_id: vessel_type_id,
         vessel_code: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true
