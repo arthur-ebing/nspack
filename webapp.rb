@@ -59,6 +59,14 @@ class Nspack < Roda
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
     template_opts(layout_opts: { path: 'views/layout_auth.erb' })
+    after_login do
+      # Crude method to go to the URL provided by the user:
+      if ENV['pre_login_path']
+        pre_path = ENV['pre_login_path']
+        ENV['pre_login_path'] = nil
+        redirect(pre_path)
+      end
+    end
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_mail, to: AppConst::ERROR_MAIL_RECIPIENTS,
@@ -131,16 +139,6 @@ class Nspack < Roda
       end
     end
 
-    # OVERRIDE RodAuth's Login form:
-    # r.get 'login' do
-    #   if @registered_mobile_device
-    #     @no_logout = true
-    #     view(:login, layout: 'layout_rmd')
-    #   else
-    #     view(:login)
-    #   end
-    # end
-
     unless AppConst::BYPASS_LOGIN_ROUTES.any? do |path|
       if path.end_with?('*')
         request.path.match?(/#{path}/)
@@ -149,6 +147,7 @@ class Nspack < Roda
       end
     end
       r.rodauth
+      ENV['pre_login_path'] = r.path unless rodauth.logged_in? || r.path == '/login'
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
     end
