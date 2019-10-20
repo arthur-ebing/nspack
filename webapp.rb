@@ -47,6 +47,7 @@ class Nspack < Roda
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
+  plugin :cookies, path: '/'
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
@@ -60,12 +61,10 @@ class Nspack < Roda
     account_password_hash_column :password_hash
     template_opts(layout_opts: { path: 'views/layout_auth.erb' })
     after_login do
-      # Crude method to go to the URL provided by the user:
-      if ENV['pre_login_path']
-        pre_path = ENV['pre_login_path']
-        ENV['pre_login_path'] = nil
-        redirect(pre_path)
-      end
+      # On successful login, see if the user had given a specific path that required the login and redirect to it.
+      path = request.cookies['pre_login_path']
+      response.delete_cookie('pre_login_path')
+      redirect(path) if path && scope.can_login_to_path?(path, account[:id])
     end
   end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
@@ -147,7 +146,8 @@ class Nspack < Roda
       end
     end
       r.rodauth
-      ENV['pre_login_path'] = r.path unless rodauth.logged_in? || r.path == '/login'
+      # Store this path before login so we can redirect after login. NB. Only a GET request!
+      response.set_cookie('pre_login_path', r.path) unless rodauth.logged_in? || r.path == '/login' || !request.get? || fetch?(r)
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
     end
