@@ -147,7 +147,7 @@ class Nspack < Roda
     end
       r.rodauth
       # Store this path before login so we can redirect after login. NB. Only a GET request!
-      response.set_cookie('pre_login_path', r.path) unless rodauth.logged_in? || r.path == '/login' || !request.get? || fetch?(r)
+      response.set_cookie('pre_login_path', r.fullpath) unless rodauth.logged_in? || r.path == '/login' || !request.get? || fetch?(r)
       rodauth.require_authentication
       r.redirect('/login') if current_user.nil? # Session might have the incorrect user_id
     end
