@@ -119,70 +119,97 @@ Note particularly the order of things in the `down` block:
 
 === Migration methods
 
+[source,ruby]
+----
 add_functional_area(key, rmd_menu: false)
+----
 
-- key - the functional area name (String, capitalised)
-- rmd_menu - set to true if this menu is only available on RMDs.
+* `key` - the functional area name (String, capitalised)
+* `:rmd_menu` - set to true if this menu is only available on RMDs.
 
+[source,ruby]
+----
 drop_functional_area(key)
+----
 
-- key - the functional area name (String, capitalised)
+* `key` - the functional area name (String, capitalised)
 
+[source,ruby]
+----
 change_functional_area(key, options = {})
+----
 
-- key - the functional area name (String, capitalised)
-- options:
-  - rmd_menu(boolean)
-  - rename (string) the new name for the functional area
+* `key` - the functional area name (String, capitalised)
+* options:
+** `:rmd_menu` (boolean)
+** `:rename` (string) the new name for the functional area
 
+[source,ruby]
+----
 add_program(key, functional_area:, seq: 1)
+----
 
-- key - the program name (String, capitalised)
-- functional_area - the functional area name (String, capitalised)
-- seq - the program sequence (default 1)
+* `key` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+* `:seq` - the program sequence (default 1)
 
+[source,ruby]
+----
 drop_program(key, functional_area:)
+----
 
-- key - the program name (String, capitalised)
-- functional_area - the functional area name (String, capitalised)
+* `key` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
 
+[source,ruby]
+----
 change_program(key, options = {})
+----
 
-- key - the program name (String, capitalised)
-- options
-  - functional_area - the functional area name (String, capitalised)
-  - seq - the program sequence
-  - rename (string) the new name for the program
+* `key` - the program name (String, capitalised)
+* options
+** `:functional_area` - the functional area name (String, capitalised)
+** `:seq` - the program sequence
+** `:rename` (string) the new name for the program
 
+[source,ruby]
+----
 add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false)
+----
 
-- key - the program function name (String, capitalised)
-- program - the program name (String, capitalised)
-- functional_area - the functional area name (String, capitalised)
-- seq - the program sequence (default 1)
-- group - the group name (default nil)
-- url - the URL to callfrom this menu item
-- restricted - if true, specific users need to be linked to the item to see it
-- show_in_iframe - if true, render the URL inside an iframe
+* `key` - the program function name (String, capitalised)
+* `:program` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
+* `:seq` - the program sequence (default 1)
+* `:group` - the group name (default nil)
+* `:url` - the URL to callfrom this menu item
+* `:restricted` - if true, specific users need to be linked to the item to see it
+* `:show_in_iframe` - if true, render the URL inside an iframe
 
+[source,ruby]
+----
 drop_program_function(key, functional_area:, program:)
+----
 
-- key - the program function name (String, capitalised)
-- program - the program name (String, capitalised)
-- functional_area - the functional area name (String, capitalised)
+* `key` - the program function name (String, capitalised)
+* `:program` - the program name (String, capitalised)
+* `:functional_area` - the functional area name (String, capitalised)
 
+[source,ruby]
+----
 change_program_function(key, options = {})
+----
 
-- key - the program function name (String, capitalised)
-- options
-  - program - the program name (String, capitalised)
-  - functional_area - the functional area name (String, capitalised)
-  - seq - the program sequence
-  - group - the group name
-  - url - the URL to callfrom this menu item
-  - restricted - if true, specific users need to be linked to the item to see it
-  - show_in_iframe - if true, render the URL inside an iframe
-  - rename (string) the new name for the program function
+* `key` - the program function name (String, capitalised)
+* options
+** `:program` - the program name (String, capitalised)
+** `:functional_area` - the functional area name (String, capitalised)
+** `:seq` - the program sequence
+** `:group` - the group name
+** `:url` - the URL to callfrom this menu item
+** `:restricted` - if true, specific users need to be linked to the item to see it
+** `:show_in_iframe` - if true, render the URL inside an iframe
+** `:rename` (string) the new name for the program function
 
 === Running migrations
 
@@ -195,4 +222,7 @@ Run menu migrations using `rake`:
 
 === Menu permissions
 
-To be done still
+A user can be given permission to see a menu item in one of to ways:
+
+1. The user has been given access to a program (via a record in the `programs_users` table)
+2. The program function has `restricted_user_access` set to true and the user has been given that access (via a record in `program_functions_users` table). Note that the user must also have access to the program this item belongs to.
