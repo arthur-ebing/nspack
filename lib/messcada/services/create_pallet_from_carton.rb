@@ -10,7 +10,7 @@ module MesscadaApp
       @carton_quantity = carton_quantity
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       @repo = MesscadaApp::MesscadaRepo.new
       return failed_response("Carton / Bin:#{carton_id} not verified") unless carton_exists?
 
@@ -18,7 +18,7 @@ module MesscadaApp
       @cartons_per_pallet = carton_cartons_per_pallet
 
       res = create_pallet_and_sequences
-      raise unwrap_failed_response(res) unless res.success
+      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
 
       ok_response
     end

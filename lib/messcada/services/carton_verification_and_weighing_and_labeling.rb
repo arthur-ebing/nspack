@@ -15,7 +15,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing_and_labeling
-      raise unwrap_failed_response(res) unless res.success
+      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
 
       ok_response
     end

@@ -13,7 +13,7 @@ module MesscadaApp
       @params = params
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_is_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
       @provide_pack_type = (AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION == 'true')
@@ -22,7 +22,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing
-      raise unwrap_failed_response(res) unless res.success
+      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
 
       ok_response
     end

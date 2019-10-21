@@ -12,7 +12,7 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
 
       res = retrieve_cached_setup_data
-      raise unwrap_failed_response(res) unless res.success
+      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
 
       carton_labeling
     end
