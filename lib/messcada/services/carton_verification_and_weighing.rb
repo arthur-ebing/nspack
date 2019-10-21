@@ -22,7 +22,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing
-      return res unless res.success
+      raise unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -39,12 +39,15 @@ module MesscadaApp
         return failed_response("Button Indicator for button:#{plant_resource_button_indicator} referenced by more than 1 Standard Pack Code") unless one_standard_pack_code?
       end
 
-      repo.transaction do
-        res = MesscadaApp::CartonVerification.new(params).call
-        return res unless res.success
-
-        update_carton(carton_label_carton_id, update_attrs)
+      begin
+        repo.transaction do
+          MesscadaApp::CartonVerification.new(params).call
+          update_carton(carton_label_carton_id, update_attrs)
+        end
+      rescue StandardError
+        return failed_response($ERROR_INFO)
       end
+
       ok_response
     end
 

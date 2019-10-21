@@ -16,7 +16,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = create_carton
-      return res unless res.success
+      raise unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -30,13 +30,16 @@ module MesscadaApp
     def create_carton
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
-      repo.transaction do
-        id = DB[:cartons].insert(carton_params)
-        res = MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
-        return res unless res.success
-
-        # ProductionApp::RunStatsUpdateJob.enqueue(id, 'CARTON_PACKED')
+      begin
+        repo.transaction do
+          id = DB[:cartons].insert(carton_params)
+          MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
+          # ProductionApp::RunStatsUpdateJob.enqueue(id, 'CARTON_PACKED')
+        end
+      rescue StandardError
+        return failed_response($ERROR_INFO)
       end
+
       ok_response
     end
 

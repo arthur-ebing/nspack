@@ -18,7 +18,7 @@ module MesscadaApp
       @cartons_per_pallet = carton_cartons_per_pallet
 
       res = create_pallet_and_sequences
-      return res unless res.success
+      raise unwrap_failed_response(res) unless res.success
 
       ok_response
     end

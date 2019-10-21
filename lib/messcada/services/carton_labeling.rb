@@ -12,7 +12,7 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
 
       res = retrieve_cached_setup_data
-      return res unless res.success
+      raise unwrap_failed_response(res) unless res.success
 
       carton_labeling
     end
@@ -62,9 +62,13 @@ module MesscadaApp
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
-      repo.transaction do
-        repo.create_carton_label(attrs)
-        # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'CARTON_LABEL_PRINTED')
+      begin
+        repo.transaction do
+          repo.create_carton_label(attrs)
+          # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'CARTON_LABEL_PRINTED')
+        end
+      rescue StandardError
+        return failed_response($ERROR_INFO)
       end
       ok_response
     end

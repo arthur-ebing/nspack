@@ -15,7 +15,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing_and_labeling
-      return res unless res.success
+      raise unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -27,11 +27,13 @@ module MesscadaApp
     end
 
     def carton_verification_and_weighing_and_labeling
-      repo.transaction do
-        res = MesscadaApp::CartonVerificationAndWeighing.new(params).call
-        return res unless res.success
-
-        print_carton_nett_weight_label(carton_label_carton_id)
+      begin
+        repo.transaction do
+          MesscadaApp::CartonVerificationAndWeighing.new(params).call
+          print_carton_nett_weight_label(carton_label_carton_id)
+        end
+      rescue StandardError
+        return failed_response($ERROR_INFO)
       end
       ok_response
     end
