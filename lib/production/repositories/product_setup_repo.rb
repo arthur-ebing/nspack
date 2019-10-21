@@ -236,23 +236,10 @@ module ProductionApp
     end
 
     def product_setup_in_production?(id)
-      # query = <<~SQL
-      #   SELECT fn_product_setup_in_production(product_setups.id) FROM product_setups where id = #{id}
-      # SQL
-      # DB[query].single_value
       DB[Sequel.function(:fn_product_setup_in_production, id)].single_value
     end
 
     def product_setup_template_in_production?(id)
-      # query = <<~SQL
-      #   SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = #{id}
-      # SQL
-      # DB[query].single_value
-
-      # query = <<~SQL
-      #   SELECT fn_product_setup_template_in_production(product_setup_templates.id) FROM product_setup_templates where id = ?
-      # SQL
-      # DB[query, id].single_value
       DB[Sequel.function(:fn_product_setup_template_in_production, id)].single_value
     end
 
@@ -263,12 +250,12 @@ module ProductionApp
     def referenced_by_closed_or_inspected_runs?(_id)
       # query = <<~SQL
       #   SELECT EXISTS(
-      #     SELECT id from production_runs WHERE product_setup_template_id = #{id} AND is_closed
+      #     SELECT id from production_runs WHERE product_setup_template_id = ? AND is_closed
       #     UNION ALL
-      #     SELECT id from production_runs WHERE product_setup_template_id = #{id} AND govt_inspection_id IS NOT NULL
+      #     SELECT id from production_runs WHERE product_setup_template_id = ? AND govt_inspection_id IS NOT NULL
       #   )
       # SQL
-      # DB[query].single_value
+      # DB[query, id].single_value
       false
     end
 
