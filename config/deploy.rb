@@ -55,6 +55,17 @@ task :migrate do
   end
 end
 
+desc 'Runs rake menu:migrate if migrations are set'
+task :menu_migrate do
+  on primary :db do
+    within release_path do
+      with rack_env: fetch(:rack_env) do
+        execute :rake, 'menu:migrate'
+      end
+    end
+  end
+end
+
 desc 'Runs rake assets:precompile'
 task :precompile do
   on primary :app do
@@ -115,6 +126,7 @@ end
 namespace :deploy do
   after :updated, :migrate_and_precompile do
     invoke 'migrate'
+    invoke 'menu_migrate'
     invoke 'precompile'
   end
   # TODO: if there is a job Que, restart it!
