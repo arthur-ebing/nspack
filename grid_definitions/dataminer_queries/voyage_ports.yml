@@ -80,7 +80,7 @@
   ata:
     :name: ata
     :sequence_no: 9
-    :caption: Ata
+    :caption: ATA
     :namespaced_name: voyage_ports.ata
     :data_type: :date
     :width: 
@@ -96,7 +96,7 @@
   atd:
     :name: atd
     :sequence_no: 11
-    :caption: Atd
+    :caption: ATD
     :namespaced_name: voyage_ports.atd
     :data_type: :date
     :width: 
@@ -112,7 +112,7 @@
   eta:
     :name: eta
     :sequence_no: 8
-    :caption: Eta
+    :caption: ETA
     :namespaced_name: voyage_ports.eta
     :data_type: :date
     :width: 
@@ -128,7 +128,7 @@
   etd:
     :name: etd
     :sequence_no: 10
-    :caption: Etd
+    :caption: ETD
     :namespaced_name: voyage_ports.etd
     :data_type: :date
     :width: 

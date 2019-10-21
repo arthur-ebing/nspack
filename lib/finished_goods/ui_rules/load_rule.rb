@@ -165,7 +165,7 @@ module UiRules
 
     def clean_object
       h = {}
-      @form_object.to_h.each { |k, v| h[k] = v.to_s.empty? & k.to_s.end_with?('_id') ? nil : v }
+      @form_object.to_h.each { |k, v| h[k] = v.nil_or_empty? & k.to_s.end_with?('_id') ? nil : v }
       @form_object = OpenStruct.new(h)
     end
 

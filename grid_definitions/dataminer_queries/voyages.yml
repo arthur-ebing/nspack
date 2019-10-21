@@ -3,10 +3,10 @@
 :sql: "SELECT\r\n    voyages.id,\r\n    voyage_types.voyage_type_code,\r\n    vessels.vessel_code,\r\n
   \   voyages.voyage_number,\r\n    voyages.voyage_code,\r\n    voyages.year,\r\n
   \   string_agg(distinct pol_ports.port_code, ', ') AS POL,\r\n    string_agg(distinct
-  pod_ports.port_code, ', ') AS POD,\r\n    string_agg(distinct pod_voyage_ports.eta::character
-  varying, ', ') AS eta,\r\n    string_agg(distinct pod_voyage_ports.ata::character
-  varying, ', ') AS ata,\r\n    string_agg(distinct pol_voyage_ports.etd::character
-  varying, ', ') AS etd,\r\n    string_agg(distinct pol_voyage_ports.atd::character
+  pol_voyage_ports.eta::character varying, ', ') AS eta,\r\n    string_agg(distinct
+  pol_voyage_ports.ata::character varying, ', ') AS ata,\r\n    string_agg(distinct
+  pod_ports.port_code, ', ') AS POD,\r\n    string_agg(distinct pod_voyage_ports.etd::character
+  varying, ', ') AS etd,\r\n    string_agg(distinct pod_voyage_ports.atd::character
   varying, ', ') AS atd,\r\n    string_agg(distinct loads.id::character varying, ',
   ') AS load_id,\r\n    string_agg(distinct depots.depot_code, ', ') AS depot_code,\r\n
   \   voyages.created_at,\r\n    voyages.updated_at,\r\n    voyages.completed,\r\n
@@ -15,14 +15,13 @@
   JOIN voyage_types ON voyage_types.id = voyages.voyage_type_id\r\nLEFT JOIN voyage_ports
   pol_voyage_ports ON pol_voyage_ports.voyage_id = voyages.id\r\nLEFT JOIN voyage_ports
   pod_voyage_ports ON pod_voyage_ports.voyage_id = voyages.id\r\nLEFT JOIN ports pol_ports
-  ON pol_ports.id = pol_voyage_ports.port_id\r\nLEFT JOIN ports pod_ports ON pod_ports.id
-  = pod_voyage_ports.port_id\r\nLEFT JOIN loads ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\nLEFT
-  JOIN depots ON loads.depot_id = depots.id\r\nWHERE pol_voyage_ports.port_id IN (SELECT
-  ports.id FROM ports JOIN port_types ON port_types.id = ports.port_type_id WHERE
-  port_type_code = 'POL')\r\n  AND pod_voyage_ports.port_id IN (SELECT ports.id FROM
-  ports JOIN port_types ON port_types.id = ports.port_type_id WHERE port_type_code
-  = 'POD')\r\nGROUP BY voyages.id, voyages.created_at, vessels.id, voyage_types.id\r\nORDER
-  BY voyages.created_at DESC"
+  ON pol_ports.id = pol_voyage_ports.port_id AND pol_ports.port_type_id IN (SELECT
+  id FROM port_types WHERE port_type_code = 'POL')\r\nLEFT JOIN ports pod_ports ON
+  pod_ports.id = pod_voyage_ports.port_id AND pod_ports.port_type_id IN (SELECT id
+  FROM port_types WHERE port_type_code = 'POD')\r\nLEFT JOIN loads ON pol_voyage_ports.id
+  = loads.pol_voyage_port_id\r\nLEFT JOIN depots ON loads.depot_id = depots.id\r\nGROUP
+  BY voyages.id, voyages.created_at, vessels.id, voyage_types.id\r\nORDER BY voyages.created_at
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -127,23 +126,7 @@
   pol:
     :name: pol
     :sequence_no: 7
-    :caption: Pol
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pod:
-    :name: pod
-    :sequence_no: 8
-    :caption: Pod
+    :caption: POL
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -158,8 +141,8 @@
     :group_max: false
   eta:
     :name: eta
-    :sequence_no: 9
-    :caption: Eta
+    :sequence_no: 8
+    :caption: ETA
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -174,8 +157,24 @@
     :group_max: false
   ata:
     :name: ata
+    :sequence_no: 9
+    :caption: ATA
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pod:
+    :name: pod
     :sequence_no: 10
-    :caption: Ata
+    :caption: POD
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -191,7 +190,7 @@
   etd:
     :name: etd
     :sequence_no: 11
-    :caption: Etd
+    :caption: ETD
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -207,7 +206,7 @@
   atd:
     :name: atd
     :sequence_no: 12
-    :caption: Atd
+    :caption: ATD
     :namespaced_name: 
     :data_type: :string
     :width: 

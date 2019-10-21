@@ -40,6 +40,7 @@ module Crossbeams
       user_email_groups
       vehicle_types
       voyage_types
+      port_types
     ].freeze
 
     # self-referential tables. First insert all where the key is NULL, then the rest.
@@ -90,8 +91,10 @@ module Crossbeams
       party_contact_methods
       fruit_actual_counts_for_packs
       treatments
+      ports
       vessel_types
       vessels
+      depots
     ].freeze
 
     # For arrays of ids
@@ -162,6 +165,7 @@ module Crossbeams
       pdn_region_id: { subquery: 'SELECT id FROM production_regions WHERE production_region_code = ?', values: 'SELECT production_region_code FROM production_regions WHERE id = ?' },
       voyage_type_id: { subquery: 'SELECT id FROM voyage_types WHERE voyage_type_code = ?', values: 'SELECT voyage_type_code FROM voyage_types WHERE id = ?' },
       vessel_type_id: { subquery: 'SELECT id FROM vessel_types WHERE vessel_type_code = ?', values: 'SELECT vessel_type_code FROM vessel_types WHERE id = ?' },
+      city_id: { subquery: 'SELECT id FROM destination_cities WHERE city_name = ?', values: 'SELECT city_name FROM destination_cities WHERE id = ?' },
       zzz: {}
     }.freeze
 

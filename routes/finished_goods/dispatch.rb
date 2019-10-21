@@ -61,7 +61,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'voyage_ports' do
       r.on 'port_type_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           actions = []
@@ -185,7 +185,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'voyage_type_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: params[:changed_value])
@@ -396,7 +396,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.on 'voyage_type_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           actions = []
@@ -413,7 +413,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'pod_port_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           value = MasterfilesApp::PortRepo.new.find_port_flat(params[:changed_value])&.city_id
@@ -422,7 +422,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'consignee_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
@@ -432,7 +432,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'exporter_changed' do
-        if params[:changed_value].to_s.empty?
+        if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id

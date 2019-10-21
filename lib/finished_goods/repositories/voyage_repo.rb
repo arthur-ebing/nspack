@@ -26,8 +26,8 @@ module FinishedGoodsApp
     end
 
     def lookup_voyage(voyage_type_id:, vessel_id:, voyage_number:, year:)
-      return nil if voyage_type_id.to_s.empty?
-      return nil if vessel_id.to_s.empty?
+      return nil if voyage_type_id.nil_or_empty?
+      return nil if vessel_id.nil_or_empty?
 
       ds = DB[:voyages]
       ds = ds.where(voyage_type_id: voyage_type_id)

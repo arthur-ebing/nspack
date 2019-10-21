@@ -26,8 +26,6 @@ module MasterfilesApp
     end
 
     def for_select_vessels(voyage_type_id: nil, voyage_type_code: nil)
-      # return nil if voyage_type_id.to_s.empty? & voyage_type_code.to_s.empty?
-
       ds = DB[:vessels]
       ds = ds.join(:vessel_types, id: :vessel_type_id)
       ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil?

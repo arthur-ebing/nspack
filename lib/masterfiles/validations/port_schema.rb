@@ -13,7 +13,7 @@ module MasterfilesApp
 
     validate(filled?: %i[port_type_id city_id]) do |port_type_id, city_id|
       port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(port_type_id)&.port_type_code
-      port_type_code != AppConst::PORT_TYPE_POD || !city_id.to_s.empty?
+      port_type_code != AppConst::PORT_TYPE_POD || !city_id.nil_or_empty?
     end
   end
 end
