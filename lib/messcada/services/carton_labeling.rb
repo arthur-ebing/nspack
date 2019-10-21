@@ -10,7 +10,9 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
-      @setup_data = retrieve_cached_setup_data
+
+      res = retrieve_cached_setup_data
+      return res unless res.success
 
       carton_labeling
     end
@@ -27,7 +29,9 @@ module MesscadaApp
       return failed_response("Production Run:#{production_run_id} could not be found") unless production_run_exists?
       return failed_response("No setup data cached for resource #{resource_code} and production_run_id #{production_run_id}.") if file_data[resource_code][production_run_id].nil?
 
-      file_data[resource_code][production_run_id]
+      @setup_data = file_data[resource_code][production_run_id]
+
+      ok_response
     end
 
     def production_run_exists?

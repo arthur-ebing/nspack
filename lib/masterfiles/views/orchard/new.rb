@@ -31,7 +31,7 @@ module Masterfiles
               form.row do |row|
                 row.column do |col|
                   col.add_field :cultivar_ids
-                  col.add_notice('Use the close buton of the dialog when finished.')
+                  col.add_notice('Use the close button of the dialog when finished.')
                 end
               end
 
