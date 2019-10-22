@@ -106,6 +106,8 @@ class Nspack < Roda # rubocop:disable ClassLength
               exit_ref_date_time
               bin_tipping_started_date_time
               rebin_created_at
+              scrapped
+              scrapped_at
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
@@ -263,6 +265,8 @@ class Nspack < Roda # rubocop:disable ClassLength
               exit_ref_date_time
               bin_tipping_started_date_time
               rebin_created_at
+              scrapped
+              scrapped_at
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
