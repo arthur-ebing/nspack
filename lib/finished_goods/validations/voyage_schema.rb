@@ -9,7 +9,7 @@ module FinishedGoodsApp
     required(:voyage_type_id, :integer).filled(:int?)
     required(:voyage_number, Types::StrippedString).filled(:str?)
     optional(:voyage_code, Types::StrippedString).maybe(:str?)
-    required(:year, :integer).maybe(:int?)
+    required(:year, :integer).filled(:int?)
     optional(:completed, :bool).maybe(:bool?)
     optional(:completed_at, :time).filled(:time?)
   end

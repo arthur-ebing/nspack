@@ -24,7 +24,7 @@ module MasterfilesApp
 
     def create_target_market_group_type(opts = {})
       default = {
-        target_market_group_type_code: Faker::Lorem.word,
+        target_market_group_type_code: Faker::Lorem.unique.word,
         active: true
       }
       DB[:target_market_group_types].insert(default.merge(opts))

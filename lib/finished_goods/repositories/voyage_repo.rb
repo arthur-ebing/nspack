@@ -16,8 +16,14 @@ module FinishedGoodsApp
     def find_voyage_flat(id)
       find_with_association(:voyages,
                             id,
-                            parent_tables: [{ parent_table: :voyage_types, columns: [:voyage_type_code], flatten_columns: { voyage_type_code: :voyage_type_code } },
-                                            { parent_table: :vessels, columns: [:vessel_code], flatten_columns: { vessel_code: :vessel_code } }],
+                            parent_tables: [{ parent_table: :voyage_types,
+                                              columns: [:voyage_type_code],
+                                              flatten_columns: { voyage_type_code: :voyage_type_code } },
+                                            { parent_table: :vessels,
+                                              columns: [:vessel_code],
+                                              flatten_columns: { vessel_code: :vessel_code } }],
+                            sub_tables: [{ sub_table: :voyage_ports,
+                                           columns: [:id] }],
                             wrapper: VoyageFlat)
     end
 
@@ -25,7 +31,7 @@ module FinishedGoodsApp
       DB[:voyages].where(vessel_id: vessel_id).max(:id)
     end
 
-    def lookup_voyage(voyage_type_id:, vessel_id:, voyage_number:, year:)
+    def lookup_voyage(voyage_type_id: nil, vessel_id: nil, voyage_number: nil, year: nil)
       return nil if voyage_type_id.nil_or_empty?
       return nil if vessel_id.nil_or_empty?
 

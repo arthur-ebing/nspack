@@ -7,7 +7,7 @@ module UiRules
 
       make_form_object
       apply_form_values
-      clean_object
+      # clean_object
 
       common_values_for_fields common_fields
 
@@ -163,11 +163,11 @@ module UiRules
       }
     end
 
-    def clean_object
-      h = {}
-      @form_object.to_h.each { |k, v| h[k] = v.nil_or_empty? & k.to_s.end_with?('_id') ? nil : v }
-      @form_object = OpenStruct.new(h)
-    end
+    # def clean_object
+    #   h = {}
+    #   @form_object.to_h.each { |k, v| h[k] = v.to_s.empty? & k.to_s.end_with?('_id') ? nil : v }
+    #   @form_object = OpenStruct.new(h)
+    # end
 
     def make_form_object
       make_new_form_object && return if @mode == :new
