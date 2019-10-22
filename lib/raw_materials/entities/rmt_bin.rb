@@ -35,6 +35,8 @@ module RawMaterialsApp
     attribute :exit_ref_date_time, Types::DateTime
     attribute :bin_tipping_started_date_time, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
+    attribute :scrapped_at, Types::DateTime
+    attribute? :scrapped, Types::Bool
     attribute? :active, Types::Bool
   end
 
@@ -72,6 +74,8 @@ module RawMaterialsApp
     attribute :exit_ref_date_time, Types::DateTime
     attribute :bin_tipping_started_date_time, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
+    attribute :scrapped_at, Types::DateTime
+    attribute? :scrapped, Types::Bool
     attribute? :active, Types::Bool
     attribute :orchard_code, Types::String
     attribute :farm_code, Types::String

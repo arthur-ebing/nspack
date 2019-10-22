@@ -28,6 +28,8 @@ module RawMaterials
               form.add_field :rmt_inner_container_type_id if rules[:show_rmt_inner_container_type_id]
               form.add_field :rmt_inner_container_material_id if rules[:show_rmt_inner_container_material_id]
               form.add_field :bin_received_date_time
+              form.add_field :scrapped
+              form.add_field :scrapped_at
             end
           end
 

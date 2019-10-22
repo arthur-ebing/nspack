@@ -22,5 +22,7 @@ module RawMaterialsApp
     optional(:farm_id, :integer).filled(:int?)
     required(:bin_fullness, Types::StrippedString).maybe(:str?)
     optional(:bin_asset_number, :integer).maybe(:int?)
+    optional(:scrapped, :bool).maybe(:bool?)
+    optional(:scrapped_at, %i[nil time]).maybe(:time?)
   end
 end

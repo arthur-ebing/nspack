@@ -79,6 +79,8 @@ module UiRules
       fields[:rmt_inner_container_material_id] = { renderer: :label, with_value: rmt_inner_container_material_id_label, caption: 'Inner Container Material Type' }
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:bin_received_date_time] = { renderer: :label }
+      fields[:scrapped_at] = { renderer: :label }
+      fields[:scrapped] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -141,7 +143,9 @@ module UiRules
                                     bin_tipped_date_time: nil,
                                     exit_ref_date_time: nil,
                                     bin_tipping_started_date_time: nil,
-                                    rebin_created_at: nil)
+                                    rebin_created_at: nil,
+                                    scrapped: nil,
+                                    scrapped_at: nil)
     end
 
     # private

@@ -1,9 +1,8 @@
 ---
 :caption: Rmt Bins
 :sql: SELECT "rmt_bins"."id", "rmt_bins"."rmt_delivery_id", "rmt_bins"."season_id",
-  case when "rmt_bins"."qty_bins"=1 then true else false end as discrete_bin,
-  "rmt_bins"."cultivar_id", "rmt_bins"."orchard_id", "rmt_bins"."farm_id", "rmt_bins"."rmt_class_id",
-  "rmt_bins"."rmt_container_type_id",
+  case when "rmt_bins"."qty_bins"=1 then true else false end as discrete_bin, "rmt_bins"."cultivar_id",
+  "rmt_bins"."orchard_id", "rmt_bins"."farm_id", "rmt_bins"."rmt_class_id", "rmt_bins"."rmt_container_type_id",
   "rmt_bins"."rmt_container_material_type_id", "rmt_bins"."cultivar_group_id", "rmt_bins"."puc_id",
   "rmt_bins"."exit_ref", "rmt_bins"."qty_bins", "rmt_bins"."bin_asset_number", "rmt_bins"."tipped_asset_number",
   "rmt_bins"."rmt_inner_container_type_id", "rmt_bins"."rmt_inner_container_material_id",
@@ -13,23 +12,28 @@
   "rmt_bins"."active", "rmt_bins"."bin_tipped", "rmt_bins"."tipping", "rmt_bins"."created_at",
   "rmt_bins"."updated_at", "rmt_bins"."bin_received_date_time", "rmt_bins"."bin_tipped_date_time",
   "rmt_bins"."exit_ref_date_time", "rmt_bins"."bin_tipping_started_date_time", "rmt_bins"."rebin_created_at",
-  "cultivar_groups"."cultivar_group_code", "cultivars"."cultivar_name", "farms"."farm_code",
-  "orchards"."orchard_code", "pucs"."puc_code", "rmt_classes"."rmt_class_code", "rmt_container_material_types"."container_material_type_code",
+  "rmt_bins"."scrapped", "rmt_bins"."scrapped_at", "cultivar_groups"."cultivar_group_code",
+  "cultivars"."cultivar_name", "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code",
+  "rmt_classes"."rmt_class_code", "rmt_container_material_types"."container_material_type_code",
   "rmt_container_types"."container_type_code", "rmt_deliveries"."truck_registration_number"
-  AS rmt_delivery_truck_registration_number, "seasons"."season_code",
-  CASE WHEN bin_tipped THEN 'gray' ELSE NULL END AS colour_rule, fn_current_status('rmt_bins', rmt_bins.id) AS status
-  FROM "rmt_bins" LEFT OUTER JOIN "cultivar_groups" ON "cultivar_groups"."id"
-  = "rmt_bins"."cultivar_group_id" LEFT OUTER JOIN "cultivars" ON "cultivars"."id" = "rmt_bins"."cultivar_id"
-  LEFT OUTER JOIN "farms" ON "farms"."id" = "rmt_bins"."farm_id" LEFT OUTER JOIN "orchards" ON "orchards"."id"
-  = "rmt_bins"."orchard_id" LEFT OUTER JOIN "pucs" ON "pucs"."id" = "rmt_bins"."puc_id" LEFT OUTER JOIN
-  "rmt_classes" ON "rmt_classes"."id" = "rmt_bins"."rmt_class_id"
-  LEFT OUTER JOIN "rmt_container_material_types" ON "rmt_container_material_types"."id" = "rmt_bins"."rmt_container_material_type_id"
+  AS rmt_delivery_truck_registration_number, "seasons"."season_code", CASE WHEN bin_tipped
+  THEN 'gray' ELSE NULL END AS colour_rule, fn_current_status('rmt_bins', rmt_bins.id)
+  AS status FROM "rmt_bins" LEFT OUTER JOIN "cultivar_groups" ON "cultivar_groups"."id"
+  = "rmt_bins"."cultivar_group_id" LEFT OUTER JOIN "cultivars" ON "cultivars"."id"
+  = "rmt_bins"."cultivar_id" LEFT OUTER JOIN "farms" ON "farms"."id" = "rmt_bins"."farm_id"
+  LEFT OUTER JOIN "orchards" ON "orchards"."id" = "rmt_bins"."orchard_id" LEFT OUTER
+  JOIN "pucs" ON "pucs"."id" = "rmt_bins"."puc_id" LEFT OUTER JOIN "rmt_classes" ON
+  "rmt_classes"."id" = "rmt_bins"."rmt_class_id" LEFT OUTER JOIN "rmt_container_material_types"
+  ON "rmt_container_material_types"."id" = "rmt_bins"."rmt_container_material_type_id"
   LEFT OUTER JOIN "rmt_container_types" ON "rmt_container_types"."id" = "rmt_bins"."rmt_container_type_id"
-  LEFT OUTER JOIN "rmt_deliveries" ON "rmt_deliveries"."id" = "rmt_bins"."rmt_delivery_id" JOIN
-  "seasons" ON "seasons"."id" = "rmt_bins"."season_id" order by "rmt_bins"."id" desc
+  LEFT OUTER JOIN "rmt_deliveries" ON "rmt_deliveries"."id" = "rmt_bins"."rmt_delivery_id"
+  JOIN "seasons" ON "seasons"."id" = "rmt_bins"."season_id" order by "rmt_bins"."id"
+  desc
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    gray: No description
 :columns:
   id:
     :name: id
@@ -65,7 +69,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 40
+    :sequence_no: 3
     :caption: Season
     :namespaced_name: rmt_bins.season_id
     :data_type: :integer
@@ -79,9 +83,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  discrete_bin:
+    :name: discrete_bin
+    :sequence_no: 4
+    :caption: discrete_bin
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 39
+    :sequence_no: 5
     :caption: Cultivar
     :namespaced_name: rmt_bins.cultivar_id
     :data_type: :integer
@@ -97,7 +117,7 @@
     :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 41
+    :sequence_no: 6
     :caption: Orchard
     :namespaced_name: rmt_bins.orchard_id
     :data_type: :integer
@@ -113,7 +133,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Farm
     :namespaced_name: rmt_bins.farm_id
     :data_type: :integer
@@ -129,7 +149,7 @@
     :group_max: false
   rmt_class_id:
     :name: rmt_class_id
-    :sequence_no: 38
+    :sequence_no: 8
     :caption: Rmt class
     :namespaced_name: rmt_bins.rmt_class_id
     :data_type: :integer
@@ -143,25 +163,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-#  rmt_container_material_owner_id:
-#    :name: rmt_container_material_owner_id
-#    :sequence_no: 38
-#    :caption: Rmt container material owner
-#    :namespaced_name: rmt_bins.rmt_container_material_owner_id
-#    :data_type: :integer
-#    :width:
-#    :format:
-#    :hide: true
-#    :pinned:
-#    :groupable: false
-#    :group_by_seq:
-#    :group_sum: false
-#    :group_avg: false
-#    :group_min: false
-#    :group_max: false
   rmt_container_type_id:
     :name: rmt_container_type_id
-    :sequence_no: 25
+    :sequence_no: 9
     :caption: Rmt container type
     :namespaced_name: rmt_bins.rmt_container_type_id
     :data_type: :integer
@@ -177,7 +181,7 @@
     :group_max: false
   rmt_container_material_type_id:
     :name: rmt_container_material_type_id
-    :sequence_no: 26
+    :sequence_no: 10
     :caption: Rmt container material type
     :namespaced_name: rmt_bins.rmt_container_material_type_id
     :data_type: :integer
@@ -193,7 +197,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 47
+    :sequence_no: 11
     :caption: Cultivar group
     :namespaced_name: rmt_bins.cultivar_group_id
     :data_type: :integer
@@ -209,7 +213,7 @@
     :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 36
+    :sequence_no: 12
     :caption: Puc
     :namespaced_name: rmt_bins.puc_id
     :data_type: :integer
@@ -225,7 +229,7 @@
     :group_max: false
   exit_ref:
     :name: exit_ref
-    :sequence_no: 37
+    :sequence_no: 13
     :caption: Exit ref
     :namespaced_name: rmt_bins.exit_ref
     :data_type: :string
@@ -241,7 +245,7 @@
     :group_max: false
   qty_bins:
     :name: qty_bins
-    :sequence_no: 7
+    :sequence_no: 14
     :caption: Qty bins
     :namespaced_name: rmt_bins.qty_bins
     :data_type: :integer
@@ -257,7 +261,7 @@
     :group_max: false
   bin_asset_number:
     :name: bin_asset_number
-    :sequence_no: 2
+    :sequence_no: 15
     :caption: Bin asset number
     :namespaced_name: rmt_bins.bin_asset_number
     :data_type: :integer
@@ -417,7 +421,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 16
+    :sequence_no: 25
     :caption: Nett weight
     :namespaced_name: rmt_bins.nett_weight
     :data_type: :number
@@ -433,7 +437,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 15
+    :sequence_no: 26
     :caption: Gross weight
     :namespaced_name: rmt_bins.gross_weight
     :data_type: :number
@@ -465,7 +469,7 @@
     :group_max: false
   bin_tipped:
     :name: bin_tipped
-    :sequence_no: 12
+    :sequence_no: 28
     :caption: Bin tipped
     :namespaced_name: rmt_bins.bin_tipped
     :data_type: :boolean
@@ -545,7 +549,7 @@
     :group_max: false
   bin_tipped_date_time:
     :name: bin_tipped_date_time
-    :sequence_no: 13
+    :sequence_no: 33
     :caption: Bin tipped date time
     :namespaced_name: rmt_bins.bin_tipped_date_time
     :data_type: :datetime
@@ -607,9 +611,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  scrapped:
+    :name: scrapped
+    :sequence_no: 37
+    :caption: Scrapped
+    :namespaced_name: rmt_bins.scrapped
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped_at:
+    :name: scrapped_at
+    :sequence_no: 38
+    :caption: Scrapped at
+    :namespaced_name: rmt_bins.scrapped_at
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 37
+    :sequence_no: 39
     :caption: Cultivar group code
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
@@ -625,7 +661,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 6
+    :sequence_no: 40
     :caption: Cultivar name
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
@@ -641,7 +677,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 4
+    :sequence_no: 41
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -657,7 +693,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 3
+    :sequence_no: 42
     :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -673,7 +709,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 5
+    :sequence_no: 43
     :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -689,7 +725,7 @@
     :group_max: false
   rmt_class_code:
     :name: rmt_class_code
-    :sequence_no: 42
+    :sequence_no: 44
     :caption: Rmt class code
     :namespaced_name: rmt_classes.rmt_class_code
     :data_type: :string
@@ -703,25 +739,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-#  rmt_container_material_owners_id:
-#    :name: rmt_container_material_owners_id
-#    :sequence_no: 43
-#    :caption: Rmt container material owners
-#    :namespaced_name: rmt_container_material_owners.id
-#    :data_type: :string
-#    :width:
-#    :format:
-#    :hide: true
-#    :pinned:
-#    :groupable: false
-#    :group_by_seq:
-#    :group_sum: false
-#    :group_avg: false
-#    :group_min: false
-#    :group_max: false
   container_material_type_code:
     :name: container_material_type_code
-    :sequence_no: 15
+    :sequence_no: 45
     :caption: Container material type code
     :namespaced_name: rmt_container_material_types.container_material_type_code
     :data_type: :string
@@ -737,7 +757,7 @@
     :group_max: false
   container_type_code:
     :name: container_type_code
-    :sequence_no: 15
+    :sequence_no: 46
     :caption: Container type code
     :namespaced_name: rmt_container_types.container_type_code
     :data_type: :string
@@ -753,7 +773,7 @@
     :group_max: false
   rmt_delivery_truck_registration_number:
     :name: rmt_delivery_truck_registration_number
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: Rmt delivery truck registration number
     :namespaced_name: rmt_deliveries.truck_registration_number
     :data_type: :string
@@ -769,7 +789,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 11
+    :sequence_no: 48
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -783,18 +803,34 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  discrete_bin:
-    :name: discrete_bin
-    :sequence_no: 47
-    :caption: discrete_bin
-    :namespaced_name: discrete_bin
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 49
+    :caption: Colour rule
+    :namespaced_name: 
     :data_type: :string
-    :width:
-    :format:
-    :hide: true
-    :pinned:
-    :groupable: true
-    :group_by_seq:
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 50
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -848,14 +884,6 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
-#- :column: rmt_bins.rmt_container_material_owner_id
-#  :caption: Rmt container material owner
-#  :data_type: :integer
-#  :control_type: :list
-#  :default_value:
-#  :ordered_list: true
-#  :ui_priority: 1
-#  :list_def: SELECT id, id FROM rmt_container_material_owners ORDER BY id
 - :column: rmt_bins.rmt_container_type_id
   :caption: Rmt container type
   :data_type: :integer
@@ -945,21 +973,13 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-#- :column: rmt_container_material_owners.id
-#  :caption: Rmt container material owners
-#  :data_type: :string
-#  :control_type: :text
-#  :default_value:
-#  :ordered_list: false
-#  :ui_priority: 1
-#  :list_def:
 - :column: rmt_bins.bin_tipped
   :caption: Tipped?
   :data_type: :boolean
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 7
   :list_def:
-    - true
-    - false
+  - true
+  - false

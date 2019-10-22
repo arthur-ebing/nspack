@@ -43,7 +43,9 @@ module RawMaterialsApp
         exit_ref_date_time: '2010-01-01 12:00',
         bin_tipping_started_date_time: '2010-01-01 12:00',
         rebin_created_at: '2010-01-01 12:00',
-        active: true
+        active: true,
+        scrapped: false,
+        scrapped_at: '2010-01-01 12:00'
       }
       RawMaterialsApp::RmtBin.new(base_attrs.merge(attrs))
     end
