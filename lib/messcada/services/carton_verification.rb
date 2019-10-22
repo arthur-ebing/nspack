@@ -16,7 +16,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = create_carton
-      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
+      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -27,7 +27,7 @@ module MesscadaApp
       repo.carton_label_carton_exists?(carton_label_id)
     end
 
-    def create_carton
+    def create_carton  # rubocop:disable Metrics/AbcSize
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
       begin
@@ -36,11 +36,11 @@ module MesscadaApp
           MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
           # ProductionApp::RunStatsUpdateJob.enqueue(id, 'CARTON_PACKED')
         end
-      rescue StandardError
-        return failed_response($ERROR_INFO)
-      end
 
-      ok_response
+        ok_response
+      rescue Crossbeams::InfoError => e
+        failed_response(e.message)
+      end
     end
 
     def carton_label_carton_params

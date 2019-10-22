@@ -13,7 +13,7 @@ module MesscadaApp
       @params = params
     end
 
-    def call  # rubocop:disable Metrics/AbcSize
+    def call
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_is_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
       @provide_pack_type = (AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION == 'true')
@@ -22,7 +22,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing
-      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
+      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -44,11 +44,11 @@ module MesscadaApp
           MesscadaApp::CartonVerification.new(params).call
           update_carton(carton_label_carton_id, update_attrs)
         end
-      rescue StandardError
-        return failed_response($ERROR_INFO)
-      end
 
-      ok_response
+        ok_response
+      rescue Crossbeams::InfoError => e
+        failed_response(e.message)
+      end
     end
 
     def standard_pack_code_exists?

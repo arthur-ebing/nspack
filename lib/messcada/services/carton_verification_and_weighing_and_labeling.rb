@@ -15,7 +15,7 @@ module MesscadaApp
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = carton_verification_and_weighing_and_labeling
-      raise "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}" unless res.success
+      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       ok_response
     end
@@ -27,15 +27,14 @@ module MesscadaApp
     end
 
     def carton_verification_and_weighing_and_labeling
-      begin
-        repo.transaction do
-          MesscadaApp::CartonVerificationAndWeighing.new(params).call
-          print_carton_nett_weight_label(carton_label_carton_id)
-        end
-      rescue StandardError
-        return failed_response($ERROR_INFO)
+      repo.transaction do
+        MesscadaApp::CartonVerificationAndWeighing.new(params).call
+        print_carton_nett_weight_label(carton_label_carton_id)
       end
+
       ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def carton_label_carton_id
