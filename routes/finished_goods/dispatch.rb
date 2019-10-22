@@ -327,61 +327,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           check_auth!('dispatch', 'read')
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id, back_url: request.referer) }
         end
+
         r.patch do     # UPDATE
-          # UPDATE OR CREATE VOYAGE
-          params[:voyage] = params[:load].select { |key, _value| %i[voyage_type_id vessel_id voyage_number year].include?(key) }
-          voyage_id = FinishedGoodsApp::VoyageRepo.new.lookup_voyage(params[:voyage])
-          if voyage_id.nil?
-            voyage_interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-            res = voyage_interactor.create_voyage(params[:voyage])
-            raise StandardError unless res.success
-
-            voyage_id = res.instance.id
-          end
-
-          # UPDATE OR CREATE VOYAGE_PORT
-          params[:voyage_port] = { pol_voyage_port_id: params[:load][:pol_port_id], pod_voyage_port_id: params[:load][:pod_port_id] }
-          params[:voyage_port].each do |key, port_id|
-            voyage_port_id = FinishedGoodsApp::VoyagePortRepo.new.lookup_voyage_port(voyage_id: voyage_id, port_id: port_id)
-            if voyage_port_id.nil?
-              voyage_port_interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
-              res = voyage_port_interactor.create_voyage_port(voyage_id, port_id: port_id)
-              raise StandardError unless res.success
-
-              voyage_port_id = res.instance.id
-            end
-            params[:load][key] = voyage_port_id.to_s
-          end
-
-          # UPDATE LOAD_VOYAGE
-          params[:load_voyage] = params[:load].select { |key, _value| %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad].include?(key) }
-          params[:load_voyage][:voyage_id] = voyage_id
-          params[:load_voyage][:load_id] = id
-          load_voyage_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage_id(load_id: id)
-          load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-          res = load_voyage_interactor.update_load_voyage(load_voyage_id, params[:load_voyage])
-          raise StandardError unless res.success
-
-          # UPDATE LOAD
           res = interactor.update_load(id, params[:load])
-          raise StandardError unless res.success
-
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-
-        rescue StandardError
-          flash[:notice] = res.errors.to_s
-          re_show_form(r, res) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
+          end
         end
 
         r.delete do    # DELETE
           check_auth!('dispatch', 'delete')
           interactor.assert_permission!(:delete, id)
-
-          load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-          load_voyage_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage_id(load_id: id)
-          load_voyage_interactor.delete_load_voyage(load_voyage_id)
-
           res = interactor.delete_load(id)
           if res.success
             delete_grid_row(id, notice: res.message)
@@ -394,7 +353,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
-
       r.on 'voyage_type_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
@@ -446,53 +404,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_page { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
       end
 
-      r.post do        # CREATE LOAD
-        # CREATE VOYAGE
-        params[:voyage] = params[:load].select { |key, _value| %i[voyage_type_id vessel_id voyage_number year].include?(key) }
-        voyage_id = FinishedGoodsApp::VoyageRepo.new.lookup_voyage(params[:voyage])
-        if voyage_id.nil?
-          voyage_interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-          res = voyage_interactor.create_voyage(params[:voyage])
-          raise StandardError unless res.success
-
-          voyage_id = res.instance.id
-        end
-
-        # CREATE VOYAGE_PORT
-        params[:voyage_port] = { pol_voyage_port_id: params[:load][:pol_port_id], pod_voyage_port_id: params[:load][:pod_port_id] }
-        params[:voyage_port].each do |key, port_id|
-          voyage_port_id = FinishedGoodsApp::VoyagePortRepo.new.lookup_voyage_port(voyage_id: voyage_id, port_id: port_id)
-          if voyage_port_id.nil?
-            voyage_port_interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
-            res = voyage_port_interactor.create_voyage_port(voyage_id, port_id: port_id)
-            raise StandardError unless res.success
-
-            voyage_port_id = res.instance.id
-          end
-          params[:load][key] = voyage_port_id.to_s
-        end
-
-        # CREATE LOAD
+      r.post do        # CREATE
         res = interactor.create_load(params[:load])
-        raise StandardError unless res.success
-
-        load_id = res.instance.id
-
-        # CREATE LOAD_VOYAGE
-        params[:load_voyage] = params[:load].select { |key, _value| %i[shipping_line_party_role_id shipper_party_role_id booking_reference memo_pad].include?(key) }
-        params[:load_voyage][:voyage_id] = voyage_id
-        params[:load_voyage][:load_id] = load_id
-        load_voyage_interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-        res = load_voyage_interactor.create_load_voyage(params[:load_voyage])
-        raise StandardError unless res.success
-
-        flash[:notice] = res.message.to_s
-        redirect_to_last_grid(r)
-
-      rescue StandardError
-        flash[:notice] = res.errors.to_s
-        re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
-          FinishedGoods::Dispatch::Load::New.call(back_url: request.referer, form_values: params[:load], form_errors: res.errors, remote: fetch?(r))
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
+            FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
+                                                    form_values: params[:load],
+                                                    form_errors: res.errors,
+                                                    remote: fetch?(r))
+          end
         end
       end
     end

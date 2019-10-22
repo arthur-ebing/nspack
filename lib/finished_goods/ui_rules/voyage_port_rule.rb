@@ -56,10 +56,18 @@ module UiRules
                                     options: MasterfilesApp::VesselRepo.new.for_select_vessels,
                                     prompt: '',
                                     caption: 'Trans shipment vessel' },
-        eta: { renderer: :date, caption: 'ETA', hide_on_load: rules[:item_visibility][:eta] },
-        ata: { renderer: :date, caption: 'ATA', hide_on_load: rules[:item_visibility][:ata] },
-        etd: { renderer: :date, caption: 'ETD', hide_on_load: rules[:item_visibility][:etd] },
-        atd: { renderer: :date, caption: 'ATD', hide_on_load: rules[:item_visibility][:atd] }
+        eta: { renderer: :date,
+               caption: 'ETA',
+               hide_on_load: rules[:item_visibility][:eta] },
+        ata: { renderer: :date,
+               caption: 'ATA',
+               hide_on_load: rules[:item_visibility][:ata] },
+        etd: { renderer: :date,
+               caption: 'ETD',
+               hide_on_load: rules[:item_visibility][:etd] },
+        atd: { renderer: :date,
+               caption: 'ATD',
+               hide_on_load: rules[:item_visibility][:atd] }
       }
     end
 

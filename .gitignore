@@ -21,6 +21,7 @@ public/js/ag-enterprise-activation.js
 
 # Used by dotenv library to load environment variables.
 .env.local
+cartons.json
 
 ## Documentation cache and generated files:
 /.yardoc/

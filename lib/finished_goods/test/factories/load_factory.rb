@@ -2,14 +2,13 @@
 
 module FinishedGoodsApp
   module LoadFactory # rubocop:disable Metrics/ModuleLength
-    def create_load(opts = {})
+    def create_load(opts = {}) # rubocop:disable Metrics/AbcSize
       party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
-      voyage_port_id = create_voyage_port
       depot_id = create_depot
-      # port_id = create_port
-      # voyage_type_id = create_voyage_type
-      # vessel_id = create_vessel
+      voyage_id = create_voyage
+      pol_voyage_port_id = create_voyage_port(voyage_id: voyage_id)
+      pod_voyage_port_id = create_voyage_port(voyage_id: voyage_id)
 
       default = {
         customer_party_role_id: party_role_id,
@@ -19,8 +18,8 @@ module FinishedGoodsApp
         final_receiver_party_role_id: party_role_id,
         final_destination_id: destination_city_id,
         depot_id: depot_id,
-        pol_voyage_port_id: voyage_port_id,
-        pod_voyage_port_id: voyage_port_id,
+        pol_voyage_port_id: pol_voyage_port_id,
+        pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,
         edi_file_name: Faker::Lorem.word,
         customer_order_number: Faker::Lorem.word,
@@ -29,16 +28,6 @@ module FinishedGoodsApp
         shipped_date: '2010-01-01',
         shipped: false,
         transfer_load: false,
-        # voyage_type_id: voyage_type_id,
-        # vessel_id: vessel_id,
-        # voyage_number: Faker::Number.number(4),
-        # year: '2019',
-        # pol_port_id: port_id,
-        # pod_port_id: port_id,
-        # shipping_line_party_role_id: party_role_id,
-        # shipper_party_role_id: party_role_id,
-        # booking_reference: Faker::Lorem.word,
-        # memo_pad: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

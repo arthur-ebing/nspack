@@ -39,8 +39,18 @@ module FinishedGoodsApp
     def delete_voyage(id) # rubocop:disable Metrics/AbcSize
       name = voyage(id).voyage_number
       vessel_id = voyage(id).vessel_id
+
       if id == FinishedGoodsApp::VoyageRepo.new.last_voyage_created(vessel_id)
         repo.transaction do
+          # DELETE VOYAGE_PORT
+          voyage_ports = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(id)&.voyage_ports
+          voyage_ports.each do |voyage_port|
+            VoyagePortRepo.new.delete_voyage_port(voyage_port[:id])
+            log_status('voyage_ports', voyage_port[:id], 'DELETED')
+            log_transaction
+          end
+
+          # DELETE VOYAGE
           repo.delete_voyage(id)
           log_status('voyages', id, 'DELETED')
           log_transaction

@@ -24,6 +24,7 @@ module FinishedGoodsApp
     attribute :completed_at, Types::DateTime
     attribute :voyage_type_code, Types::String
     attribute :vessel_code, Types::String
+    attribute :voyage_ports, Types::Hash
     attribute? :active, Types::Bool
   end
 end
