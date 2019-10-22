@@ -11,7 +11,7 @@ Sequel.migration do
     alter_table(:production_run_stats) do
       rename_column :pallets_palletized_full, :pallets_palletized
       rename_column :inspected_pallets, :pallets_inspected
-      drop_constraint :pallets_palletized_partial
+      drop_column :pallets_palletized_partial
     end
   end
 end
