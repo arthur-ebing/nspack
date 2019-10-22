@@ -12,7 +12,7 @@
     :hide_if_true: in_production
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setups/$:id$/edit_active_run_setup"
     :text: edit active run setup
@@ -22,7 +22,7 @@
     :hide_if_false: in_production
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setups/$:id$/clone"
     :text: clone
@@ -30,7 +30,7 @@
     :title: Clone
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setups/$:id$"
     :text: delete
@@ -45,7 +45,7 @@
     :hide_if_true: active
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setups/$:id$/deactivate"
     :text: De-activate
@@ -55,5 +55,5 @@
     :hide_if_true: in_production
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit

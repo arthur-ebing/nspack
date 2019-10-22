@@ -13,7 +13,7 @@
     :popup: true
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setup_templates/$:id$/clone_product_setup_template/clone"
     :text: clone
@@ -21,7 +21,7 @@
     :title: Clone
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setup_templates/$:id$"
     :text: delete
@@ -36,7 +36,7 @@
     :hide_if_true: active
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :url: "/production/product_setups/product_setup_templates/$:id$/deactivate"
     :text: De-activate
@@ -46,7 +46,7 @@
     :hide_if_true: in_production
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
   - :separator: true
   - :url: "/production/product_setups/product_setup_templates/$:id$/manage"
@@ -56,7 +56,7 @@
     :hide_if_false: active
     :auth:
       :function: production
-      :program: product_setups
+      :program: product setups
       :permission: edit
 :page_controls:
   - :control_type: :link
