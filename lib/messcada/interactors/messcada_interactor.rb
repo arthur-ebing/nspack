@@ -96,6 +96,14 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def find_pallet_sequences_by_pallet_number(pallet_number)
+      repo.find_pallet_sequences_by_pallet_number(pallet_number)
+    end
+
+    # def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+    #   repo.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+    # end
+
     private
 
     def repo
