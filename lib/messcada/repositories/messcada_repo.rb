@@ -112,5 +112,13 @@ module MesscadaApp
     def production_run_stats(run_id)
       DB[:production_run_stats].where(production_run_id: run_id).map { |p| p[:bins_tipped] }.first
     end
+
+    def find_pallet_sequences_by_pallet_number(pallet_number)
+      DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number).all
+    end
+
+    # def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+    #   DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).first
+    # end
   end
 end
