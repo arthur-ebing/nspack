@@ -142,7 +142,7 @@ class Nspack < Roda
       # BEHAVIOURS
       # -------------------------------
       r.on 'changed', String do |key|
-        send("production_run_changed_#{key}".to_sym, interactor)
+        UiRules::ChangeRenderer.render_json(:production_run, self, "changed_#{key}".to_sym, interactor: interactor, params: params)
       end
 
       r.post do        # CREATE
@@ -188,104 +188,6 @@ class Nspack < Roda
           end
         end
       end
-    end
-  end
-
-  # DROPDOWN CHANGES
-  # ----------------
-  def production_run_changed_packhouse(interactor)
-    res = interactor.lines_for_packhouse(params)
-    if res.success
-      json_replace_select_options('production_run_production_line_id', res.instance)
-    else
-      show_json_error(res.message)
-    end
-  end
-
-  def production_run_changed_farm(interactor) # rubocop:disable Metrics/AbcSize
-    res = interactor.change_for_farm(params)
-    if res.success
-      json_actions(
-        [
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_puc_id',
-                         options_array: res.instance[:pucs]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_orchard_id',
-                         options_array: res.instance[:orchards]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_group_id',
-                         options_array: res.instance[:cultivar_groups]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_id',
-                         options_array: res.instance[:cultivars]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_season_id',
-                         options_array: res.instance[:seasons])
-        ]
-      )
-    else
-      show_json_error(res.message)
-    end
-  end
-
-  def production_run_changed_puc(interactor) # rubocop:disable Metrics/AbcSize
-    res = interactor.change_for_puc(params)
-    if res.success
-      json_actions(
-        [
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_orchard_id',
-                         options_array: res.instance[:orchards]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_group_id',
-                         options_array: res.instance[:cultivar_groups]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_id',
-                         options_array: res.instance[:cultivars]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_season_id',
-                         options_array: res.instance[:seasons])
-        ]
-      )
-    else
-      show_json_error(res.message)
-    end
-  end
-
-  def production_run_changed_orchard(interactor)
-    res = interactor.change_for_orchard(params)
-    if res.success
-      json_actions(
-        [
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_group_id',
-                         options_array: res.instance[:cultivar_groups]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_id',
-                         options_array: res.instance[:cultivars])
-        ]
-      )
-    else
-      show_json_error(res.message)
-    end
-  end
-
-  def production_run_changed_cultivar_group(interactor)
-    res = interactor.change_for_cultivar_group(params)
-    if res.success
-      json_actions(
-        [
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_cultivar_id',
-                         options_array: res.instance[:cultivars]),
-          OpenStruct.new(type: :replace_select_options,
-                         dom_id: 'production_run_season_id',
-                         options_array: res.instance[:seasons])
-        ]
-      )
-    else
-      show_json_error(res.message)
     end
   end
 end
