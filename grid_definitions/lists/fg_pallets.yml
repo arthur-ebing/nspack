@@ -1,0 +1,27 @@
+---
+:dataminer_definition: fg_pallets
+:captions:
+  :conditions:
+    :active: Active Pallets
+    :allocated_stock: Allocated Pallets
+    :shipped: Shipped Pallets
+:conditions:
+  :standard:
+    - :col: id
+      :op: =
+      :val: $:id$
+  :active:
+    - :col: active
+      :op: =
+      :val: $:active$
+  :allocated_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: allocated
+      :op: =
+      :val: $:allocated$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: $:shipped$

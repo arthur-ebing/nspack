@@ -1,25 +1,36 @@
 ---
 :caption: All Pallets
-:sql: SELECT id, sequence_id, pallet_id, pallet_number, pallet_sequence_number, seq_carton_qty,
-  carton_quantity, pallet_size, pallet_age, stock_age, allocated, shipped, in_stock,
-  inspected, palletized, production_run_id, farm, puc, orchard, cultivar_group, cultivar,
-  season, marketing_variety, customer_variety, std_size, actual_count, size_ref, basic_pack,
-  std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at, exit_ref,
-  palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at,
-  cold_age, ambient_age, verified_at gross_weight, nett_weight, sequence_nett_weight,
-  gross_weight_measured_at, plt_packhouse, plt_line, packhouse, line, seq_exit_ref,
-  pick_ref, phc, verification_result, pallet_base, stack_type, cpp, bom, client_size_ref,
-  treatments, order_number, pm_type, pm_subtype, scrapped, scrapped_at, partially_palletized,
-  partially_palletized_at, reinspected, verified, verification_passed, status, build_status,
-  fruit_sticker, govt_inspection_passed, internal_inspection_passed, inspection_age,
+:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, seq_carton_qty,
+  carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age, allocated,
+  shipped, in_stock, inspected, palletized, production_run_id, farm, puc, orchard,
+  commodity, cultivar, marketing_variety, std_size, actual_count, size_ref, std_pack,
+  packed_tm_group, mark, inventory_code, marketing_org, created_at, palletized_at,
+  govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, verified_at,
+  pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight, basic_pack,
+  packhouse, line, pick_ref, phc, verification_result, scrapped_at, scrapped, partially_palletized,
+  reinspected, verified, verification_passed, status, build_status, load_id, vessel,
+  voyage, container, internal_container, temp_code, vehicle_number, cooled,
+  pol, pod, final_destination, customer, consignee, final_receiver, exporter, country,
+  region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd) AS departure_date,
+  pallet_verification_failed, verification_failure_reason, scanned_carton, cpp, bom,
+  client_size_ref, treatments, order_number, pm_type, pm_subtype, fruit_sticker, cultivar_group,
+  season, customer_variety, plt_packhouse, plt_line, exit_ref, seq_exit_ref, gross_weight_measured_at,
+  partially_palletized_at, govt_inspection_passed, internal_inspection_passed, inspection_age,
   internal_inspection_at, internal_reinspection_at, stock_created_at, intake_created_at,
-  first_cold_storage_at, pallet_verification_failed, verification_failure_reason,
-  active, extended_columns, scanned_carton, seq_scrapped_at FROM vw_pallet_sequence_flat
-  ORDER BY id DESC
+  first_cold_storage_at, active, extended_columns, seq_scrapped_at, colour_rule
+  FROM vw_pallet_sequence_flat
+  ORDER BY pallet_id, pallet_number DESC
 :limit: 10000
 :offset: 
 :external_settings:
-  :render_url: 
+  :render_url:
+  :colour_key:
+    ok: In Stock Pallets
+    ready: Allocated Pallets
+    inactive: Shipped Pallets
+    warning: Scrapped Pallets
+    error: Failed inspection and/or failed verifications Pallets
+    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id
@@ -37,25 +48,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sequence_id:
-    :name: sequence_id
-    :sequence_no: 2
-    :caption: Sequence
-    :namespaced_name: sequence_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   pallet_id:
     :name: pallet_id
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Pallet
     :namespaced_name: pallet_id
     :data_type: :integer
@@ -71,7 +66,7 @@
     :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
@@ -87,7 +82,7 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Pallet sequence number
     :namespaced_name: pallet_sequence_number
     :data_type: :string
@@ -103,7 +98,7 @@
     :group_max: false
   seq_carton_qty:
     :name: seq_carton_qty
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Seq carton qty
     :namespaced_name: seq_carton_qty
     :data_type: :number
@@ -119,12 +114,12 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Carton quantity
     :namespaced_name: carton_quantity
-    :data_type: :integer
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: true
@@ -135,7 +130,7 @@
     :group_max: false
   pallet_size:
     :name: pallet_size
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Pallet size
     :namespaced_name: pallet_size
     :data_type: :number
@@ -151,7 +146,7 @@
     :group_max: false
   pallet_age:
     :name: pallet_age
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Pallet age
     :namespaced_name: pallet_age
     :data_type: :number
@@ -167,7 +162,7 @@
     :group_max: false
   stock_age:
     :name: stock_age
-    :sequence_no: 10
+    :sequence_no: 9
     :caption: Stock age
     :namespaced_name: stock_age
     :data_type: :number
@@ -181,9 +176,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  cold_age:
+    :name: cold_age
+    :sequence_no: 10
+    :caption: Cold age
+    :namespaced_name: cold_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ambient_age:
+    :name: ambient_age
+    :sequence_no: 11
+    :caption: Ambient age
+    :namespaced_name: ambient_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Allocated
     :namespaced_name: allocated
     :data_type: :boolean
@@ -199,7 +226,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Shipped
     :namespaced_name: shipped
     :data_type: :boolean
@@ -215,7 +242,7 @@
     :group_max: false
   in_stock:
     :name: in_stock
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: In stock
     :namespaced_name: in_stock
     :data_type: :boolean
@@ -231,7 +258,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Inspected
     :namespaced_name: inspected
     :data_type: :boolean
@@ -247,7 +274,7 @@
     :group_max: false
   palletized:
     :name: palletized
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Palletized
     :namespaced_name: palletized
     :data_type: :boolean
@@ -263,7 +290,7 @@
     :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Production run
     :namespaced_name: production_run_id
     :data_type: :integer
@@ -279,7 +306,7 @@
     :group_max: false
   farm:
     :name: farm
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Farm
     :namespaced_name: farm
     :data_type: :string
@@ -295,7 +322,7 @@
     :group_max: false
   puc:
     :name: puc
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Puc
     :namespaced_name: puc
     :data_type: :string
@@ -311,7 +338,7 @@
     :group_max: false
   orchard:
     :name: orchard
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Orchard
     :namespaced_name: orchard
     :data_type: :string
@@ -325,11 +352,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cultivar_group:
-    :name: cultivar_group
-    :sequence_no: 20
-    :caption: Cultivar group
-    :namespaced_name: cultivar_group
+  commodity:
+    :name: commodity
+    :sequence_no: 21
+    :caption: Commodity
+    :namespaced_name: commodity
     :data_type: :string
     :width: 
     :format: 
@@ -343,25 +370,9 @@
     :group_max: false
   cultivar:
     :name: cultivar
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Cultivar
     :namespaced_name: cultivar
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  season:
-    :name: season
-    :sequence_no: 22
-    :caption: Season
-    :namespaced_name: season
     :data_type: :string
     :width: 
     :format: 
@@ -389,25 +400,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  customer_variety:
-    :name: customer_variety
-    :sequence_no: 24
-    :caption: Customer variety
-    :namespaced_name: customer_variety
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   std_size:
     :name: std_size
-    :sequence_no: 25
+    :sequence_no: 24
     :caption: Std size
     :namespaced_name: std_size
     :data_type: :integer
@@ -423,7 +418,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 26
+    :sequence_no: 25
     :caption: Actual count
     :namespaced_name: actual_count
     :data_type: :integer
@@ -439,7 +434,7 @@
     :group_max: false
   size_ref:
     :name: size_ref
-    :sequence_no: 27
+    :sequence_no: 26
     :caption: Size ref
     :namespaced_name: size_ref
     :data_type: :string
@@ -453,25 +448,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  basic_pack:
-    :name: basic_pack
-    :sequence_no: 28
-    :caption: Basic pack
-    :namespaced_name: basic_pack
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   std_pack:
     :name: std_pack
-    :sequence_no: 29
+    :sequence_no: 27
     :caption: Std pack
     :namespaced_name: std_pack
     :data_type: :string
@@ -487,7 +466,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 30
+    :sequence_no: 28
     :caption: Packed tm group
     :namespaced_name: packed_tm_group
     :data_type: :string
@@ -503,7 +482,7 @@
     :group_max: false
   mark:
     :name: mark
-    :sequence_no: 31
+    :sequence_no: 29
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
@@ -519,7 +498,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 32
+    :sequence_no: 30
     :caption: Inventory code
     :namespaced_name: inventory_code
     :data_type: :string
@@ -535,7 +514,7 @@
     :group_max: false
   marketing_org:
     :name: marketing_org
-    :sequence_no: 33
+    :sequence_no: 31
     :caption: Marketing org
     :namespaced_name: marketing_org
     :data_type: :string
@@ -551,7 +530,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 34
+    :sequence_no: 32
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
@@ -565,25 +544,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  exit_ref:
-    :name: exit_ref
-    :sequence_no: 35
-    :caption: Exit ref
-    :namespaced_name: exit_ref
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   palletized_at:
     :name: palletized_at
-    :sequence_no: 36
+    :sequence_no: 33
     :caption: Palletized at
     :namespaced_name: palletized_at
     :data_type: :datetime
@@ -599,7 +562,7 @@
     :group_max: false
   govt_first_inspection_at:
     :name: govt_first_inspection_at
-    :sequence_no: 37
+    :sequence_no: 34
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
     :data_type: :datetime
@@ -615,7 +578,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 38
+    :sequence_no: 35
     :caption: Shipped at
     :namespaced_name: shipped_at
     :data_type: :datetime
@@ -631,7 +594,7 @@
     :group_max: false
   govt_reinspection_at:
     :name: govt_reinspection_at
-    :sequence_no: 39
+    :sequence_no: 36
     :caption: Govt reinspection at
     :namespaced_name: govt_reinspection_at
     :data_type: :datetime
@@ -647,7 +610,7 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 40
+    :sequence_no: 37
     :caption: Allocated at
     :namespaced_name: allocated_at
     :data_type: :datetime
@@ -661,220 +624,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cold_age:
-    :name: cold_age
-    :sequence_no: 41
-    :caption: Cold age
-    :namespaced_name: cold_age
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  ambient_age:
-    :name: ambient_age
-    :sequence_no: 42
-    :caption: Ambient age
-    :namespaced_name: ambient_age
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  gross_weight:
-    :name: gross_weight
-    :sequence_no: 43
-    :caption: Gross weight
+  verified_at:
+    :name: verified_at
+    :sequence_no: 38
+    :caption: Verified at
     :namespaced_name: verified_at
     :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  nett_weight:
-    :name: nett_weight
-    :sequence_no: 44
-    :caption: Nett weight
-    :namespaced_name: nett_weight
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  sequence_nett_weight:
-    :name: sequence_nett_weight
-    :sequence_no: 45
-    :caption: Sequence nett weight
-    :namespaced_name: sequence_nett_weight
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  gross_weight_measured_at:
-    :name: gross_weight_measured_at
-    :sequence_no: 46
-    :caption: Gross weight measured at
-    :namespaced_name: gross_weight_measured_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  plt_packhouse:
-    :name: plt_packhouse
-    :sequence_no: 47
-    :caption: Plt packhouse
-    :namespaced_name: plt_packhouse
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  plt_line:
-    :name: plt_line
-    :sequence_no: 48
-    :caption: Plt line
-    :namespaced_name: plt_line
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  packhouse:
-    :name: packhouse
-    :sequence_no: 49
-    :caption: Packhouse
-    :namespaced_name: packhouse
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  line:
-    :name: line
-    :sequence_no: 50
-    :caption: Line
-    :namespaced_name: line
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  seq_exit_ref:
-    :name: seq_exit_ref
-    :sequence_no: 51
-    :caption: Seq exit ref
-    :namespaced_name: seq_exit_ref
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pick_ref:
-    :name: pick_ref
-    :sequence_no: 52
-    :caption: Pick ref
-    :namespaced_name: pick_ref
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  phc:
-    :name: phc
-    :sequence_no: 53
-    :caption: Phc
-    :namespaced_name: phc
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  verification_result:
-    :name: verification_result
-    :sequence_no: 54
-    :caption: Verification result
-    :namespaced_name: verification_result
-    :data_type: :string
     :width: 
     :format: 
     :hide: false
@@ -887,7 +642,7 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 55
+    :sequence_no: 39
     :caption: Pallet base
     :namespaced_name: pallet_base
     :data_type: :string
@@ -903,7 +658,7 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 56
+    :sequence_no: 40
     :caption: Stack type
     :namespaced_name: stack_type
     :data_type: :string
@@ -917,14 +672,30 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cpp:
-    :name: cpp
-    :sequence_no: 57
-    :caption: Cpp
-    :namespaced_name: cpp
-    :data_type: :integer
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 41
+    :caption: Gross weight
+    :namespaced_name: gross_weight
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 42
+    :caption: Nett weight
+    :namespaced_name: nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -933,11 +704,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  bom:
-    :name: bom
-    :sequence_no: 58
-    :caption: Bom
-    :namespaced_name: bom
+  sequence_nett_weight:
+    :name: sequence_nett_weight
+    :sequence_no: 43
+    :caption: Sequence nett weight
+    :namespaced_name: sequence_nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack:
+    :name: basic_pack
+    :sequence_no: 44
+    :caption: Basic pack
+    :namespaced_name: basic_pack
     :data_type: :string
     :width: 
     :format: 
@@ -949,11 +736,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  client_size_ref:
-    :name: client_size_ref
-    :sequence_no: 59
-    :caption: Client size ref
-    :namespaced_name: client_size_ref
+  packhouse:
+    :name: packhouse
+    :sequence_no: 45
+    :caption: Packhouse
+    :namespaced_name: packhouse
     :data_type: :string
     :width: 
     :format: 
@@ -965,11 +752,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  treatments:
-    :name: treatments
-    :sequence_no: 60
-    :caption: Treatments
-    :namespaced_name: treatments
+  line:
+    :name: line
+    :sequence_no: 46
+    :caption: Line
+    :namespaced_name: line
     :data_type: :string
     :width: 
     :format: 
@@ -981,11 +768,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  order_number:
-    :name: order_number
-    :sequence_no: 61
-    :caption: Order number
-    :namespaced_name: order_number
+  pick_ref:
+    :name: pick_ref
+    :sequence_no: 47
+    :caption: Pick ref
+    :namespaced_name: pick_ref
     :data_type: :string
     :width: 
     :format: 
@@ -997,44 +784,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pm_type:
-    :name: pm_type
-    :sequence_no: 62
-    :caption: Pm type
-    :namespaced_name: pm_type
+  phc:
+    :name: phc
+    :sequence_no: 48
+    :caption: Phc
+    :namespaced_name: phc
     :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_subtype:
-    :name: pm_subtype
-    :sequence_no: 63
-    :caption: Pm subtype
-    :namespaced_name: pm_subtype
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  scrapped:
-    :name: scrapped
-    :sequence_no: 64
-    :caption: Scrapped
-    :namespaced_name: scrapped
-    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -1045,9 +800,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  verification_result:
+    :name: verification_result
+    :sequence_no: 49
+    :caption: Verification result
+    :namespaced_name: verification_result
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 65
+    :sequence_no: 50
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -1061,9 +832,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  scrapped:
+    :name: scrapped
+    :sequence_no: 51
+    :caption: Scrapped
+    :namespaced_name: scrapped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   partially_palletized:
     :name: partially_palletized
-    :sequence_no: 66
+    :sequence_no: 52
     :caption: Partially palletized
     :namespaced_name: partially_palletized
     :data_type: :boolean
@@ -1077,25 +864,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  partially_palletized_at:
-    :name: partially_palletized_at
-    :sequence_no: 67
-    :caption: Partially palletized at
-    :namespaced_name: partially_palletized_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   reinspected:
     :name: reinspected
-    :sequence_no: 68
+    :sequence_no: 53
     :caption: Reinspected
     :namespaced_name: reinspected
     :data_type: :boolean
@@ -1111,7 +882,7 @@
     :group_max: false
   verified:
     :name: verified
-    :sequence_no: 69
+    :sequence_no: 54
     :caption: Verified
     :namespaced_name: verified
     :data_type: :boolean
@@ -1127,7 +898,7 @@
     :group_max: false
   verification_passed:
     :name: verification_passed
-    :sequence_no: 70
+    :sequence_no: 55
     :caption: Verification passed
     :namespaced_name: verification_passed
     :data_type: :boolean
@@ -1143,7 +914,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 71
+    :sequence_no: 56
     :caption: Status
     :namespaced_name: status
     :data_type: :string
@@ -1159,7 +930,7 @@
     :group_max: false
   build_status:
     :name: build_status
-    :sequence_no: 72
+    :sequence_no: 57
     :caption: Build status
     :namespaced_name: build_status
     :data_type: :string
@@ -1173,11 +944,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fruit_sticker:
-    :name: fruit_sticker
-    :sequence_no: 73
-    :caption: Fruit sticker
-    :namespaced_name: fruit_sticker
+  load_id:
+    :name: load_id
+    :sequence_no: 58
+    :caption: Load
+    :namespaced_name: load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel:
+    :name: vessel
+    :sequence_no: 59
+    :caption: Vessel
+    :namespaced_name: vessel
     :data_type: :string
     :width: 
     :format: 
@@ -1189,124 +976,268 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  govt_inspection_passed:
-    :name: govt_inspection_passed
+  voyage:
+    :name: voyage
+    :sequence_no: 60
+    :caption: Voyage
+    :namespaced_name: voyage
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container:
+    :name: container
+    :sequence_no: 61
+    :caption: Container
+    :namespaced_name: container
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_container:
+    :name: internal_container
+    :sequence_no: 62
+    :caption: Internal container
+    :namespaced_name: internal_container
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  temp_code:
+    :name: temp_code
+    :sequence_no: 63
+    :caption: Temp code
+    :namespaced_name: temp_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_number:
+    :name: vehicle_number
+    :sequence_no: 64
+    :caption: Vehicle number
+    :namespaced_name: vehicle_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cooled:
+    :name: cooled
+    :sequence_no: 65
+    :caption: Cooled?
+    :namespaced_name: cooled
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pol:
+    :name: pol
+    :sequence_no: 66
+    :caption: Pol
+    :namespaced_name: pol
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pod:
+    :name: pod
+    :sequence_no: 67
+    :caption: Pod
+    :namespaced_name: pod
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  final_destination:
+    :name: final_destination
+    :sequence_no: 68
+    :caption: Final destination
+    :namespaced_name: final_destination
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer:
+    :name: customer
+    :sequence_no: 69
+    :caption: Customer
+    :namespaced_name: customer
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  consignee:
+    :name: consignee
+    :sequence_no: 70
+    :caption: Consignee
+    :namespaced_name: consignee
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  final_receiver:
+    :name: final_receiver
+    :sequence_no: 71
+    :caption: Final receiver
+    :namespaced_name: final_receiver
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exporter:
+    :name: exporter
+    :sequence_no: 72
+    :caption: Exporter
+    :namespaced_name: exporter
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  country:
+    :name: country
+    :sequence_no: 73
+    :caption: Country
+    :namespaced_name: country
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  region:
+    :name: region
     :sequence_no: 74
-    :caption: Govt inspection passed
-    :namespaced_name: govt_inspection_passed
-    :data_type: :boolean
+    :caption: Region
+    :namespaced_name: region
+    :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  internal_inspection_passed:
-    :name: internal_inspection_passed
+  arrival_date:
+    :name: arrival_date
     :sequence_no: 75
-    :caption: Internal inspection passed
-    :namespaced_name: internal_inspection_passed
-    :data_type: :boolean
+    :caption: Arrival date
+    :namespaced_name: arrival_date
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  inspection_age:
-    :name: inspection_age
+  departure_date:
+    :name: departure_date
     :sequence_no: 76
-    :caption: Inspection age
-    :namespaced_name: inspection_age
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  internal_inspection_at:
-    :name: internal_inspection_at
-    :sequence_no: 77
-    :caption: Internal inspection at
-    :namespaced_name: internal_inspection_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  internal_reinspection_at:
-    :name: internal_reinspection_at
-    :sequence_no: 78
-    :caption: Internal reinspection at
-    :namespaced_name: internal_reinspection_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  stock_created_at:
-    :name: stock_created_at
-    :sequence_no: 79
-    :caption: Stock created at
-    :namespaced_name: stock_created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  intake_created_at:
-    :name: intake_created_at
-    :sequence_no: 80
-    :caption: Intake created at
-    :namespaced_name: intake_created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  first_cold_storage_at:
-    :name: first_cold_storage_at
-    :sequence_no: 81
-    :caption: First cold storage at
-    :namespaced_name: first_cold_storage_at
-    :data_type: :datetime
+    :caption: Departure date
+    :namespaced_name: departure_date
+    :data_type: :string
     :width: 
     :format: 
     :hide: false
@@ -1319,7 +1250,7 @@
     :group_max: false
   pallet_verification_failed:
     :name: pallet_verification_failed
-    :sequence_no: 82
+    :sequence_no: 77
     :caption: Pallet verification failed
     :namespaced_name: pallet_verification_failed
     :data_type: :boolean
@@ -1335,7 +1266,7 @@
     :group_max: false
   verification_failure_reason:
     :name: verification_failure_reason
-    :sequence_no: 83
+    :sequence_no: 78
     :caption: Verification failure reason
     :namespaced_name: verification_failure_reason
     :data_type: :string
@@ -1349,9 +1280,425 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  scanned_carton:
+    :name: scanned_carton
+    :sequence_no: 79
+    :caption: Scanned carton
+    :namespaced_name: scanned_carton
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cpp:
+    :name: cpp
+    :sequence_no: 80
+    :caption: Cpp
+    :namespaced_name: cpp
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bom:
+    :name: bom
+    :sequence_no: 81
+    :caption: Bom
+    :namespaced_name: bom
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  client_size_ref:
+    :name: client_size_ref
+    :sequence_no: 82
+    :caption: Client size ref
+    :namespaced_name: client_size_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  treatments:
+    :name: treatments
+    :sequence_no: 83
+    :caption: Treatments
+    :namespaced_name: treatments
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 84
+    :caption: Order number
+    :namespaced_name: order_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_type:
+    :name: pm_type
+    :sequence_no: 85
+    :caption: Pm type
+    :namespaced_name: pm_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_subtype:
+    :name: pm_subtype
+    :sequence_no: 86
+    :caption: Pm subtype
+    :namespaced_name: pm_subtype
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker:
+    :name: fruit_sticker
+    :sequence_no: 87
+    :caption: Fruit sticker
+    :namespaced_name: fruit_sticker
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group:
+    :name: cultivar_group
+    :sequence_no: 88
+    :caption: Cultivar group
+    :namespaced_name: cultivar_group
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season:
+    :name: season
+    :sequence_no: 89
+    :caption: Season
+    :namespaced_name: season
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_variety:
+    :name: customer_variety
+    :sequence_no: 90
+    :caption: Customer variety
+    :namespaced_name: customer_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plt_packhouse:
+    :name: plt_packhouse
+    :sequence_no: 91
+    :caption: Plt packhouse
+    :namespaced_name: plt_packhouse
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plt_line:
+    :name: plt_line
+    :sequence_no: 92
+    :caption: Plt line
+    :namespaced_name: plt_line
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  exit_ref:
+    :name: exit_ref
+    :sequence_no: 93
+    :caption: Exit ref
+    :namespaced_name: exit_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  seq_exit_ref:
+    :name: seq_exit_ref
+    :sequence_no: 94
+    :caption: Seq exit ref
+    :namespaced_name: seq_exit_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight_measured_at:
+    :name: gross_weight_measured_at
+    :sequence_no: 95
+    :caption: Gross weight measured at
+    :namespaced_name: gross_weight_measured_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  partially_palletized_at:
+    :name: partially_palletized_at
+    :sequence_no: 96
+    :caption: Partially palletized at
+    :namespaced_name: partially_palletized_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_inspection_passed:
+    :name: govt_inspection_passed
+    :sequence_no: 97
+    :caption: Govt inspection passed
+    :namespaced_name: govt_inspection_passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_inspection_passed:
+    :name: internal_inspection_passed
+    :sequence_no: 98
+    :caption: Internal inspection passed
+    :namespaced_name: internal_inspection_passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_age:
+    :name: inspection_age
+    :sequence_no: 99
+    :caption: Inspection age
+    :namespaced_name: inspection_age
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_inspection_at:
+    :name: internal_inspection_at
+    :sequence_no: 100
+    :caption: Internal inspection at
+    :namespaced_name: internal_inspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_reinspection_at:
+    :name: internal_reinspection_at
+    :sequence_no: 101
+    :caption: Internal reinspection at
+    :namespaced_name: internal_reinspection_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stock_created_at:
+    :name: stock_created_at
+    :sequence_no: 102
+    :caption: Stock created at
+    :namespaced_name: stock_created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  intake_created_at:
+    :name: intake_created_at
+    :sequence_no: 103
+    :caption: Intake created at
+    :namespaced_name: intake_created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  first_cold_storage_at:
+    :name: first_cold_storage_at
+    :sequence_no: 104
+    :caption: First cold storage at
+    :namespaced_name: first_cold_storage_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 84
+    :sequence_no: 105
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1367,7 +1714,7 @@
     :group_max: false
   extended_columns:
     :name: extended_columns
-    :sequence_no: 85
+    :sequence_no: 106
     :caption: Extended columns
     :namespaced_name: extended_columns
     :data_type: :string
@@ -1381,12 +1728,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  scanned_carton:
-    :name: scanned_carton
-    :sequence_no: 86
-    :caption: Scanned carton
-    :namespaced_name: scanned_carton
-    :data_type: :integer
+  seq_scrapped_at:
+    :name: seq_scrapped_at
+    :sequence_no: 107
+    :caption: Seq scrapped at
+    :namespaced_name: seq_scrapped_at
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
@@ -1397,15 +1744,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  seq_scrapped_at:
-    :name: seq_scrapped_at
-    :sequence_no: 87
-    :caption: Seq scrapped at
-    :namespaced_name: seq_scrapped_at
-    :data_type: :datetime
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 108
+    :caption: Colour rule
+    :namespaced_name: colour_rule
+    :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

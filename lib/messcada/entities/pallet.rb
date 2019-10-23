@@ -39,5 +39,7 @@ module MesscadaApp
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
     attribute? :active, Types::Bool
+    attribute :load_id, Types::Integer
+    attribute? :cooled, Types::Bool
   end
 end

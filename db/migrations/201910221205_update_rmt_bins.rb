@@ -8,8 +8,8 @@ Sequel.migration do
 
   down do
     alter_table(:rmt_bins) do
-      drop_constraint :scrapped
-      drop_constraint :scrapped_at
+      drop_column :scrapped
+      drop_column :scrapped_at
     end
   end
 end

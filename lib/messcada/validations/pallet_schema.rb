@@ -40,5 +40,7 @@ module MesscadaApp
     required(:plt_packhouse_resource_id, :integer).maybe(:int?)
     required(:plt_line_resource_id, :integer).maybe(:int?)
     optional(:nett_weight, %i[nil decimal]).maybe(:decimal?)
+    optional(:load_id, :integer).maybe(:int?)
+    optional(:cooled, :bool).maybe(:bool?)
   end
 end
