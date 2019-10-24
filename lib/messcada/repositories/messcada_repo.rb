@@ -122,11 +122,25 @@ module MesscadaApp
     end
 
     def find_pallet_sequences_by_pallet_number(pallet_number)
-      DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number).all
+      # DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number)
+      DB["SELECT *
+          FROM vw_pallet_sequence_flat
+          WHERE pallet_number = '#{pallet_number}'
+          order by pallet_sequence_number asc"]
     end
 
-    # def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
-    #   DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).first
-    # end
+    def find_pallet_sequences_from_same_pallet(id)
+      DB["select sis.id
+          from pallet_sequences s
+          join pallet_sequences sis on sis.pallet_id=s.pallet_id
+          where s.id = #{id}
+          order by s.pallet_sequence_number asc"].map { |s| s[:id] }
+    end
+
+    def find_pallet_sequence_attrs(id)
+      DB["SELECT *
+          FROM vw_pallet_sequence_flat
+          WHERE id = ?", id].first
+    end
   end
 end
