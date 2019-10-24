@@ -45,7 +45,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SHARED_CONFIG_HOST_PORT: 'IP address of shared_config in the format HOST:PORT' },
     { DEFAULT_RMT_CONTAINER_TYPE: 'This should be set behind the scenes, since it will almost always be the same thing, e.g. ‘bins’, for a given packhouse.' },
     { CHRUBY_STRING: 'The version of chruby used in development. Used in Rake tasks.' },
-    { GLN_LEVEL: 'Resource Level at which the GLN code is stored. Can be "LINE" or "PACKHOUSE".' }
+    { GLN_LEVEL: 'Resource Level at which the GLN code is stored. Can be "LINE" or "PACKHOUSE".' },
+    { PHC_LEVEL: 'Resource Level at which the PHC code is stored. Can be "LINE" or "PACKHOUSE".' }
   ].freeze
 
   MUST_OVERRIDE = [

@@ -32,6 +32,7 @@ module UiRules
 
       at_ph_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::PACKHOUSE
       at_gln_level = @form_object.plant_resource_type_code == AppConst::GLN_LEVEL
+      at_phc_level = @form_object.plant_resource_type_code == AppConst::PHC_LEVEL
       fields[:location_id] = { renderer: :lookup,
                                lookup_name: :plant_resource_locations,
                                lookup_key: :standard,
@@ -45,6 +46,8 @@ module UiRules
                        prompt: true,
                        parent_field: :resource_properties,
                        invisible: !at_gln_level }
+      fields[:phc] = { parent_field: :resource_properties,
+                       invisible: !at_phc_level }
       fields[:packhouse_no] = { renderer: :integer,
                                 required: true,
                                 parent_field: :resource_properties,
