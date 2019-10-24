@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class MesscadaRepo < BaseRepo
+  class MesscadaRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :carton_labels, name: :carton_label, wrapper: CartonLabel
     crud_calls_for :cartons, name: :carton, wrapper: Carton
     crud_calls_for :pallets, name: :pallet, wrapper: Pallet
@@ -56,15 +56,22 @@ module MesscadaApp
     end
 
     def find_resource_phc(id)
-      DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'phc'").as(:phc)).first[:phc].to_s
+      # DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'phc'").as(:phc)).first[:phc].to_s
+      DB[:plant_resources].where(id: id).get(Sequel.lit("resource_properties ->> 'phc'"))
     end
 
     def find_resource_packhouse_no(id)
-      DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'packhouse_no'").as(:packhouse_no)).first[:packhouse_no].to_s
+      # DB[:plant_resources].where(id: id).select(:id, Sequel.lit("resource_properties ->> 'packhouse_no'").as(:packhouse_no)).first[:packhouse_no].to_s
+      DB[:plant_resources].where(id: id).get(Sequel.lit("resource_properties ->> 'packhouse_no'"))
     end
 
     def find_cartons_per_pallet(id)
       DB[:cartons_per_pallet].where(id: id).get(:cartons_per_pallet)
+    end
+
+    # Create several carton_labels records returning an array of the newly-created ids
+    def create_carton_labels(no_of_prints, attrs)
+      DB[:carton_labels].multi_insert(no_of_prints.times.map { attrs }, return: :primary_key)
     end
 
     def create_pallet_and_sequences(pallet, pallet_sequence)

@@ -95,3 +95,4 @@ class Nspack < Roda
     form.add_label(:bom, 'Bom Code', pallet_sequence[:bom])
   end
 end
+# rubocop:enable Metrics/BlockLength

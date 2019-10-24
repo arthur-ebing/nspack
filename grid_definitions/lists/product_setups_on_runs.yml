@@ -1,0 +1,17 @@
+---
+:dataminer_definition: product_setup_details_on_runs
+:actions:
+- :url: "/production/product_setups/product_setups/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/production/runs/production_runs/$:production_run_id$/product_setup/$:id$/print_label"
+  :text: Print carton label
+  :icon: printer
+  :title: Print carton label
+  :popup: true
+:conditions:
+  :standard:
+    - :col: production_runs.id
+      :op: =
+      :val: $:production_run_id$

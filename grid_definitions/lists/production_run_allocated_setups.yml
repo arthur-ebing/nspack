@@ -6,6 +6,11 @@
   :icon: view-show
   :title: View
   :hide_if_null: product_setup_id
+- :url: "/production/runs/product_resource_allocations/$:id$/preview_label"
+  :text: Preview label
+  :icon: photo
+  :title: Peview label
+  :popup: true
 :conditions:
   :standard:
     - :col: r.id

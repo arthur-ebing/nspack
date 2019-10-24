@@ -11,7 +11,7 @@ module MesscadaApp
     attribute :cultivar_id, Types::Integer
     attribute :product_resource_allocation_id, Types::Integer
     attribute :packhouse_resource_id, Types::Integer
-    attribute :production_line_resource_id, Types::Integer
+    attribute :production_line_id, Types::Integer
     attribute :season_id, Types::Integer
     attribute :marketing_variety_id, Types::Integer
     attribute :customer_variety_variety_id, Types::Integer

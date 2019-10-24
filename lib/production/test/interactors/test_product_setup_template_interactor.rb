@@ -74,7 +74,7 @@ module ProductionApp
       cultivar_group_id = create_cultivar_group
       cultivar_id = create_cultivar
       # packhouse_resource_id = create_plant_resource
-      # production_line_resource_id = create_plant_resource
+      # production_line_id = create_plant_resource
       season_group_id = create_season_group
       season_id = create_season
 
@@ -85,14 +85,14 @@ module ProductionApp
         cultivar_group_id: cultivar_group_id,
         cultivar_id: cultivar_id,
         packhouse_resource_id: nil,
-        production_line_resource_id: nil,
+        production_line_id: nil,
         season_group_id: season_group_id,
         season_id: season_id,
         active: true,
         cultivar_group_code: 'ABC',
         cultivar_name: 'ABC',
         packhouse_resource_code: 'ABC',
-        production_line_resource_code: 'ABC',
+        production_line_code: 'ABC',
         season_group_code: 'ABC',
         season_code: 'ABC'
       }

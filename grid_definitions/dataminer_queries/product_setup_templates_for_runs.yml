@@ -6,8 +6,8 @@
   \r\n       seasons.season_code\r\n  FROM production_runs\r\n  JOIN product_setup_templates
   ON product_setup_templates.cultivar_group_id = production_runs.cultivar_group_id\r\n
   \  AND (product_setup_templates.packhouse_resource_id IS NULL OR product_setup_templates.packhouse_resource_id
-  = production_runs.packhouse_resource_id)\r\n   AND (product_setup_templates.production_line_resource_id
-  IS NULL OR product_setup_templates.production_line_resource_id = production_runs.production_line_id)\r\n
+  = production_runs.packhouse_resource_id)\r\n   AND (product_setup_templates.production_line_id
+  IS NULL OR product_setup_templates.production_line_id = production_runs.production_line_id)\r\n
   \  AND (product_setup_templates.season_id IS NULL OR product_setup_templates.season_id
   = production_runs.season_id)\r\n   AND CASE WHEN NOT production_runs.allow_cultivar_mixing
   THEN (product_setup_templates.cultivar_id IS NULL OR product_setup_templates.cultivar_id
@@ -15,7 +15,7 @@
   = product_setup_templates.cultivar_group_id\r\n  LEFT OUTER JOIN cultivars ON cultivars.id
   = product_setup_templates.cultivar_id\r\n  LEFT OUTER JOIN plant_resources ph ON
   ph.id = product_setup_templates.packhouse_resource_id\r\n  LEFT OUTER JOIN plant_resources
-  line ON line.id = product_setup_templates.production_line_resource_id\r\n  LEFT
+  line ON line.id = product_setup_templates.production_line_id\r\n  LEFT
   OUTER JOIN season_groups ON season_groups.id = product_setup_templates.season_group_id\r\n
   \ LEFT OUTER JOIN seasons ON seasons.id = product_setup_templates.season_id\r\n
   \ WHERE product_setup_templates.active"

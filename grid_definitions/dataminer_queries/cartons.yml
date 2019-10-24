@@ -24,7 +24,7 @@
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
   JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
   JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
-  JOIN plant_resources lines ON lines.id = carton_labels.production_line_resource_id
+  JOIN plant_resources lines ON lines.id = carton_labels.production_line_id
   JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id
   JOIN system_resources ON packpoints.system_resource_id = system_resources.id
   JOIN farms ON farms.id = carton_labels.farm_id

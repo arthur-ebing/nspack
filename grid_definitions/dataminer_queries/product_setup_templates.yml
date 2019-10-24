@@ -2,10 +2,10 @@
 :caption: Product Setup Templates
 :sql: SELECT product_setup_templates.id, product_setup_templates.template_name, product_setup_templates.description,
   product_setup_templates.cultivar_group_id, product_setup_templates.cultivar_id,
-  product_setup_templates.packhouse_resource_id, product_setup_templates.production_line_resource_id, product_setup_templates.season_group_id,
+  product_setup_templates.packhouse_resource_id, product_setup_templates.production_line_id, product_setup_templates.season_group_id,
   product_setup_templates.season_id, product_setup_templates.active, product_setup_templates.created_at, product_setup_templates.updated_at,
   cultivar_groups.cultivar_group_code, cultivars.cultivar_name, plant_resources.plant_resource_code
-  AS packhouse_resource_code, plant_resources2.plant_resource_code AS production_line_resource_code,
+  AS packhouse_resource_code, plant_resources2.plant_resource_code AS production_line_code,
   season_groups.season_group_code, seasons.season_code, fn_current_status('product_setup_templates',
   product_setup_templates.id) AS status, fn_product_setup_template_in_production(product_setup_templates.id)
   AS in_production, CASE WHEN fn_product_setup_template_in_production(product_setup_templates.id)
@@ -14,7 +14,7 @@
   = product_setup_templates.cultivar_group_id LEFT JOIN cultivars ON cultivars.id
   = product_setup_templates.cultivar_id LEFT JOIN plant_resources ON plant_resources.id
   = product_setup_templates.packhouse_resource_id LEFT JOIN plant_resources plant_resources2
-  ON plant_resources2.id = product_setup_templates.production_line_resource_id LEFT
+  ON plant_resources2.id = product_setup_templates.production_line_id LEFT
   JOIN season_groups ON season_groups.id = product_setup_templates.season_group_id
   LEFT JOIN seasons ON seasons.id = product_setup_templates.season_id
 :limit: 
@@ -120,11 +120,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  production_line_resource_id:
-    :name: production_line_resource_id
+  production_line_id:
+    :name: production_line_id
     :sequence_no: 16
     :caption: Production line resource
-    :namespaced_name: product_setup_templates.production_line_resource_id
+    :namespaced_name: product_setup_templates.production_line_id
     :data_type: :integer
     :width: 
     :format: 
@@ -264,8 +264,8 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  production_line_resource_code:
-    :name: production_line_resource_code
+  production_line_code:
+    :name: production_line_code
     :sequence_no: 6
     :caption: Production line resource code
     :namespaced_name: plant_resources2.plant_resource_code
@@ -395,7 +395,7 @@
   :list_def: SELECT plant_resources.plant_resource_code, plant_resources.id FROM plant_resources
     JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
     WHERE plant_resource_type_code = 'PACKHOUSE' ORDER BY plant_resource_code
-- :column: product_setup_templates.production_line_resource_id
+- :column: product_setup_templates.production_line_id
   :caption: Production line resource
   :data_type: :integer
   :control_type: :list

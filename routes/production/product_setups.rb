@@ -97,7 +97,7 @@ class Nspack < Roda # rubocop:disable ClassLength
               cultivar_group_code
               cultivar_name
               packhouse_resource_code
-              production_line_resource_code
+              production_line_code
               season_group_code
               season_code
               active
@@ -175,7 +175,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                    else
                                      interactor.for_select_packhouse_lines(params[:changed_value])
                                    end
-        json_replace_select_options('product_setup_template_production_line_resource_id', packhouse_resource_lines)
+        json_replace_select_options('product_setup_template_production_line_id', packhouse_resource_lines)
       end
 
       r.on 'season_group_changed' do
@@ -201,7 +201,7 @@ class Nspack < Roda # rubocop:disable ClassLength
             cultivar_group_code
             cultivar_name
             packhouse_resource_code
-            production_line_resource_code
+            production_line_code
             season_group_code
             season_code
             active

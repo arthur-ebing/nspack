@@ -16,7 +16,7 @@ module MesscadaApp
     required(:cultivar_id, :integer).maybe(:int?)
     required(:product_resource_allocation_id, :integer).filled(:int?)
     required(:packhouse_resource_id, :integer).filled(:int?)
-    required(:production_line_resource_id, :integer).filled(:int?)
+    required(:production_line_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:marketing_variety_id, :integer).filled(:int?)
     required(:customer_variety_variety_id, :integer).maybe(:int?)

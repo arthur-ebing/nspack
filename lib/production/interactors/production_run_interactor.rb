@@ -168,6 +168,33 @@ module ProductionApp
       success_response('ok', instance)
     end
 
+    def preview_allocation_carton_label(product_resource_allocation_id)
+      alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
+      return failed_response('Please choose a product setup') unless alloc[:product_setup_id]
+      return failed_response('Please choose a label template') unless alloc[:label_template_id]
+
+      instance = product_setup_repo.find_product_setup(alloc[:product_setup_id])
+      label = repo.find_hash(:label_templates, alloc[:label_template_id])[:label_template_name]
+      LabelPrintingApp::PreviewLabel.call(label, instance)
+    end
+
+    # create carton_print_repo?
+    def print_carton_label(id, product_setup_id, params)
+      res = validate_print_carton(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      return mixed_validation_failed_response(res, messages: { no_of_prints: ["cannot be more than #{AppConst::BATCH_PRINT_MAX_LABELS}"] }) if res[:no_of_prints] > AppConst::BATCH_PRINT_MAX_LABELS
+
+      # # {:product_setup=>{:printer=>"2", :label_template_id=>"2", :no_of_prints=>"1"}}
+      label_template = repo.find_hash(:label_templates, res[:label_template_id])
+      # print service...
+      # repo.transaction do
+      #   # gen carton_label
+      # end
+      # instance = carton_label(id)
+      # LabelPrintingApp::PrintLabel.call(label_template[:label_template_name], instance, params)
+      success_response(label_template[:label_template_name], id: id, product_setup_id: product_setup_id)
+    end
+
     private
 
     def repo
@@ -180,6 +207,10 @@ module ProductionApp
 
     def cultivar_repo
       @cultivar_repo ||= MasterfilesApp::CultivarRepo.new
+    end
+
+    def product_setup_repo
+      @product_setup_repo ||= ProductionApp::ProductSetupRepo.new
     end
 
     def production_run(id)
@@ -200,6 +231,16 @@ module ProductionApp
 
     def validate_production_run_template_params(params)
       ProductionRunTemplateSchema.call(params)
+    end
+
+    def validate_print_carton(params)
+      Dry::Validation.Params do
+        configure { config.type_specs = true }
+
+        required(:printer, :integer).filled(:int?)
+        required(:label_template_id, :integer).filled(:int?)
+        required(:no_of_prints, :integer).filled(:int?, gt?: 0)
+      end.call(params)
     end
   end
 end

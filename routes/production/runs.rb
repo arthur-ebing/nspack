@@ -51,6 +51,22 @@ class Nspack < Roda
         end
       end
 
+      r.on 'product_setup', Integer do |product_setup_id|
+        r.on 'print_label' do
+          r.get do
+            show_partial { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id) }
+          end
+          r.patch do
+            res = interactor.print_carton_label(id, product_setup_id, params[:product_setup])
+            if res.success
+              show_json_notice(res.message)
+            else
+              re_show_form(r, res) { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id, form_values: params[:product_setup], form_errors: res.errors) }
+            end
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('runs', 'read')
@@ -186,6 +202,29 @@ class Nspack < Roda
                                                       form_errors: res.errors,
                                                       remote: fetch?(r))
           end
+        end
+      end
+    end
+
+    r.on 'product_resource_allocations', Integer do |id|
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:production_runs, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'preview_label' do
+        res = interactor.preview_allocation_carton_label(id)
+        if res.success
+          filepath = Tempfile.open([res.instance.fname, '.png'], 'public/tempfiles') do |f|
+            f.write(res.instance.body)
+            f.path
+          end
+          File.chmod(0o644, filepath) # Ensure web app can read the image.
+          update_dialog_content(content: "<div style='border:2px solid orange'><img src='/#{File.join('tempfiles', File.basename(filepath))}'>i</div>")
+        else
+          { flash: { error: res.message } }.to_json
         end
       end
     end

@@ -36,7 +36,7 @@ module Production
                 end
                 row.column do |col|
                   col.add_field :packhouse_resource_id
-                  col.add_field :production_line_resource_id
+                  col.add_field :production_line_id
                   col.add_field :season_group_id
                   col.add_field :season_id
                 end

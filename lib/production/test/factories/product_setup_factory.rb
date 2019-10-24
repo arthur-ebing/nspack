@@ -11,7 +11,7 @@ module ProductionApp
         cultivar_group_id: cultivar_group_id,
         cultivar_id: nil,
         packhouse_resource_id: nil,
-        production_line_resource_id: nil,
+        production_line_id: nil,
         season_group_id: nil,
         season_id: nil,
         active: true
@@ -32,6 +32,7 @@ module ProductionApp
       cartons_per_pallet_id = create_cartons_per_pallet
       treatment_ids = create_treatment
       grade_id = create_grade
+      inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
 
       default = {
@@ -46,7 +47,7 @@ module ProductionApp
         marketing_org_party_role_id: marketing_org_party_role_id,
         packed_tm_group_id: packed_tm_group_id,
         mark_id: mark_id,
-        inventory_code_id: nil,
+        inventory_code_id: inventory_code_id,
         pallet_format_id: pallet_format_id,
         cartons_per_pallet_id: cartons_per_pallet_id,
         pm_bom_id: nil,

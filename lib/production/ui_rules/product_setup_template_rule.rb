@@ -25,7 +25,7 @@ module UiRules
       cultivar_group_id_label = @repo.find_hash(:cultivar_groups, @form_object.cultivar_group_id)[:cultivar_group_code]
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       packhouse_resource_id_label = ProductionApp::ResourceRepo.new.find_plant_resource(@form_object.packhouse_resource_id)&.plant_resource_code
-      production_line_resource_id_label = ProductionApp::ResourceRepo.new.find_plant_resource(@form_object.production_line_resource_id)&.plant_resource_code
+      production_line_id_label = ProductionApp::ResourceRepo.new.find_plant_resource(@form_object.production_line_id)&.plant_resource_code
       season_group_id_label = MasterfilesApp::CalendarRepo.new.find_season_group(@form_object.season_group_id)&.season_group_code
       season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       fields[:template_name] = { renderer: :label }
@@ -33,7 +33,7 @@ module UiRules
       fields[:cultivar_group_id] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:packhouse_resource_id] = { renderer: :label, with_value: packhouse_resource_id_label, caption: 'Packhouse Resource' }
-      fields[:production_line_resource_id] = { renderer: :label, with_value: production_line_resource_id_label, caption: 'Production Line Resource' }
+      fields[:production_line_id] = { renderer: :label, with_value: production_line_id_label, caption: 'Production Line Resource' }
       fields[:season_group_id] = { renderer: :label, with_value: season_group_id_label, caption: 'Season Group' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -70,12 +70,12 @@ module UiRules
                                  prompt: 'Select Packhouse',
                                  searchable: true,
                                  remove_search_for_small_list: false },
-        production_line_resource_id: { renderer: :select, options: @repo.for_select_plant_resources(Crossbeams::Config::ResourceDefinitions::LINE),
-                                       disabled_options: ProductionApp::ResourceRepo.new.for_select_inactive_plant_resources,
-                                       caption: 'Production Line',
-                                       prompt: 'Select Production Line',
-                                       searchable: true,
-                                       remove_search_for_small_list: false },
+        production_line_id: { renderer: :select, options: @repo.for_select_plant_resources(Crossbeams::Config::ResourceDefinitions::LINE),
+                              disabled_options: ProductionApp::ResourceRepo.new.for_select_inactive_plant_resources,
+                              caption: 'Production Line',
+                              prompt: 'Select Production Line',
+                              searchable: true,
+                              remove_search_for_small_list: false },
         season_group_id: { renderer: :select, options: MasterfilesApp::CalendarRepo.new.for_select_season_groups,
                            disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_season_groups,
                            caption: 'Season Group',
@@ -105,7 +105,7 @@ module UiRules
 
     def set_manage_template_setups
       compact_header(columns: %i[template_name description cultivar_group_code cultivar_name
-                                 packhouse_resource_code production_line_resource_code
+                                 packhouse_resource_code production_line_code
                                  season_group_code season_code],
                      header_captions: {
                        template_name: 'Template',
@@ -113,7 +113,7 @@ module UiRules
                        cultivar_group_code: 'Cultivar group',
                        cultivar_name: 'Cultivar',
                        packhouse_resource_code: 'Packhouse',
-                       production_line_resource_code: 'Line',
+                       production_line_code: 'Line',
                        season_group_code: 'Season Group',
                        season_code: 'Season'
                      })
@@ -136,7 +136,7 @@ module UiRules
                                     cultivar_group_id: nil,
                                     cultivar_id: nil,
                                     packhouse_resource_id: nil,
-                                    production_line_resource_id: nil,
+                                    production_line_id: nil,
                                     season_group_id: nil,
                                     season_id: nil)
     end

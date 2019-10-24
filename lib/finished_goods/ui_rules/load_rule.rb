@@ -72,7 +72,7 @@ module UiRules
       fields[:memo_pad] = { renderer: :label, with_value: memo_pad_label, caption: 'Memo Pad' }
     end
 
-    def set_allocate_fields
+    def set_allocate_fields # rubocop:disable Metrics/AbcSize
       depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code

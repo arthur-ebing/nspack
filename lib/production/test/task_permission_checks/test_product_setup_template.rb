@@ -14,14 +14,14 @@ module ProductionApp
         cultivar_group_id: 1,
         cultivar_id: 1,
         packhouse_resource_id: 1,
-        production_line_resource_id: 1,
+        production_line_id: 1,
         season_group_id: 1,
         season_id: 1,
         active: true,
         cultivar_group_code: 'ABC',
         cultivar_name: 'ABC',
         packhouse_resource_code: 'ABC',
-        production_line_resource_code: 'ABC',
+        production_line_code: 'ABC',
         season_group_code: 'ABC',
         season_code: 'ABC'
       }

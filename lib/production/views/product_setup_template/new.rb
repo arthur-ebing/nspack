@@ -21,7 +21,7 @@ module Production
               form.add_field :cultivar_group_id
               form.add_field :cultivar_id
               form.add_field :packhouse_resource_id
-              form.add_field :production_line_resource_id
+              form.add_field :production_line_id
               form.add_field :season_group_id
               form.add_field :season_id
             end
