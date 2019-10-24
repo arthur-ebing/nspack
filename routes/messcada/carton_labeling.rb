@@ -36,7 +36,7 @@ class Nspack < Roda
             <lcd4></lcd4>
             <lcd5></lcd5>
             <lcd6>Label printing failed.</lcd6>
-            <msg>#{res.message}</msg>
+            <msg>#{unwrap_failed_response(res)}</msg>
             </label>", nil)
           end
         end

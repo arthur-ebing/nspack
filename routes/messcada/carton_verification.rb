@@ -19,7 +19,7 @@ class Nspack < Roda
               if res.success
                 wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
               else
-                wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
+                wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
               end
             end
           end
@@ -37,7 +37,7 @@ class Nspack < Roda
             if res.success
               wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
             else
-              wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
+              wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
             end
           end
         end
@@ -55,7 +55,7 @@ class Nspack < Roda
           if res.success
             wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
           else
-            wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
+            wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
           end
         end
       end
