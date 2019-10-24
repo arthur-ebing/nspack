@@ -66,16 +66,31 @@ module MesscadaApp
     def update_attrs
       attrs = { gross_weight: gross_weight }
       if provide_pack_type
-        nett_weight = gross_weight.to_f - repo.find_standard_pack_code_material_mass(plant_resource_button_indicator)
-        attrs = attrs.to_h.merge(nett_weight: nett_weight)
+        standard_pack_code_id = find_standard_pack_code(plant_resource_button_indicator)
+        nett_weight = gross_weight.to_f - repo.find_standard_pack_code_material_mass(standard_pack_code_id).to_f
+        attrs = attrs.to_h.merge(nett_weight: nett_weight,
+                                 standard_pack_code_id: standard_pack_code_id)
       end
       attrs
     end
 
+    def find_standard_pack_code(plant_resource_button_indicator)
+      repo.find_standard_pack_code(plant_resource_button_indicator)
+    end
+
     def update_carton(id, attrs)
       repo.update_carton(id, attrs)
-      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(attrs) if carton_is_pallet
+      return unless carton_is_pallet
+
+      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
+      pallet_id = find_pallet_from_carton(id)
+      DB[:pallets].where(id: pallet_id).update(gross_weight: gross_weight)
+
       # ProductionApp::RunStatsUpdateJob.enqueue(id, nett_weight, 'CARTONS_PACKED_WEIGHT')
+    end
+
+    def find_pallet_from_carton(carton_id)
+      repo.find_pallet_from_carton(carton_id)
     end
   end
 end

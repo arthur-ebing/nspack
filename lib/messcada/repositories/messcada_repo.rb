@@ -39,8 +39,16 @@ module MesscadaApp
       DB[:standard_pack_codes].where(plant_resource_button_indicator: plant_resource_button_indicator).count == 1
     end
 
-    def find_standard_pack_code_material_mass(plant_resource_button_indicator)
-      DB[:standard_pack_codes].where(plant_resource_button_indicator: plant_resource_button_indicator).get(:material_mass)
+    def find_standard_pack_code(plant_resource_button_indicator)
+      DB[:standard_pack_codes].where(plant_resource_button_indicator: plant_resource_button_indicator).get(:id)
+    end
+
+    def find_standard_pack_code_material_mass(id)
+      DB[:standard_pack_codes].where(id: id).get(:material_mass)
+    end
+
+    def find_pallet_from_carton(carton_id)
+      DB[:pallet_sequences].where(scanned_from_carton_id: carton_id).get(:pallet_id)
     end
 
     def find_resource_location_id(id)
