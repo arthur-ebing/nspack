@@ -13,9 +13,7 @@ module FinishedGoodsApp
 
     crud_calls_for :load_voyages, name: :load_voyage, wrapper: LoadVoyage
 
-    def find_load_voyage_id(load_id: nil)
-      return nil if load_id.nil_or_empty?
-
+    def find_load_voyage_id(load_id)
       ds = DB[:load_voyages]
       ds = ds.where(load_id: load_id)
       ds.get(:id)

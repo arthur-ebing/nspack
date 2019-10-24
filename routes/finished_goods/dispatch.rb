@@ -316,6 +316,34 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'allocate_pallets' do
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.update_load_pallets(id, multiselect_grid_choices(params))
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
+
+      r.on 'allocate_pallets_form' do
+        r.get do       # SHOW
+          check_auth!('dispatch', 'read')
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, back_url: request.referer) }
+        end
+
+        r.patch do     # UPDATE
+          p params
+          res = interactor.update_load(id, params[:load])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, form_values: params[:load], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

@@ -7,11 +7,11 @@ module UiRules
 
       make_form_object
       apply_form_values
-      # clean_object
 
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
+      set_allocate_fields if %i[allocate].include? @mode
       add_behaviours if %i[new edit].include? @mode
 
       form_name 'load'
@@ -72,6 +72,18 @@ module UiRules
       fields[:memo_pad] = { renderer: :label, with_value: memo_pad_label, caption: 'Memo Pad' }
     end
 
+    def set_allocate_fields
+      depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
+      fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
+      voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code
+      pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_code
+      pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_code
+      fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
+      fields[:pol_voyage_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
+      fields[:pod_voyage_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
+    end
+
     def common_fields # rubocop:disable Metrics/AbcSize
       {
         # Parties
@@ -102,7 +114,7 @@ module UiRules
                                         prompt: true },
 
         # Load Details
-        order_number: { required: true },
+        order_number: {},
         customer_order_number: {},
         customer_reference: {},
         depot_id: { renderer: :select,
@@ -159,20 +171,15 @@ module UiRules
                                  caption: 'Shipper',
                                  prompt: true },
         booking_reference: {},
-        memo_pad: { renderer: :textarea, rows: 7 }
+        memo_pad: { renderer: :textarea, rows: 7 },
+        pallet_list: { renderer: :textarea, rows: 12 }
       }
     end
 
-    # def clean_object
-    #   h = {}
-    #   @form_object.to_h.each { |k, v| h[k] = v.to_s.empty? & k.to_s.end_with?('_id') ? nil : v }
-    #   @form_object = OpenStruct.new(h)
-    # end
-
     def make_form_object
       make_new_form_object && return if @mode == :new
-
       @form_object = @repo.find_load_flat(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil))
     end
 
     def make_new_form_object

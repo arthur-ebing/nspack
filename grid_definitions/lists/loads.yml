@@ -14,6 +14,14 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: "/list/stock_pallets/multi?key=allocate_pallets&id=$:id$&in_stock=true"
+  :text: allocate pallets
+  :icon: list
+  :popup: true
+- :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_form"
+  :text: allocate pallets
+  :icon: edit
+  :title: Allocate Pallets
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/dispatch/loads/new"

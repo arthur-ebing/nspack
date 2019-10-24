@@ -48,3 +48,18 @@
     - :col: pallet_verification_failed
       :op: =
       :val: $:pallet_verification_failed$
+  :unallocated_load_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: zero_load_id
+      :op: IN
+      :val: $:id$,0
+:multiselect:
+  :allocate_pallets:
+    :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"
+    :preselect: "SELECT id FROM vw_pallet_sequence_flat WHERE load_id = $:id$"
+    :section_caption: "SELECT 'Assign pallets to load ' || order_number FROM loads WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_load_stock

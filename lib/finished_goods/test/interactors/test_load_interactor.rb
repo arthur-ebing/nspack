@@ -6,12 +6,6 @@ module FinishedGoodsApp
   class TestLoadInteractor < MiniTestWithHooks
     include LoadFactory
     include MasterfilesApp::PartyFactory
-    # include VoyageFactory
-    # include VoyagePortFactory
-    # include MasterfilesApp::PartyFactory
-    # include MasterfilesApp::VesselFactory
-    # include MasterfilesApp::PortFactory
-    # include MasterfilesApp::DepotFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -19,8 +13,8 @@ module FinishedGoodsApp
     end
 
     def test_load
-      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load).returns(fake_load)
-      entity = interactor.send(:load, 1)
+      FinishedGoodsApp::LoadRepo.any_instance.stubs(:find_load_flat).returns(fake_load)
+      entity = interactor.send(:load_entity, 1)
       assert entity.is_a?(LoadFlat)
     end
 
@@ -28,15 +22,15 @@ module FinishedGoodsApp
       attrs = fake_load.to_h.reject { |k, _| k == :id }
       res = interactor.create_load(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(Load, res.instance)
+      assert_instance_of(LoadFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
     def test_create_load_fail
-      attrs = fake_load.to_h.reject { |k, _| %i[id order_number].include?(k) }
+      attrs = fake_load.to_h.reject { |k, _| %i[id depot_id].include?(k) }
       res = interactor.create_load(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['is missing'], res.errors[:order_number]
+      assert_equal ['is missing'], res.errors[:depot_id]
     end
 
     def test_update_load
@@ -46,17 +40,17 @@ module FinishedGoodsApp
       attrs[:order_number] = 'a_change'
       res = interactor.update_load(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(Load, res.instance)
+      assert_instance_of(LoadFlat, res.instance)
       assert_equal 'a_change', res.instance.order_number
       refute_equal value, res.instance.order_number
     end
 
     def test_update_load_fail
       id = create_load
-      attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| %i[id order_number].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| %i[id depot_id].include?(k) }
       res = interactor.update_load(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:order_number]
+      assert_equal ['is missing'], res.errors[:depot_id]
     end
 
     def test_delete_load
@@ -100,7 +94,8 @@ module FinishedGoodsApp
         voyage_type_id: voyage_type_id,
         vessel_id: vessel_id,
         voyage_number: Faker::Number.number(4),
-        year: '2019',
+        voyage_code: Faker::Lorem.unique.word,
+        year: 2019,
         pol_port_id: port_id,
         pod_port_id: port_id,
         shipping_line_party_role_id: party_role_id,

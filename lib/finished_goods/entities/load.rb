@@ -42,10 +42,10 @@ module FinishedGoodsApp
     attribute :shipped_date, Types::DateTime
     attribute :shipped, Types::Bool
     attribute :transfer_load, Types::Bool
-    # attribute :voyage_id, Types::Integer
     attribute :voyage_type_id, Types::Integer
     attribute :vessel_id, Types::Integer
     attribute :voyage_number, Types::String
+    attribute :voyage_code, Types::String
     attribute :year, Types::Integer
     attribute :pol_port_id, Types::Integer
     attribute :pod_port_id, Types::Integer

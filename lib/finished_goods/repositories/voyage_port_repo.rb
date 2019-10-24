@@ -24,11 +24,12 @@ module FinishedGoodsApp
                                               foreign_key: :port_type_id,
                                               flatten_columns: { port_type_code: :port_type_code } },
                                             { parent_table: :voyages,
-                                              columns: %i[voyage_type_id vessel_id voyage_number year],
+                                              columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
                                               foreign_key: :voyage_id,
                                               flatten_columns: { voyage_type_id: :voyage_type_id,
                                                                  vessel_id: :vessel_id,
                                                                  voyage_number: :voyage_number,
+                                                                 voyage_code: :voyage_code,
                                                                  year: :year } },
                                             { parent_table: :voyage_types,
                                               columns: %i[voyage_type_code],
@@ -45,12 +46,19 @@ module FinishedGoodsApp
                             wrapper: VoyagePortFlat)
     end
 
-    def lookup_voyage_port(voyage_id: nil, port_id: nil)
+    def find_or_create_voyage_port(voyage_id:, port_id:)
       ds = DB[:voyage_ports]
-      ds = ds.where(voyage_id: voyage_id)
-      ds = ds.where(port_id: port_id)
+      ds = ds.where(voyage_id: voyage_id,
+                    port_id: port_id)
       ds = ds.where(active: true)
-      ds.first.nil? ? nil : ds.first[:id]
+      voyage_port_id = ds.get(:id)
+
+      if voyage_port_id.nil?
+        voyage_port_id = DB[:voyage_ports].insert(voyage_id: voyage_id,
+                                                  port_id: port_id)
+        log_status('voyage_ports', voyage_port_id, 'CREATED')
+      end
+      voyage_port_id
     end
   end
 end

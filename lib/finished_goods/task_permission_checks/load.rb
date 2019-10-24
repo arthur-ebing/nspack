@@ -15,9 +15,6 @@ module FinishedGoodsApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
       }.freeze
 
       def call
@@ -36,43 +33,12 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        # return failed_response 'Load has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'Load has been completed' if completed?
-
         all_ok
       end
-
-      # def complete_check
-      #   return failed_response 'Load has already been completed' if completed?
-
-      #   all_ok
-      # end
-
-      # def approve_check
-      #   return failed_response 'Load has not been completed' unless completed?
-      #   return failed_response 'Load has already been approved' if approved?
-
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'Load has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
     end
   end
 end

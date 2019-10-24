@@ -32,6 +32,7 @@ module FinishedGoodsApp
     attribute :vessel_code, Types::String
     attribute :year, Types::Integer
     attribute :voyage_number, Types::String
+    attribute :voyage_code, Types::String
     attribute? :active, Types::Bool
   end
 end

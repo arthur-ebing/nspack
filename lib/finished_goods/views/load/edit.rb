@@ -25,7 +25,7 @@ module FinishedGoods
               form.method :update
               form.fold_up do |fold|
                 fold.caption 'Parties'
-                fold.open!
+                # fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :customer_party_role_id
@@ -40,7 +40,7 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Load Details'
-                fold.open!
+                # fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :order_number
@@ -58,7 +58,7 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Voyage Ports and Locations'
-                fold.open!
+                # fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :voyage_type_id
@@ -76,7 +76,7 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Load Voyage'
-                fold.open!
+                # fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :shipping_line_party_role_id
@@ -88,6 +88,18 @@ module FinishedGoods
                   end
                 end
               end
+            end
+            page.section do |section|
+              section.add_grid('stock_pallets',
+                               '/list/stock_pallets/grid_multi',
+                               caption: 'Choose Pallets',
+                               is_multiselect: true,
+                               can_be_cleared: true,
+                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets",
+                               multiselect_key: 'allocate_pallets',
+                               multiselect_params: { key: 'allocate_pallets',
+                                                     id: id,
+                                                     in_stock: true })
             end
           end
 
