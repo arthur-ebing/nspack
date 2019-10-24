@@ -115,6 +115,20 @@ module Crossbeams
       HTML
     end
 
+    # Render a section caption in bold that takes up the width of the table.
+    #
+    # @param caption [string] the caption for the section.
+    # @return [void]
+    def add_section_header(caption)
+      raise ArgumentError, 'Section header caption cannot be blank' if caption.nil_or_empty?
+
+      @fields << <<~HTML
+        <tr>
+          <td colspan="2" class="b mid-gray">#{caption}</td>
+        </tr>
+      HTML
+    end
+
     # Render the form.
     #
     # @return [String] HTML for the form.
