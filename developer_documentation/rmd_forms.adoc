@@ -148,6 +148,11 @@ Each hash has:
 |Boolean
 |`true`.
 
+|options - :no_submit
+|Should the form be rendered without a submit button? (e.g. for view-only display)
+|Boolean
+|`false`.
+
 |===
 
 === Method: add_field
