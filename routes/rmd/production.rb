@@ -1,66 +1,72 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   # --------------------------------------------------------------------------
-  # DELIVERIES
+  # PALLET INQUIRY
   # --------------------------------------------------------------------------
-  route 'production', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
-    r.on 'pallet_inquiry' do  # rubocop:disable Metrics/BlockLength
+  route 'production', 'rmd' do |r|
+    r.on 'pallet_inquiry' do
       interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path }, {})
       # --------------------------------------------------------------------------
-      # /rmd/production/pallet_inquiry/scan_pallet
+      # PALLET
       # --------------------------------------------------------------------------
       r.on 'scan_pallet' do
-        pallet = {}
-        error = retrieve_from_local_store(:scan_pallet_submit_error)
-        pallet = { error_message: error } unless error.nil?
+        r.get do
+          pallet = {}
+          error = retrieve_from_local_store(:scan_pallet_submit_error)
+          pallet = { error_message: error } unless error.nil?
 
-        form = Crossbeams::RMDForm.new(pallet,
-                                       form_name: :pallet,
-                                       scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Scan Pallet',
-                                       action: '/rmd/production/pallet_inquiry/scan_pallet_submit',
-                                       button_caption: 'Submit')
+          form = Crossbeams::RMDForm.new(pallet,
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Pallet',
+                                         action: '/rmd/production/pallet_inquiry/scan_pallet',
+                                         button_caption: 'Submit')
 
-        form.add_field(:pallet_number, 'Pallet Number', data_type: :number, required: true)
-        form.add_csrf_tag csrf_tag
-        view(inline: form.render, layout: :layout_rmd)
-      end
-
-      r.on 'scan_pallet_submit' do
-        pallet_sequences = interactor.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
-        if pallet_sequences.empty?
-          store_locally(:scan_pallet_submit_error, "scanned_pallet:#{params[:pallet][:pallet_number]}  doesn't exist")
-          r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
-        else
-          form = pallet_sequences_navigator_form(pallet_sequences.find { |p| p[:pallet_sequence_number] == 1 }, pallet_sequences.map { |p| p[:pallet_sequence_number] })
+          form.add_field(:pallet_number, 'Pallet Number', data_type: :number, required: true)
+          form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
-      end
 
-      r.on Integer do |id|
-        # --------------------------------------------------------------------------
-        # /rmd/production/pallet_inquiry/$:id$/navigate_to_sequence/#{pallet_sequence[:pallet_number]}
-        # --------------------------------------------------------------------------
-        r.on 'navigate_to_sequence' do
-          r.on Integer do |pallet_num|
-            pallet_sequences = interactor.find_pallet_sequences_by_pallet_number(pallet_num.to_s)
-            form = pallet_sequences_navigator_form(pallet_sequences.find { |p| p[:pallet_sequence_number] == id }, pallet_sequences.map { |p| p[:pallet_sequence_number] })
-            view(inline: form.render, layout: :layout_rmd)
+        r.post do
+          pallet_sequences = interactor.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
+          if pallet_sequences.empty?
+            store_locally(:scan_pallet_submit_error, "scanned_pallet:#{params[:pallet][:pallet_number]} doesn't exist")
+            r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
+          else
+            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{pallet_sequences.first[:id]}")
           end
         end
+      end
+
+      # --------------------------------------------------------------------------
+      # PALLET SEQUENCE
+      # --------------------------------------------------------------------------
+      r.on 'scan_pallet_sequence', Integer do |id|
+        pallet_sequence = interactor.find_pallet_sequence_attrs(id)
+        ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
+
+        form = Crossbeams::RMDForm.new({},
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "View Pallet #{pallet_sequence[:pallet_number]}",
+                                       step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       reset_button: false,
+                                       no_submit: true,
+                                       action: '/')
+        fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
+        form.add_csrf_tag csrf_tag
+        form.add_label(:verification_result, 'Verification Result', pallet_sequence[:verification_result])
+        form.add_label(:verification_failure_reason, 'Verification Failure Reason', pallet_sequence[:verification_failure_reason])
+        form.add_label(:fruit_sticker, 'Fruit Sticker', pallet_sequence[:fruit_sticker]) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION == 'true'
+        form.add_prev_next_nav('/rmd/production/pallet_inquiry/scan_pallet_sequence/$:id$', ps_ids, id)
+        view(inline: form.render, layout: :layout_rmd)
       end
     end
   end
 
-  def pallet_sequences_navigator_form(pallet_sequence, ids, action = nil, caption = nil) # rubocop:disable Metrics/AbcSize
-    form = Crossbeams::RMDForm.new(pallet_sequence || {},
-                                   form_name: :pallet,
-                                   scan_with_camera: @rmd_scan_with_camera,
-                                   caption: 'View Pallet',
-                                   action: action,
-                                   button_caption: caption)
-
+  def fields_for_rmd_pallet_sequence_display(form, pallet_sequence) # rubocop:disable Metrics/AbcSize
     form.add_label(:pallet_number, 'Pallet Number', pallet_sequence[:pallet_number])
     form.add_label(:pallet_sequence_number, 'Pallet Sequence Number', pallet_sequence[:pallet_sequence_number])
     form.add_label(:build_status, 'Build Status', pallet_sequence[:build_status])
@@ -87,13 +93,5 @@ class Nspack < Roda
     form.add_label(:mark, 'Mark', pallet_sequence[:mark])
     form.add_label(:inventory_code, 'Inventory Code', pallet_sequence[:inventory_code])
     form.add_label(:bom, 'Bom Code', pallet_sequence[:bom])
-    form.add_label(:verification_result, 'Verification Result', pallet_sequence[:verification_result])
-    form.add_label(:verification_failure_reason, 'Verification Failure Reason', pallet_sequence[:verification_failure_reason])
-    form.add_label(:fruit_sticker, 'Fruit Sticker', pallet_sequence[:fruit_sticker]) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION == 'true'
-    form.add_csrf_tag csrf_tag
-
-    form.add_prev_next_nav("/rmd/production/pallet_inquiry/$:id$/navigate_to_sequence/#{pallet_sequence[:pallet_number]}", ids, pallet_sequence[:pallet_sequence_number])
-
-    form
   end
 end

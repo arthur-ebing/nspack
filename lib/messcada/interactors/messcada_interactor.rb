@@ -100,9 +100,13 @@ module MesscadaApp
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
     end
 
-    # def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
-    #   repo.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
-    # end
+    def find_pallet_sequences_from_same_pallet(id)
+      repo.find_pallet_sequences_from_same_pallet(id)
+    end
+
+    def find_pallet_sequence_attrs(id)
+      repo.find_pallet_sequence_attrs(id)
+    end
 
     private
 
