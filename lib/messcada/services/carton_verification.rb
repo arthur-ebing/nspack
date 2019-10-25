@@ -2,11 +2,12 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code
+    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :carton_and_pallet_verification
 
     def initialize(params)
       @carton_label_id = params[:carton_number]
-      @resource_code = params[:device]
+      @carton_and_pallet_verification = params[:carton_and_pallet_verification]
+      @resource_code = params[:device] unless carton_and_pallet_verification
     end
 
     def call
@@ -34,7 +35,6 @@ module MesscadaApp
         repo.transaction do
           id = DB[:cartons].insert(carton_params)
           MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
-          # ProductionApp::RunStatsUpdateJob.enqueue(id, 'CARTON_PACKED')
         end
 
         ok_response

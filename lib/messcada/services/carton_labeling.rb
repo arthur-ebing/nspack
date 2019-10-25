@@ -65,7 +65,6 @@ module MesscadaApp
       begin
         repo.transaction do
           repo.create_carton_label(attrs)
-          # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'CARTON_LABEL_PRINTED')
         end
       rescue StandardError
         return failed_response($ERROR_INFO)

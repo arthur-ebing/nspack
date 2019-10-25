@@ -121,7 +121,7 @@ Sequel.migration do
           pod_voyage_ports.ata,
           pol_voyage_ports.etd,
           pol_voyage_ports.atd,
-          coalesce(p.load_id, 0) as zero_load_id,
+          COALESCE(p.load_id, 0) as zero_load_id,
           CASE WHEN NOT p.in_stock THEN NULL 
             WHEN p.in_stock THEN 'ok'
             WHEN p.allocated THEN 'ready'

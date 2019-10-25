@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class MesscadaInteractor < BaseInteractor
+  class MesscadaInteractor < BaseInteractor # rubocop:disable ClassLength
     def update_rmt_bin_weights(params)
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -45,12 +45,20 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification(params)  # rubocop:disable Metrics/AbcSize
-      res = CartonVerificationSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+    def carton_verification(params)  # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, PerceivedComplexity
+      carton_and_pallet_verification = (AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true') && (params[:device].nil? ? true : false)
+      params[:carton_and_pallet_verification] = carton_and_pallet_verification
 
-      resource_code = res[:device]
-      return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+      if carton_and_pallet_verification
+        res = CartonAndPalletVerificationSchema.call(params)
+        return validation_failed_response(res) unless res.messages.empty?
+      else
+        res = CartonVerificationSchema.call(params)
+        return validation_failed_response(res) unless res.messages.empty?
+
+        resource_code = res[:device]
+        return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+      end
 
       carton_label_id = res[:carton_number]
       return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)

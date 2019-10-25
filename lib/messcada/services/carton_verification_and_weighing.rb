@@ -85,8 +85,6 @@ module MesscadaApp
       DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
       pallet_id = find_pallet_from_carton(id)
       DB[:pallets].where(id: pallet_id).update(gross_weight: gross_weight)
-
-      # ProductionApp::RunStatsUpdateJob.enqueue(id, nett_weight, 'CARTONS_PACKED_WEIGHT')
     end
 
     def find_pallet_from_carton(carton_id)
