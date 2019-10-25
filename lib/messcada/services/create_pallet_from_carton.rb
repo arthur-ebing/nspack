@@ -92,8 +92,7 @@ module MesscadaApp
     end
 
     def resource_phc
-      # repo.find_resource_phc(carton[:production_line_id]) || repo.find_resource_phc(carton[:packhouse_resource_id])
-      'test'
+      repo.find_resource_phc(carton[:production_line_id]) || repo.find_resource_phc(carton[:packhouse_resource_id])
     end
 
     def validate_pallet_params(params)
@@ -115,7 +114,8 @@ module MesscadaApp
     end
 
     def pallet_sequence_carton_params
-      carton_rejected_fields = %i[id resource_id label_name fruit_sticker_pm_product_id carton_label_id gross_weight nett_weight active created_at updated_at]
+      carton_rejected_fields = %i[id resource_id label_name fruit_sticker_pm_product_id carton_label_id gross_weight nett_weight
+                                  sell_by_code grade_id product_chars pallet_label_name active created_at updated_at]
       repo.find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
     end
 
