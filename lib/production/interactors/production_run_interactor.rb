@@ -173,7 +173,7 @@ module ProductionApp
       return failed_response('Please choose a product setup') unless alloc[:product_setup_id]
       return failed_response('Please choose a label template') unless alloc[:label_template_id]
 
-      instance = product_setup_repo.find_product_setup(alloc[:product_setup_id])
+      instance = messcada_repo.allocated_product_setup_label_printing_instance(product_resource_allocation_id)
       label = repo.find_hash(:label_templates, alloc[:label_template_id])[:label_template_name]
       LabelPrintingApp::PreviewLabel.call(label, instance)
     end
@@ -184,15 +184,8 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
       return mixed_validation_failed_response(res, messages: { no_of_prints: ["cannot be more than #{AppConst::BATCH_PRINT_MAX_LABELS}"] }) if res[:no_of_prints] > AppConst::BATCH_PRINT_MAX_LABELS
 
-      # # {:product_setup=>{:printer=>"2", :label_template_id=>"2", :no_of_prints=>"1"}}
-      label_template = repo.find_hash(:label_templates, res[:label_template_id])
-      # print service...
-      # repo.transaction do
-      #   # gen carton_label
-      # end
-      # instance = carton_label(id)
-      # LabelPrintingApp::PrintLabel.call(label_template[:label_template_name], instance, params)
-      success_response(label_template[:label_template_name], id: id, product_setup_id: product_setup_id)
+      MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], params)
+      success_response('Label sent to printer', id: id, product_setup_id: product_setup_id)
     end
 
     private
@@ -211,6 +204,10 @@ module ProductionApp
 
     def product_setup_repo
       @product_setup_repo ||= ProductionApp::ProductSetupRepo.new
+    end
+
+    def messcada_repo
+      @messcada_repo ||= MesscadaApp::MesscadaRepo.new
     end
 
     def production_run(id)
