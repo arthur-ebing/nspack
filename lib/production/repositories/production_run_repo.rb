@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductionRunRepo < BaseRepo
+  class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :production_runs,
                      label: :active_run_stage,
                      value: :id,
@@ -96,6 +96,31 @@ module ProductionApp
       return failed_response('No runs in this state') if runs.empty?
 
       success_response('ok', runs)
+    end
+
+    def allocated_setup_keys(production_run_id)
+      query = <<~SQL
+        SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
+               a.product_setup_id, a.label_template_id, s.system_resource_code, t.label_template_name
+          FROM product_resource_allocations a
+          JOIN plant_resources p ON p.id = a.plant_resource_id
+          JOIN system_resources s ON s.id = p.system_resource_id
+          JOIN label_templates t ON t.id = a.label_template_id
+          WHERE a.production_run_id = ?
+            AND a.active
+            AND a.product_setup_id IS NOT NULL
+            AND a.label_template_id IS NOT NULL
+      SQL
+      recs = DB[query, production_run_id].all
+      recs.map do |rec|
+        rec.merge(setup_data: setup_data_for(rec[:product_setup_id]))
+      end
+    end
+
+    def setup_data_for(product_setup_id)
+      rec = find_hash(:product_setups, product_setup_id) # convert treatment_ids from Sequel arr to ruby arr
+      rec[:treatment_ids] = rec[:treatment_ids].to_ary
+      rec
     end
   end
 end
