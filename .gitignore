@@ -18,6 +18,7 @@ lib/applets/.sass-cache/
 public/assets/*.*
 public/downloads/jasper/*.*
 public/js/ag-enterprise-activation.js
+public/tempfiles/*
 
 # Used by dotenv library to load environment variables.
 .env.local
