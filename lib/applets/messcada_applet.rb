@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 root_dir = File.expand_path('..', __dir__)
+
+# Pre-load included module:
+require "#{root_dir}/label_printing/services/label_content.rb"
+
 Dir["#{root_dir}/messcada/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/messcada/interactors/*.rb"].each { |f| require f }
 Dir["#{root_dir}/messcada/jobs/*.rb"].each { |f| require f }
