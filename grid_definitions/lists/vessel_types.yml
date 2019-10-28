@@ -6,19 +6,4 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/masterfiles/shipping/vessel_types/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/masterfiles/shipping/vessel_types/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/masterfiles/shipping/vessel_types/new"
-  :text: New Vessel Type
-  :style: :button
-  :behaviour: :popup
+
