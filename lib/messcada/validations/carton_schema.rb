@@ -32,7 +32,7 @@ module MesscadaApp
     required(:extended_columns, :hash).maybe(:hash?)
     required(:client_size_reference, Types::StrippedString).maybe(:str?)
     required(:client_product_code, Types::StrippedString).maybe(:str?)
-    required(:treatment_ids, :array).maybe(:array?) { each(:int?) }
+    required(:treatment_ids, Types::IntArray).maybe { each(:int?) }
     required(:marketing_order_number, Types::StrippedString).maybe(:str?)
     required(:fruit_sticker_pm_product_id, :integer).maybe(:int?)
     required(:pm_type_id, :integer).maybe(:int?)
