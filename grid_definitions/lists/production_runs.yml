@@ -11,6 +11,12 @@
   :icon: edit
   :title: Edit
   :popup: true
+- :url: "/production/runs/production_runs/$:id$/complete_setup"
+  :text: Mark setup as complete
+  :icon: toggle-on
+  :title: Mark setup as complete
+  :popup: true
+  :hide_if_true: setup_complete
 - :url: "/production/runs/production_runs/$:id$/select_template"
   :text: select product setup template
   :icon: arrow-left

@@ -20,6 +20,19 @@ class Nspack < Roda
         show_partial { Production::Runs::ProductionRun::Edit.call(id) }
       end
 
+      r.on 'complete_setup' do   # EDIT
+        r.get do
+          check_auth!('runs', 'edit')
+          interactor.assert_permission!(:complete_setup, id)
+          show_partial { Production::Runs::ProductionRun::CompleteSetup.call(id) }
+        end
+
+        r.post do
+          interactor.mark_setup_as_complete(id)
+          update_grid_row(id, changes: { setup_complete: true }, notice: 'Production run setups have been marked as complete')
+        end
+      end
+
       r.on 'select_template' do
         r.get do
           check_auth!('runs', 'edit')

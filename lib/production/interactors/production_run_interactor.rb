@@ -9,6 +9,7 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_production_run(res)
+        repo.create_production_run_stats(id)
         log_status('production_runs', id, 'CREATED')
         log_transaction
       end
@@ -39,6 +40,7 @@ module ProductionApp
     def delete_production_run(id)
       name = production_run(id).active_run_stage
       repo.transaction do
+        repo.delete_production_run_stats(id)
         repo.delete_production_run(id)
         log_status('production_runs', id, 'DELETED')
         log_transaction
@@ -186,6 +188,14 @@ module ProductionApp
 
       MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], params)
       success_response('Label sent to printer', id: id, product_setup_id: product_setup_id)
+    end
+
+    def mark_setup_as_complete(id)
+      repo.transaction do
+        repo.update_production_run(id, setup_complete: true)
+        log_status('production_runs', id, 'SETUP_COMPLETED')
+        log_transaction
+      end
     end
 
     private

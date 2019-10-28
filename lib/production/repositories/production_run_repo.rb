@@ -13,6 +13,14 @@ module ProductionApp
 
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
 
+    def create_production_run_stats(id)
+      create(:production_run_stats, production_run_id: id)
+    end
+
+    def delete_production_run_stats(id)
+      DB[:production_run_stats].where(production_run_id: id).delete
+    end
+
     def find_production_run_with_assoc(id)
       find_with_association(:production_runs,
                             id,
@@ -118,9 +126,19 @@ module ProductionApp
     end
 
     def setup_data_for(product_setup_id)
-      rec = find_hash(:product_setups, product_setup_id) # convert treatment_ids from Sequel arr to ruby arr
-      rec[:treatment_ids] = rec[:treatment_ids].to_ary
+      rec = find_hash(:product_setups, product_setup_id)
+      rec[:treatment_ids] = rec[:treatment_ids].to_ary # convert treatment_ids from Sequel array to ruby array
       rec
+    end
+
+    # Does the run have at least one resource allocation with a setup?
+    def any_allocated_setup?(id)
+      exists?(:product_resource_allocations, Sequel.lit("production_run_id = #{id} AND product_setup_id IS NOT NULL"))
+    end
+
+    # Is there an active tipping run on this line?
+    def line_has_active_tipping_run?(production_line_id)
+      DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
     end
   end
 end

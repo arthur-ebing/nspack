@@ -15,7 +15,7 @@ module UiRules
       set_show_fields if %i[show reopen template].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if @mode == :allocate_setups
+      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup].include?(@mode)
 
       add_new_behaviours if @mode == :new
 

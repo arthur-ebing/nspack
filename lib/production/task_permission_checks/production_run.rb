@@ -3,7 +3,7 @@
 module ProductionApp
   module TaskPermissionCheck
     class ProductionRun < BaseService
-      attr_reader :task, :entity
+      attr_reader :task, :entity, :repo
       def initialize(task, production_run_id = nil)
         @task = task
         @repo = ProductionRunRepo.new
@@ -15,7 +15,9 @@ module ProductionApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check,
-        allocate_setups: :allocate_setups_check
+        complete_setup: :complete_setup_check,
+        allocate_setups: :allocate_setups_check,
+        execute_run: :execute_check
       }.freeze
 
       def call
@@ -41,10 +43,32 @@ module ProductionApp
         all_ok
       end
 
-      def allocate_setups_check
-        return failed_response 'No product setup template has been set' if @entity.product_setup_template_id.nil?
+      def complete_setup_check
+        return failed_response 'No product setup template has been set' if entity.product_setup_template_id.nil?
+        return failed_response 'No product setup has been allocated yet' unless any_allocated_setup?
 
         all_ok
+      end
+
+      def allocate_setups_check
+        return failed_response 'No product setup template has been set' if entity.product_setup_template_id.nil?
+
+        all_ok
+      end
+
+      def execute_check
+        return failed_response 'Setup is not yet complete' unless entity.setup_complete
+        return failed_response 'There is a tipping run already active on this line' if line_has_active_tipping_run?
+
+        all_ok
+      end
+
+      def any_allocated_setup?
+        repo.any_allocated_setup?(entity.id)
+      end
+
+      def line_has_active_tipping_run?
+        repo.line_has_active_tipping_run?(entity.production_line_id)
       end
     end
   end

@@ -38,9 +38,8 @@ module ProductionApp
                                                label_name: rec[:label_template_name])
         }
       end
-      # write cache (per run, but was this changed to a file per line?...
       FileUtils.mkpath(File.join(ENV['ROOT'], 'tmp', 'run_cache'))
-      File.open(File.join(ENV['ROOT'], 'tmp', 'run_cache', "run_#{production_run.id}.yml"), 'w') { |f| f << cache.to_yaml }
+      File.open(File.join(ENV['ROOT'], 'tmp', 'run_cache', "line_#{production_run.production_line_id}.yml"), 'w') { |f| f << cache.to_yaml }
     end
 
     def cache_run # rubocop:disable Metrics/AbcSize

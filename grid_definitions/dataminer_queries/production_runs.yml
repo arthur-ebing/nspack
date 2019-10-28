@@ -39,7 +39,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
