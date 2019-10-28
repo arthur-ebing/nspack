@@ -8,7 +8,6 @@ module FinishedGoods
         def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :allocate, id: id, form_values: form_values)
           rules   = ui_rule.compile
-          order_number = FinishedGoodsApp::LoadRepo.new.find_load_flat(id)&.order_number
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
@@ -21,11 +20,9 @@ module FinishedGoods
                                   style: :back_button)
             end
             page.form do |form|
-              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets_form"
-              form.remote!
+              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_list"
               form.submit_captions 'Add Pallets'
               form.method :update
-              form.caption "Load #{order_number} Details"
               form.row do |row|
                 row.column do |col|
                   col.add_field :id

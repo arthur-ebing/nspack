@@ -46,36 +46,53 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
-    def update_load_pallets(load_id, multiselect_list)
-      added_allocation = DB[:vw_pallet_sequence_flat].where(id: multiselect_list).map { |rec| rec[:pallet_id] }
-      current_allocation = DB[:pallets].where(load_id: load_id).map { |rec| rec[:id] }
+    def allocate_pallets_from_list(load_id, res)
+      pallet_numbers = res.instance[:pallet_list]
+      added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
+      add_pallets(load_id, added_allocation)
+    end
 
-      add_pallets(added_allocation - current_allocation, load_id)
+    def allocate_pallets_from_multiselect(load_id, multiselect_list)
+      added_allocation = DB[:vw_pallet_sequence_flat].where(id: multiselect_list).select_map(:pallet_id)
+      current_allocation = DB[:pallets].where(load_id: load_id).select_map(:id)
+      add_pallets(load_id, added_allocation - current_allocation)
       remove_pallets(current_allocation - added_allocation)
     end
 
-    def add_pallets(pallet_ids, load_id)
-      pallet_ids.each do |pallet_id|
-        ds = DB[:pallets]
-        ds = ds.where(id: pallet_id,
-                      shipped: false)
-        ds.update(load_id: load_id,
-                  allocated: true,
-                  allocated_at: Time.now)
-        log_status('pallets', pallet_id, 'LOAD_ADDED')
-      end
+    def pallets_allocated(pallet_numbers)
+      DB[:pallets]
+        .where(pallet_number: pallet_numbers,
+               allocated: true)
+        .select_map(:pallet_number)
+    end
+
+    def pallets_exists(pallet_numbers)
+      DB[:pallets]
+        .where(pallet_number: pallet_numbers)
+        .select_map(:pallet_number)
+    end
+
+    def add_pallets(load_id, pallet_ids)
+      ds = DB[:pallets]
+      ds = ds.where(id: pallet_ids,
+                    allocated: false,
+                    shipped: false)
+      ds.update(load_id: load_id,
+                allocated: true,
+                allocated_at: Time.now)
+      log_multiple_statuses('pallets', pallet_ids, 'LOAD_ADDED')
+      success_response('ok')
     end
 
     def remove_pallets(pallet_ids)
-      pallet_ids.each do |pallet_id|
-        ds = DB[:pallets]
-        ds = ds.where(id: pallet_id,
-                      shipped: false)
-        ds.update(load_id: nil,
-                  allocated: false,
-                  allocated_at: nil)
-        log_status('pallets', pallet_id, 'LOAD_REMOVED')
-      end
+      ds = DB[:pallets]
+      ds = ds.where(id: pallet_ids,
+                    shipped: false)
+      ds.update(load_id: nil,
+                allocated: false,
+                allocated_at: nil)
+      log_multiple_statuses('pallets', pallet_ids, 'LOAD_REMOVED')
+      success_response('ok')
     end
   end
 end

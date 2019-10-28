@@ -33,10 +33,10 @@ module MasterfilesApp
       ds = DB[:port_types]
       ds = ds.join(:ports, port_type_id: :id)
       ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(port_type_id: port_type_id) unless port_type_id.nil?
-      ds = ds.where(port_type_code: port_type_code) unless port_type_code.nil?
-      ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil?
-      ds = ds.where(voyage_type_code: voyage_type_code) unless voyage_type_code.nil?
+      ds = ds.where(port_type_id: port_type_id) unless port_type_id.nil_or_empty?
+      ds = ds.where(port_type_code: port_type_code) unless port_type_code.nil_or_empty?
+      ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil_or_empty?
+      ds = ds.where(voyage_type_code: voyage_type_code) unless voyage_type_code.nil_or_empty?
       ds = ds.order(:port_code)
       ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
     end

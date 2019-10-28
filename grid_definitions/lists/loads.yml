@@ -18,7 +18,7 @@
   :text: allocate pallets
   :icon: list
   :popup: true
-- :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_form"
+- :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
   :text: allocate pallets
   :icon: edit
   :title: Allocate Pallets

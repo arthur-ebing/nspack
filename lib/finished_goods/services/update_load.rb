@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class UpdateLoadService < BaseService
     def initialize(load_id, params)
       @load_id = load_id
-      @params = params
+      @params = params.output
     end
 
     def call  # rubocop:disable Metrics/AbcSize

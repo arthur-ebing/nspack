@@ -319,27 +319,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'allocate_pallets' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.update_load_pallets(id, multiselect_grid_choices(params))
+        res = interactor.allocate_pallets_from_multiselect(id, multiselect_grid_choices(params))
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
         end
       end
 
-      r.on 'allocate_pallets_form' do
+      r.on 'allocate_pallets_from_list' do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, back_url: request.referer) }
         end
 
         r.patch do     # UPDATE
-          p params
-          res = interactor.update_load(id, params[:load])
+          res = interactor.allocate_pallets_from_list(id, params[:load])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, form_values: params[:load], form_errors: res.errors) }
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, form_values: params[:load], form_errors: res.errors) }
           end
         end
       end
@@ -429,7 +428,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
-        show_page { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
       end
 
       r.post do        # CREATE
@@ -441,8 +440,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
             FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
                                                     form_values: params[:load],
-                                                    form_errors: res.errors,
-                                                    remote: fetch?(r))
+                                                    form_errors: res.errors)
           end
         end
       end

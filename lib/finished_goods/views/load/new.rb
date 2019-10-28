@@ -5,7 +5,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class New
-        def self.call(back_url: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -21,7 +21,6 @@ module FinishedGoods
             end
             page.form do |form|
               form.action '/finished_goods/dispatch/loads'
-              form.remote! if remote
               form.fold_up do |fold|
                 fold.caption 'Parties'
                 fold.open!
