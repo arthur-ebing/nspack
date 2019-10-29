@@ -198,6 +198,10 @@ module ProductionApp
       end
     end
 
+    def execute_run(id)
+      ExecuteRun.call(id, @user.user_name)
+    end
+
     private
 
     def repo

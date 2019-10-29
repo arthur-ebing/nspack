@@ -22,7 +22,7 @@ module ProductionApp
                         comment: changeset[:active_run_status],
                         user_name: user_name)
       end
-      success_response('Run is executing')
+      success_response('Run is executing', changeset)
     end
 
     private
