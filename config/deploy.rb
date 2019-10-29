@@ -66,6 +66,17 @@ task :menu_migrate do
   end
 end
 
+desc 'Runs rake jobs:restart_screen'
+task :restart_que do
+  on primary :db do
+    within release_path do
+      with rack_env: fetch(:rack_env) do
+        execute :rake, 'jobs:restart_screen'
+      end
+    end
+  end
+end
+
 desc 'Runs rake assets:precompile'
 task :precompile do
   on primary :app do
@@ -128,6 +139,6 @@ namespace :deploy do
     invoke 'migrate'
     invoke 'menu_migrate'
     invoke 'precompile'
+    invoke 'restart_que'
   end
-  # TODO: if there is a job Que, restart it!
 end
