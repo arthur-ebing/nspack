@@ -12,10 +12,10 @@
   \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
   \   loads.exporter_certificate_code,\r\n    loads.shipped,\r\n    loads.shipped_date,\r\n
   \   fn_current_status('loads', loads.id) AS status,\r\n    loads.transfer_load,\r\n
-  \   loads.edi_file_name,\r\n    loads.updated_at,\r\nCASE \r\n     WHEN loads.shipped
-  THEN 'ready'  \r\n     WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id
-  = loads.id) THEN 'ok'\r\n     ELSE NULL\r\n     END AS colour_rule\r\n\r\nFROM loads\r\n
-  \        JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
+  \   loads.edi_file_name,\r\n    loads.updated_at,\r\n    voyages.id AS voyage_id,\r\nCASE
+  \r\n     WHEN loads.shipped THEN 'ready'  \r\n     WHEN EXISTS(SELECT id FROM pallets
+  WHERE pallets.load_id = loads.id) THEN 'ok'\r\n     ELSE NULL\r\n     END AS colour_rule\r\n\r\nFROM
+  loads\r\n         JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
   \ ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
   pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
   voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
@@ -478,9 +478,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  voyage_id:
+    :name: voyage_id
+    :sequence_no: 29
+    :caption: Voyage
+    :namespaced_name: voyages.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -494,4 +510,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+:query_parameter_definitions:
+- :column: voyages.id
+  :caption: voyage_id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

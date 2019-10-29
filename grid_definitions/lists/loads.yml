@@ -23,3 +23,8 @@
   :url: "/finished_goods/dispatch/loads/new"
   :text: New Load
   :style: :button
+:conditions:
+  :standard:
+    - :col: voyages.id
+      :op: =
+      :val: $:voyage_id$
