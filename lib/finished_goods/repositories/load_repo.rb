@@ -80,7 +80,8 @@ module FinishedGoodsApp
       ds.update(load_id: load_id,
                 allocated: true,
                 allocated_at: Time.now)
-      log_multiple_statuses('pallets', pallet_ids, 'LOAD_ADDED')
+      log_status('loads', load_id, 'ALLOCATED')
+      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED')
       success_response('ok')
     end
 
@@ -91,7 +92,7 @@ module FinishedGoodsApp
       ds.update(load_id: nil,
                 allocated: false,
                 allocated_at: nil)
-      log_multiple_statuses('pallets', pallet_ids, 'LOAD_REMOVED')
+      log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED')
       success_response('ok')
     end
   end
