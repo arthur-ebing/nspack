@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductionRunRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = ProductionApp::ProductionRunRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
@@ -12,10 +12,11 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen template].include? @mode
+      set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup execute_run].include?(@mode)
+      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup execute_run show_stats].include?(@mode)
+      build_stats_table if @mode == :show_stats
 
       add_new_behaviours if @mode == :new
 
@@ -43,7 +44,7 @@ module UiRules
       fields[:cultivar_group_id] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
-      fields[:cloned_from_run_id] = { renderer: :label, with_value: cloned_from_run_id_label, caption: 'Cloned From Run' }
+      fields[:cloned_from_run_id] = { renderer: :label, with_value: cloned_from_run_id_label, caption: 'Cloned From Run', invisible: cloned_from_run_id_label.nil? }
       fields[:active_run_stage] = { renderer: :label }
       fields[:started_at] = { renderer: :label }
       fields[:closed_at] = { renderer: :label }
@@ -150,6 +151,35 @@ module UiRules
         closed: { renderer: :checkbox },
         setup_complete: { renderer: :checkbox },
         completed: { renderer: :checkbox }
+      }
+    end
+
+    def build_stats_table
+      stats = @repo.where_hash(:production_run_stats, production_run_id: @options[:id])
+      rules[:detail_cols] = %i[
+        bins_tipped
+        bins_tipped_weight
+        carton_labels_printed
+        cartons_verified
+        cartons_verified_weight
+        inspected_pallets
+        pallets_palletized_full
+        pallets_palletized_partial
+        rebins_created
+        rebins_weight
+      ]
+      rules[:detail_rows] = [stats]
+      rules[:detail_alignment] = {
+        bins_tipped: :right,
+        bins_tipped_weight: :right,
+        carton_labels_printed: :right,
+        cartons_verified: :right,
+        cartons_verified_weight: :right,
+        inspected_pallets: :right,
+        pallets_palletized_full: :right,
+        pallets_palletized_partial: :right,
+        rebins_created: :right,
+        rebins_weight: :right
       }
     end
 

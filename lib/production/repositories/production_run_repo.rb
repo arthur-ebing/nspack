@@ -12,6 +12,7 @@ module ProductionApp
                           order_by: :active_run_stage
 
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
+    crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
 
     def create_production_run_stats(id)
       create(:production_run_stats, production_run_id: id)
