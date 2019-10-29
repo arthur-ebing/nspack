@@ -7,7 +7,7 @@ module MasterfilesApp
     optional(:id, :integer).filled(:int?)
     required(:temperature_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
-    required(:set_point_temperature, [:nil, :decimal]).maybe(:decimal?)
-    required(:load_temperature, [:nil, :decimal]).maybe(:decimal?)
+    required(:set_point_temperature, %i[nil decimal]).maybe(:decimal?)
+    required(:load_temperature, %i[nil decimal]).maybe(:decimal?)
   end
 end

@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class CargoTemperatureInteractor < BaseInteractor
-    def create_cargo_temperature(params)
+    def create_cargo_temperature(params) # rubocop:disable Metrics/AbcSize
       res = validate_cargo_temperature_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 

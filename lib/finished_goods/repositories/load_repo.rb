@@ -90,7 +90,7 @@ module FinishedGoodsApp
       success_response('ok')
     end
 
-    def remove_pallets(pallet_ids)
+    def remove_pallets(pallet_ids) # rubocop:disable Metrics/AbcSize
       ds = DB[:pallets]
       ds = ds.where(id: pallet_ids,
                     shipped: false)

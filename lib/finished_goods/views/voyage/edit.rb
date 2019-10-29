@@ -59,7 +59,7 @@ module FinishedGoods
                                height: 6)
               section.add_grid('loads',
                                "/list/loads/grid?key=standard&voyage_id=#{id}",
-                               caption: 'Loads',)
+                               caption: 'Loads')
             end
           end
 

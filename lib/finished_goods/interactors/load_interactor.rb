@@ -48,9 +48,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_pallets_from_list(id, params)
+    def allocate_pallets_from_list(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_list(params)
-      return validation_failed_response(res) unless res.errors.empty?
+      return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         load_res = repo.allocate_pallets_from_list(id, res)
@@ -105,16 +105,16 @@ module FinishedGoodsApp
 
       errors = attrs.reject { |x| x.match(/\A\d+\Z/) }
       message = "#{errors.join(', ')} must be numeric"
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
       pallet_exists = repo.pallets_exists(pallet_numbers)
       errors = (pallet_numbers - pallet_exists)
       message = "#{errors.join(', ')} doesn't exist"
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
       errors = repo.pallets_allocated(pallet_exists)
       message = "#{errors.join(', ')} already allocated"
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
       params[:pallet_list] = pallet_numbers
       PalletListSchema.call(params)
