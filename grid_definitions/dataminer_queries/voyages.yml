@@ -11,25 +11,27 @@
   ') AS load_id,\r\n    string_agg(distinct depots.depot_code, ', ') AS depot_code,\r\n
   \   voyages.created_at,\r\n    voyages.updated_at,\r\n    voyages.completed,\r\n
   \   voyages.completed_at,\r\n    voyages.active,\r\n    fn_current_status('voyages',
-  voyages.id) AS status,\r\n    CASE\r\n        WHEN EXISTS(SELECT id FROM loads WHERE
-  id = loads.id)  THEN 'ready'\r\n        ELSE NULL\r\n        END AS colour_rule\r\n\r\n\r\nFROM
-  voyages\r\n         LEFT JOIN vessels ON vessels.id = voyages.vessel_id\r\n         LEFT
-  JOIN voyage_types ON voyage_types.id = voyages.voyage_type_id\r\n         LEFT JOIN
-  voyage_ports pol_voyage_ports ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT
-  JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.voyage_id = voyages.id\r\n
-  \        LEFT JOIN ports pol_ports ON pol_ports.id = pol_voyage_ports.port_id AND
-  pol_ports.port_type_id IN (SELECT id FROM port_types WHERE port_type_code = 'POL')\r\n
-  \        LEFT JOIN ports pod_ports ON pod_ports.id = pod_voyage_ports.port_id AND
-  pod_ports.port_type_id IN (SELECT id FROM port_types WHERE port_type_code = 'POD')\r\n
-  \        LEFT JOIN loads ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         LEFT
-  JOIN depots ON loads.depot_id = depots.id\r\nGROUP BY voyages.id, voyages.created_at,
-  vessels.id, voyage_types.id\r\nORDER BY voyages.created_at DESC"
+  voyages.id) AS status,\r\n    CASE\r\n        WHEN completed THEN 'ready'\r\n        WHEN
+  EXISTS(SELECT id FROM loads WHERE id = loads.id)  THEN 'ok'\r\n        ELSE NULL\r\n
+  \       END AS colour_rule\r\n\r\n\r\nFROM voyages\r\n         LEFT JOIN vessels
+  ON vessels.id = voyages.vessel_id\r\n         LEFT JOIN voyage_types ON voyage_types.id
+  = voyages.voyage_type_id\r\n         LEFT JOIN voyage_ports pol_voyage_ports ON
+  pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN voyage_ports pod_voyage_ports
+  ON pod_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN ports pol_ports
+  ON pol_ports.id = pol_voyage_ports.port_id AND pol_ports.port_type_id IN (SELECT
+  id FROM port_types WHERE port_type_code = 'POL')\r\n         LEFT JOIN ports pod_ports
+  ON pod_ports.id = pod_voyage_ports.port_id AND pod_ports.port_type_id IN (SELECT
+  id FROM port_types WHERE port_type_code = 'POD')\r\n         LEFT JOIN loads ON
+  pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         LEFT JOIN depots ON loads.depot_id
+  = depots.id\r\nGROUP BY voyages.id, voyages.created_at, vessels.id, voyage_types.id\r\nORDER
+  BY voyages.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    ready: No description
+    ready: Completed
+    ok: Has Load
 :columns:
   id:
     :name: id

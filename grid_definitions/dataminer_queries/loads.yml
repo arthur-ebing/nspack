@@ -27,8 +27,8 @@
 :offset: 
 :external_settings:
   :colour_key:
-    ready: No description
-    ok: No description
+    ready: Shipped
+    ok: Allocated
 :columns:
   id:
     :name: id

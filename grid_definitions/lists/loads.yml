@@ -18,6 +18,12 @@
   :text: allocate pallets
   :icon: edit
   :title: Allocate Pallets
+- :separator: true
+- :url: "/development/statuses/list/loads/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/dispatch/loads/new"

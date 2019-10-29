@@ -46,13 +46,15 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
-    def allocate_pallets_from_list(load_id, res)
+    def allocate_pallets_from_list(load_id, res, user)
+      @user = user
       pallet_numbers = res.output[:pallet_list]
       added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
       add_pallets(load_id, added_allocation)
     end
 
-    def allocate_pallets_from_multiselect(load_id, multiselect_list)
+    def allocate_pallets_from_multiselect(load_id, multiselect_list, user)
+      @user = user
       added_allocation = DB[:pallet_sequences].where(id: multiselect_list).select_map(:pallet_id)
       current_allocation = DB[:pallets].where(load_id: load_id).select_map(:id)
       add_pallets(load_id, added_allocation - current_allocation)
@@ -85,8 +87,8 @@ module FinishedGoodsApp
                 allocated: true,
                 allocated_at: Time.now)
 
-      log_status('loads', load_id, 'ALLOCATED')
-      log_multiple_statuses('pallets', allocate_ids, 'ALLOCATED')
+      log_status('loads', load_id, 'ALLOCATED', user_name: @user.user_name)
+      log_multiple_statuses('pallets', allocate_ids, 'ALLOCATED', user_name: @user.user_name)
       success_response('ok')
     end
 
@@ -111,8 +113,8 @@ module FinishedGoodsApp
       allocated_load_ids = ds.select_map(:load_id)
 
       unallocate_load_ids = (load_ids - allocated_load_ids)
-      log_multiple_statuses('loads', unallocate_load_ids, 'UNALLOCATED')
-      log_multiple_statuses('pallets', unallocate_ids, 'UNALLOCATED')
+      log_multiple_statuses('loads', unallocate_load_ids, 'UNALLOCATED', user_name: @user.user_name)
+      log_multiple_statuses('pallets', unallocate_ids, 'UNALLOCATED', user_name: @user.user_name)
       success_response('ok')
     end
   end
