@@ -112,8 +112,7 @@ module FinishedGoodsApp
       ds = ds.where(load_id: load_ids)
       allocated_load_ids = ds.select_map(:load_id)
 
-      unallocate_load_ids = (load_ids - allocated_load_ids)
-      log_multiple_statuses('loads', unallocate_load_ids, 'UNALLOCATED', user_name: @user.user_name)
+      log_multiple_statuses('loads', (load_ids - allocated_load_ids), 'UNALLOCATED', user_name: @user.user_name)
       log_multiple_statuses('pallets', unallocate_ids, 'UNALLOCATED', user_name: @user.user_name)
       success_response('ok')
     end
