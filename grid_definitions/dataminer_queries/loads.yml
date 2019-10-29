@@ -12,17 +12,23 @@
   \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
   \   loads.exporter_certificate_code,\r\n    loads.shipped,\r\n    loads.shipped_date,\r\n
   \   fn_current_status('loads', loads.id) AS status,\r\n    loads.transfer_load,\r\n
-  \   loads.edi_file_name,\r\n    loads.updated_at\r\n\r\nFROM loads\r\n         JOIN
-  depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities  ON destination_cities.id
-  = loads.final_destination_id\r\n         JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
-  = loads.pol_voyage_port_id\r\n         JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
-  = loads.pod_voyage_port_id\r\n         JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n
-  \        JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN
-  voyages ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels
-  ON voyages.vessel_id = vessels.id"
+  \   loads.edi_file_name,\r\n    loads.updated_at,\r\nCASE \r\n     WHEN loads.shipped
+  THEN 'ready'  \r\n     WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id
+  = loads.id) THEN 'ok'\r\n     ELSE NULL\r\n     END AS colour_rule\r\n\r\nFROM loads\r\n
+  \        JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
+  \ ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
+  pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
+  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
+  \        JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n         JOIN
+  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN voyages
+  ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels ON voyages.vessel_id
+  = vessels.id"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    ready: No description
+    ok: No description
 :columns:
   id:
     :name: id
@@ -462,6 +468,22 @@
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 29
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
