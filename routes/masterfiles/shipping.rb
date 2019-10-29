@@ -528,6 +528,83 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # CARGO TEMPERATURES
+    # --------------------------------------------------------------------------
+    r.on 'cargo_temperatures', Integer do |id|
+      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:cargo_temperatures, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('shipping', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Shipping::CargoTemperature::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('shipping', 'read')
+          show_partial { Masterfiles::Shipping::CargoTemperature::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_cargo_temperature(id, params[:cargo_temperature])
+          if res.success
+            row_keys = %i[
+              temperature_code
+              description
+              set_point_temperature
+              load_temperature
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Shipping::CargoTemperature::Edit.call(id, form_values: params[:cargo_temperature], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('shipping', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_cargo_temperature(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'cargo_temperatures' do
+      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path }, {})
+      r.on 'new' do    # NEW
+        check_auth!('shipping', 'new')
+        show_partial_or_page(r) { Masterfiles::Shipping::CargoTemperature::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_cargo_temperature(params[:cargo_temperature])
+        if res.success
+          row_keys = %i[
+            id
+            temperature_code
+            description
+            set_point_temperature
+            load_temperature
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/shipping/cargo_temperatures/new') do
+            Masterfiles::Shipping::CargoTemperature::New.call(form_values: params[:cargo_temperature],
+                                                              form_errors: res.errors,
+                                                              remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
