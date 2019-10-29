@@ -47,13 +47,13 @@ module FinishedGoodsApp
     end
 
     def allocate_pallets_from_list(load_id, res)
-      pallet_numbers = res.instance[:pallet_list]
+      pallet_numbers = res.output[:pallet_list]
       added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
       add_pallets(load_id, added_allocation)
     end
 
     def allocate_pallets_from_multiselect(load_id, multiselect_list)
-      added_allocation = DB[:vw_pallet_sequence_flat].where(id: multiselect_list).select_map(:pallet_id)
+      added_allocation = DB[:pallet_sequences].where(id: multiselect_list).select_map(:pallet_id)
       current_allocation = DB[:pallets].where(load_id: load_id).select_map(:id)
       add_pallets(load_id, added_allocation - current_allocation)
       remove_pallets(current_allocation - added_allocation)
