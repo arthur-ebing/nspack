@@ -77,11 +77,16 @@ module FinishedGoodsApp
       ds = ds.where(id: pallet_ids,
                     allocated: false,
                     shipped: false)
+      allocate_ids = ds.select_map(:id)
+
+      ds = DB[:pallets]
+      ds = ds.where(id: allocate_ids)
       ds.update(load_id: load_id,
                 allocated: true,
                 allocated_at: Time.now)
+
       log_status('loads', load_id, 'ALLOCATED')
-      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED')
+      log_multiple_statuses('pallets', allocate_ids, 'ALLOCATED')
       success_response('ok')
     end
 
@@ -89,10 +94,25 @@ module FinishedGoodsApp
       ds = DB[:pallets]
       ds = ds.where(id: pallet_ids,
                     shipped: false)
+      unallocate_ids = ds.select_map(:id)
+
+      ds = DB[:pallets].distinct
+      ds = ds.where(id: unallocate_ids)
+      load_ids = ds.select_map(:load_id)
+
+      ds = DB[:pallets]
+      ds = ds.where(id: unallocate_ids)
       ds.update(load_id: nil,
                 allocated: false,
                 allocated_at: nil)
-      log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED')
+
+      ds = DB[:pallets].distinct
+      ds = ds.where(load_id: load_ids)
+      allocated_load_ids = ds.select_map(:load_id)
+
+      unallocate_load_ids = (load_ids - allocated_load_ids)
+      log_multiple_statuses('loads', unallocate_load_ids, 'UNALLOCATED')
+      log_multiple_statuses('pallets', unallocate_ids, 'UNALLOCATED')
       success_response('ok')
     end
   end
