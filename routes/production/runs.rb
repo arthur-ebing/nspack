@@ -53,6 +53,11 @@ class Nspack < Roda
         end
       end
 
+      r.on 'show_stats' do
+        check_auth!('runs', 'read')
+        show_partial { Production::Runs::ProductionRun::ShowStats.call(id) }
+      end
+
       r.on 'select_template' do
         r.get do
           check_auth!('runs', 'edit')

@@ -45,6 +45,11 @@
   :is_delete: true
   :popup: true
 - :separator: true
+- :url: "/production/runs/production_runs/$:id$/show_stats"
+  :text: View run stats
+  :icon: view-show
+  :title: View run stats
+  :popup: true
 - :url: "/development/statuses/list/production_runs/$:id$"
   :text: status
   :icon: information-solid
