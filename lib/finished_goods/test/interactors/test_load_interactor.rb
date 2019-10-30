@@ -35,7 +35,7 @@ module FinishedGoodsApp
 
     def test_update_load
       id = create_load
-      attrs = interactor.send(:repo).find_load_flat(id).to_h.reject { |k, _| %i[id shipped_date].include?(k) }
+      attrs = interactor.send(:repo).find_load_flat(id).to_h.reject { |k, _| %i[id shipped_at].include?(k) }
       value = attrs[:order_number]
       attrs[:order_number] = 'a_change'
       res = interactor.update_load(id, attrs)
@@ -87,8 +87,10 @@ module FinishedGoodsApp
         customer_order_number: 'ABC',
         customer_reference: 'ABC',
         exporter_certificate_code: 'ABC',
-        shipped_date: '2010-01-01',
+        shipped_at: '2010-01-01',
         shipped: false,
+        allocated_at: '2010-01-01',
+        allocated: false,
         transfer_load: false,
         active: true,
         voyage_type_id: voyage_type_id,

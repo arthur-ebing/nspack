@@ -22,7 +22,7 @@ module FinishedGoodsApp
     required(:pol_port_id, :integer).filled(:int?)
     required(:pod_port_id, :integer).filled(:int?)
     required(:final_destination_id, :integer).filled(:int?)
-    optional(:shipped_date, %i[nil date]).maybe(:date?)
+    optional(:shipped_at, %i[nil date]).maybe(:date?)
     optional(:shipped, :bool).maybe(:bool?)
     required(:transfer_load, :bool).maybe(:bool?)
     optional(:shipping_line_party_role_id, :integer).maybe(:int?)

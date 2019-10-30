@@ -21,7 +21,7 @@ module FinishedGoods
             end
             page.form do |form|
               form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_list"
-              form.submit_captions 'Add Pallets'
+              form.submit_captions 'Allocate pasted pallets'
               form.method :update
               form.row do |row|
                 row.column do |col|
@@ -36,6 +36,7 @@ module FinishedGoods
                 end
               end
             end
+            page.add_notice 'Click button to allocate pasted pallets from the list or use Checkboxes to select from the grid below'
             page.section do |section|
               section.fit_height!
               section.add_grid('stock_pallets',

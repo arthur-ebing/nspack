@@ -38,7 +38,7 @@ module UiRules
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:exporter_certificate_code] = { renderer: :label }
       fields[:edi_file_name] = { renderer: :label }
-      fields[:shipped_date] = { renderer: :label }
+      fields[:shipped_at] = { renderer: :label }
       fields[:shipped] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
 
@@ -124,7 +124,7 @@ module UiRules
                     required: true },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
-        shipped_date: { renderer: :label },
+        shipped_at: { renderer: :label },
         shipped: { renderer: :label, as_boolean: true  },
 
         # Voyage Ports
@@ -172,7 +172,9 @@ module UiRules
                                  prompt: true },
         booking_reference: {},
         memo_pad: { renderer: :textarea, rows: 7 },
-        pallet_list: { renderer: :textarea, rows: 12 }
+        pallet_list: { renderer: :textarea, rows: 12,
+                       placeholder: 'Paste pallet numbers here',
+                       caption: 'Allocate' }
       }
     end
 
@@ -198,7 +200,7 @@ module UiRules
                                     customer_order_number: nil,
                                     customer_reference: nil,
                                     exporter_certificate_code: nil,
-                                    shipped_date: nil,
+                                    shipped_at: nil,
                                     shipped: nil,
                                     transfer_load: nil)
     end
@@ -211,6 +213,7 @@ module UiRules
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }]
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
+        # behaviour.keyup :pallet_list, notify: [{ url: '/finished_goods/dispatch/loads/pallet_list_changed' }] if @mode == :allocate
       end
     end
   end

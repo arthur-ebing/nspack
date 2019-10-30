@@ -43,7 +43,7 @@ module FinishedGoodsApp
         repo.allocate_pallets_from_multiselect(id, multiselect_list, @user.user_name)
         log_transaction
       end
-      success_response("Loaded pallets to load #{id} ")
+      success_response("Load #{id} has been updated")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -101,9 +101,9 @@ module FinishedGoodsApp
 
     def validate_pallet_list(params) # rubocop:disable Metrics/AbcSize
       attrs = params[:pallet_list].split(/\n|,/).map(&:strip).reject(&:empty?)
-      pallet_numbers = attrs.map { |x| x }
+      pallet_numbers = attrs.map { |x| x.gsub(/['"]/, '') }
 
-      errors = attrs.reject { |x| x.match(/\A\d+\Z/) }
+      errors = pallet_numbers.reject { |x| x.match(/\A\d+\Z/) }
       message = "#{errors.join(', ')} must be numeric"
       return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 

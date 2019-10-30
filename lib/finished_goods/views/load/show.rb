@@ -48,7 +48,7 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :exporter_certificate_code
                     col.add_field :edi_file_name
-                    col.add_field :shipped_date
+                    col.add_field :shipped_at
                     col.add_field :shipped
                   end
                 end

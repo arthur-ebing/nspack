@@ -24,8 +24,10 @@ module FinishedGoodsApp
         customer_order_number: 'ABC',
         customer_reference: 'ABC',
         exporter_certificate_code: 'ABC',
-        shipped_date: '2010-01-01 12:00',
+        shipped_at: '2010-01-01 12:00',
         shipped: false,
+        allocated_at: '2010-01-01 12:00',
+        allocated: false,
         transfer_load: false,
         active: true
       }

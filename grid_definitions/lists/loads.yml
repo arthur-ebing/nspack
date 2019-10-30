@@ -15,7 +15,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: shipped,has_pallet
+  :hide_if_true: shipped,allocated
 - :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
   :text: allocate pallets
   :icon: edit

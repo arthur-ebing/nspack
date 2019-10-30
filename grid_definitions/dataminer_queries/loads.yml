@@ -1,6 +1,6 @@
 ---
 :caption: Loads
-:sql: "\r\nSELECT\r\n    loads.id,\r\n    loads.id AS load_id,\r\n    voyages.voyage_code,\r\n
+:sql: "SELECT\r\n    loads.id,\r\n    loads.id AS load_id,\r\n    voyages.voyage_code,\r\n
   \   depots.depot_code AS depot,\r\n    pol_port.port_code AS pol,\r\n    pol_voyage_ports.eta
   AS eta,\r\n    pol_voyage_ports.ata AS ata,\r\n    pod_port.port_code AS pod,\r\n
   \   pod_voyage_ports.etd AS etd,\r\n    pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n
@@ -10,13 +10,11 @@
   \   fn_party_role_name(loads.exporter_party_role_id) AS exporter,\r\n    fn_party_role_name(loads.billing_client_party_role_id)
   AS billing_client,\r\n    destination_cities.city_name AS final_destination_city,\r\n
   \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
-  \   loads.exporter_certificate_code,\r\n    loads.shipped,\r\n    loads.shipped_date,\r\n
-  \   fn_current_status('loads', loads.id) AS status,\r\n    loads.transfer_load,\r\n
-  \   loads.edi_file_name,\r\n    loads.updated_at,\r\n    voyages.id AS voyage_id,\r\n
-  \   CASE\r\n        WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id = loads.id)
-  \  THEN TRUE\r\n        ELSE FALSE\r\n    END AS has_pallet,\r\n    CASE\r\n        WHEN
-  loads.shipped THEN 'ready'\r\n        WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id
-  = loads.id) THEN 'ok'\r\n        ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM
+  \   loads.exporter_certificate_code,\r\n    loads.allocated,\r\n    loads.allocated_at,\r\n
+  \   loads.shipped,\r\n    loads.shipped_at,\r\n    fn_current_status('loads', loads.id)
+  AS status,\r\n    loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
+  \   voyages.id AS voyage_id,\r\n    CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n
+  \       WHEN loads.allocated THEN 'ok'\r\n        ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM
   loads\r\n         JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
   \ ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
   pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
@@ -384,9 +382,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  allocated:
+    :name: allocated
+    :sequence_no: 23
+    :caption: Allocated
+    :namespaced_name: loads.allocated
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_at:
+    :name: allocated_at
+    :sequence_no: 24
+    :caption: Allocated at
+    :namespaced_name: loads.allocated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Shipped
     :namespaced_name: loads.shipped
     :data_type: :boolean
@@ -400,11 +430,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  shipped_date:
-    :name: shipped_date
-    :sequence_no: 24
-    :caption: Shipped date
-    :namespaced_name: loads.shipped_date
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 26
+    :caption: Shipped at
+    :namespaced_name: loads.shipped_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -418,7 +448,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -434,7 +464,7 @@
     :group_max: false
   transfer_load:
     :name: transfer_load
-    :sequence_no: 26
+    :sequence_no: 28
     :caption: Transfer load
     :namespaced_name: loads.transfer_load
     :data_type: :boolean
@@ -450,7 +480,7 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 27
+    :sequence_no: 29
     :caption: Edi file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
@@ -466,7 +496,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 28
+    :sequence_no: 30
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
@@ -482,7 +512,7 @@
     :group_max: false
   voyage_id:
     :name: voyage_id
-    :sequence_no: 29
+    :sequence_no: 31
     :caption: Voyage
     :namespaced_name: voyages.id
     :data_type: :string
@@ -496,25 +526,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  has_pallet:
-    :name: has_pallet
-    :sequence_no: 30
-    :caption: Has pallet
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

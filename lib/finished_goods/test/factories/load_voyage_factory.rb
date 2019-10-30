@@ -42,7 +42,7 @@ module FinishedGoodsApp
         customer_order_number: Faker::Lorem.word,
         customer_reference: Faker::Lorem.word,
         exporter_certificate_code: Faker::Lorem.word,
-        shipped_date: '2010-01-01 12:00',
+        shipped_at: '2010-01-01 12:00',
         shipped: false,
         transfer_load: false,
         active: true,

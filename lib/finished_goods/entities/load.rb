@@ -17,8 +17,10 @@ module FinishedGoodsApp
     attribute :customer_order_number, Types::String
     attribute :customer_reference, Types::String
     attribute :exporter_certificate_code, Types::String
-    attribute :shipped_date, Types::DateTime
+    attribute :shipped_at, Types::DateTime
     attribute :shipped, Types::Bool
+    attribute :allocated_at, Types::DateTime
+    attribute :allocated, Types::Bool
     attribute :transfer_load, Types::Bool
     attribute? :active, Types::Bool
   end
@@ -39,8 +41,10 @@ module FinishedGoodsApp
     attribute :customer_order_number, Types::String
     attribute :customer_reference, Types::String
     attribute :exporter_certificate_code, Types::String
-    attribute :shipped_date, Types::DateTime
+    attribute :shipped_at, Types::DateTime
     attribute :shipped, Types::Bool
+    attribute :allocated_at, Types::DateTime
+    attribute :allocated, Types::Bool
     attribute :transfer_load, Types::Bool
     attribute :voyage_type_id, Types::Integer
     attribute :vessel_id, Types::Integer
