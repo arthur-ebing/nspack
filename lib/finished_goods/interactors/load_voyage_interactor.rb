@@ -13,8 +13,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_voyage(id)
-      success_response("Created load voyage #{instance.booking_reference}",
-                       instance)
+      success_response("Created load voyage #{instance.booking_reference}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { booking_reference: ['This load voyage already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_voyage(id)
-      success_response("Updated load voyage #{instance.booking_reference}",
-                       instance)
+      success_response("Updated load voyage #{instance.booking_reference}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

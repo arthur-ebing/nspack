@@ -8,7 +8,7 @@ module FinishedGoodsApp
 
       id = nil
       repo.transaction do
-        load_res = CreateLoadService.call(res)
+        load_res = CreateLoadService.call(res, @user.user_name)
         id = load_res.instance
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
@@ -27,7 +27,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        load_res = UpdateLoadService.call(id, res)
+        load_res = UpdateLoadService.call(id, res, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -40,7 +40,7 @@ module FinishedGoodsApp
 
     def allocate_pallets_from_multiselect(id, multiselect_list)
       repo.transaction do
-        repo.allocate_pallets_from_multiselect(id, multiselect_list, @user)
+        repo.allocate_pallets_from_multiselect(id, multiselect_list, @user.user_name)
         log_transaction
       end
       success_response("Loaded pallets to load #{id} ")
@@ -53,7 +53,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        load_res = repo.allocate_pallets_from_list(id, res, @user)
+        load_res = repo.allocate_pallets_from_list(id, res, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction

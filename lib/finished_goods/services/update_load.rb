@@ -2,9 +2,10 @@
 
 module FinishedGoodsApp
   class UpdateLoadService < BaseService
-    def initialize(load_id, params)
+    def initialize(load_id, params, user_name)
       @load_id = load_id
       @params = params.output
+      @user_name = user_name
     end
 
     def call  # rubocop:disable Metrics/AbcSize
@@ -13,6 +14,7 @@ module FinishedGoodsApp
                                    :vessel_id,
                                    :voyage_number,
                                    :year)
+      voyage_attrs[:user_name] = @user_name
       voyage_id = VoyageRepo.new.find_or_create_voyage(voyage_attrs)
 
       # UPDATE LOAD

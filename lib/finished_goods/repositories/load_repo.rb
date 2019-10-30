@@ -46,75 +46,53 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
-    def allocate_pallets_from_list(load_id, res, user)
-      @user = user
-      pallet_numbers = res.output[:pallet_list]
-      added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
-      add_pallets(load_id, added_allocation)
+    def add_pallets(load_id, pallet_ids, user_name)
+      ds = DB[:pallets].where(id: pallet_ids, allocated: false, shipped: false) # restrict allocation
+      pallet_ids = ds.select_map(:id)
+
+      ds.update(load_id: load_id, allocated: true, allocated_at: Time.now)
+      log_status('loads', load_id, 'ALLOCATED', user_name: user_name)
+      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name)
+
+      success_response('ok')
     end
 
-    def allocate_pallets_from_multiselect(load_id, multiselect_list, user)
-      @user = user
+    def remove_pallets(pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
+      ds = DB[:pallets].where(id: pallet_ids, shipped: false) # restrict un-allocation
+      unallocated_pallets = ds.select_map(:id)
+      affected_loads = ds.distinct.select_map(:load_id)
+
+      ds.update(load_id: nil, allocated: false)
+      log_multiple_statuses('pallets', unallocated_pallets, 'UNALLOCATED', user_name: user_name) unless unallocated_pallets.nil_or_empty?
+
+      ds = DB[:pallets].where(load_id: affected_loads)
+      allocated_loads = ds.distinct.select_map(:load_id) # test for loads cleared
+
+      unallocated_loads = (affected_loads - allocated_loads)
+      log_multiple_statuses('loads', unallocated_loads, 'UNALLOCATED', user_name: user_name) unless unallocated_loads.nil_or_empty?
+
+      success_response('ok')
+    end
+
+    def allocate_pallets_from_list(load_id, res, user_name)
+      pallet_numbers = res.output[:pallet_list]
+      added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
+      add_pallets(load_id, added_allocation, user_name)
+    end
+
+    def allocate_pallets_from_multiselect(load_id, multiselect_list, user_name)
       added_allocation = DB[:pallet_sequences].where(id: multiselect_list).select_map(:pallet_id)
       current_allocation = DB[:pallets].where(load_id: load_id).select_map(:id)
-      add_pallets(load_id, added_allocation - current_allocation)
-      remove_pallets(current_allocation - added_allocation)
+      add_pallets(load_id, added_allocation - current_allocation, user_name)
+      remove_pallets(current_allocation - added_allocation, user_name)
     end
 
     def pallets_allocated(pallet_numbers)
-      DB[:pallets]
-        .where(pallet_number: pallet_numbers,
-               allocated: true)
-        .select_map(:pallet_number)
+      DB[:pallets].where(pallet_number: pallet_numbers, allocated: true).select_map(:pallet_number)
     end
 
     def pallets_exists(pallet_numbers)
-      DB[:pallets]
-        .where(pallet_number: pallet_numbers)
-        .select_map(:pallet_number)
-    end
-
-    def add_pallets(load_id, pallet_ids)
-      ds = DB[:pallets]
-      ds = ds.where(id: pallet_ids,
-                    allocated: false,
-                    shipped: false)
-      allocate_ids = ds.select_map(:id)
-
-      ds = DB[:pallets]
-      ds = ds.where(id: allocate_ids)
-      ds.update(load_id: load_id,
-                allocated: true,
-                allocated_at: Time.now)
-
-      log_status('loads', load_id, 'ALLOCATED', user_name: @user.user_name)
-      log_multiple_statuses('pallets', allocate_ids, 'ALLOCATED', user_name: @user.user_name)
-      success_response('ok')
-    end
-
-    def remove_pallets(pallet_ids) # rubocop:disable Metrics/AbcSize
-      ds = DB[:pallets]
-      ds = ds.where(id: pallet_ids,
-                    shipped: false)
-      unallocate_ids = ds.select_map(:id)
-
-      ds = DB[:pallets].distinct
-      ds = ds.where(id: unallocate_ids)
-      load_ids = ds.select_map(:load_id)
-
-      ds = DB[:pallets]
-      ds = ds.where(id: unallocate_ids)
-      ds.update(load_id: nil,
-                allocated: false,
-                allocated_at: nil)
-
-      ds = DB[:pallets].distinct
-      ds = ds.where(load_id: load_ids)
-      allocated_load_ids = ds.select_map(:load_id)
-
-      log_multiple_statuses('loads', (load_ids - allocated_load_ids), 'UNALLOCATED', user_name: @user.user_name)
-      log_multiple_statuses('pallets', unallocate_ids, 'UNALLOCATED', user_name: @user.user_name)
-      success_response('ok')
+      DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
     end
   end
 end
