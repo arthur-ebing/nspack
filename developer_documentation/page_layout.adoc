@@ -326,6 +326,14 @@ These are the methods used in building a page layout.
 |
 |Do not render a submit button in the form.
 
+|button_id
+|String
+|Set the DOM id of the submit button
+
+|initially_hide_button
+|Boolean
+|When `true`, the submit button will be hidden on render. Default is `false`.
+
 |multipart!
 |
 |Make this a multipart form for including file uploads.

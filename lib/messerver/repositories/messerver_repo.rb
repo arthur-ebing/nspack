@@ -246,6 +246,10 @@ module MesserverApp
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPrinterList&ListType=yaml")
     end
 
+    def module_list_uri(type = 'robot')
+      URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetModuleList&ListType=yaml#{type.nil? ? '' : "&ModuleType=#{type}"}")
+    end
+
     def publish_target_list_uri
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=GetPublishServerList&ListType=yaml")
     end
