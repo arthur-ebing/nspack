@@ -17,7 +17,8 @@
   season, customer_variety, plt_packhouse, plt_line, exit_ref, seq_exit_ref, gross_weight_measured_at,
   partially_palletized_at, govt_inspection_passed, internal_inspection_passed, inspection_age,
   internal_inspection_at, internal_reinspection_at, stock_created_at, intake_created_at,
-  first_cold_storage_at, active, extended_columns, seq_scrapped_at, colour_rule
+  first_cold_storage_at, active, extended_columns, seq_scrapped_at,
+  CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
   FROM vw_pallet_sequence_flat
   ORDER BY pallet_id, pallet_number DESC
 :limit: 10000

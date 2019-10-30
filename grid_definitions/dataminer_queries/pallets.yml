@@ -9,7 +9,7 @@
   partially_palletized, reinspected, verified, verification_passed, status, build_status, load_id, vessel, voyage,
   container, internal_container, temp_code, vehicle_number, cooled, pol, pod, final_destination, customer, consignee,
   final_receiver, exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd) AS departure_date,
-  active, colour_rule
+  active, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
   FROM vw_pallet_sequence_flat
   WHERE NOT scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text AND pallet_number::text IS NOT NULL
   ORDER BY pallet_id, pallet_number DESC
