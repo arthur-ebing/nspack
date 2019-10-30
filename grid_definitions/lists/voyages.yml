@@ -14,7 +14,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: completed,has_load
+  :hide_if_true: completed,loaded
 - :separator: true
 - :url: "/development/statuses/list/voyages/$:id$"
   :text: status

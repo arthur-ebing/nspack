@@ -1,24 +1,39 @@
 ---
 :dataminer_definition: loads
 :actions:
-- :url: "/finished_goods/dispatch/loads/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-  :popup: true
-- :url: "/finished_goods/dispatch/loads/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/finished_goods/dispatch/loads/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
+  - :url: "/finished_goods/dispatch/loads/$:id$"
+    :text: view
+    :icon: view-show
+    :title: View
+  - :url: "/finished_goods/dispatch/loads/$:id$/edit"
+    :text: edit
+    :icon: edit
+    :title: Edit
+    :hide_if_true: shipped
+  - :url: "/finished_goods/dispatch/loads/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_true: shipped,allocated
+  - :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
+    :text: allocate pallets
+    :icon: edit
+    :title: Allocate Pallets
+    :hide_if_true: shipped
+  - :separator: true
+  - :url: "/development/statuses/list/loads/$:id$"
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
 :page_controls:
-- :control_type: :link
-  :url: "/finished_goods/dispatch/loads/new"
-  :text: New Load
-  :style: :button
-  :behaviour: :popup
+  - :control_type: :link
+    :url: "/finished_goods/dispatch/loads/new"
+    :text: New Load
+    :style: :button
+:conditions:
+  :standard:
+    - :col: voyages.id
+      :op: =
+      :val: $:voyage_id$

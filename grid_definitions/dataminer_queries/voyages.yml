@@ -12,8 +12,8 @@
   \   voyages.created_at,\r\n    voyages.updated_at,\r\n    voyages.completed,\r\n
   \   voyages.completed_at,\r\n    voyages.active,\r\n    fn_current_status('voyages',
   voyages.id) AS status,\r\n    CASE\r\n        WHEN COUNT(loads.id) > 0  THEN TRUE\r\n
-  \       ELSE FALSE\r\n    END AS has_load,\r\n    CASE\r\n        WHEN completed
-  THEN 'ready'\r\n        WHEN COUNT(loads.id) > 0  THEN 'ok'\r\n        ELSE NULL\r\n
+  \       ELSE FALSE\r\n    END AS loaded,\r\n    CASE\r\n        WHEN completed THEN
+  'ready'\r\n        WHEN COUNT(loads.id) > 0  THEN 'ok'\r\n        ELSE NULL\r\n
   \   END AS colour_rule\r\n\r\nFROM voyages\r\n         LEFT JOIN vessels ON vessels.id
   = voyages.vessel_id\r\n         LEFT JOIN voyage_types ON voyage_types.id = voyages.voyage_type_id\r\n
   \        LEFT JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.voyage_id =
@@ -31,7 +31,7 @@
   :render_url: 
   :colour_key:
     ready: Completed
-    ok: Has Load
+    ok: Loaded
 :columns:
   id:
     :name: id
@@ -353,15 +353,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  has_load:
-    :name: has_load
+  loaded:
+    :name: loaded
     :sequence_no: 21
-    :caption: Has load
+    :caption: Loaded
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -387,26 +387,50 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: voyages.vessel_id
-  :caption: Vessel
+  :caption: Vessel Id
   :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT vessel_code, id FROM vessels ORDER BY vessel_code
-- :column: voyages.voyage_type_id
-  :caption: Voyage type
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT voyage_type_code, id FROM voyage_types ORDER BY voyage_type_code
-- :column: voyages.voyage_code
-  :caption: Voyage code
-  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
+  :list_def: 
+- :column: voyages.vessel_code
+  :caption: Vessel Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: 
+- :column: voyages.voyage_code
+  :caption: Voyage Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 
+- :column: voyage_types.voyage_type_code
+  :caption: Voyage Type
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: 
+- :column: voyages.completed_at
+  :caption: Completed at
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def: 
+- :column: voyages.year
+  :caption: Year
+  :data_type: :number
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 6
   :list_def: 

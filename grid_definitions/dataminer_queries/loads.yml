@@ -13,16 +13,17 @@
   \   loads.exporter_certificate_code,\r\n    loads.allocated,\r\n    loads.allocated_at,\r\n
   \   loads.shipped,\r\n    loads.shipped_at,\r\n    fn_current_status('loads', loads.id)
   AS status,\r\n    loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
-  \   voyages.id AS voyage_id,\r\n    CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n
-  \       WHEN loads.allocated THEN 'ok'\r\n        ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM
-  loads\r\n         JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
-  \ ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
-  pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
-  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
-  \        JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n         JOIN
-  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN voyages
-  ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels ON voyages.vessel_id
-  = vessels.id"
+  \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
+  \   CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n        WHEN loads.allocated
+  THEN 'ok'\r\n        ELSE NULL\r\n        END AS colour_rule\r\n\r\nFROM loads\r\nJOIN
+  depots  ON depots.id = loads.depot_id\r\nJOIN destination_cities  ON destination_cities.id
+  = loads.final_destination_id\r\nJOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
+  = loads.pol_voyage_port_id\r\nJOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
+  = loads.pod_voyage_port_id\r\nJOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\nJOIN
+  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\nJOIN voyages ON pol_voyage_ports.voyage_id
+  = voyages.id\r\nLEFT JOIN vessels ON voyages.vessel_id = vessels.id\r\nLEFT JOIN
+  load_containers on loads.id = load_containers.load_id\r\nLEFT JOIN load_voyages
+  on loads.id = load_voyages.load_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -526,9 +527,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  container_code:
+    :name: container_code
+    :sequence_no: 32
+    :caption: Container code
+    :namespaced_name: load_containers.container_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  booking_reference:
+    :name: booking_reference
+    :sequence_no: 33
+    :caption: Booking reference
+    :namespaced_name: load_voyages.booking_reference
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 32
+    :sequence_no: 34
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -543,11 +576,107 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: voyages.id
-  :caption: voyage_id
+- :column: loads.id
+  :caption: Load Id
   :data_type: :integer
   :control_type: :text
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: vessels.vessel_code
+  :caption: Vessel Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: 
+- :column: voyages.voyage_code
+  :caption: Voyage Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 
+- :column: depots.depot_code
+  :caption: Depot Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: 
+- :column: load_containers.container_code
+  :caption: Container Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def: 
+- :column: loads.order_number
+  :caption: Order Number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 6
+  :list_def: 
+- :column: loads.shipped_at
+  :caption: Shipped at
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 7
+  :list_def: 
+- :column: loads.created_at
+  :caption: Created at
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def: 
+- :column: pol_voyage_ports.eta
+  :caption: ETA
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def: 
+- :column: pol_voyage_ports.ata
+  :caption: ATA
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 10
+  :list_def: 
+- :column: pod_voyage_ports.etd
+  :caption: ETD
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 11
+  :list_def: 
+- :column: pod_voyage_ports.atd
+  :caption: ATD
+  :data_type: :datetime
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 12
+  :list_def: 
+- :column: loads.edi_file_name
+  :caption: EDI file name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 13
+  :list_def:

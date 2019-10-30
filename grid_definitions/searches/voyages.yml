@@ -1,0 +1,34 @@
+---
+:dataminer_definition: voyages
+:actions:
+  - :url: "/finished_goods/dispatch/voyages/$:id$"
+    :text: view
+    :icon: view-show
+    :title: View
+  - :url: "/finished_goods/dispatch/voyages/$:id$/edit"
+    :text: edit
+    :icon: edit
+    :title: Edit
+  - :url: "/finished_goods/dispatch/voyages/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true
+    :hide_if_true: completed,loaded
+  - :separator: true
+  - :url: "/development/statuses/list/voyages/$:id$"
+    :text: status
+    :icon: information-solid
+    :title: Status
+    :popup: true
+:page_controls:
+  - :control_type: :link
+    :url: "/finished_goods/dispatch/voyages/new"
+    :text: New Voyage
+    :style: :button
+    :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: voyages.id
+      :op: =
+      :val: $:voyage_id$
