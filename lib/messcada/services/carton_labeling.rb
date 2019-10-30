@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonLabeling < BaseService
-    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :label_name
+    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref
 
     def initialize(params)
       @resource_code = params[:device]
@@ -11,46 +11,66 @@ module MesscadaApp
     def call
       @repo = MesscadaApp::MesscadaRepo.new
 
-      res = retrieve_cached_setup_data
+      res = carton_labeling
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      carton_labeling
+      print_command = setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s)
+      success_response('Carton Label printed successfully', print_command)
     end
 
     private
 
-    def retrieve_cached_setup_data # rubocop:disable Metrics/AbcSize
-      file_data = JSON.parse(File.read(AppConst::LABELING_CACHED_DATA_FILEPATH))
-      return failed_response('File does not have any setup data cached.') if file_data.empty?
-      return failed_response("No setup data cached for resource #{resource_code}.") if file_data[resource_code].nil?
+    def carton_labeling  # rubocop:disable Metrics/AbcSize
+      res = retrieve_resource_cached_setup_data
+      return res unless res.success
 
-      @production_run_id = file_data[resource_code].keys.first
-      return failed_response("No active production run setup data cached for resource #{resource_code}.") if production_run_id.nil?
-      return failed_response("Production Run:#{production_run_id} could not be found") unless production_run_exists?
-      return failed_response("No setup data cached for resource #{resource_code} and production_run_id #{production_run_id}.") if file_data[resource_code][production_run_id].nil?
+      attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
+      @pick_ref = calc_pick_ref
+      attrs = attrs.merge(pick_ref: pick_ref)
 
-      @setup_data = file_data[resource_code][production_run_id]
+      res = validate_carton_label_params(attrs)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      res = create_carton_label(res)
+      return res unless res.success
 
       ok_response
+    end
+
+    def retrieve_resource_cached_setup_data
+      @setup_data = search_cache_files
+      return failed_response("No setup data cached for resource #{resource_code}.") if setup_data.empty?
+
+      @production_run_id = setup_data[:production_run_data][:production_run_id]
+      return failed_response("Production Run:#{production_run_id} could not be found") unless production_run_exists?
+
+      ok_response
+    end
+
+    def search_cache_files
+      cache_files = File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, 'line_*.yml')
+      Dir.glob(cache_files).each do |f|
+        file_data = YAML.load_file(f) if File.file?(f)
+        return file_data[resource_code] unless file_data.empty? || file_data[resource_code].nil?
+      end
+      []
     end
 
     def production_run_exists?
       repo.production_run_exists?(production_run_id)
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize
-      attrs = setup_data['production_run_data'].merge(setup_data['setup_data'])
-      res = validate_carton_label_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+    def calc_pick_ref  # rubocop:disable Metrics/AbcSize
+      iso_week = Date.today.cweek.to_s
+      iso_week = '0' + iso_week if iso_week.length == 1
+      day = Time.now.wday.to_s
+      day = '7' if day == '0'
 
-      @label_name = res[:label_name]
+      iso_week.slice(1, 1) + day + packhouse_no + iso_week.slice(0, 1)
+    end
 
-      repo.transaction do
-        res = create_carton_label(res)
-        return res unless res.success
-
-        carton_label_printing
-      end
+    def packhouse_no
+      repo.find_resource_packhouse_no(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
     def validate_carton_label_params(params)
@@ -62,33 +82,13 @@ module MesscadaApp
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
-      begin
-        repo.transaction do
-          repo.create_carton_label(attrs)
-        end
-      rescue StandardError
-        return failed_response($ERROR_INFO)
+      repo.transaction do
+        @carton_label_id = repo.create_carton_label(attrs)
       end
+
       ok_response
-    end
-
-    def carton_label_printing
-      print_command = resolve_print_command(setup_data['print_command'])
-      atrs = {
-        label_name: label_name,
-        print_command: print_command
-      }
-      success_response('Carton Label printed successfully', atrs)
-    end
-
-    def resolve_print_command(print_command)
-      fvalue_regex = /F\d=/i
-      print_commands = (print_command || '').split(fvalue_regex).collect(&:strip).compact.reject(&:empty?)
-      fvalue_body = []
-      print_commands.each do |fvalue|
-        fvalue_body << "<fvalue>#{fvalue}</fvalue>\r"
-      end
-      fvalue_body.join(' ')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
   end
 end

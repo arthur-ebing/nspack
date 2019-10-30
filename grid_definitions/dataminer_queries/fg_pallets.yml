@@ -7,7 +7,7 @@
   marketing_variety,  std_size, actual_count, size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at,
   palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, pallet_base, stack_type,
   gross_weight, nett_weight, sequence_nett_weight, basic_pack, packhouse, line, pick_ref, phc, reinspected, status, build_status,
-  active, colour_rule
+  active, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
   FROM vw_pallet_sequence_flat
   WHERE NOT scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text AND pallet_number::text IS NOT NULL
   ORDER BY pallet_id, pallet_number DESC
