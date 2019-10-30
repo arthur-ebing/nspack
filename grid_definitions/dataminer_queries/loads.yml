@@ -1,6 +1,6 @@
 ---
 :caption: Loads
-:sql: "SELECT\r\n    loads.id,\r\n    loads.id AS load_id,\r\n    voyages.voyage_code,\r\n
+:sql: "\r\nSELECT\r\n    loads.id,\r\n    loads.id AS load_id,\r\n    voyages.voyage_code,\r\n
   \   depots.depot_code AS depot,\r\n    pol_port.port_code AS pol,\r\n    pol_voyage_ports.eta
   AS eta,\r\n    pol_voyage_ports.ata AS ata,\r\n    pod_port.port_code AS pod,\r\n
   \   pod_voyage_ports.etd AS etd,\r\n    pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n
@@ -12,9 +12,11 @@
   \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
   \   loads.exporter_certificate_code,\r\n    loads.shipped,\r\n    loads.shipped_date,\r\n
   \   fn_current_status('loads', loads.id) AS status,\r\n    loads.transfer_load,\r\n
-  \   loads.edi_file_name,\r\n    loads.updated_at,\r\n    voyages.id AS voyage_id,\r\nCASE
-  \r\n     WHEN loads.shipped THEN 'ready'  \r\n     WHEN EXISTS(SELECT id FROM pallets
-  WHERE pallets.load_id = loads.id) THEN 'ok'\r\n     ELSE NULL\r\n     END AS colour_rule\r\n\r\nFROM
+  \   loads.edi_file_name,\r\n    loads.updated_at,\r\n    voyages.id AS voyage_id,\r\n
+  \   CASE\r\n        WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id = loads.id)
+  \  THEN TRUE\r\n        ELSE FALSE\r\n    END AS has_pallet,\r\n    CASE\r\n        WHEN
+  loads.shipped THEN 'ready'\r\n        WHEN EXISTS(SELECT id FROM pallets WHERE pallets.load_id
+  = loads.id) THEN 'ok'\r\n        ELSE NULL\r\n    END AS colour_rule\r\n\r\nFROM
   loads\r\n         JOIN depots  ON depots.id = loads.depot_id\r\n         JOIN destination_cities
   \ ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
   pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
@@ -494,9 +496,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_pallet:
+    :name: has_pallet
+    :sequence_no: 30
+    :caption: Has pallet
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

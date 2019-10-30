@@ -9,15 +9,18 @@
   :text: edit
   :icon: edit
   :title: Edit
+  :hide_if_true: shipped
 - :url: "/finished_goods/dispatch/loads/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: shipped,has_pallet
 - :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
   :text: allocate pallets
   :icon: edit
   :title: Allocate Pallets
+  :hide_if_true: shipped
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status

@@ -86,7 +86,13 @@ module FinishedGoods
                 end
               end
             end
+            page.section do |section|
+              section.add_grid('stock_pallets',
+                               "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
+                               caption: 'Pallets')
+            end
           end
+
           layout
         end
       end

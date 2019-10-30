@@ -55,6 +55,10 @@
     - :col: zero_load_id
       :op: IN
       :val: $:id$,0
+  :on_load:
+    - :col: load_id
+      :op: =
+      :val: $:load_id$
 :multiselect:
   :allocate_pallets:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"
