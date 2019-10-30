@@ -38,5 +38,6 @@ module MesscadaApp
     attribute :resource_id, Types::Integer
     attribute :label_name, Types::String
     attribute? :active, Types::Bool
+    attribute :pick_ref, Types::String
   end
 end

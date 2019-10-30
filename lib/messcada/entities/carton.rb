@@ -39,5 +39,6 @@ module MesscadaApp
     attribute :gross_weight, Types::Decimal
     attribute :nett_weight, Types::Decimal
     attribute? :active, Types::Bool
+    attribute :pick_ref, Types::String
   end
 end

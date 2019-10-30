@@ -15,7 +15,7 @@
   (SELECT t.treatment_code FROM treatments t JOIN carton_labels cl ON t.id = ANY (cl.treatment_ids) WHERE cl.id = carton_labels.id ORDER BY t.treatment_code DESC) AS clt) AS treatments,
   carton_labels.client_size_reference AS client_size_ref, carton_labels.client_product_code, carton_labels.marketing_order_number,
   target_market_groups.target_market_group_name AS packed_tm_group, seasons.season_code, pm_subtypes.subtype_code, pm_types.pm_type_code,
-  cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight, cartons.nett_weight,
+  cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight, cartons.nett_weight, carton_labels.pick_ref,
   CASE WHEN EXISTS(SELECT id FROM cartons WHERE cartons.carton_label_id= carton_labels.id) THEN 'ok' ELSE NULL END AS colour_rule
   FROM carton_labels
   LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id
@@ -747,9 +747,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pick_ref:
+    :name: pick_ref
+    :sequence_no: 44
+    :caption: Pick ref
+    :namespaced_name: carton_labels.pick_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -788,7 +804,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 3
-  :list_def:
+  :list_def: 
 - :column: cartons.created_at
   :caption: Label verified at
   :data_type: :date
@@ -796,7 +812,7 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 4
-  :list_def:
+  :list_def: 
 - :column: packhouses.plant_resource_code
   :caption: Packhouce
   :data_type: :string
@@ -870,7 +886,8 @@
   :ordered_list: true
   :ui_priority: 13
   :list_def: SELECT orchard_code FROM orchards ORDER BY orchard_code
-- :column: "ABS(date_part('epoch', current_timestamp - carton_labels.created_at) / 3600)::int"
+- :column: ABS(date_part('epoch', current_timestamp - carton_labels.created_at) /
+    3600)::int
   :caption: Label age (hrs)
   :data_type: :integer
   :control_type: :text
@@ -878,7 +895,7 @@
   :ordered_list: false
   :ui_priority: 5
   :list_def: 
-- :column: "ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int"
+- :column: ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int
   :caption: Carton age (hrs)
   :data_type: :integer
   :control_type: :text
