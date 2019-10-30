@@ -20,6 +20,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SCAN_RMT_BIN_ASSET_NUMBERS: 'Capture deliveries with permanently barcoded bins.' },
     { USE_PERMANENT_RMT_BIN_BARCODES: 'use when bins have permanent barcodes.' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
+    { CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION: 'optional.' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },

@@ -141,5 +141,13 @@ module MasterfilesApp
       SQL
       DB[query].all unless id.nil?
     end
+
+    def find_pm_products_by_pm_type(pm_type)
+      DB["select p.id, p.product_code
+          from pm_products p
+          join pm_subtypes s on s.id=p.pm_subtype_id
+          join pm_types t on t.id=s.pm_type_id
+          where t.pm_type_code = '#{pm_type}'"].map { |r| [r[:product_code], r[:id]] }
+    end
   end
 end

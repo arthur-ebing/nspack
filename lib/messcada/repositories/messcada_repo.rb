@@ -141,13 +141,27 @@ module MesscadaApp
           from pallet_sequences s
           join pallet_sequences sis on sis.pallet_id=s.pallet_id
           where s.id = #{id}
-          order by s.pallet_sequence_number asc"].map { |s| s[:id] }
+          order by sis.pallet_sequence_number asc"].map { |s| s[:id] }
     end
 
     def find_pallet_sequence_attrs(id)
       DB["SELECT *
           FROM vw_pallet_sequence_flat
           WHERE id = ?", id].first
+    end
+
+    def update_pallet_sequence_verification_result(pallet_sequence_id, params)
+      nett_weight_upd = ", nett_weight=#{params[:nett_weight]} " if params[:nett_weight]
+      upd = "UPDATE pallet_sequences SET verified=true,verified_at='#{Time.now}',verification_result = '#{params[:verification_result]}', pallet_verification_failure_reason_id = #{(params[:verification_result] != 'failed' ? 'Null' : "'#{params[:verification_failure_reason]}'")} #{nett_weight_upd} WHERE id = #{pallet_sequence_id};"
+      DB[upd].update
+    end
+
+    def update_pallet_nett_weight(pallet_id)
+      DB["UPDATE pallets p set nett_weight=(select sum(nett_weight) from pallet_sequences where pallet_id=p.id) WHERE id = #{pallet_id};"].update
+    end
+
+    def pallet_verified?(pallet_id)
+      DB["select * from pallet_sequences where pallet_id = '#{pallet_id}' AND (verified is null or verified is false) "].first.nil?
     end
 
     # instance of a carton label with all its relevant lookup columns
