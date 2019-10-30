@@ -14,6 +14,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: completed,has_load
 - :separator: true
 - :url: "/development/statuses/list/voyages/$:id$"
   :text: status
@@ -26,3 +27,8 @@
   :text: New Voyage
   :style: :button
   :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: voyages.id
+      :op: =
+      :val: $:voyage_id$

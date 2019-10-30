@@ -220,10 +220,10 @@
     :sequence_no: 13
     :caption: Load
     :namespaced_name: load_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -1130,5 +1130,5 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 13
   :list_def: 
