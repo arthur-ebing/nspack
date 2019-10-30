@@ -8,7 +8,7 @@ module FinishedGoodsApp
 
       id = nil
       repo.transaction do
-        load_res = CreateLoadService.call(res)
+        load_res = CreateLoadService.call(res, @user.user_name)
         id = load_res.instance
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
@@ -27,7 +27,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        load_res = UpdateLoadService.call(id, res)
+        load_res = UpdateLoadService.call(id, res, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -40,7 +40,7 @@ module FinishedGoodsApp
 
     def allocate_pallets_from_multiselect(id, multiselect_list)
       repo.transaction do
-        repo.allocate_pallets_from_multiselect(id, multiselect_list)
+        repo.allocate_pallets_from_multiselect(id, multiselect_list, @user.user_name)
         log_transaction
       end
       success_response("Loaded pallets to load #{id} ")
@@ -48,12 +48,12 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_pallets_from_list(id, params)
+    def allocate_pallets_from_list(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_list(params)
-      return res unless res.message.empty?
+      return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        load_res = repo.allocate_pallets_from_list(id, res)
+        load_res = repo.allocate_pallets_from_list(id, res, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -104,20 +104,20 @@ module FinishedGoodsApp
       pallet_numbers = attrs.map { |x| x }
 
       errors = attrs.reject { |x| x.match(/\A\d+\Z/) }
-      message = errors.join(', ') + ' must be numeric'
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      message = "#{errors.join(', ')} must be numeric"
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
       pallet_exists = repo.pallets_exists(pallet_numbers)
       errors = (pallet_numbers - pallet_exists)
-      message = errors.join(', ') + ' doesn\'t exist'
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      message = "#{errors.join(', ')} doesn't exist"
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
-      errors = (pallet_exists & repo.pallets_allocated(pallet_exists))
-      message = errors.join(', ') + ' already allocated'
-      return validation_failed_response(OpenStruct.new(messages: { pallet_list: [message] })) unless errors.nil_or_empty?
+      errors = repo.pallets_allocated(pallet_exists)
+      message = "#{errors.join(', ')} already allocated"
+      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
       params[:pallet_list] = pallet_numbers
-      success_response('', params)
+      PalletListSchema.call(params)
     end
   end
 end

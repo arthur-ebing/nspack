@@ -27,11 +27,7 @@ module FinishedGoodsApp
                             wrapper: VoyageFlat)
     end
 
-    def last_voyage_created(vessel_id)
-      DB[:voyages].where(vessel_id: vessel_id).max(:id)
-    end
-
-    def find_or_create_voyage(voyage_type_id:, vessel_id:, voyage_number:, year:)
+    def find_or_create_voyage(voyage_type_id:, vessel_id:, voyage_number:, year:, user_name: nil)
       ds = DB[:voyages]
       ds = ds.where(vessel_id: vessel_id,
                     voyage_type_id: voyage_type_id,
@@ -39,16 +35,20 @@ module FinishedGoodsApp
                     year: year)
       ds = ds.where(active: true,
                     completed: false)
-      voyage_id = ds.get(:id)
+      voyage_id = ds.get(:id) # find existing
 
       if voyage_id.nil?
         voyage_id = DB[:voyages].insert(vessel_id: vessel_id,
                                         voyage_type_id: voyage_type_id,
                                         voyage_number: voyage_number,
-                                        year: year)
-        log_status('voyages', voyage_id, 'CREATED')
+                                        year: year) # create new voyage
+        log_status('voyages', voyage_id, 'CREATED', user_name: user_name)
       end
       voyage_id
+    end
+
+    def last_voyage_created(vessel_id)
+      DB[:voyages].where(vessel_id: vessel_id).max(:id)
     end
   end
 end

@@ -1,0 +1,24 @@
+---
+:dataminer_definition: cargo_temperatures
+:actions:
+- :url: "/masterfiles/shipping/cargo_temperatures/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/shipping/cargo_temperatures/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/shipping/cargo_temperatures/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/shipping/cargo_temperatures/new"
+  :text: New Cargo Temperature
+  :style: :button
+  :behaviour: :popup
