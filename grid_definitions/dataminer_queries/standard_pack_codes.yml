@@ -1,6 +1,6 @@
 ---
 :caption: Standard Pack Codes
-:sql: SELECT "standard_pack_codes"."id", "standard_pack_codes"."standard_pack_code",
+:sql: SELECT "standard_pack_codes"."id", "standard_pack_codes"."standard_pack_code", "standard_pack_codes"."description",
   "standard_pack_codes"."material_mass", "standard_pack_codes"."plant_resource_button_indicator",
   "standard_pack_codes"."created_at", "standard_pack_codes"."updated_at", "standard_pack_codes"."active"
   FROM "standard_pack_codes"
@@ -40,9 +40,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: standard_pack_codes.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   material_mass:
     :name: material_mass
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Material mass
     :namespaced_name: standard_pack_codes.material_mass
     :data_type: :string
@@ -58,7 +74,7 @@
     :group_max: false
   plant_resource_button_indicator:
     :name: plant_resource_button_indicator
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Plant resource button indicator
     :namespaced_name: standard_pack_codes.plant_resource_button_indicator
     :data_type: :string
@@ -74,7 +90,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: standard_pack_codes.created_at
     :data_type: :datetime
@@ -90,7 +106,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: standard_pack_codes.updated_at
     :data_type: :datetime
@@ -106,7 +122,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: standard_pack_codes.active
     :data_type: :boolean

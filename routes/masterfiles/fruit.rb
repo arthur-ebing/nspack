@@ -419,6 +419,7 @@ class Nspack < Roda
               standard_pack_code
               material_mass
               plant_resource_button_indicator
+              description
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)

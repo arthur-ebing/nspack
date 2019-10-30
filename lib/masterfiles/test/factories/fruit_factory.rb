@@ -56,6 +56,7 @@ module MasterfilesApp
     def create_standard_pack_code(opts = {})
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
         active: true,
         material_mass: Faker::Number.decimal,
         plant_resource_button_indicator: Faker::Lorem.word

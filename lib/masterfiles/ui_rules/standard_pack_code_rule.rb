@@ -16,6 +16,7 @@ module UiRules
 
     def set_show_fields
       fields[:standard_pack_code] = { renderer: :label }
+      fields[:description] = { renderer: :label }
       fields[:material_mass] = { renderer: :label }
       fields[:plant_resource_button_indicator] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -24,6 +25,7 @@ module UiRules
     def common_fields
       {
         standard_pack_code: { required: true },
+        description: {},
         material_mass: { renderer: :numeric },
         plant_resource_button_indicator: { renderer: :select,
                                            options: @this_repo.for_select_plant_resource_button_indicator(Crossbeams::Config::ResourceDefinitions::MODULE_BUTTON),
@@ -42,6 +44,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(standard_pack_code: nil,
+                                    description: nil,
                                     material_mass: nil,
                                     plant_resource_button_indicator: nil)
     end

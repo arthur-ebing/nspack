@@ -10,6 +10,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         standard_pack_code: Faker::Lorem.unique.word,
+        description: 'ABC',
         material_mass: 1.0,
         plant_resource_button_indicator: 'ABC',
         active: true

@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :standard_pack_code
+              form.add_field :description
               form.add_field :material_mass
               form.add_field :plant_resource_button_indicator
               form.add_field :active

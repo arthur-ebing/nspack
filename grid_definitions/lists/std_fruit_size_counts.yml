@@ -19,7 +19,7 @@
 - :url: "/masterfiles/fruit/std_fruit_size_counts/$:id$/fruit_actual_counts_for_packs/new"
   :text: add actual count
   :icon: add
-  :title: New Actual Count for Pack
+  :title: Add Actual Count for Std Count $:size_count_value$
   :popup: true
 - :url: "/list/fruit_actual_counts_for_packs/with_params?key=standard&fruit_actual_counts_for_packs.std_fruit_size_count_id=$:id$"
   :text: actual counts list
