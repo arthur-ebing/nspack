@@ -166,6 +166,10 @@ module Crossbeams
       voyage_type_id: { subquery: 'SELECT id FROM voyage_types WHERE voyage_type_code = ?', values: 'SELECT voyage_type_code FROM voyage_types WHERE id = ?' },
       vessel_type_id: { subquery: 'SELECT id FROM vessel_types WHERE vessel_type_code = ?', values: 'SELECT vessel_type_code FROM vessel_types WHERE id = ?' },
       city_id: { subquery: 'SELECT id FROM destination_cities WHERE city_name = ?', values: 'SELECT city_name FROM destination_cities WHERE id = ?' },
+      user_id: { subquery: 'SELECT id FROM users WHERE login_name = ?', values: 'SELECT login_name FROM users WHERE id = ?' },
+      security_group_id: { subquery: 'SELECT id FROM security_groups WHERE security_group_name = ?', values: 'SELECT security_group_name FROM security_groups WHERE id = ?' },
+      program_id: { subquery: 'SELECT id FROM programs WHERE program_name = ? AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = ?)', values: 'SELECT p.program_name, f.functional_area_name FROM programs p JOIN functional_areas f ON f.id = p.functional_area_id WHERE p.id = ?' },
+      program_function_id: { subquery: 'SELECT id FROM program_functions WHERE program_function_name = ? AND program_id = (SELECT id FROM programs WHERE program_name = ? AND functional_area_id = (SELECT id FROM functional_areas WHERE functional_area_name = ?))', values: 'SELECT pf.program_function_name, p.program_name, f.functional_area_name FROM program_functions pf JOIN programs p ON p.id = pf.program_id JOIN functional_areas f ON f.id = p.functional_area_id WHERE pf.id = ?' },
       zzz: {}
     }.freeze
 
