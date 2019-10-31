@@ -90,6 +90,9 @@
       <%= render_rmd_menu %>
     <% end %>
     <% unless @no_logout %>
+      <% if @hybrid_device %>
+        <%= Crossbeams::Layout::Link.new(text: 'Main page', url: '/', style: :back_button, css_class: 'mr4').render %>
+      <% end %>
       <a href="/logout" id="logout" class="f6 link dim br2 ph3 pv2 dib white bg-silver" title="Logout">logout</a>
     <% end %>
     <div id="container" class="container ma2">

@@ -154,7 +154,7 @@ class Nspack < Roda
 
     r.root do
       # TODO: Config this, and maybe set it up per user.
-      if @registered_mobile_device
+      if @registered_mobile_device && !@hybrid_device
         r.redirect @rmd_start_page || '/rmd/home'
       else
         # r.redirect '/packhouse/portal'
