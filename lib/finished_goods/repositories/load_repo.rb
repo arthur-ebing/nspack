@@ -14,36 +14,41 @@ module FinishedGoodsApp
     crud_calls_for :loads, name: :load, wrapper: Load
 
     def find_load_flat(id)
-      find_with_association(:loads,
-                            id,
-                            parent_tables: [{ parent_table: :voyage_ports,
-                                              columns: %i[port_id voyage_id],
-                                              foreign_key: :pol_voyage_port_id,
-                                              flatten_columns: { port_id: :pol_port_id,
-                                                                 voyage_id: :voyage_id } },
-                                            { parent_table: :voyage_ports,
-                                              columns: %i[port_id],
-                                              foreign_key: :pod_voyage_port_id,
-                                              flatten_columns: { port_id: :pod_port_id } },
-                                            { parent_table: :voyages,
-                                              columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
-                                              foreign_key: :voyage_id,
-                                              flatten_columns: { voyage_type_id: :voyage_type_id,
-                                                                 vessel_id: :vessel_id,
-                                                                 voyage_number: :voyage_number,
-                                                                 voyage_code: :voyage_code,
-                                                                 year: :year } },
-                                            { parent_table: :load_voyages,
-                                              columns: %i[shipping_line_party_role_id
-                                                          shipper_party_role_id
-                                                          booking_reference
-                                                          memo_pad],
-                                              foreign_key: :id,
-                                              flatten_columns: { shipping_line_party_role_id: :shipping_line_party_role_id,
-                                                                 shipper_party_role_id: :shipper_party_role_id,
-                                                                 booking_reference: :booking_reference,
-                                                                 memo_pad: :memo_pad } }],
-                            wrapper: LoadFlat)
+      hash = find_with_association(:loads,
+                                   id,
+                                   parent_tables: [{ parent_table: :voyage_ports,
+                                                     columns: %i[port_id voyage_id],
+                                                     foreign_key: :pol_voyage_port_id,
+                                                     flatten_columns: { port_id: :pol_port_id,
+                                                                        voyage_id: :voyage_id } },
+                                                   { parent_table: :voyage_ports,
+                                                     columns: %i[port_id],
+                                                     foreign_key: :pod_voyage_port_id,
+                                                     flatten_columns: { port_id: :pod_port_id } },
+                                                   { parent_table: :voyages,
+                                                     columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
+                                                     foreign_key: :voyage_id,
+                                                     flatten_columns: { voyage_type_id: :voyage_type_id,
+                                                                        vessel_id: :vessel_id,
+                                                                        voyage_number: :voyage_number,
+                                                                        voyage_code: :voyage_code,
+                                                                        year: :year } }],
+                                   sub_tables: [{ sub_table: :load_voyages,
+                                                  columns: %i[shipping_line_party_role_id
+                                                              shipper_party_role_id
+                                                              booking_reference
+                                                              memo_pad]  }])
+      return LoadFlat.new(hash) if hash.nil?
+
+      flatten_columns = { shipping_line_party_role_id: :shipping_line_party_role_id,
+                          shipper_party_role_id: :shipper_party_role_id,
+                          booking_reference: :booking_reference,
+                          memo_pad: :memo_pad }
+      sub_hash = hash.delete(:load_voyages).first
+      sub_hash ||= {}
+      flatten_columns.each { |col, new_name|  hash[new_name] = sub_hash.delete(col) }
+
+      LoadFlat.new(hash)
     end
 
     def add_pallets(load_id, pallet_ids, user_name)
