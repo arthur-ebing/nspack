@@ -5,7 +5,7 @@ class Nspack < Roda
     # MES MODULES
     # --------------------------------------------------------------------------
     r.on 'mes_modules', Integer do |id|
-      interactor = LabelsApp::MesModuleInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::MesModuleInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:mes_modules, id) do
@@ -21,7 +21,7 @@ class Nspack < Roda
     end
 
     r.on 'mes_modules' do
-      interactor = LabelsApp::MesModuleInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::MesModuleInteractor.new(current_user, {}, { route_url: request.path }, {})
       r.on 'refresh' do
         res = interactor.refresh_mes_modules
         if res.success

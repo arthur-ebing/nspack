@@ -2,17 +2,17 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-module LabelsApp
+module LabelApp
   class TestMesModuleInteractor < MiniTestWithHooks
     include MesModuleFactory
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(LabelsApp::MesModuleRepo)
+      assert repo.is_a?(LabelApp::PrinterRepo)
     end
 
     def test_mes_module
-      LabelsApp::MesModuleRepo.any_instance.stubs(:find_mes_module).returns(fake_mes_module)
+      LabelApp::PrinterRepo.any_instance.stubs(:find_mes_module).returns(fake_mes_module)
       entity = interactor.send(:mes_module, 1)
       assert entity.is_a?(MesModule)
     end

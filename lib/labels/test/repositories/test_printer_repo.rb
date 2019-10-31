@@ -2,8 +2,8 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-module LabelsApp
-  class TestMesModuleRepo < MiniTestWithHooks
+module LabelApp
+  class TestPrinterRepo < MiniTestWithHooks
     def test_for_selects
       assert_respond_to repo, :for_select_mes_modules
     end
@@ -15,7 +15,7 @@ module LabelsApp
     private
 
     def repo
-      MesModuleRepo.new
+      PrinterRepo.new
     end
   end
 end

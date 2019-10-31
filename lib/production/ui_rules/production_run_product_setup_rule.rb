@@ -19,7 +19,8 @@ module UiRules
         product_setup_code: { renderer: :label },
         printer: { renderer: :select,
                    options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_CARTON),
-                   required: true },
+                   required: true,
+                   invisible: print_to_robot? },
         no_of_prints: { renderer: :integer, required: true },
         label_template_id: { renderer: :select,
                              options: @template_repo.for_select_label_templates(where: { application: AppConst::PRINT_APP_CARTON }),
@@ -30,6 +31,10 @@ module UiRules
     def make_form_object
       @form_object = @repo.find_product_setup(@options[:product_setup_id])
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_CARTON), no_of_prints: 1))
+    end
+
+    def print_to_robot?
+      @print_repo.print_to_robot?(@options[:request_ip])
     end
   end
 end

@@ -4,8 +4,8 @@ module Production
   module Runs
     module ProductionRun
       class PrintCarton
-        def self.call(id, product_setup_id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:production_run_product_setup, :print_barcode, id: id, product_setup_id: product_setup_id, form_values: form_values)
+        def self.call(id, product_setup_id, request_ip, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:production_run_product_setup, :print_barcode, id: id, product_setup_id: product_setup_id, request_ip: request_ip, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

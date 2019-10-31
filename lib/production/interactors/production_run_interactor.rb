@@ -181,12 +181,12 @@ module ProductionApp
     end
 
     # create carton_print_repo?
-    def print_carton_label(id, product_setup_id, params)
+    def print_carton_label(id, product_setup_id, request_ip, params)
       res = validate_print_carton(params)
       return validation_failed_response(res) unless res.messages.empty?
       return mixed_validation_failed_response(res, messages: { no_of_prints: ["cannot be more than #{AppConst::BATCH_PRINT_MAX_LABELS}"] }) if res[:no_of_prints] > AppConst::BATCH_PRINT_MAX_LABELS
 
-      MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], params)
+      MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], request_ip, params)
       success_response('Label sent to printer', id: id, product_setup_id: product_setup_id)
     end
 
@@ -248,7 +248,7 @@ module ProductionApp
       Dry::Validation.Params do
         configure { config.type_specs = true }
 
-        required(:printer, :integer).filled(:int?)
+        optional(:printer, :integer).filled(:int?)
         required(:label_template_id, :integer).filled(:int?)
         required(:no_of_prints, :integer).filled(:int?, gt?: 0)
       end.call(params)

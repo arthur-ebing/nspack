@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LabelsApp
+module LabelApp
   class MesModule < Dry::Struct
     attribute :id, Types::Integer
     attribute :module_code, Types::String

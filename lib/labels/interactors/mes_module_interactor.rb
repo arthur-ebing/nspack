@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module LabelsApp
+module LabelApp
   class MesModuleInteractor < BaseInteractor
     def refresh_mes_modules
       mes_repo = MesserverApp::MesserverRepo.new
@@ -16,7 +16,7 @@ module LabelsApp
     private
 
     def repo
-      @repo ||= MesModuleRepo.new
+      @repo ||= PrinterRepo.new
     end
 
     def mes_module(id)

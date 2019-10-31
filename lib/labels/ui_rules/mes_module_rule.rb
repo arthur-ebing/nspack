@@ -3,7 +3,7 @@
 module UiRules
   class MesModuleRule < Base
     def generate_rules
-      @repo = LabelsApp::MesModuleRepo.new
+      @repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
 

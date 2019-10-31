@@ -2,16 +2,17 @@
 
 module MesscadaApp
   class BatchPrintCartonLabels < BaseService
-    attr_reader :repo, :production_run_id, :product_setup_id,
+    attr_reader :repo, :production_run_id, :product_setup_id, :request_ip,
                 :label_name, :printer_id, :no_of_prints, :run_repo, :label_template_id
 
-    def initialize(production_run_id, product_setup_id, label_template_id, params)
+    def initialize(production_run_id, product_setup_id, label_template_id, request_ip, params)
       @production_run_id = production_run_id
       @product_setup_id = product_setup_id
       @no_of_prints = params[:no_of_prints]
       @printer_id = params[:printer]
       @label_template_id = label_template_id
       @repo = MesscadaApp::MesscadaRepo.new
+      @request_ip = LabelApp::PrinterRepo.new.print_to_robot?(request_ip) ? request_ip : nil
       @label_name = repo.get(:label_templates, label_template_id, :label_template_name)
     end
 
@@ -20,7 +21,7 @@ module MesscadaApp
 
       repo.transaction do
         ids = repo.create_carton_labels(no_of_prints, attrs)
-        Job::BatchPrintCartonLabels.enqueue(attrs[:packhouse_resource_id], ids, label_template_id, printer_id)
+        Job::BatchPrintCartonLabels.enqueue(attrs[:packhouse_resource_id], ids, label_template_id, printer_id, request_ip)
       end
       ok_response
     end

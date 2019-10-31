@@ -4,7 +4,7 @@ require File.join(File.expand_path('./../../../', __dir__), 'test_helper_for_rou
 
 class TestMesModuleRoutes < RouteTester
 
-  INTERACTOR = LabelsApp::MesModuleInteractor
+  INTERACTOR = LabelApp::MesModuleInteractor
 
   def test_show
     authorise_pass!

@@ -92,14 +92,20 @@ class Nspack < Roda
       r.on 'product_setup', Integer do |product_setup_id|
         r.on 'print_label' do
           r.get do
-            show_partial { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id) }
+            show_partial { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id, request.ip) }
           end
           r.patch do
-            res = interactor.print_carton_label(id, product_setup_id, params[:product_setup])
+            res = interactor.print_carton_label(id, product_setup_id, request.ip, params[:product_setup])
             if res.success
               show_json_notice(res.message)
             else
-              re_show_form(r, res) { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id, form_values: params[:product_setup], form_errors: res.errors) }
+              re_show_form(r, res) do
+                Production::Runs::ProductionRun::PrintCarton.call(id,
+                                                                  product_setup_id,
+                                                                  request.ip,
+                                                                  form_values: params[:product_setup],
+                                                                  form_errors: res.errors)
+              end
             end
           end
         end

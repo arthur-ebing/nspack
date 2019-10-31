@@ -5,11 +5,12 @@ module MesscadaApp
     class BatchPrintCartonLabels < BaseQueJob
       include LabelPrintingApp::LabelContent
 
-      attr_reader :label_name, :instance, :repo, :messerver_repo, :carton_label_ids, :printer_id, :packhouse_no
+      attr_reader :label_name, :instance, :repo, :messerver_repo, :carton_label_ids, :printer_id, :packhouse_no, :request_ip
 
-      def run(packhouse_resource_id, carton_label_ids, label_template_id, printer_id)
+      def run(packhouse_resource_id, carton_label_ids, label_template_id, printer_id, request_ip)
         setup_repos
         @printer_id = printer_id
+        @request_ip = request_ip
         @packhouse_no = repo.find_resource_packhouse_no(packhouse_resource_id)
 
         find_label(label_template_id)
@@ -31,7 +32,7 @@ module MesscadaApp
       end
 
       def send_label_to_printer(vars)
-        messerver_repo.print_published_label(label_name, vars, 1, printer_code(printer_id)) # , host = nil)
+        messerver_repo.print_published_label(label_name, vars, 1, printer_code(printer_id), request_ip)
       end
 
       def print_labels(carton_label_ids)
