@@ -1,0 +1,14 @@
+---
+:dataminer_definition: mes_modules
+:actions:
+- :url: "/labels/mes_modules/mes_modules/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/labels/mes_modules/mes_modules/refresh"
+  :text: Refresh Module list
+  :style: :button
+  :behaviour: :default

@@ -12,6 +12,14 @@ module MesserverApp
       success_response('Refreshed printers', printer_list['PrinterList'])
     end
 
+    def mes_module_list
+      res = request_uri(module_list_uri)
+      return res unless res.success
+
+      module_list = YAML.safe_load(res.instance.body)
+      success_response('Refreshed modules', module_list['ModuleList'])
+    end
+
     def publish_target_list
       res = request_uri(publish_target_list_uri)
       return res unless res.success
