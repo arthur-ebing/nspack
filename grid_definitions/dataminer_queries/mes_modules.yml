@@ -1,0 +1,196 @@
+---
+:caption: Modules
+:sql: SELECT "mes_modules"."id", "mes_modules"."module_code", "mes_modules"."module_type",
+  "mes_modules"."server_ip", "mes_modules"."ip_address", "mes_modules"."port", "mes_modules"."alias", "mes_modules"."active",
+  "mes_modules"."created_at", "mes_modules"."updated_at", fn_current_status('mes_modules',
+  "mes_modules"."id") AS status FROM "mes_modules"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: mes_modules.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  module_code:
+    :name: module_code
+    :sequence_no: 2
+    :caption: Module Code
+    :namespaced_name: mes_modules.module_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  module_type:
+    :name: module_type
+    :sequence_no: 3
+    :caption: Module type
+    :namespaced_name: mes_modules.module_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  server_ip:
+    :name: server_ip
+    :sequence_no: 4
+    :caption: Server ip
+    :namespaced_name: mes_modules.server_ip
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ip_address:
+    :name: ip_address
+    :sequence_no: 5
+    :caption: Ip address
+    :namespaced_name: mes_modules.ip_address
+    :data_type: :ipaddr
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  port:
+    :name: port
+    :sequence_no: 6
+    :caption: Port
+    :namespaced_name: mes_modules.port
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  alias:
+    :name: alias
+    :sequence_no: 7
+    :caption: Alias
+    :namespaced_name: mes_modules.alias
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 8
+    :caption: Active
+    :namespaced_name: mes_modules.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 9
+    :caption: Created at
+    :namespaced_name: mes_modules.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 10
+    :caption: Updated at
+    :namespaced_name: mes_modules.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 11
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: mes_modules.module_code
+  :caption: Module Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
