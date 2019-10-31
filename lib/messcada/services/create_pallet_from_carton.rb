@@ -123,17 +123,8 @@ module MesscadaApp
       {
         scanned_from_carton_id: carton_id,
         carton_quantity: carton_quantity.nil? ? cartons_per_pallet : carton_quantity,
-        pick_ref: calc_pick_ref
+        pick_ref: UtilityFunctions.calculate_pick_ref(packhouse_no)
       }
-    end
-
-    def calc_pick_ref  # rubocop:disable Metrics/AbcSize
-      iso_week = Date.today.cweek.to_s
-      iso_week = '0' + iso_week if iso_week.length == 1
-      day = Time.now.wday.to_s
-      day = '7' if day == '0'
-
-      iso_week.slice(1, 1) + day + packhouse_no + iso_week.slice(0, 1)
     end
 
     def packhouse_no

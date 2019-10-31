@@ -6,7 +6,7 @@ module MesscadaApp
 
     def initialize(params)
       @carton_label_id = params[:carton_number]
-      @params = params
+      @params = params.to_h.merge(carton_and_pallet_verification: false)
     end
 
     def call
