@@ -4,7 +4,7 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -90,6 +90,16 @@ module FinishedGoods
               end
             end
             page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Ship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
+                                  visible: rules[:shipped],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Unship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/unship",
+                                  visible: !rules[:shipped],
+                                  style: :button)
               section.add_grid('stock_pallets',
                                '/list/stock_pallets/grid_multi',
                                caption: 'Choose Pallets',

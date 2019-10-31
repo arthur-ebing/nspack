@@ -83,7 +83,7 @@ module UiRules
       end
 
       rules[:can_complete] = !(true & @form_object.completed)
-      rules[:is_complete] = !@form_object.completed
+      rules[:completed] = @form_object.completed
     end
   end
 end

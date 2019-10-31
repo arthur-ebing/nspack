@@ -12,7 +12,7 @@ module UiRules
 
       set_show_fields if %i[show].include? @mode
       set_allocate_fields if %i[allocate].include? @mode
-      add_behaviours if %i[new edit].include? @mode
+      add_behaviours
 
       form_name 'load'
     end
@@ -211,10 +211,11 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :consignee_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/consignee_changed' }] if @mode == :new
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
-        behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }]
+        behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
         # behaviour.keyup :pallet_list, notify: [{ url: '/finished_goods/dispatch/loads/pallet_list_changed' }] if @mode == :allocate
       end
+      rules[:shipped] = !@form_object.shipped
     end
   end
 end

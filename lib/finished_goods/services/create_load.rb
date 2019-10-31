@@ -10,7 +10,7 @@ module FinishedGoodsApp
     end
 
     def call
-      create_voyage
+      find_or_create_voyage
       create_load
       create_load_voyage
 
@@ -19,7 +19,7 @@ module FinishedGoodsApp
 
     private
 
-    def create_voyage
+    def find_or_create_voyage
       voyage_attrs = params.slice(:voyage_type_id,
                                   :vessel_id,
                                   :voyage_number,

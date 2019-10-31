@@ -8,6 +8,7 @@ module FinishedGoods
         def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:voyage, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
+          p rules
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
@@ -42,7 +43,7 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Complete Voyage',
-                                  url: 'complete',
+                                  url: "/finished_goods/dispatch/voyages/#{id}/complete",
                                   behaviour: :popup,
                                   visible: rules[:can_complete],
                                   style: :button)
@@ -51,7 +52,7 @@ module FinishedGoods
                                   url: "/finished_goods/dispatch/voyages/#{id}/voyage_ports/new",
                                   behaviour: :popup,
                                   grid_id: 'voyage_ports',
-                                  visible: rules[:is_complete],
+                                  visible: !rules[:completed],
                                   style: :button)
               section.add_grid('voyage_ports',
                                "/list/voyage_ports/grid?key=standard&voyage_id=#{id}",

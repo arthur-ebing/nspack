@@ -316,6 +316,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'ship' do
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.ship_load(id, params[:load])
+        if res.success
+          flash[:notice] = res.message
+          r.redirect '/list/loads'
+        end
+      end
+
+      r.on 'unship' do
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.unship_load(id, params[:load])
+        if res.success
+          flash[:notice] = res.message
+          r.redirect '/list/loads'
+        end
+      end
+
       r.on 'allocate_pallets' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)

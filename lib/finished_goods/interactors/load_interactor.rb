@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadInteractor < BaseInteractor
+  class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_load(params) # rubocop:disable Metrics/AbcSize
       res = validate_load_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -34,6 +34,32 @@ module FinishedGoodsApp
       end
       instance = load_entity(id)
       success_response("Updated load #{id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def ship_load(id, params)
+      repo.transaction do
+        res = ShipLoadService.call(id, params, @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        log_transaction
+      end
+      instance = load_entity(id)
+      success_response("Shipped load #{id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def unship_load(id, params)
+      repo.transaction do
+        res = UnshipLoadService.call(id, params, @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
+
+        log_transaction
+      end
+      instance = load_entity(id)
+      success_response("Unshipped load #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

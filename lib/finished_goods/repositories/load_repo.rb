@@ -113,5 +113,19 @@ module FinishedGoodsApp
     def pallets_exists(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
     end
+
+    def ship_load(id, user_name)
+      DB[:loads].where(id: id).update(shipped: true, shipped_at: Time.now)
+      log_status('loads', id, 'SHIPPED', user_name: user_name)
+
+      success_response('ok')
+    end
+
+    def unship_load(id, user_name)
+      DB[:loads].where(id: id).update(shipped: false)
+      log_status('loads', id, 'UNSHIPPED', user_name: user_name)
+
+      success_response('ok')
+    end
   end
 end
