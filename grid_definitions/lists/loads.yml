@@ -10,6 +10,10 @@
   :icon: edit
   :title: Edit
   :hide_if_true: shipped
+- :url: "/finished_goods/dispatch/loads/$:id$/copy"
+  :text: copy
+  :icon: copy
+  :title: Copy
 - :url: "/finished_goods/dispatch/loads/$:id$"
   :text: delete
   :icon: delete

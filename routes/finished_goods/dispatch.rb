@@ -344,6 +344,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'copy' do    # COPY
+        check_auth!('dispatch', 'new')
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(id: id, back_url: request.referer) }
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_load(params[:load])
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
+            FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
+                                                    form_values: params[:load],
+                                                    form_errors: res.errors)
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
