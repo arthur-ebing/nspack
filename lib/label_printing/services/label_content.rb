@@ -70,5 +70,24 @@ module LabelPrintingApp
         var.values.first['resolver']
       end
     end
+
+    # Go through the list of fields for a label and record which are
+    # special fields and the positions in which they occur.
+    def special_field_positions(fields, special_fields)
+      Hash[fields.each_with_index.select { |a, _| special_fields.include?(a) }.map { |n, i| [i, n] }]
+    end
+
+    # If a resolver needs to be swapped out on the fly, we place a token instead of the value
+    # in the label field.
+    # This method takes "carton_label_id" and returns "$:carton_label_id$"
+    # and takes "BCD:carton_label_id" and returns "BCD:$:carton_label_id$"
+    def format_special_field(field_name)
+      if field_name.include?(':')
+        parts = field_name.split(':')
+        "#{parts.first}:$:#{parts.last}$"
+      else
+        "$:#{field_name}$"
+      end
+    end
   end
 end

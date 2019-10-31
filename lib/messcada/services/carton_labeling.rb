@@ -25,7 +25,7 @@ module MesscadaApp
       return res unless res.success
 
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
-      @pick_ref = calc_pick_ref
+      @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref)
 
       res = validate_carton_label_params(attrs)
@@ -35,6 +35,10 @@ module MesscadaApp
       return res unless res.success
 
       ok_response
+    end
+
+    def packhouse_no
+      repo.find_resource_packhouse_no(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
     def retrieve_resource_cached_setup_data
@@ -58,19 +62,6 @@ module MesscadaApp
 
     def production_run_exists?
       repo.production_run_exists?(production_run_id)
-    end
-
-    def calc_pick_ref  # rubocop:disable Metrics/AbcSize
-      iso_week = Date.today.cweek.to_s
-      iso_week = '0' + iso_week if iso_week.length == 1
-      day = Time.now.wday.to_s
-      day = '7' if day == '0'
-
-      iso_week.slice(1, 1) + day + packhouse_no + iso_week.slice(0, 1)
-    end
-
-    def packhouse_no
-      repo.find_resource_packhouse_no(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
     def validate_carton_label_params(params)

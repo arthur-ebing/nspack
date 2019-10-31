@@ -10,7 +10,7 @@ module MesscadaApp
       @gross_weight = params[:gross_weight]
       @uom = params[:measurement_unit]
       @resource_code = params[:device]
-      @params = params
+      @params = params.to_h.merge(carton_and_pallet_verification: false)
     end
 
     def call

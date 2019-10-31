@@ -5,11 +5,12 @@ module MesscadaApp
     class BatchPrintCartonLabels < BaseQueJob
       include LabelPrintingApp::LabelContent
 
-      attr_reader :label_name, :instance, :repo, :messerver_repo, :carton_label_ids, :printer_id
+      attr_reader :label_name, :instance, :repo, :messerver_repo, :carton_label_ids, :printer_id, :packhouse_no
 
-      def run(carton_label_ids, label_template_id, printer_id)
+      def run(packhouse_resource_id, carton_label_ids, label_template_id, printer_id)
         setup_repos
         @printer_id = printer_id
+        @packhouse_no = repo.find_resource_packhouse_no(packhouse_resource_id)
 
         find_label(label_template_id)
         @instance = repo.carton_label_printing_instance(carton_label_ids.first)
@@ -35,12 +36,19 @@ module MesscadaApp
 
       def print_labels(carton_label_ids)
         lbl_required = fields_for_label
-        field_positions = lbl_required.each_with_index.select { |a, _| a == 'carton_label_id' }.map(&:last) # modify for BCD:carton_id ???
+        field_positions = special_field_positions(lbl_required, %w[carton_label_id pick_ref])
 
         vars = values_from(lbl_required)
 
         carton_label_ids.each do |carton_label_id|
-          field_positions.each { |key| vars["F#{key + 1}".to_sym] = carton_label_id }
+          # field_positions.each { |key| vars["F#{key + 1}".to_sym] = carton_label_id }
+          field_positions.each do |key, name|
+            vars["F#{key + 1}".to_sym] = if name == 'pick_ref'
+                                           UtilityFunctions.calculate_pick_ref(packhouse_no)
+                                         else
+                                           carton_label_id
+                                         end
+          end
           send_label_to_printer(vars)
         end
       end
