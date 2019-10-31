@@ -129,4 +129,21 @@ module UtilityFunctions
       hash
     end
   end
+
+  # Calculate the 4-digit pick ref:
+  #
+  # 1: Second digit of the ISO week
+  # 2: day of the week (Mon = 1, Sun = 7)
+  # 3: Packhouse number
+  # 4: First digit of the ISO week
+  #
+  # @param packhouse_no [integer,string] the packhouse number - must be a single character.
+  # @return [string] the pick ref for today.
+  def calculate_pick_ref(packhouse_no)
+    raise ArgumentError, "Pick ref calculation: Packhouse number #{packhouse_no} is invalid - it must be a single character." unless packhouse_no.to_s.length == 1
+
+    iso_week1, iso_week2 = Date.today.strftime('%V').split(//).reverse
+
+    "#{iso_week1}#{Date.today.strftime('%u')}#{packhouse_no}#{iso_week2}"
+  end
 end

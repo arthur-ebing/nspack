@@ -20,7 +20,7 @@ module MesscadaApp
 
       repo.transaction do
         ids = repo.create_carton_labels(no_of_prints, attrs)
-        Job::BatchPrintCartonLabels.enqueue(ids, label_template_id, printer_id)
+        Job::BatchPrintCartonLabels.enqueue(attrs[:packhouse_resource_id], ids, label_template_id, printer_id)
       end
       ok_response
     end
