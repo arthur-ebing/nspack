@@ -46,7 +46,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SHARED_CONFIG_HOST_PORT: 'IP address of shared_config in the format HOST:PORT' },
     { DEFAULT_RMT_CONTAINER_TYPE: 'This should be set behind the scenes, since it will almost always be the same thing, e.g. ‘bins’, for a given packhouse.' },
     { CHRUBY_STRING: 'The version of chruby used in development. Used in Rake tasks.' },
-    { GLN_LEVEL: 'Resource Level at which the GLN code is stored. Can be "LINE" or "PACKHOUSE".' },
     { PHC_LEVEL: 'Resource Level at which the PHC code is stored. Can be "LINE" or "PACKHOUSE".' }
   ].freeze
 
@@ -60,8 +59,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
     { DEPOT_LOCATION_CODE: 'Default Depot for new dispatch loads.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
-    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of 2-digit GLN or line numbers.' },
-    { COMPANY_PREFIX: 'The company prefix used in generating pallet numbers. This should be the 10-digit SSCC company code or a shorter numeric code.' }
+    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' }
   ].freeze
 
   def print

@@ -31,7 +31,7 @@ module UiRules
       fields[:plant_resource_code][:readonly] = true if rules[:non_editable_code]
 
       at_ph_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::PACKHOUSE
-      at_gln_level = @form_object.plant_resource_type_code == AppConst::GLN_LEVEL
+      at_gln_level = @form_object.plant_resource_type_code == Crossbeams::Config::ResourceDefinitions::LINE
       at_phc_level = @form_object.plant_resource_type_code == AppConst::PHC_LEVEL
       fields[:location_id] = { renderer: :lookup,
                                lookup_name: :plant_resource_locations,

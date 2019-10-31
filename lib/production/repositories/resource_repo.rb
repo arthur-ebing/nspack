@@ -86,11 +86,7 @@ module ProductionApp
     end
 
     def create_root_plant_resource(params)
-      id = if Crossbeams::Config::ResourceDefinitions::SITE == plant_resource_type_code(params[:plant_resource_type_id])
-             create_plant_resource(params.to_h.merge(resource_properties: { company_prefix: AppConst::COMPANY_PREFIX }))
-           else
-             create_plant_resource(params)
-           end
+      id = create_plant_resource(params)
       DB[:tree_plant_resources].insert(ancestor_plant_resource_id: id,
                                        descendant_plant_resource_id: id,
                                        path_length: 0)
