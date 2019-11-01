@@ -52,3 +52,7 @@ INSERT INTO vessel_types (voyage_type_id, vessel_type_code, description) VALUES(
 
 -- UNITS OF MEASURE TYPE
 INSERT INTO uom_types (code) VALUES ('INVENTORY');
+
+-- CONTAINER_STACK_TYPES
+INSERT INTO container_stack_types (stack_type_code, description) VALUES('S', 'Standard');
+INSERT INTO container_stack_types (stack_type_code, description) VALUES('H', 'High');

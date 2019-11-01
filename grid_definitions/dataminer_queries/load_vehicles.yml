@@ -1,0 +1,264 @@
+---
+:caption: Load Vehicles
+:sql: SELECT "load_vehicles"."id", "load_vehicles"."load_id", "load_vehicles"."vehicle_type_id",
+  "load_vehicles"."haulier_party_role_id", "load_vehicles"."vehicle_number", "load_vehicles"."vehicle_weight_out",
+  "load_vehicles"."dispatch_consignment_note_number",
+  "load_vehicles"."active", "load_vehicles"."created_at", "load_vehicles"."updated_at",
+  fn_party_role_name("load_vehicles"."haulier_party_role_id") AS haulier_party_role,
+  "loads"."edi_file_name", "vehicle_types"."vehicle_type_code", fn_current_status('load_vehicles',
+  "load_vehicles"."id") AS status FROM "load_vehicles" JOIN "loads" ON "loads"."id"
+  = "load_vehicles"."load_id" JOIN "vehicle_types" ON "vehicle_types"."id" = "load_vehicles"."vehicle_type_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: load_vehicles.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 2
+    :caption: Load
+    :namespaced_name: load_vehicles.load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_type_id:
+    :name: vehicle_type_id
+    :sequence_no: 3
+    :caption: Vehicle type
+    :namespaced_name: load_vehicles.vehicle_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  haulier_party_role_id:
+    :name: haulier_party_role_id
+    :sequence_no: 4
+    :caption: Haulier party role
+    :namespaced_name: load_vehicles.haulier_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_number:
+    :name: vehicle_number
+    :sequence_no: 5
+    :caption: Vehicle number
+    :namespaced_name: load_vehicles.vehicle_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_weight_out:
+    :name: vehicle_weight_out
+    :sequence_no: 6
+    :caption: Vehicle weight out
+    :namespaced_name: load_vehicles.vehicle_weight_out
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_consignment_note_number:
+    :name: dispatch_consignment_note_number
+    :sequence_no: 8
+    :caption: Dispatch consignment note number
+    :namespaced_name: load_vehicles.dispatch_consignment_note_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: load_vehicles.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: load_vehicles.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 11
+    :caption: Updated at
+    :namespaced_name: load_vehicles.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  haulier_party_role:
+    :name: haulier_party_role
+    :sequence_no: 12
+    :caption: Haulier party role
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_file_name:
+    :name: edi_file_name
+    :sequence_no: 13
+    :caption: Edi file name
+    :namespaced_name: loads.edi_file_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vehicle_type_code:
+    :name: vehicle_type_code
+    :sequence_no: 14
+    :caption: Vehicle type code
+    :namespaced_name: vehicle_types.vehicle_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: load_vehicles.load_id
+  :caption: Load
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT edi_file_name, id FROM loads ORDER BY edi_file_name
+- :column: load_vehicles.vehicle_type_id
+  :caption: Vehicle type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT vehicle_type_code, id FROM vehicle_types ORDER BY vehicle_type_code
+- :column: load_vehicles.haulier_party_role_id
+  :caption: Haulier party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')

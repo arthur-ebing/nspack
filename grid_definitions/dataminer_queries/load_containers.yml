@@ -1,0 +1,419 @@
+---
+:caption: Load Containers
+:sql: SELECT "load_containers"."id", "load_containers"."load_id", "load_containers"."container_code",
+  "load_containers"."container_vents", "load_containers"."container_seal_code", "load_containers"."container_temperature_rhine",
+  "load_containers"."container_temperature_rhine2", "load_containers"."internal_container_code",
+  "load_containers"."max_gross_weight", "load_containers"."tare_weight", "load_containers"."max_payload",
+  "load_containers"."actual_payload", "load_containers"."verified_gross_weight", "load_containers"."verified_gross_weight_date",
+  "load_containers"."active", "load_containers"."created_at", "load_containers"."updated_at",
+  "load_containers"."cargo_temperature_id", "load_containers"."stack_type_id", "cargo_temperatures"."temperature_code",
+  "loads"."edi_file_name", "container_stack_types"."stack_type_code" AS stack_type_stack_type_code,
+  fn_current_status('load_containers', "load_containers"."id") AS status FROM "load_containers"
+  JOIN "cargo_temperatures" ON "cargo_temperatures"."id" = "load_containers"."cargo_temperature_id"
+  JOIN "loads" ON "loads"."id" = "load_containers"."load_id" JOIN "container_stack_types"
+  ON "container_stack_types"."id" = "load_containers"."stack_type_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: load_containers.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 2
+    :caption: Load
+    :namespaced_name: load_containers.load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_code:
+    :name: container_code
+    :sequence_no: 3
+    :caption: Container code
+    :namespaced_name: load_containers.container_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_vents:
+    :name: container_vents
+    :sequence_no: 4
+    :caption: Container vents
+    :namespaced_name: load_containers.container_vents
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_seal_code:
+    :name: container_seal_code
+    :sequence_no: 5
+    :caption: Container seal code
+    :namespaced_name: load_containers.container_seal_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_temperature_rhine:
+    :name: container_temperature_rhine
+    :sequence_no: 6
+    :caption: Container temperature rhine
+    :namespaced_name: load_containers.container_temperature_rhine
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_temperature_rhine2:
+    :name: container_temperature_rhine2
+    :sequence_no: 7
+    :caption: Container temperature rhine2
+    :namespaced_name: load_containers.container_temperature_rhine2
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  internal_container_code:
+    :name: internal_container_code
+    :sequence_no: 8
+    :caption: Internal container code
+    :namespaced_name: load_containers.internal_container_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  max_gross_weight:
+    :name: max_gross_weight
+    :sequence_no: 9
+    :caption: Max gross weight
+    :namespaced_name: load_containers.max_gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tare_weight:
+    :name: tare_weight
+    :sequence_no: 10
+    :caption: Tare weight
+    :namespaced_name: load_containers.tare_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  max_payload:
+    :name: max_payload
+    :sequence_no: 11
+    :caption: Max payload
+    :namespaced_name: load_containers.max_payload
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  actual_payload:
+    :name: actual_payload
+    :sequence_no: 12
+    :caption: Actual payload
+    :namespaced_name: load_containers.actual_payload
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_gross_weight:
+    :name: verified_gross_weight
+    :sequence_no: 13
+    :caption: Verified gross weight
+    :namespaced_name: load_containers.verified_gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_gross_weight_date:
+    :name: verified_gross_weight_date
+    :sequence_no: 14
+    :caption: Verified gross weight date
+    :namespaced_name: load_containers.verified_gross_weight_date
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 15
+    :caption: Active
+    :namespaced_name: load_containers.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 16
+    :caption: Created at
+    :namespaced_name: load_containers.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 17
+    :caption: Updated at
+    :namespaced_name: load_containers.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cargo_temperature_id:
+    :name: cargo_temperature_id
+    :sequence_no: 18
+    :caption: Cargo temperature
+    :namespaced_name: load_containers.cargo_temperature_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stack_type_id:
+    :name: stack_type_id
+    :sequence_no: 19
+    :caption: Stack type
+    :namespaced_name: load_containers.stack_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  temperature_code:
+    :name: temperature_code
+    :sequence_no: 20
+    :caption: Temperature code
+    :namespaced_name: cargo_temperatures.temperature_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_file_name:
+    :name: edi_file_name
+    :sequence_no: 21
+    :caption: Edi file name
+    :namespaced_name: loads.edi_file_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  stack_type_stack_type_code:
+    :name: stack_type_stack_type_code
+    :sequence_no: 22
+    :caption: Stack type stack type code
+    :namespaced_name: container_stack_types.stack_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 23
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: load_containers.load_id
+  :caption: Load
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT edi_file_name, id FROM loads ORDER BY edi_file_name
+- :column: load_containers.internal_container_code
+  :caption: Internal container code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: load_containers.cargo_temperature_id
+  :caption: Cargo temperature
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT temperature_code, id FROM cargo_temperatures ORDER BY temperature_code
+- :column: load_containers.stack_type_id
+  :caption: Stack type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT stack_type_code, id FROM container_stack_types ORDER BY stack_type_code

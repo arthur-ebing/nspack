@@ -1,0 +1,24 @@
+---
+:dataminer_definition: load_containers
+:actions:
+- :url: "/finished_goods/dispatch/load_containers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/finished_goods/dispatch/load_containers/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/finished_goods/dispatch/load_containers/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/dispatch/load_containers/new"
+  :text: New Load Container
+  :style: :button
+  :behaviour: :popup
