@@ -6,19 +6,3 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/masterfiles/target_markets/target_market_group_types/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
-- :url: "/masterfiles/target_markets/target_market_group_types/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-:page_controls:
-- :control_type: :link
-  :url: "/masterfiles/target_markets/target_market_group_types/new"
-  :text: New Target Market Group Type
-  :style: :button
-  :behaviour: :popup

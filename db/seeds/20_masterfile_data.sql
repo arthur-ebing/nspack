@@ -1,11 +1,20 @@
+-- ADDRESS TYPES
+INSERT INTO public.address_types(address_type) VALUES ('Delivery Address');
+
 -- CONTACT METHOD TYPES
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Tel');
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Fax');
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Cell');
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Email');
 
--- ADDRESS TYPES
-INSERT INTO public.address_types(address_type) VALUES ('Delivery Address');
+-- PM TYPE
+INSERT INTO pm_types (pm_type_code, description) VALUES ('BIN', 'BIN');
+INSERT INTO pm_types (pm_type_code, description) VALUES ('CARTON', 'CARTON');
+
+-- PORT_TYPES
+INSERT INTO port_types (port_type_code, description) VALUES('POL', 'Port of Loading');
+INSERT INTO port_types (port_type_code, description) VALUES('POD', 'Port of Dispatch');
+INSERT INTO port_types (port_type_code, description) VALUES('TRANSSHIP', 'Transfer Shipment');
 
 -- ROLES
 INSERT INTO roles (name) VALUES ('IMPLEMENTATION_OWNER');
@@ -23,13 +32,11 @@ INSERT INTO roles (name) VALUES ('CONSIGNEE');
 INSERT INTO roles (name) VALUES ('HAULIER');
 INSERT INTO roles (name) VALUES ('FARM_OWNER');
 
-
--- UNITS OF MEASURE TYPE
-INSERT INTO uom_types (code) VALUES ('INVENTORY');
-
--- PM TYPE
-INSERT INTO pm_types (pm_type_code, description) VALUES ('BIN', 'BIN');
-INSERT INTO pm_types (pm_type_code, description) VALUES ('CARTON', 'CARTON');
+-- TARGET MARKET GROUP TYPES
+INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED');
+INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('SHIPPING');
+INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('MARKETING');
+INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('SALES');
 
 -- VOYAGE_TYPES
 INSERT INTO voyage_types (voyage_type_code, description) VALUES('ROAD', 'Trucks');
@@ -43,7 +50,5 @@ INSERT INTO vessel_types (voyage_type_id, vessel_type_code, description) VALUES(
 INSERT INTO vessel_types (voyage_type_id, vessel_type_code, description) VALUES((SELECT id FROM voyage_types WHERE voyage_type_code = 'RAIL'), 'TRAIN', 'Train');
 INSERT INTO vessel_types (voyage_type_id, vessel_type_code, description) VALUES((SELECT id FROM voyage_types WHERE voyage_type_code = 'AIR'), 'AIRCRAFT', 'Aircraft');
 
--- PORT_TYPES
-INSERT INTO port_types (port_type_code, description) VALUES('POL', 'Port of Loading');
-INSERT INTO port_types (port_type_code, description) VALUES('POD', 'Port of Dispatch');
-INSERT INTO port_types (port_type_code, description) VALUES('TRANSSHIP', 'Transfer Shipment');
+-- UNITS OF MEASURE TYPE
+INSERT INTO uom_types (code) VALUES ('INVENTORY');
