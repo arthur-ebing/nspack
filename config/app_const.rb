@@ -16,7 +16,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
 
   # labeling cached setup data path
-  LABELING_CACHED_DATA_FILEPATH = ENV.fetch('LABELING_CACHED_DATA_FILEPATH')
+  LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
   # carton verification
   CARTONS_IS_PALLETS = ENV['CARTONS_IS_PALLETS']

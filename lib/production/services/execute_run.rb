@@ -38,8 +38,8 @@ module ProductionApp
                                                label_name: rec[:label_template_name])
         }
       end
-      FileUtils.mkpath(File.join(ENV['ROOT'], 'tmp', 'run_cache'))
-      File.open(File.join(ENV['ROOT'], 'tmp', 'run_cache', "line_#{production_run.production_line_id}.yml"), 'w') { |f| f << cache.to_yaml }
+      FileUtils.mkpath(AppConst::LABELING_CACHED_DATA_FILEPATH)
+      File.open(File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, "line_#{production_run.production_line_id}.yml"), 'w') { |f| f << cache.to_yaml }
     end
 
     def cache_run # rubocop:disable Metrics/AbcSize

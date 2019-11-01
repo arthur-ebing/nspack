@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'carton_labeling', 'messcada' do |r|
+  route 'production', 'messcada' do |r|
     # --------------------------------------------------------------------------
     # CARTON/FG BIN LABELING
-    # view-source:http://192.168.50.106:9296/messcada/carton_labeling?device=CLM-101B1
+    # view-source:http://192.168.50.106:9296/messcada/production/carton_labeling?device=CLM-101B1
     # --------------------------------------------------------------------------
-    r.on do
+    r.on 'carton_labeling' do
       interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path }, {})
 
       r.is do
