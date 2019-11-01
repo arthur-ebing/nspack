@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      std_fruit_size_count_id_label = @repo.find_hash(:std_fruit_size_counts, @form_object.std_fruit_size_count_id)[:size_count_description]
+      std_fruit_size_count_id_label = @repo.find_hash(:std_fruit_size_counts, @form_object.std_fruit_size_count_id)[:size_count_value]
       basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
       fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
