@@ -124,6 +124,16 @@ module MesscadaApp
         WHERE r.id = ?", run_id].first
     end
 
+    def get_pallet_by_carton_label_id(carton_label_id)
+      pallet = DB["select p.pallet_number
+          from pallets p
+          join pallet_sequences ps on p.id = ps.pallet_id
+          join cartons c on c.id = ps.scanned_from_carton_id
+          join carton_labels cl on cl.id = c.carton_label_id
+          where cl.id = ?", carton_label_id].first
+      return pallet[:pallet_number] unless pallet.nil?
+    end
+
     def production_run_stats(run_id)
       DB[:production_run_stats].where(production_run_id: run_id).map { |p| p[:bins_tipped] }.first
     end

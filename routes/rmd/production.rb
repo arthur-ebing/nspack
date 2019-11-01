@@ -101,16 +101,22 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.post do
           if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true'
-            store_locally(:scan_carton_submit_error, "Error: scanned_carton:#{params[:carton][:carton_number]}")
-            r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
-          else
-            res = interactor.validate_pallet_to_be_verified(params[:pallet][:pallet_number])
-            if res.success
-              r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
-            else
-              store_locally(:scan_pallet_submit_error, res.message)
+            res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
+            pallet_number = interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
+            unless res.success
+              store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
               r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
             end
+          else
+            pallet_number = params[:pallet][:pallet_number]
+          end
+
+          res = interactor.validate_pallet_to_be_verified(pallet_number)
+          if res.success
+            r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
+          else
+            store_locally(:scan_pallet_submit_error, res.message)
+            r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
           end
         end
       end

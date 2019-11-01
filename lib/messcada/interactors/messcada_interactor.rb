@@ -144,6 +144,10 @@ module MesscadaApp
       repo.get(:pallet_sequences, id, :pallet_id)
     end
 
+    def get_pallet_by_carton_label_id(carton_label_id)
+      repo.get_pallet_by_carton_label_id(carton_label_id)
+    end
+
     private
 
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)
