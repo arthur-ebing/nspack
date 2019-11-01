@@ -50,6 +50,7 @@ module UiRules
                        invisible: !at_phc_level }
       fields[:packhouse_no] = { renderer: :integer,
                                 required: true,
+                                maxvalue: 9,
                                 parent_field: :resource_properties,
                                 invisible: !at_ph_level }
     end
