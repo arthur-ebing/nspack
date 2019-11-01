@@ -4,7 +4,7 @@
       fruit_actual_counts_for_packs.basic_pack_code_id, fruit_actual_counts_for_packs.actual_count_for_pack,
       fruit_actual_counts_for_packs.created_at, fruit_actual_counts_for_packs.updated_at, fruit_actual_counts_for_packs.active,
       fruit_actual_counts_for_packs.standard_pack_code_ids, fruit_actual_counts_for_packs.size_reference_ids,
-      std_fruit_size_counts.size_count_description AS std_fruit_size_count, basic_pack_codes.basic_pack_code,
+      std_fruit_size_counts.size_count_value AS std_fruit_size_count, basic_pack_codes.basic_pack_code,
       (SELECT array_agg(fruit_spc.standard_pack_code)
       FROM (SELECT spc.standard_pack_code
       FROM standard_pack_codes spc
