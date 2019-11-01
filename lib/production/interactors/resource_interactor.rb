@@ -42,9 +42,7 @@ module ProductionApp
 
     def update_plant_resource(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
-
-      dup_err = validate_plant_resource_gln(id, params)
-      return mixed_validation_failed_response(res, dup_err) unless res.messages.empty? && dup_err.empty?
+      return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_plant_resource(id, res)
@@ -107,15 +105,6 @@ module ProductionApp
 
     def validate_plant_resource_params(params)
       PlantResourceSchema.call(params)
-    end
-
-    def validate_plant_resource_gln(id, params)
-      return {} unless params[:resource_properties] && params[:resource_properties][:gln]
-
-      res = repo.check_for_duplicate_gln(id, params[:resource_properties][:gln])
-      return {} if res.success
-
-      { messages: { gln: ['Has already been used'] } }
     end
   end
 end
