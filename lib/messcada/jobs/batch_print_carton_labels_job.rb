@@ -32,7 +32,8 @@ module MesscadaApp
       end
 
       def send_label_to_printer(vars)
-        messerver_repo.print_published_label(label_name, vars, 1, printer_code(printer_id), request_ip)
+        res = messerver_repo.print_published_label(label_name, vars, 1, printer_code(printer_id), request_ip)
+        raise Crossbeams::InfoError, res.message unless res.success
       end
 
       def print_labels(carton_label_ids)
@@ -41,6 +42,9 @@ module MesscadaApp
 
         vars = values_from(lbl_required)
 
+        # NOTE: Temporary delay to get around issues with timing for USB printers.
+        #       - Remove when MesServer handles the timing problem.
+        needs_delay = carton_label_ids.length > 1
         carton_label_ids.each do |carton_label_id|
           # field_positions.each { |key| vars["F#{key + 1}".to_sym] = carton_label_id }
           field_positions.each do |key, name|
@@ -50,13 +54,14 @@ module MesscadaApp
                                            carton_label_id
                                          end
           end
+          sleep 1 if needs_delay
           send_label_to_printer(vars)
         end
       end
 
       def printer_code(printer_id)
-        # For a robot printing to an attached printer, the default printer is PRN-01
-        return 'PRN-01' if printer_id.nil?
+        # For a robot printing to an attached printer, we don't know the actual printer code: use 'DEFAULT'
+        return 'DEFAULT' if printer_id.nil?
 
         repo.get(:printers, printer_id, :printer_code)
       end

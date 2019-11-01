@@ -282,7 +282,7 @@ module MesserverApp
       if host.nil?
         URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPrint")
       else
-        URI.parse("#{host}LabelPrint")
+        URI.parse("http://#{host}:2080/LabelPrint")
       end
     end
 

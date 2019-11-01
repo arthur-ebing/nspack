@@ -27,8 +27,8 @@ module LabelPrintingApp
     private
 
     def printer_code(printer)
-      # For a robot printing to an attached printer, the default printer is PRN-01
-      return 'PRN-01' if printer.nil?
+      # For a robot printing to an attached printer, we don't know the actual printer code: use 'DEFAULT'
+      return 'DEFAULT' if printer_id.nil?
 
       repo = LabelApp::PrinterRepo.new
       repo.find_hash(:printers, printer)[:printer_code]
@@ -36,7 +36,8 @@ module LabelPrintingApp
 
     def messerver_print(vars, printer_code)
       mes_repo = MesserverApp::MesserverRepo.new
-      mes_repo.print_published_label(label_name, vars, quantity, printer_code, host)
+      res = mes_repo.print_published_label(label_name, vars, quantity, printer_code, host)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
   end
 end
