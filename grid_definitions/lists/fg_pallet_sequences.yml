@@ -7,9 +7,9 @@
     :shipped: Shipped Pallet Sequences
 :conditions:
   :standard:
-    - :col: id
+    - :col: pallet_id
       :op: =
-      :val: $:id$
+      :val: $:pallet_id$
   :active:
     - :col: active
       :op: =

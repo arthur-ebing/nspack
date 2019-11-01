@@ -1757,8 +1757,8 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: id
-  :caption: Id
+- :column: pallet_id
+  :caption: Pallet Id
   :data_type: :integer
   :control_type: :text
   :default_value: 

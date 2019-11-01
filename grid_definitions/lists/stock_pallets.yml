@@ -1,5 +1,11 @@
 ---
 :dataminer_definition: stock_pallets
+:actions:
+  - :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+    :text: sequences
+    :title: Pallet sequences for Pallet No $:pallet_number$
+    :icon: list
+    :popup: true
 :captions:
   :conditions:
     :active: Active Pallets

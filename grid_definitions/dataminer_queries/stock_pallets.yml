@@ -14,8 +14,14 @@
 :limit: 
 :offset: 
 :external_settings:
-  :render_url: 
-  :colour_key: {}
+  :render_url:
+  :colour_key:
+    ok: In Stock Pallets
+    ready: Allocated Pallets
+    inactive: Shipped Pallets
+    warning: Scrapped Pallets
+    error: Failed inspection and/or failed verifications Pallets
+    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id
