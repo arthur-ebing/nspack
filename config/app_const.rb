@@ -187,6 +187,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Depots: Depot Code
   DEPOT_LOCATION_CODE = ENV.fetch('DEPOT_LOCATION_CODE')
 
+  # Load_containers:
+  VGM_REQUIRED = ENV.fetch('VGM_REQUIRED') == 'y'
+
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'
