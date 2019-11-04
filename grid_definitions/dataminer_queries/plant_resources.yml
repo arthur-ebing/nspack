@@ -2,7 +2,9 @@
 :caption: Plant Resources
 :sql: "SELECT plant_resources.id, plant_resources.plant_resource_type_id,\r\nplant_resource_types.icon,
   plant_resources.plant_resource_code, plant_resources.description,\r\nsystem_resources.system_resource_code,
-  \r\n(SELECT string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code
+  \r\nplant_resources.resource_properties ->> 'phc' AS phc,\r\nplant_resources.resource_properties
+  ->> 'packhouse_no' AS ph_no,\r\nplant_resources.resource_properties ->> 'gln' AS
+  gln,\r\n(SELECT string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code
   \r\n  FROM plant_resources_system_resources prs\r\n  JOIN system_resources pr ON
   pr.id = prs.system_resource_id\r\n  WHERE prs.plant_resource_id = plant_resources.id)
   sub) AS linked_resources,\r\nplant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
@@ -121,9 +123,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  phc:
+    :name: phc
+    :sequence_no: 7
+    :caption: PHC
+    :namespaced_name: 
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ph_no:
+    :name: ph_no
+    :sequence_no: 8
+    :caption: Ph no
+    :namespaced_name: 
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gln:
+    :name: gln
+    :sequence_no: 9
+    :caption: GLN
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   linked_resources:
     :name: linked_resources
-    :sequence_no: 7
+    :sequence_no: 10
     :caption: Linked resources
     :namespaced_name: 
     :data_type: :string
@@ -139,7 +189,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 8
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: plant_resources.active
     :data_type: :boolean
@@ -155,7 +205,7 @@
     :group_max: false
   plant_resource_type_code:
     :name: plant_resource_type_code
-    :sequence_no: 9
+    :sequence_no: 12
     :caption: Plant resource type code
     :namespaced_name: plant_resource_types.plant_resource_type_code
     :data_type: :string
@@ -171,7 +221,7 @@
     :group_max: false
   type_description:
     :name: type_description
-    :sequence_no: 10
+    :sequence_no: 13
     :caption: Type description
     :namespaced_name: plant_resource_types.description
     :data_type: :string
@@ -187,7 +237,7 @@
     :group_max: false
   path_array:
     :name: path_array
-    :sequence_no: 11
+    :sequence_no: 14
     :caption: Path array
     :namespaced_name: 
     :data_type: :string
@@ -203,7 +253,7 @@
     :group_max: false
   level:
     :name: level
-    :sequence_no: 12
+    :sequence_no: 15
     :caption: Level
     :namespaced_name: 
     :data_type: :string
@@ -219,7 +269,7 @@
     :group_max: false
   system_resource_id:
     :name: system_resource_id
-    :sequence_no: 13
+    :sequence_no: 16
     :caption: System resource
     :namespaced_name: plant_resources.system_resource_id
     :data_type: :integer
@@ -235,7 +285,7 @@
     :group_max: false
   peripheral:
     :name: peripheral
-    :sequence_no: 14
+    :sequence_no: 17
     :caption: Peripheral
     :namespaced_name: system_resource_types.peripheral
     :data_type: :boolean
