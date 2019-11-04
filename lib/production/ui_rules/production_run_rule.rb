@@ -33,7 +33,7 @@ module UiRules
       cultivar_group_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
       product_setup_template_id_label = ProductionApp::ProductSetupRepo.new.find_product_setup_template(@form_object.product_setup_template_id)&.template_name
-      cloned_from_run_id_label = @repo.find_production_run_with_assoc(@form_object.cloned_from_run_id)&.production_run_code
+      cloned_from_run_id_label = @repo.find_production_run_flat(@form_object.cloned_from_run_id)&.production_run_code
 
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
@@ -54,6 +54,8 @@ module UiRules
       fields[:allow_orchard_mixing] = { renderer: :label, as_boolean: true }
       fields[:reconfiguring] = { renderer: :label, as_boolean: true }
       fields[:running] = { renderer: :label, as_boolean: true }
+      fields[:tipping] = { renderer: :label, as_boolean: true }
+      fields[:labeling] = { renderer: :label, as_boolean: true }
       fields[:closed] = { renderer: :label, as_boolean: true }
       fields[:setup_complete] = { renderer: :label, as_boolean: true }
       fields[:completed] = { renderer: :label, as_boolean: true }
@@ -148,6 +150,8 @@ module UiRules
         allow_orchard_mixing: { renderer: :checkbox },
         reconfiguring: { renderer: :checkbox },
         running: { renderer: :checkbox },
+        tipping: { renderer: :checkbox },
+        labeling: { renderer: :checkbox },
         closed: { renderer: :checkbox },
         setup_complete: { renderer: :checkbox },
         completed: { renderer: :checkbox }
@@ -189,7 +193,7 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_production_run_with_assoc(@options[:id])
+      @form_object = @repo.find_production_run_flat(@options[:id])
     end
 
     def make_new_form_object
@@ -215,6 +219,8 @@ module UiRules
                                     allow_orchard_mixing: nil,
                                     reconfiguring: nil,
                                     running: nil,
+                                    tipping: nil,
+                                    labeling: nil,
                                     closed: nil,
                                     setup_complete: nil,
                                     completed: nil)

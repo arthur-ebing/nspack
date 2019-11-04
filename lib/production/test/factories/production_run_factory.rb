@@ -36,6 +36,8 @@ module ProductionApp
         setup_complete: false,
         completed: false,
         running: false,
+        tipping: false,
+        labeling: false,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

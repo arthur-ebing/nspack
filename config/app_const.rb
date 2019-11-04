@@ -6,6 +6,23 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ENV['RACK_ENV'] == 'development'
   end
 
+  # Any value that starts with y, Y, t or T is considered true.
+  # All else is false.
+  def self.check_true(val)
+    val.match?(/^[TtYy]/)
+  end
+
+  # Take an environment variable and interpret it
+  # as a boolean.
+  def self.make_boolean(key, required: false)
+    val = if required
+            ENV.fetch(key)
+          else
+            ENV.fetch(key, 'f')
+          end
+    check_true(val)
+  end
+
   # Helper to create hash of label sizes from a 2D array.
   def self.make_label_size_hash(array)
     Hash[array.map { |w, h| ["#{w}x#{h}", { 'width': w, 'height': h }] }].freeze
@@ -172,7 +189,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ERROR_MAIL_RECIPIENTS = ENV.fetch('ERROR_MAIL_RECIPIENTS')
   ERROR_MAIL_PREFIX = ENV.fetch('ERROR_MAIL_PREFIX')
   SYSTEM_MAIL_SENDER = ENV.fetch('SYSTEM_MAIL_SENDER')
-  EMAIL_REQUIRES_REPLY_TO = ENV.fetch('EMAIL_REQUIRES_REPLY_TO', 'N') == 'Y'
+  EMAIL_REQUIRES_REPLY_TO = make_boolean('EMAIL_REQUIRES_REPLY_TO')
   EMAIL_GROUP_LABEL_APPROVERS = 'label_approvers'
   EMAIL_GROUP_LABEL_PUBLISHERS = 'label_publishers'
   USER_EMAIL_GROUPS = [EMAIL_GROUP_LABEL_APPROVERS, EMAIL_GROUP_LABEL_PUBLISHERS].freeze

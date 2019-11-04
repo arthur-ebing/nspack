@@ -25,6 +25,8 @@ module ProductionApp
     attribute :setup_complete, Types::Bool
     attribute :completed, Types::Bool
     attribute :running, Types::Bool
+    attribute :tipping, Types::Bool
+    attribute :labeling, Types::Bool
     attribute? :active, Types::Bool
   end
 
@@ -52,6 +54,8 @@ module ProductionApp
     attribute :setup_complete, Types::Bool
     attribute :completed, Types::Bool
     attribute :running, Types::Bool
+    attribute :tipping, Types::Bool
+    attribute :labeling, Types::Bool
     attribute? :active, Types::Bool
     attribute :template_name, Types::String
     attribute :production_run_code, Types::String

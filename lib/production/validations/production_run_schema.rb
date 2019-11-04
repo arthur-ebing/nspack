@@ -17,7 +17,7 @@ module ProductionApp
     required(:allow_orchard_mixing, :bool).maybe(:bool?)
   end
 
-  ProductionRunSchema = Dry::Validation.Params do
+  ProductionRunSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
@@ -40,6 +40,8 @@ module ProductionApp
     required(:allow_orchard_mixing, :bool).maybe(:bool?)
     optional(:reconfiguring, :bool).maybe(:bool?)
     optional(:running, :bool).maybe(:bool?)
+    optional(:tipping, :bool).maybe(:bool?)
+    optional(:labeling, :bool).maybe(:bool?)
     optional(:closed, :bool).maybe(:bool?)
     optional(:setup_complete, :bool).maybe(:bool?)
     optional(:completed, :bool).maybe(:bool?)

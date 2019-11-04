@@ -22,7 +22,7 @@ module ProductionApp
       DB[:production_run_stats].where(production_run_id: id).delete
     end
 
-    def find_production_run_with_assoc(id)
+    def find_production_run_flat(id)
       find_with_association(:production_runs,
                             id,
                             parent_tables: [{ parent_table: :product_setup_templates,

@@ -42,9 +42,6 @@ module MesscadaApp
 
         vars = values_from(lbl_required)
 
-        # NOTE: Temporary delay to get around issues with timing for USB printers.
-        #       - Remove when MesServer handles the timing problem.
-        needs_delay = carton_label_ids.length > 1
         carton_label_ids.each do |carton_label_id|
           # field_positions.each { |key| vars["F#{key + 1}".to_sym] = carton_label_id }
           field_positions.each do |key, name|
@@ -54,7 +51,6 @@ module MesscadaApp
                                            carton_label_id
                                          end
           end
-          sleep 1 if needs_delay
           send_label_to_printer(vars)
         end
       end

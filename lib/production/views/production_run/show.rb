@@ -45,6 +45,8 @@ module Production
                     fold.caption 'Status'
                     fold.add_field :reconfiguring
                     fold.add_field :running
+                    fold.add_field :tipping
+                    fold.add_field :labeling
                     fold.add_field :closed
                     fold.add_field :setup_complete
                     fold.add_field :completed

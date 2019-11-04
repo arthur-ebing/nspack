@@ -10,18 +10,19 @@
   \r\nfn_production_run_code(\"production_runs\".\"cloned_from_run_id\") AS cloned_from_run,\r\n\"production_runs\".\"active_run_stage\",
   \"production_runs\".\"started_at\", \"production_runs\".\"closed_at\", \"production_runs\".\"re_executed_at\",
   \r\n\"production_runs\".\"completed_at\", \"production_runs\".\"allow_cultivar_mixing\",
-  \"production_runs\".\"allow_orchard_mixing\", \r\n\"production_runs\".\"reconfiguring\",
-  \"production_runs\".\"closed\", \"production_runs\".\"setup_complete\", \"production_runs\".\"completed\",
-  \r\n\"production_runs\".\"farm_id\", \"production_runs\".\"puc_id\", \"production_runs\".\"packhouse_resource_id\",
-  \r\n\"production_runs\".\"production_line_id\", \"production_runs\".\"season_id\",
-  \"production_runs\".\"orchard_id\", \"production_runs\".\"cultivar_group_id\", \r\n\"production_runs\".\"cultivar_id\",
-  \"production_runs\".\"product_setup_template_id\", \"production_runs\".\"cloned_from_run_id\",
-  \r\n\"production_runs\".\"active\", \"production_runs\".\"created_at\", \"production_runs\".\"updated_at\"\r\nFROM
-  \"production_runs\" \r\nLEFT JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\"
-  = \"production_runs\".\"cultivar_group_id\" \r\nLEFT JOIN \"cultivars\" ON \"cultivars\".\"id\"
-  = \"production_runs\".\"cultivar_id\" \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\"
-  \r\nLEFT JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\"
-  \r\nJOIN \"plant_resources\" ON \"plant_resources\".\"id\" = \"production_runs\".\"packhouse_resource_id\"
+  \"production_runs\".\"allow_orchard_mixing\", \r\n\"production_runs\".\"tipping\",
+  \"production_runs\".\"labeling\", \r\n\"production_runs\".\"reconfiguring\", \"production_runs\".\"closed\",
+  \"production_runs\".\"setup_complete\", \"production_runs\".\"completed\", \r\n\"production_runs\".\"farm_id\",
+  \"production_runs\".\"puc_id\", \"production_runs\".\"packhouse_resource_id\", \r\n\"production_runs\".\"production_line_id\",
+  \"production_runs\".\"season_id\", \"production_runs\".\"orchard_id\", \"production_runs\".\"cultivar_group_id\",
+  \r\n\"production_runs\".\"cultivar_id\", \"production_runs\".\"product_setup_template_id\",
+  \"production_runs\".\"cloned_from_run_id\", \r\n\"production_runs\".\"active\",
+  \"production_runs\".\"created_at\", \"production_runs\".\"updated_at\"\r\nFROM \"production_runs\"
+  \r\nLEFT JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\" = \"production_runs\".\"cultivar_group_id\"
+  \r\nLEFT JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"production_runs\".\"cultivar_id\"
+  \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\" \r\nLEFT
+  JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\" \r\nJOIN
+  \"plant_resources\" ON \"plant_resources\".\"id\" = \"production_runs\".\"packhouse_resource_id\"
   \r\nLEFT JOIN \"product_setup_templates\" ON \"product_setup_templates\".\"id\"
   = \"production_runs\".\"product_setup_template_id\" \r\nJOIN \"plant_resources\"
   plant_resources2 ON \"plant_resources2\".\"id\" = \"production_runs\".\"production_line_id\"
@@ -367,9 +368,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  tipping:
+    :name: tipping
+    :sequence_no: 22
+    :caption: Tipping
+    :namespaced_name: production_runs.tipping
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  labeling:
+    :name: labeling
+    :sequence_no: 23
+    :caption: Labeling
+    :namespaced_name: production_runs.labeling
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   reconfiguring:
     :name: reconfiguring
-    :sequence_no: 22
+    :sequence_no: 24
     :caption: Reconfiguring
     :namespaced_name: production_runs.reconfiguring
     :data_type: :boolean
@@ -385,7 +418,7 @@
     :group_max: false
   closed:
     :name: closed
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Closed
     :namespaced_name: production_runs.closed
     :data_type: :boolean
@@ -401,7 +434,7 @@
     :group_max: false
   setup_complete:
     :name: setup_complete
-    :sequence_no: 24
+    :sequence_no: 26
     :caption: Setup complete
     :namespaced_name: production_runs.setup_complete
     :data_type: :boolean
@@ -417,7 +450,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Completed
     :namespaced_name: production_runs.completed
     :data_type: :boolean
@@ -433,7 +466,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 26
+    :sequence_no: 28
     :caption: Farm
     :namespaced_name: production_runs.farm_id
     :data_type: :integer
@@ -449,7 +482,7 @@
     :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 27
+    :sequence_no: 29
     :caption: Puc
     :namespaced_name: production_runs.puc_id
     :data_type: :integer
@@ -465,7 +498,7 @@
     :group_max: false
   packhouse_resource_id:
     :name: packhouse_resource_id
-    :sequence_no: 28
+    :sequence_no: 30
     :caption: Packhouse resource
     :namespaced_name: production_runs.packhouse_resource_id
     :data_type: :integer
@@ -481,7 +514,7 @@
     :group_max: false
   production_line_id:
     :name: production_line_id
-    :sequence_no: 29
+    :sequence_no: 31
     :caption: Production line
     :namespaced_name: production_runs.production_line_id
     :data_type: :integer
@@ -497,7 +530,7 @@
     :group_max: false
   season_id:
     :name: season_id
-    :sequence_no: 30
+    :sequence_no: 32
     :caption: Season
     :namespaced_name: production_runs.season_id
     :data_type: :integer
@@ -513,7 +546,7 @@
     :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 31
+    :sequence_no: 33
     :caption: Orchard
     :namespaced_name: production_runs.orchard_id
     :data_type: :integer
@@ -529,7 +562,7 @@
     :group_max: false
   cultivar_group_id:
     :name: cultivar_group_id
-    :sequence_no: 32
+    :sequence_no: 34
     :caption: Cultivar group
     :namespaced_name: production_runs.cultivar_group_id
     :data_type: :integer
@@ -545,7 +578,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 33
+    :sequence_no: 35
     :caption: Cultivar
     :namespaced_name: production_runs.cultivar_id
     :data_type: :integer
@@ -561,7 +594,7 @@
     :group_max: false
   product_setup_template_id:
     :name: product_setup_template_id
-    :sequence_no: 34
+    :sequence_no: 36
     :caption: Product setup template
     :namespaced_name: production_runs.product_setup_template_id
     :data_type: :integer
@@ -577,7 +610,7 @@
     :group_max: false
   cloned_from_run_id:
     :name: cloned_from_run_id
-    :sequence_no: 35
+    :sequence_no: 37
     :caption: Cloned from run
     :namespaced_name: production_runs.cloned_from_run_id
     :data_type: :integer
@@ -593,7 +626,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 36
+    :sequence_no: 38
     :caption: Active
     :namespaced_name: production_runs.active
     :data_type: :boolean
@@ -609,7 +642,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 37
+    :sequence_no: 39
     :caption: Created at
     :namespaced_name: production_runs.created_at
     :data_type: :datetime
@@ -625,7 +658,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 38
+    :sequence_no: 40
     :caption: Updated at
     :namespaced_name: production_runs.updated_at
     :data_type: :string

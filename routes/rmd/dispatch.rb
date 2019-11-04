@@ -126,7 +126,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
 
           if res.success
-            store_locally(:flash_notice, res.message)
+            store_locally(:flash_notice, rmd_success_message(res.message))
             r.redirect("/rmd/dispatch/truck_arrival/load_containers/#{load_id}") if attrs[:container] == 'true'
             r.redirect('/rmd/dispatch/truck_arrival/load')
           else

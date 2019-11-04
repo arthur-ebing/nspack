@@ -19,9 +19,10 @@ module MesscadaApp
       return validation_failed_response(res) unless res.messages.empty?
 
       MesscadaApp::UpdateBinWeights.new(res).call
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
@@ -31,16 +32,18 @@ module MesscadaApp
 
       repo.transaction do
         res = MesscadaApp::TipBin.new(res).call
+
         if res.success
           log_status('rmt_bins', res.instance[:rmt_bin_id], 'TIPPED')
           log_transaction
         end
         res
       end
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue StandardError => e
+      puts e.backtrace.join("\n")
+      failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
 
     def carton_labeling(params)

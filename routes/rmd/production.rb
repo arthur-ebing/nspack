@@ -180,7 +180,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'verify_pallet_sequence_submit', Integer do |id|
         res = interactor.verify_pallet_sequence(id, params[:pallet])
         if res.success
-          store_locally(:flash_notice, (res.instance[:verification_completed] ? 'Pallet Verified Successfully' : res.message))
+          store_locally(:flash_notice, (res.instance[:verification_completed] ? rmd_success_message('Pallet Verified Successfully') : rmd_info_message(res.message)))
         else
           store_locally(:verification_errors, res)
         end

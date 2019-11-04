@@ -217,6 +217,14 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:act_as_user_id] || session[:user_id])
   end
 
+  # A fixed user to be used for logging activities not initiated by users.
+  # e.g. when set in a route that does not require login.
+  #
+  # @return [User] the system user.
+  def system_user
+    DevelopmentApp::User.new(id: nil, login_name: 'system', user_name: 'System', password_hash: nil, email: nil, active: true)
+  end
+
   # The user acting as another user.
   #
   # @return [User, nil] the logged-in user acting as another user.

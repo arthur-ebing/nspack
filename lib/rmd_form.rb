@@ -73,6 +73,8 @@ module Crossbeams
       HTML
     end
 
+    # TODO: Add disabled_items to select
+
     # Add a select box to the form.
     # The field will render as an input with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
@@ -114,7 +116,7 @@ module Crossbeams
     def add_label(name, label, value, hidden_value = nil, options = {})
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
-        <td><div class="pa2 bg-moon-gray br2">#{value}</div>#{hidden_label(name, hidden_value)}
+        <td><div class="pa2 bg-moon-gray br2">#{value || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
     end

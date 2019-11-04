@@ -105,6 +105,8 @@ module ProductionApp
         setup_complete: false,
         completed: false,
         running: false,
+        tipping: false,
+        labeling: false,
         active: true
       }
     end

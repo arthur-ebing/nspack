@@ -64,7 +64,7 @@ module ProductionApp
         log_status('production_runs', id, 'EDITING') if current_template.nil?
         log_transaction
       end
-      instance = production_run_with_assoc(id)
+      instance = production_run_flat(id)
       success_response("Updated production run #{instance.production_run_code}",
                        instance)
     rescue Crossbeams::InfoError => e
@@ -228,8 +228,8 @@ module ProductionApp
       repo.find_production_run(id)
     end
 
-    def production_run_with_assoc(id)
-      repo.find_production_run_with_assoc(id)
+    def production_run_flat(id)
+      repo.find_production_run_flat(id)
     end
 
     def validate_new_production_run_params(params)

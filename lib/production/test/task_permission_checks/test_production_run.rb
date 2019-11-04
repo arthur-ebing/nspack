@@ -32,6 +32,8 @@ module ProductionApp
         setup_complete: false,
         completed: false,
         running: false,
+        tipping: false,
+        labeling: false,
         active: true
       }
       ProductionApp::ProductionRun.new(base_attrs.merge(attrs))
