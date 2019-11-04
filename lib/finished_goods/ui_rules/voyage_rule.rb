@@ -21,8 +21,8 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      vessel_id_label = @repo.find(:vessels, MasterfilesApp::Vessel, @form_object.vessel_id)&.vessel_code
-      voyage_type_id_label = @repo.find(:voyage_types, MasterfilesApp::VoyageType, @form_object.voyage_type_id)&.voyage_type_code
+      vessel_id_label = MasterfilesApp::VesselRepo.new.find_vessel(@form_object.vessel_id)&.vessel_code
+      voyage_type_id_label = MasterfilesApp::VoyageTypeRepo.new.find_voyage_type(@form_object.voyage_type_id)&.voyage_type_code
       fields[:vessel_id] = { renderer: :label, with_value: vessel_id_label, caption: 'Vessel' }
       fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_id_label, caption: 'Voyage Type' }
       fields[:voyage_number] = { renderer: :label }
@@ -37,12 +37,14 @@ module UiRules
       {
         voyage_type_id: { renderer: :select,
                           options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types,
+                          disabled_options: MasterfilesApp::VoyageTypeRepo.new.for_select_inactive_voyage_types,
                           caption: 'Voyage Type',
                           prompt: true,
                           required: true,
                           disabled: false },
         vessel_id: { renderer: :select,
                      options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id),
+                     disabled_options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id, active: false),
                      caption: 'Vessel',
                      prompt: true,
                      required: true },
