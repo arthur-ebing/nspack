@@ -6,10 +6,16 @@ module FinishedGoodsApp
       res = validate_load_container_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      load_id = res.output[:load_id]
       id = nil
       repo.transaction do
         id = repo.create_load_container(res)
         log_status('load_containers', id, 'CREATED')
+        log_status('loads', load_id, 'TRUCK_ARRIVED')
+        log_multiple_statuses('pallets',
+                              FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id),
+                              'TRUCK_ARRIVED')
+
         log_transaction
       end
       instance = load_container(id)
