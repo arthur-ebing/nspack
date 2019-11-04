@@ -55,11 +55,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.get do
+          # find and initiate load_vehicle
           id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
           form_state = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(id).to_h
           form_state[:container] = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(form_state[:vehicle_type_id])&.has_container.to_s
           form_state[:container] = 'true' unless FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id).nil?
 
+          # over ride instance if rmd_form had previous attempt
           res = retrieve_from_local_store(:res)
           unless res.nil?
             form_state = res.instance
@@ -107,22 +109,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           value: form_state[:container],
                           items: [false, true])
           form.add_csrf_tag csrf_tag
-
-          store_locally(:previous_form_state, form_state.each { |k, v| form_state[k] = v.to_s }.reject! { |k| k == :active })
           view(inline: form.render, layout: :layout_rmd)
         end
 
         r.post do
           interactor = FinishedGoodsApp::LoadVehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
-          res = OpenStruct.new(success: true)
           attrs = params[:load_vehicle]
 
-          # test for form changes
-          unless attrs == retrieve_from_local_store(:previous_form_state)
-            id = attrs[:id]
-            # if load_vehicle exists
-            res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
-          end
+          id = attrs[:id]
+          # if load_vehicle exists
+          res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
 
           if res.success
             store_locally(:flash_notice, res.message)
@@ -137,10 +133,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'load_containers', Integer do |load_id|
         r.get do
+          # set defaults
+          form_state = {}
+          form_state[:verified_gross_weight_date] = Time.now
+
           # check if load_container exists
           id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
-          form_state = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(id).to_h
+          form_state = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(id).to_h unless id.nil?
 
+          # check if redirect from form error
           res = retrieve_from_local_store(:res)
           unless res.nil?
             form_state = res.instance
@@ -210,26 +211,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          allow_decimals: true)
           form.add_label(:verified_gross_weight_date,
                          'Verified Gross Weight Date',
-                         Time.now,
-                         Time.now,
+                         form_state[:verified_gross_weight_date],
+                         form_state[:verified_gross_weight_date],
                          hide_on_load: false)
           form.add_csrf_tag csrf_tag
-          # store initial state to compare against if change has occurred
-          store_locally(:previous_form_state, form_state.each { |k, v| form_state[k] = v.to_s }.reject! { |k| k == :active })
           view(inline: form.render, layout: :layout_rmd)
         end
 
         r.post do
           interactor = FinishedGoodsApp::LoadContainerInteractor.new(current_user, {}, { route_url: request.path }, {})
-          res = OpenStruct.new(success: true)
           attrs = params[:load_container]
 
-          # test for form changes
-          unless attrs == retrieve_from_local_store(:previous_form_state)
-            id = attrs[:id]
-            # if load_container exists
-            res = id.nil_or_empty? ? interactor.create_load_container(attrs) : interactor.update_load_container(id, attrs)
-          end
+          id = attrs[:id]
+          # if load_container exists
+          res = id.nil_or_empty? ? interactor.create_load_container(attrs) : interactor.update_load_container(id, attrs)
 
           if res.success
             store_locally(:flash_notice, res.message)
