@@ -2,12 +2,12 @@
 
 module FinishedGoodsApp
   class LoadVehicleInteractor < BaseInteractor
-    def validate_load(id)
-      load = LoadRepo.new.find_load(id)
-      return failed_response("Load:#{id} doesn't exist") if (load&.id).nil_or_empty?
-      return failed_response("Load:#{id} has already been shipped") if load&.shipped
+    def validate_load(load_id)
+      load = LoadRepo.new.find_load(load_id)
+      return failed_response("Load:#{load_id} doesn't exist") if (load&.id).nil_or_empty?
+      return failed_response("Load:#{load_id} has already been shipped") if load&.shipped
 
-      success_response('ok', load_id: id)
+      success_response('ok', load_id: load_id)
     end
 
     def create_load_vehicle(params) # rubocop:disable Metrics/AbcSize
@@ -28,9 +28,17 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load_vehicle(id, params)
+    def update_load_vehicle(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_load_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      # test for changes
+      instance = load_vehicle(id).to_h.reject! { |k| k == :active }
+      return success_response("Load vehicle #{instance[:vehicle_number]}", instance) if instance == res.output
+
+      # if load shipped dont allow update
+      shipped = LoadRepo.new.find_load(instance[:load_id])&.shipped
+      return success_response("Update not allowed, Load#{instance[:load_id]}, already Shipped", instance) if shipped
 
       repo.transaction do
         repo.update_load_vehicle(id, res)

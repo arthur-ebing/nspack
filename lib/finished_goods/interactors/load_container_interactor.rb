@@ -21,9 +21,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load_container(id, params)
+    def update_load_container(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_load_container_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      # test for changes
+      instance = load_container(id).to_h.reject! { |k| k == :active }
+      return success_response("Container #{instance[:container_code]}", instance) if instance == res.output
 
       repo.transaction do
         repo.update_load_container(id, res)
