@@ -38,6 +38,8 @@ module LabelPrintingApp
       mes_repo = MesserverApp::MesserverRepo.new
       res = mes_repo.print_published_label(label_name, vars, quantity, printer_code, host)
       raise Crossbeams::InfoError, res.message unless res.success
+
+      res
     end
   end
 end

@@ -24,7 +24,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                          action: '/rmd/production/pallet_inquiry/scan_pallet',
                                          button_caption: 'Submit')
 
-          form.add_field(:pallet_number, 'Pallet Number', data_type: :number, required: true)
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
@@ -94,7 +94,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                          action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
                                          button_caption: 'Submit')
 
-          form.add_field(form_attrs[:field_name], form_attrs[:field_caption], data_type: :number, required: true)
+          form.add_field(form_attrs[:field_name], form_attrs[:field_caption], data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end

@@ -20,7 +20,7 @@
   :hide_if_true: bin_tipped
 - :url: "/raw_materials/deliveries/rmt_bins/$:id$/print_barcode"
   :text: print
-  :icon: print
+  :icon: printer
   :title: Print
   :popup: true
   :hide_if_false: discrete_bin
