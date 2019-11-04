@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo
+  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :loads,
                      label: :order_number,
                      value: :id,
@@ -112,6 +112,13 @@ module FinishedGoodsApp
 
     def pallets_exists(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
+    end
+
+    def pallets_allocated_by(load_id: nil, pallet_number: nil)
+      ds = DB[:pallets]
+      ds = ds.where(pallet_number: pallet_number) unless pallet_number.nil_or_empty?
+      ds = ds.where(load_id: load_id) unless load_id.nil_or_empty?
+      ds.select_map(:id)
     end
 
     def ship_load(id, user_name)

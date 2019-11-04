@@ -32,7 +32,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           pallet_sequences = interactor.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
           if pallet_sequences.empty?
-            store_locally(:scan_pallet_submit_error, "scanned_pallet:#{params[:pallet][:pallet_number]} doesn't exist")
+            store_locally(:scan_pallet_submit_error, "Scanned Pallet:#{params[:pallet][:pallet_number]} doesn't exist")
             r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
           else
             r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{pallet_sequences.first[:id]}")
@@ -76,25 +76,32 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'scan_pallet_or_carton' do
         r.get do
           form_state = {}
+          notice = retrieve_from_local_store(:flash_notice)
+
           if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true'
             error = retrieve_from_local_store(:scan_carton_submit_error)
-            form_attrs = { caption: 'Scan Carton', form_name: :carton, field_name: :carton_number, field_caption: 'Carton Number' }
+            form_state = { error_message: error } unless error.nil?
+            form = Crossbeams::RMDForm.new(form_state,
+                                           form_name: :carton,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           notes: notice,
+                                           caption: 'Scan Carton',
+                                           action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
+                                           button_caption: 'Submit')
+            form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
           else
             error = retrieve_from_local_store(:scan_pallet_submit_error)
-            form_attrs = { caption: 'Scan Pallet', form_name: :pallet, field_name: :pallet_number, field_caption: 'Pallet Number' }
+            form_state = { error_message: error, errors: { pallet_number: [''] } } unless error.nil?
+            form = Crossbeams::RMDForm.new(form_state,
+                                           form_name: :pallet,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           notes: notice,
+                                           caption: 'Scan Pallet',
+                                           action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
+                                           button_caption: 'Submit')
+            form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
           end
 
-          notice = retrieve_from_local_store(:flash_notice)
-          form_state = { error_message: error } unless error.nil?
-          form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: form_attrs[:form_name],
-                                         scan_with_camera: @rmd_scan_with_camera,
-                                         notes: notice,
-                                         caption: form_attrs[:caption],
-                                         action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
-                                         button_caption: 'Submit')
-
-          form.add_field(form_attrs[:field_name], form_attrs[:field_caption], data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
