@@ -1,0 +1,24 @@
+---
+:dataminer_definition: scrap_reasons
+:actions:
+- :url: "/masterfiles/quality/scrap_reasons/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/scrap_reasons/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/scrap_reasons/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/scrap_reasons/new"
+  :text: New Scrap Reason
+  :style: :button
+  :behaviour: :popup

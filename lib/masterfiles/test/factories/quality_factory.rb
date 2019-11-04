@@ -9,5 +9,14 @@ module MasterfilesApp
       }
       DB[:pallet_verification_failure_reasons].insert(default.merge(opts))
     end
+
+    def create_scrap_reason(opts = {})
+      default = {
+        scrap_reason: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word,
+        active: true
+      }
+      DB[:scrap_reasons].insert(default.merge(opts))
+    end
   end
 end

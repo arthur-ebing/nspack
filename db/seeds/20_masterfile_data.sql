@@ -56,3 +56,10 @@ INSERT INTO uom_types (code) VALUES ('INVENTORY');
 -- CONTAINER_STACK_TYPES
 INSERT INTO container_stack_types (stack_type_code, description) VALUES('S', 'Standard');
 INSERT INTO container_stack_types (stack_type_code, description) VALUES('H', 'High');
+
+-- REWORKS_RUN_TYPES
+INSERT INTO reworks_run_types (run_type, description) VALUES('Data Change', 'Data Change');
+INSERT INTO reworks_run_types (run_type, description) VALUES('Scrap Pallet', 'Scrap Pallet');
+INSERT INTO reworks_run_types (run_type, description) VALUES('Repack Pallet', 'Repack Pallet');
+INSERT INTO reworks_run_types (run_type, description) VALUES('Buildup', 'Buildup');
+INSERT INTO reworks_run_types (run_type, description) VALUES('Tip Bins', 'Tip Bins');
