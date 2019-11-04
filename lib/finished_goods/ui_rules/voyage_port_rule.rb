@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class VoyagePortRule < Base
+  class VoyagePortRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = FinishedGoodsApp::VoyagePortRepo.new
       make_form_object
@@ -16,10 +16,10 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      voyage_id_label = @repo.find(:voyages, FinishedGoodsApp::Voyage, @form_object.voyage_id)&.voyage_number
-      port_id_label = @repo.find(:ports, MasterfilesApp::Port, @form_object.port_id)&.port_code
+      voyage_id_label = FinishedGoodsApp::VoyageRepo.new.find_voyage(@form_object.voyage_id)&.voyage_number
+      port_id_label = MasterfilesApp::PortRepo.new.find_port(@form_object.port_id)&.port_code
       port_type_id_label = MasterfilesApp::PortRepo.new.find_port_flat(@form_object.port_id)&.port_type_code
-      trans_shipment_vessel_id_label = @repo.find(:vessels, MasterfilesApp::Vessel, @form_object.trans_shipment_vessel_id)&.vessel_code
+      trans_shipment_vessel_id_label = MasterfilesApp::VesselRepo.new.find_vessel(@form_object.trans_shipment_vessel_id)&.vessel_code
       fields[:voyage_id] = { renderer: :label, with_value: voyage_id_label, caption: 'Voyage' }
       fields[:port_id] = { renderer: :label, with_value: port_id_label, caption: 'Port' }
       fields[:port_type_id] = { renderer: :label, with_value: port_type_id_label, caption: 'Port type' }
@@ -37,23 +37,27 @@ module UiRules
       {
         port_type_id: { renderer: :select,
                         options: MasterfilesApp::PortTypeRepo.new.for_select_port_types,
+                        disabled_options: MasterfilesApp::PortTypeRepo.new.for_select_inactive_port_types,
                         caption: 'Port type',
                         prompt: true,
                         required: true },
         voyage_id: { hide_on_load: true,
                      renderer: :select,
                      options: FinishedGoodsApp::VoyageRepo.new.for_select_voyages,
+                     disabled_options: FinishedGoodsApp::VoyageRepo.new.for_select_inactive_voyages,
                      caption: 'Voyage',
                      required: true },
         port_id: { hide_on_load: rules[:item_visibility][:port_id],
                    renderer: :select,
                    options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
+                   disabled_options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id, active: false),
                    caption: 'Port',
                    prompt: true,
                    required: true },
         trans_shipment_vessel_id: { hide_on_load: rules[:item_visibility][:trans_shipment_vessel_id],
                                     renderer: :select,
                                     options: MasterfilesApp::VesselRepo.new.for_select_vessels,
+                                    disabled_options: MasterfilesApp::VesselRepo.new.for_select_inactive_vessels,
                                     prompt: '',
                                     caption: 'Trans shipment vessel' },
         eta: { renderer: :date,

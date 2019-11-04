@@ -57,6 +57,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
     { DEPOT_LOCATION_CODE: 'Default Depot for new dispatch loads.' },
+    { VGM_REQUIRED: 'Sets if verified gross mass is required for RMD load_containers.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' }
   ].freeze

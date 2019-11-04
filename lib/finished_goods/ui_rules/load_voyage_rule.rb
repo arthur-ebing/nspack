@@ -30,10 +30,24 @@ module UiRules
 
     def common_fields
       {
-        load_id: { renderer: :select, options: FinishedGoodsApp::LoadRepo.new.for_select_loads, caption: 'Load', required: true },
-        voyage_id: { renderer: :select, options: FinishedGoodsApp::VoyageRepo.new.for_select_voyages, caption: 'Voyage', required: true },
-        shipping_line_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles, caption: 'Shipping Line', required: true },
-        shipper_party_role_id: { renderer: :select, options: MasterfilesApp::PartyRepo.new.for_select_party_roles, caption: 'Shipper', required: true },
+        load_id: { renderer: :select,
+                   options: FinishedGoodsApp::LoadRepo.new.for_select_loads,
+                   disabled_options: FinishedGoodsApp::LoadRepo.new.for_select_inactive_loads,
+                   caption: 'Load',
+                   required: true },
+        voyage_id: { renderer: :select,
+                     options: FinishedGoodsApp::VoyageRepo.new.for_select_voyages,
+                     disabled_options: FinishedGoodsApp::VoyageRepo.new.for_select_inactive_voyages,
+                     caption: 'Voyage',
+                     required: true },
+        shipping_line_party_role_id: { renderer: :select,
+                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles,
+                                       caption: 'Shipping Line',
+                                       required: true },
+        shipper_party_role_id: { renderer: :select,
+                                 options: MasterfilesApp::PartyRepo.new.for_select_party_roles,
+                                 caption: 'Shipper',
+                                 required: true },
         booking_reference: { required: true },
         memo_pad: {}
       }

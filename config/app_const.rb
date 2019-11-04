@@ -141,7 +141,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
     # { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     # { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
-    { regex: '^BN(\\d+)', type: 'bin', field: 'id' }
+    { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
+    { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
+    { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' }
   ].freeze
 
   # Per scan type, per field, set attributes for displaying a lookup value below a scan field.
@@ -186,6 +188,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Depots: Depot Code
   DEPOT_LOCATION_CODE = ENV.fetch('DEPOT_LOCATION_CODE')
+
+  # Load_containers:
+  VGM_REQUIRED = ENV.fetch('VGM_REQUIRED') == 'y'
 
   # Constants for port types:
   PORT_TYPE_POL = 'POL'

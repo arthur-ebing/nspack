@@ -22,8 +22,19 @@ module FinishedGoodsApp
 
     crud_calls_for :load_containers, name: :load_container, wrapper: LoadContainer
 
+    def find_stack_type_id(stack_type_code)
+      DB[:container_stack_types].where(stack_type_code: stack_type_code).get(:id)
+    end
+
     def find_load_container_by_load(load_id)
       DB[:load_containers].where(load_id: load_id).get(:id)
+    end
+
+    def actual_payload_by_load(load_id)
+      ds = DB[:pallets].where(load_id: load_id)
+      return ds.where(nett_weight: nil).select_map(:pallet_number) if ds.select_map(:nett_weight).any?(&:nil?)
+
+      ds.select_map(:nett_weight).sum
     end
   end
 end

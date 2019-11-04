@@ -55,11 +55,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.get do
+          # set defaults
+          form_state = {}
+
           # find and initiate load_vehicle
           id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
-          form_state = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(id).to_h
-          form_state[:container] = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(form_state[:vehicle_type_id])&.has_container.to_s
-          form_state[:container] = 'true' unless FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id).nil?
+          unless id.nil?
+            form_state = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(id).to_h
+            form_state[:container] = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(form_state[:vehicle_type_id])&.has_container.to_s
+            form_state[:container] = 'true' unless FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id).nil?
+          end
 
           # over ride instance if rmd_form had previous attempt
           res = retrieve_from_local_store(:res)
@@ -116,8 +121,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           interactor = FinishedGoodsApp::LoadVehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
           attrs = params[:load_vehicle]
 
-          id = attrs[:id]
           # if load_vehicle exists
+          id = attrs[:id]
           res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
 
           if res.success
@@ -135,7 +140,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do
           # set defaults
           form_state = {}
+          form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
           form_state[:verified_gross_weight_date] = Time.now
+          if AppConst::VGM_REQUIRED
+            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
+            if form_state[:actual_payload].is_a?(Array)
+              form_state[:error_message] = "Pallet #{form_state[:actual_payload].join(', ')} has no nett weight"
+              form_state[:actual_payload] = 'Error'
+            end
+          end
 
           # check if load_container exists
           id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
@@ -187,15 +200,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_field(:tare_weight,
                          'Tare Weight',
                          data_type: 'number',
-                         allow_decimals: true)
+                         allow_decimals: true,
+                         hide_on_load: !AppConst::VGM_REQUIRED,
+                         required: AppConst::VGM_REQUIRED)
           form.add_field(:max_payload,
                          'Max Payload',
                          data_type: 'number',
-                         allow_decimals: true)
-          form.add_field(:actual_payload,
-                         'Actual Payload',
-                         data_type: 'number',
-                         allow_decimals: true)
+                         allow_decimals: true,
+                         hide_on_load: !AppConst::VGM_REQUIRED,
+                         required: AppConst::VGM_REQUIRED)
+          form.add_label(:actual_payload,
+                         'Calculated: Sum of Pallets',
+                         form_state[:actual_payload],
+                         form_state[:actual_payload],
+                         hide_on_load: !AppConst::VGM_REQUIRED)
           form.add_select(:cargo_temperature_id,
                           'Cargo Temperature',
                           # disabled_items: MasterfilesApp::CargoTemperatureRepo.new.for_select_inactive_cargo_temperatures,
