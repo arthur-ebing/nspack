@@ -25,7 +25,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          action: '/rmd/dispatch/truck_arrival/load',
                                          button_caption: 'Submit')
 
-          form.add_field(:load_id, 'Load', scan: 'key248_all', required: true)
+          form.add_field(:load_id,
+                         'Load',
+                         scan: 'key248_all',
+                         scan_type: :load,
+                         submit_form: true,
+                         required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
@@ -50,44 +55,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             blank_json_response
           else
             value = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(params[:changed_value])&.has_container
-            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container/#{value}")
+            UiRules::ChangeRenderer.render_json(:rmd_load,
+                                                self,
+                                                :change_container_use,
+                                                use_container: value,
+                                                load_id: load_id)
           end
         end
 
         r.on 'container_changed' do
-          value = params[:changed_value]
-          r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container/#{value}")
-        end
-
-        r.on 'container', String  do |value|
-          container = value == 'true'
-          actions = []
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_container', value: value)
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_code_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_code_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_vents_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_seal_code_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_internal_container_code_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_temperature_rhine_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_temperature_rhine2_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_max_gross_weight_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_cargo_temperature_id_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_stack_type_id_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_verified_gross_weight_row')
-          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_verified_gross_weight_date_row')
-
-          if AppConst::VGM_REQUIRED
-            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_tare_weight_row')
-            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_max_payload_row')
-            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_actual_payload_row')
-          end
-
-          load_container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
-          if load_container_id.is_a?(Integer)
-            actions << OpenStruct.new(type: container ? :hide_element : :show_element, dom_id: 'load_load_container_delete_prompt_row')
-          end
-
-          json_actions(actions)
+          UiRules::ChangeRenderer.render_json(:rmd_load,
+                                              self,
+                                              :change_container_use,
+                                              use_container: params[:changed_value] == 'true',
+                                              load_id: load_id)
         end
 
         r.get do
@@ -96,9 +77,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
           form_state[:verified_gross_weight_date] = Time.now
           if AppConst::VGM_REQUIRED
-            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
-            if form_state[:actual_payload].is_a?(Array)
-              form_state[:error_message] = "Pallet #{form_state[:actual_payload].join(', ')} has no nett weight"
+            res = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
+            if res.success
+              form_state[:actual_payload] = res.instance
+            else
+              form_state[:error_message] = "Pallet #{res.instance.join(', ')} has no nett weight"
               form_state[:actual_payload] = 'Error'
             end
           end
@@ -143,7 +126,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          'Vehicle Number',
                          data_type: 'string',
                          force_uppercase: true,
-                         required: false)
+                         required: true)
           form.add_select(:vehicle_type_id,
                           'Vehicle Type',
                           items: MasterfilesApp::VehicleTypeRepo.new.for_select_vehicle_types,
@@ -167,11 +150,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           'Container',
                           value: form_state[:container],
                           items: [['No', false], ['Yes', true]])
-          form.add_label(:load_container_delete_prompt,
-                         'Warning',
-                         'Container Record will be deleted!',
-                         'Container Record will be deleted!',
-                         hide_on_load: true)
 
           form.add_field(:container_code,
                          'Container Code',
@@ -274,7 +252,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             if res.success
               message << res.message
             else
-              res = OpenStruct.new(success: false, instance: attrs, errors: res.errors, message: res.message)
+              res.instance = attrs
               store_locally(:res, res)
               r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
             end
@@ -293,10 +271,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           if res.success
             message << res.message
-            store_locally(:flash_notice, message.uniq.join(',  '))
+            store_locally(:flash_notice, rmd_success_message(message.uniq.join(',  ')))
             r.redirect('/rmd/dispatch/truck_arrival/load')
           else
-            res = OpenStruct.new(success: false, instance: attrs, errors: res.errors, message: res.message)
+            res.instance = attrs
             store_locally(:res, res)
             r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
           end

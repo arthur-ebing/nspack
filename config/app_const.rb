@@ -159,7 +159,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     # { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
     { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
     { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
-    { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' }
+    { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
+    { regex: '^(\\d+)', type: 'load', field: 'id' }
   ].freeze
 
   # Per scan type, per field, set attributes for displaying a lookup value below a scan field.

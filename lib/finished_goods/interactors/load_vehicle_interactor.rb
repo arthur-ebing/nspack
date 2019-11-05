@@ -13,12 +13,12 @@ module FinishedGoodsApp
       res = validate_load_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      load_id = res.output[:load_id]
       # if load shipped dont allow update
       shipped = LoadRepo.new.find_load(load_id)&.shipped
       return failed_response("Update not allowed, Load #{load_id}, already Shipped") if shipped
 
       id = nil
-      load_id = res.output[:load_id]
       pallet_ids = FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id)
 
       repo.transaction do
