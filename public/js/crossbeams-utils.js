@@ -556,7 +556,28 @@ const crossbeamsUtils = {
     elem.innerHTML = action.replace_inner_html.value;
   },
   /**
-   * Hide a DOM element.
+   * Set an input element to required or not.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  setRequired: function setRequired(action) {
+    const elem = document.getElementById(action.set_required.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.set_required.id}"`,
+        title: 'Set Required element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.set_required.required) {
+      elem.required = true;
+    } else {
+      elem.required = false;
+    }
+  },
+  /**
+   * Make an input element readonly or make it editable.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
    */
@@ -707,6 +728,9 @@ const crossbeamsUtils = {
       }
       if (action.set_readonly) {
         crossbeamsUtils.setReadonlyInput(action);
+      }
+      if (action.set_required) {
+        crossbeamsUtils.setRequired(action);
       }
       if (action.hide_element) {
         crossbeamsUtils.hideElement(action);
