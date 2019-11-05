@@ -13,23 +13,19 @@ module FinishedGoodsApp
       res = validate_load_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      load_id = res.output[:load_id]
       # if load shipped dont allow update
       shipped = LoadRepo.new.find_load(load_id)&.shipped
       return failed_response("Update not allowed, Load #{load_id}, already Shipped") if shipped
 
       id = nil
+      load_id = res.output[:load_id]
+      pallet_ids = FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id)
+
       repo.transaction do
         id = repo.create_load_vehicle(res)
         log_status('load_vehicles', id, 'CREATED')
-
-        if params[:container] == 'false'
-          log_status('loads', load_id, 'TRUCK_ARRIVED')
-          log_multiple_statuses('pallets',
-                                FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id),
-                                'TRUCK_ARRIVED')
-        end
-
+        log_status('loads', load_id, 'TRUCK_ARRIVED')
+        log_multiple_statuses('pallets', pallet_ids, 'TRUCK_ARRIVED')
         log_transaction
       end
       instance = load_vehicle(id)
@@ -45,8 +41,8 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       # test for changes
-      instance = load_vehicle(id).to_h.reject! { |k| k == :active }
-      return success_response("Load vehicle #{params[:vehicle_number]}", instance) if instance == res.output
+      instance = load_vehicle(id).to_h.reject { |k, _| %i[id active].include?(k) }
+      return success_response("Load #{params[:load_id]}", instance) if instance == res.output
 
       # if load shipped dont allow update
       shipped = LoadRepo.new.find_load(params[:load_id])&.shipped

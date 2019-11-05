@@ -50,23 +50,71 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             blank_json_response
           else
             value = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(params[:changed_value])&.has_container
-            json_change_select_value('load_vehicle_container', value)
+            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container/#{value}")
           end
+        end
+
+        r.on 'container_changed' do
+          value = params[:changed_value]
+          r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container/#{value}")
+        end
+
+        r.on 'container', String  do |value|
+          container = value == 'true'
+          actions = []
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_container', value: value)
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_code_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_code_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_vents_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_seal_code_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_internal_container_code_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_temperature_rhine_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_container_temperature_rhine2_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_max_gross_weight_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_cargo_temperature_id_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_stack_type_id_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_verified_gross_weight_row')
+          actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_verified_gross_weight_date_row')
+
+          if AppConst::VGM_REQUIRED
+            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_tare_weight_row')
+            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_max_payload_row')
+            actions << OpenStruct.new(type: container ? :show_element : :hide_element, dom_id: 'load_actual_payload_row')
+          end
+
+          load_container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
+          if load_container_id.is_a?(Integer)
+            actions << OpenStruct.new(type: container ? :hide_element : :show_element, dom_id: 'load_load_container_delete_prompt_row')
+          end
+
+          json_actions(actions)
         end
 
         r.get do
           # set defaults
           form_state = {}
-
-          # find and initiate load_vehicle
-          id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
-          unless id.nil?
-            form_state = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(id).to_h
-            form_state[:container] = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(form_state[:vehicle_type_id])&.has_container.to_s
-            form_state[:container] = 'true' unless FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id).nil?
+          form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
+          form_state[:verified_gross_weight_date] = Time.now
+          if AppConst::VGM_REQUIRED
+            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
+            if form_state[:actual_payload].is_a?(Array)
+              form_state[:error_message] = "Pallet #{form_state[:actual_payload].join(', ')} has no nett weight"
+              form_state[:actual_payload] = 'Error'
+            end
           end
 
-          # over ride instance if rmd_form had previous attempt
+          # check if load_container exists
+          load_container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
+          unless load_container_id.nil?
+            form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container(load_container_id).to_h)
+            form_state[:container] = 'true'
+          end
+
+          # check if load_vehicle exists
+          load_vehicles_id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
+          form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(load_vehicles_id).to_h) unless load_vehicles_id.nil?
+
+          # override if redirect from error
           res = retrieve_from_local_store(:res)
           unless res.nil?
             form_state = res.instance
@@ -74,23 +122,28 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             form_state[:errors] = res.errors
           end
 
+          has_container = form_state[:container] == 'true'
           form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: :load_vehicle,
+                                         form_name: :load,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: retrieve_from_local_store(:flash_notice),
                                          caption: 'Capture Vehicle',
                                          action: "/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}",
                                          button_caption: 'Submit')
-
           form.behaviours do |behaviour|
-            behaviour.dropdown_change :vehicle_type_id, notify: [{ url: "/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/vehicle_type_changed" }]
+            behaviour.dropdown_change :vehicle_type_id,
+                                      notify: [{ url: "/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/vehicle_type_changed" }]
+            behaviour.dropdown_change :container,
+                                      notify: [{ url: "/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container_changed" }]
           end
-
-          form.add_label(:id, 'load_vehicle_id', id, id, hide_on_load: true)
           form.add_label(:load_id, 'Load', load_id, load_id)
+          form.add_label(:load_vehicles_id, 'load_vehicle_id', load_vehicles_id, load_vehicles_id, hide_on_load: true)
+          form.add_label(:load_container_id, 'load_container_id', load_container_id, load_container_id, hide_on_load: true)
           form.add_field(:vehicle_number,
                          'Vehicle Number',
-                         data_type: 'string')
+                         data_type: 'string',
+                         force_uppercase: true,
+                         required: false)
           form.add_select(:vehicle_type_id,
                           'Vehicle Type',
                           items: MasterfilesApp::VehicleTypeRepo.new.for_select_vehicle_types,
@@ -108,148 +161,144 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_field(:dispatch_consignment_note_number,
                          'Consignment Note Number',
                          data_type: 'string',
-                         required: false)
+                         required: false,
+                         hide_on_load: true)
           form.add_select(:container,
                           'Container',
                           value: form_state[:container],
-                          items: [false, true])
-          form.add_csrf_tag csrf_tag
-          view(inline: form.render, layout: :layout_rmd)
-        end
+                          items: [['No', false], ['Yes', true]])
+          form.add_label(:load_container_delete_prompt,
+                         'Warning',
+                         'Container Record will be deleted!',
+                         'Container Record will be deleted!',
+                         hide_on_load: true)
 
-        r.post do
-          interactor = FinishedGoodsApp::LoadVehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
-          attrs = params[:load_vehicle]
-
-          # if load_vehicle exists
-          id = attrs[:id]
-          res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
-
-          if res.success
-            store_locally(:flash_notice, res.message)
-            r.redirect("/rmd/dispatch/truck_arrival/load_containers/#{load_id}") if attrs[:container] == 'true'
-            r.redirect('/rmd/dispatch/truck_arrival/load')
-          else
-            store_locally(:res, res)
-            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
-          end
-        end
-      end
-
-      r.on 'load_containers', Integer do |load_id|
-        r.get do
-          # set defaults
-          form_state = {}
-          form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
-          form_state[:verified_gross_weight_date] = Time.now
-          if AppConst::VGM_REQUIRED
-            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
-            if form_state[:actual_payload].is_a?(Array)
-              form_state[:error_message] = "Pallet #{form_state[:actual_payload].join(', ')} has no nett weight"
-              form_state[:actual_payload] = 'Error'
-            end
-          end
-
-          # check if load_container exists
-          id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
-          form_state = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(id).to_h unless id.nil?
-
-          # check if redirect from form error
-          res = retrieve_from_local_store(:res)
-          unless res.nil?
-            form_state = res.instance
-            form_state[:error_message] = res.message
-            form_state[:errors] = res.errors
-          end
-
-          form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: :load_container,
-                                         scan_with_camera: @rmd_scan_with_camera,
-                                         notes: retrieve_from_local_store(:flash_notice),
-                                         caption: 'Capture Container',
-                                         action: "/rmd/dispatch/truck_arrival/load_containers/#{load_id}",
-                                         button_caption: 'Submit')
-
-          form.add_label(:id, 'load_container_id', id, id, hide_on_load: true)
-          form.add_label(:load_id, 'Load', load_id, load_id)
           form.add_field(:container_code,
                          'Container Code',
-                         data_type: 'string')
+                         data_type: 'string',
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:container_vents,
                          'Container Vents',
-                         data_type: 'string')
+                         data_type: 'string',
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:container_seal_code,
                          'Container Seal Code',
-                         data_type: 'string')
+                         data_type: 'string',
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:internal_container_code,
                          'Internal Container Code',
-                         data_type: 'string')
+                         data_type: 'string',
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
                          data_type: 'number',
-                         allow_decimals: true)
+                         allow_decimals: true,
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine2,
                          'Temperature Rhine2',
                          data_type: 'number',
                          allow_decimals: true,
-                         required: false)
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_field(:max_gross_weight,
                          'Max Gross Weight',
                          data_type: 'number',
-                         allow_decimals: true)
-          form.add_field(:tare_weight,
-                         'Tare Weight',
-                         data_type: 'number',
                          allow_decimals: true,
-                         hide_on_load: !AppConst::VGM_REQUIRED,
-                         required: AppConst::VGM_REQUIRED)
-          form.add_field(:max_payload,
-                         'Max Payload',
-                         data_type: 'number',
-                         allow_decimals: true,
-                         hide_on_load: !AppConst::VGM_REQUIRED,
-                         required: AppConst::VGM_REQUIRED)
-          form.add_label(:actual_payload,
-                         'Calculated: Sum of Pallets',
-                         form_state[:actual_payload],
-                         form_state[:actual_payload],
-                         hide_on_load: !AppConst::VGM_REQUIRED)
+                         required: false,
+                         hide_on_load: !has_container)
+          if AppConst::VGM_REQUIRED
+            form.add_field(:tare_weight,
+                           'Tare Weight',
+                           data_type: 'number',
+                           allow_decimals: true,
+                           required: false,
+                           hide_on_load: !has_container)
+            form.add_field(:max_payload,
+                           'Max Payload',
+                           data_type: 'number',
+                           allow_decimals: true,
+                           required: false,
+                           hide_on_load: !has_container)
+            form.add_label(:actual_payload,
+                           'Calculated Payload',
+                           form_state[:actual_payload],
+                           form_state[:actual_payload],
+                           hide_on_load: !has_container)
+          end
           form.add_select(:cargo_temperature_id,
                           'Cargo Temperature',
                           # disabled_items: MasterfilesApp::CargoTemperatureRepo.new.for_select_inactive_cargo_temperatures,
                           items: MasterfilesApp::CargoTemperatureRepo.new.for_select_cargo_temperatures,
-                          prompt: true)
+                          required: false,
+                          hide_on_load: !has_container)
           form.add_select(:stack_type_id,
                           'Stack Type',
                           # disabled_items: MasterfilesApp::LoadContainerRepo.new.for_select_inactive_container_stack_types,
-                          items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types)
+                          items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types,
+                          required: false,
+                          hide_on_load: !has_container)
           form.add_field(:verified_gross_weight,
                          'Verified Gross Weight',
                          data_type: 'number',
-                         allow_decimals: true)
+                         allow_decimals: true,
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_label(:verified_gross_weight_date,
                          'Verified Gross Weight Date',
                          form_state[:verified_gross_weight_date],
                          form_state[:verified_gross_weight_date],
-                         hide_on_load: false)
+                         required: false,
+                         hide_on_load: !has_container)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
 
         r.post do
+          attrs = params[:load]
+          load_id = attrs[:load_id]
+          load_container_id = attrs[:load_container_id]
+          has_container = attrs[:container] == 'true'
+          message = []
           interactor = FinishedGoodsApp::LoadContainerInteractor.new(current_user, {}, { route_url: request.path }, {})
-          attrs = params[:load_container]
 
-          id = attrs[:id]
-          # if load_container exists
-          res = id.nil_or_empty? ? interactor.create_load_container(attrs) : interactor.update_load_container(id, attrs)
+          # create or edit load_container record
+          if has_container
+            id = attrs[:load_container_id]
+            res = id.nil_or_empty? ? interactor.create_load_container(attrs) : interactor.update_load_container(id, attrs)
+
+            if res.success
+              message << res.message
+            else
+              res = OpenStruct.new(success: false, instance: attrs, errors: res.errors, message: res.message)
+              store_locally(:res, res)
+              r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
+            end
+          end
+
+          # delete load_container record
+          if !load_container_id.nil_or_empty? & !has_container
+            res = interactor.delete_load_container(load_container_id)
+            message << res.message
+          end
+
+          # create or edit load_vehicle record
+          interactor = FinishedGoodsApp::LoadVehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
+          id = attrs[:load_vehicles_id]
+          res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
 
           if res.success
-            store_locally(:flash_notice, res.message)
+            message << res.message
+            store_locally(:flash_notice, message.uniq.join(',  '))
             r.redirect('/rmd/dispatch/truck_arrival/load')
           else
+            res = OpenStruct.new(success: false, instance: attrs, errors: res.errors, message: res.message)
             store_locally(:res, res)
-            r.redirect("/rmd/dispatch/truck_arrival/load_containers/#{load_id}")
+            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
           end
         end
       end
