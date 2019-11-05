@@ -34,7 +34,7 @@
   :text: unship
   :icon: unship
   :title: Unship
-  :hide_if_true: unshipped
+  :hide_if_true: not_shipped
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status

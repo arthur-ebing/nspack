@@ -6,16 +6,10 @@ module FinishedGoodsApp
       res = validate_load_container_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      load_id = res.output[:load_id]
       id = nil
       repo.transaction do
         id = repo.create_load_container(res)
         log_status('load_containers', id, 'CREATED')
-        log_status('loads', load_id, 'TRUCK_ARRIVED')
-        log_multiple_statuses('pallets',
-                              FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id),
-                              'TRUCK_ARRIVED')
-
         log_transaction
       end
       instance = load_container(id)
@@ -32,8 +26,11 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       # test for changes
-      instance = load_container(id).to_h.reject! { |k| k == :active }
-      return success_response("Container #{instance[:container_code]}", instance) if instance == res.output
+      instance = load_container(id).to_h.reject { |k, _| %i[id active].include?(k) }
+      return success_response("Load #{instance[:load_id]}", instance) if instance == res.output
+
+      # update date field if weight changed
+      res.output[:verified_gross_weight_date] = Time.now if instance[:verified_gross_weight] != res.output[:verified_gross_weight]
 
       repo.transaction do
         repo.update_load_container(id, res)
@@ -74,6 +71,8 @@ module FinishedGoodsApp
     end
 
     def validate_load_container_params(params)
+      return VGM_REQUIRED_Schema.call(params) if AppConst::VGM_REQUIRED
+
       LoadContainerSchema.call(params)
     end
   end

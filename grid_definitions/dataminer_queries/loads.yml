@@ -1,23 +1,22 @@
 ---
 :caption: Loads
-:sql: "SELECT\r\n    loads.id,\r\n    loads.id AS load_id,\r\n    voyages.voyage_code,\r\n
-  \   depots.depot_code AS depot,\r\n    pol_port.port_code AS pol,\r\n    pol_voyage_ports.eta
-  AS eta,\r\n    pol_voyage_ports.ata AS ata,\r\n    pod_port.port_code AS pod,\r\n
-  \   pod_voyage_ports.etd AS etd,\r\n    pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n
-  \   loads.created_at,\r\n    fn_party_role_name(loads.customer_party_role_id) AS
-  customer,\r\n    fn_party_role_name(loads.consignee_party_role_id) AS consignee,\r\n
-  \   fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,\r\n
+:sql: "SELECT\r\n    loads.id,\r\n    loads.id AS load,\r\n    fn_current_status('loads',
+  loads.id) AS status,\r\n    voyages.voyage_code,\r\n    depots.depot_code AS depot,\r\n
+  \   pol_port.port_code AS pol,\r\n    pol_voyage_ports.eta AS eta,\r\n    pol_voyage_ports.ata
+  AS ata,\r\n    pod_port.port_code AS pod,\r\n    pod_voyage_ports.etd AS etd,\r\n
+  \   pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n    loads.created_at,\r\n
+  \   fn_party_role_name(loads.customer_party_role_id) AS customer,\r\n    fn_party_role_name(loads.consignee_party_role_id)
+  AS consignee,\r\n    fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,\r\n
   \   fn_party_role_name(loads.exporter_party_role_id) AS exporter,\r\n    fn_party_role_name(loads.billing_client_party_role_id)
   AS billing_client,\r\n    destination_cities.city_name AS final_destination_city,\r\n
   \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
   \   loads.exporter_certificate_code,\r\n    loads.allocated,\r\n    loads.allocated_at,\r\n
-  \   loads.shipped,\r\n    loads.shipped_at,\r\n    not loads.shipped as unshipped,\r\n
-  \   fn_current_status('loads', loads.id) AS status,\r\n    loads.transfer_load,\r\n
-  \   loads.edi_file_name,\r\n    loads.updated_at,\r\n    voyages.id AS voyage_id,\r\n
-  \   load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n    CASE\r\n
-  \       WHEN loads.shipped THEN 'ready'\r\n        WHEN loads.allocated THEN 'ok'\r\n
-  \       ELSE NULL\r\n        END AS colour_rule\r\n\r\nFROM loads\r\nJOIN depots
-  \ ON depots.id = loads.depot_id\r\nJOIN destination_cities  ON destination_cities.id
+  \   loads.shipped,\r\n    loads.shipped_at,\r\n    not loads.shipped as not_shipped,\r\n
+  \   loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
+  \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
+  \   CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n        WHEN loads.allocated
+  THEN 'ok'\r\n        ELSE NULL\r\n        END AS colour_rule\r\n\r\nFROM loads\r\nJOIN
+  depots  ON depots.id = loads.depot_id\r\nJOIN destination_cities  ON destination_cities.id
   = loads.final_destination_id\r\nJOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
   = loads.pol_voyage_port_id\r\nJOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
   = loads.pod_voyage_port_id\r\nJOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\nJOIN
@@ -48,11 +47,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  load_id:
-    :name: load_id
+  load:
+    :name: load
     :sequence_no: 2
-    :caption: Load Id
+    :caption: Load
     :namespaced_name: loads.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 3
+    :caption: Status
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -66,7 +81,7 @@
     :group_max: false
   voyage_code:
     :name: voyage_code
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Voyage code
     :namespaced_name: voyages.voyage_code
     :data_type: :string
@@ -82,7 +97,7 @@
     :group_max: false
   depot:
     :name: depot
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Depot
     :namespaced_name: depots.depot_code
     :data_type: :string
@@ -98,7 +113,7 @@
     :group_max: false
   pol:
     :name: pol
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: POL
     :namespaced_name: pol_port.port_code
     :data_type: :string
@@ -114,7 +129,7 @@
     :group_max: false
   eta:
     :name: eta
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: ETA
     :namespaced_name: pol_voyage_ports.eta
     :data_type: :string
@@ -130,7 +145,7 @@
     :group_max: false
   ata:
     :name: ata
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: ATA
     :namespaced_name: pol_voyage_ports.ata
     :data_type: :string
@@ -146,7 +161,7 @@
     :group_max: false
   pod:
     :name: pod
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: POD
     :namespaced_name: pod_port.port_code
     :data_type: :string
@@ -162,7 +177,7 @@
     :group_max: false
   etd:
     :name: etd
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: ETD
     :namespaced_name: pod_voyage_ports.etd
     :data_type: :string
@@ -178,7 +193,7 @@
     :group_max: false
   atd:
     :name: atd
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: ATD
     :namespaced_name: pod_voyage_ports.atd
     :data_type: :string
@@ -194,7 +209,7 @@
     :group_max: false
   vessel_code:
     :name: vessel_code
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Vessel code
     :namespaced_name: vessels.vessel_code
     :data_type: :string
@@ -210,7 +225,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Created at
     :namespaced_name: loads.created_at
     :data_type: :datetime
@@ -226,7 +241,7 @@
     :group_max: false
   customer:
     :name: customer
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Customer
     :namespaced_name: 
     :data_type: :string
@@ -242,7 +257,7 @@
     :group_max: false
   consignee:
     :name: consignee
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Consignee
     :namespaced_name: 
     :data_type: :string
@@ -258,7 +273,7 @@
     :group_max: false
   final_receiver:
     :name: final_receiver
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Final receiver
     :namespaced_name: 
     :data_type: :string
@@ -274,7 +289,7 @@
     :group_max: false
   exporter:
     :name: exporter
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Exporter
     :namespaced_name: 
     :data_type: :string
@@ -290,7 +305,7 @@
     :group_max: false
   billing_client:
     :name: billing_client
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Billing client
     :namespaced_name: 
     :data_type: :string
@@ -306,7 +321,7 @@
     :group_max: false
   final_destination_city:
     :name: final_destination_city
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Final destination city
     :namespaced_name: destination_cities.city_name
     :data_type: :string
@@ -322,7 +337,7 @@
     :group_max: false
   order_number:
     :name: order_number
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Order number
     :namespaced_name: loads.order_number
     :data_type: :string
@@ -338,7 +353,7 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Customer order number
     :namespaced_name: loads.customer_order_number
     :data_type: :string
@@ -354,7 +369,7 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Customer reference
     :namespaced_name: loads.customer_reference
     :data_type: :string
@@ -370,7 +385,7 @@
     :group_max: false
   exporter_certificate_code:
     :name: exporter_certificate_code
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Exporter certificate code
     :namespaced_name: loads.exporter_certificate_code
     :data_type: :string
@@ -386,7 +401,7 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Allocated
     :namespaced_name: loads.allocated
     :data_type: :boolean
@@ -402,7 +417,7 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Allocated at
     :namespaced_name: loads.allocated_at
     :data_type: :datetime
@@ -418,7 +433,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Shipped
     :namespaced_name: loads.shipped
     :data_type: :boolean
@@ -434,7 +449,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Shipped at
     :namespaced_name: loads.shipped_at
     :data_type: :datetime
@@ -448,31 +463,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  unshipped:
-    :name: unshipped
-    :sequence_no: 27
-    :caption: Unshipped
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
+  not_shipped:
+    :name: not_shipped
     :sequence_no: 28
-    :caption: Status
+    :caption: Not shipped
     :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
