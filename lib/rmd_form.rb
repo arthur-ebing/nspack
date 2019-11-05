@@ -316,7 +316,7 @@ module Crossbeams
       return '' if value.nil?
 
       <<~HTML
-        <input id ="#{form_name}_#{name}" type="hidden" name="#{form_name}[#{name}]" value="#{value}">
+        <input id ="#{form_name}_#{name}" type="hidden" name="#{form_name}[#{name}]" value="#{field_value(value)}">
       HTML
     end
 
