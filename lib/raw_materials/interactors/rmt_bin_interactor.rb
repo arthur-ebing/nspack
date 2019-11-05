@@ -3,7 +3,7 @@
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::SCAN_RMT_BIN_ASSET_NUMBERS == 'true' && in_stock_bin_for_asset_number?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && in_stock_bin_for_asset_number?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))

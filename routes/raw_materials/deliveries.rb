@@ -308,28 +308,28 @@ class Nspack < Roda # rubocop:disable ClassLength
         actions = []
         if !params[:changed_value].to_s.empty?
           rmt_container_material_type_ids = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
             actions << OpenStruct.new(type: :replace_select_options,
                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
                                       options_array: rmt_container_material_type_ids)
           end
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
             actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
                                       dom_id: 'rmt_bin_qty_inner_bins_field_wrapper')
           end
         else
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
             actions << OpenStruct.new(type: :replace_select_options,
                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
                                       options_array: [])
           end
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
             actions << OpenStruct.new(type: :hide_element,
                                       dom_id: 'rmt_bin_qty_inner_bins_field_wrapper')
           end
         end
 
-        if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+        if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
           actions << OpenStruct.new(type: :replace_select_options,
                                     dom_id: 'rmt_bin_rmt_material_owner_party_role_id',
                                     options_array: [])

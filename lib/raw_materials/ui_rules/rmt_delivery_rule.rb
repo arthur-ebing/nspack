@@ -9,11 +9,11 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      @rules[:show_delivery_destination] = AppConst::DELIVERY_USE_DELIVERY_DESTINATION == 'true'
-      @rules[:show_qty_damaged_bins] = AppConst::DELIVERY_CAPTURE_DAMAGED_BINS == 'true'
-      @rules[:show_qty_empty_bins] = AppConst::DELIVERY_CAPTURE_EMPTY_BINS == 'true'
-      @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION == 'true'
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::SCAN_RMT_BIN_ASSET_NUMBERS == 'true'
+      @rules[:show_delivery_destination] = AppConst::DELIVERY_USE_DELIVERY_DESTINATION
+      @rules[:show_qty_damaged_bins] = AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
+      @rules[:show_qty_empty_bins] = AppConst::DELIVERY_CAPTURE_EMPTY_BINS
+      @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
+      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode

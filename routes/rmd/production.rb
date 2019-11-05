@@ -59,7 +59,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_csrf_tag csrf_tag
         form.add_label(:verification_result, 'Verification Result', pallet_sequence[:verification_result])
         form.add_label(:verification_failure_reason, 'Verification Failure Reason', pallet_sequence[:verification_failure_reason])
-        form.add_label(:fruit_sticker, 'Fruit Sticker', pallet_sequence[:fruit_sticker]) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION == 'true'
+        form.add_label(:fruit_sticker, 'Fruit Sticker', pallet_sequence[:fruit_sticker]) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION
         form.add_prev_next_nav('/rmd/production/pallet_inquiry/scan_pallet_sequence/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -78,7 +78,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           form_state = {}
           notice = retrieve_from_local_store(:flash_notice)
 
-          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true'
+          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
             error = retrieve_from_local_store(:scan_carton_submit_error)
             form_state = { error_message: error } unless error.nil?
             form = Crossbeams::RMDForm.new(form_state,
@@ -107,7 +107,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.post do
-          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true'
+          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
             res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
             pallet_number = interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
             unless res.success
@@ -159,9 +159,9 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_select(:verification_result, 'Verification Result', items: %w[unknown passed failed], value: (pallet_sequence[:verification_result].nil_or_empty? ? 'unknown' : pallet_sequence[:verification_result]))
         form.add_select(:verification_failure_reason, 'Verification Failure Reason', items: MasterfilesApp::QualityRepo.new.for_select_pallet_verification_failure_reasons,
                                                                                      hide_on_load: (pallet_sequence[:verification_result] != 'failed'), value: pallet_sequence[:pallet_verification_failure_reason_id], prompt: true, required: false)
-        form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION == 'true' && pallet_sequence[:pallet_sequence_number] == 1
+        form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
         form.add_label(:gross_weight, 'Gross Weight', pallet_sequence[:gross_weight])
-        if AppConst::CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION == 'true'
+        if AppConst::CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION
           form.add_field(:nett_weight, 'Nett Weight', required: true, prompt: true, data_type: :number)
         else
           form.add_label(:nett_weight, 'Nett Weight', (!pallet_sequence[:sequence_nett_weight].nil_or_empty? ? pallet_sequence[:sequence_nett_weight].to_f : nil))

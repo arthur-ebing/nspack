@@ -17,7 +17,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_DAMAGED_BINS: 'not applicable to many clients.' },
     { CAPTURE_EMPTY_BINS: 'not applicable to many clients.' },
     { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'optional, not applicable to many clients.' },
-    { SCAN_RMT_BIN_ASSET_NUMBERS: 'Capture deliveries with permanently barcoded bins.' },
+    { USE_PERMANENT_RMT_BIN_BARCODES: 'Capture deliveries with permanently barcoded bins.' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
     { CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION: 'optional.' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },

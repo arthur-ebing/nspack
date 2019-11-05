@@ -33,7 +33,7 @@ module MesscadaApp
     end
 
     def find_rmt_bin
-      return repo.find_bin_by_asset_number(bin_number) if AppConst::SCAN_RMT_BIN_ASSET_NUMBERS == 'true'
+      return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       repo.find_rmt_bin(bin_number)
     end

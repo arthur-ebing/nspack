@@ -61,7 +61,7 @@ module MesscadaApp
     end
 
     def carton_verification(params)  # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, PerceivedComplexity
-      carton_and_pallet_verification = (AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION == 'true') && (params[:device].nil? ? true : false)
+      carton_and_pallet_verification = AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION && (params[:device].nil? ? true : false)
       params[:carton_and_pallet_verification] = carton_and_pallet_verification
 
       if carton_and_pallet_verification

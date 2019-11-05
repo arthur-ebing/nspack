@@ -16,10 +16,10 @@ class Nspack < Roda
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
         details = retrieve_from_local_store(:bin) || { cultivar_id: delivery.cultivar_id, bin_fullness: :Full }
 
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true' && !default_rmt_container_type[:id].nil?
-        capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION == 'true'
-        capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
-        capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil?
+        capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
+        capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+        capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
         form = Crossbeams::RMDForm.new(details,
                                        form_name: :rmt_bin,
@@ -29,8 +29,8 @@ class Nspack < Roda
                                        button_caption: 'Submit')
 
         form.behaviours do |behaviour|
-          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_container_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
-          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/container_material_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_container_type_combo_changed' }] if capture_container_material
+          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
         end
 
         form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(delivery.orchard_id), required: true, prompt: true)
@@ -74,28 +74,28 @@ class Nspack < Roda
         actions = []
         if !params[:changed_value].to_s.empty?
           rmt_container_material_type_ids = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
             actions << OpenStruct.new(type: :replace_select_options,
                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
                                       options_array: rmt_container_material_type_ids)
           end
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
             actions << OpenStruct.new(type: MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(params[:changed_value])&.rmt_inner_container_type_id ? :show_element : :hide_element,
                                       dom_id: 'rmt_bin_qty_inner_bins_row')
           end
         else
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
             actions << OpenStruct.new(type: :replace_select_options,
                                       dom_id: 'rmt_bin_rmt_container_material_type_id',
                                       options_array: [])
           end
-          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true'
+          if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
             actions << OpenStruct.new(type: :hide_element,
                                       dom_id: 'rmt_bin_qty_inner_bins_row')
           end
         end
 
-        if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true' && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+        if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
           actions << OpenStruct.new(type: :replace_select_options,
                                     dom_id: 'rmt_bin_rmt_material_owner_party_role_id',
                                     options_array: [])

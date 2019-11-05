@@ -13,17 +13,17 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:show_nett_weight] = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION == 'true'
-      @rules[:capture_inner_bins] = AppConst::DELIVERY_CAPTURE_INNER_BINS == 'true' && !@form_object.rmt_inner_container_type_id.nil?
-      @rules[:capture_container_material] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
-      @rules[:capture_container_material_owner] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+      @rules[:show_nett_weight] = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
+      @rules[:capture_inner_bins] = AppConst::DELIVERY_CAPTURE_INNER_BINS && !@form_object.rmt_inner_container_type_id.nil?
+      @rules[:capture_container_material] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+      @rules[:capture_container_material_owner] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
       @rules[:show_rmt_container_material_type_id] = !@form_object.rmt_container_material_type_id.nil?
       @rules[:show_rmt_material_owner_party_role_id] = !@form_object.rmt_material_owner_party_role_id.nil?
       @rules[:show_rmt_inner_container_type_id] = !@form_object.rmt_inner_container_type_id.nil?
       @rules[:show_rmt_inner_container_material_id] = !@form_object.rmt_inner_container_material_id.nil?
 
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::SCAN_RMT_BIN_ASSET_NUMBERS == 'true'
+      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       common_values_for_fields common_fields
 
@@ -151,11 +151,11 @@ module UiRules
     # private
 
     def add_behaviours
-      return unless AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL == 'true'
+      return unless AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
 
       behaviours do |behaviour|
         behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/rmt_container_type_combo_changed' }]
-        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER == 'true'
+        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/raw_materials/deliveries/rmt_bins/container_material_type_combo_changed', param_keys: %i[rmt_bin_rmt_container_material_type_id] }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
       end
     end
   end
