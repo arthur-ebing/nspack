@@ -4,8 +4,8 @@ module MesscadaApp
   class MesscadaInteractor < BaseInteractor # rubocop:disable ClassLength
     def validate_pallet_to_be_verified(pallet_number)
       pallet_sequences = find_pallet_sequences_by_pallet_number(pallet_number)
-      return failed_response("scanned_pallet:#{pallet_number} doesn't exist") if pallet_sequences.empty?
-      return failed_response("scanned_pallet:#{pallet_number} has already been inspected") if pallet_sequences.first[:inspected]
+      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") if pallet_sequences.empty?
+      return failed_response("Scanned Pallet:#{pallet_number} has already been inspected") if pallet_sequences.first[:inspected]
 
       success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     end
