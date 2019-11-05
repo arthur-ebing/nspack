@@ -8,10 +8,10 @@ module RmdHelpers
   end
 
   def rmd_warning_message(str)
-    %(<span class="olive">#{str}</span>)
+    %(<span class="light-purple">#{str}</span>)
   end
 
   def rmd_error_message(str)
-    %(<span class="brown">#{str}</span>)
+    %(<span class="red">#{str}</span>)
   end
 end

@@ -414,7 +414,7 @@ module Crossbeams
     end
 
     def error_section
-      show_hide = form_state[:error_message] ? '' : ' style="display:none"'
+      show_hide = form_state[:error_message] ? '' : ' hidden'
       <<~HTML
         <div id="rmd-error" class="brown bg-washed-red ba b--light-red pa3 mw6"#{show_hide}>
           #{form_state[:error_message]}
