@@ -36,8 +36,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
   # carton verification
-  CARTONS_IS_PALLETS = ENV['CARTONS_IS_PALLETS']
-  PROVIDE_PACK_TYPE_AT_VERIFICATION = ENV['PROVIDE_PACK_TYPE_AT_VERIFICATION']
+  CARTONS_IS_PALLETS = make_boolean('CARTONS_IS_PALLETS')
+  PROVIDE_PACK_TYPE_AT_VERIFICATION = make_boolean('PROVIDE_PACK_TYPE_AT_VERIFICATION')
 
   # General
   DEFAULT_KEY = 'DEFAULT'
@@ -85,7 +85,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Defaults for Packaging
   DEFAULT_FG_PACKAGING_TYPE = ENV['DEFAULT_FG_PACKAGING_TYPE']
-  REQUIRE_PACKAGING_BOM = ENV['REQUIRE_PACKAGING_BOM']
+  REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
 
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'

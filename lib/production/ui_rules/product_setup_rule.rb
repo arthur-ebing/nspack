@@ -10,7 +10,7 @@ module UiRules
       apply_form_values
 
       @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
-      @rules[:require_packaging_bom] = (AppConst::REQUIRE_PACKAGING_BOM == 'true')
+      @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
 
       common_values_for_fields common_fields
 

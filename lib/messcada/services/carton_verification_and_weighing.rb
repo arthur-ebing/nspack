@@ -15,8 +15,8 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
-      @carton_is_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
-      @provide_pack_type = (AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION == 'true')
+      @carton_is_pallet = AppConst::CARTONS_IS_PALLETS
+      @provide_pack_type = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       @plant_resource_button_indicator = resource_code.split('-').last
 
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?

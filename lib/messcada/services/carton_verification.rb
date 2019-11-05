@@ -13,7 +13,7 @@ module MesscadaApp
     def call
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_quantity = 1
-      @carton_is_pallet = (AppConst::CARTONS_IS_PALLETS == 'true')
+      @carton_is_pallet = AppConst::CARTONS_IS_PALLETS
       return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
       res = create_carton
