@@ -75,7 +75,7 @@ class Nspack < Roda
         if @registered_mobile_device
           form = Crossbeams::RMDForm.new({},
                                          form_name: :camera_scan,
-                                         notes: "The camera scan option is #{@rmd_scan_with_camera ? 'ON' : 'OFF'}",
+                                         notes: rmd_info_message("The camera scan option is #{@rmd_scan_with_camera ? 'ON' : 'OFF'}"),
                                          scan_with_camera: @rmd_scan_with_camera,
                                          caption: 'Toggle camera scan',
                                          action: '/rmd/utilities/toggle_camera',

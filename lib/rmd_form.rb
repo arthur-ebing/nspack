@@ -68,7 +68,7 @@ module Crossbeams
       autofocus = autofocus_for_field(name)
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left">#{label}#{field_error_message}</th>
-        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{form_state[name]}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
+        <td><div class="rmdScanFieldGroup"><input class="pa2#{field_error_class}#{field_upper_class(options)}" id="#{form_name}_#{name}" type="#{data_type}"#{decimal_or_int(data_type, options)} name="#{form_name}[#{name}]" placeholder="#{for_scan}#{label}"#{scan_opts(options)} #{render_behaviours} style="width:#{width}rem;" value="#{field_value(form_state[name])}"#{required}#{autofocus}#{lookup_data(options)}#{submit_form(options)}#{set_readonly(form_state[name], for_scan)}#{attr_upper(options)}>#{clear_button(for_scan)}</div>#{hidden_scan_type(name, options)}#{lookup_display(name, options)}
         </td></tr>
       HTML
     end
@@ -116,7 +116,7 @@ module Crossbeams
     def add_label(name, label, value, hidden_value = nil, options = {})
       @fields << <<~HTML
         <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
-        <td><div class="pa2 bg-moon-gray br2">#{value || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
+        <td><div class="pa2 bg-moon-gray br2">#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
     end
@@ -270,6 +270,12 @@ module Crossbeams
     end
 
     private
+
+    def field_value(value)
+      return value.to_s('F') if value.is_a?(BigDecimal)
+
+      value
+    end
 
     def initial_visibilty(options)
       return '' unless options[:hide_on_load]
@@ -484,6 +490,9 @@ module Crossbeams
       <<~HTML
         <button id="cameraScan" type="button" class="dim br2 pa3 bn white bg-blue">
           #{Crossbeams::Layout::Icon.render(:camera)} Scan with camera
+        </button>
+        <button id="cameraLight" type="button" class="dim br2 pa3 bn white bg-blue">
+          #{Crossbeams::Layout::Icon.render(:show)} Light On/Off
         </button>
       HTML
     end
