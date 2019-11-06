@@ -87,15 +87,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
 
           # check if load_container exists
-          load_container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
-          unless load_container_id.nil?
-            form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container(load_container_id).to_h)
+          container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
+          unless container_id.nil?
+            form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container(container_id).to_h)
             form_state[:container] = 'true'
           end
 
           # check if load_vehicle exists
-          load_vehicles_id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
-          form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(load_vehicles_id).to_h) unless load_vehicles_id.nil?
+          vehicle_id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicles_by_load(load_id)
+          form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(vehicle_id).to_h) unless vehicle_id.nil?
 
           # override if redirect from error
           res = retrieve_from_local_store(:res)
@@ -120,8 +120,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                       notify: [{ url: "/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}/container_changed" }]
           end
           form.add_label(:load_id, 'Load', load_id, load_id)
-          form.add_label(:load_vehicles_id, 'load_vehicle_id', load_vehicles_id, load_vehicles_id, hide_on_load: true)
-          form.add_label(:load_container_id, 'load_container_id', load_container_id, load_container_id, hide_on_load: true)
+          form.add_label(:vehicle_id, 'vehicle_id', vehicle_id, vehicle_id, hide_on_load: true)
+          form.add_label(:container_id, 'container_id', container_id, container_id, hide_on_load: true)
           form.add_field(:vehicle_number,
                          'Vehicle Number',
                          data_type: 'string',
@@ -150,7 +150,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           'Container',
                           value: form_state[:container],
                           items: [['No', false], ['Yes', true]])
-
+          form.add_section_header(rmd_info_message('Container Info'),
+                                  id:'container_info_section',
+                                  hide_on_load: true)
           form.add_field(:container_code,
                          'Container Code',
                          data_type: 'string',
@@ -238,45 +240,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           attrs = params[:load]
-          load_id = attrs[:load_id]
-          load_container_id = attrs[:load_container_id]
-          has_container = attrs[:container] == 'true'
-          message = []
-          interactor = FinishedGoodsApp::LoadContainerInteractor.new(current_user, {}, { route_url: request.path }, {})
-
-          # create or edit load_container record
-          if has_container
-            id = attrs[:load_container_id]
-            res = id.nil_or_empty? ? interactor.create_load_container(attrs) : interactor.update_load_container(id, attrs)
-
-            if res.success
-              message << res.message
-            else
-              res.instance = attrs
-              store_locally(:res, res)
-              r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
-            end
-          end
-
-          # delete load_container record
-          if !load_container_id.nil_or_empty? & !has_container
-            res = interactor.delete_load_container(load_container_id)
-            message << res.message
-          end
-
-          # create or edit load_vehicle record
           interactor = FinishedGoodsApp::LoadVehicleInteractor.new(current_user, {}, { route_url: request.path }, {})
-          id = attrs[:load_vehicles_id]
-          res = id.nil_or_empty? ? interactor.create_load_vehicle(attrs) : interactor.update_load_vehicle(id, attrs)
+          res = interactor.load_vehicle_service(attrs)
 
           if res.success
-            message << res.message
-            store_locally(:flash_notice, rmd_success_message(message.uniq.join(',  ')))
+            store_locally(:flash_notice, rmd_success_message(res.message))
             r.redirect('/rmd/dispatch/truck_arrival/load')
           else
             res.instance = attrs
             store_locally(:res, res)
-            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{load_id}")
+            r.redirect("/rmd/dispatch/truck_arrival/load_vehicles/#{attrs[:load_id]}")
           end
         end
       end
