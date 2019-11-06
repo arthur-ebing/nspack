@@ -7,5 +7,6 @@ module MasterfilesApp
     optional(:id, :integer).filled(:int?)
     required(:scrap_reason, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
+    optional(:applies_to_pallets, :bool).maybe(:bool?)
   end
 end

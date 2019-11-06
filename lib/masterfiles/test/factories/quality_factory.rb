@@ -14,7 +14,8 @@ module MasterfilesApp
       default = {
         scrap_reason: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        applies_to_pallets: false
       }
       DB[:scrap_reasons].insert(default.merge(opts))
     end

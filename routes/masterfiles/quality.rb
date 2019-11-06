@@ -95,7 +95,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do     # UPDATE
           res = interactor.update_scrap_reason(id, params[:scrap_reason])
           if res.success
-            update_grid_row(id, changes: { scrap_reason: res.instance[:scrap_reason], description: res.instance[:description] },
+            update_grid_row(id, changes: { scrap_reason: res.instance[:scrap_reason], description: res.instance[:description], applies_to_pallets: res.instance[:applies_to_pallets] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::ScrapReason::Edit.call(id, form_values: params[:scrap_reason], form_errors: res.errors) }
@@ -128,6 +128,7 @@ class Nspack < Roda # rubocop:disable ClassLength
             scrap_reason
             description
             active
+            applies_to_pallets
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

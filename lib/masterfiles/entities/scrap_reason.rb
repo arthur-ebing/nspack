@@ -6,5 +6,6 @@ module MasterfilesApp
     attribute :scrap_reason, Types::String
     attribute :description, Types::String
     attribute? :active, Types::Bool
+    attribute :applies_to_pallets, Types::Bool
   end
 end

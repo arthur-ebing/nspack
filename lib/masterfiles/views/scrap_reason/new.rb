@@ -18,6 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :scrap_reason
               form.add_field :description
+              form.add_field :applies_to_pallets
             end
           end
 

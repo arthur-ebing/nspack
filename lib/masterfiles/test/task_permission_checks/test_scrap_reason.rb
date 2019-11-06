@@ -11,7 +11,8 @@ module MasterfilesApp
         id: 1,
         scrap_reason: Faker::Lorem.unique.word,
         description: 'ABC',
-        active: true
+        active: true,
+        applies_to_pallets: true
       }
       MasterfilesApp::ScrapReason.new(base_attrs.merge(attrs))
     end

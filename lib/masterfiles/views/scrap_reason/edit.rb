@@ -4,7 +4,7 @@ module Masterfiles
   module Quality
     module ScrapReason
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:scrap_reason, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :scrap_reason
               form.add_field :description
+              form.add_field :applies_to_pallets
             end
           end
 
