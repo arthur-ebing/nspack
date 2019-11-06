@@ -42,7 +42,7 @@ module MesscadaApp
       begin
         repo.transaction do
           MesscadaApp::CartonVerification.new(params).call
-          update_carton(carton_label_carton_id, update_attrs)
+          update_carton(carton_label_carton_id, update_attrs) if provide_pack_type
         end
 
         ok_response

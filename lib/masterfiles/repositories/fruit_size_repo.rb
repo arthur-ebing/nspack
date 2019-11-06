@@ -136,6 +136,7 @@ module MasterfilesApp
       DB[:system_resources]
         .join(:system_resource_types, id: :system_resource_type_id)
         .where(system_resource_type_code: plant_resource_type_code)
+        .distinct
         .select(
           :system_resource_code
         ).map { |r| bis << r[:system_resource_code].split('-').last }
