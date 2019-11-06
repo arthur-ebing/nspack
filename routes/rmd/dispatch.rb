@@ -151,7 +151,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           value: form_state[:container],
                           items: [['No', false], ['Yes', true]])
           form.add_section_header(rmd_info_message('Container Info'),
-                                  id:'container_info_section',
+                                  id: 'container_info_section',
                                   hide_on_load: true)
           form.add_field(:container_code,
                          'Container Code',
