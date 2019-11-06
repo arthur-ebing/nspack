@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-label_designer.git
-  revision: beae8841910f87a34779021606ce5ffa0b905e66
+  revision: d64098befcf4a45112ffdf0c763d8b9134f362ba
   specs:
     crossbeams-label_designer (0.2.3)
       dry-configurable
@@ -78,7 +78,7 @@ GEM
     daemons (1.3.1)
     diffy (3.3.0)
     dotenv (2.7.2)
-    dry-configurable (0.8.3)
+    dry-configurable (0.9.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.7)
     dry-container (0.7.1)
@@ -111,7 +111,7 @@ GEM
       dry-equalizer (~> 0.2)
       dry-logic (~> 0.5, >= 0.5.0)
       dry-types (~> 0.14, >= 0.14)
-    erubi (1.8.0)
+    erubi (1.9.0)
     erubis (2.7.0)
     eventmachine (1.2.7)
     faker (1.9.3)
