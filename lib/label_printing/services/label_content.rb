@@ -45,7 +45,7 @@ module LabelPrintingApp
       when /\ACMP:/
         make_composite(resolver.delete_prefix('CMP:'))
       else
-        instance[resolver.to_sym]
+        format_print_str(instance[resolver.to_sym])
       end
     end
 
@@ -88,6 +88,13 @@ module LabelPrintingApp
       else
         "$:#{field_name}$"
       end
+    end
+
+    # Reformat BigDecimal to avoid printing scientific notation.
+    def format_print_str(value)
+      return value.to_s('F') if value.is_a?(BigDecimal)
+
+      value
     end
   end
 end

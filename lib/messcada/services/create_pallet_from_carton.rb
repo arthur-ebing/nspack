@@ -56,9 +56,7 @@ module MesscadaApp
       res = create_pallet_sequence
       return res unless res.success
 
-      repo.transaction do
-        repo.create_pallet_and_sequences(pallet, pallet_sequence)
-      end
+      repo.create_pallet_and_sequences(pallet, pallet_sequence)
 
       ok_response
     rescue Crossbeams::InfoError => e

@@ -128,6 +128,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Label names for barcode printing:
   LABEL_LOCATION_BARCODE = 'NSPACK_LOCATION'
   LABEL_BIN_BARCODE = 'MAIN_BIN'
+  LABEL_CARTON_VERIFICATION = 'BIN_VERIFICATION'
 
   # Printers
   PRINTER_USE_INDUSTRIAL = 'INDUSTRIAL'

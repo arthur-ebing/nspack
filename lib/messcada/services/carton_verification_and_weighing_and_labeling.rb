@@ -2,11 +2,13 @@
 
 module MesscadaApp
   class CartonVerificationAndWeighingAndLabeling < BaseService
-    attr_reader :repo, :carton_label_id, :resource_code, :gross_weight, :uom, :params
+    attr_reader :repo, :carton_label_id, :resource_code, :gross_weight, :uom, :params, :request_ip
 
-    def initialize(params)
+    def initialize(params, request_ip)
       @carton_label_id = params[:carton_number]
       @params = params.to_h.merge(carton_and_pallet_verification: false)
+      @uom = params[:measurement_unit]
+      @request_ip = request_ip
     end
 
     def call
@@ -27,10 +29,8 @@ module MesscadaApp
     end
 
     def carton_verification_and_weighing_and_labeling
-      repo.transaction do
-        MesscadaApp::CartonVerificationAndWeighing.new(params).call
-        print_carton_nett_weight_label(carton_label_carton_id)
-      end
+      MesscadaApp::CartonVerificationAndWeighing.new(params).call
+      print_carton_nett_weight_label(carton_label_carton_id)
 
       ok_response
     rescue Crossbeams::InfoError => e
@@ -45,8 +45,9 @@ module MesscadaApp
       instance = carton(id)
       attrs = { gross_weight: instance[:gross_weight],
                 nett_weight: instance[:nett_weight],
-                uom: uom }
-      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_BIN_BARCODE, instance, attrs)
+                weighed_date: Date.today.strftime('%Y-%m-%d'),
+                uom_code: uom }
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_CARTON_VERIFICATION, instance.to_h.merge(attrs), { quantity: 1 }, request_ip)
     end
 
     def carton(id)

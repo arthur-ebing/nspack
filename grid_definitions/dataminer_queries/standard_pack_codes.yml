@@ -1,7 +1,7 @@
 ---
 :caption: Standard Pack Codes
-:sql: SELECT "standard_pack_codes"."id", "standard_pack_codes"."standard_pack_code", "standard_pack_codes"."description",
-  "standard_pack_codes"."material_mass", "standard_pack_codes"."plant_resource_button_indicator",
+:sql: SELECT "standard_pack_codes"."id", "standard_pack_codes"."standard_pack_code",
+  "standard_pack_codes"."description", "standard_pack_codes"."material_mass", "standard_pack_codes"."plant_resource_button_indicator",
   "standard_pack_codes"."created_at", "standard_pack_codes"."updated_at", "standard_pack_codes"."active"
   FROM "standard_pack_codes"
 :limit: 
@@ -61,7 +61,7 @@
     :sequence_no: 4
     :caption: Material mass
     :namespaced_name: standard_pack_codes.material_mass
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false

@@ -28,19 +28,15 @@ module MesscadaApp
       repo.carton_label_carton_exists?(carton_label_id)
     end
 
-    def create_carton  # rubocop:disable Metrics/AbcSize
+    def create_carton
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
-      begin
-        repo.transaction do
-          id = DB[:cartons].insert(carton_params)
-          MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
-        end
+      id = DB[:cartons].insert(carton_params)
+      MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
 
-        ok_response
-      rescue Crossbeams::InfoError => e
-        failed_response(e.message)
-      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def carton_label_carton_params

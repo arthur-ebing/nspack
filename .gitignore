@@ -19,6 +19,7 @@ public/assets/*.*
 public/downloads/jasper/*.*
 public/js/ag-enterprise-activation.js
 public/tempfiles/*
+.rake_t_cache
 
 # Used by dotenv library to load environment variables.
 .env.local

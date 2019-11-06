@@ -1,57 +1,62 @@
 ---
 :caption: Cartons
-:sql: SELECT COALESCE(cartons.id, carton_labels.id) AS carton_id, carton_labels.production_run_id, carton_labels.created_at AS label_created_at,
-  ABS(date_part('epoch', current_timestamp - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS carton_verified_at,
-  ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int AS carton_age_hrs,
-  packhouses.plant_resource_code AS packhouse, lines.plant_resource_code AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code AS print_device,
-  carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code AS puc, orchards.orchard_code AS orchard, commodities.code as commodity,
-  cultivar_groups.cultivar_group_code AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code AS variety,
-  cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value AS std_size, fruit_size_references.size_reference AS size_ref,
-  fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack,
-  standard_pack_codes.standard_pack_code AS std_pack, fn_party_role_name(carton_labels.marketing_org_party_role_id) AS marketer,
-  marks.mark_code AS mark, inventory_codes.inventory_code, carton_labels.product_resource_allocation_id AS resource_allocation_id,
-  product_resource_allocations.product_setup_id, product_setup_templates.template_name AS product_setup_template, pm_boms.bom_code AS pm_bom,
-  (SELECT array_agg(clt.treatment_code) FROM
-  (SELECT t.treatment_code FROM treatments t JOIN carton_labels cl ON t.id = ANY (cl.treatment_ids) WHERE cl.id = carton_labels.id ORDER BY t.treatment_code DESC) AS clt) AS treatments,
-  carton_labels.client_size_reference AS client_size_ref, carton_labels.client_product_code, carton_labels.marketing_order_number,
-  target_market_groups.target_market_group_name AS packed_tm_group, seasons.season_code, pm_subtypes.subtype_code, pm_types.pm_type_code,
-  cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight, cartons.nett_weight, carton_labels.pick_ref,
-  CASE WHEN EXISTS(SELECT id FROM cartons WHERE cartons.carton_label_id= carton_labels.id) THEN 'ok' ELSE NULL END AS colour_rule
-  FROM carton_labels
-  LEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id
-  JOIN production_runs ON production_runs.id = carton_labels.production_run_id
-  JOIN product_resource_allocations ON product_resource_allocations.id = carton_labels.product_resource_allocation_id
-  JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
-  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
-  JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
-  JOIN plant_resources lines ON lines.id = carton_labels.production_line_id
-  JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id
-  JOIN system_resources ON packpoints.system_resource_id = system_resources.id
-  JOIN farms ON farms.id = carton_labels.farm_id
-  JOIN pucs ON pucs.id = carton_labels.puc_id
-  JOIN orchards ON orchards.id = carton_labels.orchard_id
-  JOIN cultivar_groups ON cultivar_groups.id = carton_labels.cultivar_group_id
-  LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
-  LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
-  JOIN marketing_varieties ON marketing_varieties.id = carton_labels.marketing_variety_id
-  LEFT JOIN customer_variety_varieties ON customer_variety_varieties.id = carton_labels.customer_variety_variety_id
-  LEFT JOIN marketing_varieties cvv ON cvv.id = customer_variety_varieties.marketing_variety_id
-  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = carton_labels.std_fruit_size_count_id
-  LEFT JOIN fruit_size_references ON fruit_size_references.id = carton_labels.fruit_size_reference_id
-  LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = carton_labels.fruit_actual_counts_for_pack_id
-  JOIN basic_pack_codes ON basic_pack_codes.id = carton_labels.basic_pack_code_id
-  JOIN standard_pack_codes ON standard_pack_codes.id = carton_labels.standard_pack_code_id
-  JOIN marks ON marks.id = carton_labels.mark_id
-  JOIN inventory_codes ON inventory_codes.id = carton_labels.inventory_code_id
-  LEFT JOIN pm_boms ON pm_boms.id = carton_labels.pm_bom_id
-  LEFT JOIN pm_subtypes ON pm_subtypes.id = carton_labels.pm_subtype_id
-  LEFT JOIN pm_types ON pm_types.id = carton_labels.pm_type_id
-  JOIN target_market_groups ON target_market_groups.id = carton_labels.packed_tm_group_id
-  JOIN seasons ON seasons.id = carton_labels.season_id
-  JOIN cartons_per_pallet ON cartons_per_pallet.id = carton_labels.cartons_per_pallet_id
-  LEFT JOIN pm_products ON pm_products.id = carton_labels.fruit_sticker_pm_product_id
-  JOIN pallet_formats ON pallet_formats.id = carton_labels.pallet_format_id
-  ORDER BY carton_labels.created_at DESC
+:sql: "SELECT COALESCE(cartons.id, carton_labels.id) AS carton_id, carton_labels.production_run_id,
+  carton_labels.created_at AS label_created_at, ABS(date_part('epoch', current_timestamp
+  - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS
+  carton_verified_at, ABS(date_part('epoch', current_timestamp - cartons.created_at)
+  / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code AS packhouse, lines.plant_resource_code
+  AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code
+  AS print_device, carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code
+  AS puc, orchards.orchard_code AS orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code
+  AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
+  AS variety, cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value
+  AS std_size, fruit_size_references.size_reference AS size_ref, fruit_actual_counts_for_packs.actual_count_for_pack
+  AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack, standard_pack_codes.standard_pack_code
+  AS std_pack, fn_party_role_name(carton_labels.marketing_org_party_role_id) AS marketer,
+  marks.mark_code AS mark, inventory_codes.inventory_code, carton_labels.product_resource_allocation_id
+  AS resource_allocation_id, product_resource_allocations.product_setup_id, product_setup_templates.template_name
+  AS product_setup_template, pm_boms.bom_code AS pm_bom, (SELECT array_agg(clt.treatment_code)
+  FROM (SELECT t.treatment_code FROM treatments t JOIN carton_labels cl ON t.id =
+  ANY (cl.treatment_ids) WHERE cl.id = carton_labels.id ORDER BY t.treatment_code
+  DESC) AS clt) AS treatments, carton_labels.client_size_reference AS client_size_ref,
+  carton_labels.client_product_code, carton_labels.marketing_order_number, target_market_groups.target_market_group_name
+  AS packed_tm_group, seasons.season_code, pm_subtypes.subtype_code, pm_types.pm_type_code,
+  cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight,
+  cartons.nett_weight, carton_labels.pick_ref, CASE WHEN EXISTS(SELECT id FROM cartons
+  WHERE cartons.carton_label_id= carton_labels.id) THEN 'ok' ELSE NULL END AS colour_rule,
+  cartons.carton_label_id\r\nFROM carton_labels \r\nLEFT JOIN cartons ON carton_labels.id
+  = cartons.carton_label_id \r\nJOIN production_runs ON production_runs.id = carton_labels.production_run_id
+  \r\nLEFT JOIN product_resource_allocations ON product_resource_allocations.id =
+  carton_labels.product_resource_allocation_id \r\nLEFT JOIN product_setups ON product_setups.id
+  = product_resource_allocations.product_setup_id\r\nJOIN product_setup_templates
+  ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
+  plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
+  \r\nJOIN plant_resources lines ON lines.id = carton_labels.production_line_id \r\nLEFT
+  JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id \r\nLEFT
+  JOIN system_resources ON packpoints.system_resource_id = system_resources.id \r\nJOIN
+  farms ON farms.id = carton_labels.farm_id \r\nJOIN pucs ON pucs.id = carton_labels.puc_id
+  \r\nJOIN orchards ON orchards.id = carton_labels.orchard_id \r\nJOIN cultivar_groups
+  ON cultivar_groups.id = carton_labels.cultivar_group_id \r\nLEFT JOIN cultivars
+  ON cultivars.id = carton_labels.cultivar_id \r\nLEFT JOIN commodities ON commodities.id
+  = cultivars.commodity_id \r\nJOIN marketing_varieties ON marketing_varieties.id
+  = carton_labels.marketing_variety_id \r\nLEFT JOIN customer_variety_varieties ON
+  customer_variety_varieties.id = carton_labels.customer_variety_variety_id \r\nLEFT
+  JOIN marketing_varieties cvv ON cvv.id = customer_variety_varieties.marketing_variety_id
+  \r\nLEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = carton_labels.std_fruit_size_count_id
+  \r\nLEFT JOIN fruit_size_references ON fruit_size_references.id = carton_labels.fruit_size_reference_id
+  \r\nLEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id
+  = carton_labels.fruit_actual_counts_for_pack_id JOIN basic_pack_codes ON basic_pack_codes.id
+  = carton_labels.basic_pack_code_id \r\nJOIN standard_pack_codes ON standard_pack_codes.id
+  = carton_labels.standard_pack_code_id \r\nJOIN marks ON marks.id = carton_labels.mark_id
+  \r\nJOIN inventory_codes ON inventory_codes.id = carton_labels.inventory_code_id
+  \r\nLEFT JOIN pm_boms ON pm_boms.id = carton_labels.pm_bom_id \r\nLEFT JOIN pm_subtypes
+  ON pm_subtypes.id = carton_labels.pm_subtype_id \r\nLEFT JOIN pm_types ON pm_types.id
+  = carton_labels.pm_type_id \r\nJOIN target_market_groups ON target_market_groups.id
+  = carton_labels.packed_tm_group_id \r\nJOIN seasons ON seasons.id = carton_labels.season_id\r\nJOIN
+  cartons_per_pallet ON cartons_per_pallet.id = carton_labels.cartons_per_pallet_id
+  \r\nLEFT JOIN pm_products ON pm_products.id = carton_labels.fruit_sticker_pm_product_id
+  \r\nJOIN pallet_formats ON pallet_formats.id = carton_labels.pallet_format_id \r\nORDER
+  BY carton_labels.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -80,7 +85,7 @@
     :sequence_no: 2
     :caption: Production run
     :namespaced_name: carton_labels.production_run_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -96,7 +101,7 @@
     :sequence_no: 3
     :caption: Label created at
     :namespaced_name: carton_labels.created_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
@@ -112,7 +117,7 @@
     :sequence_no: 4
     :caption: Label age hrs
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
@@ -128,7 +133,7 @@
     :sequence_no: 5
     :caption: Carton verified at
     :namespaced_name: cartons.created_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
@@ -144,7 +149,7 @@
     :sequence_no: 6
     :caption: Carton age hrs
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
@@ -688,7 +693,7 @@
     :sequence_no: 40
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet.cartons_per_pallet
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -720,7 +725,7 @@
     :sequence_no: 42
     :caption: Gross weight
     :namespaced_name: cartons.gross_weight
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
@@ -736,7 +741,7 @@
     :sequence_no: 43
     :caption: Nett weight
     :namespaced_name: cartons.nett_weight
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
@@ -772,6 +777,22 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_label_id:
+    :name: carton_label_id
+    :sequence_no: 46
+    :caption: Carton label
+    :namespaced_name: cartons.carton_label_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

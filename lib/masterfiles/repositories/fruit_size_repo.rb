@@ -132,15 +132,13 @@ module MasterfilesApp
     end
 
     def for_select_plant_resource_button_indicator(plant_resource_type_code)
-      bis = []
-      DB[:system_resources]
-        .join(:system_resource_types, id: :system_resource_type_id)
-        .where(system_resource_type_code: plant_resource_type_code)
-        .distinct
-        .select(
-          :system_resource_code
-        ).map { |r| bis << r[:system_resource_code].split('-').last }
-      bis
+      query = <<~SQL
+        SELECT DISTINCT substring("system_resource_code"  from '..$') AS button
+        FROM "system_resources"
+        INNER JOIN "system_resource_types" ON ("system_resource_types"."id" = "system_resources"."system_resource_type_id")
+        WHERE ("system_resource_type_code" = ?)
+      SQL
+      DB[query, plant_resource_type_code].select_map(:button)
     end
   end
 end

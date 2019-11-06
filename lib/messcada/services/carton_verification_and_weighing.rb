@@ -39,16 +39,12 @@ module MesscadaApp
         return failed_response("Button Indicator for button:#{plant_resource_button_indicator} referenced by more than 1 Standard Pack Code") unless one_standard_pack_code?
       end
 
-      begin
-        repo.transaction do
-          MesscadaApp::CartonVerification.new(params).call
-          update_carton(carton_label_carton_id, update_attrs) if provide_pack_type
-        end
+      MesscadaApp::CartonVerification.new(params).call
+      update_carton(carton_label_carton_id, update_attrs) if provide_pack_type
 
-        ok_response
-      rescue Crossbeams::InfoError => e
-        failed_response(e.message)
-      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def standard_pack_code_exists?
