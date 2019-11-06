@@ -48,4 +48,50 @@ class TestRMDForm < Minitest::Test
     form = make_form({}, action: nil, button_initially_hidden: true)
     assert_match(/data-rmd-btn="Y" hidden>/, form.render)
   end
+
+  def test_section_header
+    form = make_form
+    form.add_section_header('test')
+    assert_match(/>test<\/td/, form.render)
+    assert_match(/id="sh_#{'test'.hash}"/, form.render)
+
+    form = make_form
+    form.add_section_header('test', id: 'this_id_instead')
+    refute_match(/id="sh_#{'test'.hash}"/, form.render)
+    assert_match(/id="this_id_instead"/, form.render)
+  end
+
+  def test_hide_on_load
+    form = make_form
+    form.add_section_header('test')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_section_header('test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_field('test', 'Test', {})
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_field('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_label('test', 'Test', 'abc', nil, hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_select('test', 'Test', {})
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_select('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+  end
 end

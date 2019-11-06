@@ -399,7 +399,7 @@ form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Be
 
 |===
 
-== Method: add_section_header
+=== Method: add_section_header
 
 Renders a caption in bold to denote a section of the form.
 
@@ -415,6 +415,19 @@ form.add_section_header('The next part of the form')
 |The text to render as the section caption.
 |String
 |None. Required.
+
+|options - :id
+|The DOM id of the table row. Use this to dynamically hide/show.
+|String
+|The hash of the `caption` value prefixed with `sh_`.
+
+|options - :hide_on_load
+a|Should the section be hidden when the form loads - typically to be shown later via a behaviour.
+
+Note: the table row (`tr`) is hidden, the id of the row must be provided with the `:id` option.
+|Boolean
+|`false`
+
 |===
 
 == Testing

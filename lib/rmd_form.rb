@@ -52,9 +52,11 @@ module Crossbeams
     # @param label [string] the caption for the label to appear beside the input.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @option options [String] :data_type the input type. Defaults to 'text'.
     # @option options [Integer] :width the input with in rem. Defaults to 12.
     # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
+    # @option options [Boolean] :submit_form Should the form be submitted automatically after a scan result is placed in theis field?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
@@ -83,6 +85,7 @@ module Crossbeams
     # @param label [string] the caption for the label to appear beside the select.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @option options [String] :value the selected value.
     # @option options [String,Boolean] :prompt if true, display a generic prompt. If a string, display the string as prompt.
     # @option options [Array,Hash] :items the select options.
@@ -112,6 +115,8 @@ module Crossbeams
     # @param label [string] the caption for the label to appear beside the input.
     # @param value [string] the value to be displayed in the label.
     # @param hidden_value [string] the value of the hidden field. If nil, no hidden field will be generated.
+    # @param options (Hash) options for the field
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
     def add_label(name, label, value, hidden_value = nil, options = {})
       @fields << <<~HTML
@@ -124,12 +129,16 @@ module Crossbeams
     # Render a section caption in bold that takes up the width of the table.
     #
     # @param caption [string] the caption for the section.
+    # @param options (Hash) options for the header
+    # @option options [String] :id the DOM id of the element
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
-    def add_section_header(caption)
+    def add_section_header(caption, options = {})
       raise ArgumentError, 'Section header caption cannot be blank' if caption.nil_or_empty?
 
+      id = options[:id] || "sh_#{caption.hash}"
       @fields << <<~HTML
-        <tr>
+        <tr id="#{id}"#{initial_visibilty(options)}>
           <td colspan="2" class="b mid-gray">#{caption}</td>
         </tr>
       HTML
