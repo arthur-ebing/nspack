@@ -255,7 +255,7 @@ module UiRules
     end
   end
 
-  class BaseChangeRenderer
+  class BaseChangeRenderer # rubocop:disable Metrics/ClassLength
     attr_reader :router, :options, :params
     def initialize(router, options)
       @router = router
@@ -324,6 +324,14 @@ module UiRules
         OpenStruct.new(type: :set_readonly,
                        dom_id: act[:dom_id],
                        readonly: act[:readonly])
+      end
+    end
+
+    def set_required(actions) # rubocop:disable Naming/AccessorMethodName
+      actions.map do |act|
+        OpenStruct.new(type: :set_required,
+                       dom_id: act[:dom_id],
+                       required: act[:required])
       end
     end
 
