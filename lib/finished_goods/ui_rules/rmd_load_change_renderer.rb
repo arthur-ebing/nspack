@@ -5,8 +5,11 @@ module UiRules
     def change_container_use # rubocop:disable Metrics/AbcSize
       container = options[:use_container]
 
-      key = container ? :show_element : :hide_element
-      actions = %w[load_container_code_row
+      actions = {}
+      actions[:change_select_value] = [{ dom_id: 'load_container', value: container }]
+
+      # hide show if container
+      row_ids = %w[container_info_section
                    load_container_code_row
                    load_container_vents_row
                    load_container_seal_code_row
@@ -18,25 +21,40 @@ module UiRules
                    load_stack_type_id_row
                    load_verified_gross_weight_row
                    load_verified_gross_weight_date_row]
-
       if AppConst::VGM_REQUIRED
-        actions <<  'load_tare_weight_row'
-        actions <<  'load_max_payload_row'
-        actions <<  'load_actual_payload_row'
+        row_ids <<  'load_tare_weight_row'
+        row_ids <<  'load_max_payload_row'
+        row_ids <<  'load_actual_payload_row'
       end
+      actions[container ? :show_element : :hide_element] = row_ids.map { |a| { dom_id: a } }
 
-      container_actions = {}
+      # test delete flash warning
       load_container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(options[:load_id])
       unless load_container_id.nil?
-        error_key = container ? :hide_element : :show_element
-        value = container ? '' : 'Container info will be lost'
-        container_actions = { error_key => [{ dom_id: 'rmd-error' }],
-                              replace_inner_html: [{ dom_id: 'rmd-error', value: value }] }
+        if container
+          actions[:hide_element] = [{ dom_id: 'rmd-error' }]
+          actions[:replace_inner_html] = [{ dom_id: 'rmd-error', value: '' }]
+        else
+          actions[:show_element] = [{ dom_id: 'rmd-error' }]
+          actions[:replace_inner_html] = [{ dom_id: 'rmd-error', value: 'Container info will be lost' }]
+        end
       end
 
-      build_actions(container_actions.merge(key => actions.map { |a| { dom_id: a } },
-                                            change_select_value: [{ dom_id: 'load_container',
-                                                                    value: container }]))
+      # set_required
+      req_ids = %w[load_container_code
+                   load_container_temperature_rhine
+                   load_max_gross_weight
+                   load_cargo_temperature_id
+                   load_stack_type_id
+                   load_verified_gross_weight
+                   load_verified_gross_weight_date]
+      if AppConst::VGM_REQUIRED
+        req_ids <<  'load_tare_weight'
+        req_ids <<  'load_max_payload'
+        req_ids <<  'load_actual_payload'
+      end
+      actions[:set_required] = req_ids.map { |a| { dom_id: a, required: container } }
+      build_actions(actions)
     end
   end
 end

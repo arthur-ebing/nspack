@@ -11,5 +11,6 @@ module FinishedGoodsApp
     required(:vehicle_number, Types::StrippedString).filled(:str?)
     optional(:vehicle_weight_out, %i[nil decimal]).maybe(:decimal?)
     optional(:dispatch_consignment_note_number, Types::StrippedString).maybe(:str?)
+    optional(:vehicle_id, :integer).filled(:int?)
   end
 end
