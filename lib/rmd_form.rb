@@ -75,6 +75,29 @@ module Crossbeams
       HTML
     end
 
+    # Add a toggle (checbox) field to the form.
+    # The field will render as a toggle with name = FORM_NAME[FIELD_NAME]
+    # and id = FORM_NAME_FIELD_NAME.
+    # The value returned in params is 't' or 'f'.
+    #
+    # @param name [string] the name of the form field.
+    # @param label [string] the caption for the label to appear beside the input.
+    # @param options (Hash) options for the field
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
+    # @return [void]
+    def add_toggle(name, label, options = {}) # rubocop:disable Metrics/AbcSize
+      @current_field = name
+      @fields << <<~HTML
+        <tr id="#{form_name}_#{name}_row"#{field_error_state}#{initial_visibilty(options)}><th align="left"><label for="#{form_name}_#{name}">#{label}</label>#{field_error_message}</th>
+        <td>
+            <input name="#{form_name}[#{name}]" type="hidden" value="f">
+          <label class="switch">
+            <input type="checkbox" class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{render_behaviours} value="t"#{checked(field_value(form_state[name]))}><span class="slider round"></span>
+          </label>
+        </td></tr>
+      HTML
+    end
+
     # TODO: Add disabled_items to select
 
     # Add a select box to the form.
@@ -537,6 +560,10 @@ module Crossbeams
     def option_string(text, value, selected)
       sel = selected && value.to_s == selected.to_s ? ' selected ' : ''
       "<option value=\"#{CGI.escapeHTML(value.to_s)}\"#{sel}>#{CGI.escapeHTML(text.to_s)}</option>"
+    end
+
+    def checked(value)
+      value && value != false && value != 'f' && value != 'false' && value.to_s != '0' ? ' checked' : ''
     end
 
     # ---------------------------------------------------------------------------------------------------

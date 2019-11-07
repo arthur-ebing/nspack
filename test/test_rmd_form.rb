@@ -93,5 +93,25 @@ class TestRMDForm < Minitest::Test
     form = make_form
     form.add_select('test', 'Test', hide_on_load: true)
     assert_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_toggle('test', 'Test')
+    refute_match(/<tr id=".+ hidden>/, form.render)
+
+    form = make_form
+    form.add_toggle('test', 'Test', hide_on_load: true)
+    assert_match(/<tr id=".+ hidden>/, form.render)
+  end
+
+  def test_toggle
+    form = make_form
+    form.add_toggle(:test, 'Test')
+    assert_match(/<input type="checkbox"/, form.render)
+    assert_match(/value="t">/, form.render)
+
+    form = make_form(test: 't')
+    form.add_toggle(:test, 'Test')
+    assert_match(/<input type="checkbox"/, form.render)
+    assert_match(/value="t" checked>/, form.render)
   end
 end
