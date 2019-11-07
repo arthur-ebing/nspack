@@ -2,11 +2,10 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :carton_and_pallet_verification
+    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code
 
-    def initialize(params)
+    def initialize(params, carton_and_pallet_verification)
       @carton_label_id = params[:carton_number]
-      @carton_and_pallet_verification = params[:carton_and_pallet_verification]
       @resource_code = params[:device] unless carton_and_pallet_verification
     end
 
@@ -14,9 +13,7 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_quantity = 1
       @carton_is_pallet = AppConst::CARTONS_IS_PALLETS
-      return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
-
-      res = create_carton
+      res = carton_verification
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       ok_response
@@ -24,11 +21,9 @@ module MesscadaApp
 
     private
 
-    def carton_label_carton_exists?
-      repo.carton_label_carton_exists?(carton_label_id)
-    end
+    def carton_verification  # rubocop:disable Metrics/AbcSize
+      return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
 
-    def create_carton
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
       id = DB[:cartons].insert(carton_params)
@@ -37,6 +32,10 @@ module MesscadaApp
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def carton_label_carton_exists?
+      repo.carton_label_carton_exists?(carton_label_id)
     end
 
     def carton_label_carton_params

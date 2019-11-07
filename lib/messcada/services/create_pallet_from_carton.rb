@@ -12,8 +12,6 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
-      return failed_response("Carton / Bin:#{carton_id} not verified") unless carton_exists?
-
       @carton = find_carton
       @cartons_per_pallet = carton_cartons_per_pallet
 
@@ -24,10 +22,6 @@ module MesscadaApp
     end
 
     private
-
-    def carton_exists?
-      repo.carton_exists?(carton_id)
-    end
 
     def find_carton
       repo.find_carton(carton_id)
@@ -50,6 +44,8 @@ module MesscadaApp
     end
 
     def create_pallet_and_sequences
+      return failed_response("Carton / Bin:#{carton_id} not verified") unless carton_exists?
+
       res = create_pallet
       return res unless res.success
 
@@ -61,6 +57,10 @@ module MesscadaApp
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def carton_exists?
+      repo.carton_exists?(carton_id)
     end
 
     def create_pallet

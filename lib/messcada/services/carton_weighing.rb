@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class CartonVerificationAndWeighing < BaseService
+  class CartonWeighing < BaseService
     attr_reader :repo, :carton_is_pallet, :provide_pack_type, :carton_label_id, :resource_code, :gross_weight, :uom,
-                :plant_resource_button_indicator, :params
+                :plant_resource_button_indicator
 
     def initialize(params)
       @carton_label_id = params[:carton_number]
-      @gross_weight = params[:gross_weight]
+      @gross_weight = params[:gross_weight].to_f
       @uom = params[:measurement_unit]
       @resource_code = params[:device]
-      @params = params.to_h.merge(carton_and_pallet_verification: false)
     end
 
     def call
@@ -18,10 +17,7 @@ module MesscadaApp
       @carton_is_pallet = AppConst::CARTONS_IS_PALLETS
       @provide_pack_type = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       @plant_resource_button_indicator = resource_code.split('-').last
-
-      return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
-
-      res = carton_verification_and_weighing
+      res = carton_weighing
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
       ok_response
@@ -29,22 +25,24 @@ module MesscadaApp
 
     private
 
-    def carton_label_carton_exists?
-      repo.carton_label_carton_exists?(carton_label_id)
-    end
+    def carton_weighing  # rubocop:disable Metrics/AbcSize
+      return failed_response("Carton / Bin:#{carton_label_id} not verified") unless carton_label_carton_exists?
 
-    def carton_verification_and_weighing  # rubocop:disable Metrics/AbcSize
       if provide_pack_type
         return failed_response("Pack Type for button :#{plant_resource_button_indicator} not found") unless standard_pack_code_exists?
         return failed_response("Button Indicator for button:#{plant_resource_button_indicator} referenced by more than 1 Standard Pack Code") unless one_standard_pack_code?
       end
 
-      MesscadaApp::CartonVerification.new(params).call
-      update_carton(carton_label_carton_id, update_attrs) if provide_pack_type
+      attrs = update_attrs
+      update_carton(carton.id, attrs)
 
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def carton_label_carton_exists?
+      repo.carton_label_carton_exists?(carton_label_id)
     end
 
     def standard_pack_code_exists?
@@ -55,15 +53,15 @@ module MesscadaApp
       repo.one_standard_pack_code?(plant_resource_button_indicator)
     end
 
-    def carton_label_carton_id
-      repo.carton_label_carton_id(carton_label_id)
+    def carton
+      repo.where(:cartons, MesscadaApp::Carton, carton_label_id: carton_label_id)
     end
 
     def update_attrs
       attrs = { gross_weight: gross_weight }
       if provide_pack_type
         standard_pack_code_id = find_standard_pack_code(plant_resource_button_indicator)
-        nett_weight = gross_weight.to_f - repo.find_standard_pack_code_material_mass(standard_pack_code_id).to_f
+        nett_weight = gross_weight - repo.find_standard_pack_code_material_mass(standard_pack_code_id)
         attrs = attrs.to_h.merge(nett_weight: nett_weight,
                                  standard_pack_code_id: standard_pack_code_id)
       end
@@ -78,7 +76,7 @@ module MesscadaApp
       repo.update_carton(id, attrs)
       return unless carton_is_pallet
 
-      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
+      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: attrs[:standard_pack_code_id]) if provide_pack_type
       pallet_id = find_pallet_from_carton(id)
       DB[:pallets].where(id: pallet_id).update(gross_weight: gross_weight)
     end

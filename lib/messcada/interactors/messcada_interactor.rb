@@ -65,8 +65,6 @@ module MesscadaApp
 
     def carton_verification(params)  # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, PerceivedComplexity
       carton_and_pallet_verification = AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION && (params[:device].nil? ? true : false)
-      params[:carton_and_pallet_verification] = carton_and_pallet_verification
-
       if carton_and_pallet_verification
         res = CartonAndPalletVerificationSchema.call(params)
         return validation_failed_response(res) unless res.messages.empty?
@@ -82,7 +80,7 @@ module MesscadaApp
       return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
 
       repo.transaction do
-        MesscadaApp::CartonVerification.call(res)
+        MesscadaApp::CartonVerification.call(res, carton_and_pallet_verification)
         log_transaction
       end
     rescue StandardError => e
@@ -101,13 +99,18 @@ module MesscadaApp
       carton_label_id = res[:carton_number]
       return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
 
+      cvl_res = nil
       repo.transaction do
-        MesscadaApp::CartonVerificationAndWeighing.call(res)
+        cvl_res = MesscadaApp::CartonVerification.call(res, false)
+        cvl_res = MesscadaApp::CartonWeighing.call(res)
         log_transaction
       end
-    rescue StandardError => e
-      failed_response(e.message)
+      cvl_res
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
@@ -123,7 +126,9 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerificationAndWeighingAndLabeling.call(res, request_ip)
+        cvl_res = MesscadaApp::CartonVerification.call(res, false)
+        cvl_res = MesscadaApp::CartonWeighing.call(res)
+        cvl_res = MesscadaApp::CartonLabelPrinting.call(res, request_ip)
         log_transaction
       end
       cvl_res
