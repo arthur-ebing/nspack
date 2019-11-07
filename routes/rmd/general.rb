@@ -40,7 +40,6 @@ class Nspack < Roda
                                        button_caption: 'Show')
         form.add_field(:barcode_1, 'Barcode one', scan: 'key248_all', required: false)
         form.add_field(:barcode_2, 'Barcode two', scan: 'key248_all', required: false)
-        form.add_toggle(:toggle_me, 'Toggle me')
         form.add_field(:barcode_3, 'Barcode three', scan: 'key248_all', required: false)
         form.add_field(:barcode_4, 'Barcode four', scan: 'key248_all', required: false)
         form.add_field(:barcode_5, 'Barcode five', scan: 'key248_all', required: false)
@@ -54,7 +53,6 @@ class Nspack < Roda
         res = <<~HTML
           <table class="collapse ba br2 b--black-10 pv2 ph3">
           <tbody>
-            <tr class="#{tr_cls}"><td class="#{td_cls}">TOGGLE</td><td class="#{td_cls}">#{params[:barcodes][:toggle_me]}</td></tr>
             <tr class="#{tr_cls}"><td class="#{td_cls}">Barcode one</td><td class="#{td_cls}">#{params[:barcodes][:barcode_1]}</td></tr>
             <tr class="#{tr_cls}"><td class="#{td_cls}">Barcode two</td><td class="#{td_cls}">#{params[:barcodes][:barcode_2]}</td></tr>
             <tr class="#{tr_cls}"><td class="#{td_cls}">Barcode three</td><td class="#{td_cls}">#{params[:barcodes][:barcode_3]}</td></tr>
