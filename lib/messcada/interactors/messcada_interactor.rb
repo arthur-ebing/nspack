@@ -53,10 +53,12 @@ module MesscadaApp
       resource_code = res[:device]
       return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
 
+      cvl_res = nil
       repo.transaction do
-        MesscadaApp::CartonLabeling.call(res)
+        cvl_res = MesscadaApp::CartonLabeling.call(res)
         log_transaction
       end
+      cvl_res
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
@@ -79,10 +81,12 @@ module MesscadaApp
       carton_label_id = res[:carton_number]
       return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
 
+      cvl_res = nil
       repo.transaction do
-        MesscadaApp::CartonVerification.call(res, carton_and_pallet_verification)
+        cvl_res = MesscadaApp::CartonVerification.call(res, carton_and_pallet_verification)
         log_transaction
       end
+      cvl_res
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
