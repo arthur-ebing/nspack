@@ -19,7 +19,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
       end
 
-      r.on 'recalc_nett_weight' do   # EDIT
+      r.on 'recalc_nett_weight' do
         res = interactor.recalc_rmt_bin_nett_weight(id)
         if res.success
           flash[:notice] = res.message
@@ -27,6 +27,16 @@ class Nspack < Roda # rubocop:disable ClassLength
           flash[:error] = res.message
         end
         r.redirect(" /raw_materials/deliveries/rmt_deliveries/#{id}/edit")
+      end
+
+      r.on 'set_current_delivery' do
+        res = interactor.delivery_set_current(id)
+        if res.success
+          flash[:notice] = "Delivery:#{id} Has Been Set As The Current Delivery"
+        else
+          flash[:error] = "Error: Could Not Set Delivery:#{id} As The Current Delivery"
+        end
+        r.redirect('/list/rmt_deliveries')
       end
 
       r.is do
@@ -62,6 +72,22 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.on 'new' do    # NEW
           check_auth!('deliveries', 'new')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, remote: fetch?(r)) }
+        end
+
+        r.on 'direct_create' do
+          r.post do
+            id = interactor.find_current_delivery
+            res = interactor.create_rmt_bin(id, params[:rmt_bin])
+            if res.success
+              r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}/edit")
+            else
+              re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/new") do
+                RawMaterials::Deliveries::RmtBin::New.call(id, is_direct_create: true, form_values: params[:rmt_bin],
+                                                               form_errors: res.errors,
+                                                               remote: fetch?(r))
+              end
+            end
+          end
         end
 
         r.post do # rubocop:disable Metrics/BlockLength        # CREATE
@@ -127,6 +153,18 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::New.call(remote: fetch?(r)) }
+      end
+
+      r.on 'current' do    # CURRENT
+        id = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {}).find_current_delivery
+        if interactor.delivery_tipped?(id)
+          check_auth!('deliveries', 'read')
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
+        else
+          check_auth!('deliveries', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
+        end
       end
 
       r.on 'farm_combo_changed' do
@@ -303,6 +341,22 @@ class Nspack < Roda # rubocop:disable ClassLength
 
     r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('deliveries', 'new')
+        id = interactor.find_current_delivery
+        if id.nil_or_empty?
+          flash[:error] = 'Error: There Is No Current Delivery To Add Bins To'
+          r.redirect('/list/rmt_deliveries')
+        elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {}).delivery_tipped?(id)
+          flash[:error] = 'Cannot Add Bin To Current Delivery. Delivery Has Been Tipped'
+          r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}")
+        elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
+        else
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, is_direct_create: true, remote: fetch?(r)) }
+        end
+      end
 
       r.on 'rmt_container_type_combo_changed' do # rubocop:disable Metrics/BlockLength
         actions = []

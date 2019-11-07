@@ -158,5 +158,14 @@ module RawMaterialsApp
     def find_bins_by_delivery_id(id)
       DB[:rmt_bins].where(rmt_delivery_id: id).all
     end
+
+    def find_current_delivery
+      DB[:rmt_deliveries].where(current: true).get(:id)
+    end
+
+    def delivery_set_current(id)
+      DB[:rmt_deliveries].where(current: true).update(current: false)
+      update(:rmt_deliveries, id, current: true)
+    end
   end
 end

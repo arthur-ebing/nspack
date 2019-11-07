@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class New
-        def self.call(id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil, remote: true, is_direct_create: false) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
           ui_rule = UiRules::Compiler.new(:rmt_bin, :new, delivery_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -14,7 +14,7 @@ module RawMaterials
             page.form_errors form_errors
             page.form do |form|
               form.caption 'New Bin'
-              form.action "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins"
+              form.action is_direct_create ? "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/direct_create" : "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins"
               form.remote! if remote
               form.add_field :cultivar_id
               form.add_field :rmt_container_type_id

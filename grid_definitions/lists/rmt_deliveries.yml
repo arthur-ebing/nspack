@@ -23,43 +23,8 @@
   :text: recalc_nett_weight
   :icon: play
   :popup: false
-#- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/complete"
-#  :text: Complete
-#  :icon: toggle-on
-#  :popup: true
-#  :hide_if_true: completed
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: edit
-#- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/approve"
-#  :text: Approve/Reject
-#  :icon: gavel
-#  :popup: true
-#  :hide_if_false: completed
-#  :hide_if_true: approved
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: approve
-#- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/reopen"
-#  :text: Re-open for editing
-#  :icon: toggle-off
-#  :popup: true
-#  :hide_if_false: approved
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: edit
-#- :separator: true
-#- :url: "/development/statuses/list/rmt_deliveries/$:id$"
-#  :text: status
-#  :icon: information-solid
-#  :title: Status
-#  :popup: true
-#:page_controls:
-#- :control_type: :link
-#  :url: "/raw_materials/deliveries/rmt_deliveries/new"
-#  :text: New Rmt Delivery
-#  :style: :button
-#  :behaviour: :popup
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_current_delivery"
+  :text: set_current
+  :icon: play
+  :popup: false
+  :hide_if_true: delivery_tipped

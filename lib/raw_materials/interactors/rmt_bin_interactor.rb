@@ -30,8 +30,7 @@ module RawMaterialsApp
     end
 
     def get_header_inherited_field(delivery, container_type_id)
-      # rmt_inner_container_type_id: repo.rmt_inner_container_type_rmt_inner_container_material_type(rmt_inner_container_type_id)
-      rmt_inner_container_type_id = repo.rmt_container_type_rmt_inner_container_type(container_type_id)
+      rmt_inner_container_type_id = repo.rmt_container_type_rmt_inner_container_type(container_type_id) unless container_type_id.nil_or_empty?
       { rmt_delivery_id: delivery.id,
         orchard_id: delivery.orchard_id,
         season_id: delivery.season_id,
@@ -79,6 +78,10 @@ module RawMaterialsApp
 
     def find_rmt_delivery_by_bin_id(id)
       repo.find_rmt_delivery_by_bin_id(id)
+    end
+
+    def find_current_delivery
+      repo.find_current_delivery
     end
 
     def assert_permission!(task, id = nil)

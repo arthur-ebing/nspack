@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable ClassLength
-    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       assert_permission!(:create)
       if !params[:cultivar_id].nil_or_empty? && !params[:date_delivered].nil_or_empty?
         params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered])
@@ -15,6 +15,7 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_delivery(res)
+        repo.delivery_set_current(id) if res[:current]
         log_status('rmt_deliveries', id, 'DELIVERY_RECEIVED')
         log_transaction
       end
@@ -69,6 +70,15 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def delivery_set_current(id)
+      repo.transaction do
+        repo.delivery_set_current(id)
+      end
+      success_response("Delivery #{id} set as current")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize, Metrics/PerceivedComplexity
       repo.transaction do
         rmt_bins = repo.find_bins_by_delivery_id(id)
@@ -111,6 +121,10 @@ module RawMaterialsApp
 
     def find_rmt_container_type_by_container_type_code(container_type_code)
       repo.rmt_container_type_by_container_type_code(container_type_code)
+    end
+
+    def delivery_tipped?(id)
+      repo.get(:rmt_deliveries, id, :delivery_tipped)
     end
 
     def assert_permission!(task, id = nil)

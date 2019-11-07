@@ -26,6 +26,7 @@ module RawMaterials
               form.add_field :date_delivered
               form.add_field :date_picked
               form.add_field :truck_registration_number if rules[:show_truck_registration_number]
+              form.add_field :current
             end
           end
 

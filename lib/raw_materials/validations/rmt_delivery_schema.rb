@@ -16,5 +16,6 @@ module RawMaterialsApp
     optional(:qty_empty_bins, :integer).maybe(:int?)
     required(:date_picked, :date).maybe(:date?)
     required(:date_delivered, :time).maybe(:time?)
+    optional(:current, :bool).filled(:bool?)
   end
 end
