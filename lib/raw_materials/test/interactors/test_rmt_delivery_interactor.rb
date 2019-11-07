@@ -101,6 +101,7 @@ module RawMaterialsApp
         date_picked: '2010-01-01',
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
+        current: false,
         active: true
       }
     end
