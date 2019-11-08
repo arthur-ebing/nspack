@@ -44,7 +44,7 @@ module MesscadaApp
     end
 
     def find_standard_pack_code_material_mass(id)
-      DB[:standard_pack_codes].where(id: id).get(:material_mass).to_f
+      DB[:standard_pack_codes].where(id: id).get(:material_mass)
     end
 
     def find_pallet_from_carton(carton_id)

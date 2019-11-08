@@ -7,7 +7,7 @@ module MesscadaApp
 
     def initialize(params)
       @carton_label_id = params[:carton_number]
-      @gross_weight = params[:gross_weight].to_f
+      @gross_weight = BigDecimal(params[:gross_weight])
       @uom = params[:measurement_unit]
       @resource_code = params[:device]
     end
@@ -61,7 +61,7 @@ module MesscadaApp
       attrs = { gross_weight: gross_weight }
       if provide_pack_type
         standard_pack_code_id = find_standard_pack_code(plant_resource_button_indicator)
-        nett_weight = gross_weight - repo.find_standard_pack_code_material_mass(standard_pack_code_id)
+        nett_weight = gross_weight - BigDecimal(repo.find_standard_pack_code_material_mass(standard_pack_code_id))
         attrs = attrs.to_h.merge(nett_weight: nett_weight,
                                  standard_pack_code_id: standard_pack_code_id)
       end
