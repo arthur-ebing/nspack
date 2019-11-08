@@ -168,6 +168,13 @@
       }
     }, false);
 
+    // InputChange - check for observers
+    document.body.addEventListener('change', (event) => {
+      if (event.target.dataset && event.target.dataset.observeInputChange) {
+        crossbeamsUtils.observeInputChange(event.target, event.target.dataset.observeInputChange);
+      }
+    }, false);
+
     // Blur (lose focus) - check for observers
     document.body.addEventListener('blur', (event) => {
       if (event.target.dataset && event.target.dataset.observeLoseFocus) {

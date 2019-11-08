@@ -92,7 +92,7 @@ module Crossbeams
         <td>
             <input name="#{form_name}[#{name}]" type="hidden" value="f">
           <label class="switch">
-            <input type="checkbox" class="pa2#{field_error_class}" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{render_behaviours} value="t"#{checked(field_value(form_state[name]))}><span class="slider round"></span>
+            <input type="checkbox" class="pa2#{field_error_class} toggleCheck" id="#{form_name}_#{name}" name="#{form_name}[#{name}]" #{render_behaviours} value="t"#{checked(field_value(form_state[name]))}><span class="slider round"></span>
           </label>
         </td></tr>
       HTML
@@ -287,6 +287,20 @@ module Crossbeams
       } }
     end
 
+    def input_change(field_name, conditions = {})
+      raise(ArgumentError, 'Input change behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
+
+      @rules << { field_name => {
+        input_change: (conditions[:notify] || []).map do |n|
+          {
+            url: n[:url],
+            param_keys: n[:param_keys] || [],
+            param_values: n[:param_values] || {}
+          }
+        end
+      } }
+    end
+
     def lose_focus(field_name, conditions = {})
       raise(ArgumentError, 'Key up behaviour requires `notify: url`.') if (conditions[:notify] || []).any? { |c| c[:url].nil? }
 
@@ -449,7 +463,7 @@ module Crossbeams
       show_hide = form_state[:error_message] ? '' : ' hidden'
       <<~HTML
         <div id="rmd-error" class="brown bg-washed-red ba b--light-red pa3 mw6"#{show_hide}>
-          #{form_state[:error_message]}
+          #{(form_state[:error_message] || '').gsub("\n", '<br>')}
         </div>
       HTML
     end
@@ -466,7 +480,7 @@ module Crossbeams
     def notes_section
       return '' unless notes
 
-      "<p>#{notes}</p>"
+      "<p>#{notes.gsub("\n", '<br>')}</p>"
     end
 
     def submit_section
@@ -562,8 +576,11 @@ module Crossbeams
       "<option value=\"#{CGI.escapeHTML(value.to_s)}\"#{sel}>#{CGI.escapeHTML(text.to_s)}</option>"
     end
 
+    # False if value is nil, false or starts with f, n or 0.
+    # Else true.
     def checked(value)
-      value && value != false && value != 'f' && value != 'false' && value.to_s != '0' ? ' checked' : ''
+      false_str = value.to_s.match?(/[nf0]/i)
+      value && value != false && !false_str ? ' checked' : ''
     end
 
     # ---------------------------------------------------------------------------------------------------
@@ -591,12 +608,13 @@ module Crossbeams
       res.join(' ')
     end
 
-    def build_behaviour(rule) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def build_behaviour(rule) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return %(data-change-values="#{split_change_affects(rule[:change_affects])}") if rule[:change_affects]
       return %(data-enable-on-values="#{rule[:enable_on_change].join(',')}") if rule[:enable_on_change]
-      return %(data-observe-change=#{build_observe_change(rule[:notify])}) if rule[:notify]
       return %(data-observe-selected=#{build_observe_selected(rule[:populate_from_selected])}) if rule[:populate_from_selected]
+      return %(data-observe-change=#{build_observe_change(rule[:notify])}) if rule[:notify]
       return %(data-observe-keyup=#{build_observe_change(rule[:keyup])}) if rule[:keyup]
+      return %(data-observe-input-change=#{build_observe_change(rule[:input_change])}) if rule[:input_change]
       return %(data-observe-lose-focus=#{build_observe_change(rule[:lose_focus])}) if rule[:lose_focus]
     end
 

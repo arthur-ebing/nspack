@@ -372,6 +372,11 @@ Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{fiel
 === Method: add_toggle
 
 This adds a checkbox to the form which renders as a toggle switch.
+The toggle will be checked if the field has a value and the value is not `false` and does not start with any of these characters: `F, f, N, n, 0`.
+
+The best way to set the value is to make the field value `true` or `false`, but any of the following: `Yes`, `no`, `t` or `False` would set the state as you would expect.
+
+The returned parameter value is either `t` when checked or `f` when unchecked.
 [source,ruby]
 ----
 form.add_toggle(:complete, 'Are you done yet?')

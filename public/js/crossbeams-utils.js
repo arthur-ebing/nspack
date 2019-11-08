@@ -807,9 +807,12 @@ const crossbeamsUtils = {
    * @returns {void}
    */
   observeInputChange: function observeInputChange(elem, rules) {
-    // const s = elem.dataset.observeChange;
     const j = JSON.parse(rules);
-    const urls = j.map(el => this.buildObserveChangeUrl(el, elem.value));
+    let changedValue = elem.value;
+    if (elem.type && elem.type === 'checkbox') {
+      changedValue = elem.checked ? 't' : 'f';
+    }
+    const urls = j.map(el => this.buildObserveChangeUrl(el, changedValue));
 
     urls.forEach(url => this.fetchDropdownChanges(url));
   },
