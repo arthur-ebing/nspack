@@ -113,8 +113,8 @@ module FinishedGoodsApp
       ds = DB[:pallets].where(pallet_number: pallet_numbers)
       ds = ds.where(allocated: allocated) unless allocated.nil?
       ds = ds.where(shipped: shipped) unless shipped.nil?
-      ds = ds.where { nett_weight > 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
-      ds = ds.where { gross_weight > 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
+      ds = ds.exclude { nett_weight.> 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
+      ds = ds.exclude { gross_weight.> 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
       ds.select_map(:pallet_number)
     end
 
