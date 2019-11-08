@@ -107,6 +107,14 @@ module ProductionApp
       success_response('ok', runs)
     end
 
+    def for_select_labeling_run_lines
+      DB[:production_runs]
+        .join(:plant_resources, id: :production_line_id)
+        .where(running: true)
+        .where(labeling: true)
+        .select_map([:plant_resource_code, Sequel[:production_runs][:id]])
+    end
+
     def allocated_setup_keys(production_run_id)
       query = <<~SQL
         SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
