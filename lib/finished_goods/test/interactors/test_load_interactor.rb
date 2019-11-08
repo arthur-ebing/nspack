@@ -103,7 +103,9 @@ module FinishedGoodsApp
         shipping_line_party_role_id: party_role_id,
         shipper_party_role_id: party_role_id,
         booking_reference: Faker::Lorem.word,
-        memo_pad: Faker::Lorem.word
+        memo_pad: Faker::Lorem.word,
+        vehicle_number: Faker::Lorem.word,
+        container_code: Faker::Lorem.word
       }
     end
 

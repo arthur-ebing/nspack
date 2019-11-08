@@ -316,37 +316,27 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
-      r.on 'ship' do
-        check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:edit, id)
-        res = interactor.ship_load(id, params[:load])
-        if res.success
-          flash[:notice] = res.message
-          r.redirect '/list/loads'
-        end
-      end
-
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.unship_load(id, params[:load])
+        res = interactor.unship_load(id)
         if res.success
           flash[:notice] = res.message
           r.redirect '/list/loads'
         end
       end
 
-      r.on 'allocate_pallets' do
+      r.on 'allocate_pallets_from_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
         res = interactor.allocate_pallets_from_multiselect(id, multiselect_grid_choices(params))
         if res.success
           flash[:notice] = res.message
-          r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_list"
+          r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
         end
       end
 
-      r.on 'allocate_pallets_from_list' do
+      r.on 'allocate_pallets' do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')
           interactor.assert_permission!(:edit, id)
@@ -357,7 +347,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.allocate_pallets_from_list(id, params[:load])
           if res.success
             flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_list"
+            r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
           else
             re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, form_values: params[:load], form_errors: res.errors) }
           end
