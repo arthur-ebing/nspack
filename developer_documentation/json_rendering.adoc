@@ -184,6 +184,16 @@ dom_id: the value of the `id` attribute of the input element in the page.
 
 required: (true or false) - if true, the input will be set to required. if false, the required attribute will be removed from the input.
 
+===== Set the checked attribute of an input
+
+Works on a DOM checkbox element with an id.
+
+type: `:set_checked`.
+
+dom_id: the value of the `id` attribute of the checkbox element in the page.
+
+checked: (true or false) - if true, the `checked` attribute on the checkbox will be set. if false, it will be unset.
+
 ===== Hide a DOM element
 
 Works on any DOM element with an id.
@@ -260,6 +270,8 @@ json_replace_list_items(dom_id, items, message: nil, keep_dialog_open: false)
 json_set_readonly(dom_id, readonly, message: nil, keep_dialog_open: false)
 
 json_set_required(dom_id, required, message: nil, keep_dialog_open: false)
+
+json_set_checked(dom_id, checked, message: nil, keep_dialog_open: false)
 
 json_hide_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
 

@@ -577,6 +577,27 @@ const crossbeamsUtils = {
     }
   },
   /**
+   * Set the checked attribute of an input checkbox element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  setChecked: function setChecked(action) {
+    const elem = document.getElementById(action.set_checked.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.set_checked.id}"`,
+        title: 'Set Checked element: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (action.set_checked.checked) {
+      elem.checked = true;
+    } else {
+      elem.checked = false;
+    }
+  },
+  /**
    * Make an input element readonly or make it editable.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -731,6 +752,9 @@ const crossbeamsUtils = {
       }
       if (action.set_required) {
         crossbeamsUtils.setRequired(action);
+      }
+      if (action.set_checked) {
+        crossbeamsUtils.setChecked(action);
       }
       if (action.hide_element) {
         crossbeamsUtils.hideElement(action);

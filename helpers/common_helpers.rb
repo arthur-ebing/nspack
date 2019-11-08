@@ -500,6 +500,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :set_required, dom_id: dom_id, required: required), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_set_checked(dom_id, checked, message: nil, keep_dialog_open: false)
+    json_actions(OpenStruct.new(type: :set_checked, dom_id: dom_id, checked: checked), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
     # rubocop:disable Layout/AlignHash
     {
@@ -516,7 +520,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
-      set_required:           ->(act) { action_set_required(act) }
+      set_required:           ->(act) { action_set_required(act) },
+      set_checked:            ->(act) { action_set_checked(act) }
     }[action.type].call(action)
     # rubocop:enable Layout/AlignHash
   end
@@ -563,6 +568,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
 
   def action_set_required(action)
     { set_required: { id: action.dom_id, required: action.required } }
+  end
+
+  def action_set_checked(action)
+    { set_checked: { id: action.dom_id, checked: action.checked } }
   end
 
   def json_actions(actions, message = nil, keep_dialog_open: false)
