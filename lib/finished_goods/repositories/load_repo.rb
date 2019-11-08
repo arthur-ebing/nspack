@@ -13,14 +13,13 @@ module FinishedGoodsApp
 
     crud_calls_for :loads, name: :load, wrapper: Load
 
-    def find_load_flat(id)
+    def find_load_flat(id) # rubocop:disable Metrics/AbcSize
       hash = find_with_association(:loads,
                                    id,
                                    parent_tables: [{ parent_table: :voyage_ports,
                                                      columns: %i[port_id voyage_id],
                                                      foreign_key: :pol_voyage_port_id,
-                                                     flatten_columns: { port_id: :pol_port_id,
-                                                                        voyage_id: :voyage_id } },
+                                                     flatten_columns: { port_id: :pol_port_id, voyage_id: :voyage_id } },
                                                    { parent_table: :voyage_ports,
                                                      columns: %i[port_id],
                                                      foreign_key: :pod_voyage_port_id,
@@ -37,102 +36,106 @@ module FinishedGoodsApp
                                                   columns: %i[shipping_line_party_role_id
                                                               shipper_party_role_id
                                                               booking_reference
-                                                              memo_pad]  }])
-      return LoadFlat.new(hash) if hash.nil?
+                                                              memo_pad]  },
+                                                { sub_table: :load_vehicles, columns: %i[vehicle_number] },
+                                                { sub_table: :load_containers, columns: %i[container_code] }])
+      return nil if hash.nil?
 
       flatten_columns = { shipping_line_party_role_id: :shipping_line_party_role_id,
                           shipper_party_role_id: :shipper_party_role_id,
                           booking_reference: :booking_reference,
                           memo_pad: :memo_pad }
-      sub_hash = hash.delete(:load_voyages).first
-      sub_hash ||= {}
-      flatten_columns.each { |col, new_name|  hash[new_name] = sub_hash.delete(col) }
+      sub_table = hash.delete(:load_voyages).first
+      sub_table ||= {}
+      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
+
+      flatten_columns = { vehicle_number: :vehicle_number }
+      sub_table = hash.delete(:load_vehicles).first
+      sub_table ||= {}
+      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
+
+      flatten_columns = { container_code: :container_code }
+      sub_table = hash.delete(:load_containers).first
+      sub_table ||= {}
+      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
 
       LoadFlat.new(hash)
     end
 
-    def add_pallets(load_id, pallet_ids, user_name)
-      # checks for unallocated and un-shipped pallets
-      ds = DB[:pallets].where(id: pallet_ids, allocated: false, shipped: false)
-      pallet_ids = ds.select_map(:id)
-
+    def allocate_pallets(load_id, pallet_ids, user_name)
       # allocates pallets
-      ds.update(load_id: load_id, allocated: true, allocated_at: Time.now)
-      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name) unless pallet_ids.nil_or_empty?
+      DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
+      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name)
 
-      # updates allocated status
-      unless pallet_ids.nil_or_empty?
-        DB[:loads].where(id: load_id).update(allocated: true, allocated_at: Time.now)
-        log_status('loads', load_id, 'ALLOCATED', user_name: user_name)
-      end
+      # updates load status allocated
+      DB[:loads].where(id: load_id).update(allocated: true, allocated_at: Time.now)
+      log_status('loads', load_id, 'ALLOCATED', user_name: user_name)
+
       success_response('ok')
     end
 
-    def remove_pallets(pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
-      # get un-shipped pallets and loads they represent
-      ds = DB[:pallets].where(id: pallet_ids, shipped: false)
-      unallocated_pallets = ds.select_map(:id)
-      load_ids = ds.distinct.select_map(:load_id)
+    def unallocate_pallets(pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
+      # get pallet loads
+      load_ids = DB[:pallets].where(id: pallet_ids).select_map(:load_id)
 
-      # unallocate pallets
-      unless unallocated_pallets.nil_or_empty?
-        ds.update(load_id: nil, allocated: false)
-        log_multiple_statuses('pallets', unallocated_pallets, 'UNALLOCATED', user_name: user_name)
-      end
+      DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
+      log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED', user_name: user_name)
 
-      # find loads still allocated
-      ds = DB[:pallets].where(load_id: load_ids)
-      allocated_loads = ds.distinct.select_map(:load_id)
+      # find unallocated loads
+      allocated_loads = DB[:pallets].where(load_id: load_ids).distinct.select_map(:load_id)
+      unallocated_loads = load_ids - allocated_loads
 
       # log status for loads where all pallets have been unallocated
-      unallocated_loads = (load_ids - allocated_loads)
       unless unallocated_loads.nil_or_empty?
         DB[:loads].where(id: unallocated_loads).update(allocated: false)
         log_multiple_statuses('loads', unallocated_loads, 'UNALLOCATED', user_name: user_name)
       end
+
       success_response('ok')
     end
 
-    def allocate_pallets_from_list(load_id, res, user_name)
-      pallet_numbers = res.output[:pallet_list]
-      added_allocation = DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
-      add_pallets(load_id, added_allocation, user_name)
-    end
-
-    def allocate_pallets_from_multiselect(load_id, multiselect_list, user_name)
-      added_allocation = DB[:pallet_sequences].where(id: multiselect_list).select_map(:pallet_id)
-      current_allocation = DB[:pallets].where(load_id: load_id).select_map(:id)
-      add_pallets(load_id, added_allocation - current_allocation, user_name)
-      remove_pallets(current_allocation - added_allocation, user_name)
-    end
-
-    def pallets_allocated(pallet_numbers)
-      DB[:pallets].where(pallet_number: pallet_numbers, allocated: true).select_map(:pallet_number)
-    end
-
-    def pallets_exists(pallet_numbers)
-      DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
-    end
-
-    def pallets_allocated_by(load_id: nil, pallet_number: nil)
+    def find_pallet_numbers_from(pallet_sequence_id: nil, load_id: nil)
       ds = DB[:pallets]
-      ds = ds.where(pallet_number: pallet_number) unless pallet_number.nil_or_empty?
-      ds = ds.where(load_id: load_id) unless load_id.nil_or_empty?
-      ds.select_map(:id)
+      ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
+      ds = ds.where(load_id: load_id) unless load_id.nil?
+      ds.select_map(:pallet_number).flatten
     end
 
-    def ship_load(id, user_name)
+    def find_pallet_ids_from(pallet_sequence_id: nil, load_id: nil, pallet_numbers: nil)
+      ds = DB[:pallets]
+      ds = ds.where(id: B[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
+      ds = ds.where(load_id: load_id) unless load_id.nil?
+      ds = ds.where(pallet_number: pallet_numbers) unless pallet_numbers.nil?
+      ds.select_map(:id).flatten
+    end
+
+    def validate_pallets(pallet_numbers, allocated: nil, shipped: nil, has_nett_weight: false, has_gross_weight: false)
+      ds = DB[:pallets].where(pallet_number: pallet_numbers)
+      ds = ds.where(allocated: allocated) unless allocated.nil?
+      ds = ds.where(shipped: shipped) unless shipped.nil?
+      ds = ds.where { nett_weight > 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
+      ds = ds.where { gross_weight > 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
+      ds.select_map(:pallet_number)
+    end
+
+    def ship_load(id)
       DB[:loads].where(id: id).update(shipped: true, shipped_at: Time.now)
-      log_status('loads', id, 'SHIPPED', user_name: user_name)
-
-      success_response('ok')
+      DB[:loads].where(id: id).select_map(:id)
     end
 
-    def unship_load(id, user_name)
-      DB[:loads].where(id: id).update(shipped: false)
-      log_status('loads', id, 'UNSHIPPED', user_name: user_name)
+    def unship_load(id)
+      DB[:loads].where(id: id).update(shipped: false, shipped_at: nil)
+      DB[:loads].where(id: id).select_map(:id)
+    end
 
-      success_response('ok')
+    def ship_pallets(pallet_numbers)
+      DB[:pallets].where(pallet_number: pallet_numbers).update(shipped: true, shipped_at: Time.now, exit_ref: 'SHIPPED')
+      DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
+    end
+
+    def unship_pallets(pallet_numbers)
+      DB[:pallets].where(pallet_number: pallet_numbers).update(shipped: false, shipped_at: nil, exit_ref: nil)
+      DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
     end
   end
 end

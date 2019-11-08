@@ -57,6 +57,8 @@ module FinishedGoodsApp
     attribute :shipper_party_role_id, Types::Integer
     attribute :booking_reference, Types::String
     attribute :memo_pad, Types::String
+    attribute :vehicle_number, Types::String
+    attribute :container_code, Types::String
     attribute? :active, Types::Bool
   end
 end

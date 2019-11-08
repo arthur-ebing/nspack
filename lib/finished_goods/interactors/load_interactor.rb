@@ -38,9 +38,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def ship_load(id, params)
+    def ship_load(id)
       repo.transaction do
-        res = ShipLoadService.call(id, params, @user.user_name)
+        res = ShipLoad.call(id, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
@@ -51,9 +51,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def unship_load(id, params)
+    def unship_load(id)
       repo.transaction do
-        res = UnshipLoadService.call(id, params, @user.user_name)
+        res = UnshipLoad.call(id, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
@@ -64,9 +64,15 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_pallets_from_multiselect(id, multiselect_list)
+    def allocate_pallets_from_multiselect(id, pallet_sequence_id) # rubocop:disable Metrics/AbcSize
+      pallet_numbers = repo.find_pallet_numbers_from(pallet_sequence_id: pallet_sequence_id)
+      validated_pallet_numbers = repo.validate_pallets(pallet_numbers, shipped: false)
+      new_allocation = repo.find_pallet_ids_from(pallet_numbers: validated_pallet_numbers)
+      current_allocation = repo.find_pallet_ids_from(load_id: id)
+
       repo.transaction do
-        repo.allocate_pallets_from_multiselect(id, multiselect_list, @user.user_name)
+        repo.allocate_pallets(id, new_allocation - current_allocation, @user.user_name)
+        repo.unallocate_pallets(current_allocation - new_allocation, @user.user_name)
         log_transaction
       end
       success_response("Load #{id} has been updated")
@@ -76,10 +82,10 @@ module FinishedGoodsApp
 
     def allocate_pallets_from_list(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_list(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) unless res.success
 
       repo.transaction do
-        load_res = repo.allocate_pallets_from_list(id, res, @user.user_name)
+        load_res = repo.allocate_pallets(id, res.instance, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -131,19 +137,21 @@ module FinishedGoodsApp
 
       errors = pallet_numbers.reject { |x| x.match(/\A\d+\Z/) }
       message = "#{errors.join(', ')} must be numeric"
-      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
-      pallet_exists = repo.pallets_exists(pallet_numbers)
-      errors = (pallet_numbers - pallet_exists)
+      errors = (pallet_numbers - repo.validate_pallets(pallet_numbers))
       message = "#{errors.join(', ')} doesn't exist"
-      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
-      errors = repo.pallets_allocated(pallet_exists)
+      errors = repo.validate_pallets(pallet_numbers, allocated: true)
       message = "#{errors.join(', ')} already allocated"
-      return OpenStruct.new(messages: { pallet_list: [message] }) unless errors.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pallet_list: [message] }) unless errors.nil_or_empty?
 
-      params[:pallet_list] = pallet_numbers
-      PalletListSchema.call(params)
+      errors = repo.validate_pallets(pallet_numbers, shipped: true)
+      message = "#{errors.join(', ')} already shipped"
+      return OpenStruct.new(success: false, messages: { pallet_list: [message] }) unless errors.nil_or_empty?
+
+      OpenStruct.new(success: true, instance: repo.find_pallet_ids_from(pallet_numbers: pallet_numbers))
     end
   end
 end

@@ -30,8 +30,4 @@ module FinishedGoodsApp
     optional(:booking_reference, Types::StrippedString).maybe(:str?)
     optional(:memo_pad, Types::StrippedString).maybe(:str?)
   end
-  PalletListSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-    optional(:pallet_list, :array).maybe(:array?) { each(:str?) }
-  end
 end

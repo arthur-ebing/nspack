@@ -4,9 +4,9 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class AllocatePallets
+      class Unship
         def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:load, :allocate, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:load, :unship, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -20,8 +20,7 @@ module FinishedGoods
                                   style: :back_button)
             end
             page.form do |form|
-              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
-              form.submit_captions 'Allocate pasted pallets'
+              form.action "/finished_goods/dispatch/loads/#{id}/unship"
               form.method :update
               form.row do |row|
                 row.column do |col|
@@ -32,7 +31,11 @@ module FinishedGoods
                   col.add_field :pod_voyage_port_id
                 end
                 row.column do |col|
-                  col.add_field :pallet_list
+                  col.add_control(control_type: :link,
+                                  text: 'Unship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/unship",
+                                  visible: !rules[:shipped],
+                                  style: :button)
                 end
               end
             end
@@ -44,7 +47,7 @@ module FinishedGoods
                                caption: 'Choose Pallets',
                                is_multiselect: true,
                                can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_multiselect",
+                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets",
                                multiselect_key: 'allocate_pallets',
                                multiselect_params: { key: 'allocate_pallets',
                                                      id: id,

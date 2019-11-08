@@ -13,7 +13,7 @@ module FinishedGoodsApp
 
     crud_calls_for :load_vehicles, name: :load_vehicle, wrapper: LoadVehicle
 
-    def find_load_vehicles_by_load(load_id)
+    def find_load_vehicle_from(load_id:)
       DB[:load_vehicles].where(load_id: load_id).get(:id)
     end
   end

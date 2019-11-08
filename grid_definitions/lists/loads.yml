@@ -20,21 +20,11 @@
   :is_delete: true
   :popup: true
   :hide_if_true: shipped,allocated
-- :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
+- :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"
   :text: allocate pallets
   :icon: edit
   :title: Allocate Pallets
   :hide_if_true: shipped
-- :url: "/finished_goods/dispatch/loads/$:id$/ship"
-  :text: ship
-  :icon: ship
-  :title: Ship
-  :hide_if_true: shipped
-- :url: "/finished_goods/dispatch/loads/$:id$/unship"
-  :text: unship
-  :icon: unship
-  :title: Unship
-  :hide_if_true: not_shipped
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
