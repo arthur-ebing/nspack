@@ -52,7 +52,9 @@ module UiRules
     end
 
     def set_edit_fields
+      menu_options = SecurityApp::MenuRepo.new.for_select_homepages
       fields[:login_name] = { renderer: :label }
+      fields[:homepage_id] = { renderer: :select, parent_field: :profile, options: menu_options, prompt: true }
     end
 
     def set_show_fields

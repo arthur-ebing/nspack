@@ -158,7 +158,8 @@ class Nspack < Roda
       if @registered_mobile_device && !@hybrid_device
         r.redirect @rmd_start_page || '/rmd/home'
       else
-        # r.redirect '/packhouse/portal'
+        page = user_homepage
+        r.redirect page unless page.nil?
         view(inline: '<p>Welcome<p>')
       end
     end

@@ -217,6 +217,13 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user ||= DevelopmentApp::UserRepo.new.find(:users, DevelopmentApp::User, session[:act_as_user_id] || session[:user_id])
   end
 
+  def user_homepage
+    return nil unless current_user&.profile
+    return nil if current_user.profile['homepage_id'].nil_or_empty?
+
+    SecurityApp::MenuRepo.new.find_program_function(current_user.profile['homepage_id']).url
+  end
+
   # A fixed user to be used for logging activities not initiated by users.
   # e.g. when set in a route that does not require login.
   #
