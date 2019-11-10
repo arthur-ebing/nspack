@@ -13,11 +13,14 @@ module UiRules
     end
 
     def common_fields
+      choices = @repo.for_select_labeling_run_lines
+      rules[:notice] = 'There are no currently active labeling runs' if choices.empty?
       {
         production_run_id: { renderer: :select,
-                             options: @repo.for_select_labeling_run_lines,
+                             options: choices,
                              caption: 'Production Line',
-                             required: true }
+                             required: true,
+                             invisible: choices.empty? }
       }
     end
 

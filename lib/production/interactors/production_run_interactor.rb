@@ -202,11 +202,12 @@ module ProductionApp
       ExecuteRun.call(id, @user.user_name)
     end
 
-    # read the user profile to get line_no & then find active labeling run for that line
+    # Read the user profile to get line_no & then find active labeling run for that line
     def active_run_id_for_user(current_user)
-      return current_user.id if current_user.id > 50
+      return nil unless current_user&.profile
+      return nil if current_user.profile['production_line_id'].nil_or_empty?
 
-      nil
+      repo.labeling_run_for_line(current_user.profile['production_line_id'])
     end
 
     private
