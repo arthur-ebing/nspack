@@ -33,6 +33,7 @@ module UiRules
     end
 
     def set_detail_fields
+      rules[:can_change_password] = Crossbeams::Config::UserPermissions.can_user?(@form_object, :password, :can_be_changed_by_user)
       fields[:old_password] = { subtype: :password }
       set_show_fields
       set_new_fields
