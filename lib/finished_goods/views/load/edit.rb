@@ -91,11 +91,6 @@ module FinishedGoods
             end
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: 'Ship Load',
-                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
-                                  visible: rules[:shipped],
-                                  style: :button)
-              section.add_control(control_type: :link,
                                   text: 'Unship Load',
                                   url: "/finished_goods/dispatch/loads/#{id}/unship",
                                   visible: !rules[:shipped],

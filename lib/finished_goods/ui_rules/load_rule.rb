@@ -219,7 +219,6 @@ module UiRules
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
-        # behaviour.keyup :pallet_list, notify: [{ url: '/finished_goods/dispatch/loads/pallet_list_changed' }] if @mode == :allocate
       end
       rules[:shipped] = !@form_object.shipped
     end

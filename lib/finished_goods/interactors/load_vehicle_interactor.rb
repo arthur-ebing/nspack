@@ -2,30 +2,19 @@
 
 module FinishedGoodsApp
   class LoadVehicleInteractor < BaseInteractor
-    def validate_load(load_id)
-      load = LoadRepo.new.find_load(load_id)
-      return failed_response("Load:#{load_id} doesn't exist") if (load&.id).nil_or_empty?
-
-      success_response('ok', load_id: load_id)
-    end
-
     def create_load_vehicle(params) # rubocop:disable Metrics/AbcSize
       res = validate_load_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      load_id = res.output[:load_id]
-      # if load shipped dont allow update
-      shipped = LoadRepo.new.find_load(load_id)&.shipped
-      return failed_response("Update not allowed, Load #{load_id}, already Shipped") if shipped
-
       id = nil
-      pallet_ids = FinishedGoodsApp::LoadRepo.new.pallets_allocated_by(load_id: load_id)
+      load_id = res.to_h[:load_id]
+      pallet_ids = load_repo.find_pallet_ids_from(load_id: load_id)
 
       repo.transaction do
         id = repo.create_load_vehicle(res)
         log_status('load_vehicles', id, 'CREATED')
         log_status('loads', load_id, 'TRUCK_ARRIVED')
-        log_multiple_statuses('pallets', pallet_ids, 'TRUCK_ARRIVED')
+        log_multiple_statuses('pallets', pallet_ids, 'TRUCK_ARRIVED') unless pallet_ids.empty?
         log_transaction
       end
       instance = load_vehicle(id)
@@ -36,17 +25,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load_vehicle(id, params) # rubocop:disable Metrics/AbcSize
+    def update_load_vehicle(id, params)
       res = validate_load_vehicle_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-
-      # test for changes
-      instance = load_vehicle(id).to_h.reject { |k, _| %i[id active].include?(k) }
-      return success_response("Load #{params[:load_id]}", instance) if instance == res.output
-
-      # if load shipped dont allow update
-      shipped = LoadRepo.new.find_load(params[:load_id])&.shipped
-      return failed_response("Update not allowed, Load #{instance[:load_id]}, already Shipped") if shipped
 
       repo.transaction do
         repo.update_load_vehicle(id, res)
@@ -79,6 +60,10 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadVehicleRepo.new
+    end
+
+    def load_repo
+      @load_repo ||= LoadRepo.new
     end
 
     def load_vehicle(id)

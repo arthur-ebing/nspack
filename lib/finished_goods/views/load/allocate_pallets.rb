@@ -20,7 +20,7 @@ module FinishedGoods
                                   style: :back_button)
             end
             page.form do |form|
-              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets_from_list"
+              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
               form.submit_captions 'Allocate pasted pallets'
               form.method :update
               form.row do |row|
@@ -44,7 +44,7 @@ module FinishedGoods
                                caption: 'Choose Pallets',
                                is_multiselect: true,
                                can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets",
+                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets_multiselect",
                                multiselect_key: 'allocate_pallets',
                                multiselect_params: { key: 'allocate_pallets',
                                                      id: id,

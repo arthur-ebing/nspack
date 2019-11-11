@@ -87,16 +87,6 @@ module FinishedGoods
               end
             end
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Ship Load',
-                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
-                                  visible: rules[:shipped],
-                                  style: :button)
-              section.add_control(control_type: :link,
-                                  text: 'Unship Load',
-                                  url: "/finished_goods/dispatch/loads/#{id}/unship",
-                                  visible: !rules[:shipped],
-                                  style: :button)
               section.add_grid('stock_pallets',
                                "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
                                caption: 'Pallets')

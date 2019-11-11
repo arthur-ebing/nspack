@@ -16,7 +16,7 @@
     :is_delete: true
     :popup: true
     :hide_if_true: shipped,allocated
-  - :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets_from_list"
+  - :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"
     :text: allocate pallets
     :icon: edit
     :title: Allocate Pallets
