@@ -13,13 +13,15 @@ module FinishedGoodsApp
 
     def validate_load_truck(load_id) # rubocop:disable Metrics/AbcSize
       load = repo.find_load_flat(load_id)
-      p load
       message = []
-      message << "Doesn't exist" if load.id.nil_or_empty?
-      validate_pallets = validate_load_truck_pallets(load_id)
-      message << validate_pallets.message  unless validate_pallets.success
-      message << "Truck Arrival hasn't been done"  if load.vehicle_number.nil_or_empty?
-      message << 'Already Shipped'  if load.shipped
+      message << "Doesn't exist" if load.nil?
+      message << "Truck Arrival hasn't been done"  if load&.vehicle_number.nil?
+      if load&.shipped
+        message << 'Already Shipped'
+      else
+        validate_pallets = validate_load_truck_pallets(load_id)
+        message << validate_pallets.message  unless validate_pallets.success
+      end
       return failed_response("Load:#{load_id}\n#{message.join("\n")}") unless message.empty?
 
       success_response('ok', load_id)
@@ -68,6 +70,11 @@ module FinishedGoodsApp
       validation_failed_response(OpenStruct.new(messages: { vehicle_number: ['This load vehicle already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def assert_permission!(task, id = nil)
+      res = TaskPermissionCheck::Load.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
     private

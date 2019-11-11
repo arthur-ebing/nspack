@@ -13,57 +13,44 @@ module FinishedGoodsApp
 
     crud_calls_for :loads, name: :load, wrapper: Load
 
-    def find_load_flat(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:loads,
-                                   id,
-                                   parent_tables: [{ parent_table: :voyage_ports,
-                                                     columns: %i[port_id voyage_id],
-                                                     foreign_key: :pol_voyage_port_id,
-                                                     flatten_columns: { port_id: :pol_port_id, voyage_id: :voyage_id } },
-                                                   { parent_table: :voyage_ports,
-                                                     columns: %i[port_id],
-                                                     foreign_key: :pod_voyage_port_id,
-                                                     flatten_columns: { port_id: :pod_port_id } },
-                                                   { parent_table: :voyages,
-                                                     columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
-                                                     foreign_key: :voyage_id,
-                                                     flatten_columns: { voyage_type_id: :voyage_type_id,
-                                                                        vessel_id: :vessel_id,
-                                                                        voyage_number: :voyage_number,
-                                                                        voyage_code: :voyage_code,
-                                                                        year: :year } }],
-                                   sub_tables: [{ sub_table: :load_voyages,
-                                                  columns: %i[shipping_line_party_role_id
-                                                              shipper_party_role_id
-                                                              booking_reference
-                                                              memo_pad]  },
-                                                { sub_table: :load_vehicles, columns: %i[vehicle_number] },
-                                                { sub_table: :load_containers, columns: %i[container_code] }])
-      return nil if hash.nil?
-
-      flatten_columns = { shipping_line_party_role_id: :shipping_line_party_role_id,
-                          shipper_party_role_id: :shipper_party_role_id,
-                          booking_reference: :booking_reference,
-                          memo_pad: :memo_pad }
-      sub_table = hash.delete(:load_voyages).first
-      sub_table ||= {}
-      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
-
-      flatten_columns = { vehicle_number: :vehicle_number }
-      sub_table = hash.delete(:load_vehicles).first
-      sub_table ||= {}
-      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
-
-      flatten_columns = { container_code: :container_code }
-      sub_table = hash.delete(:load_containers).first
-      sub_table ||= {}
-      flatten_columns.each { |col, new_name|  hash[new_name] = sub_table.delete(col) }
-
-      LoadFlat.new(hash)
+    def find_load_flat(id)
+      find_with_association(:loads,
+                            id,
+                            parent_tables: [{ parent_table: :voyage_ports,
+                                              columns: %i[port_id voyage_id],
+                                              foreign_key: :pol_voyage_port_id,
+                                              flatten_columns: { port_id: :pol_port_id, voyage_id: :voyage_id } },
+                                            { parent_table: :voyage_ports,
+                                              columns: %i[port_id],
+                                              foreign_key: :pod_voyage_port_id,
+                                              flatten_columns: { port_id: :pod_port_id } },
+                                            { parent_table: :voyages,
+                                              columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
+                                              foreign_key: :voyage_id,
+                                              flatten_columns: { voyage_type_id: :voyage_type_id,
+                                                                 vessel_id: :vessel_id,
+                                                                 voyage_number: :voyage_number,
+                                                                 voyage_code: :voyage_code,
+                                                                 year: :year } }],
+                            sub_tables: [{ sub_table: :load_voyages,
+                                           columns: %i[shipping_line_party_role_id
+                                                       shipper_party_role_id
+                                                       booking_reference
+                                                       memo_pad],
+                                           one_to_one: { shipping_line_party_role_id: :shipping_line_party_role_id,
+                                                         shipper_party_role_id: :shipper_party_role_id,
+                                                         booking_reference: :booking_reference,
+                                                         memo_pad: :memo_pad } },
+                                         { sub_table: :load_vehicles,
+                                           columns: %i[vehicle_number],
+                                           one_to_one: { vehicle_number: :vehicle_number } },
+                                         { sub_table: :load_containers,
+                                           columns: %i[container_code],
+                                           one_to_one: { container_code: :container_code } }],
+                            wrapper: LoadFlat)
     end
 
     def allocate_pallets(load_id, pallet_ids, user_name)
-      # allocates pallets
       DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
       log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name)
 
@@ -75,13 +62,11 @@ module FinishedGoodsApp
     end
 
     def unallocate_pallets(pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
-      # get pallet loads
-      load_ids = DB[:pallets].where(id: pallet_ids).select_map(:load_id)
-
       DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
       log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED', user_name: user_name)
 
       # find unallocated loads
+      load_ids = DB[:pallets].where(id: pallet_ids).select_map(:load_id)
       allocated_loads = DB[:pallets].where(load_id: load_ids).distinct.select_map(:load_id)
       unallocated_loads = load_ids - allocated_loads
 

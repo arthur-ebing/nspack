@@ -14,6 +14,7 @@ module FinishedGoodsApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
+        unship: :unship_check,
         delete: :delete_check
       }.freeze
 
@@ -33,6 +34,12 @@ module FinishedGoodsApp
       end
 
       def edit_check
+        return failed_response "Load#{@id} has already been shipped" if @entity&.shipped
+
+        all_ok
+      end
+
+      def unship_check
         all_ok
       end
 

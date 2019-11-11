@@ -225,87 +225,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # LOAD VOYAGES
-    # --------------------------------------------------------------------------
-    r.on 'load_voyages', Integer do |id|
-      interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-
-      # Check for notfound:
-      r.on !interactor.exists?(:load_voyages, id) do
-        handle_not_found(r)
-      end
-
-      r.on 'edit' do   # EDIT
-        check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:edit, id)
-        show_partial { FinishedGoods::Dispatch::LoadVoyage::Edit.call(id) }
-      end
-
-      r.is do
-        r.get do       # SHOW
-          check_auth!('dispatch', 'read')
-          show_partial { FinishedGoods::Dispatch::LoadVoyage::Show.call(id) }
-        end
-        r.patch do     # UPDATE
-          res = interactor.update_load_voyage(id, params[:load_voyage])
-          if res.success
-            row_keys = %i[
-              load_id
-              voyage_id
-              shipping_line_party_role_id
-              shipper_party_role_id
-              booking_reference
-              memo_pad
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
-          else
-            re_show_form(r, res) { FinishedGoods::Dispatch::LoadVoyage::Edit.call(id, form_values: params[:load_voyage], form_errors: res.errors) }
-          end
-        end
-        r.delete do    # DELETE
-          check_auth!('dispatch', 'delete')
-          interactor.assert_permission!(:delete, id)
-          res = interactor.delete_load_voyage(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            show_json_error(res.message, status: 200)
-          end
-        end
-      end
-    end
-
-    r.on 'load_voyages' do
-      interactor = FinishedGoodsApp::LoadVoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
-      r.on 'new' do    # NEW
-        check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::LoadVoyage::New.call(remote: fetch?(r)) }
-      end
-      r.post do        # CREATE
-        res = interactor.create_load_voyage(params[:load_voyage])
-        if res.success
-          row_keys = %i[
-            id
-            load_id
-            voyage_id
-            shipping_line_party_role_id
-            shipper_party_role_id
-            booking_reference
-            memo_pad
-            active
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
-        else
-          re_show_form(r, res, url: '/finished_goods/dispatch/load_voyages/new') do
-            FinishedGoods::Dispatch::LoadVoyage::New.call(form_values: params[:load_voyage],
-                                                          form_errors: res.errors,
-                                                          remote: fetch?(r))
-          end
-        end
-      end
-    end
-
     # LOADS
     # --------------------------------------------------------------------------
     r.on 'loads', Integer do |id|
@@ -318,7 +237,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:edit, id)
+        interactor.assert_permission!(:unship, id)
         res = interactor.unship_load(id)
         if res.success
           flash[:notice] = res.message
@@ -326,25 +245,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'allocate_pallets_from_multiselect' do
+      r.on 'allocate_pallets_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.allocate_pallets_from_multiselect(id, multiselect_grid_choices(params))
-        if res.success
-          flash[:notice] = res.message
-          r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
-        end
+        res = interactor.allocate_pallets_multiselect(id, multiselect_grid_choices(params))
+        flash[:notice] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
       end
 
       r.on 'allocate_pallets' do
         r.get do       # SHOW
-          check_auth!('dispatch', 'read')
+          check_auth!('dispatch', 'edit')
           interactor.assert_permission!(:edit, id)
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, back_url: session[:last_grid_url]) }
         end
 
         r.patch do     # UPDATE
-          res = interactor.allocate_pallets_from_list(id, params[:load])
+          res = interactor.allocate_pallets(id, params[:load])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
@@ -410,14 +327,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
-
-      # r.on 'pallet_list_changed' do
-      #   # if params[:changed_value].nil_or_empty?
-      #   #   json_hide_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
-      #   # else
-      #   #   json_show_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
-      #   # end
-      # end
 
       r.on 'voyage_type_changed' do
         if params[:changed_value].nil_or_empty?

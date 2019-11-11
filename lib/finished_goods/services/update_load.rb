@@ -54,7 +54,7 @@ module FinishedGoodsApp
                                        :booking_reference,
                                        :memo_pad)
       load_voyage_attrs[:voyage_id] = voyage_id
-      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_id(load_id)
+      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_from(load_id: load_id)
       LoadVoyageRepo.new.update_load_voyage(load_voyage_id, load_voyage_attrs)
     end
   end

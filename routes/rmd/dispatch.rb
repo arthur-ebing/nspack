@@ -241,7 +241,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
-
           load_id = params[:load][:load_id]
           res = interactor.validate_load(load_id)
           if res.success

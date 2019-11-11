@@ -64,9 +64,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_pallets_from_multiselect(id, pallet_sequence_id) # rubocop:disable Metrics/AbcSize
+    def allocate_pallets_multiselect(id, pallet_sequence_id) # rubocop:disable Metrics/AbcSize
       pallet_numbers = repo.find_pallet_numbers_from(pallet_sequence_id: pallet_sequence_id)
       validated_pallet_numbers = repo.validate_pallets(pallet_numbers, shipped: false)
+
       new_allocation = repo.find_pallet_ids_from(pallet_numbers: validated_pallet_numbers)
       current_allocation = repo.find_pallet_ids_from(load_id: id)
 
@@ -80,7 +81,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_pallets_from_list(id, params) # rubocop:disable Metrics/AbcSize
+    def allocate_pallets(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_list(params)
       return validation_failed_response(res) unless res.success
 
@@ -96,7 +97,7 @@ module FinishedGoodsApp
     end
 
     def delete_load(id)
-      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_id(id)
+      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_from(load_id: id)
       repo.transaction do
         # DELETE LOAD_VOYAGE
         LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
