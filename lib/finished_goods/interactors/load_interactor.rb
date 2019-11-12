@@ -38,28 +38,34 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def ship_load(id)
+    def ship_load(id) # rubocop:disable Metrics/AbcSize
+      failed_response("Load #{id} already shipped") if load_entity(id)&.shipped
+      res = nil
       repo.transaction do
-        res = ShipLoad.call(id, @user.user_name)
+        res = ShipLoad.call(load_id: id, user_name: @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
       end
-      instance = load_entity(id)
-      success_response("Shipped load #{id}", instance)
+      success_response(res.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def unship_load(id)
+    def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
+      failed_response("Load #{id} not shipped") unless load_entity(id)&.shipped
+
+      pallet_shipped = repo.validate_pallets(pallet_number, shipped: true) == [pallet_number]
+      failed_response("Pallet Number #{pallet_number} not shipped") unless pallet_shipped
+
+      res = nil
       repo.transaction do
-        res = UnshipLoad.call(id, @user.user_name)
+        res = UnshipLoad.call(id, @user.user_name, pallet_number)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
       end
-      instance = load_entity(id)
-      success_response("Unshipped load #{id}", instance)
+      success_response(res.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

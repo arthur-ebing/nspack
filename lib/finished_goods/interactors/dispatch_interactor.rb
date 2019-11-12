@@ -72,13 +72,14 @@ module FinishedGoodsApp
     end
 
     def ship_load(load_id)
+      res = nil
       repo.transaction do
         res = ShipLoad.call(load_id, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
       end
-      success_response("Shipped load #{load_id}")
+      success_response(res.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

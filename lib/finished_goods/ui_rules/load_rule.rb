@@ -188,6 +188,7 @@ module UiRules
       make_new_form_object && return if @mode == :new
       @form_object = @repo.find_load_flat(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil))
+      rules[:shipped] = !@form_object.shipped
     end
 
     def make_new_form_object
@@ -220,7 +221,6 @@ module UiRules
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
       end
-      rules[:shipped] = !@form_object.shipped
     end
   end
 end

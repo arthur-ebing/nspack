@@ -6,6 +6,10 @@
     :title: Pallet sequences for Pallet No $:pallet_number$
     :icon: list
     :popup: true
+  - :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
+    :text: Unship and Unallocate
+    :icon: edit
+    :hide_if_false: shipped
 :captions:
   :conditions:
     :active: Active Pallets
@@ -65,6 +69,10 @@
     - :col: load_id
       :op: =
       :val: $:load_id$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: $:shipped$
 :multiselect:
   :allocate_pallets:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"

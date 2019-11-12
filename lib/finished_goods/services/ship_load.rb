@@ -2,11 +2,11 @@
 
 module FinishedGoodsApp
   class ShipLoad < BaseService
-    attr_reader :load_id, :pallet_numbers, :user_name
+    attr_reader :load_id, :pallet_ids, :user_name
 
     def initialize(load_id, user_name)
       @load_id = load_id
-      @pallet_numbers = FinishedGoodsApp::LoadRepo.new.find_pallet_numbers_from(load_id: load_id).flatten
+      @pallet_ids = FinishedGoodsApp::LoadRepo.new.find_pallet_ids_from(load_id: load_id)
       @user_name = user_name
     end
 
@@ -14,23 +14,23 @@ module FinishedGoodsApp
       ship_load
       ship_pallets
 
-      success_response("Shipped Load #{load_id}", load_id)
+      success_response("Shipped Load #{load_id}")
     end
 
     private
 
     def ship_load
-      id = repo.ship_load(load_id)
-      repo.log_status('loads', id, 'SHIPPED', user_name: user_name)
+      repo.ship_load(load_id)
+      repo.log_status('loads', load_id, 'SHIPPED', user_name: user_name)
 
-      success_response('ok')
+      ok_response
     end
 
     def ship_pallets
-      ids = repo.ship_pallets(pallet_numbers)
-      repo.log_multiple_statuses('pallets', ids, 'SHIPPED', user_name: user_name)
+      repo.ship_pallets(pallet_ids)
+      repo.log_multiple_statuses('pallets', pallet_ids, 'SHIPPED', user_name: user_name)
 
-      success_response('ok')
+      ok_response
     end
 
     def repo
