@@ -7,7 +7,7 @@ class Nspack < Roda
     # PRODUCTION RUNS
     # --------------------------------------------------------------------------
     r.on 'production_runs', Integer do |id|
-      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:production_runs, id) do
@@ -162,7 +162,7 @@ class Nspack < Roda
     end
 
     r.on 'production_runs' do
-      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('runs', 'new')
         set_last_grid_url('/list/production_runs', r)
@@ -251,7 +251,7 @@ class Nspack < Roda
     end
 
     r.on 'product_resource_allocations', Integer do |id|
-      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:production_runs, id) do

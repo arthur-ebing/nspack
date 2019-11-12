@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VOYAGES_PORTS
     # --------------------------------------------------------------------------
     r.on 'voyage_ports', Integer do |id|
-      interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:voyage_ports, id) do
@@ -87,7 +87,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VOYAGES
     # --------------------------------------------------------------------------
     r.on 'voyages', Integer do |id|
-      interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:voyages, id) do
@@ -101,7 +101,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'voyage_ports' do
-        interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = FinishedGoodsApp::VoyagePortInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('dispatch', 'new')
           show_partial_or_page(r) { FinishedGoods::Dispatch::VoyagePort::New.call(id, remote: fetch?(r)) }
@@ -182,7 +182,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'voyages' do
-      interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::VoyageInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'voyage_type_changed' do
         if params[:changed_value].nil_or_empty?
@@ -228,7 +228,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOADS
     # --------------------------------------------------------------------------
     r.on 'loads', Integer do |id|
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:loads, id) do
@@ -326,7 +326,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'loads' do
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'voyage_type_changed' do
         if params[:changed_value].nil_or_empty?

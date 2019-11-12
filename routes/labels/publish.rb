@@ -7,7 +7,7 @@ class Nspack < Roda
   route 'publish', 'labels' do |r|
     # BATCH PUBLISH
     # --------------------------------------------------------------------------
-    interactor = LabelApp::PublishInteractor.new(current_user, {}, { route_url: request.path }, {})
+    interactor = LabelApp::PublishInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     r.on 'batch' do
       r.is do

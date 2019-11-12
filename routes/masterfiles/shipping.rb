@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VEHICLE TYPES
     # --------------------------------------------------------------------------
     r.on 'vehicle_types', Integer do |id|
-      interactor = MasterfilesApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vehicle_types, id) do
@@ -47,7 +47,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'vehicle_types' do
-      interactor = MasterfilesApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VehicleTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::VehicleType::New.call(remote: fetch?(r)) }
@@ -77,7 +77,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VOYAGE TYPES
     # --------------------------------------------------------------------------
     r.on 'voyage_types', Integer do |id|
-      interactor = MasterfilesApp::VoyageTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VoyageTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:voyage_types, id) do
@@ -118,7 +118,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'voyage_types' do
-      interactor = MasterfilesApp::VoyageTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VoyageTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::VoyageType::New.call(remote: fetch?(r)) }
@@ -146,7 +146,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PORT TYPES
     # --------------------------------------------------------------------------
     r.on 'port_types', Integer do |id|
-      interactor = MasterfilesApp::PortTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PortTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:port_types, id) do
@@ -187,7 +187,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'port_types' do
-      interactor = MasterfilesApp::PortTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PortTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::PortType::New.call(remote: fetch?(r)) }
@@ -216,7 +216,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PORTS
     # --------------------------------------------------------------------------
     r.on 'ports', Integer do |id|
-      interactor = MasterfilesApp::PortInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PortInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:ports, id) do
@@ -266,7 +266,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'ports' do
-      interactor = MasterfilesApp::PortInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PortInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::Port::New.call(remote: fetch?(r)) }
@@ -300,7 +300,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VESSEL TYPES
     # --------------------------------------------------------------------------
     r.on 'vessel_types', Integer do |id|
-      interactor = MasterfilesApp::VesselTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VesselTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vessel_types, id) do
@@ -342,7 +342,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'vessel_types' do
-      interactor = MasterfilesApp::VesselTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VesselTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::VesselType::New.call(remote: fetch?(r)) }
@@ -373,7 +373,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # VESSELS
     # --------------------------------------------------------------------------
     r.on 'vessels', Integer do |id|
-      interactor = MasterfilesApp::VesselInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VesselInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:vessels, id) do
@@ -422,7 +422,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'vessels' do
-      interactor = MasterfilesApp::VesselInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::VesselInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::Vessel::New.call(remote: fetch?(r)) }
@@ -453,7 +453,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # DEPOTS
     # --------------------------------------------------------------------------
     r.on 'depots', Integer do |id|
-      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:depots, id) do
@@ -500,7 +500,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'depots' do
-      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::DepotInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::Depot::New.call(remote: fetch?(r)) }
@@ -532,7 +532,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # CARGO TEMPERATURES
     # --------------------------------------------------------------------------
     r.on 'cargo_temperatures', Integer do |id|
-      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cargo_temperatures, id) do
@@ -578,7 +578,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'cargo_temperatures' do
-      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CargoTemperatureInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('shipping', 'new')
         show_partial_or_page(r) { Masterfiles::Shipping::CargoTemperature::New.call(remote: fetch?(r)) }

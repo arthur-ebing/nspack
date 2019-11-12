@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # SEASON GROUPS
     # --------------------------------------------------------------------------
     r.on 'season_groups', Integer do |id|
-      interactor = MasterfilesApp::SeasonGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SeasonGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:season_groups, id) do
@@ -47,7 +47,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'season_groups' do
-      interactor = MasterfilesApp::SeasonGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SeasonGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('calendar', 'new')
         show_partial_or_page(r) { Masterfiles::Calendar::SeasonGroup::New.call(remote: fetch?(r)) }
@@ -77,7 +77,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # SEASONS
     # --------------------------------------------------------------------------
     r.on 'seasons', Integer do |id|
-      interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:seasons, id) do
@@ -127,7 +127,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'seasons' do
-      interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'start_date_changed' do
         end_date = if params[:changed_value].blank?

@@ -30,7 +30,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   #
   # @return [void]
   def log_transaction
-    repo.log_action(user_name: @user.user_name, context: @context.context, route_url: @context.route_url)
+    repo.log_action(user_name: @user.user_name, context: @context.context, route_url: @context.route_url, request_ip: @context.request_ip)
   end
 
   # Log the status of a record. Uses the context passed to the Interactor constructor.

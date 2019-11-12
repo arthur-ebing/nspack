@@ -8,7 +8,7 @@ class Nspack < Roda
     # COMMODITY GROUPS
     # --------------------------------------------------------------------------
     r.on 'commodity_groups', Integer do |id|
-      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:commodity_groups, id) do
@@ -47,7 +47,7 @@ class Nspack < Roda
       end
     end
     r.on 'commodity_groups' do
-      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::CommodityGroup::New.call(remote: fetch?(r)) }
@@ -69,7 +69,7 @@ class Nspack < Roda
     # COMMODITIES
     # --------------------------------------------------------------------------
     r.on 'commodities', Integer do |id|
-      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:commodities, id) do
@@ -114,7 +114,7 @@ class Nspack < Roda
       end
     end
     r.on 'commodities' do
-      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::Commodity::New.call(remote: fetch?(r)) }
@@ -145,7 +145,7 @@ class Nspack < Roda
     # CULTIVAR GROUPS
     # --------------------------------------------------------------------------
     r.on 'cultivar_groups', Integer do |id|
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivar_groups, id) do
@@ -180,7 +180,7 @@ class Nspack < Roda
       end
     end
     r.on 'cultivar_groups' do
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::CultivarGroup::New.call(remote: fetch?(r)) }
@@ -202,7 +202,7 @@ class Nspack < Roda
     # CULTIVARS
     # --------------------------------------------------------------------------
     r.on 'cultivars', Integer do |id|
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cultivars, id) do
@@ -218,7 +218,7 @@ class Nspack < Roda
       # --------------------------------------------------------------------------
       r.on 'link_marketing_varieties' do
         r.post do
-          interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+          interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           res = interactor.link_marketing_varieties(id, multiselect_grid_choices(params))
 
           if res.success
@@ -230,7 +230,7 @@ class Nspack < Roda
         end
       end
       r.on 'marketing_varieties' do
-        interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('fruit', 'new')
           show_partial_or_page(r) { Masterfiles::Fruit::MarketingVariety::New.call(id, remote: fetch?(r)) }
@@ -280,7 +280,7 @@ class Nspack < Roda
       end
     end
     r.on 'cultivars' do
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::Cultivar::New.call(remote: fetch?(r)) }
@@ -300,7 +300,7 @@ class Nspack < Roda
       end
     end
     r.on 'marketing_varieties', Integer do |id|
-      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:marketing_varieties, id) do
@@ -332,7 +332,7 @@ class Nspack < Roda
     # BASIC PACK CODES
     # --------------------------------------------------------------------------
     r.on 'basic_pack_codes', Integer do |id|
-      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:basic_pack_codes, id) do
@@ -374,7 +374,7 @@ class Nspack < Roda
       end
     end
     r.on 'basic_pack_codes' do
-      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
@@ -396,7 +396,7 @@ class Nspack < Roda
     # STANDARD PACK CODES
     # --------------------------------------------------------------------------
     r.on 'standard_pack_codes', Integer do |id|
-      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:standard_pack_codes, id) do
@@ -439,7 +439,7 @@ class Nspack < Roda
       end
     end
     r.on 'standard_pack_codes' do
-      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
@@ -461,7 +461,7 @@ class Nspack < Roda
     # STD FRUIT SIZE COUNTS
     # --------------------------------------------------------------------------
     r.on 'std_fruit_size_counts', Integer do |id|
-      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
       r.on !interactor.exists?(:std_fruit_size_counts, id) do
         handle_not_found(r)
@@ -472,7 +472,7 @@ class Nspack < Roda
         show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
       end
       r.on 'fruit_actual_counts_for_packs' do
-        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('fruit', 'new')
           show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
@@ -526,7 +526,7 @@ class Nspack < Roda
       end
     end
     r.on 'std_fruit_size_counts' do
-      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
@@ -546,7 +546,7 @@ class Nspack < Roda
       end
     end
     r.on 'fruit_actual_counts_for_packs', Integer do |id|
-      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_actual_counts_for_packs, id) do
@@ -603,7 +603,7 @@ class Nspack < Roda
     # FRUIT SIZE REFERENCES
     # --------------------------------------------------------------------------
     r.on 'fruit_size_references', Integer do |id|
-      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:fruit_size_references, id) do
@@ -644,7 +644,7 @@ class Nspack < Roda
     end
 
     r.on 'fruit_size_references' do
-      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FruitSizeReferenceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::FruitSizeReference::New.call(remote: fetch?(r)) }
@@ -672,7 +672,7 @@ class Nspack < Roda
     # RMT CLASSES
     # --------------------------------------------------------------------------
     r.on 'rmt_classes', Integer do |id|
-      interactor = MasterfilesApp::RmtClassInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtClassInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_classes, id) do
@@ -713,7 +713,7 @@ class Nspack < Roda
     end
 
     r.on 'rmt_classes' do
-      interactor = MasterfilesApp::RmtClassInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtClassInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::RmtClass::New.call(remote: fetch?(r)) }
@@ -741,7 +741,7 @@ class Nspack < Roda
 
     # GRADES
     r.on 'grades', Integer do |id|
-      interactor = MasterfilesApp::GradeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::GradeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:grades, id) do
@@ -781,7 +781,7 @@ class Nspack < Roda
     end
 
     r.on 'grades' do
-      interactor = MasterfilesApp::GradeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::GradeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::Grade::New.call(remote: fetch?(r)) }
@@ -810,7 +810,7 @@ class Nspack < Roda
     # TREATMENT TYPES
     # --------------------------------------------------------------------------
     r.on 'treatment_types', Integer do |id|
-      interactor = MasterfilesApp::TreatmentTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TreatmentTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:treatment_types, id) do
@@ -850,7 +850,7 @@ class Nspack < Roda
     end
 
     r.on 'treatment_types' do
-      interactor = MasterfilesApp::TreatmentTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TreatmentTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::TreatmentType::New.call(remote: fetch?(r)) }
@@ -879,7 +879,7 @@ class Nspack < Roda
     # TREATMENTS
     # --------------------------------------------------------------------------
     r.on 'treatments', Integer do |id|
-      interactor = MasterfilesApp::TreatmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TreatmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:treatments, id) do
@@ -922,7 +922,7 @@ class Nspack < Roda
     end
 
     r.on 'treatments' do
-      interactor = MasterfilesApp::TreatmentInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::TreatmentInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::Treatment::New.call(remote: fetch?(r)) }
@@ -952,7 +952,7 @@ class Nspack < Roda
     # INVENTORY CODES
     # --------------------------------------------------------------------------
     r.on 'inventory_codes', Integer do |id|
-      interactor = MasterfilesApp::InventoryCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::InventoryCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:inventory_codes, id) do
@@ -993,7 +993,7 @@ class Nspack < Roda
     end
 
     r.on 'inventory_codes' do
-      interactor = MasterfilesApp::InventoryCodeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::InventoryCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::InventoryCode::New.call(remote: fetch?(r)) }

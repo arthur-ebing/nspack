@@ -8,7 +8,7 @@ class Nspack < Roda
     # UOM TYPES
     # --------------------------------------------------------------------------
     r.on 'uom_types', Integer do |id|
-      interactor = MasterfilesApp::UomTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::UomTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:uom_types, id) do
@@ -46,7 +46,7 @@ class Nspack < Roda
     end
 
     r.on 'uom_types' do
-      interactor = MasterfilesApp::UomTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::UomTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('general', 'new')
         show_partial_or_page(r) { Masterfiles::General::UomType::New.call(remote: fetch?(r)) }
@@ -74,7 +74,7 @@ class Nspack < Roda
     # UOMS
     # --------------------------------------------------------------------------
     r.on 'uoms', Integer do |id|
-      interactor = MasterfilesApp::UomInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::UomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:uoms, id) do
@@ -113,7 +113,7 @@ class Nspack < Roda
     end
 
     r.on 'uoms' do
-      interactor = MasterfilesApp::UomInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::UomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('general', 'new')
         show_partial_or_page(r) { Masterfiles::General::Uom::New.call(remote: fetch?(r)) }

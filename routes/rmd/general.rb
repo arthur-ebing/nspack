@@ -88,7 +88,7 @@ class Nspack < Roda
         end
       end
       r.post do
-        interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         res = interactor.toggle_camera_scan(request.ip)
         if res.success
           r.redirect '/rmd/utilities/toggle_camera'

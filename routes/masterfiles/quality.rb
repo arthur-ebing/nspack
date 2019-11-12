@@ -5,7 +5,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # PALLET VERIFICATION FAILURE REASONS
     # --------------------------------------------------------------------------
     r.on 'pallet_verification_failure_reasons', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PalletVerificationFailureReasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletVerificationFailureReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pallet_verification_failure_reasons, id) do
@@ -46,7 +46,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'pallet_verification_failure_reasons' do
-      interactor = MasterfilesApp::PalletVerificationFailureReasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletVerificationFailureReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('quality', 'new')
         show_partial_or_page(r) { Masterfiles::Quality::PalletVerificationFailureReason::New.call(remote: fetch?(r)) }
@@ -74,7 +74,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # SCRAP REASONS
     # --------------------------------------------------------------------------
     r.on 'scrap_reasons', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::ScrapReasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ScrapReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:scrap_reasons, id) do
@@ -115,7 +115,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'scrap_reasons' do
-      interactor = MasterfilesApp::ScrapReasonInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ScrapReasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('quality', 'new')
         show_partial_or_page(r) { Masterfiles::Quality::ScrapReason::New.call(remote: fetch?(r)) }

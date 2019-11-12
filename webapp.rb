@@ -96,7 +96,7 @@ class Nspack < Roda
     r.on 'webquery', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path, request_ip: request.ip }, {})
       interactor.prepared_report_as_html(id)
     end
 
@@ -104,7 +104,7 @@ class Nspack < Roda
     r.on 'xmlreport', String do |id|
       # A dummy user
       user = DevelopmentApp::User.new(id: 0, login_name: 'webquery', user_name: 'webquery', password_hash: 'dummy', email: nil, active: true)
-      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path }, {})
+      interactor = DataminerApp::PreparedReportInteractor.new(user, {}, { route_url: request.path, request_ip: request.ip }, {})
       interactor.prepared_report_as_xml(id)
     end
     # Do the same as XML?
@@ -349,7 +349,7 @@ class Nspack < Roda
     # ----------------------------------------------------------------------
 
     r.on 'label_designer' do
-      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.is do
         @label_edit_page = true
         view(inline: interactor.label_designer_page(label_name: params[:label_name],
@@ -360,7 +360,7 @@ class Nspack < Roda
     end
 
     r.on 'save_label' do
-      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on :id do |id|
         r.post do
           repo = LabelApp::LabelRepo.new
@@ -369,7 +369,7 @@ class Nspack < Roda
                         png_image: Sequel.blob(interactor.image_from_param(params[:imageString])) }
           DB.transaction do
             repo.update_label(id, interactor.include_updated_by_in_changeset(changeset))
-            repo.log_action(user_name: current_user.user_name, context: 'update label', route_url: request.path)
+            repo.log_action(user_name: current_user.user_name, context: 'update label', route_url: request.path, request_ip: request.ip)
           end
 
           flash[:notice] = 'Updated'
@@ -406,7 +406,7 @@ class Nspack < Roda
             from_lbl = repo.find_label(from_id)
             repo.log_status('labels', id, 'CLONED', comment: "from #{from_lbl.label_name}", user_name: current_user.user_name)
           end
-          repo.log_action(user_name: current_user.user_name, context: 'create label', route_url: request.path)
+          repo.log_action(user_name: current_user.user_name, context: 'create label', route_url: request.path, request_ip: request.ip)
         end
         session[:new_label_attributes] = nil
         flash[:notice] = 'Created'

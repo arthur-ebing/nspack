@@ -8,7 +8,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # view-source:http://192.168.43.254:9296/messcada/rmt/bin_weighing?bin_number=1234&gross_weight=600.23&measurement_unit=KG
     # --------------------------------------------------------------------------
     r.on 'bin_weighing' do
-      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.is do
         r.get do       # WEIGH BIN
@@ -55,7 +55,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # view-source:http://192.168.43.254:9296/messcada/rmt/bin_tipping?bin_number=1234&device=BTM-01
     # --------------------------------------------------------------------------
     r.on 'bin_tipping' do
-      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.is do
         r.get do       # TIP BIN

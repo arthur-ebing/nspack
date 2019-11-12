@@ -8,7 +8,7 @@ class Nspack < Roda
     # LABELS
     # --------------------------------------------------------------------------
     r.on 'labels', Integer do |id|
-      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:labels, id) do
@@ -297,7 +297,7 @@ class Nspack < Roda
       end
     end
     r.on 'labels' do
-      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = LabelApp::LabelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('designs', 'new')
         interactor.assert_permission!(:create)

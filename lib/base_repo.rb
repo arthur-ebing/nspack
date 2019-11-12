@@ -286,15 +286,17 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param user_name [String] the current user's name.
   # @param context [String] more context about what led to the action.
   # @param route_url [String] the application route that led to the transaction.
-  def log_action(user_name: nil, context: nil, route_url: nil)
+  # @param request_ip [String] the ip address of the client browser.
+  def log_action(user_name: nil, context: nil, route_url: nil, request_ip: nil)
     DB[Sequel[:audit][:logged_action_details]].insert(user_name: user_name,
                                                       context: context,
-                                                      route_url: route_url)
+                                                      route_url: route_url,
+                                                      request_ip: request_ip)
   end
 
   # Log the status of a record.
   #
-  # @param table_name [String] the name of the table.
+  # @param table_name [Symbol, String] the name of the table.
   # @param id [Integer] the id of the record with the changed status.
   # @param status [String] the status to be logged.
   # @param comment [String] extra information about the status change.

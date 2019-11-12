@@ -5,7 +5,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # MARKS
     # --------------------------------------------------------------------------
     r.on 'marks', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::MarkInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::MarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:marks, id) do
@@ -46,7 +46,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'marks' do
-      interactor = MasterfilesApp::MarkInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::MarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('marketing', 'new')
         show_partial_or_page(r) { Masterfiles::Marketing::Mark::New.call(remote: fetch?(r)) }
@@ -75,7 +75,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # CUSTOMER VARIETIES
     # --------------------------------------------------------------------------
     r.on 'customer_varieties', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:customer_varieties, id) do
@@ -158,7 +158,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'customer_varieties' do # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'variety_as_customer_variety_changed' do
         customer_variety_varieties = interactor.for_select_group_marketing_varieties(params[:changed_value])
@@ -193,7 +193,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # CUSTOMER VARIETY VARIETIES
     # --------------------------------------------------------------------------
     r.on 'customer_variety_varieties', Integer do |id|
-      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CustomerVarietyInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:customer_variety_varieties, id) do

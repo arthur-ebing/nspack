@@ -197,7 +197,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           attrs = params[:truck_arrival]
-          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           res = interactor.truck_arrival_service(attrs)
 
           if res.success
@@ -240,7 +240,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           load_id = params[:load][:load_id]
           res = interactor.validate_load(load_id)
           if res.success
@@ -256,7 +256,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOAD TRUCK
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
-      interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do

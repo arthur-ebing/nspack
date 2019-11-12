@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # RESOURCE TYPES
     # --------------------------------------------------------------------------
     r.on 'plant_resource_types', Integer do |id|
-      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:plant_resource_types, id) do
@@ -52,7 +52,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'plant_resource_types' do
-      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('resources', 'new')
         show_partial_or_page(r) { Production::Resources::PlantResourceType::New.call(remote: fetch?(r)) }
@@ -88,7 +88,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PLANT RESOURCES
     # --------------------------------------------------------------------------
     r.on 'plant_resources', Integer do |id|
-      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:plant_resources, id) do
@@ -164,7 +164,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'plant_resources' do
-      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('resources', 'new')
         show_partial_or_page(r) { Production::Resources::PlantResource::New.call(remote: fetch?(r)) }
@@ -209,7 +209,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # SYSTEM RESOURCE TYPES
     # --------------------------------------------------------------------------
     r.on 'system_resource_types', Integer do |id|
-      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ResourceTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:system_resource_types, id) do

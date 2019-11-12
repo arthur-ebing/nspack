@@ -9,7 +9,7 @@ class Nspack < Roda
     # BINS
     # --------------------------------------------------------------------------
     r.on 'rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'new' do # rubocop:disable Metrics/BlockLength    # NEW
         delivery = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(id)

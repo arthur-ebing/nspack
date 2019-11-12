@@ -5,7 +5,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # PRODUCT SETUP TEMPLATES
     # --------------------------------------------------------------------------
     r.on 'product_setup_templates', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:product_setup_templates, id) do
@@ -60,7 +60,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'product_setups' do
-        interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         r.on 'new' do    # NEW
           check_auth!('product setups', 'new')
@@ -121,7 +121,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'product_setup_templates' do # rubocop:disable Metrics/BlockLength
-      interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'cultivar_group_changed' do
         if params[:changed_value].blank?
@@ -221,7 +221,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # PRODUCT SETUPS
     # --------------------------------------------------------------------------
     r.on 'product_setups', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:product_setups, id) do
@@ -297,7 +297,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'product_setups' do # rubocop:disable Metrics/BlockLength
-      interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'commodity_changed' do
         commodity_id = params[:changed_value]
         product_setup_template_id = params[:product_setup_product_setup_template_id]

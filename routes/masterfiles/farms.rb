@@ -7,7 +7,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PRODUCTION REGIONS
     # --------------------------------------------------------------------------
     r.on 'production_regions', Integer do |id|
-      interactor = MasterfilesApp::ProductionRegionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ProductionRegionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:production_regions, id) do
@@ -47,7 +47,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'production_regions' do
-      interactor = MasterfilesApp::ProductionRegionInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::ProductionRegionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::ProductionRegion::New.call(remote: fetch?(r)) }
@@ -75,7 +75,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # FARM GROUPS
     # --------------------------------------------------------------------------
     r.on 'farm_groups', Integer do |id|
-      interactor = MasterfilesApp::FarmGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FarmGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:farm_groups, id) do
@@ -115,7 +115,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'farm_groups' do
-      interactor = MasterfilesApp::FarmGroupInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FarmGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::FarmGroup::New.call(remote: fetch?(r)) }
@@ -144,7 +144,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # FARMS
     r.on 'farms', Integer do |id|
-      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:farms, id) do
@@ -180,7 +180,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'orchards' do
-        interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do
           check_auth!('farms', 'new')
           show_partial_or_page(r) { Masterfiles::Farms::Orchard::New.call(id, remote: fetch?(r)) }
@@ -261,7 +261,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
     r.on 'farms' do
-      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::Farm::New.call(remote: fetch?(r)) }
@@ -294,7 +294,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
     # ORCHARDS
     r.on 'orchards', Integer do |id|
-      interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
       r.on !interactor.exists?(:orchards, id) do
         handle_not_found(r)
@@ -349,7 +349,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PUCS
     r.on 'pucs', Integer do |id|
-      interactor = MasterfilesApp::PucInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PucInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
       r.on !interactor.exists?(:pucs, id) do
         handle_not_found(r)
@@ -388,7 +388,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pucs' do
-      interactor = MasterfilesApp::PucInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PucInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::Puc::New.call(remote: fetch?(r)) }
@@ -417,7 +417,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # RMT CONTAINER TYPES
     # --------------------------------------------------------------------------
     r.on 'rmt_container_types', Integer do |id|
-      interactor = MasterfilesApp::RmtContainerTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtContainerTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_container_types, id) do
@@ -512,7 +512,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'rmt_container_types' do
-      interactor = MasterfilesApp::RmtContainerTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtContainerTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::RmtContainerType::New.call(remote: fetch?(r)) }
@@ -540,7 +540,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # RMT CONTAINER MATERIAL TYPES
     # --------------------------------------------------------------------------
     r.on 'rmt_container_material_types', Integer do |id|
-      interactor = MasterfilesApp::RmtContainerMaterialTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtContainerMaterialTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_container_material_types, id) do
@@ -636,7 +636,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'rmt_container_material_types' do
-      interactor = MasterfilesApp::RmtContainerMaterialTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtContainerMaterialTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('farms', 'new')
         show_partial_or_page(r) { Masterfiles::Farms::RmtContainerMaterialType::New.call(remote: fetch?(r)) }

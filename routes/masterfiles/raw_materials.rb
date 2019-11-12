@@ -6,7 +6,7 @@ class Nspack < Roda
     # RMT DELIVERY DESTINATIONS
     # --------------------------------------------------------------------------
     r.on 'rmt_delivery_destinations', Integer do |id|
-      interactor = MasterfilesApp::RmtDeliveryDestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtDeliveryDestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_delivery_destinations, id) do
@@ -47,7 +47,7 @@ class Nspack < Roda
     end
 
     r.on 'rmt_delivery_destinations' do
-      interactor = MasterfilesApp::RmtDeliveryDestinationInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::RmtDeliveryDestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('raw materials', 'new')
         show_partial_or_page(r) { Masterfiles::RawMaterials::RmtDeliveryDestination::New.call(remote: fetch?(r)) }

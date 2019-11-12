@@ -8,7 +8,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # view-source:http://192.168.50.106:9296/messcada/production/carton_labeling?device=CLM-101B1
     # --------------------------------------------------------------------------
     r.on 'carton_labeling' do
-      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.is do
         r.get do
@@ -35,7 +35,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'carton_verification' do
-      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'weighing' do # rubocop:disable Metrics/BlockLength
         r.on 'labeling' do
           # --------------------------------------------------------------------------

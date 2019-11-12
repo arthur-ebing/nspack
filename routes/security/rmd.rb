@@ -7,7 +7,7 @@ class Nspack < Roda
     # REGISTERED MOBILE DEVICES
     # --------------------------------------------------------------------------
     r.on 'registered_mobile_devices', Integer do |id|
-      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:registered_mobile_devices, id) do
@@ -49,7 +49,7 @@ class Nspack < Roda
     end
 
     r.on 'registered_mobile_devices' do
-      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = SecurityApp::RegisteredMobileDeviceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('rmd', 'new')
         show_partial_or_page(r) { Security::Rmd::RegisteredMobileDevice::New.call(remote: fetch?(r)) }

@@ -833,7 +833,7 @@ module DevelopmentApp
               # #{opts.table.upcase.tr('_', ' ')}
               # --------------------------------------------------------------------------
               r.on '#{opts.table}', Integer do |id|
-                interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+                interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
                 # Check for notfound:
                 r.on !interactor.exists?(:#{opts.table}, id) do
@@ -943,7 +943,7 @@ module DevelopmentApp
       def plain_new_routes
         <<~RUBY
           r.on '#{opts.table}' do
-            interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+            interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
             r.on 'new' do    # NEW
               check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
               show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(remote: fetch?(r)) }
@@ -968,7 +968,7 @@ module DevelopmentApp
         <<~RUBY
           r.on '#{opts.nested_route}', Integer do |id|
             r.on '#{opts.table}' do
-              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path }, {})
+              interactor = #{opts.classnames[:namespaced_interactor]}.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
               r.on 'new' do    # NEW
                 check_auth!('#{opts.program_text}', 'new')#{on_new_lastgrid.chomp}
                 show_partial_or_page(r) { #{opts.classnames[:view_prefix]}::New.call(id, remote: fetch?(r)) }

@@ -5,7 +5,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PALLET BASES
     # --------------------------------------------------------------------------
     r.on 'pallet_bases', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pallet_bases, id) do
@@ -56,7 +56,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pallet_bases' do # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PalletBase::New.call(remote: fetch?(r)) }
@@ -91,7 +91,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PALLET STACK TYPES
     # --------------------------------------------------------------------------
     r.on 'pallet_stack_types', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PalletStackTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletStackTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pallet_stack_types, id) do
@@ -132,7 +132,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pallet_stack_types' do
-      interactor = MasterfilesApp::PalletStackTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletStackTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PalletStackType::New.call(remote: fetch?(r)) }
@@ -162,7 +162,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PALLET FORMATS
     # --------------------------------------------------------------------------
     r.on 'pallet_formats', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PalletFormatInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletFormatInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pallet_formats, id) do
@@ -208,7 +208,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pallet_formats' do
-      interactor = MasterfilesApp::PalletFormatInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PalletFormatInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PalletFormat::New.call(remote: fetch?(r)) }
@@ -238,7 +238,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # CARTONS PER PALLET
     # --------------------------------------------------------------------------
     r.on 'cartons_per_pallet', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:cartons_per_pallet, id) do
@@ -289,7 +289,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'cartons_per_pallet' do # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::CartonsPerPallet::New.call(remote: fetch?(r)) }
@@ -324,7 +324,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PM TYPES
     # --------------------------------------------------------------------------
     r.on 'pm_types', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pm_types, id) do
@@ -365,7 +365,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pm_types' do
-      interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PmType::New.call(remote: fetch?(r)) }
@@ -394,7 +394,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PM SUBTYPES
     # --------------------------------------------------------------------------
     r.on 'pm_subtypes', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pm_subtypes, id) do
@@ -435,7 +435,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pm_subtypes' do
-      interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PmSubtype::New.call(remote: fetch?(r)) }
@@ -465,7 +465,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PM PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pm_products', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pm_products, id) do
@@ -512,7 +512,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pm_products' do # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PmProduct::New.call(remote: fetch?(r)) }
@@ -543,7 +543,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PM BOMS
     # --------------------------------------------------------------------------
     r.on 'pm_boms', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pm_boms, id) do
@@ -557,7 +557,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
-        interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('packaging', 'new')
           show_partial_or_page(r) { Masterfiles::Packaging::PmBomsProduct::New.call(id, remote: fetch?(r)) }
@@ -614,7 +614,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'pm_boms' do
-      interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PmBom::New.call(remote: fetch?(r)) }
@@ -644,7 +644,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PM BOMS PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pm_boms_products', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:pm_boms_products, id) do

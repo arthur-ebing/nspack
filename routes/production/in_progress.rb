@@ -5,7 +5,7 @@ class Nspack < Roda
     # PRODUCTION RUNS
     # --------------------------------------------------------------------------
     r.on 'product_setups' do
-      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'select' do
         r.get do
           check_auth!('in progress', 'edit')

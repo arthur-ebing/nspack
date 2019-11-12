@@ -7,7 +7,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # PALLET ENQUIRY
     # --------------------------------------------------------------------------
     r.on 'pallet_inquiry' do
-      interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       # PALLET
       # --------------------------------------------------------------------------
@@ -69,7 +69,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # PALLET Verification
     # --------------------------------------------------------------------------
     r.on 'pallet_verification' do
-      interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       # PALLET/CARTON
       # --------------------------------------------------------------------------

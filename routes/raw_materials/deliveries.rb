@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # RMT DELIVERIES
     # --------------------------------------------------------------------------
     r.on 'rmt_deliveries', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_deliveries, id) do
@@ -68,7 +68,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
-        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {})
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('deliveries', 'new')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, remote: fetch?(r)) }
@@ -149,14 +149,14 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'rmt_deliveries' do # rubocop:disable Metrics/BlockLength
-      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::New.call(remote: fetch?(r)) }
       end
 
       r.on 'current' do    # CURRENT
-        id = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {}).find_current_delivery
+        id = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_current_delivery
         if interactor.delivery_tipped?(id)
           check_auth!('deliveries', 'read')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
@@ -242,7 +242,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     # RMT BINS
     # --------------------------------------------------------------------------
     r.on 'rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
-      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:rmt_bins, id) do
@@ -340,7 +340,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
-      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path }, {})
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'new' do    # NEW
         check_auth!('deliveries', 'new')
@@ -348,7 +348,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         if id.nil_or_empty?
           flash[:error] = 'Error: There Is No Current Delivery To Add Bins To'
           r.redirect('/list/rmt_deliveries')
-        elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path }, {}).delivery_tipped?(id)
+        elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
           flash[:error] = 'Cannot Add Bin To Current Delivery. Delivery Has Been Tipped'
           r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}")
         elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
