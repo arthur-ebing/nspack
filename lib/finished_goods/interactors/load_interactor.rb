@@ -101,11 +101,11 @@ module FinishedGoodsApp
       repo.transaction do
         # DELETE LOAD_VOYAGE
         LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
-        log_status('load_voyages', load_voyage_id, 'DELETED')
+        log_status(:load_voyages, load_voyage_id, 'DELETED')
 
         # DELETE LOAD
         repo.delete_load(id)
-        log_status('loads', id, 'DELETED')
+        log_status(:loads, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted load #{id}")

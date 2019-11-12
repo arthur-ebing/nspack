@@ -35,7 +35,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
           form_state[:verified_gross_weight_date] = Time.now
           if AppConst::VGM_REQUIRED
-            res = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_by_load(load_id)
+            res = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id)
             if res.success
               form_state[:actual_payload] = res.instance
             else
@@ -45,7 +45,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
 
           # check if load_container exists
-          container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
+          container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_from(load_id: load_id)
           unless container_id.nil?
             form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container(container_id).to_h)
             form_state[:container] = 'true'
@@ -244,7 +244,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           load_id = params[:load][:load_id]
           res = interactor.validate_load(load_id)
           if res.success
-            r.redirect("/rmd/dispatch/truck_arrival/load/#{res.instance}")
+            r.redirect("/rmd/dispatch/truck_arrival/load/#{load_id}")
           else
             store_locally(:res, res)
             r.redirect('/rmd/dispatch/truck_arrival/load')
@@ -256,29 +256,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOAD TRUCK
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
+      interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
-          form_state = retrieve_from_local_store(:load_truck) || {}
-
-          if form_state.empty?
-            form_state[:load_id]        = load_id
-            form_state[:voyage_code]    = FinishedGoodsApp::LoadRepo.new.find_load_flat(load_id)&.voyage_code
-            vehicle_id                  = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: load_id)
-            form_state[:vehicle_number] = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(vehicle_id)&.vehicle_number
-            container_id                = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_by_load(load_id)
-            form_state[:container_code] = FinishedGoodsApp::LoadContainerRepo.new.find_load_container(container_id)&.container_code
-            form_state[:allocated]      = FinishedGoodsApp::LoadRepo.new.find_pallet_numbers_from(load_id: load_id)
-            form_state[:scanned]        = []
-          end
-
-          progress = "Pallets still to scan<br>#{form_state[:allocated].join('<br>')}<br>"
-          progress = "#{progress}<br>Scanned Pallets<br>#{form_state[:scanned].join('<br>')}" unless form_state[:scanned].empty?
-
-          store_locally(:load_truck, form_state)
+          form_state = interactor.current_load_truck.form_state
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :load_truck,
-                                         progress: progress,
+                                         progress: interactor.current_load_truck.progress,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          links: [{ caption: 'Cancel', url: '/rmd/dispatch/load_truck/load/clear', prompt: 'Cancel Load?' }],
                                          notes: retrieve_from_local_store(:flash_notice),
@@ -289,7 +274,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:load_id, 'Load', load_id)
           form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
           form.add_label(:vehicle_number, 'Vehicle Number', form_state[:vehicle_number])
-          form.add_label(:container_code, 'Container Code', form_state[:container_code])
+          form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
+
           form.add_field(:pallet_number,
                          'Pallet',
                          scan: 'key248_all',
@@ -303,53 +289,35 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path }, {})
-
-          attrs = retrieve_from_local_store(:load_truck)
           scanned_number = params[:load_truck][:pallet_number]
+          res = interactor.scan_pallet(load_id, scanned_number)
 
-          case scanned_number
-          when *attrs[:allocated]
-            attrs[:scanned] << attrs[:allocated].delete(scanned_number)
-          when *attrs[:scanned]
-            attrs[:allocated] << attrs[:scanned].delete(scanned_number)
+          if res.success
+            if res.instance[:load_complete]
+              store_locally(:flash_notice, rmd_success_message(res.message))
+              r.redirect('/rmd/dispatch/load_truck/load')
+            else
+              r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
+            end
           else
-            flash_notice = rmd_error_message("Pallet number '#{scanned_number}', not on load #{load_id}")
-            store_locally(:flash_notice, flash_notice)
+            r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
           end
-
-          if attrs[:allocated].empty?
-            res = interactor.ship_load(attrs[:load_id])
-            store_locally(:flash_notice, res.message)
-            store_locally(:load_truck, nil)
-            r.redirect('/rmd/dispatch/load_truck/load') if res.success
-          end
-
-          store_locally(:load_truck, attrs)
-          r.redirect("/rmd/dispatch/load_truck/load/#{attrs[:load_id]}")
         end
       end
 
       r.on 'load' do
         r.on 'clear' do
-          store_locally(:load_truck, nil)
+          interactor.stepper.clear
           r.redirect('/rmd/dispatch/load_truck/load')
         end
 
         r.get do
           form_state = {}
-          attrs = retrieve_from_local_store(:load_truck)
-          unless attrs.nil?
-            store_locally(:load_truck, attrs)
-            r.redirect("/rmd/dispatch/load_truck/load/#{attrs[:load_id]}")
-          end
+          current_load = interactor.current_load_truck
 
-          res = retrieve_from_local_store(:res)
-          unless res.nil?
-            form_state = res.instance
-            form_state[:error_message] = res.message
-            form_state[:errors] = res.errors
-          end
+          r.redirect("/rmd/dispatch/load_truck/load/#{current_load.id}") unless current_load&.id.nil?
+
+          form_state = current_load.form_state if current_load&.error?
 
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :load,
@@ -370,14 +338,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path }, {})
-
+          current_load = interactor.current_load_truck
           load_id = params[:load][:load_id]
           res = interactor.validate_load_truck(load_id)
+
           if res.success
-            r.redirect("/rmd/dispatch/load_truck/load/#{res.instance}")
+            interactor.setup_load_truck(load_id)
+            r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
           else
-            store_locally(:res, res)
+            current_load.write(load_id: load_id, error_message: res.message, errors: res.errors)
             r.redirect('/rmd/dispatch/load_truck/load')
           end
         end
