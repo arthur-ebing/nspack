@@ -74,17 +74,29 @@ module MesscadaApp
       DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { attrs }, return: :primary_key)
     end
 
-    def create_pallet_and_sequences(pallet, pallet_sequence)
+    def create_pallet(pallet)
       id = DB[:pallets].insert(pallet)
-
-      pallet_sequence = pallet_sequence.merge(pallet_params(id))
-      DB[:pallet_sequences].insert(pallet_sequence)
-
       log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
-      # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
 
-      { success: true }
+      id
     end
+
+    def create_sequences(pallet_sequence, pallet_id)
+      pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
+      DB[:pallet_sequences].insert(pallet_sequence)
+    end
+
+    # def create_pallet_and_sequences(pallet, pallet_sequence)
+    #   id = DB[:pallets].insert(pallet)
+    #
+    #   pallet_sequence = pallet_sequence.merge(pallet_params(id))
+    #   DB[:pallet_sequences].insert(pallet_sequence)
+    #
+    #   log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
+    #   # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
+    #
+    #   { success: true }
+    # end
 
     def pallet_params(pallet_id)
       {
