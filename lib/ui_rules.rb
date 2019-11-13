@@ -341,6 +341,14 @@ module UiRules
       end
     end
 
+    def set_checked(actions) # rubocop:disable Naming/AccessorMethodName
+      actions.map do |act|
+        OpenStruct.new(type: :set_checked,
+                       dom_id: act[:dom_id],
+                       checked: act[:checked])
+      end
+    end
+
     def set_required(actions) # rubocop:disable Naming/AccessorMethodName
       actions.map do |act|
         OpenStruct.new(type: :set_required,
