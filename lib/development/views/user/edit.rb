@@ -20,6 +20,7 @@ module Development
               form.add_field :user_name
               form.add_field :email
               form.add_field :homepage_id
+              form.add_field :packhouse_line_id
             end
           end
 
