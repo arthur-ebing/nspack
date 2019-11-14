@@ -1,20 +1,22 @@
 ---
 :caption: Stock Pallets
-:sql: SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number, seq_carton_qty,
-  carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age, allocated, load_id, shipped,
-  in_stock, inspected, palletized, production_run_id, farm, puc, orchard, commodity, cultivar, marketing_variety,
-  std_size, actual_count, size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at,
-  palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, verified_at, pallet_base,
-  stack_type, gross_weight, nett_weight, sequence_nett_weight, basic_pack, packhouse, line, pick_ref, phc,
-  verification_result, scrapped_at, scrapped, partially_palletized, reinspected, verified, verification_passed, status,
-  build_status, active, zero_load_id, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
-  FROM vw_pallet_sequence_flat
-  WHERE NOT scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text AND pallet_number::text IS NOT NULL
-  ORDER BY pallet_id, pallet_number DESC
+:sql: SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number,
+  seq_carton_qty, carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age,
+  allocated, load_id, shipped, in_stock, inspected, palletized, production_run_id,
+  farm, puc, orchard, commodity, cultivar, marketing_variety, std_size, actual_count,
+  size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at,
+  palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at,
+  verified_at, pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight,
+  basic_pack, packhouse, line, pick_ref, phc, verification_result, scrapped_at, scrapped,
+  partially_palletized, reinspected, verified, verification_passed, status, build_status,
+  active, zero_load_id, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error'
+  ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT scrapped
+  AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text AND
+  pallet_number::text IS NOT NULL ORDER BY pallet_id, pallet_number DESC
 :limit: 
 :offset: 
 :external_settings:
-  :render_url:
+  :render_url: 
   :colour_key:
     ok: In Stock Pallets
     ready: Allocated Pallets
@@ -1132,3 +1134,11 @@
   :ordered_list: false
   :ui_priority: 13
   :list_def: 
+- :column: shipped
+  :caption: Shipped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: true, false

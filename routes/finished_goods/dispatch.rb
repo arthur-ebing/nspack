@@ -235,38 +235,51 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
-      r.on 'unship' do
+      # Unship only pallet
+      r.on 'unship', String do |pallet_number|
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:unship, id)
-        res = interactor.unship_load(id)
-        if res.success
-          flash[:notice] = res.message
-          r.redirect '/list/loads'
-        end
+        res = interactor.unship_load(id, pallet_number)
+        flash[:notice] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
-      r.on 'allocate_pallets_multiselect' do
+      r.on 'unship' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.unship_load(id)
+        flash[:notice] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}/edit"
+      end
+
+      r.on 'ship' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.ship_load(id)
+        flash[:notice] = res.message
+        r.redirect '/list/loads'
+      end
+
+      r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.allocate_pallets_multiselect(id, multiselect_grid_choices(params))
+        res = interactor.allocate_multiselect(id, multiselect_grid_choices(params))
         flash[:notice] = res.message
-        r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
+        r.redirect request.referer
       end
 
-      r.on 'allocate_pallets' do
+      r.on 'allocate' do
         r.get do       # SHOW
           check_auth!('dispatch', 'edit')
           interactor.assert_permission!(:edit, id)
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, back_url: session[:last_grid_url]) }
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Allocate.call(id, back_url: session[:last_grid_url]) }
         end
 
         r.patch do     # UPDATE
-          res = interactor.allocate_pallets(id, params[:load])
+          res = interactor.allocate(id, params[:load])
           if res.success
             flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
+            r.redirect "/finished_goods/dispatch/loads/#{id}/allocate"
           else
-            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::AllocatePallets.call(id, form_values: params[:load], form_errors: res.errors) }
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::Allocate.call(id, form_values: params[:load], form_errors: res.errors) }
           end
         end
       end
@@ -274,20 +287,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'copy' do    # COPY
         check_auth!('dispatch', 'new')
         show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(id: id, back_url: request.referer) }
-      end
-
-      r.post do        # CREATE
-        res = interactor.create_load(params[:load])
-        if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
-        else
-          re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
-            FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
-                                                    form_values: params[:load],
-                                                    form_errors: res.errors)
-          end
-        end
       end
 
       r.on 'edit' do   # EDIT
@@ -299,7 +298,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id, back_url: request.referer) }
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id, user: current_user, back_url: request.referer) }
         end
 
         r.patch do     # UPDATE
@@ -371,6 +370,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
           value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_BILLING_CLIENT, party_id)
           json_change_select_value('load_billing_client_party_role_id', value)
+        end
+      end
+
+      r.on 'unship' do
+        attrs = params[:unship]
+        check_auth!('dispatch', 'edit')
+        if attrs.nil_or_empty?
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Unship.call(back_url: request.referer) }
+        else
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(attrs[:id], back_url: request.referer) }
         end
       end
 

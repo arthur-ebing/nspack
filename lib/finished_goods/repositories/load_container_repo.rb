@@ -31,10 +31,7 @@ module FinishedGoodsApp
     end
 
     def actual_payload_from(load_id:)
-      ds = DB[:pallets].where(load_id: load_id)
-      return failed_response('pallets without weight', ds.where(nett_weight: nil).select_map(:pallet_number)) if ds.select_map(:nett_weight).any?(&:nil?)
-
-      success_response('ok', ds.select_map(:nett_weight).sum)
+      DB[:pallets].where(load_id: load_id).select_map(:nett_weight).sum
     end
   end
 end

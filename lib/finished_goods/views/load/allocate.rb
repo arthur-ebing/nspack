@@ -4,7 +4,7 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class AllocatePallets
+      class Allocate
         def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :allocate, id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -20,7 +20,7 @@ module FinishedGoods
                                   style: :back_button)
             end
             page.form do |form|
-              form.action "/finished_goods/dispatch/loads/#{id}/allocate_pallets"
+              form.action "/finished_goods/dispatch/loads/#{id}/allocate"
               form.submit_captions 'Allocate pasted pallets'
               form.method :update
               form.row do |row|
@@ -28,8 +28,8 @@ module FinishedGoods
                   col.add_field :id
                   col.add_field :depot_id
                   col.add_field :voyage_code
-                  col.add_field :pol_voyage_port_id
-                  col.add_field :pod_voyage_port_id
+                  col.add_field :pol_port_id
+                  col.add_field :pod_port_id
                 end
                 row.column do |col|
                   col.add_field :pallet_list
@@ -44,9 +44,9 @@ module FinishedGoods
                                caption: 'Choose Pallets',
                                is_multiselect: true,
                                can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets_multiselect",
-                               multiselect_key: 'allocate_pallets',
-                               multiselect_params: { key: 'allocate_pallets',
+                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
+                               multiselect_key: 'allocate',
+                               multiselect_params: { key: 'allocate',
                                                      id: id,
                                                      in_stock: true })
             end

@@ -25,7 +25,7 @@ module FinishedGoodsApp
     end
 
     def form_state
-      current_step[:form_state]
+      current_step[:form_state] ||= {}
     end
 
     def ready_to_load?
@@ -33,7 +33,7 @@ module FinishedGoodsApp
     end
 
     def error?
-      !current_step[:error_message].nil?
+      !form_state[:error_message].nil?
     end
 
     def progress

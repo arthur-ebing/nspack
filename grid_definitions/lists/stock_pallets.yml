@@ -6,6 +6,13 @@
     :title: Pallet sequences for Pallet No $:pallet_number$
     :icon: list
     :popup: true
+  - :url: "/finished_goods/dispatch/loads/$:load_id$/unship/$:pallet_number$"
+    :text: Unship and Unallocate
+    :icon: edit
+    :hide_if_false: shipped
+    :has_permission:
+      - load
+      - can_unship
 :captions:
   :conditions:
     :active: Active Pallets
@@ -65,9 +72,13 @@
     - :col: load_id
       :op: =
       :val: $:load_id$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: $:shipped$
 :multiselect:
-  :allocate_pallets:
-    :url: "/finished_goods/dispatch/loads/$:id$/allocate_pallets"
+  :allocate:
+    :url: "/finished_goods/dispatch/loads/$:id$/allocate"
     :preselect: "SELECT id FROM vw_pallet_sequence_flat WHERE load_id = $:id$"
     :section_caption: "SELECT 'Assign pallets to load ' || order_number FROM loads WHERE id = $:id$"
     :multiselect_save_method: remote
