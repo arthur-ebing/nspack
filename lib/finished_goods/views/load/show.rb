@@ -4,8 +4,8 @@ module FinishedGoods
   module Dispatch
     module Load
       class Show
-        def self.call(id, back_url: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:load, :show, id: id)
+        def self.call(id, user: nil, back_url: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:load, user.nil? ? :show : :ship, id: id, user: user)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
@@ -90,7 +90,12 @@ module FinishedGoods
               section.add_control(control_type: :link,
                                   text: 'Unship Load',
                                   url: "/finished_goods/dispatch/loads/#{id}/unship",
-                                  visible: !rules[:shipped],
+                                  visible: rules[:can_unship],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Ship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
+                                  visible: rules[:can_ship],
                                   style: :button)
               section.add_grid('stock_pallets',
                                "/list/stock_pallets/grid?key=on_load&load_id=#{id}",

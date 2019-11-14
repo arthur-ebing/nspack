@@ -4,10 +4,8 @@ module UiRules
   class RmdLoadChangeRenderer < BaseChangeRenderer
     def change_container_use # rubocop:disable Metrics/AbcSize
       container = options[:use_container]
-
       actions = {}
-      actions[:change_select_value] = [{ dom_id: 'truck_arrival_container', value: container }]
-
+      actions[:set_checked] = [{ dom_id: 'truck_arrival_container', checked: container }]
       # hide show if container
       row_ids = %w[container_info_section
                    truck_arrival_container_code_row

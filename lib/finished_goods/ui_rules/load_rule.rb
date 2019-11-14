@@ -10,8 +10,9 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show].include? @mode
-      set_allocate_fields if %i[allocate].include? @mode
+      set_show_fields if %i[show ship].include? @mode
+      add_rules if @mode == :ship
+      set_allocate_fields if @mode == :allocate
       add_behaviours
 
       form_name 'load'
@@ -54,8 +55,8 @@ module UiRules
       fields[:vessel_id] = { renderer: :label, with_value: voyage_vessel_label, caption: 'Vessel' }
       fields[:voyage_number] = { renderer: :label, with_value: voyage_number_label, caption: 'Voyage Number' }
       fields[:year] = { renderer: :label, with_value: voyage_year_label, caption: 'Voyage Number' }
-      fields[:pol_voyage_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
-      fields[:pod_voyage_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
+      fields[:pol_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
+      fields[:pod_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
       fields[:final_destination_id] = { renderer: :label, with_value: final_destination_label, caption: 'Final Destination' }
       fields[:transfer_load] = { renderer: :label, as_boolean: true }
 
@@ -79,8 +80,8 @@ module UiRules
       pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_code
       pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_code
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
-      fields[:pol_voyage_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
-      fields[:pod_voyage_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
+      fields[:pol_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
+      fields[:pod_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
       fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
     end
 
@@ -178,6 +179,8 @@ module UiRules
                                  prompt: true },
         booking_reference: {},
         memo_pad: { renderer: :textarea, rows: 7 },
+
+        # Allocate Pallets
         pallet_list: { renderer: :textarea, rows: 12,
                        placeholder: 'Paste pallet numbers here',
                        caption: 'Allocate' }
@@ -188,7 +191,6 @@ module UiRules
       make_new_form_object && return if @mode == :new
       @form_object = @repo.find_load_flat(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil))
-      rules[:shipped] = !@form_object.shipped
     end
 
     def make_new_form_object
@@ -221,6 +223,14 @@ module UiRules
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
       end
+    end
+
+    def add_rules
+      rules[:can_unship] = @form_object.shipped && Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
+
+      rules[:can_ship] = !@form_object.shipped &&
+                         Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
+                         !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
     end
   end
 end

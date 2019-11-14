@@ -95,9 +95,9 @@ module FinishedGoods
                                caption: 'Choose Pallets',
                                is_multiselect: true,
                                can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_pallets_multiselect",
-                               multiselect_key: 'allocate_pallets',
-                               multiselect_params: { key: 'allocate_pallets',
+                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
+                               multiselect_key: 'allocate',
+                               multiselect_params: { key: 'allocate',
                                                      id: id,
                                                      in_stock: true })
             end

@@ -47,7 +47,7 @@ module FinishedGoodsApp
     def unship_unallocate_pallet
       repo.unship_pallets(pallet_ids)
       repo.log_multiple_statuses('pallets', pallet_ids, 'UNSHIPPED', user_name: user_name)
-      repo.unallocate_pallets(pallet_ids, user_name)
+      repo.unallocate_pallets(load_id, pallet_ids, user_name)
 
       ok_response
     end

@@ -34,15 +34,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form_state = {}
           form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
           form_state[:verified_gross_weight_date] = Time.now
-          if AppConst::VGM_REQUIRED
-            res = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id)
-            if res.success
-              form_state[:actual_payload] = res.instance
-            else
-              form_state[:error_message] = "Pallet #{res.instance.join(', ')} has no nett weight"
-              form_state[:actual_payload] = 'Error'
-            end
-          end
+          form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
 
           # check if load_container exists
           container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_from(load_id: load_id)
@@ -78,115 +70,115 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                    notify: [{ url: "/rmd/dispatch/truck_arrival/load/#{load_id}/container_changed" }]
           end
 
-          form.add_label('load_id', 'Load', load_id, load_id)
-          form.add_label('vehicle_id', 'vehicle_id', vehicle_id, vehicle_id, hide_on_load: true)
-          form.add_label('container_id', 'container_id', container_id, container_id, hide_on_load: true)
-          form.add_field('vehicle_number',
+          form.add_label(:load_id, 'Load', load_id, load_id)
+          form.add_label(:vehicle_id, 'vehicle_id', vehicle_id, vehicle_id, hide_on_load: true)
+          form.add_label(:container_id, 'container_id', container_id, container_id, hide_on_load: true)
+          form.add_field(:vehicle_number,
                          'Vehicle Number',
                          data_type: 'string',
                          force_uppercase: true,
                          required: true)
-          form.add_select('vehicle_type_id',
+          form.add_select(:vehicle_type_id,
                           'Vehicle Type',
                           items: MasterfilesApp::VehicleTypeRepo.new.for_select_vehicle_types,
                           # disabled_items: MasterfilesApp::VehicleTypeRepo.new.for_select_inactive_vehicle_types,
                           prompt: true)
-          form.add_select('haulier_party_role_id',
+          form.add_select(:haulier_party_role_id,
                           'Haulier',
                           items: MasterfilesApp::PartyRepo.new.for_select_party_roles,
                           prompt: true)
-          form.add_field('vehicle_weight_out',
+          form.add_field(:vehicle_weight_out,
                          'Vehicle Weight Out',
                          data_type: 'number',
                          allow_decimals: true,
                          required: false)
-          form.add_field('dispatch_consignment_note_number',
+          form.add_field(:dispatch_consignment_note_number,
                          'Consignment Note Number',
                          data_type: 'string',
                          required: false,
                          hide_on_load: true)
-          form.add_toggle('container',
+          form.add_toggle(:container,
                           'Container')
 
           form.add_section_header(rmd_info_message('Container Info'),
                                   id: 'container_info_section',
                                   hide_on_load: !has_container)
-          form.add_field('container_code',
+          form.add_field(:container_code,
                          'Container Code',
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('container_vents',
+          form.add_field(:container_vents,
                          'Container Vents',
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('container_seal_code',
+          form.add_field(:container_seal_code,
                          'Container Seal Code',
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('internal_container_code',
+          form.add_field(:internal_container_code,
                          'Internal Container Code',
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('container_temperature_rhine',
+          form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
                          data_type: 'number',
                          allow_decimals: true,
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('container_temperature_rhine2',
+          form.add_field(:container_temperature_rhine2,
                          'Temperature Rhine2',
                          data_type: 'number',
                          allow_decimals: true,
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field('max_gross_weight',
+          form.add_field(:max_gross_weight,
                          'Max Gross Weight',
                          data_type: 'number',
                          allow_decimals: true,
                          required: false,
                          hide_on_load: !has_container)
           if AppConst::VGM_REQUIRED
-            form.add_field('tare_weight',
+            form.add_field(:tare_weight,
                            'Tare Weight',
                            data_type: 'number',
                            allow_decimals: true,
                            required: false,
                            hide_on_load: !has_container)
-            form.add_field('max_payload',
+            form.add_field(:max_payload,
                            'Max Payload',
                            data_type: 'number',
                            allow_decimals: true,
                            required: false,
                            hide_on_load: !has_container)
-            form.add_label('actual_payload',
+            form.add_label(:actual_payload,
                            'Calculated Payload',
                            form_state[:actual_payload],
                            form_state[:actual_payload],
                            hide_on_load: !has_container)
           end
-          form.add_select('cargo_temperature_id',
+          form.add_select(:cargo_temperature_id,
                           'Cargo Temperature',
                           # disabled_items: MasterfilesApp::CargoTemperatureRepo.new.for_select_inactive_cargo_temperatures,
                           items: MasterfilesApp::CargoTemperatureRepo.new.for_select_cargo_temperatures,
                           required: false,
                           hide_on_load: !has_container)
-          form.add_select('stack_type_id',
+          form.add_select(:stack_type_id,
                           'Stack Type',
                           # disabled_items: MasterfilesApp::LoadContainerRepo.new.for_select_inactive_container_stack_types,
                           items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types,
                           required: false,
                           hide_on_load: !has_container)
-          form.add_field('verified_gross_weight',
+          form.add_field(:verified_gross_weight,
                          'Verified Gross Weight',
                          data_type: 'number',
                          allow_decimals: true,
                          required: false,
                          hide_on_load: !has_container)
-          form.add_label('verified_gross_weight_date',
+          form.add_label(:verified_gross_weight_date,
                          'Verified Gross Weight Date',
                          form_state[:verified_gross_weight_date],
                          form_state[:verified_gross_weight_date],
@@ -197,7 +189,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           attrs = params[:truck_arrival]
-          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           res = interactor.truck_arrival_service(attrs)
 
           if res.success
@@ -229,7 +221,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          action: '/rmd/dispatch/truck_arrival/load',
                                          button_caption: 'Submit')
 
-          form.add_field('load_id',
+          form.add_field(:load_id,
                          'Load',
                          scan: 'key248_all',
                          scan_type: :load,
@@ -240,7 +232,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           load_id = params[:load][:load_id]
           res = interactor.validate_load(load_id)
           if res.success
@@ -256,7 +248,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOAD TRUCK
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
-      interactor = FinishedGoodsApp::DispatchInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
@@ -271,12 +263,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          action: "/rmd/dispatch/load_truck/load/#{load_id}",
                                          button_caption: 'Submit')
 
-          form.add_label('load_id', 'Load', load_id)
-          form.add_label('voyage_code', 'Voyage Code', form_state[:voyage_code])
-          form.add_label('vehicle_number', 'Vehicle Number', form_state[:vehicle_number])
-          form.add_label('container_code', 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
+          form.add_label(:load_id, 'Load', load_id)
+          form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
+          form.add_label(:vehicle_number, 'Vehicle Number', form_state[:vehicle_number])
+          form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
 
-          form.add_field('pallet_number',
+          form.add_field(:pallet_number,
                          'Pallet',
                          scan: 'key248_all',
                          scan_type: :pallet_number,
@@ -327,7 +319,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          action: '/rmd/dispatch/load_truck/load',
                                          button_caption: 'Submit')
 
-          form.add_field('load_id',
+          form.add_field(:load_id,
                          'Load',
                          scan: 'key248_all',
                          scan_type: :load,
