@@ -4,7 +4,7 @@
   pallet_age, stock_age, cold_age, ambient_age, allocated, shipped, load_id, vessel, voyage, container, internal_container,
   temp_code, vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver, exporter,
   country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd) AS departure_date, farm, puc, orchard, cultivar,
-  marketing_variety,  std_size, actual_count, size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at,
+  marketing_variety, grade, std_size, actual_count, size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at,
   palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, pallet_base, stack_type,
   gross_weight, nett_weight, sequence_nett_weight, basic_pack, packhouse, line, pick_ref, phc, reinspected, status, build_status,
   active, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
@@ -611,6 +611,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 37
+    :caption: Grade
+    :namespaced_name: grade
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

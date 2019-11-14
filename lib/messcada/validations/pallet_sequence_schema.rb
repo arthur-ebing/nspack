@@ -50,5 +50,6 @@ module MesscadaApp
     optional(:verified, :bool).maybe(:bool?)
     optional(:verification_passed, :bool).maybe(:bool?)
     required(:pick_ref, Types::StrippedString).maybe(:str?)
+    required(:grade_id, :integer).filled(:int?)
   end
 end

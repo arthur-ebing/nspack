@@ -40,5 +40,6 @@ module MesscadaApp
     attribute :nett_weight, Types::Decimal
     attribute? :active, Types::Bool
     attribute :pick_ref, Types::String
+    attribute :grade_id, Types::Integer
   end
 end

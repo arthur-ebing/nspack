@@ -41,5 +41,6 @@ module MesscadaApp
     optional(:gross_weight, :decimal).maybe(:decimal?)
     optional(:nett_weight, :decimal).maybe(:decimal?)
     optional(:pick_ref, Types::StrippedString).maybe(:str?)
+    required(:grade_id, :integer).filled(:int?)
   end
 end
