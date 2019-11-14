@@ -4,7 +4,7 @@ module MesscadaApp
   class NewPalletSequence < BaseService
     attr_reader :repo, :carton_id, :carton_quantity, :pallet_id
 
-    def initialize(carton_id, carton_quantity, pallet_id)
+    def initialize(carton_id, pallet_id, carton_quantity)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
       @pallet_id = pallet_id
@@ -15,7 +15,7 @@ module MesscadaApp
       res = NewPalletSequenceObject.new(carton_id, carton_quantity).call
       return res unless res.success
 
-      repo.create_sequences(res.instance.to_h, pallet_id)
+      repo.create_sequences(res.instance, pallet_id)
 
       ok_response
     end

@@ -2,8 +2,7 @@
 
 module MesscadaApp
   class CreatePalletFromCarton < BaseService
-    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet,
-                :pallet, :pallet_sequence
+    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet, :pallet_sequence
 
     def initialize(carton_id, carton_quantity)
       @carton_id = carton_id
@@ -79,7 +78,7 @@ module MesscadaApp
     end
 
     def create_pallet_sequence
-      res = NewPalletSequence.new(carton_id, carton_quantity, @pallet).call
+      res = NewPalletSequence.new(carton_id, pallet, carton_quantity).call
       return res unless res.success
 
       ok_response
