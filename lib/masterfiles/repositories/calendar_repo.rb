@@ -41,7 +41,8 @@ module MasterfilesApp
       DB[:seasons]
         .join(:cultivars, commodity_id: :commodity_id)
         .where(cultivar_group_id: cultivar_group_id)
-        .where(season_year: Time.now.year)
+        .where(Sequel.lit('start_date').< Time.now)
+        .where(Sequel.lit('end_date').> Time.now)
         .order(:season_code)
         .distinct
         .select_map([:season_code, Sequel[:seasons][:id]])
