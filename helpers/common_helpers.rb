@@ -448,6 +448,12 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
+  # Change the contents of a currently-displayed dialog.
+  #
+  # @param content [string] the HTML content to be rendered.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @return [JSON] the commands for the front end to apply.
   def update_dialog_content(content:, notice: nil, error: nil)
     res = { replaceDialog: { content: content } }
     res[:flash] = { notice: notice } if notice
@@ -455,12 +461,34 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
-  def dialog_error(content, notice: nil, error: nil)
-    update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+  # Display an error message in a dialog.
+  #
+  # @param content [string] the error message.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @param hide_caption [boolean] hide the "Error" caption. Default is false.
+  # @return [JSON] the commands for the front end to apply.
+  def dialog_error(content, notice: nil, error: nil, hide_caption: false)
+    if hide_caption
+      update_dialog_content(content: wrap_content_in_style(content, :error, caption: ''), notice: notice, error: error)
+    else
+      update_dialog_content(content: wrap_content_in_style(content, :error), notice: notice, error: error)
+    end
   end
 
-  def dialog_warning(content, notice: nil, error: nil)
-    update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+  # Display a warning message in a dialog.
+  #
+  # @param content [string] the warning message.
+  # @param notice [nil, string] an optional notice to flash in the page.
+  # @param error [nil, string] an optional error message to flash in the page.
+  # @param hide_caption [boolean] hide the "Warning" caption. Default is false.
+  # @return [JSON] the commands for the front end to apply.
+  def dialog_warning(content, notice: nil, error: nil, hide_caption: false)
+    if hide_caption
+      update_dialog_content(content: wrap_content_in_style(content, :warning, caption: ''), notice: notice, error: error)
+    else
+      update_dialog_content(content: wrap_content_in_style(content, :warning), notice: notice, error: error)
+    end
   end
 
   def json_replace_select_options(dom_id, options_array, message: nil, keep_dialog_open: false)
@@ -529,6 +557,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
       set_required:           ->(act) { action_set_required(act) },
       set_checked:            ->(act) { action_set_checked(act) }
+      # redirect:               ->(act) { action_redirect(act) }       // url
+      # replace_dialog:         ->(act) { action_replace_dialog(act) } // url
     }[action.type].call(action)
     # rubocop:enable Layout/AlignHash
   end
@@ -580,6 +610,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   def action_set_checked(action)
     { set_checked: { id: action.dom_id, checked: action.checked } }
   end
+
+  # def action_redirect(action)
+  #   { redirect: { url: action.url } }
+  # end
 
   def json_actions(actions, message = nil, keep_dialog_open: false)
     res = { actions: Array(actions).map { |a| build_json_action(a) } }

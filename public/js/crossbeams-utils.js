@@ -250,15 +250,23 @@ const crossbeamsUtils = {
       return response.json();
     }).then((data) => {
       if (data.flash) {
-        // const err = document.getElementById(this.activeDialogError());
-        // err.innerHTML = `<strong>An error occurred:</strong><br>${data.flash.error}`;
-        // err.style.display = 'block';
+        let noteStyle = 'error';
         if (data.flash.type && data.flash.type === 'permission') {
+          noteStyle = 'warning';
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Permission error</span>';
         } else {
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Error</span>';
         }
-        crossbeamsUtils.setDialogContent(data.flash.error);
+        if (data.replaceDialog) {
+          crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+          if (data.flash.type && data.flash.type === 'permission') {
+            Jackbox.warn(data.flash.error, { time: 20 });
+          } else {
+            Jackbox.error(data.flash.error, { time: 20 });
+          }
+        } else {
+          crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
+        }
         if (data.exception) {
           if (data.backtrace) {
             console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
