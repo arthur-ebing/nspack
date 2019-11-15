@@ -74,6 +74,12 @@ module MesscadaApp
       DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET) }, return: :primary_key)
     end
 
+    def carton_label_pallet_number(carton_label_id)
+      return nil unless AppConst::CARTON_EQUALS_PALLET
+
+      DB[:carton_labels].where(id: carton_label_id).get(:pallet_number)
+    end
+
     def create_pallet(pallet)
       id = DB[:pallets].insert(pallet)
       log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)

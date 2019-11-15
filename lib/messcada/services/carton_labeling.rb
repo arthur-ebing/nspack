@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonLabeling < BaseService
-    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref
+    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number
 
     def initialize(params)
       @resource_code = params[:device]
@@ -14,11 +14,14 @@ module MesscadaApp
       res = carton_labeling
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      print_command = setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s)
       success_response('Carton Label printed successfully', print_command)
     end
 
     private
+
+    def print_command
+      setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s).gsub('$:pallet_number$', pallet_number)
+    end
 
     def carton_labeling  # rubocop:disable Metrics/AbcSize
       res = retrieve_resource_cached_setup_data
@@ -72,7 +75,7 @@ module MesscadaApp
       CartonLabelSchema.call(params)
     end
 
-    def create_carton_label(params)
+    def create_carton_label(params) # rubocop:disable Metrics/AbcSize
       attrs = params.to_h
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
@@ -80,6 +83,8 @@ module MesscadaApp
       repo.transaction do
         @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET, phc: phc))
       end
+
+      @pallet_number = repo.carton_label_pallet_number(carton_label_id)
 
       ok_response
     rescue Crossbeams::InfoError => e

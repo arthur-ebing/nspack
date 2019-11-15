@@ -45,6 +45,6 @@ module MesscadaApp
     required(:sell_by_code, Types::StrippedString).maybe(:str?)
     required(:pallet_label_name, Types::StrippedString).maybe(:str?)
     optional(:pallet_number, Types::StrippedString).maybe(:str?)
-    required(:phc, Types::StrippedString).filled(:str?)
+    optional(:phc, Types::StrippedString).filled(:str?)
   end
 end
