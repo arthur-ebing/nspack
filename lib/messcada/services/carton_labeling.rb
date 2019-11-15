@@ -41,6 +41,10 @@ module MesscadaApp
       repo.find_resource_packhouse_no(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
+    def phc
+      repo.find_resource_phc(setup_data[:production_run_data][:production_line_id]) || repo.find_resource_phc(setup_data[:production_run_data][:packhouse_resource_id])
+    end
+
     def retrieve_resource_cached_setup_data
       @setup_data = search_cache_files
       return failed_response("No setup data cached for resource #{resource_code}.") if setup_data.empty?
@@ -74,7 +78,7 @@ module MesscadaApp
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
       repo.transaction do
-        @carton_label_id = repo.create_carton_label(attrs)
+        @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET, phc: phc))
       end
 
       ok_response

@@ -32,7 +32,7 @@ module MesscadaApp
     def prepare_carton_label_record # rubocop:disable Metrics/AbcSize
       attrs = repo.find_hash(:product_setups, product_setup_id).reject { |k, _| EXCLUDE_PROD_SET_COLS.include?(k) }
       pr = repo.find_hash(:production_runs, production_run_id).select { |k, _| INCLUDE_PROD_RUN_COLS.include?(k) }
-      phc = @repo.find_resource_phc(pr[:production_line_id]) || repo.find_resource_phc(pr[:packhouse_resource_id])
+      phc = repo.find_resource_phc(pr[:production_line_id]) || repo.find_resource_phc(pr[:packhouse_resource_id])
       attrs.merge(pr).merge(production_run_id: production_run_id, label_name: label_name, phc: phc)
     end
   end
