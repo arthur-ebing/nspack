@@ -36,7 +36,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 
   # carton verification
-  CARTONS_IS_PALLETS = make_boolean('CARTONS_IS_PALLETS')
+  CARTON_EQUALS_PALLET = make_boolean('CARTON_EQUALS_PALLET')
   PROVIDE_PACK_TYPE_AT_VERIFICATION = make_boolean('PROVIDE_PACK_TYPE_AT_VERIFICATION')
 
   # General

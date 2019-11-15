@@ -12,7 +12,7 @@ module MesscadaApp
     def call
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_quantity = 1
-      @carton_is_pallet = AppConst::CARTONS_IS_PALLETS
+      @carton_is_pallet = AppConst::CARTON_EQUALS_PALLET
       res = carton_verification
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 

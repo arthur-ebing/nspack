@@ -29,10 +29,11 @@ module MesscadaApp
     EXCLUDE_PROD_SET_COLS = %i[created_at updated_at id active product_setup_template_id pallet_label_name].freeze
     INCLUDE_PROD_RUN_COLS = %i[farm_id puc_id orchard_id cultivar_group_id cultivar_id packhouse_resource_id production_line_id season_id].freeze
     # sell_by_code grade_id product_chars
-    def prepare_carton_label_record
+    def prepare_carton_label_record # rubocop:disable Metrics/AbcSize
       attrs = repo.find_hash(:product_setups, product_setup_id).reject { |k, _| EXCLUDE_PROD_SET_COLS.include?(k) }
       pr = repo.find_hash(:production_runs, production_run_id).select { |k, _| INCLUDE_PROD_RUN_COLS.include?(k) }
-      attrs.merge(pr).merge(production_run_id: production_run_id, label_name: label_name)
+      phc = @repo.find_resource_phc(pr[:production_line_id]) || repo.find_resource_phc(pr[:packhouse_resource_id])
+      attrs.merge(pr).merge(production_run_id: production_run_id, label_name: label_name, phc: phc)
     end
   end
 end

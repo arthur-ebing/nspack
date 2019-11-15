@@ -27,7 +27,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { REQUIRE_PACKAGING_BOM: 'Require packaging bom for Product Setups. Display PM Subtype and PM BOM if true' },
     { DEFAULT_LABEL_DIMENSION: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
     { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' },
-    { CARTONS_IS_PALLETS: 'Create pallets and pallet_sequences from carton' },
+    { CARTON_EQUALS_PALLET: 'Create pallets and pallet_sequences from carton. Default false' },
     { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' }
   ].freeze
 

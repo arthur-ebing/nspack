@@ -40,5 +40,8 @@ module MesscadaApp
     attribute? :active, Types::Bool
     attribute :pick_ref, Types::String
     attribute :grade_id, Types::Integer
+    attribute :pallet_number, Types::String
+    attribute :carton_equals_pallet, Types::Bool
+    attribute :phc, Types::String
   end
 end

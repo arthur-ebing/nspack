@@ -1,14 +1,14 @@
 ---
 :caption: Cartons
-:sql: "SELECT COALESCE(cartons.id, carton_labels.id) AS carton_id, carton_labels.production_run_id,
-  carton_labels.created_at AS label_created_at, ABS(date_part('epoch', current_timestamp
-  - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS
-  carton_verified_at, ABS(date_part('epoch', current_timestamp - cartons.created_at)
-  / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code AS packhouse, lines.plant_resource_code
-  AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code
-  AS print_device, carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code
-  AS puc, orchards.orchard_code AS orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code
-  AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
+:sql: "SELECT carton_labels.id, carton_labels.production_run_id, carton_labels.created_at
+  AS label_created_at, ABS(date_part('epoch', current_timestamp - carton_labels.created_at)
+  / 3600)::int AS label_age_hrs, cartons.created_at AS carton_verified_at, ABS(date_part('epoch',
+  current_timestamp - cartons.created_at) / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code
+  AS packhouse, lines.plant_resource_code AS line, packpoints.plant_resource_code
+  AS packpoint, system_resources.system_resource_code AS print_device, carton_labels.label_name
+  AS label, farms.farm_code AS farm, pucs.puc_code AS puc, orchards.orchard_code AS
+  orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code AS cultivar_group,
+  cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
   AS variety, cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value
   AS std_size, fruit_size_references.size_reference AS size_ref, fruit_actual_counts_for_packs.actual_count_for_pack
   AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack, standard_pack_codes.standard_pack_code
@@ -64,17 +64,17 @@
   :colour_key:
     ok: carton verified
 :columns:
-  carton_id:
-    :name: carton_id
+  id:
+    :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: 
-    :data_type: :integer
+    :namespaced_name: carton_labels.id
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

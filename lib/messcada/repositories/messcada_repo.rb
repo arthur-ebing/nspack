@@ -71,7 +71,7 @@ module MesscadaApp
 
     # Create several carton_labels records returning an array of the newly-created ids
     def create_carton_labels(no_of_prints, attrs)
-      DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { attrs }, return: :primary_key)
+      DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET) }, return: :primary_key)
     end
 
     def create_pallet(pallet)
@@ -204,6 +204,7 @@ module MesscadaApp
         "cultivar_groups"."cultivar_group_code",
         "cultivars"."cultivar_name",
         "marketing_varieties"."marketing_variety_code",
+        "marketing_varieties"."description" AS marketing_variety_description,
         "cvv"."marketing_variety_code" AS customer_variety_code,
         "std_fruit_size_counts"."size_count_value",
         "fruit_size_references"."size_reference",
@@ -229,7 +230,13 @@ module MesscadaApp
         "pm_subtypes"."subtype_code",
         "pm_types"."pm_type_code",
         "cartons_per_pallet"."cartons_per_pallet",
-        "pm_products"."product_code"
+        "pm_products"."product_code",
+        "carton_labels"."pallet_number",
+        "carton_labels"."sell_by_code",
+        "grades"."grade_code",
+        "carton_labels"."product_chars",
+        "carton_labels"."pick_ref",
+        "carton_labels"."phc"
         FROM "carton_labels"
         JOIN "production_runs" ON "production_runs"."id" = "carton_labels"."production_run_id"
         LEFT JOIN "product_resource_allocations" ON "product_resource_allocations"."id" = "carton_labels"."product_resource_allocation_id"
@@ -241,6 +248,7 @@ module MesscadaApp
         JOIN "pucs" ON "pucs"."id" = "carton_labels"."puc_id"
         JOIN "orchards" ON "orchards"."id" = "carton_labels"."orchard_id"
         JOIN "cultivar_groups" ON "cultivar_groups"."id" = "carton_labels"."cultivar_group_id"
+        LEFT JOIN "grades" ON "grades"."id" = "carton_labels"."grade_id"
         LEFT JOIN "cultivars" ON "cultivars"."id" = "carton_labels"."cultivar_id"
         LEFT JOIN "commodities" ON "commodities"."id" = "cultivars"."commodity_id"
         JOIN "marketing_varieties" ON "marketing_varieties"."id" = "carton_labels"."marketing_variety_id"
