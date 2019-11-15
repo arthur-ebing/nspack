@@ -83,8 +83,8 @@ module UiRules
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
       cultivar_id = product_setup_template&.cultivar_id
-      commodity_id = @options[:commodity_id] || @repo.commodity_id(cultivar_group_id, cultivar_id)
-      default_mkting_org_id = MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
+      commodity_id = @form_object[:commodity_id] || @repo.commodity_id(cultivar_group_id, cultivar_id)
+      default_mkting_org_id = @form_object[:marketing_org_party_role_id] || MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
       default_pm_type_id = MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },

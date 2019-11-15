@@ -51,5 +51,9 @@ module MesscadaApp
     optional(:verification_passed, :bool).maybe(:bool?)
     required(:pick_ref, Types::StrippedString).maybe(:str?)
     required(:grade_id, :integer).filled(:int?)
+    optional(:scrapped_from_pallet_id, :integer).maybe(:int?)
+    optional(:removed_from_pallet, :bool).maybe(:bool?)
+    optional(:removed_from_pallet_at, %i[nil time]).maybe(:time?)
+    optional(:removed_from_pallet_id, :integer).maybe(:int?)
   end
 end

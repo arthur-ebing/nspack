@@ -41,5 +41,8 @@ module MesscadaApp
     optional(:label_name, Types::StrippedString).maybe(:str?)
     optional(:pick_ref, Types::StrippedString).maybe(:str?)
     required(:grade_id, :integer).filled(:int?)
+    required(:product_chars, Types::StrippedString).maybe(:str?)
+    required(:sell_by_code, Types::StrippedString).maybe(:str?)
+    required(:pallet_label_name, Types::StrippedString).maybe(:str?)
   end
 end
