@@ -28,7 +28,7 @@ module ProductionApp
       attrs = fake_production_run.to_h.reject { |k, _| k == :id }
       res = interactor.create_production_run(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductionRun, res.instance)
+      assert_instance_of(ProductionRunFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -46,7 +46,7 @@ module ProductionApp
       attrs[:active_run_stage] = 'a_change'
       res = interactor.update_production_run(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(ProductionRun, res.instance)
+      assert_instance_of(ProductionRunFlat, res.instance)
       assert_equal 'a_change', res.instance.active_run_stage
       refute_equal value, res.instance.active_run_stage
     end

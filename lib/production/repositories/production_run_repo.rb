@@ -2,15 +2,6 @@
 
 module ProductionApp
   class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :production_runs,
-                     label: :active_run_stage,
-                     value: :id,
-                     order_by: :active_run_stage
-    build_inactive_select :production_runs,
-                          label: :active_run_stage,
-                          value: :id,
-                          order_by: :active_run_stage
-
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
 
@@ -56,8 +47,15 @@ module ProductionApp
                                               flatten_columns: { plant_resource_code: :line_code } }],
                             lookup_functions: [{ function: :fn_production_run_code,
                                                  args: [:id],
-                                                 col_name: :production_run_code }],
+                                                 col_name: :production_run_code },
+                                               { function: :fn_production_run_code,
+                                                 args: [:cloned_from_run_id],
+                                                 col_name: :cloned_from_run_code }],
                             wrapper: ProductionRunFlat)
+    end
+
+    def production_run_code(id)
+      DB[:production_runs].select(Sequel.lit("fn_production_run_code(#{id}) AS production_run_code")).where(id: id).first[:production_run_code]
     end
 
     def prepare_run_allocation_targets(id)

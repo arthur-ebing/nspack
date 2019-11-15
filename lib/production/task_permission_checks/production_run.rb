@@ -15,8 +15,10 @@ module ProductionApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check,
+        re_configure: :re_configure_check,
         complete_setup: :complete_setup_check,
         allocate_setups: :allocate_setups_check,
+        complete_run_stage: :complete_run_stage_check,
         execute_run: :execute_check
       }.freeze
 
@@ -36,10 +38,18 @@ module ProductionApp
       end
 
       def edit_check
+        return failed_response 'Run has been closed' if entity.closed
+        return failed_response 'Run is active' if entity.running && !entity.reconfiguring
+        return failed_response 'Setup is complete' if entity.setup_complete
+
         all_ok
       end
 
       def delete_check
+        return failed_response 'Run has been closed' if entity.closed
+        # No if any pseq or ctn exists referencing the run...
+        return failed_response 'Run is active' if entity.running && !entity.reconfiguring
+
         all_ok
       end
 
@@ -59,6 +69,31 @@ module ProductionApp
       def execute_check
         return failed_response 'Setup is not yet complete' unless entity.setup_complete
         return failed_response 'There is a tipping run already active on this line' if line_has_active_tipping_run?
+
+        all_ok
+      end
+
+      def re_configure_check
+        return failed_response 'Run is already re-configuring' if entity.reconfiguring
+
+        all_ok
+      end
+
+      def complete_run_stage_check
+        return failed_response 'This is not an active run' unless entity.running
+
+        if entity.tipping
+          complete_tipping_stage_check
+        else
+          return failed_response 'This run is not in a valid state (RUNNING, but not TIPPING or LABELING)' unless entity.labeling
+
+          all_ok
+        end
+      end
+
+      def complete_tipping_stage_check
+        running_id = repo.labeling_run_for_line(entity.production_line_id)
+        return failed_response 'There is another run currently LABELING on this line' unless running_id.nil? || running_id == entity.id
 
         all_ok
       end

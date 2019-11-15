@@ -2,7 +2,7 @@
 
 module UiRules
   class ProductionRunRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ProductionRunRepo.new
       @resource_repo = ProductionApp::ResourceRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
@@ -15,8 +15,9 @@ module UiRules
       set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup execute_run show_stats].include?(@mode)
+      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup execute_run complete_stage show_stats].include?(@mode)
       build_stats_table if @mode == :show_stats
+      set_stage_fields if @mode == :complete_stage
 
       add_new_behaviours if @mode == :new
 
@@ -26,39 +27,19 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       farm_id_label = @farm_repo.find_farm(@form_object.farm_id)&.farm_code
       puc_id_label = @farm_repo.find_puc(@form_object.puc_id)&.puc_code
-      packhouse_resource_id_label = @resource_repo.find_plant_resource(@form_object.packhouse_resource_id)&.plant_resource_code
-      production_line_id_label = @resource_repo.find_plant_resource(@form_object.production_line_id)&.plant_resource_code
       season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       orchard_id_label = @farm_repo.find_orchard(@form_object.orchard_id)&.orchard_code
       cultivar_group_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
-      product_setup_template_id_label = ProductionApp::ProductSetupRepo.new.find_product_setup_template(@form_object.product_setup_template_id)&.template_name
-      cloned_from_run_id_label = @repo.find_production_run_flat(@form_object.cloned_from_run_id)&.production_run_code
 
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
-      fields[:packhouse_resource_id] = { renderer: :label, with_value: packhouse_resource_id_label, caption: 'Packhouse Resource' }
-      fields[:production_line_id] = { renderer: :label, with_value: production_line_id_label, caption: 'Production Line' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
       fields[:cultivar_group_id] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
-      fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
-      fields[:cloned_from_run_id] = { renderer: :label, with_value: cloned_from_run_id_label, caption: 'Cloned From Run', invisible: cloned_from_run_id_label.nil? }
-      fields[:active_run_stage] = { renderer: :label }
-      fields[:started_at] = { renderer: :label }
-      fields[:closed_at] = { renderer: :label }
-      fields[:re_executed_at] = { renderer: :label }
-      fields[:completed_at] = { renderer: :label }
       fields[:allow_cultivar_mixing] = { renderer: :label, as_boolean: true }
       fields[:allow_orchard_mixing] = { renderer: :label, as_boolean: true }
-      fields[:reconfiguring] = { renderer: :label, as_boolean: true }
-      fields[:running] = { renderer: :label, as_boolean: true }
-      fields[:tipping] = { renderer: :label, as_boolean: true }
-      fields[:labeling] = { renderer: :label, as_boolean: true }
-      fields[:closed] = { renderer: :label, as_boolean: true }
-      fields[:setup_complete] = { renderer: :label, as_boolean: true }
-      fields[:completed] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -94,18 +75,31 @@ module UiRules
                                              caption: 'Select Template' }
     end
 
+    def set_stage_fields
+      fields[:current_stage] = { renderer: :label, with_value: current_stage }
+      fields[:new_stage] = { renderer: :label, with_value: next_stage }
+    end
+
     def common_fields # rubocop:disable Metrics/AbcSize
+      if @mode == :new
+        ph_renderer = { renderer: :select,
+                        options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE),
+                        disabled_options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE, active: false),
+                        caption: 'Packhouse',
+                        required: true }
+        line_renderer = { renderer: :select,
+                          options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id),
+                          disabled_options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id, active: false),
+                          caption: 'Production line',
+                          required: true }
+      else
+        ph_renderer = { renderer: :label, with_value: @form_object.packhouse_code }
+        line_renderer = { renderer: :label, with_value: @form_object.line_code }
+      end
+
       {
-        packhouse_resource_id: { renderer: :select,
-                                 options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE),
-                                 disabled_options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE, active: false),
-                                 caption: 'Packhouse',
-                                 required: true },
-        production_line_id: { renderer: :select,
-                              options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id),
-                              disabled_options: @resource_repo.packhouse_lines(@form_object.packhouse_resource_id, active: false),
-                              caption: 'Production line',
-                              required: true },
+        packhouse_resource_id: ph_renderer,
+        production_line_id: line_renderer,
         farm_id: { renderer: :select,
                    options: @farm_repo.for_select_farms,
                    disabled_options: @farm_repo.for_select_inactive_farms,
@@ -133,28 +127,26 @@ module UiRules
                        options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                        caption: 'Cultivar' },
-        product_setup_template_id: { renderer: :select,
-                                     options: ProductionApp::ProductSetupRepo.new.for_select_product_setup_templates,
-                                     disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setup_templates,
+        product_setup_template_id: { renderer: :label,
+                                     with_value: product_setup_template_name,
                                      caption: 'Product setup template' },
-        cloned_from_run_id: { renderer: :select,
-                              options: @repo.for_select_production_runs,
-                              disabled_options: @repo.for_select_inactive_production_runs,
+        cloned_from_run_id: { renderer: :label,
+                              with_value: cloned_run_label,
                               caption: 'Cloned from run' },
-        active_run_stage: {},
-        started_at: {},
-        closed_at: {},
-        re_executed_at: {},
-        completed_at: {},
+        active_run_stage: { renderer: :label },
+        started_at: { renderer: :label },
+        closed_at: { renderer: :label },
+        re_executed_at: { renderer: :label },
+        completed_at: { renderer: :label },
         allow_cultivar_mixing: { renderer: :checkbox },
         allow_orchard_mixing: { renderer: :checkbox },
-        reconfiguring: { renderer: :checkbox },
-        running: { renderer: :checkbox },
-        tipping: { renderer: :checkbox },
-        labeling: { renderer: :checkbox },
-        closed: { renderer: :checkbox },
-        setup_complete: { renderer: :checkbox },
-        completed: { renderer: :checkbox }
+        reconfiguring: { renderer: :label, as_boolean: true },
+        running: { renderer: :label, as_boolean: true },
+        tipping: { renderer: :label, as_boolean: true },
+        labeling: { renderer: :label, as_boolean: true },
+        closed: { renderer: :label, as_boolean: true },
+        setup_complete: { renderer: :label, as_boolean: true },
+        completed: { renderer: :label, as_boolean: true }
       }
     end
 
@@ -227,6 +219,36 @@ module UiRules
     end
 
     private
+
+    def current_stage
+      if @form_object.tipping && @form_object.labeling
+        'TIPPING AND LABELING'
+      elsif @form_object.tipping
+        'TIPPING'
+      else
+        'LABELING'
+      end
+    end
+
+    def next_stage
+      if @options[:complete_run] || (@form_object.labeling && !@form_object.tipping)
+        'COMPLETED'
+      else
+        'LABELING'
+      end
+    end
+
+    def cloned_run_label
+      return '' if @form_object.cloned_from_run_id.nil?
+
+      @form_object.cloned_from_run_code
+    end
+
+    def product_setup_template_name
+      return '' if @form_object.product_setup_template_id.nil?
+
+      @form_object.template_name
+    end
 
     def add_new_behaviours
       behaviours do |behaviour|

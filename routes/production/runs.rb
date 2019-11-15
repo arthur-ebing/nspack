@@ -29,7 +29,7 @@ class Nspack < Roda
 
         r.post do
           interactor.mark_setup_as_complete(id)
-          update_grid_row(id, changes: { setup_complete: true }, notice: 'Production run setups have been marked as complete')
+          update_grid_row(id, changes: { setup_complete: true, status: 'SETUP_COMPLETED' }, notice: 'Production run setups have been marked as complete')
         end
       end
 
@@ -50,6 +50,71 @@ class Nspack < Roda
             started_at
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        end
+      end
+
+      r.on 're_configure' do
+        check_auth!('runs', 'execute')
+        res = interactor.re_configure_run(id)
+        if res.success
+          # This should be JSON actions - update grid row and replace_dialog by calling edit url...
+          r.redirect "/production/runs/production_runs/#{id}/edit"
+        else
+          dialog_error(res.message, error: "Run cannot be re-configured - #{res.message}")
+        end
+      end
+
+      r.on 'complete_run' do
+        r.get do
+          check_auth!('runs', 'execute')
+          res = interactor.prepare_to_complete_run(id)
+          show_partial { Production::Runs::ProductionRun::CompleteStage.call(id, res, complete_run: true) }
+        end
+
+        r.post do
+          check_auth!('runs', 'execute')
+          res = interactor.complete_run(id)
+          if res.success
+            row_keys = %i[
+              running
+              tipping
+              labeling
+              active_run_stage
+              completed
+              completed_at
+              status
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
+          end
+        end
+      end
+
+      r.on 'complete_stage' do
+        r.get do
+          check_auth!('runs', 'execute')
+          res = interactor.prepare_to_complete_stage(id)
+          show_partial { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
+        end
+
+        r.post do
+          check_auth!('runs', 'execute')
+          res = interactor.complete_stage(id)
+          if res.success
+            row_keys = %i[
+              running
+              tipping
+              labeling
+              active_run_stage
+              completed
+              completed_at
+              status
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
+          end
         end
       end
 

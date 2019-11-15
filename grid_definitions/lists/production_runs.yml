@@ -11,6 +11,7 @@
   :icon: edit
   :title: Edit
   :popup: true
+  :hide_if_true: setup_complete
 - :url: "/production/runs/production_runs/$:id$/complete_setup"
   :text: Mark setup as complete
   :icon: toggle-on
@@ -24,6 +25,26 @@
   :popup: true
   :hide_if_true: running
   :hide_if_false: setup_complete
+- :url: "/production/runs/production_runs/$:id$/complete_run"
+  :text: Complete all run stages
+  :icon: minus-solid
+  :title: Complete all run stages
+  :popup: true
+  :hide_if_false: running,tipping,labeling
+- :url: "/production/runs/production_runs/$:id$/complete_stage"
+  :text: Complete current run stage
+  :icon: minus-outline
+  :title: Complete current run stage
+  :popup: true
+  :hide_if_false: running
+- :url: "/production/runs/production_runs/$:id$/re_configure"
+  :text: Re-configure
+  :icon: edit
+  :title: Re-configure
+  :popup: true
+  :prompt: Are you sure you want to re-configure this run?
+  :hide_if_false: running
+  :hide_if_true: reconfiguring
 - :url: "/production/runs/production_runs/$:id$/select_template"
   :text: select product setup template
   :icon: arrow-left

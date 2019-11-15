@@ -28,6 +28,18 @@ module ProductionApp
     attribute :tipping, Types::Bool
     attribute :labeling, Types::Bool
     attribute? :active, Types::Bool
+
+    def next_stage
+      if tipping && labeling
+        :labeling
+      elsif tipping
+        :labeling
+      elsif labeling
+        :complete
+      else
+        :tipping
+      end
+    end
   end
 
   class ProductionRunFlat < Dry::Struct
@@ -59,6 +71,7 @@ module ProductionApp
     attribute? :active, Types::Bool
     attribute :template_name, Types::String
     attribute :production_run_code, Types::String
+    attribute :cloned_from_run_code, Types::String
     attribute :cultivar_group_code, Types::String
     attribute :cultivar_name, Types::String
     attribute :farm_code, Types::String

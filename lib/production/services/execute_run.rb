@@ -19,10 +19,10 @@ module ProductionApp
 
         repo.log_status(:production_runs, production_run.id,
                         'RUNNING',
-                        comment: changeset[:active_run_status],
+                        comment: changeset[:active_run_stage],
                         user_name: user_name)
       end
-      success_response('Run is executing', changeset)
+      success_response('Run is executing', changeset.to_h.merge(status: 'RUNNING'))
     end
 
     private
@@ -67,18 +67,38 @@ module ProductionApp
     def do_labeling?
       @do_labeling ||= begin
                          res = repo.find_production_runs_for_line_in_state(production_run.production_line_id, running: true, labeling: true)
-                         !res.success
+                         if res.success
+                           res.instance.include?(production_run.id) ? true : false
+                         else
+                           true
+                         end
                        end
     end
 
+    def run_is_already_tipping?
+      production_run.tipping
+    end
+
+    def active_stage
+      if run_is_already_tipping?
+        'LABELING'
+      elsif do_labeling?
+        'TIPPING_AND_LABELING'
+      else
+        'TIPPING_ONLY'
+      end
+    end
+
     def build_changeset
-      {
-        tipping: true,
+      changeset = {
+        tipping: !run_is_already_tipping?,
         running: true,
         labeling: do_labeling?,
-        started_at: Time.now,
-        active_run_stage: do_labeling? ? 'TIPPING_AND_LABELING' : 'TIPPING_ONLY'
+        active_run_stage: active_stage
       }
+
+      changeset[:started_at] = Time.now unless run_is_already_tipping?
+      changeset
     end
   end
 end

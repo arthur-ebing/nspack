@@ -17,28 +17,46 @@ module Production
               form.action "/production/runs/production_runs/#{id}"
               form.remote!
               form.method :update
-              form.add_field :farm_id
-              form.add_field :puc_id
-              form.add_field :packhouse_resource_id
-              form.add_field :production_line_id
-              form.add_field :season_id
-              form.add_field :orchard_id
-              form.add_field :cultivar_group_id
-              form.add_field :cultivar_id
-              form.add_field :product_setup_template_id
-              form.add_field :cloned_from_run_id
-              form.add_field :active_run_stage
-              form.add_field :started_at
-              form.add_field :closed_at
-              form.add_field :re_executed_at
-              form.add_field :completed_at
-              form.add_field :allow_cultivar_mixing
-              form.add_field :allow_orchard_mixing
-              form.add_field :reconfiguring
-              form.add_field :running
-              form.add_field :closed
-              form.add_field :setup_complete
-              form.add_field :completed
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :packhouse_resource_id
+                  col.add_field :farm_id
+                  col.add_field :orchard_id
+                  col.add_field :cultivar_group_id
+                  col.add_field :allow_cultivar_mixing
+                end
+                row.column do |col|
+                  col.add_field :production_line_id
+                  col.add_field :puc_id
+                  col.add_field :season_id
+                  col.add_field :cultivar_id
+                  col.add_field :allow_orchard_mixing
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :product_setup_template_id
+                  col.add_field :cloned_from_run_id
+                  col.add_field :active_run_stage
+                  col.fold_up do |fold|
+                    fold.caption 'Dates'
+                    fold.add_field :started_at
+                    fold.add_field :closed_at
+                    fold.add_field :re_executed_at
+                    fold.add_field :completed_at
+                  end
+                  col.fold_up do |fold|
+                    fold.caption 'Status'
+                    fold.add_field :reconfiguring
+                    fold.add_field :running
+                    fold.add_field :tipping
+                    fold.add_field :labeling
+                    fold.add_field :closed
+                    fold.add_field :setup_complete
+                    fold.add_field :completed
+                  end
+                end
+              end
             end
           end
 

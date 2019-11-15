@@ -13,11 +13,11 @@ module ProductionApp
         log_status('production_runs', id, 'CREATED')
         log_transaction
       end
-      instance = production_run(id)
-      success_response("Created production run #{instance.active_run_stage}",
+      instance = production_run_flat(id)
+      success_response("Created production run #{instance.production_run_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { active_run_stage: ['This production run already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { packhouse_id: ['This production run already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,15 +30,15 @@ module ProductionApp
         repo.update_production_run(id, res)
         log_transaction
       end
-      instance = production_run(id)
-      success_response("Updated production run #{instance.active_run_stage}",
+      instance = production_run_flat(id)
+      success_response("Updated production run #{instance.production_run_code}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_production_run(id)
-      name = production_run(id).active_run_stage
+      name = production_run_flat(id).production_run_code
       repo.transaction do
         repo.delete_production_run_stats(id)
         repo.delete_production_run(id)
@@ -101,6 +101,50 @@ module ProductionApp
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::ProductionRun.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def re_configure_run(id)
+      assert_permission!(:re_configure, id)
+      repo.transaction do
+        repo.update_production_run(id, reconfiguring: true, setup_complete: false)
+        log_status('production_runs', id, 'RE-CONFiGURING')
+        log_transaction
+      end
+      success_response('Run can be re-configured')
+    end
+
+    def prepare_to_complete_run(id)
+      assert_permission!(:complete_run_stage, id)
+      success_response('Labeling stage will finish and run will complete')
+    end
+
+    def prepare_to_complete_stage(id)
+      assert_permission!(:complete_run_stage, id)
+      message = case production_run(id).next_stage
+                when :complete
+                  'Labeling stage will finish and run will complete'
+                when :labeling
+                  'The tipping stage will finish and the labeling stage will begin'
+                else
+                  return failed_response('This run is not in a valid state')
+                end
+
+      success_response(message)
+    end
+
+    def complete_run(id)
+      CompleteRun.call(id, @user.user_name)
+    end
+
+    def complete_stage(id)
+      case production_run(id).next_stage
+      when :complete
+        CompleteRun.call(id, @user.user_name)
+      when :labeling
+        ExecuteRun.call(id, @user.user_name)
+      else
+        failed_response('Incorrect state')
+      end
     end
 
     def lines_for_packhouse(params)

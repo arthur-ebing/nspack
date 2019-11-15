@@ -22,26 +22,14 @@ module Production
                   col.add_field :farm_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_group_id
-                  # col.add_field :product_setup_template_id
-                  # col.add_field :cloned_from_run_id
-                  # col.add_field :active_run_stage
                 end
                 row.column do |col|
                   col.add_field :production_line_id
                   col.add_field :puc_id
                   col.add_field :season_id
                   col.add_field :cultivar_id
-                  # col.add_field :started_at
-                  # col.add_field :closed_at
-                  # col.add_field :re_executed_at
-                  # col.add_field :completed_at
                   col.add_field :allow_cultivar_mixing
                   col.add_field :allow_orchard_mixing
-                  # col.add_field :reconfiguring
-                  # col.add_field :running
-                  # col.add_field :closed
-                  # col.add_field :setup_complete
-                  # col.add_field :completed
                 end
               end
             end
