@@ -121,9 +121,9 @@ module FinishedGoodsApp
 
     def validate_load(load_id) # rubocop:disable Metrics/AbcSize
       load = repo.find_load(load_id)
-      return failed_response("Load:#{load_id} doesn't exist") if load&.id&.nil_or_empty?
+      return failed_response("Load:#{load_id} doesn't exist") if load.nil?
 
-      return failed_response("Load:#{load_id} already Shipped") if load&.shipped
+      return failed_response("Load:#{load_id} already Shipped") if load.shipped
 
       validate_pallets = validate_load_truck_pallets(load_id)
       return failed_response(validate_pallets.message) unless validate_pallets.success
@@ -135,11 +135,11 @@ module FinishedGoodsApp
 
     def validate_load_truck(load_id) # rubocop:disable Metrics/AbcSize
       load = repo.find_load_flat(load_id)
-      return failed_response("Load:#{load_id} doesn't exist") if load&.id&.nil_or_empty?
+      return failed_response("Load:#{load_id} doesn't exist") if load.nil?
 
       message = []
-      message << "Truck Arrival hasn't been done" if load&.vehicle_number.nil?
-      if load&.shipped
+      message << "Truck Arrival hasn't been done" if load.vehicle_number.nil?
+      if load.shipped
         message << 'Already Shipped'
       else
         validate_pallets = validate_load_truck_pallets(load_id)
@@ -201,13 +201,14 @@ module FinishedGoodsApp
       stepper
     end
 
-    def setup_load_truck(load_id) # rubocop:disable Metrics/AbcSize
-      vehicle_id = LoadVehicleRepo.new.find_load_vehicle_from(load_id: load_id)
-      container_id = LoadContainerRepo.new.find_load_container_from(load_id: load_id)
-      form_state = { load_id: load_id }
-      form_state[:voyage_code] = LoadRepo.new.find_load_flat(load_id)&.voyage_code
-      form_state[:vehicle_number] = LoadVehicleRepo.new.find_load_vehicle(vehicle_id)&.vehicle_number
-      form_state[:container_code] = LoadContainerRepo.new.find_load_container(container_id)&.container_code
+    def setup_load_truck(load_id)
+      load_flat = LoadRepo.new.find_load_flat(load_id)
+      raise 'Setup Load called without load_id' if load_flat.nil?
+
+      form_state = { load_id: load_id,
+                     voyage_code: load_flat.voyage_code,
+                     vehicle_number: load_flat.vehicle_number,
+                     container_code: load_flat.container_code }
       allocated = LoadRepo.new.find_pallet_numbers_from(load_id: load_id)
 
       stepper.write(form_state: form_state, allocated: allocated, scanned: [])
@@ -252,7 +253,7 @@ module FinishedGoodsApp
     end
 
     def validate_load_container_params(params)
-      AppConst::VGM_REQUIRED ? VGM_REQUIRED_Schema.call(params) : LoadContainerSchema.call(params)
+      LoadContainerSchema.call(params)
     end
 
     def validate_pallet_list(params) # rubocop:disable Metrics/AbcSize

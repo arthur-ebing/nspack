@@ -71,8 +71,6 @@ module FinishedGoodsApp
     end
 
     def validate_load_container_params(params)
-      return VGM_REQUIRED_Schema.call(params) if AppConst::VGM_REQUIRED
-
       LoadContainerSchema.call(params)
     end
   end
