@@ -273,9 +273,9 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.update_product_setup(id, params[:product_setup])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage")
+            r.redirect("/production/product_setups/product_setup_templates/#{res.instance.product_setup_template_id}/manage")
           else
-            re_show_form(r, res) do
+            re_show_form(r, res, url: "/production/product_setups/product_setups/#{id}/edit") do
               Production::ProductSetups::ProductSetup::Edit.call(id,
                                                                  back_url: "/production/product_setups/product_setup_templates/#{res.instance[:product_setup_template_id]}/manage",
                                                                  form_values: params[:product_setup],

@@ -23,7 +23,6 @@ module Production
             page.form do |form| # rubocop:disable Metrics/BlockLength
               form.caption 'Edit Product Setup'
               form.action "/production/product_setups/product_setups/#{id}"
-              form.remote!
               form.method :update
               form.row do |row|
                 row.column do |col|
