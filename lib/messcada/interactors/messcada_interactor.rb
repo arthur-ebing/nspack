@@ -50,8 +50,8 @@ module MesscadaApp
       res = CartonLabelingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      resource_code = res[:device]
-      return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+      check_res = validate_device_exists(res[:device])
+      return check_res unless check_res.success
 
       cvl_res = nil
       repo.transaction do
@@ -59,9 +59,9 @@ module MesscadaApp
         log_transaction
       end
       cvl_res
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
       failed_response(e.message)
     end
 
@@ -74,12 +74,14 @@ module MesscadaApp
         res = CartonVerificationSchema.call(params)
         return validation_failed_response(res) unless res.messages.empty?
 
-        resource_code = res[:device]
-        return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+        check_res = validate_device_exists(res[:device])
+        return check_res unless check_res.success
       end
 
-      carton_label_id = res[:carton_number]
-      return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
+      check_res = validate_carton_label_exists(res[:carton_number])
+      return check_res unless check_res.success
+
+      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
 
       cvl_res = nil
       repo.transaction do
@@ -87,9 +89,9 @@ module MesscadaApp
         log_transaction
       end
       cvl_res
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
       failed_response(e.message)
     end
 
@@ -97,11 +99,10 @@ module MesscadaApp
       res = CartonVerificationAndWeighingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      resource_code = res[:device]
-      return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+      check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
+      return check_res unless check_res.success
 
-      carton_label_id = res[:carton_number]
-      return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
+      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
 
       cvl_res = nil
       repo.transaction do
@@ -122,11 +123,10 @@ module MesscadaApp
       res = CartonVerificationAndWeighingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      resource_code = res[:device]
-      return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+      check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
+      return check_res unless check_res.success
 
-      carton_label_id = res[:carton_number]
-      return failed_response("Carton / Bin label:#{carton_label_id} could not be found") unless carton_label_exists?(carton_label_id)
+      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
 
       cvl_res = nil
       repo.transaction do
@@ -212,6 +212,38 @@ module MesscadaApp
 
     def carton_label_exists?(carton_label_id)
       repo.carton_label_exists?(carton_label_id)
+    end
+
+    def validate_carton_label_exists(carton_id_or_pallet_no)
+      if AppConst::CARTON_EQUALS_PALLET
+        return failed_response("Bin label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists_for_pallet?(carton_id_or_pallet_no)
+      else
+        return failed_response("Carton label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists?(carton_id_or_pallet_no)
+      end
+
+      ok_response
+    end
+
+    def validate_device_exists(resource_code)
+      return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+
+      ok_response
+    end
+
+    def validate_device_and_label_exist(device, carton_id_or_pallet_no)
+      res1 = validate_device_exists(device)
+      return res1 unless res1.success
+
+      res2 = validate_carton_label_exists(carton_id_or_pallet_no)
+      return res2 unless res2.success
+
+      ok_response
+    end
+
+    def convert_pallet_no_to_carton_no(res)
+      out = res.to_h
+      out[:carton_number] = repo.carton_label_id_for_pallet_no(res[:carton_number])
+      out
     end
   end
 end

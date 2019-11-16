@@ -23,6 +23,10 @@ module MesscadaApp
       DB[:cartons].where(carton_label_id: carton_label_id).get(:id)
     end
 
+    def carton_label_id_for_pallet_no(pallet_no)
+      DB[:carton_labels].where(pallet_number: pallet_no.to_s).get(:id)
+    end
+
     def resource_code_exists?(resource_code)
       exists?(:system_resources, system_resource_code: resource_code)
     end
