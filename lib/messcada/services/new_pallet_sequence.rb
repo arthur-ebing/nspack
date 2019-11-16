@@ -12,7 +12,7 @@ module MesscadaApp
     end
 
     def call
-      res = NewPalletSequenceObject.new(carton_id, carton_quantity).call
+      res = NewPalletSequenceObject.call(carton_id, carton_quantity)
       return res unless res.success
 
       repo.create_sequences(res.instance, pallet_id)

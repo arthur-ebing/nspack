@@ -39,7 +39,7 @@ module MesscadaApp
     end
 
     def carton_label_carton_params
-      repo.find_hash(:carton_labels, carton_label_id).reject { |k, _| %i[id resource_id label_name active created_at updated_at].include?(k) }
+      repo.find_hash(:carton_labels, carton_label_id).reject { |k, _| %i[id resource_id label_name carton_equals_pallet active created_at updated_at].include?(k) }
     end
   end
 end

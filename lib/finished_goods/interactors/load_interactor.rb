@@ -42,7 +42,7 @@ module FinishedGoodsApp
       failed_response("Load #{id} already shipped") if load_entity(id)&.shipped
       res = nil
       repo.transaction do
-        res = ShipLoad.call(load_id: id, user_name: @user.user_name)
+        res = ShipLoad.call(id, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
