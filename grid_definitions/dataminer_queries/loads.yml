@@ -8,20 +8,20 @@
   \   fn_party_role_name(loads.customer_party_role_id) AS customer,\r\n    fn_party_role_name(loads.consignee_party_role_id)
   AS consignee,\r\n    fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,\r\n
   \   fn_party_role_name(loads.exporter_party_role_id) AS exporter,\r\n    fn_party_role_name(loads.billing_client_party_role_id)
-  AS billing_client,\r\n    destination_cities.city_name AS final_destination_city,\r\n
-  \   loads.order_number,\r\n    loads.customer_order_number,\r\n    loads.customer_reference,\r\n
-  \   loads.exporter_certificate_code,\r\n    loads.allocated,\r\n    loads.allocated_at,\r\n
-  \   loads.shipped,\r\n    loads.shipped_at,\r\n    loads.transfer_load,\r\n    loads.edi_file_name,\r\n
-  \   loads.updated_at,\r\n    voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n
-  \   load_voyages.booking_reference,\r\n    load_vehicles.vehicle_number,\r\n    load_vehicles.id
-  IS NOT NULL AS truck_arrived,\r\n\r\n    CASE\r\n        WHEN loads.shipped THEN
-  'ready'\r\n        WHEN loads.allocated THEN 'ok'\r\n        ELSE NULL\r\n        END
-  AS colour_rule\r\n\r\nFROM loads\r\nJOIN depots ON depots.id = loads.depot_id\r\nJOIN
-  destination_cities ON destination_cities.id = loads.final_destination_id\r\nJOIN
-  voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\nJOIN
-  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\nJOIN
-  ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\nJOIN ports pod_port
-  ON pod_port.id = pod_voyage_ports.port_id\r\nJOIN voyages ON pol_voyage_ports.voyage_id
+  AS billing_client,\r\n    fn_party_role_name(load_vehicles.haulier_party_role_id)
+  AS haulier,\r\n    destination_cities.city_name AS final_destination_city,\r\n    loads.order_number,\r\n
+  \   loads.customer_order_number,\r\n    loads.customer_reference,\r\n    loads.exporter_certificate_code,\r\n
+  \   loads.allocated,\r\n    loads.allocated_at,\r\n    loads.shipped,\r\n    loads.shipped_at,\r\n
+  \   loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
+  \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
+  \   load_vehicles.vehicle_number,\r\n    load_vehicles.id IS NOT NULL AS truck_arrived,\r\n\r\n
+  \   CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n        WHEN loads.allocated
+  THEN 'ok'\r\n        ELSE NULL\r\n        END AS colour_rule\r\n\r\nFROM loads\r\nJOIN
+  depots ON depots.id = loads.depot_id\r\nJOIN destination_cities ON destination_cities.id
+  = loads.final_destination_id\r\nJOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
+  = loads.pol_voyage_port_id\r\nJOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
+  = loads.pod_voyage_port_id\r\nJOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\nJOIN
+  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\nJOIN voyages ON pol_voyage_ports.voyage_id
   = voyages.id\r\nLEFT JOIN vessels ON voyages.vessel_id = vessels.id\r\nLEFT JOIN
   load_containers ON loads.id = load_containers.load_id\r\nLEFT JOIN load_voyages
   ON loads.id = load_voyages.load_id\r\nLEFT JOIN load_vehicles ON loads.id = load_vehicles.load_id\r\nORDER
@@ -321,9 +321,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  haulier:
+    :name: haulier
+    :sequence_no: 19
+    :caption: Haulier
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   final_destination_city:
     :name: final_destination_city
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Final destination city
     :namespaced_name: destination_cities.city_name
     :data_type: :string
@@ -339,7 +355,7 @@
     :group_max: false
   order_number:
     :name: order_number
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Order number
     :namespaced_name: loads.order_number
     :data_type: :string
@@ -355,7 +371,7 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Customer order number
     :namespaced_name: loads.customer_order_number
     :data_type: :string
@@ -371,7 +387,7 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Customer reference
     :namespaced_name: loads.customer_reference
     :data_type: :string
@@ -387,7 +403,7 @@
     :group_max: false
   exporter_certificate_code:
     :name: exporter_certificate_code
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Exporter certificate code
     :namespaced_name: loads.exporter_certificate_code
     :data_type: :string
@@ -403,7 +419,7 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Allocated
     :namespaced_name: loads.allocated
     :data_type: :boolean
@@ -419,7 +435,7 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Allocated at
     :namespaced_name: loads.allocated_at
     :data_type: :datetime
@@ -435,7 +451,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Shipped
     :namespaced_name: loads.shipped
     :data_type: :boolean
@@ -451,7 +467,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Shipped at
     :namespaced_name: loads.shipped_at
     :data_type: :datetime
@@ -467,7 +483,7 @@
     :group_max: false
   transfer_load:
     :name: transfer_load
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Transfer load
     :namespaced_name: loads.transfer_load
     :data_type: :boolean
@@ -483,7 +499,7 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Edi file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
@@ -499,7 +515,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Updated at
     :namespaced_name: loads.updated_at
     :data_type: :datetime
@@ -515,7 +531,7 @@
     :group_max: false
   voyage_id:
     :name: voyage_id
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Voyage
     :namespaced_name: voyages.id
     :data_type: :string
@@ -531,7 +547,7 @@
     :group_max: false
   container_code:
     :name: container_code
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Container code
     :namespaced_name: load_containers.container_code
     :data_type: :string
@@ -547,7 +563,7 @@
     :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Booking reference
     :namespaced_name: load_voyages.booking_reference
     :data_type: :string
@@ -563,7 +579,7 @@
     :group_max: false
   vehicle_number:
     :name: vehicle_number
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Vehicle number
     :namespaced_name: load_vehicles.vehicle_number
     :data_type: :string
@@ -579,7 +595,7 @@
     :group_max: false
   truck_arrived:
     :name: truck_arrived
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Truck arrived
     :namespaced_name: 
     :data_type: :string
@@ -595,7 +611,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

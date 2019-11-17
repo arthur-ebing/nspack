@@ -33,8 +33,7 @@ module MesscadaApp
 
     def pallet_sequence_carton_params
       carton_rejected_fields = %i[id resource_id label_name fruit_sticker_pm_product_id carton_label_id gross_weight nett_weight
-                                  phc sell_by_code product_chars pallet_label_name active created_at updated_at]
-      # sell_by_code grade_id product_chars pallet_label_name active created_at updated_at]
+                                  phc pallet_label_name active created_at updated_at]
       repo.find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
     end
 

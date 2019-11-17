@@ -75,6 +75,8 @@ module FinishedGoodsApp
     end
 
     def allocate_pallets(load_id, pallet_ids, user_name)
+      return ok_response if pallet_ids.empty?
+
       DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
       log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name)
 
@@ -86,6 +88,8 @@ module FinishedGoodsApp
     end
 
     def unallocate_pallets(load_id, pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
+      return ok_response if pallet_ids.empty?
+
       DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
       log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED', user_name: user_name)
 
