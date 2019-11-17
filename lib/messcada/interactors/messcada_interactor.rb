@@ -155,13 +155,17 @@ module MesscadaApp
     def verify_pallet_sequence(pallet_sequence_id, params) # rubocop:disable Metrics/AbcSize
       return validation_failed_response(messages: { verification_failure_reason: ['is missing'] }) if params[:verification_result] == 'failed' && params[:verification_failure_reason].nil_or_empty?
 
-      pallet_id = nil
+      pallet_id = get_pallet_sequence_pallet_id(pallet_sequence_id)
+      changeset = pallet_changes_on_verify(params)
+
       repo.transaction do
-        pallet_id = get_pallet_sequence_pallet_id(pallet_sequence_id)
         update_pallet_sequence_verification_result(pallet_sequence_id, params)
-        update_pallet_fruit_sticker_pm_product_id(pallet_id, params[:fruit_sticker_pm_product_id]) unless params[:fruit_sticker_pm_product_id].nil_or_empty?
+
+        repo.update_pallet(pallet_id, changeset) unless changeset.empty?
+
         update_pallet_nett_weight(pallet_id) if params[:nett_weight]
       end
+
       verification_completed = pallet_verified?(pallet_id)
       success_response('Pallet Sequence updated successfully', verification_completed: verification_completed)
     rescue Crossbeams::InfoError => e
@@ -178,12 +182,18 @@ module MesscadaApp
 
     private
 
-    def update_pallet_sequence_verification_result(pallet_sequence_id, params)
-      repo.update_pallet_sequence_verification_result(pallet_sequence_id, params)
+    def pallet_changes_on_verify(params)
+      changeset = {}
+      changeset[:fruit_sticker_pm_product_id] = params[:fruit_sticker_pm_product_id] unless params[:fruit_sticker_pm_product_id].nil_or_empty?
+      if AppConst::PALLET_IS_IN_STOCK_WHEN_VERIFIED
+        changeset[:in_stock] = true
+        changeset[:stock_created_at] = Time.now
+      end
+      changeset
     end
 
-    def update_pallet_fruit_sticker_pm_product_id(pallet_id, fruit_sticker_pm_product_id)
-      repo.update_pallet(pallet_id, fruit_sticker_pm_product_id: fruit_sticker_pm_product_id)
+    def update_pallet_sequence_verification_result(pallet_sequence_id, params)
+      repo.update_pallet_sequence_verification_result(pallet_sequence_id, params)
     end
 
     def update_pallet_nett_weight(pallet_id)

@@ -28,6 +28,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_LABEL_DIMENSION: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
     { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' },
     { CARTON_EQUALS_PALLET: 'Create pallets and pallet_sequences from carton. Default false' },
+    { PALLET_IS_IN_STOCK_WHEN_VERIFIED: 'When a pallet is verified, take it into stock immediately. (Do not wait for an inspection)' },
     { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' }
   ].freeze
 
