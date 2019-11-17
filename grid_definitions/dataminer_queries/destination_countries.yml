@@ -1,11 +1,13 @@
 ---
 :caption: Destination Countries
-:sql: SELECT "destination_countries"."id", "destination_countries"."destination_region_id",
-  "destination_countries"."country_name", "destination_countries"."created_at", "destination_countries"."updated_at",
-  "destination_regions"."destination_region_name" FROM "destination_countries" JOIN
-  "destination_regions" ON "destination_regions"."id" = "destination_countries"."destination_region_id"
+:sql: "SELECT \"destination_countries\".\"id\", \"destination_countries\".\"destination_region_id\",
+  \"destination_countries\".\"country_name\", \"destination_countries\".\"created_at\",
+  \"destination_countries\".\"updated_at\", \"destination_regions\".\"destination_region_name\"
+  AS region_name\r\nFROM \"destination_countries\"\r\nJOIN \"destination_regions\"
+  ON \"destination_regions\".\"id\" = \"destination_countries\".\"destination_region_id\""
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -16,6 +18,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,6 +34,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -46,6 +50,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -61,6 +66,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -76,22 +82,24 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_region_name:
-    :name: destination_region_name
+  region_name:
+    :name: region_name
     :sequence_no: 6
-    :caption: Destination region name
+    :caption: Region name
     :namespaced_name: destination_regions.destination_region_name
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
-    :groupable: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -20,8 +20,9 @@ module UiRules
     end
 
     def common_fields
+      show_region = !@options[:region_id].nil?
       {
-        destination_region_id: { renderer: :select, options: @repo.for_select_destination_regions, caption: 'Region', required: true },
+        destination_region_id: { renderer: :select, options: @repo.for_select_destination_regions, caption: 'Region', required: true, invisible: show_region },
         country_name: { required: true }
       }
     end

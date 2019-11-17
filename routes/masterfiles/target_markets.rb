@@ -220,8 +220,12 @@ class Nspack < Roda
         r.post do        # CREATE
           res = country_interactor.create_country(id, params[:country])
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            if fetch?(r)
+              show_json_notice(res.message)
+            else
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            end
           else
             re_show_form(r, res, url: "/masterfiles/target_markets/destination_regions/#{id}/destination_countries/new") do
               Masterfiles::TargetMarkets::Country::New.call(id,
@@ -323,6 +327,7 @@ class Nspack < Roda
           if res.success
             update_grid_row(id,
                             changes: { destination_region_id: res.instance[:destination_region_id],
+                                       region_name: res.instance[:region_name],
                                        country_name: res.instance[:country_name] },
                             notice: res.message)
           else
@@ -340,6 +345,35 @@ class Nspack < Roda
         end
       end
     end
+
+    r.on 'destination_countries' do
+      interactor = MasterfilesApp::DestinationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('target markets', 'new')
+        show_partial_or_page(r) { Masterfiles::TargetMarkets::Country::New.call(nil, remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_country(nil, params[:country])
+        if res.success
+          row_keys = %i[
+            id
+            destination_region_id
+            country_name
+            region_name
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/target_markets/destination_countries/new') do
+            Masterfiles::TargetMarkets::Country::New.call(nil,
+                                                          form_values: params[:country],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
+
     # DESTINATION CITIES
     # --------------------------------------------------------------------------
     r.on 'destination_cities', Integer do |id|
