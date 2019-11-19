@@ -224,6 +224,10 @@ module MesscadaApp
       repo.carton_label_exists?(carton_label_id)
     end
 
+    def carton_label_exists_for_pallet?(pallet_no)
+      !repo.carton_label_id_for_pallet_no(pallet_no).nil?
+    end
+
     def validate_carton_label_exists(carton_id_or_pallet_no)
       if AppConst::CARTON_EQUALS_PALLET
         return failed_response("Bin label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists_for_pallet?(carton_id_or_pallet_no)

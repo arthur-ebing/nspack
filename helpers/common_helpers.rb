@@ -710,7 +710,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     if res.errors.empty?
       res.message
     else
-      "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+      "#{res.message} - #{res.errors.map { |fld, errs| "#{fld} #{errs.map { |e| e.gsub('<', '&lt;').gsub('>', '&gt;') }.join(', ')}" }.join('; ')}"
     end
   end
 end
