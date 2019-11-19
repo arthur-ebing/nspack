@@ -29,7 +29,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' },
     { CARTON_EQUALS_PALLET: 'Create pallets and pallet_sequences from carton. Default false' },
     { PALLET_IS_IN_STOCK_WHEN_VERIFIED: 'When a pallet is verified, take it into stock immediately. (Do not wait for an inspection)' },
-    { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' }
+    { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' },
+    { LABEL_LOCATION_BARCODE: 'Label name for Locations' },
+    { LABEL_BIN_BARCODE: 'Label name for Bins' },
+    { LABEL_CARTON_VERIFICATION: 'Label name for Cartons' }
   ].freeze
 
   NO_OVERRIDE = [
