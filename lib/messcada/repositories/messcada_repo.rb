@@ -327,7 +327,7 @@ module MesscadaApp
         -- "pm_subtypes"."subtype_code",
         -- "pm_types"."pm_type_code",
         "cartons_per_pallet"."cartons_per_pallet",
-        'UNKNOWN' AS product_code
+        'UNKNOWN' AS product_code,
         -- "pm_products"."product_code"
         "product_setups"."sell_by_code",
         "grades"."grade_code",
