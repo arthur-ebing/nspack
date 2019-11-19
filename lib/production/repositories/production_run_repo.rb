@@ -142,7 +142,7 @@ module ProductionApp
 
     def setup_data_for(product_setup_id)
       rec = find_hash(:product_setups, product_setup_id)
-      rec[:treatment_ids] = rec[:treatment_ids].to_ary # convert treatment_ids from Sequel array to ruby array
+      rec[:treatment_ids] = rec[:treatment_ids]&.to_ary # convert treatment_ids from Sequel array to ruby array
       rec
     end
 

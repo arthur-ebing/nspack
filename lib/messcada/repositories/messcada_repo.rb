@@ -299,6 +299,7 @@ module MesscadaApp
         "cultivar_groups"."cultivar_group_code",
         "cultivars"."cultivar_name",
         "marketing_varieties"."marketing_variety_code",
+        "marketing_varieties"."description" AS marketing_variety_description,
         "cvv"."marketing_variety_code" AS customer_variety_code,
         "std_fruit_size_counts"."size_count_value",
         "fruit_size_references"."size_reference",
@@ -328,6 +329,10 @@ module MesscadaApp
         "cartons_per_pallet"."cartons_per_pallet",
         'UNKNOWN' AS product_code
         -- "pm_products"."product_code"
+        "product_setups"."sell_by_code",
+        "grades"."grade_code",
+        "product_setups"."product_chars",
+        COALESCE(lines.resource_properties ->> 'phc', packhouses.resource_properties ->> 'phc') AS phc
         FROM "product_resource_allocations"
         JOIN "production_runs" ON "production_runs"."id" = "product_resource_allocations"."production_run_id"
         -- LEFT JOIN "product_resource_allocations" ON "product_resource_allocations"."id" = "carton_labels"."product_resource_allocation_id"
@@ -340,6 +345,7 @@ module MesscadaApp
         JOIN "pucs" ON "pucs"."id" = "production_runs"."puc_id"
         JOIN "orchards" ON "orchards"."id" = "production_runs"."orchard_id"
         JOIN "cultivar_groups" ON "cultivar_groups"."id" = "production_runs"."cultivar_group_id"
+        LEFT JOIN "grades" ON "grades"."id" = "product_setups"."grade_id"
         LEFT JOIN "cultivars" ON "cultivars"."id" = "production_runs"."cultivar_id"
         LEFT JOIN "commodities" ON "commodities"."id" = "cultivars"."commodity_id"
         JOIN "marketing_varieties" ON "marketing_varieties"."id" = "product_setups"."marketing_variety_id"
