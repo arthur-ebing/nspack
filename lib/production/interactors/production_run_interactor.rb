@@ -37,14 +37,18 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def delete_production_run(id)
+    def delete_production_run(id) # rubocop:disable Metrics/AbcSize
+      raise Crossbeams::TaskNotPermittedError, 'Run cannot be deleted at this stage' if production_run(id).setup_complete || production_run(id).reconfiguring
+
       name = production_run_flat(id).production_run_code
       repo.transaction do
+        repo.delete_product_resource_allocations
         repo.delete_production_run_stats(id)
         repo.delete_production_run(id)
         log_status('production_runs', id, 'DELETED')
         log_transaction
       end
+
       success_response("Deleted production run #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

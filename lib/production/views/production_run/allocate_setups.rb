@@ -22,10 +22,9 @@ module Production
                                   text: 'Back',
                                   url: '/list/production_runs',
                                   style: :back_button)
-              # section.add_control(control_type: :link,
-              #                     text: 'New Product Setup',
-              #                     url: "/production/product_setups/product_setup_templates/#{id}/product_setups/new",
-              #                     style: :button)
+            end
+            page.section do |section|
+              section.fit_height!
               section.add_grid('production_run_allocated_setups',
                                "/list/production_run_allocated_setups/grid?key=standard&production_run_id=#{id}",
                                caption: "Allocate Setups for production run #{ui_rule.form_object.production_run_code}")

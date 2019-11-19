@@ -708,9 +708,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @return [String] the formatted message.
   def unwrap_failed_response(res)
     if res.errors.empty?
-      res.message
+      CGI.escapeHTML(res.message)
     else
-      "#{res.message} - #{res.errors.map { |fld, errs| "#{fld} #{errs.map { |e| e.gsub('<', '&lt;').gsub('>', '&gt;') }.join(', ')}" }.join('; ')}"
+      "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
     end
   end
 end

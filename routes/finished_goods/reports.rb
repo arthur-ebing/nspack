@@ -39,7 +39,7 @@ class Nspack < Roda
 
     # PICKLIST
     # --------------------------------------------------------------------------
-    r.on 'piclklist', Integer do |id|
+    r.on 'picklist', Integer do |id|
       res = CreateJasperReport.call(report_name: 'dispatch_note',
                                     user: current_user.login_name,
                                     file: 'dispatch_note',

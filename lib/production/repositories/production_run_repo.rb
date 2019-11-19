@@ -9,6 +9,10 @@ module ProductionApp
       create(:production_run_stats, production_run_id: id)
     end
 
+    def delete_product_resource_allocations(production_run_id)
+      DB[:product_resource_allocations].where(production_run_id: production_run_id).delete
+    end
+
     def delete_production_run_stats(id)
       DB[:production_run_stats].where(production_run_id: id).delete
     end
