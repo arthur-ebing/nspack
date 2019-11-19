@@ -14,7 +14,7 @@ module UiRules
     end
 
     def set_show_fields
-      city_id_label = MasterfilesApp::DestinationRepo.new.find_destination_city(@form_object.city_id)&.city_name
+      city_id_label = MasterfilesApp::DestinationRepo.new.find_city(@form_object.city_id)&.city_name
       fields[:city_id] = { renderer: :label, with_value: city_id_label, caption: 'City' }
       fields[:depot_code] = { renderer: :label }
       fields[:description] = { renderer: :label }

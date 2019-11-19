@@ -54,7 +54,7 @@ module UiRules
       fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_code_label, caption: 'Voyage Type' }
       fields[:vessel_id] = { renderer: :label, with_value: voyage_vessel_label, caption: 'Vessel' }
       fields[:voyage_number] = { renderer: :label, with_value: voyage_number_label, caption: 'Voyage Number' }
-      fields[:year] = { renderer: :label, with_value: voyage_year_label, caption: 'Voyage Number' }
+      fields[:year] = { renderer: :label, with_value: voyage_year_label, caption: 'Year' }
       fields[:pol_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
       fields[:pod_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
       fields[:final_destination_id] = { renderer: :label, with_value: final_destination_label, caption: 'Final Destination' }

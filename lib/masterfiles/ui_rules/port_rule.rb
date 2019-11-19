@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       port_type_id_label = MasterfilesApp::PortTypeRepo.new.find_port_type(@form_object.port_type_id)&.port_type_code
       voyage_type_id_label = MasterfilesApp::VoyageTypeRepo.new.find_voyage_type(@form_object.voyage_type_id)&.voyage_type_code
-      city_id_label = MasterfilesApp::DestinationRepo.new.find_destination_city(@form_object.city_id)&.city_name
+      city_id_label = MasterfilesApp::DestinationRepo.new.find_city(@form_object.city_id)&.city_name
       fields[:port_type_id] = { renderer: :label, with_value: port_type_id_label, caption: 'Port Type' }
       fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_id_label, caption: 'Voyage Type' }
       fields[:city_id] = { renderer: :label, with_value: city_id_label, caption: 'City' }
