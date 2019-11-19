@@ -3,7 +3,7 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class Show
+      class Show # rubocop:disable Metrics/ClassLength
         def self.call(id, user: nil, back_url: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, user.nil? ? :show : :ship, id: id, user: user)
           rules   = ui_rule.compile
@@ -15,6 +15,21 @@ module FinishedGoods
                                   text: 'Back',
                                   url: back_url,
                                   style: :back_button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Dispatch Note',
+                                  url: "/finished_goods/reports/delivery_note/#{id}",
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Dispatch Note - Summarised',
+                                  url: "/finished_goods/reports/delivery_note_summarised/#{id}",
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Dispatch Picklist',
+                                  url: "/finished_goods/reports/picklist/#{id}",
+                                  loading_window: true,
+                                  style: :button)
             end
             page.form do |form| # rubocop:disable Metrics/BlockLength
               # form.caption 'Load'
