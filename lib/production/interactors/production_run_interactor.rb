@@ -42,7 +42,7 @@ module ProductionApp
 
       name = production_run_flat(id).production_run_code
       repo.transaction do
-        repo.delete_product_resource_allocations
+        repo.delete_product_resource_allocations(id)
         repo.delete_production_run_stats(id)
         repo.delete_production_run(id)
         log_status('production_runs', id, 'DELETED')
