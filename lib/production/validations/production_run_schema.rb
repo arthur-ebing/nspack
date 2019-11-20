@@ -10,7 +10,7 @@ module ProductionApp
     required(:production_line_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:orchard_id, :integer).maybe(:int?)
-    required(:cultivar_group_id, :integer).maybe(:int?)
+    required(:cultivar_group_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).maybe(:int?)
     optional(:product_setup_template_id, :integer).maybe(:int?)
     required(:allow_cultivar_mixing, :bool).maybe(:bool?)
