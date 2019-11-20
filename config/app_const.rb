@@ -165,6 +165,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
     { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
     { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
+    { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
     { regex: '^(\\d+)', type: 'load', field: 'id' }
   ].freeze
 
