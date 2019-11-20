@@ -1,6 +1,6 @@
 ---
 :caption: Allocated setups for production run
-:sql: "SELECT a.id, parent.plant_resource_code AS drop, sysres.system_resource_code
+:sql: "SELECT a.id, parent.plant_resource_code AS pack_station, sysres.system_resource_code
   AS module, p.plant_resource_code, \r\na.product_setup_id, fn_product_setup_code(s.id)
   AS product_setup_code, a.label_template_id, l.label_template_name,\r\na. active\r\nFROM
   production_runs r\r\nJOIN tree_plant_resources t ON t.ancestor_plant_resource_id
@@ -32,10 +32,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  drop:
-    :name: drop
+  pack_station:
+    :name: pack_station
     :sequence_no: 2
-    :caption: Drop
+    :caption: Pack station
     :namespaced_name: parent.plant_resource_code
     :data_type: :string
     :width: 

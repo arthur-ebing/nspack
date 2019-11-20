@@ -37,7 +37,7 @@ module MasterfilesApp
       instance = fruit_actual_counts_for_pack(id)
       success_response("Created fruit actual counts for pack #{instance.id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This fruit actual counts for pack already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { actual_count_for_pack: ['This fruit actual counts for pack already exists'] }))
     end
 
     def process_array_params(attrs)

@@ -472,7 +472,6 @@ class Nspack < Roda
         show_partial { Masterfiles::Fruit::StdFruitSizeCount::Edit.call(id) }
       end
       r.on 'fruit_actual_counts_for_packs' do
-        interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('fruit', 'new')
           show_partial_or_page(r) { Masterfiles::Fruit::FruitActualCountsForPack::New.call(id, remote: fetch?(r)) }
