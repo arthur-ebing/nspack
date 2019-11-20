@@ -4,11 +4,11 @@
   AS production_run_code, fn_current_status('production_runs', \"production_runs\".\"id\")
   AS status, \r\n\"production_runs\".\"running\", \"production_runs\".\"active_run_stage\",\r\n\"cultivar_groups\".\"cultivar_group_code\",
   \"cultivars\".\"cultivar_name\", \"farms\".\"farm_code\", \"orchards\".\"orchard_code\",
-  \r\n\"plant_resources\".\"plant_resource_code\" AS packhouse_resource_plant_resource_code,
-  \"plant_resources2\".\"plant_resource_code\" AS production_line_plant_resource_code,
-  \r\n\"product_setup_templates\".\"template_name\", \r\n\"pucs\".\"puc_code\", \"seasons\".\"season_code\",
-  \r\nfn_production_run_code(\"production_runs\".\"cloned_from_run_id\") AS cloned_from_run,\r\n\"production_runs\".\"started_at\",
-  \"production_runs\".\"closed_at\", \"production_runs\".\"re_executed_at\", \r\n\"production_runs\".\"completed_at\",
+  \r\n\"plant_resources\".\"plant_resource_code\" AS packhouse_code, \"plant_resources2\".\"plant_resource_code\"
+  AS line_code, \r\n\"product_setup_templates\".\"template_name\", \r\n\"pucs\".\"puc_code\",
+  \"seasons\".\"season_code\", \r\nfn_production_run_code(\"production_runs\".\"cloned_from_run_id\")
+  AS cloned_from_run,\r\n\"production_runs\".\"started_at\", \"production_runs\".\"closed_at\",
+  \"production_runs\".\"re_executed_at\", \r\n\"production_runs\".\"completed_at\",
   \"production_runs\".\"allow_cultivar_mixing\", \"production_runs\".\"allow_orchard_mixing\",
   \r\n\"production_runs\".\"tipping\", \"production_runs\".\"labeling\", \r\n\"production_runs\".\"reconfiguring\",
   \"production_runs\".\"closed\", \"production_runs\".\"setup_complete\", \"production_runs\".\"completed\",
@@ -175,13 +175,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packhouse_resource_plant_resource_code:
-    :name: packhouse_resource_plant_resource_code
+  packhouse_code:
+    :name: packhouse_code
     :sequence_no: 10
-    :caption: Packhouse
+    :caption: Packhouse code
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
-    :width: 120
+    :width: 
     :format: 
     :hide: false
     :pinned: 
@@ -191,13 +191,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  production_line_plant_resource_code:
-    :name: production_line_plant_resource_code
+  line_code:
+    :name: line_code
     :sequence_no: 11
-    :caption: Line
+    :caption: Line code
     :namespaced_name: plant_resources2.plant_resource_code
     :data_type: :string
-    :width: 80
+    :width: 
     :format: 
     :hide: false
     :pinned: 

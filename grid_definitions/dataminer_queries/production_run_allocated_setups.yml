@@ -1,15 +1,17 @@
 ---
 :caption: Allocated setups for production run
-:sql: "SELECT a.id, parent.plant_resource_code AS module, p.plant_resource_code, \r\na.product_setup_id,
-  fn_product_setup_code(s.id) AS product_setup_code, a.label_template_id, l.label_template_name,\r\na.
-  active\r\nFROM production_runs r\r\nJOIN tree_plant_resources t ON t.ancestor_plant_resource_id
+:sql: "SELECT a.id, parent.plant_resource_code AS drop, sysres.system_resource_code
+  AS module, p.plant_resource_code, \r\na.product_setup_id, fn_product_setup_code(s.id)
+  AS product_setup_code, a.label_template_id, l.label_template_name,\r\na. active\r\nFROM
+  production_runs r\r\nJOIN tree_plant_resources t ON t.ancestor_plant_resource_id
   = r.production_line_id\r\nJOIN plant_resources p ON p.id = t.descendant_plant_resource_id
   AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code
   = 'ROBOT_BUTTON')\r\nLEFT OUTER JOIN product_resource_allocations a ON a.production_run_id
   = r.id AND a.plant_resource_id = p.id\r\nLEFT OUTER JOIN product_setups s ON s.id
   = a.product_setup_id\r\nLEFT OUTER JOIN label_templates l ON l.id = a.label_template_id\r\nLEFT
   OUTER JOIN tree_plant_resources tpl ON tpl.descendant_plant_resource_id = p.id AND
-  tpl.path_length = 1\r\nLEFT OUTER JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id"
+  tpl.path_length = 1\r\nLEFT OUTER JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id\r\nLEFT
+  OUTER JOIN system_resources sysres ON sysres.id = parent.system_resource_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -30,11 +32,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  drop:
+    :name: drop
+    :sequence_no: 2
+    :caption: Drop
+    :namespaced_name: parent.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   module:
     :name: module
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Module
-    :namespaced_name: parent.plant_resource_code
+    :namespaced_name: sysres.system_resource_code
     :data_type: :string
     :width: 
     :format: 
@@ -48,7 +66,7 @@
     :group_max: false
   plant_resource_code:
     :name: plant_resource_code
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Plant resource code
     :namespaced_name: p.plant_resource_code
     :data_type: :string
@@ -64,7 +82,7 @@
     :group_max: false
   product_setup_id:
     :name: product_setup_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Product setup
     :namespaced_name: a.product_setup_id
     :data_type: :integer
@@ -80,7 +98,7 @@
     :group_max: false
   product_setup_code:
     :name: product_setup_code
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Product setup code
     :namespaced_name: 
     :data_type: :string
@@ -96,7 +114,7 @@
     :group_max: false
   label_template_id:
     :name: label_template_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Label template
     :namespaced_name: a.label_template_id
     :data_type: :integer
@@ -112,7 +130,7 @@
     :group_max: false
   label_template_name:
     :name: label_template_name
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Label template name
     :namespaced_name: l.label_template_name
     :data_type: :string
@@ -128,7 +146,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Active
     :namespaced_name: a.active
     :data_type: :boolean

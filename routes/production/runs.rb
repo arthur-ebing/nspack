@@ -276,6 +276,16 @@ class Nspack < Roda
           if fetch?(r)
             row_keys = %i[
               id
+              production_run_code
+              cultivar_group_code
+              cultivar_name
+              farm_code
+              orchard_code
+              packhouse_code
+              line_code
+              status
+              puc_code
+              season_code
               farm_id
               puc_id
               packhouse_resource_id
@@ -299,7 +309,7 @@ class Nspack < Roda
               setup_complete
               completed
             ]
-            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+            add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: 'CREATED'), row_keys),
                          notice: res.message)
           else
             flash[:notice] = res.message
