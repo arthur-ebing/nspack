@@ -209,11 +209,11 @@ module MesscadaApp
     end
 
     def validate_update_rmt_bin_weights_params(params)
-      UpdateRmtBinWeightsSchema.call(params)
+      UpdateRmtBinWeightsSchema.call(params.transform_values { |v| v.sub('SK', '') if v.match?(/SK/) })
     end
 
     def validate_tip_rmt_bin_params(params)
-      TipRmtBinSchema.call(params)
+      TipRmtBinSchema.call(params.transform_values { |v| v.sub('SK', '') if v.match?(/SK/) })
     end
 
     def resource_code_exists?(resource_code)
