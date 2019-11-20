@@ -17,14 +17,12 @@ module ProductionApp
     required(:allow_orchard_mixing, :bool).maybe(:bool?)
   end
 
-  ProductionRunSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
+  ProductionRunSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
     required(:farm_id, :integer).filled(:int?)
     required(:puc_id, :integer).filled(:int?)
-    required(:packhouse_resource_id, :integer).filled(:int?)
-    required(:production_line_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:orchard_id, :integer).maybe(:int?)
     required(:cultivar_group_id, :integer).maybe(:int?)
