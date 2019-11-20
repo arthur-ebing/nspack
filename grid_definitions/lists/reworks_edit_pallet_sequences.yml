@@ -1,0 +1,16 @@
+---
+:dataminer_definition: edit_pallet_sequences
+:conditions:
+  standard:
+    - :col: pallet_id
+      :op: =
+      :val: $:pallet_id$
+  :pallet_number:
+    - :col: pallet_number
+      :op: =
+      :val: $:pallet_number$
+:edit_rules:
+  :url: /production/reworks/pallet_sequences/$:id$/edit_carton_quantities
+  :editable_fields:
+    seq_carton_qty:
+      :editor: :numeric

@@ -1,0 +1,436 @@
+---
+:caption: Reworks Edit Pallet Sequences Quantities
+:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, seq_carton_qty, carton_quantity, gross_weight,
+  nett_weight, sequence_nett_weight, pallet_size, farm, orchard, puc, commodity, cultivar, marketing_variety, grade, mark
+  FROM vw_pallet_sequence_flat
+  ORDER BY pallet_id, pallet_number DESC
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 2
+    :caption: Pallet
+    :namespaced_name: pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 3
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_sequence_number:
+    :name: pallet_sequence_number
+    :sequence_no: 4
+    :caption: Pallet sequence number
+    :namespaced_name: pallet_sequence_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  seq_carton_qty:
+    :name: seq_carton_qty
+    :sequence_no: 5
+    :caption: Seq carton qty
+    :namespaced_name: seq_carton_qty
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 6
+    :caption: Carton quantity
+    :namespaced_name: carton_quantity
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 7
+    :caption: Gross weight
+    :namespaced_name: gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 8
+    :caption: Nett weight
+    :namespaced_name: nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sequence_nett_weight:
+    :name: sequence_nett_weight
+    :sequence_no: 9
+    :caption: Seq nett weight
+    :namespaced_name: sequence_nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_size:
+    :name: pallet_size
+    :sequence_no: 10
+    :caption: Pallet size
+    :namespaced_name: pallet_size
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm:
+    :name: farm
+    :sequence_no: 11
+    :caption: Farm
+    :namespaced_name: farm
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard:
+    :name: orchard
+    :sequence_no: 12
+    :caption: Orchard
+    :namespaced_name: orchard
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc:
+    :name: puc
+    :sequence_no: 13
+    :caption: Puc
+    :namespaced_name: puc
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity:
+    :name: commodity
+    :sequence_no: 14
+    :caption: Commodity
+    :namespaced_name: commodity
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar:
+    :name: cultivar
+    :sequence_no: 15
+    :caption: Cultivar
+    :namespaced_name: cultivar
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 16
+    :caption: Marketing variety
+    :namespaced_name: marketing_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 17
+    :caption: Grade
+    :namespaced_name: grade
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark:
+    :name: mark
+    :sequence_no: 18
+    :caption: Mark
+    :namespaced_name: mark
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pallet_id
+  :caption: Pallet Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: pallet_number
+  :caption: Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: 
+- :column: in_stock
+  :caption: In Stock?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def:
+  - true
+  - false
+- :column: allocated
+  :caption: Allocated?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def:
+  - true
+  - false
+- :column: shipped
+  :caption: Shipped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def:
+  - true
+  - false
+- :column: scrapped
+  :caption: Scrapped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def:
+  - true
+  - false
+- :column: inspected
+  :caption: Inspected?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 5
+  :list_def:
+  - true
+  - false
+- :column: reinspected
+  :caption: Reinspected?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 6
+  :list_def:
+  - true
+  - false
+- :column: palletized
+  :caption: Palletized?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 7
+  :list_def:
+  - true
+  - false
+- :column: partially_palletized
+  :caption: Partially Palletized?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def:
+  - true
+  - false
+- :column: govt_inspection_passed
+  :caption: Govt inspection passed?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 9
+  :list_def:
+  - true
+  - false
+- :column: verified
+  :caption: Pallet Sequence Verified?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 10
+  :list_def:
+  - true
+  - false
+- :column: verification_passed
+  :caption: Pallet Sequence verification passed?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 11
+  :list_def:
+  - true
+  - false
+- :column: active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 12
+  :list_def:
+  - true
+  - false

@@ -1,0 +1,18 @@
+---
+:dataminer_definition: reworks_run_details
+:actions:
+- :url: "/production/reworks/reworks_runs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/reworks/reworks_runs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/reworks/reworks_runs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true

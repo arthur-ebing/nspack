@@ -1,0 +1,23 @@
+---
+:dataminer_definition: scrapped_pallet_sequences
+:captions:
+  :conditions:
+    :active: Active Pallet Sequences
+    :scrapped: Scrapped Pallet Sequences
+:conditions:
+  :standard:
+    - :col: pallet_id
+      :op: =
+      :val: $:pallet_id$
+  :pallet_number:
+    - :col: pallet_number
+      :op: =
+      :val: $:pallet_number$
+  :active:
+    - :col: active
+      :op: =
+      :val: $:active$
+  :scrapped:
+    - :col: scrapped
+      :op: =
+      :val: $:scrapped$

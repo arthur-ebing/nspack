@@ -1,0 +1,16 @@
+---
+:dataminer_definition: pallet_sequences
+:lookups:
+  :standard:
+    :url: /production/reworks/pallet_sequences/selected_sequences
+    :section_caption: Select a Pallet Sequence
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: pallet_id
+      :op: IN
+      :val: $:pallet_id$
+  :pallet_number:
+    - :col: pallet_number
+      :op: IN
+      :val: $:pallet_number$

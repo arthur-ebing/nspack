@@ -1,0 +1,40 @@
+# frozen_string_literal: true
+
+module Production
+  module Reworks
+    module ReworksRun
+      class Show
+        def self.call(id)  # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:reworks_run, :show, id: id)
+          rules   = ui_rule.compile
+
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
+            page.form_object ui_rule.form_object
+            page.form do |form|
+              # form.caption 'Reworks Run'
+              form.view_only!
+              form.no_submit!
+              form.add_field :reworks_run_type_id
+              form.add_field :scrap_reason_id
+              form.add_field :remarks
+              form.add_field :reworks_action
+              form.add_field :user
+              form.add_field :pallets_selected
+              form.add_field :pallets_affected
+              form.add_field :pallet_number
+              form.add_field :pallet_sequence_number
+            end
+            if rules[:show_changes_made]
+              page.add_notice 'The changes below were made to pallets affected list:'
+              page.section do |section|
+                section.add_diff :changes_made
+              end
+            end
+          end
+
+          layout
+        end
+      end
+    end
+  end
+end

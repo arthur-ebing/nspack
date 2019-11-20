@@ -1,0 +1,324 @@
+---
+:caption: Reworks Runs
+:sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type,
+  reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
+  reworks_runs.changes_made ->> 'reworks_action' AS reworks_action, reworks_runs.user,
+  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,
+  reworks_runs.pallets_affected, reworks_runs.changes_made -> 'pallets' ->> 'pallet_number' AS pallet_number,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before' AS before_state,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state,
+  reworks_runs.created_at, reworks_runs.updated_at
+  FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
+  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
+  ORDER BY id DESC
+:limit:
+:offset:
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: reworks_runs.id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reworks_run_type_id:
+    :name: reworks_run_type_id
+    :sequence_no: 2
+    :caption: Reworks run type
+    :namespaced_name: reworks_runs.reworks_run_type_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  run_type:
+    :name: run_type
+    :sequence_no: 3
+    :caption: Run type
+    :namespaced_name: reworks_run_types.run_type
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrap_reason_id:
+    :name: scrap_reason_id
+    :sequence_no: 4
+    :caption: Scrap reason
+    :namespaced_name: reworks_runs.scrap_reason_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrap_reason:
+    :name: scrap_reason
+    :sequence_no: 5
+    :caption: Scrap reason
+    :namespaced_name: scrap_reasons.scrap_reason
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 6
+    :caption: Remarks
+    :namespaced_name: reworks_runs.remarks
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reworks_action:
+    :name: reworks_action
+    :sequence_no: 7
+    :caption: Reworks action
+    :namespaced_name: reworks_action
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user:
+    :name: user
+    :sequence_no: 8
+    :caption: User
+    :namespaced_name: reworks_runs.user
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallets_selected:
+    :name: pallets_selected
+    :sequence_no: 9
+    :caption: Pallets selected
+    :namespaced_name: reworks_runs.pallets_selected
+    :data_type: :string_array
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallets_affected:
+    :name: pallets_affected
+    :sequence_no: 10
+    :caption: Pallets affected
+    :namespaced_name: reworks_runs.pallets_affected
+    :data_type: :string_array
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 11
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 12
+    :caption: Pallet
+    :namespaced_name: pallet_id
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_sequence_number:
+    :name: pallet_sequence_number
+    :sequence_no: 13
+    :caption: Pallet sequence number
+    :namespaced_name: pallet_sequence_number
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  before_state:
+    :name: before_state
+    :sequence_no: 14
+    :caption: Before state
+    :namespaced_name: before_state
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  after_state:
+    :name: after_state
+    :sequence_no: 15
+    :caption: After state
+    :namespaced_name: after_state
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 16
+    :caption: Created at
+    :namespaced_name: reworks_runs.created_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 17
+    :caption: Updated at
+    :namespaced_name: reworks_runs.updated_at
+    :data_type: :datetime
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+  - :column: reworks_runs.reworks_run_type_id
+    :caption: Reworks run type
+    :data_type: :integer
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 1
+    :list_def: SELECT run_type, id FROM reworks_run_types ORDER BY run_type
+  - :column: reworks_runs.scrap_reason_id
+    :caption: Scrap reason
+    :data_type: :integer
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 2
+    :list_def: SELECT scrap_reason, id FROM scrap_reasons ORDER BY scrap_reason
+  - :column: pallet_number
+    :caption: Pallet number
+    :data_type: :string
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 3
+    :list_def:
+  - :column: reworks_runs.created_at
+    :caption: Created at
+    :data_type: :date
+    :control_type: :daterange
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 4
+    :list_def:

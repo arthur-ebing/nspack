@@ -1,0 +1,19 @@
+---
+:dataminer_definition: reworks_runs
+:actions:
+- :url: "/production/reworks/reworks_runs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/reworks/reworks_run_types/$:reworks_runs.reworks_run_type_id$/reworks_runs/new"
+  :text: New Reworks Run
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: reworks_runs.reworks_run_type_id
+      :op: =
+      :val: $:reworks_runs.reworks_run_type_id$

@@ -1,0 +1,38 @@
+---
+:dataminer_definition: scrapped_pallets
+:actions:
+  - :url: "/list/scrapped_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+    :text: sequences
+    :title: Pallet sequences for Pallet No $:pallet_number$
+    :icon: list
+    :popup: true
+:captions:
+  :conditions:
+    :active: Active Pallets
+    :scrapped: Scrapped Pallets
+:conditions:
+  :standard:
+    - :col: id
+      :op: =
+      :val: $:id$
+  :active:
+    - :col: active
+      :op: =
+      :val: $:active$
+  :scrapped:
+    - :col: scrapped
+      :op: =
+      :val: $:scrapped$
+  :unscrap_reworks_pallets:
+    - :col: scrapped
+      :op: =
+      :val: true
+    - :col: exit_ref
+      :op: =
+      :val: 'SCRAPPED'
+:multiselect:
+  :unscrap_reworks_pallets:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_pallets"
+    :section_caption: "SELECT 'Select pallets for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: unscrap_reworks_pallets

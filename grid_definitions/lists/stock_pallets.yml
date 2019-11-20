@@ -76,6 +76,10 @@
     - :col: shipped
       :op: =
       :val: $:shipped$
+  :pallets_available_to_reworks:
+    - :col: in_stock
+      :op: =
+      :val: false
 :multiselect:
   :allocate:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
@@ -84,3 +88,8 @@
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: unallocated_load_stock
+  :reworks_pallets:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_pallets"
+    :section_caption: "SELECT 'Select pallets for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: pallets_available_to_reworks
