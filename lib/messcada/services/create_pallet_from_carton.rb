@@ -16,7 +16,7 @@ module MesscadaApp
       res = create_pallet_and_sequences
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      ok_response
+      success_response('ok', pallet_id: pallet)
     end
 
     private
