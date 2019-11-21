@@ -40,6 +40,10 @@ module ProductionApp
       ReworksRunFlat.new(hash)
     end
 
+    def find_reworks_run_type(id)
+      find_hash(:reworks_run_types, id)[:run_type]
+    end
+
     def find_reworks_run_type_from_run_type(run_type)
       DB[:reworks_run_types].where(run_type: run_type).get(:id)
     end
@@ -52,20 +56,20 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
-    def selected_pallet_numbers(pallet_seq_ids)
-      DB[:pallets].where(id: DB[:pallet_sequences].where(id: pallet_seq_ids).select(:pallet_id)).map { |p| p[:pallet_number] }
+    def selected_pallet_numbers(sequence_ids)
+      DB[:pallets].where(id: DB[:pallet_sequences].where(id: sequence_ids).select(:pallet_id)).map { |p| p[:pallet_number] }
     end
 
-    def selected_scrapped_pallet_numbers(pallet_seq_ids)
-      DB[:pallets].where(id: DB[:pallet_sequences].where(id: pallet_seq_ids).select(:scrapped_from_pallet_id)).map { |p| p[:pallet_number] }
+    def selected_scrapped_pallet_numbers(sequence_ids)
+      DB[:pallets].where(id: DB[:pallet_sequences].where(id: sequence_ids).select(:scrapped_from_pallet_id)).map { |p| p[:pallet_number] }
     end
 
     def find_pallet_ids_from_pallet_number(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
     end
 
-    def affected_pallet_numbers(pallet_numbers, attrs)
-      DB[:pallets].where(pallet_number: pallet_numbers).where(attrs).select_map(:pallet_number)
+    def affected_pallet_numbers(sequence_ids, attrs)
+      DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:pallet_number] }
     end
 
     def update_reworks_run_pallets(pallet_numbers, attrs, reworks_run_booleans)
@@ -75,8 +79,11 @@ module ProductionApp
       DB[upd].update
     end
 
-    def update_reworks_run_pallet_sequences(pallet_sequence_ids, attrs)
-      DB[:pallet_sequences].where(id: pallet_sequence_ids).update(attrs)
+    def update_reworks_run_pallet_sequences(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
+      upd = "UPDATE pallets SET pallet_format_id = pallet_sequences.pallet_format_id FROM pallet_sequences
+             WHERE pallets.id = pallet_sequences.pallet_id AND pallets.pallet_number IN ('#{pallet_numbers.join('\',\'')}');"
+      DB[upd].update
+      DB[:pallet_sequences].where(id: pallet_sequence_ids).update(pallet_sequence_attrs)
     end
 
     def reworks_run_clone_pallet(pallet_numbers)
@@ -93,8 +100,8 @@ module ProductionApp
     end
 
     def clone_pallet(id)  # rubocop:disable Metrics/AbcSize
-      pallet_seq_ids = pallet_pallet_seq_ids(id)
-      return if pallet_seq_ids.empty?
+      sequence_ids = pallet_sequence_ids(id)
+      return if sequence_ids.empty?
 
       pallet_rejected_fields = %i[id pallet_number build_status]
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number]
@@ -102,8 +109,8 @@ module ProductionApp
       pallet = pallet(id)
       new_pallet_id = DB[:pallets].insert(pallet.reject { |k, _| pallet_rejected_fields.include?(k) })
 
-      pallet_seq_ids.each do |pallet_seq_id|
-        attrs = find_hash(:pallet_sequences, pallet_seq_id).reject { |k, _| ps_rejected_fields.include?(k) }
+      sequence_ids.each do |sequence_id|
+        attrs = find_hash(:pallet_sequences, sequence_id).reject { |k, _| ps_rejected_fields.include?(k) }
         DB[:pallet_sequences].insert(attrs.to_h.merge(pallet_sequence_pallet_params(new_pallet_id)).to_h)
       end
     end
@@ -123,7 +130,7 @@ module ProductionApp
       DB[upd].update
     end
 
-    def pallet_pallet_seq_ids(pallet_id)
+    def pallet_sequence_ids(pallet_id)
       DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:id)
     end
 
@@ -160,16 +167,12 @@ module ProductionApp
           WHERE id = ?", id].first
     end
 
-    def find_product_setup_id(pallet_seq_id)
+    def find_product_setup_id(sequence_id)
       DB[:pallet_sequences]
         .join(:product_resource_allocations, id: :product_resource_allocation_id)
-        .where(Sequel[:pallet_sequences][:id] => pallet_seq_id)
+        .where(Sequel[:pallet_sequences][:id] => sequence_id)
         .get(:product_setup_id)
     end
-
-    # def update_reworks_run_pallet_sequence(id, attrs)
-    #   DB[:pallet_sequences].where(id: id).update(attrs)
-    # end
 
     def reworks_run_pallet_quantities(pallet_number)
       query = <<~SQL
@@ -188,12 +191,5 @@ module ProductionApp
     def pallet_seq_carton_quantity(pallet_id)
       DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:carton_quantity)
     end
-
-    # def find_reworks_run_type_from_run_type(run_type)
-    #   DB[:reworks_runs]
-    #       .join(:reworks_run_types, id: :reworks_run_type_id)
-    #       .where(run_type: run_type)
-    #       .get(:reworks_run_type_id)
-    # end
   end
 end

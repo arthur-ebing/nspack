@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:reworks_run_pallet, :show_changes, id: id, attrs: attrs)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
               section.add_control(control_type: :link,
@@ -26,12 +26,10 @@ module Production
                   col.add_control(control_type: :link,
                                   text: 'Accept',
                                   url: "/production/reworks/pallet_sequences/#{id}/accept_pallet_sequence_changes",
-                                  behaviour: :popup,
                                   style: :button)
                   col.add_control(control_type: :link,
                                   text: 'Reject',
                                   url: "/production/reworks/pallet_sequences/#{id}/reject_pallet_sequence_changes",
-                                  behaviour: :popup,
                                   style: :button)
                 end
               end

@@ -27,7 +27,7 @@ module ProductionApp
       res = create_reworks_run
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      res
+      success_response('ok', reworks_run_id: res.instance[:reworks_run_id])
     end
 
     private
@@ -36,7 +36,8 @@ module ProductionApp
       {
         scrap_pallets: scrap_pallets?,
         unscrap_pallets: unscrap_pallets?,
-        repack_pallets: repack_pallets?
+        repack_pallets: repack_pallets?,
+        update_existing_record: update_existing_record?
       }
     end
 
@@ -63,12 +64,12 @@ module ProductionApp
 
     def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
-      repo.create_reworks_run(reworks_run_attrs.to_h)
+      id = repo.create_reworks_run(reworks_run_attrs.to_h)
       repo.reworks_run_clone_pallet(pallets_affected) if reworks_run_booleans[:repack_pallets]
       repo.update_reworks_run_pallets(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
-      repo.update_reworks_run_pallet_sequences(affected_pallet_sequences, changes[:after]) if make_changes && update_existing_record?
+      repo.update_reworks_run_pallet_sequences(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
 
-      ok_response
+      success_response('ok', reworks_run_id: id)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

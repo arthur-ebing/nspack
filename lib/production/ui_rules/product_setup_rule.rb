@@ -16,7 +16,7 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
-      add_behaviours if %i[new edit].include? @mode
+      add_behaviours if %i[new edit edit_pallet_sequence].include? @mode
 
       form_name 'product_setup'
     end
@@ -270,6 +270,11 @@ module UiRules
     def make_form_object
       if @mode == :new
         make_new_form_object
+        return
+      end
+
+      if @mode == :edit_pallet_sequence
+        @form_object = @repo.find_pallet_sequence_setup_data(@options[:pallet_sequence_id])
         return
       end
 

@@ -5,7 +5,7 @@ module Production
     module ReworksRun
       class EditPalletSequence
         def self.call(id, product_setup_id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:product_setup, :edit, id: product_setup_id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:product_setup, :edit_pallet_sequence, id: product_setup_id, pallet_sequence_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           pm_boms_products = ProductionApp::ProductSetupRepo.new.pm_boms_products(product_setup_id)

@@ -52,16 +52,12 @@ module ProductionApp
     end
 
     def find_product_setup(id)
-      hash = DB["SELECT product_setups.* ,COALESCE(ps_cultivar.commodity_id, cultivars.commodity_id) AS commodity_id, pallet_formats.pallet_base_id,
-                 pallet_formats.pallet_stack_type_id, pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code,
+      hash = DB["SELECT product_setups.* ,cultivar_groups.commodity_id, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
+                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code,
                  fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production
                  FROM product_setups
                  JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
                  JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
-                 LEFT JOIN cultivars ON cultivar_groups.id = cultivars.cultivar_group_id
-                 LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
-                 LEFT JOIN cultivars ps_cultivar ON ps_cultivar.cultivar_group_id = product_setup_templates.cultivar_group_id AND ps_cultivar.id = product_setup_templates.cultivar_id
-                 LEFT JOIN commodities ps_commodity ON ps_commodity.id = ps_cultivar.commodity_id
                  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
                  JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
                  LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id
@@ -70,6 +66,33 @@ module ProductionApp
                  LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
                  LEFT JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
                  WHERE product_setups.id = ?", id].first
+      return nil if hash.nil?
+
+      ProductSetup.new(hash)
+    end
+
+    def find_pallet_sequence_setup_data(id)
+      hash = DB["SELECT product_setups.id, product_setups.product_setup_template_id, ps.marketing_variety_id, ps.customer_variety_variety_id,
+                 ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
+                 ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
+                 ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code, product_setups.pallet_label_name,
+                 fn_product_setup_code(product_setups.id) AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production,
+                 cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
+                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
+                 FROM pallet_sequences ps
+                 JOIN product_resource_allocations ON product_resource_allocations.id = ps.product_resource_allocation_id
+                 JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
+                 JOIN product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id
+                 JOIN cultivar_groups ON cultivar_groups.id = product_setup_templates.cultivar_group_id
+                 LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
+                 JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id
+                 LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id
+                 LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = product_setups.pm_bom_id
+                 LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+                 LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+                 LEFT JOIN treatments ON treatments.id = ANY (product_setups.treatment_ids)
+                 WHERE ps.id = ?", id].first
+
       return nil if hash.nil?
 
       ProductSetup.new(hash)

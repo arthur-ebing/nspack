@@ -21,18 +21,18 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
-    r.on 'reworks_runs' do # rubocop:disable Metrics/BlockLength
+    r.on 'reworks_runs' do
       r.on 'single_pallet_edit' do
         check_auth!('reworks', 'new')
         reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SINGLE_PALLET_EDIT)
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
 
-      r.on 'batch_pallet_edit' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BATCH_PALLET_EDIT)
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
+      # r.on 'batch_pallet_edit' do
+      #   check_auth!('reworks', 'new')
+      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BATCH_PALLET_EDIT)
+      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      # end
 
       r.on 'scrap_pallet' do
         check_auth!('reworks', 'new')
@@ -46,23 +46,23 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
 
-      r.on 'repack' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_REPACK)
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      r.on 'buildup' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BUILDUP)
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      r.on 'tip_bins' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
+      # r.on 'repack' do
+      #   check_auth!('reworks', 'new')
+      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_REPACK)
+      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      # end
+      #
+      # r.on 'buildup' do
+      #   check_auth!('reworks', 'new')
+      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BUILDUP)
+      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      # end
+      #
+      # r.on 'tip_bins' do
+      #   check_auth!('reworks', 'new')
+      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
+      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      # end
     end
 
     r.on 'reworks_run_types', Integer do |id| # rubocop:disable Metrics/BlockLength
@@ -85,6 +85,8 @@ class Nspack < Roda # rubocop:disable ClassLength
                 redirect_via_json(retrieve_from_local_store(:list_url))
               end
             else
+              pallets_selected = interactor.resolve_selected_pallet_numbers(res.instance[:pallets_selected])
+              params[:reworks_run][:pallets_selected] = pallets_selected
               re_show_form(r, res) do
                 Production::Reworks::ReworksRun::New.call(id,
                                                           form_values: params[:reworks_run],
@@ -180,6 +182,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do
           res = interactor.update_reworks_run_pallet_sequence(params[:product_setup])
           if res.success
+            store_locally(:reworks_run_sequence_changes, res.instance)
             show_partial_or_page(r) { Production::Reworks::ReworksRun::ShowPalletSequenceChanges.call(id, res.instance, back_url: back_button_url) }
           else
             re_show_form(r, res, url: "/production/reworks/pallet_sequences/#{id}/edit_reworks_pallet_sequence") do
@@ -194,6 +197,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'accept_pallet_sequence_changes' do
+        params = retrieve_from_local_store(:reworks_run_sequence_changes)
         res = interactor.update_pallet_sequence_record(id, reworks_run_type_id, params)
         if res.success
           flash[:notice] = res.message
@@ -202,11 +206,9 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'reject_pallet_sequence_changes' do
-        res = interactor.update_pallet_sequence_record(id, reworks_run_type_id, params)
-        if res.success
-          flash[:notice] = res.message
-          r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
-        end
+        res = interactor.reject_pallet_sequence_changes(id)
+        flash[:notice] = 'Changes to Pallet sequence has be discarded'
+        r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
       end
 
       r.on 'print_reworks_carton_label' do # Print Carton Label
