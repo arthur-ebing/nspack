@@ -298,14 +298,14 @@
     :ordered_list: true
     :ui_priority: 1
     :list_def: SELECT run_type, id FROM reworks_run_types ORDER BY run_type
-  - :column: reworks_runs.scrap_reason_id
-    :caption: Scrap reason
-    :data_type: :integer
+  - :column: reworks_runs.user
+    :caption: User
+    :data_type: :string
     :control_type: :list
     :default_value:
     :ordered_list: true
     :ui_priority: 2
-    :list_def: SELECT scrap_reason, id FROM scrap_reasons ORDER BY scrap_reason
+    :list_def: SELECT user_name FROM users ORDER BY user_name
   - :column: pallet_number
     :caption: Pallet number
     :data_type: :string

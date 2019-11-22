@@ -19,8 +19,6 @@ module UiRules
     def set_show_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
-      pallets_selected_label = resolve_pallet_numbers(@form_object.pallets_selected)
-      pallets_affected_label = resolve_pallet_numbers(@form_object.pallets_affected)
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
@@ -34,10 +32,12 @@ module UiRules
       fields[:reworks_action] = { renderer: :label,
                                   hide_on_load: @rules[:show_changes_made] ? false : true }
       fields[:user] = { renderer: :label }
-      fields[:pallets_selected] = { renderer: :label,
-                                    with_value: pallets_selected_label }
-      fields[:pallets_affected] = { renderer: :label,
-                                    with_value: pallets_affected_label }
+      fields[:pallets_selected] = { renderer: :textarea,
+                                    rows: 10,
+                                    disabled: true }
+      fields[:pallets_affected] = { renderer: :textarea,
+                                    rows: 10,
+                                    disabled: true }
       fields[:pallet_number] = { renderer: :label,
                                  hide_on_load: @rules[:show_changes_made] ? false : true }
       fields[:pallet_sequence_number] = { renderer: :label,
@@ -95,14 +95,6 @@ module UiRules
                                     remarks: nil,
                                     scrap_reason_id: nil,
                                     pallets_selected: nil)
-    end
-
-    def resolve_pallet_numbers(pallet_numbers)
-      return pallet_numbers if pallet_numbers.nil_or_empty?
-
-      pallet_numbers = pallet_numbers.join(',').split(/\n|,/).map(&:strip).reject(&:empty?)
-      pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
-      pallet_numbers.join(',')
     end
   end
 end
