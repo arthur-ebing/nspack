@@ -139,7 +139,7 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response)
+      format_response(response, uri)
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
@@ -162,7 +162,7 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response)
+      format_response(response, uri)
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
@@ -214,7 +214,7 @@ module MesserverApp
       log_request(request)
 
       response = http.request(request)
-      format_response(response)
+      format_response(response, uri)
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
