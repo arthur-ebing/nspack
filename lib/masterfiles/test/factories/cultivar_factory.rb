@@ -3,7 +3,9 @@
 module MasterfilesApp
   module CultivarFactory
     def create_cultivar_group(opts = {})
+      commodity_id = create_commodity
       default = {
+        commodity_id: commodity_id,
         cultivar_group_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true

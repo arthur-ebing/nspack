@@ -42,6 +42,21 @@ module MasterfilesApp
       CultivarGroup.new(hash)
     end
 
+    def find_cultivar_group_flat(id)
+      hash = find_with_association(:cultivar_groups,
+                                   id,
+                                   parent_tables: [{
+                                     parent_table: :commodities,
+                                     columns: [:code],
+                                     flatten_columns: { code: :commodity_code }
+                                   }])
+      return nil if hash.nil?
+
+      cultivar_ids = DB[:cultivars].where(cultivar_group_id: id).select_map(:id)
+      hash[:cultivar_ids] = cultivar_ids
+      CultivarGroupFlat.new(hash)
+    end
+
     def find_cultivar(id)
       hash = find_hash(:cultivars, id)
       return nil if hash.nil?

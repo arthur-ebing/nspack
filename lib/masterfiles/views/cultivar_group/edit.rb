@@ -18,6 +18,7 @@ module Masterfiles
               form.method :update
               form.add_field :cultivar_group_code
               form.add_field :description
+              form.add_field :commodity_id
             end
           end
 

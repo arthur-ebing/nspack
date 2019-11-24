@@ -96,7 +96,7 @@ class TestCultivarGroupRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_cultivar_group).returns(ok_response)
     post_as_fetch 'masterfiles/fruit/cultivar_groups', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect
+    expect_json_add_to_grid
   end
 
   def test_create_fail

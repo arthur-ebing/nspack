@@ -110,7 +110,7 @@ module MasterfilesApp
     end
 
     def cultivar_group(id)
-      repo.find_cultivar_group(id)
+      repo.find_cultivar_group_flat(id)
     end
 
     def validate_cultivar_group_params(params)

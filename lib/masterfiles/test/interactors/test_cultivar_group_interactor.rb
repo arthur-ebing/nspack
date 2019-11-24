@@ -4,6 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestCultivarGroupInteractor < MiniTestWithHooks
+    include CommodityFactory
     include CultivarFactory
 
     def test_repo
@@ -12,16 +13,16 @@ module MasterfilesApp
     end
 
     def test_cultivar_group
-      MasterfilesApp::CultivarRepo.any_instance.stubs(:find_cultivar_group).returns(fake_cultivar_group)
+      MasterfilesApp::CultivarRepo.any_instance.stubs(:find_cultivar_group_flat).returns(fake_cultivar_group)
       entity = interactor.send(:cultivar_group, 1)
-      assert entity.is_a?(CultivarGroup)
+      assert entity.is_a?(CultivarGroupFlat)
     end
 
     def test_create_cultivar_group
       attrs = fake_cultivar_group.to_h.reject { |k, _| k == :id }
       res = interactor.create_cultivar_group(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(CultivarGroup, res.instance)
+      assert_instance_of(CultivarGroupFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -39,7 +40,7 @@ module MasterfilesApp
       attrs[:cultivar_group_code] = 'a_change'
       res = interactor.update_cultivar_group(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(CultivarGroup, res.instance)
+      assert_instance_of(CultivarGroupFlat, res.instance)
       assert_equal 'a_change', res.instance.cultivar_group_code
       refute_equal value, res.instance.cultivar_group_code
     end
@@ -68,8 +69,11 @@ module MasterfilesApp
     private
 
     def cultivar_group_attrs
+      commodity_id = create_commodity
       {
         id: 1,
+        commodity_id: commodity_id,
+        commodity_code: 'dummy',
         cultivar_group_code: Faker::Lorem.unique.word,
         description: 'ABC',
         cultivar_ids: [1],
@@ -78,7 +82,7 @@ module MasterfilesApp
     end
 
     def fake_cultivar_group(overrides = {})
-      CultivarGroup.new(cultivar_group_attrs.merge(overrides))
+      CultivarGroupFlat.new(cultivar_group_attrs.merge(overrides))
     end
 
     def interactor
