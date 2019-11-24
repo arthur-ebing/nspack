@@ -17,12 +17,12 @@ module FinishedGoods
                                   style: :back_button)
               section.add_control(control_type: :link,
                                   text: 'Print Dispatch Note',
-                                  url: "/finished_goods/reports/delivery_note/#{id}",
+                                  url: "/finished_goods/reports/dispatch_note/#{id}",
                                   loading_window: true,
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Print Dispatch Note - Summarised',
-                                  url: "/finished_goods/reports/delivery_note_summarised/#{id}",
+                                  url: "/finished_goods/reports/dispatch_note_summarised/#{id}",
                                   loading_window: true,
                                   style: :button)
               section.add_control(control_type: :link,
