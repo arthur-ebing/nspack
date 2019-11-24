@@ -115,11 +115,11 @@ module FinishedGoodsApp
     end
 
     def ship_pallets(ids)
-      DB[:pallets].where(id: ids).update(shipped: true, shipped_at: Time.now, exit_ref: 'SHIPPED')
+      DB[:pallets].where(id: ids).update(shipped: true, shipped_at: Time.now, exit_ref: 'SHIPPED', in_stock: false)
     end
 
     def unship_pallets(ids)
-      DB[:pallets].where(id: ids).update(shipped: false, shipped_at: nil, exit_ref: nil)
+      DB[:pallets].where(id: ids).update(shipped: false, shipped_at: nil, exit_ref: nil, in_stock: true)
     end
   end
 end

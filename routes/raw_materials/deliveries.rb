@@ -157,7 +157,9 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'current' do    # CURRENT
         id = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_current_delivery
-        if interactor.delivery_tipped?(id)
+        if id.nil?
+          show_error('There is no delivery set up as current', fetch?(r))
+        elsif interactor.delivery_tipped?(id)
           check_auth!('deliveries', 'read')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Show.call(id, back_url: back_button_url) }
         else

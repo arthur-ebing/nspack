@@ -109,7 +109,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           <lcd4>orch:#{res.instance[:orchard_code]}</lcd4>
           <lcd5>cult group: #{res.instance[:cultivar_group_code]}</lcd5>
           <lcd6>cult:#{res.instance[:cultivar_name]}</lcd6>
-        </bin_tipping>"
+        </bin_tipping>
       HTML
     else
       <<~HTML

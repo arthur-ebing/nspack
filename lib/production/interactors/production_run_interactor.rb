@@ -253,9 +253,9 @@ module ProductionApp
     # Read the user profile to get line_no & then find active labeling run for that line
     def active_run_id_for_user(current_user)
       return nil unless current_user&.profile
-      return nil if current_user.profile['production_line_id'].nil_or_empty?
+      return nil if current_user.profile['packhouse_line_id'].nil_or_empty?
 
-      repo.labeling_run_for_line(current_user.profile['production_line_id'])
+      repo.labeling_run_for_line(current_user.profile['packhouse_line_id'])
     end
 
     private

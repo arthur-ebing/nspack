@@ -109,7 +109,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
             res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
-            pallet_number = interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
+            pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
             unless res.success
               store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
               r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
