@@ -145,6 +145,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -167,6 +168,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -218,11 +220,11 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      # return success_response(200, OpenStruct.new(body: 'sommer something')) if e.message.include?('Connection reset by peer') # FIXME: kludge for demo...
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
       failed_response("There was an error: #{e.message}")
     end
 
-    def request_uri(uri)
+    def request_uri(uri) # rubocop:disable Metrics/AbcSize
       http = Net::HTTP.new(uri.host, uri.port)
       http.open_timeout = 5
       http.read_timeout = 10
@@ -230,24 +232,43 @@ module MesserverApp
       log_request(request)
       response = http.request(request)
 
-      format_response(response)
+      format_response(response, uri)
     rescue Timeout::Error
       failed_response('The call to the server timed out.', timeout: true)
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
       failed_response("There was an error: #{e.message}")
     end
 
-    def format_response(response)
+    def format_response(response, context = nil) # rubocop:disable Metrics/AbcSize
       if response.code == '200'
-        success_response(response.code, response)
+        if response.body&.include?('204 No content')
+          send_error_email(response, context)
+          failed_response('The server returned an empty response', response_code: '204')
+        else
+          success_response(response.code, response)
+        end
       elsif response.code == '503' # The printer is unavailable
         failed_response(response.body, response_code: response.code)
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
+        send_error_email(response, context)
         failed_response("#{msg} The response code is #{response.code}", response_code: response.code)
       end
+    end
+
+    def send_error_email(response, context)
+      body = []
+      body << "The call to MesServer was:\n#{context}" unless context.nil?
+      body << if response.body.encoding == Encoding::ASCII_8BIT
+                'An image was probably returned from MesServer'
+              else
+                "The response from MesServer was:\n-------------------------------\n#{response.body}"
+              end
+      ErrorMailer.send_error_email(subject: "MesServer responded with error code #{response.code}",
+                                   message: body.join("\n\n"))
     end
 
     def printer_list_uri
