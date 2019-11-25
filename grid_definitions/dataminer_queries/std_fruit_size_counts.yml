@@ -1,21 +1,22 @@
 ---
 :caption: Std Fruit Size Counts
-:sql: SELECT "std_fruit_size_counts"."id", "std_fruit_size_counts"."commodity_id",
-  "std_fruit_size_counts"."size_count_description", "std_fruit_size_counts"."marketing_size_range_mm",
-  "std_fruit_size_counts"."marketing_weight_range", "std_fruit_size_counts"."size_count_interval_group",
-  "std_fruit_size_counts"."size_count_value", "std_fruit_size_counts"."minimum_size_mm",
-  "std_fruit_size_counts"."maximum_size_mm", "std_fruit_size_counts"."average_size_mm",
-  "std_fruit_size_counts"."minimum_weight_gm", "std_fruit_size_counts"."maximum_weight_gm",
-  "std_fruit_size_counts"."average_weight_gm", "std_fruit_size_counts"."created_at",
-  "std_fruit_size_counts"."updated_at", "std_fruit_size_counts"."active", "commodities"."code" FROM "std_fruit_size_counts"
-  JOIN "commodities" ON "commodities"."id" = "std_fruit_size_counts"."commodity_id"
+:sql: "SELECT \"std_fruit_size_counts\".\"id\", \"std_fruit_size_counts\".\"commodity_id\",\r\n\"std_fruit_size_counts\".\"size_count_description\",
+  \"std_fruit_size_counts\".\"marketing_size_range_mm\",\r\n\"std_fruit_size_counts\".\"marketing_weight_range\",
+  \"std_fruit_size_counts\".\"size_count_interval_group\",\r\n\"std_fruit_size_counts\".\"size_count_value\",
+  \"std_fruit_size_counts\".\"minimum_size_mm\",\r\n\"std_fruit_size_counts\".\"maximum_size_mm\",
+  \"std_fruit_size_counts\".\"average_size_mm\",\r\n\"std_fruit_size_counts\".\"minimum_weight_gm\",
+  \"std_fruit_size_counts\".\"maximum_weight_gm\",\r\n\"std_fruit_size_counts\".\"average_weight_gm\",
+  \"uoms\".\"uom_code\", \"std_fruit_size_counts\".\"created_at\",\r\n\"std_fruit_size_counts\".\"updated_at\",
+  \"std_fruit_size_counts\".\"active\", \"commodities\".\"code\"\r\nFROM \"std_fruit_size_counts\"\r\nJOIN
+  \"commodities\" ON \"commodities\".\"id\" = \"std_fruit_size_counts\".\"commodity_id\"\r\nJOIN
+  \"uoms\" ON \"uoms\".\"id\" = \"std_fruit_size_counts\".\"uom_id\""
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
   id:
     :name: id
-    :sequence_no: 2
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: std_fruit_size_counts.id
     :data_type: :integer
@@ -31,7 +32,7 @@
     :group_max: false
   commodity_id:
     :name: commodity_id
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Commodity
     :namespaced_name: std_fruit_size_counts.commodity_id
     :data_type: :integer
@@ -47,7 +48,7 @@
     :group_max: false
   size_count_description:
     :name: size_count_description
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Size count description
     :namespaced_name: std_fruit_size_counts.size_count_description
     :data_type: :string
@@ -63,7 +64,7 @@
     :group_max: false
   marketing_size_range_mm:
     :name: marketing_size_range_mm
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Marketing size range mm
     :namespaced_name: std_fruit_size_counts.marketing_size_range_mm
     :data_type: :string
@@ -79,7 +80,7 @@
     :group_max: false
   marketing_weight_range:
     :name: marketing_weight_range
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Marketing weight range
     :namespaced_name: std_fruit_size_counts.marketing_weight_range
     :data_type: :string
@@ -95,7 +96,7 @@
     :group_max: false
   size_count_interval_group:
     :name: size_count_interval_group
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Size count interval group
     :namespaced_name: std_fruit_size_counts.size_count_interval_group
     :data_type: :string
@@ -111,7 +112,7 @@
     :group_max: false
   size_count_value:
     :name: size_count_value
-    :sequence_no: 1
+    :sequence_no: 7
     :caption: Size count value
     :namespaced_name: std_fruit_size_counts.size_count_value
     :data_type: :integer
@@ -221,9 +222,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  uom_code:
+    :name: uom_code
+    :sequence_no: 14
+    :caption: Uom code
+    :namespaced_name: uoms.uom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: std_fruit_size_counts.created_at
     :data_type: :datetime
@@ -239,7 +256,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: std_fruit_size_counts.updated_at
     :data_type: :datetime
@@ -253,12 +270,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  code:
-    :name: code
-    :sequence_no: 16
-    :caption: Code
-    :namespaced_name: commodities.code
-    :data_type: :string
+  active:
+    :name: active
+    :sequence_no: 17
+    :caption: Active
+    :namespaced_name: std_fruit_size_counts.active
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -269,18 +286,18 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 17
-    :caption: Active
-    :namespaced_name: std_fruit_size_counts.active
-    :data_type: :boolean
-    :width:
-    :format:
+  code:
+    :name: code
+    :sequence_no: 18
+    :caption: Code
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

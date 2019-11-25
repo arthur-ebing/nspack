@@ -433,6 +433,7 @@ class Nspack < Roda
               material_mass
               plant_resource_button_indicator
               description
+              std_pack_label_code
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -514,6 +515,7 @@ class Nspack < Roda
           if res.success
             update_grid_row(id,
                             changes: { commodity_id: res.instance[:commodity_id],
+                                       uom_id: res.instance[:uom_id],
                                        size_count_description: res.instance[:size_count_description],
                                        marketing_size_range_mm: res.instance[:marketing_size_range_mm],
                                        marketing_weight_range: res.instance[:marketing_weight_range],

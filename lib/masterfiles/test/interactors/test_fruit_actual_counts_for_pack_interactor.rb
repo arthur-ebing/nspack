@@ -4,6 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestFruitActualCountsForPackInteractor < MiniTestWithHooks
+    include GeneralFactory
     include FruitFactory
     include CommodityFactory
 

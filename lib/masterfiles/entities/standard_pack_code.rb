@@ -7,6 +7,7 @@ module MasterfilesApp
     attribute :material_mass, Types::Decimal
     attribute :plant_resource_button_indicator, Types::String
     attribute :description, Types::String
+    attribute :std_pack_label_code, Types::String
     attribute? :active, Types::Bool
   end
 end

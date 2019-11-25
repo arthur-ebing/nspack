@@ -6,6 +6,7 @@ module MasterfilesApp
 
     optional(:id, :integer).filled(:int?)
     required(:commodity_id, :integer).filled(:int?)
+    required(:uom_id, :integer).filled(:int?)
     required(:size_count_description, Types::StrippedString).maybe(:str?)
     required(:size_count_value, :integer).filled(:int?)
     required(:size_count_interval_group, Types::StrippedString).maybe(:str?)

@@ -22,6 +22,7 @@ module Masterfiles
               form.add_field :marketing_weight_range
               form.add_field :size_count_interval_group
               form.add_field :size_count_value
+              form.add_field :uom_id
               form.add_field :minimum_size_mm
               form.add_field :maximum_size_mm
               form.add_field :average_size_mm

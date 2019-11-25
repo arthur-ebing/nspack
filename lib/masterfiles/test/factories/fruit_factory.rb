@@ -57,6 +57,7 @@ module MasterfilesApp
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
+        std_pack_label_code: Faker::Lorem.word,
         active: true,
         material_mass: Faker::Number.decimal,
         plant_resource_button_indicator: Faker::Lorem.word
@@ -66,9 +67,11 @@ module MasterfilesApp
 
     def create_std_fruit_size_count(opts = {})
       commodity_id = create_commodity
+      uom_id = create_uom
 
       default = {
         commodity_id: commodity_id,
+        uom_id: uom_id,
         size_count_description: Faker::Lorem.word,
         marketing_size_range_mm: Faker::Lorem.word,
         marketing_weight_range: Faker::Lorem.word,

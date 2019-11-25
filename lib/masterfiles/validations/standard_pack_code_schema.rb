@@ -9,5 +9,6 @@ module MasterfilesApp
     required(:material_mass, :decimal).maybe(:decimal?)
     required(:plant_resource_button_indicator, Types::StrippedString).maybe(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
+    required(:std_pack_label_code, Types::StrippedString).maybe(:str?)
   end
 end

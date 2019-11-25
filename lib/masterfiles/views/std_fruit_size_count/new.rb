@@ -23,6 +23,7 @@ module Masterfiles
                   col.add_field :marketing_weight_range
                   col.add_field :size_count_interval_group
                   col.add_field :size_count_value
+                  col.add_field :uom_id
                 end
               end
               form.row do |row|

@@ -4,6 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestStandardPackCodeInteractor < MiniTestWithHooks
+    include GeneralFactory
     include FruitFactory
 
     def test_repo
@@ -73,6 +74,7 @@ module MasterfilesApp
         id: 1,
         standard_pack_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        std_pack_label_code: 'ABC',
         active: true,
         material_mass: 1.0,
         plant_resource_button_indicator: 'ABC'

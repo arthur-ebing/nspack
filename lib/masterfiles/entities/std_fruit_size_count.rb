@@ -4,6 +4,7 @@ module MasterfilesApp
   class StdFruitSizeCount < Dry::Struct
     attribute :id, Types::Integer
     attribute :commodity_id, Types::Integer
+    attribute :uom_id, Types::Integer
     attribute :size_count_description, Types::String
     attribute :marketing_size_range_mm, Types::String
     attribute :marketing_weight_range, Types::String
