@@ -223,6 +223,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           form.add_field(:load_id,
                          'Load',
+                         data_type: 'number',
                          scan: 'key248_all',
                          scan_type: :load,
                          submit_form: true,
@@ -321,6 +322,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           form.add_field(:load_id,
                          'Load',
+                         data_type: 'number',
                          scan: 'key248_all',
                          scan_type: :load,
                          submit_form: true,

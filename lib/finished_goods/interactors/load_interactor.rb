@@ -120,6 +120,8 @@ module FinishedGoodsApp
     end
 
     def validate_load(load_id) # rubocop:disable Metrics/AbcSize
+      return failed_response("Value #{load_id} is too big to be a load. Perhaps you scanned a pallet number?") if load_id.to_i > AppConst::MAX_DB_INT
+
       load = repo.find_load(load_id)
       return failed_response("Load:#{load_id} doesn't exist") if load.nil?
 
@@ -133,7 +135,9 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def validate_load_truck(load_id) # rubocop:disable Metrics/AbcSize
+    def validate_load_truck(load_id) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      return failed_response("Value #{load_id} is too big to be a load. Perhaps you scanned a pallet number?") if load_id.to_i > AppConst::MAX_DB_INT
+
       load = repo.find_load_flat(load_id)
       return failed_response("Load:#{load_id} doesn't exist") if load.nil?
 

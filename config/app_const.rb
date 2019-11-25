@@ -249,4 +249,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
   BIG_ZERO = BigDecimal('0')
+  # The maximum size of an integer in PostgreSQL
+  MAX_DB_INT = 2_147_483_647
 end
