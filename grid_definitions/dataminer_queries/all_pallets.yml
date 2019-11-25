@@ -4,7 +4,7 @@
   carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age, allocated,
   shipped, in_stock, inspected, palletized, production_run_id, farm, puc, orchard,
   commodity, cultivar, marketing_variety, grade, std_size, actual_count, size_ref,
-  std_pack, packed_tm_group, mark, inventory_code, marketing_org, created_at, palletized_at,
+  std_pack, packed_tm_group, mark, inventory_code, fruit_sticker, marketing_org, created_at, palletized_at,
   govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, verified_at,
   pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight, basic_pack,
   packhouse, line, pick_ref, phc, sell_by_code, product_chars, verification_result,
@@ -13,7 +13,7 @@
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
   exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
   AS departure_date, pallet_verification_failed, verification_failure_reason, scanned_carton,
-  cpp, bom, client_size_ref, treatments, order_number, pm_type, pm_subtype, fruit_sticker,
+  cpp, bom, client_size_ref, treatments, order_number, pm_type, pm_subtype,
   cultivar_group, season, customer_variety, plt_packhouse, plt_line, exit_ref, seq_exit_ref,
   gross_weight_measured_at, partially_palletized_at, govt_inspection_passed, internal_inspection_passed,
   inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
@@ -525,6 +525,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker:
+    :name: fruit_sticker
+    :sequence_no: 32
+    :caption: Fruit sticker
+    :namespaced_name: fruit_sticker
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1446,22 +1462,6 @@
     :sequence_no: 89
     :caption: Pm subtype
     :namespaced_name: pm_subtype
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  fruit_sticker:
-    :name: fruit_sticker
-    :sequence_no: 90
-    :caption: Fruit sticker
-    :namespaced_name: fruit_sticker
     :data_type: :string
     :width: 
     :format: 
