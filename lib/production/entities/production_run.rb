@@ -28,6 +28,7 @@ module ProductionApp
     attribute :tipping, Types::Bool
     attribute :labeling, Types::Bool
     attribute? :active, Types::Bool
+    attribute? :allocation_required, Types::Bool
 
     def next_stage
       if tipping && labeling
@@ -69,6 +70,7 @@ module ProductionApp
     attribute :tipping, Types::Bool
     attribute :labeling, Types::Bool
     attribute? :active, Types::Bool
+    attribute? :allocation_required, Types::Bool
     attribute :template_name, Types::String
     attribute :production_run_code, Types::String
     attribute :cloned_from_run_code, Types::String
