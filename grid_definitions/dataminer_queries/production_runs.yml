@@ -16,12 +16,13 @@
   \r\n\"production_runs\".\"production_line_id\", \"production_runs\".\"season_id\",
   \"production_runs\".\"orchard_id\", \"production_runs\".\"cultivar_group_id\", \r\n\"production_runs\".\"cultivar_id\",
   \"production_runs\".\"product_setup_template_id\", \"production_runs\".\"cloned_from_run_id\",
-  \r\n\"production_runs\".\"active\", \"production_runs\".\"created_at\", \"production_runs\".\"updated_at\"\r\nFROM
-  \"production_runs\" \r\nLEFT JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\"
-  = \"production_runs\".\"cultivar_group_id\" \r\nLEFT JOIN \"cultivars\" ON \"cultivars\".\"id\"
-  = \"production_runs\".\"cultivar_id\" \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\"
-  \r\nLEFT JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\"
-  \r\nJOIN \"plant_resources\" ON \"plant_resources\".\"id\" = \"production_runs\".\"packhouse_resource_id\"
+  \r\n\"production_runs\".\"active\", \"production_runs\".\"created_at\", \"production_runs\".\"updated_at\",
+  \"production_runs\".\"allocation_required\"\r\nFROM \"production_runs\" \r\nLEFT
+  JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\" = \"production_runs\".\"cultivar_group_id\"
+  \r\nLEFT JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"production_runs\".\"cultivar_id\"
+  \r\nJOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\" \r\nLEFT
+  JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\" \r\nJOIN
+  \"plant_resources\" ON \"plant_resources\".\"id\" = \"production_runs\".\"packhouse_resource_id\"
   \r\nLEFT JOIN \"product_setup_templates\" ON \"product_setup_templates\".\"id\"
   = \"production_runs\".\"product_setup_template_id\" \r\nJOIN \"plant_resources\"
   plant_resources2 ON \"plant_resources2\".\"id\" = \"production_runs\".\"production_line_id\"
@@ -664,6 +665,22 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocation_required:
+    :name: allocation_required
+    :sequence_no: 41
+    :caption: Allocation required
+    :namespaced_name: production_runs.allocation_required
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

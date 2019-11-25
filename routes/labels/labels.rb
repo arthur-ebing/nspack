@@ -142,7 +142,7 @@ class Nspack < Roda
             f.path
           end
           File.chmod(0o644, filepath) # Ensure web app can read the image.
-          update_dialog_content(content: "<div style='border:#{interactor.label_border(id)}px solid orange'><img src='/#{File.join('tempfiles', File.basename(filepath))}'>i</div>")
+          update_dialog_content(content: "<div style='border:#{interactor.label_border(id)}px solid orange'><img src='/#{File.join('tempfiles', File.basename(filepath))}'></div>")
         else
           { flash: { error: res.message } }.to_json
         end

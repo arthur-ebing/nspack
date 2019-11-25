@@ -55,7 +55,10 @@ module ProductionApp
 
       def complete_setup_check
         return failed_response 'No product setup template has been set' if entity.product_setup_template_id.nil?
-        return failed_response 'No product setup has been allocated yet' unless any_allocated_setup?
+
+        if entity.allocation_required
+          return failed_response 'No product setup has been allocated yet' unless any_allocated_setup?
+        end
 
         all_ok
       end

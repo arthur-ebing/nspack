@@ -5,6 +5,13 @@ module ProductionApp
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
 
+    def create_production_run(params)
+      attrs = params.to_h
+      # NOTE:The NO_RUN_ALLOCATION should be changed to come from the LINE
+      attrs = attrs.merge(allocation_required: false) if ENV['NO_RUN_ALLOCATION']
+      create(:production_runs, attrs)
+    end
+
     def create_production_run_stats(id)
       create(:production_run_stats, production_run_id: id)
     end
