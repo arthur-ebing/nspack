@@ -7,7 +7,7 @@
   \r\n\"plant_resources\".\"plant_resource_code\" AS packhouse_code, \"plant_resources2\".\"plant_resource_code\"
   AS line_code, \r\n\"product_setup_templates\".\"template_name\", \r\n\"pucs\".\"puc_code\",
   \"seasons\".\"season_code\", \r\nfn_production_run_code(\"production_runs\".\"cloned_from_run_id\")
-  AS cloned_from_run,\r\n\"production_runs\".\"started_at\", \"production_runs\".\"closed_at\",
+  AS cloned_from_run_code,\r\n\"production_runs\".\"started_at\", \"production_runs\".\"closed_at\",
   \"production_runs\".\"re_executed_at\", \r\n\"production_runs\".\"completed_at\",
   \"production_runs\".\"allow_cultivar_mixing\", \"production_runs\".\"allow_orchard_mixing\",
   \r\n\"production_runs\".\"tipping\", \"production_runs\".\"labeling\", \r\n\"production_runs\".\"reconfiguring\",
@@ -256,8 +256,8 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cloned_from_run:
-    :name: cloned_from_run
+  cloned_from_run_code:
+    :name: cloned_from_run_code
     :sequence_no: 15
     :caption: Cloned from run
     :namespaced_name: 

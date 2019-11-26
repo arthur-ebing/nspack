@@ -54,6 +54,19 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def clone_production_run(id)
+      new_id = nil
+      repo.transaction do
+        new_id = repo.clone_production_run(id)
+        repo.create_production_run_stats(new_id)
+        log_status('production_runs', new_id, 'CLONED', comment: "from run id #{id}")
+        log_transaction
+      end
+      instance = production_run_flat(new_id)
+      success_response("Cloned as new production run #{instance.production_run_code}",
+                       instance)
+    end
+
     def selected_template(id)
       success_response('ok', repo.find_hash(:product_setup_templates, id))
     end

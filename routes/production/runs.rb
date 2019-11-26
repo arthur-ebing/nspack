@@ -20,11 +20,78 @@ class Nspack < Roda
         show_partial { Production::Runs::ProductionRun::Edit.call(id) }
       end
 
+      r.on 'clone' do
+        r.get do
+          check_auth!('runs', 'edit')
+          interactor.assert_permission!(:complete_setup, id)
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/clone",
+                                                          notice: 'Clone this run?',
+                                                          button_captions: %w[Clone Cloning])
+          end
+        end
+
+        r.post do
+          res = interactor.clone_production_run(id)
+          if res.success
+            row_keys = %i[
+              id
+              production_run_code
+              cultivar_group_code
+              cultivar_name
+              farm_code
+              orchard_code
+              packhouse_code
+              line_code
+              status
+              puc_code
+              season_code
+              farm_id
+              puc_id
+              packhouse_resource_id
+              production_line_id
+              season_id
+              orchard_id
+              cultivar_group_id
+              cultivar_id
+              product_setup_template_id
+              cloned_from_run_id
+              active_run_stage
+              started_at
+              closed_at
+              re_executed_at
+              completed_at
+              allow_cultivar_mixing
+              allow_orchard_mixing
+              reconfiguring
+              closed
+              running
+              setup_complete
+              completed
+              allocation_required
+              template_name
+              cloned_from_run_code
+              active
+            ]
+            add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: "CLONED from run id #{id}"), row_keys),
+                         notice: res.message)
+          else
+            dialog_error(content: res.message)
+          end
+        end
+      end
+
       r.on 'complete_setup' do
         r.get do
           check_auth!('runs', 'edit')
           interactor.assert_permission!(:complete_setup, id)
-          show_partial { Production::Runs::ProductionRun::CompleteSetup.call(id) }
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/complete_setup",
+                                                          notice: 'Press the button to mark setups as complete',
+                                                          button_captions: ['Mark as Complete', 'Completing...'])
+          end
         end
 
         r.post do
@@ -37,7 +104,12 @@ class Nspack < Roda
         r.get do
           check_auth!('runs', 'edit')
           interactor.assert_permission!(:execute_run, id)
-          show_partial { Production::Runs::ProductionRun::ExecuteRun.call(id) }
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/execute_run",
+                                                          notice: 'Press the button to start tipping the run',
+                                                          button_captions: ['Execute', 'Executing...'])
+          end
         end
 
         r.post do
@@ -308,6 +380,7 @@ class Nspack < Roda
               running
               setup_complete
               completed
+              allocation_required
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: 'CREATED'), row_keys),
                          notice: res.message)

@@ -195,7 +195,6 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'puc_combo_changed' do
-        p params
         if !params[:rmt_delivery_farm_id].to_s.empty? && !params[:rmt_delivery_puc_id].to_s.empty?
           orchards = interactor.lookup_orchards(params[:rmt_delivery_farm_id], params[:rmt_delivery_puc_id])
           json_actions([OpenStruct.new(type: :replace_select_options,

@@ -44,6 +44,23 @@ module ProductionApp
       create(:production_runs, attrs)
     end
 
+    def clone_production_run(id)
+      ignore_cols = %i[id created_at updated_at active_run_stage started_at
+                       closed_at re_executed_at completed_at reconfiguring
+                       closed setup_complete running completed tipping labeling]
+
+      attrs = find_hash(:production_runs, id).reject { |k, _| ignore_cols.include?(k) }
+      new_id = create_production_run(attrs.merge(cloned_from_run_id: id))
+      clone_alloc = <<~SQL
+        INSERT INTO product_resource_allocations(production_run_id, plant_resource_id, product_setup_id, label_template_id)
+        SELECT #{new_id}, plant_resource_id, product_setup_id, label_template_id
+        FROM product_resource_allocations
+        WHERE production_run_id = ?
+      SQL
+      DB[clone_alloc, id].insert
+      new_id
+    end
+
     def create_production_run_stats(id)
       create(:production_run_stats, production_run_id: id)
     end

@@ -7,19 +7,21 @@ module UiRules
       @resource_repo = ProductionApp::ResourceRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
+      @cultivar_repo = MasterfilesApp::CultivarRepo.new
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields common_fields unless %i[allocate_setups complete_stage confirm].include?(@mode)
 
       set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_setup execute_run complete_stage show_stats].include?(@mode)
+      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_stage show_stats confirm].include?(@mode)
       build_stats_table if @mode == :show_stats
       set_stage_fields if @mode == :complete_stage
 
       add_new_behaviours if @mode == :new
+      add_edit_behaviours if @mode == :edit
 
       form_name 'production_run'
     end
@@ -29,8 +31,8 @@ module UiRules
       puc_id_label = @farm_repo.find_puc(@form_object.puc_id)&.puc_code
       season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       orchard_id_label = @farm_repo.find_orchard(@form_object.orchard_id)&.orchard_code
-      cultivar_group_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
-      cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
+      cultivar_group_id_label = @cultivar_repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
+      cultivar_id_label = @cultivar_repo.find_cultivar(@form_object.cultivar_id)&.cultivar_name
 
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
@@ -80,7 +82,7 @@ module UiRules
       fields[:new_stage] = { renderer: :label, with_value: next_stage }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       if @mode == :new
         ph_renderer = { renderer: :select,
                         options: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE),
@@ -97,34 +99,78 @@ module UiRules
         line_renderer = { renderer: :label, with_value: @form_object.line_code }
       end
 
+      if @form_object.reconfiguring
+        farm_renderer = { renderer: :label, with_value: @form_object.farm_code }
+        puc_renderer = { renderer: :label, with_value: @form_object.puc_code }
+        orchard_renderer = { renderer: :label, with_value: @form_object.orchard_code }
+      else
+        farm_renderer = {
+          renderer: :select,
+          options: @farm_repo.for_select_farms,
+          disabled_options: @farm_repo.for_select_inactive_farms,
+          caption: 'Farm',
+          prompt: true,
+          required: true
+        }
+        pucs = if @form_object.farm_id.nil?
+                 []
+               else
+                 @farm_repo.selected_farm_pucs(@form_object.farm_id)
+               end
+        puc_renderer = {
+          renderer: :select,
+          options: pucs,
+          disabled_options: @farm_repo.for_select_inactive_pucs,
+          caption: 'Puc',
+          required: true
+        }
+        orchards = if @form_object.farm_id.nil? || @form_object.puc_id.nil?
+                     []
+                   else
+                     @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id)
+                   end
+        orchard_renderer = {
+          renderer: :select,
+          options: orchards,
+          disabled_options: @farm_repo.for_select_inactive_orchards,
+          caption: 'Orchard'
+        }
+      end
+      cultivar_groups = if @form_object.orchard_id.nil?
+                          []
+                        else
+                          orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+                          group_ids = @cultivar_repo.all_hash(:cultivars, id: orchard.cultivar_ids.to_a).map { |rec| rec[:cultivar_group_id] }.uniq
+                          @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
+                        end
+      cultivars = if @form_object.cultivar_group_id.nil?
+                    []
+                  else
+                    @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id })
+                  end
+      seasons = if @form_object.cultivar_group_id.nil?
+                  []
+                else
+                  MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id)
+                end
+
       {
         packhouse_resource_id: ph_renderer,
         production_line_id: line_renderer,
-        farm_id: { renderer: :select,
-                   options: @farm_repo.for_select_farms,
-                   disabled_options: @farm_repo.for_select_inactive_farms,
-                   caption: 'Farm',
-                   required: true },
-        puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs,
-                  disabled_options: @farm_repo.for_select_inactive_pucs,
-                  caption: 'Puc',
-                  required: true },
+        farm_id: farm_renderer,
+        puc_id: puc_renderer,
+        orchard_id: orchard_renderer,
         season_id: { renderer: :select,
-                     options: MasterfilesApp::CalendarRepo.new.for_select_seasons,
+                     options: seasons,
                      disabled_options: MasterfilesApp::CalendarRepo.new.for_select_inactive_seasons,
                      caption: 'Season',
                      required: true },
-        orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards,
-                      disabled_options: @farm_repo.for_select_inactive_orchards,
-                      caption: 'Orchard' },
         cultivar_group_id: { renderer: :select,
-                             options: MasterfilesApp::CultivarRepo.new.for_select_cultivar_groups,
+                             options: cultivar_groups,
                              disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivar_groups,
                              caption: 'Cultivar group' },
         cultivar_id: { renderer: :select,
-                       options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
+                       options: cultivars,
                        disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
                        caption: 'Cultivar' },
         product_setup_template_id: { renderer: :label,
@@ -268,6 +314,27 @@ module UiRules
                                   notify: [{ url: '/production/runs/production_runs/changed/orchard' }]
         behaviour.dropdown_change :cultivar_group_id,
                                   notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+      end
+    end
+
+    def add_edit_behaviours
+      if @form_object.reconfiguring
+        behaviours do |behaviour|
+          behaviour.dropdown_change :cultivar_group_id,
+                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+        end
+      else
+        behaviours do |behaviour|
+          behaviour.dropdown_change :farm_id,
+                                    notify: [{ url: '/production/runs/production_runs/changed/farm' }]
+          behaviour.dropdown_change :puc_id,
+                                    notify: [{ url: '/production/runs/production_runs/changed/puc',
+                                               param_keys: %i[production_run_farm_id] }]
+          behaviour.dropdown_change :orchard_id,
+                                    notify: [{ url: '/production/runs/production_runs/changed/orchard' }]
+          behaviour.dropdown_change :cultivar_group_id,
+                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+        end
       end
     end
   end

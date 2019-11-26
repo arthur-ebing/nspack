@@ -12,6 +12,13 @@
   :title: Edit
   :popup: true
   :hide_if_true: setup_complete
+- :url: "/production/runs/production_runs/$:id$/clone"
+  :text: clone this run
+  :icon: copy
+  :title: Clone this run
+  :popup: true
+  :hide_if_false: setup_complete
+- :separator: true
 - :url: "/production/runs/production_runs/$:id$/complete_setup"
   :text: Mark setup as complete
   :icon: toggle-on
@@ -45,6 +52,7 @@
   :prompt: Are you sure you want to re-configure this run?
   :hide_if_false: running
   :hide_if_true: reconfiguring
+- :separator: true
 - :url: "/production/runs/production_runs/$:id$/select_template"
   :text: select product setup template
   :icon: arrow-left
@@ -66,6 +74,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: setup_complete
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/show_stats"
   :text: View run stats
