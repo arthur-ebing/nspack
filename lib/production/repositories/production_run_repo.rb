@@ -5,6 +5,38 @@ module ProductionApp
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
 
+    def find_carton_by_carton_label_id(carton_label_id)
+      DB[:cartons].where(carton_label_id: carton_label_id).first
+    end
+
+    def find_pallet_by_pallet_number(pallet_number)
+      DB[:pallets].where(pallet_number: pallet_number).first
+    end
+
+    def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).get(:id)
+    end
+
+    def find_pallet_sequence_attrs(pallet_id, seq_number)
+      DB["SELECT *
+          FROM vw_pallet_sequence_flat
+          WHERE pallet_id = #{pallet_id} and pallet_sequence_number = #{seq_number}"].first
+    end
+
+    def find_carton_cpp(carton_id)
+      DB["select cpp.cartons_per_pallet
+          from cartons c
+          join cartons_per_pallet cpp on cpp.id = c.cartons_per_pallet_id
+          where c.id = ?", carton_id].first
+    end
+
+    def find_carton_with_run_info(carton_id)
+      DB["select c.*, r.closed as production_run_closed
+          from cartons c
+          join production_runs r on r.id = c.production_run_id
+          where c.id = ?", carton_id].first
+    end
+
     def create_production_run(params)
       attrs = params.to_h
       # NOTE:The NO_RUN_ALLOCATION should be changed to come from the LINE
