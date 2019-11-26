@@ -2217,8 +2217,8 @@ module DevelopmentApp
               add_functional_area '#{make_caption(opts.applet)}'
               add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
@@ -2243,13 +2243,13 @@ module DevelopmentApp
             up do
               add_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}', seq: 1
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
-              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
-              # drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               # drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               drop_program '#{make_caption(opts.program_text)}', functional_area: '#{make_caption(opts.applet)}'
             end
@@ -2268,13 +2268,13 @@ module DevelopmentApp
           Crossbeams::MenuMigrations::Migrator.migration('#{opts.classnames[:roda_class]}') do
             up do
               #{opts.new_from_menu ? '' : '# '}add_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/#{opts.applet}/#{opts.program}/#{opts.table}/new', seq: 1
-              add_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
-              # add_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
+              add_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/list/#{opts.table}', seq: 2
+              # add_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}', url: '/search/#{opts.table}', seq: 3
             end
 
             down do
-              # drop_program_function 'Search #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
-              drop_program_function 'List #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              # drop_program_function 'Search #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
+              drop_program_function 'List #{make_caption(opts.table)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
               #{opts.new_from_menu ? '' : '# '}drop_program_function 'New #{make_caption(opts.singlename)}', functional_area: '#{make_caption(opts.applet)}', program: '#{make_caption(opts.program_text)}'
             end
           end
