@@ -61,7 +61,7 @@ module Crossbeams
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
     # @return [void]
-    def add_field(name, label, options) # rubocop:disable Metrics/AbcSize
+    def add_field(name, label, options = {}) # rubocop:disable Metrics/AbcSize
       @current_field = name
       for_scan = options[:scan] ? 'Scan ' : ''
       data_type = options[:data_type] || 'text'

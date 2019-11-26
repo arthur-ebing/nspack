@@ -16,6 +16,8 @@ module FinishedGoodsApp
         vehicle_number: Faker::Lorem.unique.word,
         vehicle_weight_out: 1.0,
         dispatch_consignment_note_number: 'ABC',
+        driver_name: 'ABC',
+        driver_cell_number: 'ABC',
         active: true
       }
       FinishedGoodsApp::LoadVehicle.new(base_attrs.merge(attrs))

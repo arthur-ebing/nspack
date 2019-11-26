@@ -1,13 +1,14 @@
 ---
 :caption: Load Vehicles
-:sql: SELECT "load_vehicles"."id", "load_vehicles"."load_id", "load_vehicles"."vehicle_type_id",
-  "load_vehicles"."haulier_party_role_id", "load_vehicles"."vehicle_number", "load_vehicles"."vehicle_weight_out",
-  "load_vehicles"."dispatch_consignment_note_number",
-  "load_vehicles"."active", "load_vehicles"."created_at", "load_vehicles"."updated_at",
-  fn_party_role_name("load_vehicles"."haulier_party_role_id") AS haulier_party_role,
-  "loads"."edi_file_name", "vehicle_types"."vehicle_type_code", fn_current_status('load_vehicles',
-  "load_vehicles"."id") AS status FROM "load_vehicles" JOIN "loads" ON "loads"."id"
-  = "load_vehicles"."load_id" JOIN "vehicle_types" ON "vehicle_types"."id" = "load_vehicles"."vehicle_type_id"
+:sql: "SELECT \"load_vehicles\".\"id\", \"load_vehicles\".\"load_id\", \"load_vehicles\".\"vehicle_type_id\",
+  \"load_vehicles\".\"haulier_party_role_id\", \"load_vehicles\".\"vehicle_number\",
+  \"load_vehicles\".\"vehicle_weight_out\", \"load_vehicles\".\"dispatch_consignment_note_number\",\r\n\"load_vehicles\".\"driver_name\",
+  \"load_vehicles\".\"driver_cell_number\",\r\n\"load_vehicles\".\"active\", \"load_vehicles\".\"created_at\",
+  \"load_vehicles\".\"updated_at\", fn_party_role_name(\"load_vehicles\".\"haulier_party_role_id\")
+  AS haulier_party_role, \"loads\".\"edi_file_name\", \"vehicle_types\".\"vehicle_type_code\",\r\nfn_current_status('load_vehicles',
+  \"load_vehicles\".\"id\") AS status\r\nFROM \"load_vehicles\"\r\nJOIN \"loads\"
+  ON \"loads\".\"id\" = \"load_vehicles\".\"load_id\"\r\nJOIN \"vehicle_types\" ON
+  \"vehicle_types\".\"id\" = \"load_vehicles\".\"vehicle_type_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -110,7 +111,7 @@
     :group_max: false
   dispatch_consignment_note_number:
     :name: dispatch_consignment_note_number
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Dispatch consignment note number
     :namespaced_name: load_vehicles.dispatch_consignment_note_number
     :data_type: :string
@@ -124,9 +125,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  driver_name:
+    :name: driver_name
+    :sequence_no: 8
+    :caption: Driver
+    :namespaced_name: load_vehicles.driver_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  driver_cell_number:
+    :name: driver_cell_number
+    :sequence_no: 9
+    :caption: Driver cell
+    :namespaced_name: load_vehicles.driver_cell_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Active
     :namespaced_name: load_vehicles.active
     :data_type: :boolean
@@ -142,7 +175,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: load_vehicles.created_at
     :data_type: :datetime
@@ -158,7 +191,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: load_vehicles.updated_at
     :data_type: :datetime
@@ -174,7 +207,7 @@
     :group_max: false
   haulier_party_role:
     :name: haulier_party_role
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Haulier party role
     :namespaced_name: 
     :data_type: :string
@@ -190,7 +223,7 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Edi file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
@@ -206,7 +239,7 @@
     :group_max: false
   vehicle_type_code:
     :name: vehicle_type_code
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Vehicle type code
     :namespaced_name: vehicle_types.vehicle_type_code
     :data_type: :string
@@ -222,7 +255,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Status
     :namespaced_name: 
     :data_type: :string

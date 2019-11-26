@@ -92,6 +92,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          data_type: 'number',
                          allow_decimals: true,
                          required: false)
+          form.add_field(:driver_name, 'Driver')
+          form.add_field(:driver_cell_number, 'Driver Cell no')
           form.add_field(:dispatch_consignment_note_number,
                          'Consignment Note Number',
                          data_type: 'string',

@@ -14,6 +14,8 @@ module FinishedGoodsApp
         vehicle_number: Faker::Lorem.unique.word,
         vehicle_weight_out: Faker::Number.decimal,
         dispatch_consignment_note_number: Faker::Lorem.word,
+        driver_name: Faker::Lorem.word,
+        driver_cell_number: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
