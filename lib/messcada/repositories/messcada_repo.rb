@@ -217,10 +217,12 @@ module MesscadaApp
         "marketing_varieties"."description" AS marketing_variety_description,
         "cvv"."marketing_variety_code" AS customer_variety_code,
         "std_fruit_size_counts"."size_count_value",
+        uoms.uom_code AS size_count_uom,
         "fruit_size_references"."size_reference",
         "fruit_actual_counts_for_packs"."actual_count_for_pack",
         "basic_pack_codes"."basic_pack_code",
         "standard_pack_codes"."standard_pack_code",
+        "standard_pack_codes"."std_pack_label_code",
         fn_party_role_name("carton_labels"."marketing_org_party_role_id") AS marketer,
         "marks"."mark_code",
         "inventory_codes"."inventory_code",
@@ -265,6 +267,7 @@ module MesscadaApp
         LEFT JOIN "customer_variety_varieties" ON "customer_variety_varieties"."id" = "carton_labels"."customer_variety_variety_id"
         LEFT JOIN "marketing_varieties" cvv ON "cvv"."id" = "customer_variety_varieties"."marketing_variety_id"
         LEFT JOIN "std_fruit_size_counts" ON "std_fruit_size_counts"."id" = "carton_labels"."std_fruit_size_count_id"
+        LEFT JOIN "uoms" ON "uoms"."id" = "std_fruit_size_counts"."uom_id"
         LEFT JOIN "fruit_size_references" ON "fruit_size_references"."id" = "carton_labels"."fruit_size_reference_id"
         LEFT JOIN "fruit_actual_counts_for_packs" ON "fruit_actual_counts_for_packs"."id" = "carton_labels"."fruit_actual_counts_for_pack_id"
         JOIN "basic_pack_codes" ON "basic_pack_codes"."id" = "carton_labels"."basic_pack_code_id"
@@ -302,10 +305,12 @@ module MesscadaApp
         "marketing_varieties"."description" AS marketing_variety_description,
         "cvv"."marketing_variety_code" AS customer_variety_code,
         "std_fruit_size_counts"."size_count_value",
+        uoms.uom_code AS size_count_uom,
         "fruit_size_references"."size_reference",
         "fruit_actual_counts_for_packs"."actual_count_for_pack",
         "basic_pack_codes"."basic_pack_code",
         "standard_pack_codes"."standard_pack_code",
+        "standard_pack_codes"."std_pack_label_code",
         fn_party_role_name("product_setups"."marketing_org_party_role_id") AS marketer,
         "marks"."mark_code",
         "inventory_codes"."inventory_code",
@@ -324,18 +329,14 @@ module MesscadaApp
         "seasons"."season_code",
         'UNK' AS subtype_code,
         'UNK' AS pm_type_code,
-        -- "pm_subtypes"."subtype_code",
-        -- "pm_types"."pm_type_code",
         "cartons_per_pallet"."cartons_per_pallet",
         'UNKNOWN' AS product_code,
-        -- "pm_products"."product_code"
         "product_setups"."sell_by_code",
         "grades"."grade_code",
         "product_setups"."product_chars",
         COALESCE(lines.resource_properties ->> 'phc', packhouses.resource_properties ->> 'phc') AS phc
         FROM "product_resource_allocations"
         JOIN "production_runs" ON "production_runs"."id" = "product_resource_allocations"."production_run_id"
-        -- LEFT JOIN "product_resource_allocations" ON "product_resource_allocations"."id" = "carton_labels"."product_resource_allocation_id"
         JOIN "product_setups" ON "product_setups"."id" = "product_resource_allocations"."product_setup_id"
         JOIN "product_setup_templates" ON "product_setup_templates"."id" = "product_setups"."product_setup_template_id"
         JOIN "plant_resources" packhouses ON "packhouses"."id" = "production_runs"."packhouse_resource_id"
@@ -352,6 +353,7 @@ module MesscadaApp
         LEFT JOIN "customer_variety_varieties" ON "customer_variety_varieties"."id" = "product_setups"."customer_variety_variety_id"
         LEFT JOIN "marketing_varieties" cvv ON "cvv"."id" = "customer_variety_varieties"."marketing_variety_id"
         LEFT JOIN "std_fruit_size_counts" ON "std_fruit_size_counts"."id" = "product_setups"."std_fruit_size_count_id"
+        LEFT JOIN "uoms" ON "uoms"."id" = "std_fruit_size_counts"."uom_id"
         LEFT JOIN "fruit_size_references" ON "fruit_size_references"."id" = "product_setups"."fruit_size_reference_id"
         LEFT JOIN "fruit_actual_counts_for_packs" ON "fruit_actual_counts_for_packs"."id" = "product_setups"."fruit_actual_counts_for_pack_id"
         JOIN "basic_pack_codes" ON "basic_pack_codes"."id" = "product_setups"."basic_pack_code_id"
@@ -359,12 +361,9 @@ module MesscadaApp
         JOIN "marks" ON "marks"."id" = "product_setups"."mark_id"
         JOIN "inventory_codes" ON "inventory_codes"."id" = "product_setups"."inventory_code_id"
         LEFT JOIN "pm_boms" ON "pm_boms"."id" = "product_setups"."pm_bom_id"
-        -- LEFT JOIN "pm_subtypes" ON "pm_subtypes"."id" = "product_setups"."pm_subtype_id"
-        -- LEFT JOIN "pm_types" ON "pm_types"."id" = "pm_subtypes"."pm_type_id"
         JOIN "target_market_groups" ON "target_market_groups"."id" = "product_setups"."packed_tm_group_id"
         JOIN "seasons" ON "seasons"."id" = "production_runs"."season_id"
         JOIN "cartons_per_pallet" ON "cartons_per_pallet"."id" = "product_setups"."cartons_per_pallet_id"
-        -- LEFT JOIN "pm_products" ON "pm_products"."id" = "product_setups"."fruit_sticker_pm_product_id"
         JOIN "pallet_formats" ON "pallet_formats"."id" = "product_setups"."pallet_format_id"
         WHERE "product_resource_allocations"."id" = ?
       SQL
