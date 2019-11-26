@@ -177,6 +177,11 @@ module UiRules
         rebins_created: :right,
         rebins_weight: :right
       }
+      rules[:cell_transformers] = {
+        bins_tipped_weight: :decimal,
+        cartons_verified_weight: :decimal,
+        rebins_weight: :decimal
+      }
     end
 
     def make_form_object

@@ -23,6 +23,7 @@ module Production
                                 rules[:detail_cols],
                                 pivot: true,
                                 alignment: rules[:detail_alignment],
+                                cell_transformers: rules[:cell_transformers],
                                 top_margin: 2)
                 end
                 row.column do |col|
