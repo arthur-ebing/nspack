@@ -157,9 +157,9 @@ module ProductionApp
       rec
     end
 
-    # Does the run have at least one resource allocation with a setup?
+    # Does the run have at least one resource allocation with a setup and label?
     def any_allocated_setup?(id)
-      exists?(:product_resource_allocations, Sequel.lit("production_run_id = #{id} AND product_setup_id IS NOT NULL"))
+      exists?(:product_resource_allocations, Sequel.lit("production_run_id = #{id} AND product_setup_id IS NOT NULL AND label_template_id IS NOT NULL"))
     end
 
     # Is there an active tipping run on this line?
