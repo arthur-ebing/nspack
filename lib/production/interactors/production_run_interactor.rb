@@ -22,9 +22,12 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_production_run(id, params)
+    def update_production_run(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_production_run_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      template_res = validate_run_matches_template(id, res)
+      return template_res unless template_res.success
 
       repo.transaction do
         repo.update_production_run(id, res)
@@ -321,6 +324,25 @@ module ProductionApp
         required(:label_template_id, :integer).filled(:int?)
         required(:no_of_prints, :integer).filled(:int?, gt?: 0)
       end.call(params)
+    end
+
+    def validate_run_matches_template(id, instance) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      run = production_run(id)
+      return ok_response if run.product_setup_template_id.nil?
+
+      template = product_setup_repo.find_product_setup_template(run.product_setup_template_id)
+
+      errors = {}
+      errors[:cultivar_group_id] = ['does not match the template'] if template.cultivar_group_id != instance[:cultivar_group_id]
+      unless template.season_id.nil?
+        errors[:season_id] = ['does not match the template'] if template.season_id != instance[:season_id]
+      end
+      unless instance[:allow_cultivar_mixing] || template.cultivar_id.nil?
+        errors[:cultivar_id] = ['does not match the template'] if template.cultivar_id != instance[:cultivar_id]
+      end
+      return validation_failed_response(instance.to_h.merge(messages: errors)) unless errors.empty?
+
+      ok_response
     end
   end
 end
