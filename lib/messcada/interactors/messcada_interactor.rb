@@ -180,6 +180,10 @@ module MesscadaApp
       repo.get_pallet_by_carton_label_id(carton_label_id)
     end
 
+    def pallet_exists?(pallet_number)
+      repo.pallet_exists?(pallet_number)
+    end
+
     private
 
     def pallet_changes_on_verify(params)

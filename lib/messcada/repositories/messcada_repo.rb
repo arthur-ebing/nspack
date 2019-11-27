@@ -27,6 +27,10 @@ module MesscadaApp
       DB[:carton_labels].where(pallet_number: pallet_no.to_s).get(:id)
     end
 
+    def pallet_exists?(pallet_number)
+      exists?(:pallets, pallet_number: pallet_number)
+    end
+
     def resource_code_exists?(resource_code)
       exists?(:system_resources, system_resource_code: resource_code)
     end
@@ -87,6 +91,7 @@ module MesscadaApp
     def create_pallet(pallet)
       id = DB[:pallets].insert(pallet)
       log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
+      # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
 
       id
     end
@@ -94,6 +99,10 @@ module MesscadaApp
     def create_sequences(pallet_sequence, pallet_id)
       pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
       DB[:pallet_sequences].insert(pallet_sequence)
+    end
+
+    def replace_sequences(new_pallet_sequence, pallet_sequence_id)
+      DB[:pallet_sequences].where(id: pallet_sequence_id).update(new_pallet_sequence)
     end
 
     # def create_pallet_and_sequences(pallet, pallet_sequence)

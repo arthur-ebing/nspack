@@ -108,11 +108,15 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.post do
           if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
-            res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
-            pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
-            unless res.success
-              store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
-              r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
+            pallet_number = params[:carton][:carton_number] if AppConst::CARTON_EQUALS_PALLET && interactor.pallet_exists?(params[:carton][:carton_number])
+
+            unless pallet_number
+              res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
+              pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
+              unless res.success
+                store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
+                r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
+              end
             end
           else
             pallet_number = params[:pallet][:pallet_number]
@@ -122,7 +126,11 @@ class Nspack < Roda # rubocop:disable ClassLength
           if res.success
             r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
           else
-            store_locally(:scan_pallet_submit_error, res.message)
+            if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
+              store_locally(:scan_carton_submit_error, unwrap_failed_response(res))
+            else
+              store_locally(:scan_pallet_submit_error, unwrap_failed_response(res))
+            end
             r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
           end
         end
@@ -158,7 +166,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_label(:verified, 'Verified', pallet_sequence[:verified])
         form.add_select(:verification_result, 'Verification Result', items: %w[unknown passed failed], value: (pallet_sequence[:verification_result].nil_or_empty? ? 'unknown' : pallet_sequence[:verification_result]))
         form.add_select(:verification_failure_reason, 'Verification Failure Reason', items: MasterfilesApp::QualityRepo.new.for_select_pallet_verification_failure_reasons,
-                                                                                     hide_on_load: (pallet_sequence[:verification_result] != 'failed'), value: pallet_sequence[:pallet_verification_failure_reason_id], prompt: true, required: false)
+                        hide_on_load: (pallet_sequence[:verification_result] != 'failed'), value: pallet_sequence[:pallet_verification_failure_reason_id], prompt: true, required: false)
         form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
         form.add_label(:gross_weight, 'Gross Weight', pallet_sequence[:gross_weight])
         if AppConst::CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION
