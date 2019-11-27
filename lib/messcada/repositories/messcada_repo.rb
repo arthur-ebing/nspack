@@ -91,7 +91,6 @@ module MesscadaApp
     def create_pallet(pallet)
       id = DB[:pallets].insert(pallet)
       log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
-      # ProductionApp::RunStatsUpdateJob.enqueue(production_run_id, 'PALLET_CREATED')
 
       id
     end
