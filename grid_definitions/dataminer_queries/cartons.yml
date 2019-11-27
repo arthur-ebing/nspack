@@ -1,14 +1,14 @@
 ---
 :caption: Cartons
-:sql: "SELECT carton_labels.id, carton_labels.production_run_id, carton_labels.created_at
-  AS label_created_at, ABS(date_part('epoch', current_timestamp - carton_labels.created_at)
-  / 3600)::int AS label_age_hrs, cartons.created_at AS carton_verified_at, ABS(date_part('epoch',
-  current_timestamp - cartons.created_at) / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code
-  AS packhouse, lines.plant_resource_code AS line, packpoints.plant_resource_code
-  AS packpoint, system_resources.system_resource_code AS print_device, carton_labels.label_name
-  AS label, farms.farm_code AS farm, pucs.puc_code AS puc, orchards.orchard_code AS
-  orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code AS cultivar_group,
-  cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
+:sql: "SELECT carton_labels.id, carton_labels.pallet_number, carton_labels.production_run_id,
+  carton_labels.created_at AS label_created_at, ABS(date_part('epoch', current_timestamp
+  - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS
+  carton_verified_at, ABS(date_part('epoch', current_timestamp - cartons.created_at)
+  / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code AS packhouse, lines.plant_resource_code
+  AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code
+  AS print_device, carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code
+  AS puc, orchards.orchard_code AS orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code
+  AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
   AS variety, cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value
   AS std_size, fruit_size_references.size_reference AS size_ref, fruit_actual_counts_for_packs.actual_count_for_pack
   AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack, standard_pack_codes.standard_pack_code
@@ -80,9 +80,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 2
+    :caption: Pallet number
+    :namespaced_name: carton_labels.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Production run
     :namespaced_name: carton_labels.production_run_id
     :data_type: :integer
@@ -98,7 +114,7 @@
     :group_max: false
   label_created_at:
     :name: label_created_at
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Label created at
     :namespaced_name: carton_labels.created_at
     :data_type: :datetime
@@ -114,7 +130,7 @@
     :group_max: false
   label_age_hrs:
     :name: label_age_hrs
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Label age hrs
     :namespaced_name: 
     :data_type: :number
@@ -130,7 +146,7 @@
     :group_max: false
   carton_verified_at:
     :name: carton_verified_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Carton verified at
     :namespaced_name: cartons.created_at
     :data_type: :datetime
@@ -146,7 +162,7 @@
     :group_max: false
   carton_age_hrs:
     :name: carton_age_hrs
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Carton age hrs
     :namespaced_name: 
     :data_type: :number
@@ -162,7 +178,7 @@
     :group_max: false
   packhouse:
     :name: packhouse
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Packhouse
     :namespaced_name: packhouses.plant_resource_code
     :data_type: :string
@@ -178,7 +194,7 @@
     :group_max: false
   line:
     :name: line
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Line
     :namespaced_name: lines.plant_resource_code
     :data_type: :string
@@ -194,7 +210,7 @@
     :group_max: false
   packpoint:
     :name: packpoint
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Packpoint
     :namespaced_name: packpoints.plant_resource_code
     :data_type: :string
@@ -210,7 +226,7 @@
     :group_max: false
   print_device:
     :name: print_device
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Print device
     :namespaced_name: system_resources.system_resource_code
     :data_type: :string
@@ -226,7 +242,7 @@
     :group_max: false
   label:
     :name: label
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Label
     :namespaced_name: carton_labels.label_name
     :data_type: :string
@@ -242,7 +258,7 @@
     :group_max: false
   farm:
     :name: farm
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Farm
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -258,7 +274,7 @@
     :group_max: false
   puc:
     :name: puc
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Puc
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -274,7 +290,7 @@
     :group_max: false
   orchard:
     :name: orchard
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Orchard
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -290,7 +306,7 @@
     :group_max: false
   commodity:
     :name: commodity
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
@@ -306,7 +322,7 @@
     :group_max: false
   cultivar_group:
     :name: cultivar_group
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Cultivar group
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
@@ -322,7 +338,7 @@
     :group_max: false
   cultivar:
     :name: cultivar
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Cultivar
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
@@ -338,7 +354,7 @@
     :group_max: false
   variety:
     :name: variety
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Variety
     :namespaced_name: marketing_varieties.marketing_variety_code
     :data_type: :string
@@ -354,7 +370,7 @@
     :group_max: false
   cust_variety:
     :name: cust_variety
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Cust variety
     :namespaced_name: cvv.marketing_variety_code
     :data_type: :string
@@ -370,7 +386,7 @@
     :group_max: false
   std_size:
     :name: std_size
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Std size
     :namespaced_name: std_fruit_size_counts.size_count_value
     :data_type: :string
@@ -386,7 +402,7 @@
     :group_max: false
   size_ref:
     :name: size_ref
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Size ref
     :namespaced_name: fruit_size_references.size_reference
     :data_type: :string
@@ -402,7 +418,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Actual count
     :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
     :data_type: :string
@@ -418,7 +434,7 @@
     :group_max: false
   basic_pack:
     :name: basic_pack
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Basic pack
     :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
@@ -434,7 +450,7 @@
     :group_max: false
   std_pack:
     :name: std_pack
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Std pack
     :namespaced_name: standard_pack_codes.standard_pack_code
     :data_type: :string
@@ -450,7 +466,7 @@
     :group_max: false
   marketer:
     :name: marketer
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Marketer
     :namespaced_name: 
     :data_type: :string
@@ -466,7 +482,7 @@
     :group_max: false
   mark:
     :name: mark
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Mark
     :namespaced_name: marks.mark_code
     :data_type: :string
@@ -482,7 +498,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Inventory code
     :namespaced_name: inventory_codes.inventory_code
     :data_type: :string
@@ -498,7 +514,7 @@
     :group_max: false
   resource_allocation_id:
     :name: resource_allocation_id
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Resource allocation
     :namespaced_name: carton_labels.product_resource_allocation_id
     :data_type: :string
@@ -514,7 +530,7 @@
     :group_max: false
   product_setup_id:
     :name: product_setup_id
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Product setup
     :namespaced_name: product_resource_allocations.product_setup_id
     :data_type: :string
@@ -530,7 +546,7 @@
     :group_max: false
   product_setup_template:
     :name: product_setup_template
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Product setup template
     :namespaced_name: product_setup_templates.template_name
     :data_type: :string
@@ -546,7 +562,7 @@
     :group_max: false
   pm_bom:
     :name: pm_bom
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Pm bom
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
@@ -562,7 +578,7 @@
     :group_max: false
   treatments:
     :name: treatments
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Treatments
     :namespaced_name: 
     :data_type: :string
@@ -578,7 +594,7 @@
     :group_max: false
   client_size_ref:
     :name: client_size_ref
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Client size ref
     :namespaced_name: carton_labels.client_size_reference
     :data_type: :string
@@ -594,7 +610,7 @@
     :group_max: false
   client_product_code:
     :name: client_product_code
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Client product code
     :namespaced_name: carton_labels.client_product_code
     :data_type: :string
@@ -610,7 +626,7 @@
     :group_max: false
   marketing_order_number:
     :name: marketing_order_number
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Marketing order number
     :namespaced_name: carton_labels.marketing_order_number
     :data_type: :string
@@ -626,7 +642,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Packed tm group
     :namespaced_name: target_market_groups.target_market_group_name
     :data_type: :string
@@ -642,7 +658,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -658,7 +674,7 @@
     :group_max: false
   subtype_code:
     :name: subtype_code
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Subtype code
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
@@ -674,7 +690,7 @@
     :group_max: false
   pm_type_code:
     :name: pm_type_code
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Pm type code
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
@@ -690,7 +706,7 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet.cartons_per_pallet
     :data_type: :integer
@@ -706,7 +722,7 @@
     :group_max: false
   product_code:
     :name: product_code
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Product code
     :namespaced_name: pm_products.product_code
     :data_type: :string
@@ -722,7 +738,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Gross weight
     :namespaced_name: cartons.gross_weight
     :data_type: :number
@@ -738,7 +754,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: Nett weight
     :namespaced_name: cartons.nett_weight
     :data_type: :number
@@ -754,7 +770,7 @@
     :group_max: false
   pick_ref:
     :name: pick_ref
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Pick ref
     :namespaced_name: carton_labels.pick_ref
     :data_type: :string
@@ -770,7 +786,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -786,7 +802,7 @@
     :group_max: false
   carton_label_id:
     :name: carton_label_id
-    :sequence_no: 46
+    :sequence_no: 47
     :caption: Carton label
     :namespaced_name: cartons.carton_label_id
     :data_type: :integer
@@ -923,4 +939,12 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 5
+  :list_def: 
+- :column: carton_labels.pallet_number
+  :caption: Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
   :list_def: 
