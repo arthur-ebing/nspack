@@ -256,6 +256,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'load', Integer do |load_id|
         r.get do
           form_state = interactor.current_load_truck.form_state
+          r.redirect('/rmd/dispatch/load_truck/load') if form_state.empty?
+
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :load_truck,
                                          progress: interactor.current_load_truck.progress,
