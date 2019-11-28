@@ -100,10 +100,6 @@ module MesscadaApp
       DB[:pallet_sequences].insert(pallet_sequence)
     end
 
-    def replace_sequences(new_pallet_sequence, pallet_sequence_id)
-      DB[:pallet_sequences].where(id: pallet_sequence_id).update(new_pallet_sequence)
-    end
-
     # def create_pallet_and_sequences(pallet, pallet_sequence)
     #   id = DB[:pallets].insert(pallet)
     #
