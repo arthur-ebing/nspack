@@ -302,9 +302,9 @@ module MasterfilesApp
       details
     end
 
-    def for_select_party_roles(role = 'TRANSPORTER')
+    def for_select_party_roles(role = 'TRANSPORTER', active: true)
       DB[:party_roles].where(
-        role_id: DB[:roles].where(name: role).select(:id)
+        role_id: DB[:roles].where(name: role).select(:id), active: active
       ).select(
         :id,
         Sequel.function(:fn_party_role_name, :id)

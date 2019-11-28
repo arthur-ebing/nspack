@@ -40,7 +40,8 @@ module ProductionApp
     end
 
     def test_update_production_run
-      id = create_production_run
+      # Make template null to bypass template validation
+      id = create_production_run(product_setup_template_id: nil)
       attrs = interactor.send(:repo).find_hash(:production_runs, id).reject { |k, _| k == :id }
       value = attrs[:active_run_stage]
       attrs[:active_run_stage] = 'a_change'
