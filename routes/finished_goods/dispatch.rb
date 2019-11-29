@@ -353,13 +353,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'consignee_changed' do
+      r.on 'customer_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
         else
+          actions = []
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
-          value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
-          json_change_select_value('load_final_receiver_party_role_id', value)
+          consignee_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_CONSIGNEE, party_id)
+          receiver_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
+
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_consignee_party_role_id', value: consignee_value)
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_final_receiver_party_role_id', value: receiver_value)
+          json_actions(actions)
         end
       end
 

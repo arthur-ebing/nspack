@@ -1,0 +1,53 @@
+---
+:dataminer_definition: govt_inspection_sheets
+:actions:
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/add_pallet"
+  :text: add pallets
+  :icon: document-add
+  :hide_if_true: completed
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: completed
+  :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
+  :text: delete
+  :icon: delete
+  :hide_if_true: completed
+  :is_delete: true
+  :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/complete_inspection"
+  :text: complete inspection
+  :icon: edit
+  :hide_if_false: completed
+  :hide_if_true: inspected
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: edit
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/uncomplete"
+  :text: uncomplete sheet
+  :icon: edit-pencil
+  :hide_if_false: completed
+  :hide_if_true: inspected
+  :prompt: 'Are you sure you want to Uncomplete this Inspection Sheet?'
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/govt_inspection_sheets/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/inspection/govt_inspection_sheets/new"
+  :text: New Govt Inspection Sheet
+  :style: :button

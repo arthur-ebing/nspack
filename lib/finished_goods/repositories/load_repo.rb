@@ -50,10 +50,11 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
-    def find_pallet_numbers_from(pallet_sequence_id: nil, load_id: nil)
+    def find_pallet_numbers_from(pallet_sequence_id: nil, load_id: nil, pallet_id: nil)
       ds = DB[:pallets]
       ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
       ds = ds.where(load_id: load_id) unless load_id.nil?
+      ds = ds.where(id: pallet_id) unless pallet_id.nil?
       ds.select_map(:pallet_number).flatten
     end
 
@@ -78,11 +79,11 @@ module FinishedGoodsApp
       return ok_response if pallet_ids.empty?
 
       DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
-      log_multiple_statuses('pallets', pallet_ids, 'ALLOCATED', user_name: user_name)
+      log_multiple_statuses(:pallets, pallet_ids, 'ALLOCATED', user_name: user_name)
 
       # updates load status allocated
       DB[:loads].where(id: load_id).update(allocated: true, allocated_at: Time.now)
-      log_status('loads', load_id, 'ALLOCATED', user_name: user_name)
+      log_status(:loads, load_id, 'ALLOCATED', user_name: user_name)
 
       ok_response
     end
@@ -91,7 +92,7 @@ module FinishedGoodsApp
       return ok_response if pallet_ids.empty?
 
       DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
-      log_multiple_statuses('pallets', pallet_ids, 'UNALLOCATED', user_name: user_name)
+      log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user_name)
 
       # find unallocated loads
       allocated_loads = DB[:pallets].where(load_id: load_id).distinct.select_map(:load_id)
@@ -100,7 +101,7 @@ module FinishedGoodsApp
       # log status for loads where all pallets have been unallocated
       unless unallocated_loads.empty?
         DB[:loads].where(id: unallocated_loads).update(allocated: false)
-        log_multiple_statuses('loads', unallocated_loads, 'UNALLOCATED', user_name: user_name)
+        log_multiple_statuses(:loads, unallocated_loads, 'UNALLOCATED', user_name: user_name)
       end
 
       ok_response

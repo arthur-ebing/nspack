@@ -91,6 +91,12 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_BILLING_CLIENT = 'BILLING_CLIENT'
   ROLE_CONSIGNEE = 'CONSIGNEE'
   ROLE_HAULIER = 'HAULIER'
+  ROLE_INSPECTOR = 'INSPECTOR'
+  ROLE_INSPECTION_BILLING = 'INSPECTION_BILLING'
+
+  # Default roles
+  DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
+  DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
 
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'
@@ -237,10 +243,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
 
   # Depots: Depot Code
-  DEPOT_LOCATION_CODE = ENV.fetch('DEPOT_LOCATION_CODE')
+  DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
 
   # Load_containers:
-  VGM_REQUIRED = make_boolean('VGM_REQUIRED')
+  VGM_REQUIRED = make_boolean(ENV['VGM_REQUIRED'])
 
   # Constants for port types:
   PORT_TYPE_POL = 'POL'

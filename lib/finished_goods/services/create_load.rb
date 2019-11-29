@@ -44,7 +44,7 @@ module FinishedGoodsApp
       load_attrs[:pol_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id, port_id: params[:pol_port_id])
       load_attrs[:pod_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id, port_id: params[:pod_port_id])
       @load_id = repo.create_load(load_attrs)
-      repo.log_status('loads', load_id, 'CREATED', user_name: user_name)
+      repo.log_status(:loads, load_id, 'CREATED', user_name: user_name)
     end
 
     def create_load_voyage
@@ -55,7 +55,7 @@ module FinishedGoodsApp
       load_voyage_attrs[:load_id] = load_id
       load_voyage_attrs[:voyage_id] = voyage_id
       load_voyages_id = LoadVoyageRepo.new.create_load_voyage(load_voyage_attrs)
-      repo.log_status('load_voyages', load_voyages_id, 'CREATED', user_name: user_name)
+      repo.log_status(:load_voyages, load_voyages_id, 'CREATED', user_name: user_name)
     end
 
     def repo

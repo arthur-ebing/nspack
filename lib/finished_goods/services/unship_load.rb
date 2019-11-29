@@ -32,21 +32,21 @@ module FinishedGoodsApp
 
     def unship_load
       repo.unship_load(load_id)
-      repo.log_status('loads', load_id, 'UNSHIPPED', user_name: user_name)
+      repo.log_status(:loads, load_id, 'UNSHIPPED', user_name: user_name)
 
       ok_response
     end
 
     def unship_pallets
       repo.unship_pallets(pallet_ids)
-      repo.log_multiple_statuses('pallets', pallet_ids, 'UNSHIPPED', user_name: user_name)
+      repo.log_multiple_statuses(:pallets, pallet_ids, 'UNSHIPPED', user_name: user_name)
 
       ok_response
     end
 
     def unship_unallocate_pallet
       repo.unship_pallets(pallet_ids)
-      repo.log_multiple_statuses('pallets', pallet_ids, 'UNSHIPPED', user_name: user_name)
+      repo.log_multiple_statuses(:pallets, pallet_ids, 'UNSHIPPED', user_name: user_name)
       repo.unallocate_pallets(load_id, pallet_ids, user_name)
 
       ok_response

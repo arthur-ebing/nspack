@@ -4,7 +4,10 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module FinishedGoodsApp
   class TestLoadVoyageInteractor < MiniTestWithHooks
+    include LoadFactory
+    include VoyageFactory
     include LoadVoyageFactory
+    include MasterfilesApp::DepotFactory
     include MasterfilesApp::PartyFactory
 
     def test_repo

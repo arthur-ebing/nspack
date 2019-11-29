@@ -1,0 +1,299 @@
+---
+:caption: Govt Inspection Pallets
+:sql: "SELECT\r\n    fn_current_status('pallets', govt_inspection_pallets.pallet_id)
+  AS status,\r\n    pallets.pallet_number,\r\n    govt_inspection_pallets.id,\r\n
+  \   govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
+  \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
+  \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
+  \   inspection_failure_reasons.failure_reason,\r\n    govt_inspection_pallets.failure_remarks,\r\n
+  \   govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
+  \   govt_inspection_pallets.updated_at,\r\n    govt_inspection_sheets.completed,\r\n
+  \   govt_inspection_sheets.inspected AS sheet_inspected\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
+  govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
+  JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nJOIN
+  pallets ON pallets.id = govt_inspection_pallets.pallet_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  status:
+    :name: status
+    :sequence_no: 1
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 2
+    :caption: Pallet number
+    :namespaced_name: pallets.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 3
+    :caption: Id
+    :namespaced_name: govt_inspection_pallets.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 4
+    :caption: Pallet
+    :namespaced_name: govt_inspection_pallets.pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_inspection_sheet_id:
+    :name: govt_inspection_sheet_id
+    :sequence_no: 5
+    :caption: Govt inspection sheet
+    :namespaced_name: govt_inspection_pallets.govt_inspection_sheet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 6
+    :caption: Passed
+    :namespaced_name: govt_inspection_pallets.passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected:
+    :name: inspected
+    :sequence_no: 7
+    :caption: Inspected
+    :namespaced_name: govt_inspection_pallets.inspected
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected_at:
+    :name: inspected_at
+    :sequence_no: 8
+    :caption: Inspected at
+    :namespaced_name: govt_inspection_pallets.inspected_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_reason_id:
+    :name: failure_reason_id
+    :sequence_no: 9
+    :caption: Failure reason
+    :namespaced_name: govt_inspection_pallets.failure_reason_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_reason:
+    :name: failure_reason
+    :sequence_no: 10
+    :caption: Failure reason
+    :namespaced_name: inspection_failure_reasons.failure_reason
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_remarks:
+    :name: failure_remarks
+    :sequence_no: 11
+    :caption: Failure remarks
+    :namespaced_name: govt_inspection_pallets.failure_remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: govt_inspection_pallets.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: govt_inspection_pallets.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: govt_inspection_pallets.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 15
+    :caption: Completed
+    :namespaced_name: govt_inspection_sheets.completed
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sheet_inspected:
+    :name: sheet_inspected
+    :sequence_no: 16
+    :caption: Sheet inspected
+    :namespaced_name: govt_inspection_sheets.inspected
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: govt_inspection_pallets.pallet_id
+  :caption: Pallet
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pallet_number, id FROM pallets ORDER BY pallet_number
+- :column: govt_inspection_pallets.failure_reason_id
+  :caption: Failure reason
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT failure_reason, id FROM inspection_failure_reasons ORDER BY failure_reason
+- :column: govt_inspection_pallets.govt_inspection_sheet_id
+  :caption: Govt inspection sheet id
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

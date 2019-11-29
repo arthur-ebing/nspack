@@ -121,7 +121,6 @@ module UiRules
         depot_id: { renderer: :select,
                     options: MasterfilesApp::DepotRepo.new.for_select_depots,
                     disabled_options: MasterfilesApp::DepotRepo.new.for_select_inactive_depots,
-                    selected: MasterfilesApp::DepotRepo.new.find_depot_id(AppConst::DEPOT_LOCATION_CODE),
                     caption: 'Depot',
                     required: true },
         exporter_certificate_code: {},
@@ -194,7 +193,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: nil,
+      @form_object = OpenStruct.new(depot_id: MasterfilesApp::DepotRepo.new.find_depot_id(AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,
@@ -218,7 +217,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :consignee_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/consignee_changed' }] if @mode == :new
+        behaviour.dropdown_change :customer_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/customer_changed' }] if @mode == :new
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
