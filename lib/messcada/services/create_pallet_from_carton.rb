@@ -54,16 +54,17 @@ module MesscadaApp
     end
 
     def set_pallet_params
-      {
+      params = {
         status: AppConst::PALLETIZED_NEW_PALLET,
         location_id: resource_location,
         phc: carton[:phc],
         fruit_sticker_pm_product_id: carton[:fruit_sticker_pm_product_id],
         pallet_format_id: carton[:pallet_format_id],
         plt_packhouse_resource_id: carton[:packhouse_resource_id],
-        plt_line_resource_id: carton[:production_line_id],
-        pallet_number: carton[:pallet_number]
+        plt_line_resource_id: carton[:production_line_id]
       }
+      params[:pallet_number] = carton[:pallet_number] if AppConst::CARTON_EQUALS_PALLET
+      params
     end
 
     def resource_location

@@ -112,7 +112,7 @@ module UiRules
           prompt: true,
           required: true
         }
-        pucs = if @form_object.farm_id.nil?
+        pucs = if @form_object.farm_id.nil_or_empty?
                  []
                else
                  @farm_repo.selected_farm_pucs(@form_object.farm_id)
@@ -124,7 +124,7 @@ module UiRules
           caption: 'Puc',
           required: true
         }
-        orchards = if @form_object.farm_id.nil? || @form_object.puc_id.nil?
+        orchards = if @form_object.farm_id.nil_or_empty? || @form_object.puc_id.nil_or_empty?
                      []
                    else
                      @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id)
@@ -136,19 +136,19 @@ module UiRules
           caption: 'Orchard'
         }
       end
-      cultivar_groups = if @form_object.orchard_id.nil?
+      cultivar_groups = if @form_object.orchard_id.nil_or_empty?
                           []
                         else
                           orchard = @farm_repo.find_orchard(@form_object.orchard_id)
                           group_ids = @cultivar_repo.all_hash(:cultivars, id: orchard.cultivar_ids.to_a).map { |rec| rec[:cultivar_group_id] }.uniq
                           @cultivar_repo.for_select_cultivar_groups(where: { id: group_ids })
                         end
-      cultivars = if @form_object.cultivar_group_id.nil?
+      cultivars = if @form_object.cultivar_group_id.nil_or_empty?
                     []
                   else
                     @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id })
                   end
-      seasons = if @form_object.cultivar_group_id.nil?
+      seasons = if @form_object.cultivar_group_id.nil_or_empty?
                   []
                 else
                   MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id)
@@ -290,13 +290,13 @@ module UiRules
     end
 
     def cloned_run_label
-      return '' if @form_object.cloned_from_run_id.nil?
+      return '' if @form_object.cloned_from_run_id.nil_or_empty?
 
       @form_object.cloned_from_run_code
     end
 
     def product_setup_template_name
-      return '' if @form_object.product_setup_template_id.nil?
+      return '' if @form_object.product_setup_template_id.nil_or_empty?
 
       @form_object.template_name
     end

@@ -10,6 +10,7 @@ Sequel.migration do
 
     unless ENV['RACK_ENV'] == 'test'
       # Insert the required lookup value - but ignore if it is already in place:
+      run "INSERT INTO uom_types SET code = 'INVENTORY' ON CONFLICT DO NOTHING;"
       run "INSERT INTO uoms (uom_type_id, uom_code) VALUES ((SELECT id FROM uom_types WHERE code = 'INVENTORY'), 'EACH') ON CONFLICT DO NOTHING;"
 
       run "UPDATE std_fruit_size_counts SET uom_id = (SELECT id FROM uoms WHERE uom_code = 'EACH' AND uom_type_id = (SELECT id FROM uom_types WHERE code = 'INVENTORY'));"

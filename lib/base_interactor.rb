@@ -198,7 +198,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
       log_transaction
       DevelopmentApp::ProcessStateChangeEvent.call(id, table_name, status_change, @user.user_name, opts[:params])
     end
-    success_response((opts[:status_text] || status_change.to_s).capitalize)
+    success_response((opts[:status_text] || status_change.to_s).gsub('_', ' ').capitalize)
   end
 
   # Log the status of multiple records. Uses the context passed to the Interactor constructor.

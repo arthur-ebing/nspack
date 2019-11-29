@@ -21,6 +21,10 @@ module ProductionApp
                         'RUNNING',
                         comment: changeset[:active_run_stage],
                         user_name: user_name)
+        # Kick off a job to send the new button labels to MesServer
+        # get all CLM buttons for a line and if not allocated, set "unallocated" else set to the count.
+        # get all BVM buttons for a line and if not allocated, set "unallocated" else set to the tare.
+        # Separate calls for JF? or all in one XML string?
       end
       success_response('Run is executing', changeset.to_h.merge(status: 'RUNNING'))
     end
