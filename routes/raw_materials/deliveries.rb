@@ -120,17 +120,14 @@ class Nspack < Roda # rubocop:disable ClassLength
               qty_inner_bins
               production_run_rebin_id
               production_run_tipped_id
-              production_run_tipping_id
               bin_tipping_plant_resource_id
               bin_fullness
               nett_weight
               gross_weight
               bin_tipped
-              tipping
               bin_received_date_time
               bin_tipped_date_time
               exit_ref_date_time
-              bin_tipping_started_date_time
               rebin_created_at
               scrapped
               scrapped_at
@@ -292,17 +289,14 @@ class Nspack < Roda # rubocop:disable ClassLength
               qty_inner_bins
               production_run_rebin_id
               production_run_tipped_id
-              production_run_tipping_id
               bin_tipping_plant_resource_id
               bin_fullness
               nett_weight
               gross_weight
               bin_tipped
-              tipping
               bin_received_date_time
               bin_tipped_date_time
               exit_ref_date_time
-              bin_tipping_started_date_time
               rebin_created_at
               scrapped
               scrapped_at

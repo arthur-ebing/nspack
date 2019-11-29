@@ -23,17 +23,14 @@ module RawMaterialsApp
     attribute :qty_inner_bins, Types::Integer
     attribute :production_run_rebin_id, Types::Integer
     attribute :production_run_tipped_id, Types::Integer
-    attribute :production_run_tipping_id, Types::Integer
     attribute :bin_tipping_plant_resource_id, Types::Integer
     attribute :bin_fullness, Types::String
     attribute :nett_weight, Types::Decimal
     attribute :gross_weight, Types::Decimal
     attribute :bin_tipped, Types::Bool
-    attribute :tipping, Types::Bool
     attribute :bin_received_date_time, Types::DateTime
     attribute :bin_tipped_date_time, Types::DateTime
     attribute :exit_ref_date_time, Types::DateTime
-    attribute :bin_tipping_started_date_time, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool
@@ -62,17 +59,14 @@ module RawMaterialsApp
     attribute :qty_inner_bins, Types::Integer
     attribute :production_run_rebin_id, Types::Integer
     attribute :production_run_tipped_id, Types::Integer
-    attribute :production_run_tipping_id, Types::Integer
     attribute :bin_tipping_plant_resource_id, Types::Integer
     attribute :bin_fullness, Types::String
     attribute :nett_weight, Types::Decimal
     attribute :gross_weight, Types::Decimal
     attribute :bin_tipped, Types::Bool
-    attribute :tipping, Types::Bool
     attribute :bin_received_date_time, Types::DateTime
     attribute :bin_tipped_date_time, Types::DateTime
     attribute :exit_ref_date_time, Types::DateTime
-    attribute :bin_tipping_started_date_time, Types::DateTime
     attribute :rebin_created_at, Types::DateTime
     attribute :scrapped_at, Types::DateTime
     attribute? :scrapped, Types::Bool
