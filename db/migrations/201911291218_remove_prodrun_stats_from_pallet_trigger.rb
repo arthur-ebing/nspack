@@ -53,11 +53,13 @@ Sequel.migration do
       $BODY$
         DECLARE
           plt_qty INTEGER;
-          plt_gross DECIMAL;
-          plt_nett DECIMAL;
+          plt_gross NUMERIC;
+          plt_nett NUMERIC;
+          other_nett NUMERIC;
           other_qty INTEGER;
           tot_qty INTEGER;
-          calc_nett DECIMAL;
+          calc_nett NUMERIC;
+          std_pack_material_mass NUMERIC;
         BEGIN
           EXECUTE 'SELECT carton_quantity, gross_weight, nett_weight FROM pallets WHERE id = $1'
           INTO plt_qty, plt_gross, plt_nett
@@ -72,22 +74,31 @@ Sequel.migration do
           ELSE
             tot_qty = other_qty + NEW.carton_quantity;
           END IF;
-          calc_nett = fn_calculate_pallet_nett_weight(NEW.pallet_id, plt_gross);
+          other_nett = fn_calculate_pallet_nett_weight_without_seq(NEW.pallet_id, NEW.id, plt_gross);
+
+          EXECUTE 'SELECT material_mass
+                   FROM standard_pack_codes
+                   WHERE id = $1'
+          INTO std_pack_material_mass
+          USING NEW.id;
+
+          calc_nett = other_nett - COALESCE((NEW.carton_quantity * std_pack_material_mass), 0);
 
           IF (calc_nett <> plt_nett) THEN
             EXECUTE 'UPDATE pallets SET nett_weight = $2 WHERE id = $1'
             USING NEW.pallet_id, calc_nett;
-
-            EXECUTE 'UPDATE pallet_sequences SET nett_weight = (carton_quantity / $2::numeric) * $3
-                     WHERE pallet_id = $1
-                       AND id <> COALESCE($4, -1)
-                       AND carton_quantity <> 0'
-            USING NEW.pallet_id, tot_qty, calc_nett, NEW.id;
           END IF;
 
-          -- SHOULD A SEQ HAVE ITS NETT SET TO ZERO ON SCRAP?
-          IF (NEW.carton_quantity <> 0) THEN
-            NEW.nett_weight = NEW.carton_quantity / tot_qty * calc_nett;
+          EXECUTE 'UPDATE pallet_sequences SET nett_weight = (carton_quantity / $2::numeric) * $3
+                   WHERE pallet_id = $1
+                     AND id <> COALESCE($4, -1)
+                     AND carton_quantity <> 0'
+          USING NEW.pallet_id, tot_qty, calc_nett, NEW.id;
+
+          IF (NEW.carton_quantity = 0) THEN
+            NEW.nett_weight = 0;
+          ELSE
+            NEW.nett_weight = NEW.carton_quantity / tot_qty::numeric * calc_nett;
           END IF;
 
           RETURN NEW;
@@ -134,46 +145,42 @@ Sequel.migration do
             tot_qty = other_qty + NEW.carton_quantity;
           END IF;
 
-          IF (plt_qty <> tot_qty) THEN
-            EXECUTE 'SELECT cartons_per_pallet_id
-                     FROM pallet_Sequences
-                     WHERE id = (SELECT MIN(pallet_sequence_number)
-                                 FROM pallet_sequences
-                                 WHERE pallet_id = $1
-                                   AND scrapped_at IS NULL)'
-            INTO cpp_id
-            USING NEW.pallet_id;
+          EXECUTE 'SELECT cartons_per_pallet_id
+                   FROM pallet_Sequences
+                   WHERE id = (SELECT MIN(pallet_sequence_number)
+                               FROM pallet_sequences
+                               WHERE pallet_id = $1
+                                 AND scrapped_at IS NULL)'
+          INTO cpp_id
+          USING NEW.pallet_id;
 
-            EXECUTE 'SELECT cartons_per_pallet
-                     FROM cartons_per_pallet
-                     WHERE id = $1'
-            INTO cartons_per_pallet
-            USING COALESCE(cpp_id, NEW.cartons_per_pallet_id);
+          EXECUTE 'SELECT cartons_per_pallet
+                   FROM cartons_per_pallet
+                   WHERE id = $1'
+          INTO cartons_per_pallet
+          USING COALESCE(cpp_id, NEW.cartons_per_pallet_id);
 
-            IF (cartons_per_pallet IS NULL) THEN
-                RAISE EXCEPTION 'Cannot calculate a build_status. There is no cartons_per_pallet set';
-            END IF;
-
-            calc_build_status = fn_calculate_pallet_build_status(tot_qty, cartons_per_pallet);
-
-            IF (calc_build_status <> plt_build_status) THEN
-              CASE calc_build_status
-                WHEN 'FULL' THEN
-                  EXECUTE 'UPDATE pallets SET build_status = $2, palletized = true, partially_palletized = false, palletized_at = $3, carton_quantity = $4
-                           WHERE id = $1'
-                  USING NEW.pallet_id, calc_build_status, current_timestamp, tot_qty;
-                WHEN 'PARTIAL', 'OVERFULL' THEN
-                  EXECUTE 'UPDATE pallets SET build_status = $2, palletized = false, partially_palletized = true, partially_palletized_at = $3, carton_quantity = $4
-                           WHERE id = $1'
-                  USING NEW.pallet_id, calc_build_status, current_timestamp, tot_qty;
-              END CASE;
-            ELSE
-              EXECUTE 'UPDATE pallets SET carton_quantity = $2 WHERE id = $1'
-              USING NEW.pallet_id, tot_qty;
-            END IF;
+          IF (cartons_per_pallet IS NULL) THEN
+              RAISE EXCEPTION 'Cannot calculate a build_status. There is no cartons_per_pallet set';
           END IF;
 
-          -- [[[[[ WHAT IF pseq moved from one pallet to another... Will this fire?  ]]]]]
+          calc_build_status = fn_calculate_pallet_build_status(tot_qty, cartons_per_pallet);
+
+          IF (calc_build_status <> plt_build_status) THEN
+            CASE calc_build_status
+              WHEN 'FULL' THEN
+                EXECUTE 'UPDATE pallets SET build_status = $2, palletized = true, partially_palletized = false, palletized_at = $3, carton_quantity = $4
+                         WHERE id = $1'
+                USING NEW.pallet_id, calc_build_status, current_timestamp, tot_qty;
+              WHEN 'PARTIAL', 'OVERFULL' THEN
+                EXECUTE 'UPDATE pallets SET build_status = $2, palletized = false, partially_palletized = true, partially_palletized_at = $3, carton_quantity = $4
+                         WHERE id = $1'
+                USING NEW.pallet_id, calc_build_status, current_timestamp, tot_qty;
+            END CASE;
+          ELSE
+            EXECUTE 'UPDATE pallets SET carton_quantity = $2 WHERE id = $1'
+            USING NEW.pallet_id, tot_qty;
+          END IF;
 
           RETURN NEW;
         END
@@ -189,9 +196,9 @@ Sequel.migration do
       FOR EACH ROW
       EXECUTE PROCEDURE public.fn_pallet_seq_build_status_calc();
 
-      -- ======================================================================
-      -- CHANGE nett weight calculation to ignore scrapped sequences (qty == 0)
-      -- ======================================================================
+      -- ========================================================
+      -- CHANGE nett weight calculation to incorporate carton qty
+      -- ========================================================
 
       CREATE OR REPLACE FUNCTION public.fn_calculate_pallet_nett_weight(
           in_id integer,
@@ -202,11 +209,10 @@ Sequel.migration do
           plt_std_pack_material_mass DECIMAL;
           plt_base_material_mass DECIMAL;
         BEGIN
-          EXECUTE 'SELECT COALESCE(SUM(standard_pack_codes.material_mass), 0)
+          EXECUTE 'SELECT COALESCE(SUM(standard_pack_codes.material_mass * carton_quantity), 0)
                    FROM pallet_sequences
                    JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
-                   WHERE pallet_sequences.pallet_id = $1
-                     AND pallet_sequences.carton_quantity <> 0'
+                   WHERE pallet_sequences.pallet_id = $1'
           INTO plt_std_pack_material_mass
           USING in_id;
 
@@ -224,6 +230,44 @@ Sequel.migration do
         LANGUAGE plpgsql VOLATILE
         COST 100;
       ALTER FUNCTION public.fn_calculate_pallet_nett_weight(integer, numeric)
+        OWNER TO postgres;
+
+      -- =================================================================
+      -- CREATE nett weight calculation that ignores a particular sequence
+      -- =================================================================
+
+      CREATE OR REPLACE FUNCTION public.fn_calculate_pallet_nett_weight_without_seq(
+          in_id integer,
+          seq_id integer,
+          plt_gross_weight numeric)
+        RETURNS numeric AS
+      $BODY$
+        DECLARE
+          plt_std_pack_material_mass DECIMAL;
+          plt_base_material_mass DECIMAL;
+        BEGIN
+          EXECUTE 'SELECT COALESCE(SUM(standard_pack_codes.material_mass * carton_quantity), 0)
+                   FROM pallet_sequences
+                   JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
+                   WHERE pallet_sequences.pallet_id = $1
+                     AND pallet_sequences.id <> $2'
+          INTO plt_std_pack_material_mass
+          USING in_id, seq_id;
+
+          EXECUTE 'SELECT COALESCE(pallet_bases.material_mass, 0)
+                   FROM pallets
+                   LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
+                   LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+                   WHERE pallets.id = $1'
+          INTO plt_base_material_mass
+          USING in_id;
+
+          RETURN plt_gross_weight - (plt_std_pack_material_mass + plt_base_material_mass);
+        END
+      $BODY$
+        LANGUAGE plpgsql VOLATILE
+        COST 100;
+      ALTER FUNCTION public.fn_calculate_pallet_nett_weight_without_seq(integer, integer, numeric)
         OWNER TO postgres;
     SQL
   end
@@ -363,6 +407,7 @@ Sequel.migration do
       DROP TRIGGER pallet_sequences_update_pallet_build_status ON public.pallet_sequences;
       DROP FUNCTION public.fn_pallet_seq_build_status_calc();
 
+      DROP FUNCTION fn_calculate_pallet_nett_weight_without_seq(integer, integer, numeric);
 
       CREATE OR REPLACE FUNCTION public.fn_calculate_pallet_nett_weight(
           in_id integer,
