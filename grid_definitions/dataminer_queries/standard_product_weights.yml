@@ -1,0 +1,207 @@
+---
+:caption: Standard Product Weights
+:sql: SELECT "standard_product_weights"."id", "standard_product_weights"."commodity_id",
+  "standard_product_weights"."standard_pack_id", "standard_product_weights"."gross_weight",
+  "standard_product_weights"."nett_weight", "standard_product_weights"."active", "standard_product_weights"."created_at",
+  "standard_product_weights"."updated_at", "commodities"."code" AS commodity_code,
+  "standard_pack_codes"."standard_pack_code", fn_current_status('standard_product_weights',
+  "standard_product_weights"."id") AS status FROM "standard_product_weights" JOIN
+  "commodities" ON "commodities"."id" = "standard_product_weights"."commodity_id"
+  JOIN "standard_pack_codes" ON "standard_pack_codes"."id" = "standard_product_weights"."standard_pack_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: standard_product_weights.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_id:
+    :name: commodity_id
+    :sequence_no: 2
+    :caption: Commodity
+    :namespaced_name: standard_product_weights.commodity_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_id:
+    :name: standard_pack_id
+    :sequence_no: 3
+    :caption: Standard pack
+    :namespaced_name: standard_product_weights.standard_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 4
+    :caption: Gross weight
+    :namespaced_name: standard_product_weights.gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 5
+    :caption: Nett weight
+    :namespaced_name: standard_product_weights.nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 6
+    :caption: Active
+    :namespaced_name: standard_product_weights.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: standard_product_weights.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: standard_product_weights.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  commodity_code:
+    :name: commodity_code
+    :sequence_no: 9
+    :caption: Commodity code
+    :namespaced_name: commodities.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_code:
+    :name: standard_pack_code
+    :sequence_no: 10
+    :caption: Standard pack code
+    :namespaced_name: standard_pack_codes.standard_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 11
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: standard_product_weights.commodity_id
+  :caption: Commodity
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM commodities ORDER BY code
+- :column: standard_product_weights.standard_pack_id
+  :caption: Standard pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT standard_pack_code, id FROM standard_pack_codes ORDER BY standard_pack_code

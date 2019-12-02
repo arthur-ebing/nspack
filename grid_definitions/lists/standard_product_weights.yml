@@ -1,0 +1,30 @@
+---
+:dataminer_definition: standard_product_weights
+:actions:
+- :url: "/masterfiles/fruit/standard_product_weights/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/fruit/standard_product_weights/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/fruit/standard_product_weights/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/standard_product_weights/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/fruit/standard_product_weights/new"
+  :text: New Standard Product Weight
+  :style: :button
+  :behaviour: :popup

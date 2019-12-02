@@ -46,6 +46,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'commodity_groups' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -66,6 +67,7 @@ class Nspack < Roda
         end
       end
     end
+
     # COMMODITIES
     # --------------------------------------------------------------------------
     r.on 'commodities', Integer do |id|
@@ -113,6 +115,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'commodities' do
       interactor = MasterfilesApp::CommodityInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -142,6 +145,7 @@ class Nspack < Roda
         end
       end
     end
+
     # CULTIVAR GROUPS
     # --------------------------------------------------------------------------
     r.on 'cultivar_groups', Integer do |id|
@@ -180,6 +184,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'cultivar_groups' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -212,6 +217,7 @@ class Nspack < Roda
         end
       end
     end
+
     # CULTIVARS
     # --------------------------------------------------------------------------
     r.on 'cultivars', Integer do |id|
@@ -292,6 +298,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'cultivars' do
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -312,6 +319,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'marketing_varieties', Integer do |id|
       interactor = MasterfilesApp::CultivarInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -342,6 +350,7 @@ class Nspack < Roda
         end
       end
     end
+
     # BASIC PACK CODES
     # --------------------------------------------------------------------------
     r.on 'basic_pack_codes', Integer do |id|
@@ -386,6 +395,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'basic_pack_codes' do
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -406,6 +416,7 @@ class Nspack < Roda
         end
       end
     end
+
     # STANDARD PACK CODES
     # --------------------------------------------------------------------------
     r.on 'standard_pack_codes', Integer do |id|
@@ -452,6 +463,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'standard_pack_codes' do
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -472,6 +484,88 @@ class Nspack < Roda
         end
       end
     end
+
+    # STANDARD PRODUCT WEIGHTS
+    # --------------------------------------------------------------------------
+    r.on 'standard_product_weights', Integer do |id|
+      interactor = MasterfilesApp::StandardProductWeightInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:standard_product_weights, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('fruit', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Fruit::StandardProductWeight::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('fruit', 'read')
+          show_partial { Masterfiles::Fruit::StandardProductWeight::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_standard_product_weight(id, params[:standard_product_weight])
+          if res.success
+            row_keys = %i[
+              commodity_id
+              commodity_code
+              standard_pack_id
+              standard_pack_code
+              gross_weight
+              nett_weight
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Fruit::StandardProductWeight::Edit.call(id, form_values: params[:standard_product_weight], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('fruit', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_standard_product_weight(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'standard_product_weights' do
+      interactor = MasterfilesApp::StandardProductWeightInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::StandardProductWeight::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_standard_product_weight(params[:standard_product_weight])
+        if res.success
+          row_keys = %i[
+            id
+            commodity_id
+            commodity_code
+            standard_pack_id
+            standard_pack_code
+            gross_weight
+            nett_weight
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/fruit/standard_product_weights/new') do
+            Masterfiles::Fruit::StandardProductWeight::New.call(form_values: params[:standard_product_weight],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
+          end
+        end
+      end
+    end
+
     # STD FRUIT SIZE COUNTS
     # --------------------------------------------------------------------------
     r.on 'std_fruit_size_counts', Integer do |id|
@@ -539,6 +633,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'std_fruit_size_counts' do
       interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -559,6 +654,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'fruit_actual_counts_for_packs', Integer do |id|
       interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
