@@ -35,8 +35,7 @@ module ProductionApp
       rw_res = nil
       repo.transaction do
         rw_res = create_reworks_run_record(attrs, nil, nil)
-        log_status('reworks_runs', rw_res.instance[:reworks_run_id], 'CREATED')
-        log_transaction
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
       end
       rw_res
     rescue Crossbeams::InfoError => e
@@ -87,11 +86,12 @@ module ProductionApp
         new_id = repo.clone_pallet_sequence(sequence_id)
         reworks_run_attrs = reworks_run_attrs(new_id, reworks_run_type_id)
         instance = pallet_sequence(new_id)
-        rw_res = create_reworks_run_record(reworks_run_attrs, AppConst::REWORKS_ACTION_CLONE, before: {}, after: instance)
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_CLONE,
+                                           before: {}, after: instance)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_status('reworks_runs', rw_res.instance[:reworks_run_id], 'CREATED')
-        log_transaction
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
       end
       success_response('Pallet Sequence cloned successfully', instance)
     rescue Crossbeams::InfoError => e
@@ -110,24 +110,23 @@ module ProductionApp
     end
 
     def remove_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
-      before_attrs = changes_attrs(sequence_id)
+      before_attrs = sequence_changes(sequence_id)
       repo.transaction do
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
         repo.remove_pallet_sequence(sequence_id)
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_REMOVE,
-                                           before: before_attrs.sort.to_h, after: changes_attrs(sequence_id).sort.to_h)
+                                           before: before_attrs.sort.to_h, after: sequence_changes(sequence_id).sort.to_h)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_status('reworks_runs', rw_res.instance[:reworks_run_id], 'CREATED')
-        log_transaction
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
       end
       success_response('Pallet Sequence removed successfully', pallet_number: before_attrs.to_h[:pallet_number])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def changes_attrs(sequence_id)
+    def sequence_changes(sequence_id)
       instance = pallet_sequence(sequence_id)
       { removed_from_pallet: instance[:removed_from_pallet],
         removed_from_pallet_at: instance[:removed_from_pallet_at],
@@ -148,8 +147,7 @@ module ProductionApp
                                            before: { carton_quantity: old_instance[:carton_quantity] }, after: { carton_quantity: params[:column_value] })
         return validation_failed_response(rw_res) unless rw_res.success
 
-        log_status('reworks_runs', rw_res.instance[:reworks_run_id], 'CREATED')
-        log_transaction
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
       end
       instance = repo.reworks_run_pallet_seq_data(sequence_id)
       success_response('Pallet Sequence carton quantity updated successfully', instance)
@@ -198,13 +196,15 @@ module ProductionApp
       repo.transaction do
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
         reworks_run_attrs[:pallets_affected] = affected_pallet_numbers(sequence_id, attrs)
-        rw_res = create_reworks_run_record(reworks_run_attrs, AppConst::REWORKS_ACTION_SINGLE_EDIT, before: sequence_setup_attrs(sequence_id).sort.to_h, after: attrs.sort.to_h)
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_SINGLE_EDIT,
+                                           before: sequence_setup_attrs(sequence_id).sort.to_h, after: attrs.sort.to_h)
         return validation_failed_response(rw_res) unless rw_res.success
 
         pallet_id = pallet_sequence(sequence_id)[:pallet_id]
         log_status('pallets', pallet_id, AppConst::RW_PALLET_SINGLE_EDIT)
         log_status('pallet_sequences', sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
-        log_transaction
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
       end
       success_response('Pallet Sequence updated successfully', pallet_number: pallet_sequence_pallet_number(sequence_id).first)
     rescue Crossbeams::InfoError => e
@@ -223,6 +223,94 @@ module ProductionApp
       pallet_numbers = pallets_selected.join(',').split(/\n|,/).map(&:strip).reject(&:empty?)
       pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
       pallet_numbers.join("\n")
+    end
+
+    def production_run_details_table(production_run_id)
+      Crossbeams::Layout::Table.new([], ProductionApp::ReworksRepo.new.production_run_details(production_run_id), [], pivot: true).render
+    end
+
+    def farm_pucs(farm_id)
+      MasterfilesApp::FarmRepo.new.selected_farm_pucs(farm_id)
+    end
+
+    def puc_orchards(farm_id, puc_id)
+      MasterfilesApp::FarmRepo.new.selected_farm_orchard_codes(farm_id, puc_id)
+    end
+
+    def orchard_cultivars(cultivar_group_id, orchard_id)
+      orchard = MasterfilesApp::FarmRepo.new.find_orchard(orchard_id)
+      orchard.cultivar_ids.nil_or_empty? ? MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: cultivar_group_id }) : MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
+    end
+
+    def update_reworks_production_run(params)  # rubocop:disable Metrics/AbcSize
+      res = validate_update_reworks_production_run_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      sequence_id = attrs[:pallet_sequence_id]
+      sequence = pallet_sequence(sequence_id)
+      before_attrs = farm_details_attrs(sequence).merge(production_run_id: attrs[:old_production_run_id],
+                                                        packhouse_resource_id: sequence[:packhouse_resource_id],
+                                                        production_line_id: sequence[:production_line_id])
+      production_run = production_run(attrs[:production_run_id])
+      after_attrs = farm_details_attrs(production_run).merge(production_run_id: attrs[:production_run_id],
+                                                             packhouse_resource_id: production_run[:packhouse_resource_id],
+                                                             production_line_id: production_run[:production_line_id])
+      repo.transaction do
+        reworks_run_attrs = reworks_run_attrs(sequence_id, attrs[:reworks_run_type_id])
+        repo.update_pallet_sequence(sequence_id, after_attrs)
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_CHANGE_PDN_RUN,
+                                           before: before_attrs.sort.to_h, after: after_attrs.sort.to_h)
+        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+      end
+      instance = pallet_sequence(sequence_id)
+      success_response('Pallet Sequence production_run_id changed successfully', pallet_number: instance[:pallet_number])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_reworks_farm_details(params)  # rubocop:disable Metrics/AbcSize
+      res = validate_update_reworks_farm_details_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      sequence_id = attrs.delete(:pallet_sequence_id)
+      reworks_run_type_id = attrs.delete(:reworks_run_type_id)
+      after_attrs = attrs
+
+      instance = pallet_sequence(sequence_id)
+      before_attrs = farm_details_attrs(instance)
+
+      repo.transaction do
+        reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
+        repo.update_pallet_sequence(sequence_id, after_attrs)
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_CHANGE_FARM_DETAILS,
+                                           before: before_attrs.sort.to_h, after: after_attrs.sort.to_h)
+        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+      end
+      success_response('Pallet Sequence farm details changed successfully', pallet_number: instance[:pallet_number])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def farm_details_attrs(sequence)
+      { farm_id: sequence[:farm_id],
+        puc_id: sequence[:puc_id],
+        orchard_id: sequence[:orchard_id],
+        cultivar_group_id: sequence[:cultivar_group_id],
+        cultivar_id: sequence[:cultivar_id],
+        season_id: sequence[:season_id] }
+    end
+
+    def log_reworks_runs_status_and_transaction(id)
+      log_status('reworks_runs', id, 'CREATED')
+      log_transaction
     end
 
     private
@@ -252,19 +340,19 @@ module ProductionApp
       pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
 
       invalid_pallet_numbers = pallet_numbers.reject { |x| x.match(/\A\d+\Z/) }
-      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_pallet_numbers.join(', ')} must be numeric"] }) unless invalid_pallet_numbers.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_pallet_numbers.join(', ')} must be numeric"] }, pallets_selected: pallet_numbers) unless invalid_pallet_numbers.nil_or_empty?
 
       existing_pallet_numbers = repo.pallet_numbers_exists?(pallet_numbers)
       missing_pallet_numbers = (pallet_numbers - existing_pallet_numbers)
-      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_pallet_numbers.join(', ')} doesn't exist"] }) unless missing_pallet_numbers.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_pallet_numbers.join(', ')} doesn't exist"] }, pallets_selected: pallet_numbers) unless missing_pallet_numbers.nil_or_empty?
 
       scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
 
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type
         unscrapped_pallets = (pallet_numbers - scrapped_pallets)
-        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_pallets.join(', ')} cannot be unscrapped"] }) unless unscrapped_pallets.nil_or_empty?
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_pallets.join(', ')} cannot be unscrapped"] }, pallets_selected: pallet_numbers) unless unscrapped_pallets.nil_or_empty?
       else
-        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_pallets.join(', ')} already scrapped"] }) unless scrapped_pallets.nil_or_empty?
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_pallets.join(', ')} already scrapped"] }, pallets_selected: pallet_numbers) unless scrapped_pallets.nil_or_empty?
       end
 
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
@@ -308,6 +396,10 @@ module ProductionApp
       repo.where_hash(:pallet_sequences, id: id)
     end
 
+    def production_run(id)
+      repo.where_hash(:production_runs, id: id)
+    end
+
     def sequence_setup_attrs(id)
       repo.sequence_setup_attrs(id)
     end
@@ -322,6 +414,14 @@ module ProductionApp
 
     def validate_reworks_run_pallet_sequence_params(params)
       ProductSetupSchema.call(params)
+    end
+
+    def validate_update_reworks_production_run_params(params)
+      ProductionRunUpdateSchema.call(params)
+    end
+
+    def validate_update_reworks_farm_details_params(params)
+      ProductionRunUpdateFarmDetailsSchema.call(params)
     end
   end
 end

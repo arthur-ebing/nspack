@@ -11,8 +11,8 @@ module ProductionApp
       @user_name = params[:user]
       @reworks_run_type = @repo.where_hash(:reworks_run_types, id: params[:reworks_run_type_id])
       @pallets_selected = params[:pallets_selected]
-      @pallets_affected = params[:pallets_affected].nil? ? pallets_selected : params[:pallets_affected]
-      @affected_pallet_sequences = params[:pallet_sequence_id].nil? ? repo.find_pallet_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
+      @pallets_affected = params[:pallets_affected].nil_or_empty? ? pallets_selected : params[:pallets_affected]
+      @affected_pallet_sequences = params[:pallet_sequence_id].nil_or_empty? ? repo.find_pallet_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
       @make_changes = params[:make_changes]
       @reworks_action = reworks_action
       @changes = changes
@@ -89,13 +89,13 @@ module ProductionApp
     end
 
     def resolve_changes(affected_pallets)
-      changes = { reworks_action: reworks_action }
+      sequence_changes = { reworks_action: reworks_action }
       affected_pallets.each  do |pallet_number|
-        changes['pallets'] = {
+        sequence_changes['pallets'] = {
           pallet_number: pallet_number
         }.merge(pallet_sequences_objects(pallet_number))
       end
-      changes.to_json
+      sequence_changes.to_json
     end
 
     def pallet_sequences_objects(pallet_number)
