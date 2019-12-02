@@ -31,7 +31,7 @@ module UiRules
       {
         inspector_party_role_id: { renderer: :select,
                                    options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_INSPECTOR),
-                                   # disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles,
+                                   disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_INSPECTOR),
                                    caption: 'Inspector',
                                    required: true },
         tablet_ip_address: { caption: 'Tablet IP Address' },
