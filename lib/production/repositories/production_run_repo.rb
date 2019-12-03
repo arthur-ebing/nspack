@@ -17,6 +17,44 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).get(:id)
     end
 
+    def get_palet_label_data(pallet_id)
+      qry = <<~SQL
+        SELECT *
+        FROM vw_pallet_sequence_flat
+        WHERE id = ?
+      SQL
+      DB[qry, pallet_id].first
+    end
+
+    def find_pallet_labels
+      qry = <<~SQL
+        SELECT label_name
+        FROM public.labels
+        where extended_columns  @> '{"label_type": "PALLET"}';
+      SQL
+      DB[qry].all.map { |r| r[:label_name] }
+    end
+
+    def find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)
+      qry = <<~SQL
+        select ps.pallet_label_name
+        from product_setups ps
+        join product_resource_allocations pra on pra.product_setup_id=ps.id
+        where pra.id = ?
+      SQL
+      pallet_label = DB[qry, product_resource_allocation_id].first
+      pallet_label.nil_or_empty? ? '' : pallet_label[:pallet_label_name]
+    end
+
+    def find_pallet_sequence_attrs_by_id(id)
+      qry = <<~SQL
+        SELECT *
+        FROM vw_pallet_sequence_flat
+        WHERE id = ?
+      SQL
+      DB[qry, id].first
+    end
+
     def find_pallet_sequence_attrs(pallet_id, seq_number)
       DB["SELECT *
           FROM vw_pallet_sequence_flat
@@ -24,17 +62,23 @@ module ProductionApp
     end
 
     def find_carton_cpp(carton_id)
-      DB["select cpp.cartons_per_pallet
-          from cartons c
-          join cartons_per_pallet cpp on cpp.id = c.cartons_per_pallet_id
-          where c.id = ?", carton_id].first
+      qry = <<~SQL
+        select cpp.cartons_per_pallet
+        from cartons c
+        join cartons_per_pallet cpp on cpp.id = c.cartons_per_pallet_id
+        where c.id = ?
+      SQL
+      DB[qry, carton_id].first
     end
 
     def find_carton_with_run_info(carton_id)
-      DB["select c.*, r.closed as production_run_closed
-          from cartons c
-          join production_runs r on r.id = c.production_run_id
-          where c.id = ?", carton_id].first
+      qry = <<~SQL
+        select c.*, r.closed as production_run_closed
+        from cartons c
+        join production_runs r on r.id = c.production_run_id
+        where c.id = ?
+      SQL
+      DB[qry, carton_id].first
     end
 
     def create_production_run(params)

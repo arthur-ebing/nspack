@@ -37,6 +37,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # carton verification
   CARTON_EQUALS_PALLET = make_boolean('CARTON_EQUALS_PALLET')
+  CARTON_VERIFICATION_REQUIRED = make_boolean('CARTON_VERIFICATION_REQUIRED')
   PROVIDE_PACK_TYPE_AT_VERIFICATION = make_boolean('PROVIDE_PACK_TYPE_AT_VERIFICATION')
 
   # General
@@ -176,11 +177,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINT_APP_LOCATION = 'Location'
   PRINT_APP_BIN = 'Bin'
   PRINT_APP_CARTON = 'Carton'
+  PRINT_APP_PALLET = 'Pallet'
 
   PRINTER_APPLICATIONS = [
     PRINT_APP_LOCATION,
     PRINT_APP_BIN,
-    PRINT_APP_CARTON
+    PRINT_APP_CARTON,
+    PRINT_APP_PALLET
   ].freeze
 
   # These will need to be configured per installation...
