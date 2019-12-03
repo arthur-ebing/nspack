@@ -140,7 +140,10 @@ Sequel.migration do
       -- ==========================================================================
       -- Function to work through prodrun stats queue
       -- Invoke from cron like this:
-      -- PGPASSWORD=xxxx psql -v ON_ERROR_STOP=1 -c 'SELECT fn_production_run_stats_queue_worker();' -d nspack -U postgres
+      -- psql -v ON_ERROR_STOP=1 -c 'SELECT fn_production_run_stats_queue_worker();' -d nspack -U postgres
+      -- Use * 6,7,8,9,10,11,12,13,14,15,16,17,18 * * * to run every minute from 6am to 7pm.
+      -- Use */2 6,7,8,9,10,11,12,13,14,15,16,17,18 * * * to run every second minute from 6am to 7pm.
+      -- Note: you'll need "PGPASSWORD=xxxx" in front of the command if .pgpass has not been set.
       -- ==========================================================================
 
       CREATE OR REPLACE FUNCTION public.fn_production_run_stats_queue_worker()

@@ -3,19 +3,21 @@
 :sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type,
   reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
   reworks_runs.changes_made ->> 'reworks_action' AS reworks_action, reworks_runs.user,
-  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,
-  reworks_runs.pallets_affected, reworks_runs.changes_made -> 'pallets' ->> 'pallet_number' AS pallet_number,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before' AS before_state,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state,
-  reworks_runs.created_at, reworks_runs.updated_at
+  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected)
+  AS pallets_selected, reworks_runs.pallets_affected, reworks_runs.changes_made ->
+  'pallets' ->> 'pallet_number' AS pallet_number, reworks_runs.changes_made -> 'pallets'
+  -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id, reworks_runs.changes_made ->
+  'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before'
+  AS before_state, reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->
+  'changes' ->> 'after' AS after_state, reworks_runs.created_at, reworks_runs.updated_at
   FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
-  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
-  ORDER BY id DESC
-:limit: 
+  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id ORDER
+  BY id DESC
+:limit: 1000
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id
