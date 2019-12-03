@@ -36,7 +36,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { VGM_REQUIRED: 'Sets if verified gross mass as required for RMD load_containers.' },
     { DEFAULT_DEPOT: 'Default Depot for new dispatch loads.' },
     { DEFAULT_EXPORTER: 'Default Exporter Party for new loads and inspections.' },
-    { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' }
+    { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' },
+    { TITAN_ENVIRONMENT: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
+    { TITAN_API_USER_ID: 'Titan API_UserId for government inspections.' },
+    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' }
   ].freeze
 
   NO_OVERRIDE = [

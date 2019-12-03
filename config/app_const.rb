@@ -259,4 +259,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   BIG_ZERO = BigDecimal('0')
   # The maximum size of an integer in PostgreSQL
   MAX_DB_INT = 2_147_483_647
+
+  # Titan: Govt Inspections
+  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV['TITAN_ENVIRONMENT'].to_sym]
+  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
+  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
 end
