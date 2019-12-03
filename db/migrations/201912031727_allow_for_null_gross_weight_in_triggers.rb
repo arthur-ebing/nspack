@@ -25,12 +25,6 @@ Sequel.migration do
       ALTER FUNCTION public.fn_pallet_nett_weight_calc()
         OWNER TO postgres;
 
-      CREATE TRIGGER pallets_update_nett_weight
-      BEFORE UPDATE OF gross_weight, pallet_format_id
-      ON public.pallets
-      FOR EACH ROW
-      EXECUTE PROCEDURE public.fn_pallet_nett_weight_calc();
-
       -- ===================================================================
       -- PALLET SEQUENCE: Calculate Nett on insert / change of STD pack, qty
       -- ===================================================================
@@ -98,11 +92,6 @@ Sequel.migration do
       ALTER FUNCTION public.fn_pallet_seq_nett_weight_calc()
         OWNER TO postgres;
 
-      CREATE TRIGGER pallet_sequences_update_nett_weight
-      BEFORE INSERT OR UPDATE OF standard_pack_code_id, carton_quantity
-      ON public.pallet_sequences
-      FOR EACH ROW
-      EXECUTE PROCEDURE public.fn_pallet_seq_nett_weight_calc();
     SQL
   end
 
@@ -134,12 +123,6 @@ Sequel.migration do
         COST 100;
       ALTER FUNCTION public.fn_pallet_nett_weight_calc()
         OWNER TO postgres;
-
-      CREATE TRIGGER pallets_update_nett_weight
-      BEFORE UPDATE OF gross_weight, pallet_format_id
-      ON public.pallets
-      FOR EACH ROW
-      EXECUTE PROCEDURE public.fn_pallet_nett_weight_calc();
 
       -- ===================================================================
       -- PALLET SEQUENCE: Calculate Nett on insert / change of STD pack, qty
@@ -205,12 +188,6 @@ Sequel.migration do
         COST 100;
       ALTER FUNCTION public.fn_pallet_seq_nett_weight_calc()
         OWNER TO postgres;
-
-      CREATE TRIGGER pallet_sequences_update_nett_weight
-      BEFORE INSERT OR UPDATE OF standard_pack_code_id, carton_quantity
-      ON public.pallet_sequences
-      FOR EACH ROW
-      EXECUTE PROCEDURE public.fn_pallet_seq_nett_weight_calc();
     SQL
   end
 end
