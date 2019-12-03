@@ -13,7 +13,6 @@ module Production
             page.form do |form|
               # form.caption 'Reworks Run'
               form.view_only!
-              form.no_submit!
               form.add_field :reworks_run_type_id
               form.add_field :scrap_reason_id
               form.add_field :remarks

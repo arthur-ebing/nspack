@@ -32,21 +32,20 @@ module FinishedGoods
                                   style: :button)
             end
             page.form do |form| # rubocop:disable Metrics/BlockLength
-              # form.caption 'Load'
-              form.view_only!
-              form.no_submit!
+              form.action '/list/loads'
+              form.submit_captions 'Close'
               form.fold_up do |fold|
                 fold.caption 'Parties'
                 fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :customer_party_role_id
-                    col.add_field :exporter_party_role_id
-                    col.add_field :billing_client_party_role_id
-                  end
-                  row.column do |col|
                     col.add_field :consignee_party_role_id
                     col.add_field :final_receiver_party_role_id
+                  end
+                  row.column do |col|
+                    col.add_field :exporter_party_role_id
+                    col.add_field :billing_client_party_role_id
                   end
                 end
               end

@@ -1,0 +1,50 @@
+---
+:dataminer_definition: govt_inspection_pallets
+:actions:
+- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/capture_result"
+  :text: fail pallet
+  :icon: quit
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: sheet_inspected
+#- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$"
+#  :text: view
+#  :icon: view-show
+#  :title: View
+#  :popup: true
+#- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/edit"
+#  :text: edit
+#  :icon: edit
+#  :title: Edit
+#  :popup: true
+#  :hide_if_true: completed
+- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: completed
+#- :separator: true
+#- :url: "/development/statuses/list/govt_inspection_pallets/$:id$"
+#  :text: Status
+#  :icon: information-solid
+#  :title: Status
+#  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/inspection/govt_inspection_pallets/new"
+  :text: New Govt Inspection Pallet
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: govt_inspection_pallets.govt_inspection_sheet_id
+      :op: =
+      :val: $:id$
+:multiselect:
+  :standard:
+    :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/inspect"
+    :section_caption: 'Assign pallets to inspection sheet'
+    :multiselect_save_method: remote
+    :can_be_cleared: false
+    :conditions: standard

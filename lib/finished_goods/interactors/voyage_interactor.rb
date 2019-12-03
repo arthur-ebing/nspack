@@ -9,7 +9,7 @@ module FinishedGoodsApp
       id = nil
       repo.transaction do
         id = repo.create_voyage(res)
-        log_status('voyages', id, 'CREATED')
+        log_status(:voyages, id, 'CREATED')
         log_transaction
       end
       instance = voyage(id)
@@ -44,20 +44,20 @@ module FinishedGoodsApp
           voyage_ports = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(id)&.voyage_ports
           voyage_ports.each do |voyage_port|
             VoyagePortRepo.new.delete_voyage_port(voyage_port[:id])
-            log_status('voyage_ports', voyage_port[:id], 'DELETED')
+            log_status(:voyage_ports, voyage_port[:id], 'DELETED')
             log_transaction
           end
 
           # DELETE VOYAGE
           repo.delete_voyage(id)
-          log_status('voyages', id, 'DELETED')
+          log_status(:voyages, id, 'DELETED')
           log_transaction
         end
         success_response("Deleted voyage #{name}")
       else
         repo.transaction do
           repo.update_voyage(id,  active: false)
-          log_status('voyages', id, 'DEACTIVATED')
+          log_status(:voyages, id, 'DEACTIVATED')
           log_transaction
         end
         success_response("Deactivated voyage #{name}")

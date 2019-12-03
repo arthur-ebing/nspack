@@ -9,7 +9,7 @@ module FinishedGoodsApp
       id = nil
       repo.transaction do
         id = repo.create_voyage_port(res)
-        log_status('voyage_ports', id, 'CREATED')
+        log_status(:voyage_ports, id, 'CREATED')
         log_transaction
       end
       instance = voyage_port(id)
@@ -40,7 +40,7 @@ module FinishedGoodsApp
       name = voyage_port(id).id
       repo.transaction do
         repo.delete_voyage_port(id)
-        log_status('voyage_ports', id, 'DELETED')
+        log_status(:voyage_ports, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted voyage port #{name}")

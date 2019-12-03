@@ -56,7 +56,7 @@ module FinishedGoodsApp
       if voyage_port_id.nil?
         voyage_port_id = DB[:voyage_ports].insert(voyage_id: voyage_id,
                                                   port_id: port_id)
-        log_status('voyage_ports', voyage_port_id, 'CREATED')
+        log_status(:voyage_ports, voyage_port_id, 'CREATED')
       end
       voyage_port_id
     end

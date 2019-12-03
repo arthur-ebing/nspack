@@ -20,6 +20,15 @@ module MasterfilesApp
                           value: :id,
                           order_by: :standard_pack_code
 
+    build_for_select :standard_product_weights,
+                     label: :id,
+                     value: :id,
+                     order_by: :id
+    build_inactive_select :standard_product_weights,
+                          label: :id,
+                          value: :id,
+                          order_by: :id
+
     build_for_select :std_fruit_size_counts,
                      label: :size_count_value,
                      value: :id,
@@ -49,9 +58,23 @@ module MasterfilesApp
 
     crud_calls_for :basic_pack_codes, name: :basic_pack_code, wrapper: BasicPackCode
     crud_calls_for :standard_pack_codes, name: :standard_pack_code, wrapper: StandardPackCode
+    crud_calls_for :standard_product_weights, name: :standard_product_weight, wrapper: StandardProductWeight
     crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, wrapper: StdFruitSizeCount
     crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack, wrapper: FruitActualCountsForPack
     crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
+
+    def find_standard_product_weight_flat(id)
+      find_with_association(:standard_product_weights,
+                            id,
+                            parent_tables: [{ parent_table: :commodities,
+                                              columns: %i[code],
+                                              flatten_columns: { code: :commodity_code } },
+                                            { parent_table: :standard_pack_codes,
+                                              columns: %i[standard_pack_code],
+                                              foreign_key: :standard_pack_id,
+                                              flatten_columns: { standard_pack_code: :standard_pack_code } }],
+                            wrapper: StandardProductWeightFlat)
+    end
 
     def delete_basic_pack_code(id)
       dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)

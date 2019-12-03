@@ -211,6 +211,101 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
       end
 
+      r.on 'edit_reworks_production_run' do # Edit pallet sequence
+        production_run_id = ProductionApp::ReworksRepo.new.find_production_run_id(id)
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditProductionRun.call(id, production_run_id, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_reworks_production_run(params[:reworks_run_sequence])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::EditProductionRun.call(id,
+                                                                      production_run_id,
+                                                                      reworks_run_type_id,
+                                                                      form_values: params[:reworks_run_sequence],
+                                                                      form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'production_run_changed' do
+        production_run_details = if params[:changed_value].blank?
+                                   []
+                                 else
+                                   interactor.production_run_details_table(params[:changed_value])
+                                 end
+        json_actions([OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_pallet_production_run_details',
+                                     value: production_run_details)])
+      end
+
+      r.on 'edit_reworks_farm_details' do # Edit pallet sequence
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditFarmDetails.call(id, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_reworks_farm_details(params[:reworks_run_sequence])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::EditFarmDetails.call(id,
+                                                                    reworks_run_type_id,
+                                                                    form_values: params[:reworks_run_sequence],
+                                                                    form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'farm_changed' do
+        pucs = if params[:changed_value].blank?
+                 []
+               else
+                 interactor.farm_pucs(params[:changed_value])
+               end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_puc_id',
+                                     options_array: pucs),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_orchard_id',
+                                     options_array: []),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_cultivar_id',
+                                     options_array: [])])
+      end
+
+      r.on 'puc_changed' do
+        orchards = if params[:changed_value].blank? || params[:reworks_run_sequence_farm_id].blank?
+                     []
+                   else
+                     interactor.puc_orchards(params[:reworks_run_sequence_farm_id], params[:changed_value])
+                   end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_orchard_id',
+                                     options_array: orchards),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_cultivar_id',
+                                     options_array: [])])
+      end
+
+      r.on 'orchard_changed' do
+        cultivars = if params[:changed_value].blank? || params[:reworks_run_sequence_cultivar_group_id].blank?
+                      []
+                    else
+                      interactor.orchard_cultivars(params[:reworks_run_sequence_cultivar_group_id], params[:changed_value])
+                    end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_cultivar_id',
+                                     options_array: cultivars)])
+      end
+
       r.on 'print_reworks_carton_label' do # Print Carton Label
         r.get do
           show_partial { Production::Reworks::ReworksRun::PrintReworksLabel.call(id, nil, true) }

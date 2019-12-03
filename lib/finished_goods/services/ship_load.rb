@@ -21,14 +21,14 @@ module FinishedGoodsApp
 
     def ship_load
       repo.ship_load(load_id)
-      repo.log_status('loads', load_id, 'SHIPPED', user_name: user_name)
+      repo.log_status(:loads, load_id, 'SHIPPED', user_name: user_name)
 
       ok_response
     end
 
     def ship_pallets
       repo.ship_pallets(pallet_ids)
-      repo.log_multiple_statuses('pallets', pallet_ids, 'SHIPPED', user_name: user_name)
+      repo.log_multiple_statuses(:pallets, pallet_ids, 'SHIPPED', user_name: user_name)
 
       ok_response
     end

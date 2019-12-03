@@ -1,0 +1,164 @@
+---
+:caption: Inspectors
+:sql: "SELECT\r\n    fn_party_role_name(inspector_party_role_id) AS inspector,\r\n
+  \   id,\r\n    inspector_party_role_id,\r\n    tablet_ip_address,\r\n    tablet_port_number,\r\n
+  \   active,\r\n    created_at, \r\n    updated_at,\r\n    fn_current_status('inspectors',
+  id) AS status \r\nFROM inspectors"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  inspector:
+    :name: inspector
+    :sequence_no: 1
+    :caption: Inspector
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 2
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector_party_role_id:
+    :name: inspector_party_role_id
+    :sequence_no: 3
+    :caption: Inspector party role
+    :namespaced_name: inspector_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tablet_ip_address:
+    :name: tablet_ip_address
+    :sequence_no: 4
+    :caption: Tablet ip address
+    :namespaced_name: tablet_ip_address
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tablet_port_number:
+    :name: tablet_port_number
+    :sequence_no: 5
+    :caption: Tablet port number
+    :namespaced_name: tablet_port_number
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 6
+    :caption: Active
+    :namespaced_name: active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 9
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: inspectors.inspector_party_role_id
+  :caption: Inspector party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')

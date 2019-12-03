@@ -60,4 +60,26 @@ module ProductionApp
     required(:pallet_number, Types::StrippedString).maybe(:str?)
     required(:pallet_sequence_id, :integer).maybe(:int?)
   end
+
+  ProductionRunUpdateSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:pallet_sequence_id, :integer).filled(:int?)
+    required(:production_run_id, :integer).filled(:int?)
+    required(:old_production_run_id, :integer).filled(:int?)
+    required(:reworks_run_type_id, :integer).filled(:int?)
+  end
+
+  ProductionRunUpdateFarmDetailsSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:pallet_sequence_id, :integer).filled(:int?)
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:farm_id, :integer).filled(:int?)
+    required(:puc_id, :integer).filled(:int?)
+    required(:orchard_id, :integer).maybe(:int?)
+    required(:cultivar_group_id, :integer).filled(:int?)
+    required(:cultivar_id, :integer).maybe(:int?)
+    required(:season_id, :integer).filled(:int?)
+  end
 end

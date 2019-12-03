@@ -2,9 +2,21 @@
 :dataminer_definition: pallet_sequences
 :actions:
 - :url: "/production/reworks/pallet_sequences/$:id$/edit_reworks_pallet_sequence"
-  :text: edit
+  :text: edit product details
   :icon: edit
-  :title: Edit
+  :title: Edit Product Details
+- :url: "/production/reworks/pallet_sequences/$:id$/edit_reworks_production_run"
+  :text: change pdn run
+  :icon: edit
+  :title: Edit Pdn Run
+  :popup: true
+  :hide_if_null: production_run_id
+- :url: "/production/reworks/pallet_sequences/$:id$/edit_reworks_farm_details"
+  :text: edit farm details
+  :icon: edit
+  :title: Edit Farm Details
+  :popup: true
+  :hide_if_present: production_run_id
 - :url: "/production/reworks/pallet_sequences/$:id$/print_reworks_carton_label"
   :text: Print carton label
   :icon: printer

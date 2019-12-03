@@ -32,7 +32,11 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' },
     { LABEL_LOCATION_BARCODE: 'Label name for Locations' },
     { LABEL_BIN_BARCODE: 'Label name for Bins' },
-    { LABEL_CARTON_VERIFICATION: 'Label name for Cartons' }
+    { LABEL_CARTON_VERIFICATION: 'Label name for Cartons' },
+    { VGM_REQUIRED: 'Sets if verified gross mass as required for RMD load_containers.' },
+    { DEFAULT_DEPOT: 'Default Depot for new dispatch loads.' },
+    { DEFAULT_EXPORTER: 'Default Exporter Party for new loads and inspections.' },
+    { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' }
   ].freeze
 
   NO_OVERRIDE = [
@@ -59,8 +63,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SYSTEM_MAIL_SENDER: 'Email address for "FROM" address in the format NAME<email>' },
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
-    { DEPOT_LOCATION_CODE: 'Default Depot for new dispatch loads.' },
-    { VGM_REQUIRED: 'Sets if verified gross mass is required for RMD load_containers.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' }
   ].freeze

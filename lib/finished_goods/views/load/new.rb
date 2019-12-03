@@ -28,12 +28,12 @@ module FinishedGoods
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :customer_party_role_id
-                    col.add_field :exporter_party_role_id
-                    col.add_field :billing_client_party_role_id
-                  end
-                  row.column do |col|
                     col.add_field :consignee_party_role_id
                     col.add_field :final_receiver_party_role_id
+                  end
+                  row.column do |col|
+                    col.add_field :exporter_party_role_id
+                    col.add_field :billing_client_party_role_id
                   end
                 end
               end

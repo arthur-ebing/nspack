@@ -1,0 +1,58 @@
+---
+:dataminer_definition: govt_inspection_pallet_api_results
+:actions:
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :popup: true
+  :hide_if_true: completed
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: edit
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$/approve"
+  :text: Approve/Reject
+  :icon: gavel
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: approved
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: approve
+- :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :popup: true
+  :hide_if_false: approved
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/govt_inspection_pallet_api_results/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/inspection/govt_inspection_pallet_api_results/new"
+  :text: New Govt Inspection Pallet Api Result
+  :style: :button
+  :behaviour: :popup

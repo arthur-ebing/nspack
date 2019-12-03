@@ -1,0 +1,30 @@
+---
+:dataminer_definition: inspectors
+:actions:
+- :url: "/masterfiles/quality/inspectors/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/quality/inspectors/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/quality/inspectors/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/inspectors/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/quality/inspectors/new"
+  :text: New Inspector
+  :style: :button
+  :behaviour: :popup

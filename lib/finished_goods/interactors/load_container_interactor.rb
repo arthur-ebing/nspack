@@ -9,7 +9,7 @@ module FinishedGoodsApp
       id = nil
       repo.transaction do
         id = repo.create_load_container(res)
-        log_status('load_containers', id, 'CREATED')
+        log_status(:load_containers, id, 'CREATED')
         log_transaction
       end
       instance = load_container(id)
@@ -47,7 +47,7 @@ module FinishedGoodsApp
       name = load_container(id).container_code
       repo.transaction do
         repo.delete_load_container(id)
-        log_status('load_containers', id, 'DELETED')
+        log_status(:load_containers, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted container #{name}")

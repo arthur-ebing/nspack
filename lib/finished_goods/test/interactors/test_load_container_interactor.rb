@@ -7,6 +7,7 @@ module FinishedGoodsApp
     include LoadContainerFactory
     include LoadFactory
     include MasterfilesApp::PartyFactory
+    include MasterfilesApp::DepotFactory
 
     def test_repo
       repo = interactor.send(:repo)

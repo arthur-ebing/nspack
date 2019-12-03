@@ -31,6 +31,8 @@ INSERT INTO roles (name) VALUES ('BILLING_CLIENT');
 INSERT INTO roles (name) VALUES ('CONSIGNEE');
 INSERT INTO roles (name) VALUES ('HAULIER');
 INSERT INTO roles (name) VALUES ('FARM_OWNER');
+INSERT INTO roles (name) VALUES ('INSPECTOR');
+INSERT INTO roles (name) VALUES ('INSPECTION_BILLING');
 
 -- TARGET MARKET GROUP TYPES
 INSERT INTO target_market_group_types (target_market_group_type_code) VALUES('PACKED');

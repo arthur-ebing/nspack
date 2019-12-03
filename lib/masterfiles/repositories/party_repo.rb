@@ -302,6 +302,10 @@ module MasterfilesApp
       details
     end
 
+    def for_select_inactive_party_roles(role = 'TRANSPORTER')
+      for_select_party_roles(role, active: false)
+    end
+
     def for_select_party_roles(role = 'TRANSPORTER', active: true)
       DB[:party_roles].where(
         role_id: DB[:roles].where(name: role).select(:id), active: active

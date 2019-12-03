@@ -90,26 +90,31 @@ module UiRules
         # Parties
         customer_party_role_id: { renderer: :select,
                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER),
+                                  disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
                                   caption: 'Customer',
                                   required: true,
                                   prompt: true },
         billing_client_party_role_id: { renderer: :select,
                                         options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT),
+                                        disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_BILLING_CLIENT),
                                         caption: 'Billing Client',
                                         required: true,
                                         prompt: true },
         exporter_party_role_id: { renderer: :select,
                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_EXPORTER),
+                                  disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
                                   caption: 'Exporter',
                                   required: true,
                                   prompt: true },
         consignee_party_role_id: { renderer: :select,
                                    options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE),
+                                   disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_CONSIGNEE),
                                    caption: 'Consignee',
                                    required: true,
                                    prompt: true },
         final_receiver_party_role_id: { renderer: :select,
                                         options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                        disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),
                                         caption: 'Final Receiver',
                                         required: true,
                                         prompt: true },
@@ -121,7 +126,6 @@ module UiRules
         depot_id: { renderer: :select,
                     options: MasterfilesApp::DepotRepo.new.for_select_depots,
                     disabled_options: MasterfilesApp::DepotRepo.new.for_select_inactive_depots,
-                    selected: MasterfilesApp::DepotRepo.new.find_depot_id(AppConst::DEPOT_LOCATION_CODE),
                     caption: 'Depot',
                     required: true },
         exporter_certificate_code: {},
@@ -171,10 +175,12 @@ module UiRules
         # Load Voyage
         shipping_line_party_role_id: { renderer: :select,
                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_SHIPPING_LINE),
+                                       disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_SHIPPING_LINE),
                                        caption: 'Shipping Line',
                                        prompt: true },
         shipper_party_role_id: { renderer: :select,
                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_SHIPPER),
+                                 disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_SHIPPER),
                                  caption: 'Shipper',
                                  prompt: true },
         booking_reference: {},
@@ -194,7 +200,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: nil,
+      @form_object = OpenStruct.new(depot_id: MasterfilesApp::DepotRepo.new.find_depot_id(AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,
@@ -218,7 +224,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :consignee_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/consignee_changed' }] if @mode == :new
+        behaviour.dropdown_change :customer_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/customer_changed' }] if @mode == :new
         behaviour.dropdown_change :exporter_party_role_id, notify: [{ url: '/finished_goods/dispatch/loads/exporter_changed' }] if @mode == :new
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new

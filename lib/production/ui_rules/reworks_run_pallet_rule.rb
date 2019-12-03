@@ -51,12 +51,15 @@ module UiRules
                       caption: 'Select Pallet Sequence' }
     end
 
-    def set_pallet_sequence_changes
+    def set_pallet_sequence_changes  # rubocop:disable Metrics/AbcSize
+      rules[:left_record] = sequence_setup_data(@options[:id])
+      rules[:right_record] = sequence_edit_data(@options[:attrs])
+      rules[:no_changes_made] = rules[:left_record] == rules[:right_record]
       fields[:changes_made] = {
         left_caption: 'Before',
         right_caption: 'After',
-        left_record: sequence_setup_attrs(@options[:id]).sort.to_h,
-        right_record: @options[:attrs].sort.to_h
+        left_record: rules[:left_record].sort.to_h,
+        right_record: rules[:right_record].sort.to_h
       }
     end
 
@@ -66,19 +69,24 @@ module UiRules
         return
       end
 
-      @form_object = if @mode == :select_pallet_sequence
-                       OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id], pallets_selected: @options[:pallets_selected], pallet_sequence_id: nil)
-                     else
-                       OpenStruct.new(reworks_run_pallet(@options[:pallet_number]).to_h.merge(reworks_run_type_id: @options[:reworks_run_type_id]))
-                     end
+      if @mode == :select_pallet_sequence
+        OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id], pallets_selected: @options[:pallets_selected], pallet_sequence_id: nil)
+        return
+      end
+
+      @form_object = OpenStruct.new(reworks_run_pallet(@options[:pallet_number]).to_h.merge(reworks_run_type_id: @options[:reworks_run_type_id]))
     end
 
     def reworks_run_pallet(pallet_number)
       @repo.reworks_run_pallet_data(pallet_number)
     end
 
-    def sequence_setup_attrs(id)
-      @repo.sequence_setup_attrs(id)
+    def sequence_setup_data(id)
+      @repo.sequence_setup_data(id)
+    end
+
+    def sequence_edit_data(attrs)
+      @repo.sequence_edit_data(attrs)
     end
   end
 end

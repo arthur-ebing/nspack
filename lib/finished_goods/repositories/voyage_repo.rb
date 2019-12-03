@@ -42,7 +42,7 @@ module FinishedGoodsApp
                                         voyage_type_id: voyage_type_id,
                                         voyage_number: voyage_number,
                                         year: year) # create new voyage
-        log_status('voyages', voyage_id, 'CREATED', user_name: user_name)
+        log_status(:voyages, voyage_id, 'CREATED', user_name: user_name)
       end
       voyage_id
     end
