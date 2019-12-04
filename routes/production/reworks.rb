@@ -25,6 +25,8 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'single_pallet_edit' do
         check_auth!('reworks', 'new')
         reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SINGLE_PALLET_EDIT)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
 

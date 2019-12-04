@@ -4,10 +4,19 @@
 module Crossbeams
   class HTTPCalls
     include Crossbeams::Responses
+    attr_reader :use_ssl
 
-    def json_post(url, params) # rubocop:disable Metrics/AbcSize
+    def initialize(use_ssl = false)
+      @use_ssl = use_ssl
+    end
+
+    def json_post(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/json')
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
       request.body = params.to_json
 
       log_request(request)
@@ -23,8 +32,9 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
-    def xml_post(url, xml)
+    def xml_post(url, xml) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
+      http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri, 'Content-Type' => 'application/xml')
       request.body = xml
 

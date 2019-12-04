@@ -28,6 +28,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_LABEL_DIMENSION: 'User`s preferred label dimension in mm (width then height) e.g. 100x100' },
     { LABEL_SIZES: 'Possible label sizes for designing in format "w,h;w,h;w,h...". e.g. 100,100;100,150;84,64' },
     { CARTON_EQUALS_PALLET: 'Create pallets and pallet_sequences from carton. Default false' },
+    { CARTON_VERIFICATION_REQUIRED: 'Determines if the system implementation requires carton_verification' },
     { PALLET_IS_IN_STOCK_WHEN_VERIFIED: 'When a pallet is verified, take it into stock immediately. (Do not wait for an inspection)' },
     { PROVIDE_PACK_TYPE_AT_VERIFICATION: 'Provide pack type at carton verification' },
     { LABEL_LOCATION_BARCODE: 'Label name for Locations' },
@@ -36,7 +37,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { VGM_REQUIRED: 'Sets if verified gross mass as required for RMD load_containers.' },
     { DEFAULT_DEPOT: 'Default Depot for new dispatch loads.' },
     { DEFAULT_EXPORTER: 'Default Exporter Party for new loads and inspections.' },
-    { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' }
+    { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' },
+    { TITAN_ENVIRONMENT: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
+    { TITAN_API_USER_ID: 'Titan API_UserId for government inspections.' },
+    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' }
   ].freeze
 
   NO_OVERRIDE = [

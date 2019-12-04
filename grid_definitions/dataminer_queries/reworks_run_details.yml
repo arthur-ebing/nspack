@@ -3,19 +3,21 @@
 :sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type,
   reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
   reworks_runs.changes_made ->> 'reworks_action' AS reworks_action, reworks_runs.user,
-  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,
-  reworks_runs.pallets_affected, reworks_runs.changes_made -> 'pallets' ->> 'pallet_number' AS pallet_number,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before' AS before_state,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state,
-  reworks_runs.created_at, reworks_runs.updated_at
+  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected)
+  AS pallets_selected, reworks_runs.pallets_affected, reworks_runs.changes_made ->
+  'pallets' ->> 'pallet_number' AS pallet_number, reworks_runs.changes_made -> 'pallets'
+  -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id, reworks_runs.changes_made ->
+  'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
+  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before'
+  AS before_state, reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->
+  'changes' ->> 'after' AS after_state, reworks_runs.created_at, reworks_runs.updated_at
   FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
-  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
-  ORDER BY id DESC
-:limit:
-:offset:
-:external_settings: {}
+  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id ORDER
+  BY id DESC
+:limit: 1000
+:offset: 
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id
@@ -23,12 +25,12 @@
     :caption: Id
     :namespaced_name: reworks_runs.id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -39,12 +41,12 @@
     :caption: Reworks run type
     :namespaced_name: reworks_runs.reworks_run_type_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -55,12 +57,12 @@
     :caption: Run type
     :namespaced_name: reworks_run_types.run_type
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -71,12 +73,12 @@
     :caption: Scrap reason
     :namespaced_name: reworks_runs.scrap_reason_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -87,12 +89,12 @@
     :caption: Scrap reason
     :namespaced_name: scrap_reasons.scrap_reason
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -103,12 +105,12 @@
     :caption: Remarks
     :namespaced_name: reworks_runs.remarks
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -119,12 +121,12 @@
     :caption: Reworks action
     :namespaced_name: reworks_action
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -135,12 +137,12 @@
     :caption: User
     :namespaced_name: reworks_runs.user
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -151,12 +153,12 @@
     :caption: Pallets selected
     :namespaced_name: reworks_runs.pallets_selected
     :data_type: :string_array
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -167,12 +169,12 @@
     :caption: Pallets affected
     :namespaced_name: reworks_runs.pallets_affected
     :data_type: :string_array
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -183,12 +185,12 @@
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -199,12 +201,12 @@
     :caption: Pallet
     :namespaced_name: pallet_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -215,12 +217,12 @@
     :caption: Pallet sequence number
     :namespaced_name: pallet_sequence_number
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -231,12 +233,12 @@
     :caption: Before state
     :namespaced_name: before_state
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -247,12 +249,12 @@
     :caption: After state
     :namespaced_name: after_state
     :data_type: :string
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -263,12 +265,12 @@
     :caption: Created at
     :namespaced_name: reworks_runs.created_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -279,46 +281,46 @@
     :caption: Updated at
     :namespaced_name: reworks_runs.updated_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-  - :column: reworks_runs.reworks_run_type_id
-    :caption: Reworks run type
-    :data_type: :integer
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 1
-    :list_def: SELECT run_type, id FROM reworks_run_types ORDER BY run_type
-  - :column: reworks_runs.user
-    :caption: User
-    :data_type: :string
-    :control_type: :list
-    :default_value:
-    :ordered_list: true
-    :ui_priority: 2
-    :list_def: SELECT user_name FROM users ORDER BY user_name
-  - :column: pallet_number
-    :caption: Pallet number
-    :data_type: :string
-    :control_type: :text
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 3
-    :list_def:
-  - :column: reworks_runs.created_at
-    :caption: Created at
-    :data_type: :date
-    :control_type: :daterange
-    :default_value:
-    :ordered_list: false
-    :ui_priority: 4
-    :list_def:
+- :column: reworks_runs.reworks_run_type_id
+  :caption: Reworks run type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT run_type, id FROM reworks_run_types ORDER BY run_type
+- :column: reworks_runs.user
+  :caption: User
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 2
+  :list_def: SELECT user_name FROM users ORDER BY user_name
+- :column: pallet_number
+  :caption: Pallet number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 
+- :column: reworks_runs.created_at
+  :caption: Created at
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: 
