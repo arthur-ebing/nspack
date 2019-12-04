@@ -142,9 +142,12 @@ module Crossbeams
     # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
     # @return [void]
     def add_label(name, label, value, hidden_value = nil, options = {})
+      tr_css_class = options[:as_table_cell] ? ' class="hover-row"' : ''
+      td_css_class = options[:as_table_cell] ? ' class="rmd-table-cell"' : ''
+      div_css_class = options[:as_table_cell] ? '' : ' class="pa2 bg-moon-gray br2"'
       @fields << <<~HTML
-        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}><th align="left">#{label}</th>
-        <td><div class="pa2 bg-moon-gray br2">#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
+        <tr id="#{form_name}_#{name}_row"#{initial_visibilty(options)}#{tr_css_class}><th#{td_css_class} align="left">#{label}</th>
+        <td#{td_css_class}><div#{div_css_class}>#{field_value(value) || '&nbsp;'}</div>#{hidden_label(name, hidden_value)}
         </td></tr>
       HTML
     end
@@ -412,7 +415,7 @@ module Crossbeams
 
     def field_renders
       <<~HTML
-        <table><tbody>
+        <table class="rmd-table"><tbody>
           #{@fields.join("\n")}
         </tbody></table>
       HTML
