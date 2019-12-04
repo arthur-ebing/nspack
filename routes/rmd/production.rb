@@ -204,15 +204,301 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
     end
+
+    # --------------------------------------------------------------------------
+    # PALLETIZING
+    # --------------------------------------------------------------------------
+    r.on 'palletizing' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'create_new_pallet' do
+        r.get do
+          if AppConst::CARTON_EQUALS_PALLET
+            form = Crossbeams::RMDForm.new({},
+                                           form_name: :carton,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           caption: '',
+                                           action: '',
+                                           reset_button: false,
+                                           button_initially_hidden: true,
+                                           button_caption: 'Submit')
+          else
+            notice = retrieve_from_local_store(:flash_notice)
+            form_state = {}
+            error = retrieve_from_local_store(:errors)
+            form_state.merge!(error_message: error.message, errors: error.errors) unless error.nil?
+            form = Crossbeams::RMDForm.new(form_state,
+                                           form_name: :carton,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           notes: notice,
+                                           caption: 'Scan Carton',
+                                           action: '/rmd/production/palletizing/create_new_pallet',
+                                           button_caption: 'Submit')
+            form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
+          end
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          carton_number = params[:carton][:carton_number]
+          unless AppConst::CARTON_VERIFICATION_REQUIRED
+            carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])) ? carton[:id] : nil
+            unless carton_number
+              res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:carton][:carton_number])
+              unless res.success
+                store_locally(:errors, res)
+                r.redirect('/rmd/production/palletizing/create_new_pallet')
+              end
+              carton_number = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])[:id]
+            end
+          end
+
+          res = interactor.create_pallet_from_carton(carton_number)
+          if res.success
+            pallet_sequence = interactor.find_pallet_sequence_attrs(res.instance[:pallet_id], 1)
+            r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{pallet_sequence[:id]}")
+          else
+            store_locally(:errors, res)
+            r.redirect('/rmd/production/palletizing/create_new_pallet')
+          end
+        end
+      end
+
+      r.on 'seq_carton_qty_changed' do
+        actions = [OpenStruct.new(type: :show_element, dom_id: 'UpdateSeq')]
+        json_actions(actions)
+      end
+
+      r.on 'update_pallet_sequence' do
+        r.post do
+          pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number])
+          res = interactor.update_pallet_sequence_carton_qty(pallet_sequence_id, params[:pallet][:seq_carton_qty])
+          if res.success
+            store_locally(:flash_notice, "Pallet: #{params[:pallet][:pallet_number]} updated successfully")
+          else
+            store_locally(:errors, "Error: #{unwrap_failed_response(res)}")
+          end
+          r.redirect('/rmd/production/palletizing/create_new_pallet')
+        end
+      end
+
+      r.on 'print_pallet_labels', Integer do |id|
+        r.post do
+          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          if res.success
+            store_locally(:flash_notice, "Labels for Pallet: #{params[:pallet][:pallet_number]} printet successfully")
+            r.redirect('/rmd/production/palletizing/create_new_pallet')
+          else
+            store_locally(:errors, "Error: #{unwrap_failed_response(res)}")
+            r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{id}")
+          end
+        end
+      end
+
+      r.on 'add_sequence_to_pallet' do
+        r.get do
+          form_state = {}
+          if (current_state = retrieve_from_local_store(:current_form_state))
+            form_state = current_state
+          end
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error, errors: { pallet_number: [''], carton_number: [''] }) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: nil,
+                                         caption: 'Scan Pallet',
+                                         action: '/rmd/production/palletizing/add_sequence_to_pallet',
+                                         button_caption: 'Submit')
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+          form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
+          form.add_field(:seq_carton_qty, 'Seq Carton Qty', required: true, prompt: true, data_type: :number)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          carton_number = params[:pallet][:carton_number]
+          unless AppConst::CARTON_VERIFICATION_REQUIRED
+            carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
+            unless carton_number
+              res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
+              unless res.success
+                store_locally(:current_form_state, pallet_number: params[:pallet][:pallet_number], carton_number: params[:pallet][:carton_number], seq_carton_qty: params[:pallet][:carton_quantity])
+                store_locally(:errors, unwrap_failed_response(res))
+                r.redirect('/rmd/production/palletizing/add_sequence_to_pallet')
+              end
+              carton_number = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])[:id]
+            end
+          end
+
+          res = interactor.add_sequence_to_pallet(params[:pallet][:pallet_number], carton_number, params[:pallet][:seq_carton_qty])
+          if res.success
+            pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
+            r.redirect("/rmd/production/palletizing/print_pallet_view/#{pallet_sequences.all.last[:id]}")
+          else
+            store_locally(:current_form_state, pallet_number: params[:pallet][:pallet_number], carton_number: params[:pallet][:carton_number], seq_carton_qty: params[:pallet][:carton_quantity])
+            store_locally(:errors, unwrap_failed_response(res))
+            r.redirect('/rmd/production/palletizing/add_sequence_to_pallet')
+          end
+        end
+      end
+
+      r.on 'print_or_edit_pallet_view', Integer do |id|
+        pallet_sequence = interactor.find_pallet_sequence_attrs_by_id(id)
+        pallet_sequence.merge!(qty_to_print: 4)
+
+        error = retrieve_from_local_store(:errors)
+        pallet_sequence.merge!(error_message: error) unless error.nil?
+        form = Crossbeams::RMDForm.new(pallet_sequence,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "Edit Pallet #{pallet_sequence[:pallet_number]}",
+                                       links: [{ caption: 'Print', url: "/rmd/production/palletizing/print_pallet_labels/#{pallet_sequence[:id]}", prompt: 'Print Pallet Labels?' }],
+                                       reset_button: false,
+                                       no_submit: false,
+                                       action: '/rmd/production/palletizing/update_pallet_sequence',
+                                       button_id: 'UpdateSeq',
+                                       button_initially_hidden: true,
+                                       button_caption: 'Save')
+        form.behaviours do |behaviour|
+          behaviour.input_change :seq_carton_qty, notify: [{ url: '/rmd/production/palletizing/seq_carton_qty_changed' }]
+        end
+        fields_for_rmd_pallet_sequence_display(form, pallet_sequence, [:seq_carton_qty])
+        form.add_csrf_tag csrf_tag
+        form.add_field(:seq_carton_qty, 'Seq Carton Qty', required: true, prompt: true, data_type: :number)
+        form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
+        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET))
+        form.add_select(:pallet_label_name, 'Pallet Label', value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: interactor.find_pallet_labels)
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.on 'print_pallet_view', Integer do |id|
+        interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        pallet_sequence = interactor.find_pallet_sequence_attrs(id)
+        ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
+
+        form = Crossbeams::RMDForm.new({},
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "Print Pallet #{pallet_sequence[:pallet_number]}",
+                                       step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       reset_button: false,
+                                       no_submit: false,
+                                       action: "/rmd/production/palletizing/print_pallet/#{pallet_sequence[:pallet_id]}",
+                                       button_caption: 'Print')
+        fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
+        form.add_csrf_tag csrf_tag
+        form.add_prev_next_nav('/rmd/production/palletizing/print_pallet_view/$:id$', ps_ids, id)
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.on 'edit_pallet_sequence_view', Integer do |id|
+        interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        pallet_sequence = interactor.find_pallet_sequence_attrs(id)
+        ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
+
+        notice = retrieve_from_local_store(:flash_notice)
+        form_state = {}
+        error = retrieve_from_local_store(:errors)
+        form_state.merge!(error_message: error[:error_message], errors: error[:errors]) unless error.nil?
+        form = Crossbeams::RMDForm.new(form_state,
+                                       notes: notice,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: "Print Pallet #{pallet_sequence[:pallet_number]}",
+                                       step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       reset_button: false,
+                                       no_submit: false,
+                                       action: "/rmd/production/palletizing/edit_pallet_sequence_submit/#{pallet_sequence[:id]}",
+                                       button_caption: 'Update')
+        form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: false)
+        form.add_field(:seq_carton_qty, 'Seq Carton Qty', required: false, prompt: true, data_type: :number)
+        form.add_label(:current_seq_carton_qty, 'Current Seq Carton Qty', pallet_sequence[:seq_carton_qty])
+        fields_for_rmd_pallet_sequence_display(form, pallet_sequence, [:seq_carton_qty])
+        form.add_csrf_tag csrf_tag
+        form.add_prev_next_nav('/rmd/production/palletizing/edit_pallet_sequence_view/$:id$', ps_ids, id)
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.on 'edit_pallet_sequence_submit', Integer do |id|
+        r.post do
+          if !params[:pallet][:carton_number].nil_or_empty?
+            carton_number = params[:pallet][:carton_number]
+            unless AppConst::CARTON_VERIFICATION_REQUIRED
+              carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
+              unless carton_number
+                res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
+                unless res.success # rubocop:disable BlockNesting
+                  store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+                  r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
+                end
+                carton_number = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])[:id]
+              end
+            end
+
+            res = interactor.replace_pallet_sequence(carton_number, id, params[:pallet][:seq_carton_qty].nil_or_empty? ? nil : params[:pallet][:seq_carton_qty])
+            if res.success
+              store_locally(:flash_notice, 'Pallets Sequence Updated Successfully')
+            else
+              store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            end
+          elsif !params[:pallet][:seq_carton_qty].nil_or_empty?
+            res = interactor.update_pallet_sequence_carton_qty(id, params[:pallet][:seq_carton_qty])
+            if res.success
+              store_locally(:flash_notice, 'Pallets Sequence Updated Successfully')
+            else
+              store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            end
+          else
+            store_locally(:errors, error_message: 'You must scan a carton_number or carton_qty', errors: { carton_number: [''], seq_carton_qty: [''] })
+          end
+          r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
+        end
+      end
+
+      r.on 'edit_pallet' do
+        r.get do
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error.message, errors: error.errors) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: nil,
+                                         caption: 'Scan Pallet',
+                                         action: '/rmd/production/palletizing/edit_pallet',
+                                         button_caption: 'Submit')
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.edit_pallet_validations(params[:pallet][:pallet_number])
+          if res.success
+            pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
+            r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{pallet_sequences.all.last[:id]}")
+          else
+            store_locally(:errors, res)
+            r.redirect('/rmd/production/palletizing/edit_pallet')
+          end
+        end
+      end
+    end
   end
 
-  def fields_for_rmd_pallet_sequence_display(form, pallet_sequence) # rubocop:disable Metrics/AbcSize
+  def fields_for_rmd_pallet_sequence_display(form, pallet_sequence, override = []) # rubocop:disable Metrics/AbcSize
     form.add_label(:pallet_number, 'Pallet Number', pallet_sequence[:pallet_number])
     form.add_label(:pallet_sequence_number, 'Pallet Sequence Number', pallet_sequence[:pallet_sequence_number])
     form.add_label(:build_status, 'Build Status', pallet_sequence[:build_status])
+    form.add_label(:pallet_base, 'Pallet Base', pallet_sequence[:pallet_base])
     form.add_label(:stack_type, 'Stack Height', pallet_sequence[:stack_type])
     form.add_label(:carton_quantity, 'Pallet Carton Quantity', pallet_sequence[:carton_quantity])
-    form.add_label(:seq_carton_qty, 'Seq Carton Qty', pallet_sequence[:seq_carton_qty])
+    form.add_label(:seq_carton_qty, 'Seq Carton Qty', pallet_sequence[:seq_carton_qty]) unless override.include?(:seq_carton_qty)
     form.add_label(:production_run_id, 'Production Run Id', pallet_sequence[:production_run_id])
     form.add_label(:farm, 'Farm Code', pallet_sequence[:farm])
     form.add_label(:orchard, 'Orchard Code', pallet_sequence[:orchard])
