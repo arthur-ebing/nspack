@@ -12,6 +12,6 @@ module MasterfilesApp
     required(:edi_in_pallet_base, Types::StrippedString).maybe(:str?)
     required(:edi_out_pallet_base, Types::StrippedString).maybe(:str?)
     required(:cartons_per_layer, :integer).filled(:int?)
-    required(:material_mass, %i[nil decimal]).maybe(:decimal?)
+    required(:material_mass, %i[nil decimal]).filled(:decimal?)
   end
 end

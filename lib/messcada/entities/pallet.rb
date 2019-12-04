@@ -27,6 +27,7 @@ module MesscadaApp
     attribute :palletized_at, Types::DateTime
     attribute :partially_palletized_at, Types::DateTime
     attribute :fruit_sticker_pm_product_id, Types::Integer
+    attribute :fruit_sticker_pm_product_2_id, Types::Integer
     attribute? :allocated, Types::Bool
     attribute :allocated_at, Types::DateTime
     attribute? :reinspected, Types::Bool

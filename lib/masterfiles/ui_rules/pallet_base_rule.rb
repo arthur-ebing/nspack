@@ -36,7 +36,8 @@ module UiRules
         edi_in_pallet_base: {},
         edi_out_pallet_base: {},
         cartons_per_layer: { renderer: :integer, required: true },
-        material_mass: { renderer: :numeric }
+        material_mass: { required: true,
+                         renderer: :numeric }
       }
     end
 

@@ -1,8 +1,8 @@
 ---
 :caption: Reworks Edit Pallet Sequences Quantities
-:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, seq_carton_qty, carton_quantity, gross_weight,
-  nett_weight, sequence_nett_weight, pallet_size, farm, orchard, puc, commodity, cultivar, marketing_variety, grade, mark
-  FROM vw_pallet_sequence_flat
+:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, carton_quantity,
+  pallet_carton_quantity, gross_weight, nett_weight, sequence_nett_weight, pallet_size,
+  farm, orchard, puc, commodity, cultivar, marketing_variety, grade, mark FROM vw_pallet_sequence_flat
   ORDER BY pallet_id, pallet_number DESC
 :limit: 
 :offset: 
@@ -73,25 +73,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  seq_carton_qty:
-    :name: seq_carton_qty
-    :sequence_no: 5
-    :caption: Seq carton qty
-    :namespaced_name: seq_carton_qty
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Carton quantity
     :namespaced_name: carton_quantity
     :data_type: :number
@@ -100,6 +84,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_carton_quantity:
+    :name: pallet_carton_quantity
+    :sequence_no: 6
+    :caption: Pallet carton quantity
+    :namespaced_name: pallet_carton_quantity
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
