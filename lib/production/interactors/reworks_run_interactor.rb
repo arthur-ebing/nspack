@@ -313,6 +313,29 @@ module ProductionApp
       log_transaction
     end
 
+    def update_pallet_gross_weight(params)  # rubocop:disable Metrics/AbcSize
+      res = validate_update_gross_weight_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      instance = pallet(attrs[:pallet_number])
+      pallet_number = instance[:pallet_number]
+      repo.transaction do
+        repo.update_pallet_gross_weight(instance[:id], attrs)
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: Array(pallet_number),
+                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: true }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT,
+                                           before: { gross_weight: instance[:gross_weight] }, after: { gross_weight: attrs[:gross_weight] })
+        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+      end
+      success_response('Pallet gross_weight updated successfully', pallet_number: pallet_number)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -375,6 +398,10 @@ module ProductionApp
       ReworksRunPrintBarcodeSchema.call(params)
     end
 
+    def validate_update_gross_weight_params(params)
+      ReworksRunUpdateGrossWeightSchema.call(params)
+    end
+
     def make_changes?(reworks_run_type)
       case reworks_run_type
       when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK then
@@ -390,6 +417,10 @@ module ProductionApp
 
     def affected_pallet_numbers(sequence_id, attrs)
       repo.affected_pallet_numbers(sequence_id, attrs)
+    end
+
+    def pallet(pallet_number)
+      repo.where_hash(:pallets, pallet_number: pallet_number)
     end
 
     def pallet_sequence(id)

@@ -69,6 +69,10 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
     end
 
+    def find_sequence_ids_from_pallet_number(pallet_numbers)
+      DB["SELECT id FROM pallet_sequences WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}') AND pallet_id IS NOT NULL"].map { |r| r[:id] } unless pallet_numbers.nil_or_empty?
+    end
+
     def affected_pallet_numbers(sequence_ids, attrs)
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:pallet_number] }
     end
@@ -279,6 +283,23 @@ module ProductionApp
 
     def update_pallet_sequence(sequence_id, attrs)
       DB[:pallet_sequences].where(id: sequence_id).update(attrs)
+    end
+
+    def oldest_sequence_standard_pack_code(pallet_number)
+      query = <<~SQL
+        SELECT standard_pack_code_id
+        FROM pallet_sequences
+        WHERE pallet_number = '#{pallet_number}'
+          AND pallet_sequence_number = ( SELECT MIN(pallet_sequence_number)
+                                         FROM pallet_sequences
+                                         WHERE pallet_number = '#{pallet_number}' AND pallet_id IS NOT NULL)
+      SQL
+      DB[query].get(:standard_pack_code_id) unless pallet_number.nil_or_empty?
+    end
+
+    def update_pallet_gross_weight(pallet_id, attrs)
+      DB[:pallet_sequences].where(pallet_id: pallet_id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
+      DB[:pallets].where(id: pallet_id).update(gross_weight: attrs[:gross_weight])
     end
   end
 end

@@ -82,4 +82,13 @@ module ProductionApp
     required(:cultivar_id, :integer).maybe(:int?)
     required(:season_id, :integer).filled(:int?)
   end
+
+  ReworksRunUpdateGrossWeightSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallet_number, Types::StrippedString).maybe(:str?)
+    required(:standard_pack_code_id, :integer).filled(:int?)
+    required(:gross_weight, :decimal).filled(:decimal?)
+  end
 end

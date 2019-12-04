@@ -132,6 +132,9 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength
+      reworks_run_type_id = retrieve_from_local_store(:reworks_run_type_id)
+      store_locally(:reworks_run_type_id, reworks_run_type_id)
+
       r.on 'pallet_shipping_details' do
         r.get do
           show_partial_or_page(r) { Production::Reworks::ReworksRun::ShowPalletShippingDetails.call(pallet_number) }
@@ -168,6 +171,26 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit_carton_quantities' do
         r.get do
           show_partial_or_page(r) { Production::Reworks::ReworksRun::EditSequenceQuantities.call(pallet_number) }
+        end
+      end
+
+      r.on 'set_gross_weight' do
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::SetPalletGrossWeight.call(pallet_number, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_pallet_gross_weight(params[:reworks_run_pallet])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::SetPalletGrossWeight.call(pallet_number,
+                                                                         reworks_run_type_id,
+                                                                         form_values: params[:reworks_run_pallet],
+                                                                         form_errors: res.errors)
+            end
+          end
         end
       end
     end

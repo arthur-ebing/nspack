@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunPalletRule < Base
-    def generate_rules
+  class ReworksRunPalletRule < Base # rubocop:disable ClassLength
+    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = ProductionApp::ReworksRepo.new
 
       make_form_object
       apply_form_values
+
+      if @mode == :set_pallet_gross_weight
+        @rules[:provide_pack_type] = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
+        set_pallet_gross_weight_fields
+      end
 
       make_reworks_run_pallet_header_table if %i[edit_pallet].include? @mode
       set_select_pallet_sequence_fields if @mode == :select_pallet_sequence
@@ -63,14 +68,45 @@ module UiRules
       }
     end
 
-    def make_form_object
+    def set_pallet_gross_weight_fields
+      fields[:pallet_number] = { renderer: :hidden }
+      fields[:reworks_run_type_id] = { renderer: :hidden }
+      fields[:standard_pack_code_id] = if rules[:provide_pack_type]
+                                         { renderer: :select,
+                                           options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
+                                           disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
+                                           caption: 'Standard Pack Code',
+                                           required: true,
+                                           prompt: 'Select Standard Pack Code',
+                                           searchable: true,
+                                           remove_search_for_small_list: false }
+                                       else
+                                         { renderer: :hidden }
+                                       end
+
+      fields[:gross_weight] = { renderer: :numeric,
+                                required: true }
+    end
+
+    def make_form_object  # rubocop:disable Metrics/AbcSize
       if @mode == :show_changes
-        @form_object = OpenStruct.new(id: @options[:id], params: @options[:attrs], pallet_sequence_id: @options[:id])
+        @form_object = OpenStruct.new(id: @options[:id],
+                                      params: @options[:attrs],
+                                      pallet_sequence_id: @options[:id])
         return
       end
 
       if @mode == :select_pallet_sequence
-        OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id], pallets_selected: @options[:pallets_selected], pallet_sequence_id: nil)
+        @form_object = OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id],
+                                      pallets_selected: @options[:pallets_selected],
+                                      pallet_sequence_id: nil)
+        return
+      end
+
+      if @mode == :set_pallet_gross_weight
+        @form_object = OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id],
+                                      pallet_number: @options[:pallet_number],
+                                      standard_pack_code_id: standard_pack_code(@options[:pallet_number]))
         return
       end
 
@@ -87,6 +123,10 @@ module UiRules
 
     def sequence_edit_data(attrs)
       @repo.sequence_edit_data(attrs)
+    end
+
+    def standard_pack_code(pallet_number)
+      (@repo.oldest_sequence_standard_pack_code(pallet_number) unless rules[:provide_pack_type])
     end
   end
 end

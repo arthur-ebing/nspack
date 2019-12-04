@@ -31,6 +31,11 @@ module Production
                                   behaviour: :popup,
                                   style: :button)
                   col.add_control(control_type: :link,
+                                  text: 'Set Gross Weight',
+                                  url: "/production/reworks/pallets/#{pallet_number}/set_gross_weight",
+                                  behaviour: :popup,
+                                  style: :button)
+                  col.add_control(control_type: :link,
                                   text: 'Edit Carton quantities',
                                   url: "/production/reworks/pallets/#{pallet_number}/edit_carton_quantities",
                                   behaviour: :popup,
