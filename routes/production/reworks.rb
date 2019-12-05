@@ -205,6 +205,26 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
       end
+
+      r.on 'edit_pallet_details' do
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::EditPalletDetails.call(pallet_number, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_pallet_details(params[:reworks_run_pallet])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::EditPalletDetails.call(pallet_number,
+                                                                      reworks_run_type_id,
+                                                                      form_values: params[:reworks_run_pallet],
+                                                                      form_errors: res.errors)
+            end
+          end
+        end
+      end
     end
 
     r.on 'pallet_sequences', Integer do |id| # rubocop:disable Metrics/BlockLength

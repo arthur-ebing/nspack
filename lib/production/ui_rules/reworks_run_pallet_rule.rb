@@ -2,7 +2,7 @@
 
 module UiRules
   class ReworksRunPalletRule < Base # rubocop:disable ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
+    def generate_rules  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
 
       make_form_object
@@ -13,6 +13,7 @@ module UiRules
       @rules[:show_shipping_details] = @form_object[:shipped]
 
       set_pallet_gross_weight_fields if @mode == :set_pallet_gross_weight
+      set_edit_pallet_details_fields if @mode == :edit_pallet_details
       make_reworks_run_pallet_header_table if %i[edit_pallet].include? @mode
       set_select_pallet_sequence_fields if @mode == :select_pallet_sequence
       set_pallet_sequence_changes if @mode == :show_changes
@@ -86,6 +87,23 @@ module UiRules
 
       fields[:gross_weight] = { renderer: :numeric,
                                 required: true }
+    end
+
+    def set_edit_pallet_details_fields
+      fields[:pallet_number] = { renderer: :hidden }
+      fields[:reworks_run_type_id] = { renderer: :hidden }
+      fields[:fruit_sticker_pm_product_id] = { renderer: :select,
+                                               options: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type(AppConst::PM_TYPE_FRUIT_STICKER),
+                                               caption: 'Fruit Sticker',
+                                               prompt: 'Select Fruit Sticker',
+                                               searchable: true,
+                                               remove_search_for_small_list: false }
+      fields[:fruit_sticker_pm_product_2_id] = { renderer: :select,
+                                                 options: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type(AppConst::PM_TYPE_FRUIT_STICKER),
+                                                 caption: 'Fruit Sticker 2',
+                                                 prompt: 'Select Fruit Sticker 2',
+                                                 searchable: true,
+                                                 remove_search_for_small_list: false }
     end
 
     def make_form_object  # rubocop:disable Metrics/AbcSize

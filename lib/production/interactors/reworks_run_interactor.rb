@@ -386,6 +386,31 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def update_pallet_details(params)  # rubocop:disable Metrics/AbcSize
+      res = validate_update_pallet_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      reworks_run_type_id = attrs.delete(:reworks_run_type_id)
+      pallet_number = attrs.delete(:pallet_number)
+      instance = pallet(pallet_number)
+      before_attrs = { fruit_sticker_pm_product_id: instance[:fruit_sticker_pm_product_id], fruit_sticker_pm_product_2_id: instance[:fruit_sticker_pm_product_2_id] }
+      repo.transaction do
+        repo.update_pallet(instance[:id], attrs)
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: reworks_run_type_id, pallets_selected: Array(pallet_number),
+                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: true }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS,
+                                           before: before_attrs, after: attrs)
+        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+      end
+      success_response('Pallet details updated successfully', pallet_number: pallet_number)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -450,6 +475,10 @@ module ProductionApp
 
     def validate_update_gross_weight_params(params)
       ReworksRunUpdateGrossWeightSchema.call(params)
+    end
+
+    def validate_update_pallet_params(params)
+      ReworksRunUpdatePalletSchema.call(params)
     end
 
     def make_changes?(reworks_run_type)

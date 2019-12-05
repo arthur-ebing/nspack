@@ -55,7 +55,7 @@ module ProductionApp
 
     def update_existing_record?
       case reworks_action
-      when AppConst::REWORKS_ACTION_CLONE, AppConst::REWORKS_ACTION_REMOVE, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT then
+      when AppConst::REWORKS_ACTION_CLONE, AppConst::REWORKS_ACTION_REMOVE, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT, AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS then
         false
       else
         true
@@ -65,9 +65,9 @@ module ProductionApp
     def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
-      repo.reworks_run_clone_pallet(pallets_affected) if reworks_run_booleans[:repack_pallets]
-      repo.update_reworks_run_pallets(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
-      repo.update_reworks_run_pallet_sequences(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
+      repo.repacking_reworks_run(pallets_affected) if reworks_run_booleans[:repack_pallets]
+      repo.scrapping_reworks_run(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
+      repo.existing_record_reworks_run_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
 
       success_response('ok', reworks_run_id: id)
     rescue Crossbeams::InfoError => e

@@ -77,21 +77,21 @@ module ProductionApp
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:pallet_number] }
     end
 
-    def update_reworks_run_pallets(pallet_numbers, attrs, reworks_run_booleans)
+    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans)
       DB[:pallets].where(pallet_number: pallet_numbers).update(attrs)
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:scrap_pallets]
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = null, pallet_id = scrapped_from_pallet_id, scrapped_at = null, exit_ref = null WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:unscrap_pallets]
       DB[upd].update
     end
 
-    def update_reworks_run_pallet_sequences(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
+    def existing_record_reworks_run_update(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
       upd = "UPDATE pallets SET pallet_format_id = pallet_sequences.pallet_format_id FROM pallet_sequences
              WHERE pallets.id = pallet_sequences.pallet_id AND pallets.pallet_number IN ('#{pallet_numbers.join('\',\'')}');"
       DB[upd].update
       DB[:pallet_sequences].where(id: pallet_sequence_ids).update(pallet_sequence_attrs)
     end
 
-    def reworks_run_clone_pallet(pallet_numbers)
+    def repacking_reworks_run(pallet_numbers)
       pallet_number_ids = pallet_number_ids(pallet_numbers)
       return if pallet_number_ids.empty?
 
@@ -300,6 +300,10 @@ module ProductionApp
     def update_pallet_gross_weight(pallet_id, attrs)
       DB[:pallet_sequences].where(pallet_id: pallet_id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
       DB[:pallets].where(id: pallet_id).update(gross_weight: attrs[:gross_weight])
+    end
+
+    def update_pallet(pallet_id, attrs)
+      DB[:pallets].where(id: pallet_id).update(attrs)
     end
 
     def unscrapped_sequences_count(pallet_id)

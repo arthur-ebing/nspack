@@ -121,4 +121,13 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:product_chars, Types::StrippedString).maybe(:str?)
     # required(:active, :bool).maybe(:bool?)
   end
+
+  ReworksRunUpdatePalletSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallet_number, Types::StrippedString).maybe(:str?)
+    required(:fruit_sticker_pm_product_id, :integer).filled(:int?)
+    required(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
+  end
 end
