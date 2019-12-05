@@ -25,6 +25,8 @@ module UiRules
 
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
+      compact_header(columns: %i[farm_code puc_code orchard_code date_picked date_delivered qty_bins_tipped qty_bins_received], display_columns: 1)
+
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
@@ -115,6 +117,13 @@ module UiRules
                                     season_id: nil,
                                     cultivar_id: @delivery.cultivar_id,
                                     orchard_id: @delivery.orchard_id,
+                                    farm_code: @delivery.farm_code,
+                                    puc_code: @delivery.puc_code,
+                                    orchard_code: @delivery.orchard_code,
+                                    date_picked: @delivery.date_picked,
+                                    date_delivered: @delivery.date_delivered,
+                                    qty_bins_received: @delivery.qty_bins_received,
+                                    qty_bins_tipped: @delivery.qty_bins_tipped,
                                     farm_id: nil,
                                     rmt_class_id: nil,
                                     rmt_material_owner_party_role_id: nil,
