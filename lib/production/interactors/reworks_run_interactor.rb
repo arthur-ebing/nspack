@@ -47,7 +47,7 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
-      success_response('ok', reworks_run_id: rw_res.instance[:reworks_run_id])
+      success_response('Pallet change was successful', reworks_run_id: rw_res.instance[:reworks_run_id])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -57,8 +57,9 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       instance = reworks_run_pallet_print_data(pallet_number)
+      label_name = label_template_name(res[:label_template_id])
       repo.transaction do
-        LabelPrintingApp::PrintLabel.call(res.instance[:label_template], instance, quantity: res.instance[:quantity], printer: res.instance[:printer])
+        LabelPrintingApp::PrintLabel.call(label_name, instance, quantity: res[:no_of_prints], printer: res[:printer])
         log_transaction
       end
       success_response('Label printed successfully')
@@ -71,8 +72,9 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       instance = reworks_run_carton_print_data(sequence_id)
+      label_name = label_template_name(res[:label_template_id])
       repo.transaction do
-        LabelPrintingApp::PrintLabel.call(res.instance[:label_template], instance, quantity: res.instance[:quantity], printer: res.instance[:printer])
+        LabelPrintingApp::PrintLabel.call(label_name, instance, quantity: res[:no_of_prints], printer: res[:printer])
         log_transaction
       end
       success_response('Label printed successfully')
@@ -81,6 +83,9 @@ module ProductionApp
     end
 
     def clone_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
+      before_attrs = sequence_changes(sequence_id)
+      return failed_response('Sequence cannot be cloned', pallet_number: before_attrs[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET
+
       instance = nil
       repo.transaction do
         new_id = repo.clone_pallet_sequence(sequence_id)
@@ -111,6 +116,8 @@ module ProductionApp
 
     def remove_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
       before_attrs = sequence_changes(sequence_id)
+      return failed_response('Sequence cannot be removed', pallet_number: before_attrs[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET || cannot_remove_sequence(before_attrs[:pallet_id])
+
       repo.transaction do
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
         repo.remove_pallet_sequence(sequence_id)
@@ -242,6 +249,49 @@ module ProductionApp
       orchard.cultivar_ids.nil_or_empty? ? MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: cultivar_group_id }) : MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
     end
 
+    def for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: basic_pack_code_id,
+                                                                                          std_fruit_size_count_id: std_fruit_size_count_id })
+    end
+
+    def for_select_actual_count_standard_pack_codes(standard_pack_code_ids)
+      return [] if standard_pack_code_ids.empty?
+
+      MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: [[:id, standard_pack_code_ids.map { |r| r }]])
+    end
+
+    def for_select_actual_count_size_references(size_reference_ids)
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: [[:id, size_reference_ids.map { |r| r }]]) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
+    end
+
+    def for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+      MasterfilesApp::MarketingRepo.new.for_select_customer_variety_marketing_varieties(packed_tm_group_id, marketing_variety_id)
+    end
+
+    def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
+      MasterfilesApp::PackagingRepo.new.for_select_pallet_formats(where: { pallet_base_id: pallet_base_id,
+                                                                           pallet_stack_type_id: pallet_stack_type_id })
+    end
+
+    def for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
+      MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet(where: { pallet_format_id: pallet_format_id,
+                                                                               basic_pack_id: basic_pack_code_id })
+    end
+
+    def for_select_pm_type_pm_subtypes(pm_type_id)
+      MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: pm_type_id })
+    end
+
+    def for_select_pm_subtype_pm_boms(pm_subtype_id)
+      MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(pm_subtype_id)
+    end
+
+    def pm_bom_products_table(pm_bom_id)
+      Crossbeams::Layout::Table.new([], MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id), [],
+                                    alignment: { quantity: :right },
+                                    cell_transformers: { quantity: :decimal }).render
+    end
+
     def update_reworks_production_run(params)  # rubocop:disable Metrics/AbcSize
       res = validate_update_reworks_production_run_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -260,7 +310,7 @@ module ProductionApp
         reworks_run_attrs = reworks_run_attrs(sequence_id, attrs[:reworks_run_type_id])
         repo.update_pallet_sequence(sequence_id, after_attrs)
         rw_res = create_reworks_run_record(reworks_run_attrs,
-                                           AppConst::REWORKS_ACTION_CHANGE_PDN_RUN,
+                                           AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN,
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
@@ -443,8 +493,16 @@ module ProductionApp
       repo.reworks_run_pallet_seq_data(sequence_id)
     end
 
+    def label_template_name(label_template_id)
+      MasterfilesApp::LabelTemplateRepo.new.find_label_template(label_template_id)&.label_template_name
+    end
+
+    def cannot_remove_sequence(pallet_id)
+      repo.unscrapped_sequences_count(pallet_id).> 1
+    end
+
     def validate_reworks_run_pallet_sequence_params(params)
-      ProductSetupSchema.call(params)
+      SequenceSetupDataSchema.call(params)
     end
 
     def validate_update_reworks_production_run_params(params)

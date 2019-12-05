@@ -12,6 +12,7 @@ module Production
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.add_text rules[:compact_header]
             page.form do |form|
               form.action "/production/reworks/pallet_sequences/#{id}/edit_reworks_farm_details"
               form.remote!

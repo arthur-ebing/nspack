@@ -17,19 +17,21 @@ module Production
                                   style: :back_button)
             end
             page.add_text rules[:compact_header]
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.row do |row|
                 row.column do |col|
                   col.add_control(control_type: :link,
                                   text: 'shipping details',
                                   url: "/production/reworks/pallets/#{pallet_number}/pallet_shipping_details",
                                   behaviour: :popup,
-                                  style: :button)
+                                  style: :button,
+                                  visible: rules[:show_shipping_details])
                   col.add_control(control_type: :link,
                                   text: 'Print pallet label',
                                   url: "/production/reworks/pallets/#{pallet_number}/print_reworks_pallet_label",
                                   behaviour: :popup,
-                                  style: :button)
+                                  style: :button,
+                                  visible: rules[:carton_equals_pallet])
                   col.add_control(control_type: :link,
                                   text: 'Set Gross Weight',
                                   url: "/production/reworks/pallets/#{pallet_number}/set_gross_weight",

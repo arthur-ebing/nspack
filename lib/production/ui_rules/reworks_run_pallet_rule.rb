@@ -2,17 +2,17 @@
 
 module UiRules
   class ReworksRunPalletRule < Base # rubocop:disable ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def generate_rules  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
       @repo = ProductionApp::ReworksRepo.new
 
       make_form_object
       apply_form_values
 
-      if @mode == :set_pallet_gross_weight
-        @rules[:provide_pack_type] = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
-        set_pallet_gross_weight_fields
-      end
+      @rules[:provide_pack_type] = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
+      @rules[:carton_equals_pallet] = AppConst::CARTON_EQUALS_PALLET
+      @rules[:show_shipping_details] = @form_object[:shipped]
 
+      set_pallet_gross_weight_fields if @mode == :set_pallet_gross_weight
       make_reworks_run_pallet_header_table if %i[edit_pallet].include? @mode
       set_select_pallet_sequence_fields if @mode == :select_pallet_sequence
       set_pallet_sequence_changes if @mode == :show_changes
@@ -73,7 +73,7 @@ module UiRules
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:standard_pack_code_id] = if rules[:provide_pack_type]
                                          { renderer: :select,
-                                           options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
+                                           options: @repo.for_select_standard_pack_codes,
                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
                                            caption: 'Standard Pack Code',
                                            required: true,

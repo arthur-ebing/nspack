@@ -6,9 +6,9 @@
   :icon: edit
   :title: Edit Product Details
 - :url: "/production/reworks/pallet_sequences/$:id$/edit_reworks_production_run"
-  :text: change pdn run
+  :text: change production run
   :icon: edit
-  :title: Edit Pdn Run
+  :title: Edit Production Run
   :popup: true
   :hide_if_null: production_run_id
 - :url: "/production/reworks/pallet_sequences/$:id$/edit_reworks_farm_details"

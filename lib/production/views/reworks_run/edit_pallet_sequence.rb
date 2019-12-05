@@ -4,11 +4,10 @@ module Production
   module Reworks
     module ReworksRun
       class EditPalletSequence
-        def self.call(id, product_setup_id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:product_setup, :edit_pallet_sequence, id: product_setup_id, pallet_sequence_id: id, form_values: form_values)
+        def self.call(id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:reworks_run_sequence, :edit_pallet_sequence, pallet_sequence_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          pm_boms_products = ProductionApp::ProductSetupRepo.new.pm_boms_products(product_setup_id)
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -25,8 +24,8 @@ module Production
               form.method :update
               form.row do |row|
                 row.column do |col|
-                  col.add_field :product_setup_template
-                  col.add_field :product_setup_template_id
+                  col.add_field :pallet_number
+                  col.add_field :pallet_sequence_number
                 end
               end
               form.row do |row|
@@ -78,9 +77,9 @@ module Production
                     fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code
-                    fold.add_table pm_boms_products,
+                    fold.add_table rules[:pm_boms_products],
                                    %i[product_code pm_type_code subtype_code uom_code quantity],
-                                   dom_id: 'product_setup_pm_boms_products',
+                                   dom_id: 'reworks_run_sequence_pm_boms_products',
                                    alignment: { quantity: :right },
                                    cell_transformers: { quantity: :decimal }
                   end
