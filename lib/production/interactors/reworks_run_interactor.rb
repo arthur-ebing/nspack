@@ -35,7 +35,7 @@ module ProductionApp
       rw_res = nil
       repo.transaction do
         rw_res = create_reworks_run_record(attrs, nil, nil)
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], nil, nil, nil)
       end
       rw_res
     rescue Crossbeams::InfoError => e
@@ -96,7 +96,7 @@ module ProductionApp
                                            before: {}, after: instance)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CLONE)
       end
       success_response('Pallet Sequence cloned successfully', instance)
     rescue Crossbeams::InfoError => e
@@ -126,7 +126,7 @@ module ProductionApp
                                            before: before_attrs.sort.to_h, after: sequence_changes(sequence_id).sort.to_h)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], before_attrs[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_REMOVE)
       end
       success_response('Pallet Sequence removed successfully', pallet_number: before_attrs.to_h[:pallet_number])
     rescue Crossbeams::InfoError => e
@@ -154,7 +154,7 @@ module ProductionApp
                                            before: { carton_quantity: old_instance[:carton_quantity] }, after: { carton_quantity: params[:column_value] })
         return validation_failed_response(rw_res) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], old_instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_EDIT_CARTON_QUANTITY)
       end
       instance = repo.reworks_run_pallet_seq_data(sequence_id)
       success_response('Pallet Sequence carton quantity updated successfully', instance)
@@ -209,9 +209,7 @@ module ProductionApp
         return validation_failed_response(rw_res) unless rw_res.success
 
         pallet_id = pallet_sequence(sequence_id)[:pallet_id]
-        log_status('pallets', pallet_id, AppConst::RW_PALLET_SINGLE_EDIT)
-        log_status('pallet_sequences', sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
       end
       success_response('Pallet Sequence updated successfully', pallet_number: pallet_sequence_pallet_number(sequence_id).first)
     rescue Crossbeams::InfoError => e
@@ -314,7 +312,7 @@ module ProductionApp
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN)
       end
       instance = pallet_sequence(sequence_id)
       success_response('Pallet Sequence production_run_id changed successfully', pallet_number: instance[:pallet_number])
@@ -342,7 +340,7 @@ module ProductionApp
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CHANGE_FARM_DETAILS)
       end
       success_response('Pallet Sequence farm details changed successfully', pallet_number: instance[:pallet_number])
     rescue Crossbeams::InfoError => e
@@ -358,7 +356,9 @@ module ProductionApp
         season_id: sequence[:season_id] }
     end
 
-    def log_reworks_runs_status_and_transaction(id)
+    def log_reworks_runs_status_and_transaction(id, pallet_id, sequence_id, status)
+      log_status('pallets', pallet_id, status) unless pallet_id.nil_or_empty?
+      log_status('pallet_sequences', sequence_id, status) unless sequence_id.nil_or_empty?
       log_status('reworks_runs', id, 'CREATED')
       log_transaction
     end
@@ -379,7 +379,7 @@ module ProductionApp
                                            before: { gross_weight: instance[:gross_weight] }, after: { gross_weight: attrs[:gross_weight] })
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:id], nil, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT)
       end
       success_response('Pallet gross_weight updated successfully', pallet_number: pallet_number)
     rescue Crossbeams::InfoError => e
@@ -404,7 +404,7 @@ module ProductionApp
                                            before: before_attrs, after: attrs)
         return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id])
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:id], nil, AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS)
       end
       success_response('Pallet details updated successfully', pallet_number: pallet_number)
     rescue Crossbeams::InfoError => e

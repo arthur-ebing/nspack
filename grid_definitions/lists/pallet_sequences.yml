@@ -1,5 +1,12 @@
 ---
 :dataminer_definition: pallet_sequences
+:actions:
+- :separator: true
+- :url: "/development/statuses/list/pallet_sequences/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
 :captions:
   :conditions:
     :active: Active Pallet Sequences
