@@ -367,6 +367,11 @@ Note: the table row (`tr`) is hidden, the id of the row is `\#{form_name}_#{fiel
 |Boolean
 |`false`
 
+|options - :as_table_cell
+|Render this label with a border and styling like Crossbeams::Layout::Table
+|Boolean
+|`false`
+
 |===
 
 === Method: add_toggle

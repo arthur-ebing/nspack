@@ -22,6 +22,143 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def add_sequence_to_pallet(pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+      pallet = find_pallet_by_pallet_number(pallet_number)
+      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
+
+      carton = find_carton_with_run_info(carton_id)
+      return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
+      return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
+      return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
+
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::AddSequenceToPallet.new(carton_id, pallet[:id], carton_quantity).call
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def find_carton_by_carton_label_id(carton_label_id)
+      repo.find_carton_by_carton_label_id(carton_label_id)
+    end
+
+    def create_pallet_from_carton(carton_id) # rubocop:disable Metrics/AbcSize
+      carton = find_carton_with_run_info(carton_id)
+      return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
+      return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
+
+      cpp = find_carton_cpp(carton_id)
+
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::CreatePalletFromCarton.new(carton_id, cpp[:cartons_per_pallet]).call
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def edit_pallet_validations(pallet_number)
+      pallet = find_pallet_by_pallet_number(pallet_number)
+      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
+      return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
+
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def replace_pallet_sequence(carton_number, pallet_sequence_id, seq_carton_qty) # rubocop:disable Metrics/AbcSize
+      carton = find_carton_with_run_info(carton_number)
+      return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
+
+      pallet_sequence = find_pallet_sequence(pallet_sequence_id)
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::ReplacePalletSequence.new(carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, seq_carton_qty).call
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def find_pallet_sequence(pallet_sequence_id)
+      MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)
+    end
+
+    def update_pallet_sequence_carton_qty(pallet_sequence_id, seq_carton_qty)
+      pallet_sequence = find_pallet_sequence(pallet_sequence_id)
+
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::UpdatePalletSequence.new(pallet_sequence[:pallet_id], pallet_sequence_id, seq_carton_qty).call
+        log_transaction
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def print_pallet_label(pallet_id, params)
+      instance = get_palet_label_data(pallet_id)
+      LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def get_palet_label_data(pallet_id)
+      repo.get_palet_label_data(pallet_id)
+    end
+
+    def find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)
+      repo.find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)
+    end
+
+    def find_pallet_labels
+      repo.find_pallet_labels
+    end
+
+    def find_pallet_sequence_attrs_by_id(id)
+      repo.find_pallet_sequence_attrs_by_id(id)
+    end
+
+    def find_pallet_sequence_attrs(pallet_id, seq_number)
+      repo.find_pallet_sequence_attrs(pallet_id, seq_number)
+    end
+
+    def find_pallet_by_pallet_number(pallet_number)
+      repo.find_pallet_by_pallet_number(pallet_number)
+    end
+
+    def find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+      repo.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, pallet_sequence_number)
+    end
+
+    def find_carton_with_run_info(carton_id)
+      repo.find_carton_with_run_info(carton_id)
+    end
+
+    def find_carton_cpp(carton_id)
+      repo.find_carton_cpp(carton_id)
+    end
+
     def update_production_run(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_production_run_params(params)
       return validation_failed_response(res) unless res.messages.empty?

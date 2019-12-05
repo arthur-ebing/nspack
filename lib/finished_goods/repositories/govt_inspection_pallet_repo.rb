@@ -14,16 +14,23 @@ module FinishedGoodsApp
     crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, wrapper: GovtInspectionPallet
 
     def find_govt_inspection_pallet_flat(id)
-      find_with_association(:govt_inspection_pallets,
-                            id,
-                            parent_tables: [{ parent_table: :inspection_failure_reasons,
-                                              columns: %i[failure_reason description main_factor secondary_factor],
-                                              foreign_key: :failure_reason_id,
-                                              flatten_columns: { failure_reason: :failure_reason,
-                                                                 description: :description,
-                                                                 main_factor: :main_factor,
-                                                                 secondary_factor: :secondary_factor } }],
-                            wrapper: GovtInspectionPalletFlat)
+      hash = find_with_association(:govt_inspection_pallets,
+                                   id,
+                                   parent_tables: [{ parent_table: :inspection_failure_reasons,
+                                                     columns: %i[failure_reason description main_factor secondary_factor],
+                                                     foreign_key: :failure_reason_id,
+                                                     flatten_columns: { failure_reason: :failure_reason,
+                                                                        description: :description,
+                                                                        main_factor: :main_factor,
+                                                                        secondary_factor: :secondary_factor } }])
+      return nil if hash.nil?
+
+      # TODO: Change this to use lookup function for the status:
+      hash[:status] = DB[Sequel[:audit][:current_statuses]]
+                      .where(table_name: 'pallets', row_data_id: hash[:pallet_id])
+                      .reverse(:id).get(:status)
+
+      GovtInspectionPalletFlat.new(hash)
     end
 
     def for_select_pallets
