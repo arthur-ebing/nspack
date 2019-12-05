@@ -1,6 +1,6 @@
 ---
 :caption: All Pallets
-:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, carton_quantity,
+:sql: SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number, carton_quantity,
   pallet_carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age,
   allocated, shipped, in_stock, inspected, palletized, production_run_id, farm, puc,
   orchard, commodity, cultivar, marketing_variety, grade, std_size, actual_count,
@@ -19,8 +19,9 @@
   govt_inspection_passed, internal_inspection_passed, inspection_age, internal_inspection_at,
   internal_reinspection_at, stock_created_at, intake_created_at, first_cold_storage_at,
   active, extended_columns, seq_scrapped_at, CASE WHEN fn_pallet_verification_failed(pallet_id)
-  THEN 'error' ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat ORDER
-  BY pallet_id, pallet_number DESC
+  THEN 'error' ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT
+  scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text
+  AND pallet_number::text IS NOT NULL ORDER BY pallet_id, pallet_number DESC
 :limit: 
 :offset: 
 :external_settings:

@@ -22,6 +22,9 @@
     - :col: in_stock
       :op: =
       :val: $:in_stock$
+    - :col: shipped
+      :op: =
+      :val: $:shipped$
   :in_stock:
     - :col: in_stock
       :op: =
