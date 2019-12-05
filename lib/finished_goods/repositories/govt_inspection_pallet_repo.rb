@@ -23,10 +23,12 @@ module FinishedGoodsApp
                                                                         description: :description,
                                                                         main_factor: :main_factor,
                                                                         secondary_factor: :secondary_factor } }])
+      return nil if hash.nil?
+
+      # TODO: Change this to use lookup function for the status:
       hash[:status] = DB[Sequel[:audit][:current_statuses]]
                       .where(table_name: 'pallets', row_data_id: hash[:pallet_id])
                       .reverse(:id).get(:status)
-      return nil if hash.nil?
 
       GovtInspectionPalletFlat.new(hash)
     end
