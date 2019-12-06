@@ -4,12 +4,18 @@ module Production
   module Reworks
     module ReworksRun
       class EditSequenceQuantities
-        def self.call(pallet_number)
+        def self.call(pallet_number, back_url:)
           ui_rule = UiRules::Compiler.new(:reworks_run_pallet, :quantity, pallet_number: pallet_number)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: back_url,
+                                  style: :back_button)
+            end
             page.add_text rules[:compact_header]
             page.section do |section|
               section.add_grid('production_run_allocated_setups',

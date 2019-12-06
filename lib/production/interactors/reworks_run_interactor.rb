@@ -149,7 +149,6 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       old_instance = pallet_sequence(sequence_id)
-      rw_res = nil
       repo.transaction do
         repo.edit_carton_quantities(sequence_id, params[:column_value])
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
@@ -160,13 +159,7 @@ module ProductionApp
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], old_instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_EDIT_CARTON_QUANTITY)
       end
-      sequence = repo.reworks_run_pallet_seq_data(sequence_id)
-      rw_res.message = 'Pallet Sequence carton quantity updated successfully'
-      rw_res.instance = { changes: { carton_quantity: sequence[:carton_quantity],
-                                     pallet_carton_quantity: sequence[:pallet_carton_quantity],
-                                     sequence_nett_weight: sequence[:sequence_nett_weight],
-                                     pallet_size: sequence[:pallet_size] } }
-      rw_res
+      success_response('Pallet Sequence carton quantity updated successfully', pallet_number: old_instance.to_h[:pallet_number])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -297,6 +290,10 @@ module ProductionApp
       Crossbeams::Layout::Table.new([], MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id), [],
                                     alignment: { quantity: :right },
                                     cell_transformers: { quantity: :decimal }).render
+    end
+
+    def second_fruit_stickers(fruit_sticker_pm_product_id)
+      repo.for_selected_second_pm_products(AppConst::PM_TYPE_FRUIT_STICKER, fruit_sticker_pm_product_id)
     end
 
     def update_reworks_production_run(params)  # rubocop:disable Metrics/AbcSize

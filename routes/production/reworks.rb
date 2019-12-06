@@ -182,7 +182,10 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'edit_carton_quantities' do
         r.get do
-          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditSequenceQuantities.call(pallet_number) }
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::EditSequenceQuantities.call(pallet_number,
+                                                                         back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{pallet_number}/edit_pallet")
+          end
         end
       end
 
@@ -224,6 +227,17 @@ class Nspack < Roda # rubocop:disable ClassLength
             end
           end
         end
+      end
+
+      r.on 'fruit_sticker_changed' do
+        second_fruit_stickers = if params[:changed_value].blank?
+                                  []
+                                else
+                                  interactor.second_fruit_stickers(params[:changed_value])
+                                end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_pallet_fruit_sticker_pm_product_2_id',
+                                     options_array: second_fruit_stickers)])
       end
     end
 
@@ -511,10 +525,8 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit_carton_quantities' do
         res = interactor.edit_carton_quantities(id, reworks_run_type_id, params)
         if res.success
-          json_actions([OpenStruct.new(type: :update_grid_row,
-                                       ids: id,
-                                       changes: res.instance[:changes])],
-                       res.message)
+          flash[:notice] = res.message
+          redirect_via_json "/production/reworks/pallets/#{res.instance[:pallet_number]}/edit_carton_quantities"
         else
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end

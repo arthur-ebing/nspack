@@ -45,7 +45,6 @@ module Production
                   col.add_control(control_type: :link,
                                   text: 'Edit Carton quantities',
                                   url: "/production/reworks/pallets/#{pallet_number}/edit_carton_quantities",
-                                  behaviour: :popup,
                                   style: :button)
                 end
               end
