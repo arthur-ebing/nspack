@@ -37,6 +37,7 @@ form.add_field(:sku_number, 'SKU', scan: 'key248_all', scan_type: :sku)
 form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, force_uppercase: true)
 form.add_field(:quantity, 'Quantity', data_type: 'number')
 form.add_toggle(:complete, 'Is this functon complete?')
+form.add_button('Print', '/rmd/deliveries/print', id: 'print_btn')
 form.add_csrf_tag csrf_tag
 view(inline: form.render, layout: :layout_rmd)
 ----
@@ -454,6 +455,40 @@ form.prev_next_nav('/path/to/resource/$:id$', [1, 2, 3, 4], 3, prev_caption: 'Be
 |The caption to display on the next button (instead of "Next")
 |String
 |`Next`
+
+|===
+
+=== Method: add_button
+
+Renders a suplementary button to submit the form to another path.
+
+[source,ruby]
+----
+form.add_button('Click me!', '/path/to/somewhere')
+----
+
+|===
+|attribute |description |possible values |default
+
+|caption
+|The text to render as the button caption.
+|String
+|None. Required.
+
+|action
+|The path to which the form should be submitted when the button is pressed.
+|String
+|None. Required.
+
+|options - :id
+|The DOM id of the button. Use this to dynamically hide/show.
+|String
+|The hash of the `caption` value prefixed with `btn_`.
+
+|options - :hide_on_load
+|Should the button be hidden when the form loads - typically to be shown later via a behaviour.
+|Boolean
+|`false`
 
 |===
 

@@ -1,0 +1,18 @@
+---
+:dataminer_definition: production_run_allocated_setups
+:actions:
+- :url: "/production/product_setups/product_setups/$:product_setup_id$"
+  :text: view product setup
+  :icon: view-show
+  :title: View
+  :hide_if_null: product_setup_id
+- :url: "/production/runs/product_resource_allocations/$:id$/preview_label"
+  :text: Preview label
+  :icon: photo
+  :title: Peview label
+  :popup: true
+:conditions:
+  :standard:
+    - :col: r.id
+      :op: =
+      :val: $:production_run_id$
