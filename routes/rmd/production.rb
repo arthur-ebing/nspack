@@ -371,8 +371,8 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_csrf_tag csrf_tag
         form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
         form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
-        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET))
-        form.add_select(:pallet_label_name, 'Pallet Label', value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: interactor.find_pallet_labels)
+        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
+        form.add_select(:pallet_label_name, 'Pallet Label', value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: interactor.find_pallet_labels, required: false)
         form.add_button('Print', "/rmd/production/palletizing/print_pallet_labels/#{pallet_sequence[:id]}")
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -395,8 +395,8 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        button_caption: 'Print')
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
         form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
-        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET))
-        form.add_select(:pallet_label_name, 'Pallet Label', value: prod_interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: prod_interactor.find_pallet_labels)
+        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
+        form.add_select(:pallet_label_name, 'Pallet Label', value: prod_interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: prod_interactor.find_pallet_labels, required: false)
         form.add_csrf_tag csrf_tag
         form.add_prev_next_nav('/rmd/production/palletizing/print_pallet_view/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
