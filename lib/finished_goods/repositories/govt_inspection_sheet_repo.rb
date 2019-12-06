@@ -24,9 +24,5 @@ module FinishedGoodsApp
     def last_record(column)
       DB[:govt_inspection_sheets].reverse(:id).limit(1).get(column)
     end
-
-    def find_govt_inspection_sheet_pallet_ids(id)
-      DB[:govt_inspection_pallets].where(govt_inspection_sheet_id: id).select_map(:pallet_id).flatten
-    end
   end
 end

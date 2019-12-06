@@ -37,9 +37,8 @@ module FinishedGoods
               section.fit_height!
               section.add_grid('govt_inspection_pallets',
                                '/list/govt_inspection_pallets/grid_multi',
-                               caption: 'Inspect Pallets',
+                               caption: 'Choose pallets that passed inspection.',
                                is_multiselect: true,
-                               # can_be_cleared: true,
                                multiselect_url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture_results_multiselect",
                                multiselect_key: 'standard',
                                multiselect_params: { key: 'standard',
