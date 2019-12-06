@@ -130,4 +130,10 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:fruit_sticker_pm_product_id, :integer).filled(:int?)
     required(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
   end
+
+  EditCartonQuantitySchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:column_value, :integer).filled(:int?)
+  end
 end

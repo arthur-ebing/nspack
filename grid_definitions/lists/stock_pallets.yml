@@ -83,9 +83,6 @@
     - :col: in_stock
       :op: =
       :val: false
-    - :col: inspected
-      :op: =
-      :val: true
     - :col: govt_inspection_passed
       :op: =
       :val: false

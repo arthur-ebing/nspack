@@ -145,7 +145,11 @@ module ProductionApp
     end
 
     def edit_carton_quantities(sequence_id, reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
+      res = validate_edit_carton_quantity_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       old_instance = pallet_sequence(sequence_id)
+      rw_res = nil
       repo.transaction do
         repo.edit_carton_quantities(sequence_id, params[:column_value])
         reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
@@ -156,8 +160,13 @@ module ProductionApp
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], old_instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_EDIT_CARTON_QUANTITY)
       end
-      instance = repo.reworks_run_pallet_seq_data(sequence_id)
-      success_response('Pallet Sequence carton quantity updated successfully', instance)
+      sequence = repo.reworks_run_pallet_seq_data(sequence_id)
+      rw_res.message = 'Pallet Sequence carton quantity updated successfully'
+      rw_res.instance = { changes: { carton_quantity: sequence[:carton_quantity],
+                                     pallet_carton_quantity: sequence[:pallet_carton_quantity],
+                                     sequence_nett_weight: sequence[:sequence_nett_weight],
+                                     pallet_size: sequence[:pallet_size] } }
+      rw_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -540,6 +549,10 @@ module ProductionApp
 
     def validate_update_reworks_farm_details_params(params)
       ProductionRunUpdateFarmDetailsSchema.call(params)
+    end
+
+    def validate_edit_carton_quantity_params(params)
+      EditCartonQuantitySchema.call(params)
     end
   end
 end

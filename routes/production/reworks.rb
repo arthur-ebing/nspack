@@ -511,7 +511,10 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit_carton_quantities' do
         res = interactor.edit_carton_quantities(id, reworks_run_type_id, params)
         if res.success
-          update_grid_row(id, changes: { carton_quantity: res.instance[:carton_quantity], pallet_carton_quantity: res.instance[:pallet_carton_quantity], sequence_nett_weight: res.instance[:sequence_nett_weight] }, notice: res.message)
+          json_actions([OpenStruct.new(type: :update_grid_row,
+                                       ids: id,
+                                       changes: res.instance[:changes])],
+                       res.message)
         else
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
