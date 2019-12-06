@@ -376,6 +376,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'print_pallet_view', Integer do |id|
         interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        prod_interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         pallet_sequence = interactor.find_pallet_sequence_attrs(id)
         ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
@@ -387,9 +388,12 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
                                        reset_button: false,
                                        no_submit: false,
-                                       action: "/rmd/production/palletizing/print_pallet/#{pallet_sequence[:pallet_id]}",
+                                       action: "/rmd/production/palletizing/print_pallet_labels/#{id}",
                                        button_caption: 'Print')
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
+        form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
+        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET))
+        form.add_select(:pallet_label_name, 'Pallet Label', value: prod_interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: prod_interactor.find_pallet_labels)
         form.add_csrf_tag csrf_tag
         form.add_prev_next_nav('/rmd/production/palletizing/print_pallet_view/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
