@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable ClassLength
   # --------------------------------------------------------------------------
   # DELIVERIES
   # --------------------------------------------------------------------------
