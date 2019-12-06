@@ -10,7 +10,7 @@ module ProductionApp
       repo.transaction do
         id = repo.create_production_run(res)
         repo.create_production_run_stats(id)
-        log_status('production_runs', id, 'CREATED')
+        log_status(:production_runs, id, 'CREATED')
         log_transaction
       end
       instance = production_run_flat(id)
@@ -78,14 +78,14 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def replace_pallet_sequence(carton_number, pallet_sequence_id, seq_carton_qty) # rubocop:disable Metrics/AbcSize
+    def replace_pallet_sequence(carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
       carton = find_carton_with_run_info(carton_number)
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
 
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
       res = nil
       repo.transaction do
-        res = MesscadaApp::ReplacePalletSequence.new(carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, seq_carton_qty).call
+        res = MesscadaApp::ReplacePalletSequence.new(carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
         log_transaction
       end
       res
@@ -99,12 +99,12 @@ module ProductionApp
       MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)
     end
 
-    def update_pallet_sequence_carton_qty(pallet_sequence_id, seq_carton_qty)
+    def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity)
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
 
       res = nil
       repo.transaction do
-        res = MesscadaApp::UpdatePalletSequence.new(pallet_sequence[:pallet_id], pallet_sequence_id, seq_carton_qty).call
+        res = MesscadaApp::UpdatePalletSequence.new(pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
         log_transaction
       end
       res
@@ -185,7 +185,7 @@ module ProductionApp
         repo.delete_product_resource_allocations(id)
         repo.delete_production_run_stats(id)
         repo.delete_production_run(id)
-        log_status('production_runs', id, 'DELETED')
+        log_status(:production_runs, id, 'DELETED')
         log_transaction
       end
 
@@ -199,7 +199,7 @@ module ProductionApp
       repo.transaction do
         new_id = repo.clone_production_run(id)
         repo.create_production_run_stats(new_id)
-        log_status('production_runs', new_id, 'CLONED', comment: "from run id #{id}")
+        log_status(:production_runs, new_id, 'CLONED', comment: "from run id #{id}")
         log_transaction
       end
       instance = production_run_flat(new_id)
@@ -218,7 +218,7 @@ module ProductionApp
       current_template = production_run(id).product_setup_template_id
       repo.transaction do
         repo.update_production_run(id, res)
-        log_status('production_runs', id, 'EDITING') if current_template.nil?
+        log_status(:production_runs, id, 'EDITING') if current_template.nil?
         log_transaction
       end
       instance = production_run_flat(id)
@@ -264,7 +264,7 @@ module ProductionApp
       assert_permission!(:re_configure, id)
       repo.transaction do
         repo.update_production_run(id, reconfiguring: true, setup_complete: false)
-        log_status('production_runs', id, 'RE-CONFiGURING')
+        log_status(:production_runs, id, 'RE-CONFiGURING')
         log_transaction
       end
       success_response('Run can be re-configured')
@@ -287,6 +287,16 @@ module ProductionApp
                 end
 
       success_response(message)
+    end
+
+    def close_run(id)
+      repo.transaction do
+        repo.update_production_run(id, closed: true, closed_at: Time.now)
+        log_status(:production_runs, id, 'CLOSED')
+        log_transaction
+      end
+
+      success_response('Run has been closed')
     end
 
     def complete_run(id)
@@ -393,7 +403,7 @@ module ProductionApp
 
     def mark_setup_as_complete(id)
       repo.transaction do
-        repo.update_production_run(id, setup_complete: true)
+        repo.update_production_run(id, setup_complete: true, reconfiguring: false)
         log_status('production_runs', id, 'SETUP_COMPLETED')
         log_transaction
       end

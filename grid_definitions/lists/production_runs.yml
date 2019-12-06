@@ -19,6 +19,13 @@
   :popup: true
   :hide_if_false: setup_complete
 - :separator: true
+- :url: "/production/runs/production_runs/$:id$/close"
+  :text: Close this run
+  :icon: lock-closed
+  :title: Close this run
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: closed
 - :url: "/production/runs/production_runs/$:id$/complete_setup"
   :text: Mark setup as complete
   :icon: toggle-on
@@ -30,7 +37,7 @@
   :icon: play
   :title: Execute run
   :popup: true
-  :hide_if_true: running
+  :hide_if_true: running,completed
   :hide_if_false: setup_complete
 - :url: "/production/runs/production_runs/$:id$/complete_run"
   :text: Complete all run stages
@@ -58,7 +65,7 @@
   :icon: arrow-left
   :title: Select Product Setup Template
   :popup: true
-  :hide_if_true: setup_complete
+  :hide_if_true: setup_complete,reconfiguring
 - :url: "/production/runs/production_runs/$:id$/allocate_setups"
   :text: allocate product setups
   :icon: list
@@ -74,7 +81,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: setup_complete
+  :hide_if_true: setup_complete,reconfiguring
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/show_stats"
   :text: View run stats
