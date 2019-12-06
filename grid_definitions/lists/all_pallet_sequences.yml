@@ -1,0 +1,8 @@
+---
+:dataminer_definition: all_pallet_sequences
+:actions:
+- :url: "/development/statuses/list/pallet_sequences/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true

@@ -16,7 +16,7 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
-      add_behaviours if %i[new edit edit_pallet_sequence].include? @mode
+      add_behaviours if %i[new edit].include? @mode
 
       form_name 'product_setup'
     end
@@ -216,9 +216,9 @@ module UiRules
                             searchable: true,
                             remove_search_for_small_list: false },
         pallet_label_name: { renderer: :select,
-                             options: MasterfilesApp::LabelTemplateRepo.new.select_label_template_names,
-                             caption: 'Label Name',
-                             prompt: 'Select Label Name',
+                             options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_PALLET }),
+                             caption: 'Pallet Label Name',
+                             prompt: 'Select Pallet Label Name',
                              searchable: true,
                              remove_search_for_small_list: false },
         cartons_per_pallet_id: { renderer: :select,
@@ -271,11 +271,6 @@ module UiRules
     def make_form_object
       if @mode == :new
         make_new_form_object
-        return
-      end
-
-      if @mode == :edit_pallet_sequence
-        @form_object = @repo.find_pallet_sequence_setup_data(@options[:pallet_sequence_id])
         return
       end
 

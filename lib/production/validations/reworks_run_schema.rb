@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ProductionApp
+module ProductionApp  # rubocop:disable Metrics/ModuleLength
   ReworksRunSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
@@ -81,5 +81,59 @@ module ProductionApp
     required(:cultivar_group_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).maybe(:int?)
     required(:season_id, :integer).filled(:int?)
+  end
+
+  ReworksRunUpdateGrossWeightSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallet_number, Types::StrippedString).maybe(:str?)
+    required(:standard_pack_code_id, :integer).filled(:int?)
+    required(:gross_weight, :decimal).filled(:decimal?)
+  end
+
+  SequenceSetupDataSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    optional(:id, :integer).filled(:int?)
+    required(:marketing_variety_id, :integer).filled(:int?)
+    required(:customer_variety_variety_id, :integer).maybe(:int?)
+    required(:std_fruit_size_count_id, :integer).maybe(:int?)
+    required(:basic_pack_code_id, :integer).filled(:int?)
+    required(:standard_pack_code_id, :integer).filled(:int?)
+    required(:fruit_actual_counts_for_pack_id, :integer).maybe(:int?)
+    required(:fruit_size_reference_id, :integer).maybe(:int?)
+    required(:marketing_org_party_role_id, :integer).filled(:int?)
+    required(:packed_tm_group_id, :integer).filled(:int?)
+    required(:mark_id, :integer).filled(:int?)
+    required(:inventory_code_id, :integer).maybe(:int?)
+    required(:pallet_format_id, :integer).filled(:int?)
+    required(:cartons_per_pallet_id, :integer).filled(:int?)
+    required(:pm_bom_id, :integer).maybe(:int?)
+    # required(:extended_columns, :hash).maybe(:hash?)
+    required(:client_size_reference, Types::StrippedString).maybe(:str?)
+    required(:client_product_code, Types::StrippedString).maybe(:str?)
+    optional(:treatment_ids, Types::IntArray).maybe { each(:int?) }
+    required(:marketing_order_number, Types::StrippedString).maybe(:str?)
+    required(:sell_by_code, Types::StrippedString).maybe(:str?)
+    required(:pallet_label_name, Types::StrippedString).maybe(:str?)
+    required(:grade_id, :integer).maybe(:int?)
+    required(:product_chars, Types::StrippedString).maybe(:str?)
+    # required(:active, :bool).maybe(:bool?)
+  end
+
+  ReworksRunUpdatePalletSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallet_number, Types::StrippedString).maybe(:str?)
+    required(:fruit_sticker_pm_product_id, :integer).filled(:int?)
+    required(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
+  end
+
+  EditCartonQuantitySchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:column_value, :integer).filled(:int?)
   end
 end

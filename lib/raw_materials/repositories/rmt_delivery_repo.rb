@@ -23,6 +23,20 @@ module RawMaterialsApp
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
 
+    def find_rmt_delivery(id)
+      qry = <<~SQL
+        SELECT d.*,f.farm_code,p.puc_code, o.orchard_code
+        ,(select sum(qty_bins) from rmt_bins where rmt_delivery_id=d.id and bin_tipped is true) as qty_bins_tipped
+        ,(select count(id) from rmt_bins where rmt_delivery_id=d.id) as qty_bins_received
+        FROM rmt_deliveries d
+        join farms f on f.id=d.farm_id
+        join pucs p on p.id=d.puc_id
+        join orchards o on o.id=d.orchard_id
+        WHERE d.id = ?
+      SQL
+      OpenStruct.new(DB[qry, id].first)
+    end
+
     def update_rmt_bins_inherited_field(id, res)
       # Ask hans:
       # selection/change of delivery.orchard affects the options for rmt_bin.cultivar drop_down. What should happen to

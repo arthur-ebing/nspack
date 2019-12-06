@@ -3,8 +3,9 @@
 :sql: SELECT "rmt_deliveries"."id", "rmt_deliveries"."orchard_id", "rmt_deliveries"."cultivar_id",
   "rmt_deliveries"."rmt_delivery_destination_id", "rmt_deliveries"."season_id", "rmt_deliveries"."farm_id",
   "rmt_deliveries"."puc_id", "rmt_deliveries"."truck_registration_number", "rmt_deliveries"."qty_damaged_bins",
-  "rmt_deliveries"."qty_empty_bins", "rmt_deliveries"."active", "rmt_deliveries"."delivery_tipped",
+  "rmt_deliveries"."qty_empty_bins", "rmt_deliveries"."current", "rmt_deliveries"."delivery_tipped",
   "rmt_deliveries"."date_picked", "rmt_deliveries"."date_delivered", "rmt_deliveries"."tipping_complete_date_time",
+  (select sum(qty_bins) from rmt_bins where rmt_delivery_id=rmt_deliveries.id and bin_tipped is true) as qty_bins_tipped,
   "rmt_deliveries"."created_at", "rmt_deliveries"."updated_at", "cultivars"."cultivar_name",
   "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code", "rmt_delivery_destinations"."delivery_destination_code",
   "seasons"."season_code",SUM("rmt_bins".qty_bins) as qty_bins, CASE WHEN current
@@ -16,7 +17,7 @@
   GROUP BY "rmt_deliveries"."id", "rmt_deliveries"."orchard_id", "rmt_deliveries"."cultivar_id",
   "rmt_deliveries"."rmt_delivery_destination_id", "rmt_deliveries"."season_id", "rmt_deliveries"."farm_id",
   "rmt_deliveries"."puc_id", "rmt_deliveries"."truck_registration_number", "rmt_deliveries"."qty_damaged_bins",
-  "rmt_deliveries"."qty_empty_bins", "rmt_deliveries"."active", "rmt_deliveries"."delivery_tipped",
+  "rmt_deliveries"."qty_empty_bins", "rmt_deliveries"."current", "rmt_deliveries"."delivery_tipped",
   "rmt_deliveries"."date_picked", "rmt_deliveries"."date_delivered", "rmt_deliveries"."tipping_complete_date_time",
   "rmt_deliveries"."created_at", "rmt_deliveries"."updated_at", "cultivars"."cultivar_name",
   "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code", "rmt_delivery_destinations"."delivery_destination_code",
@@ -185,11 +186,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  current:
+    :name: current
     :sequence_no: 11
-    :caption: Active
-    :namespaced_name: rmt_deliveries.active
+    :caption: Current
+    :namespaced_name: rmt_deliveries.current
     :data_type: :boolean
     :width: 
     :format: 
@@ -398,6 +399,22 @@
     :sequence_no: 6
     :caption: Qty Bins
     :namespaced_name: qty_bins
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_bins_tipped:
+    :name: qty_bins_tipped
+    :sequence_no: 6
+    :caption: Qty Bins Tipped
+    :namespaced_name: qty_bins_tipped
     :data_type: :string
     :width:
     :format:

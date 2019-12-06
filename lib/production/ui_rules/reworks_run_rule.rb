@@ -2,12 +2,13 @@
 
 module UiRules
   class ReworksRunRule < Base
-    def generate_rules
+    def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
       make_form_object
       apply_form_values
 
       @rules[:show_changes_made] = !@form_object.changes_made.nil_or_empty?
+      @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
 
       common_values_for_fields common_fields
 
@@ -34,10 +35,17 @@ module UiRules
       fields[:user] = { renderer: :label }
       fields[:pallets_selected] = { renderer: :textarea,
                                     rows: 10,
-                                    disabled: true }
-      fields[:pallets_affected] = { renderer: :textarea,
-                                    rows: 10,
-                                    disabled: true }
+                                    disabled: true,
+                                    hide_on_load: @rules[:single_pallet_selected] ? true : false }
+      fields[:pallets_affected] = if @rules[:single_pallet_selected]
+                                    { renderer: :label,
+                                      with_value: @form_object.pallets_affected,
+                                      caption: 'Affected pallet' }
+                                  else
+                                    { renderer: :textarea,
+                                      rows: 10,
+                                      disabled: true }
+                                  end
       fields[:pallet_number] = { renderer: :label,
                                  hide_on_load: @rules[:show_changes_made] ? false : true }
       fields[:pallet_sequence_number] = { renderer: :label,

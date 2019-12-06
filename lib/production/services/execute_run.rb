@@ -97,11 +97,13 @@ module ProductionApp
       changeset = {
         tipping: !run_is_already_tipping?,
         running: true,
+        setup_complete: true,
         labeling: do_labeling?,
         active_run_stage: active_stage
       }
 
       changeset[:started_at] = Time.now unless run_is_already_tipping?
+      changeset[:re_executed_at] = Time.now unless production_run.started_at.nil?
       changeset
     end
   end

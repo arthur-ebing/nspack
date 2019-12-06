@@ -8,7 +8,7 @@ module Production
           ui_rule = UiRules::Compiler.new(:reworks_run_print, :print_barcode, id: id, pallet_number: pallet_number, form_values: form_values, carton_label: carton_label)
           rules   = ui_rule.compile
 
-          action = if carton_label
+          action = if rules[:carton_label]
                      "/production/reworks/pallet_sequences/#{id}/print_reworks_carton_label"
                    else
                      "/production/reworks/pallets/#{pallet_number}/print_reworks_pallet_label"

@@ -6,7 +6,7 @@ module MasterfilesApp
 
     optional(:id, :integer).filled(:int?)
     required(:standard_pack_code, Types::StrippedString).filled(:str?)
-    required(:material_mass, :decimal).maybe(:decimal?)
+    required(:material_mass, :decimal).filled(:decimal?)
     required(:plant_resource_button_indicator, Types::StrippedString).maybe(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
     required(:std_pack_label_code, Types::StrippedString).maybe(:str?)

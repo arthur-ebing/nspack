@@ -12,6 +12,7 @@ module RawMaterials
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.add_text rules[:compact_header]
             page.form do |form|
               form.caption 'New Bin'
               form.action is_direct_create ? "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/direct_create" : "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins"

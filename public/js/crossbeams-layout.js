@@ -11,7 +11,11 @@
    */
   function disableButton(button, disabledText) {
     button.dataset.enableWith = button.value;
-    button.value = disabledText;
+    if (button.value) {
+      button.value = disabledText;
+    } else {
+      button.textContent = disabledText;
+    }
     button.classList.remove('dim');
     button.classList.add('o-50');
   }
@@ -34,7 +38,11 @@
    */
   function revertDisabledButton(element) {
     element.disabled = false;
-    element.value = element.dataset.enableWith;
+    if (element.value) {
+      element.value = element.dataset.enableWith;
+    } else {
+      element.textContent = element.dataset.enableWith;
+    }
     element.classList.add('dim');
     element.classList.remove('o-50');
   }

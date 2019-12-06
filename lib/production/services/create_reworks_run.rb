@@ -12,7 +12,7 @@ module ProductionApp
       @reworks_run_type = @repo.where_hash(:reworks_run_types, id: params[:reworks_run_type_id])
       @pallets_selected = params[:pallets_selected]
       @pallets_affected = params[:pallets_affected].nil_or_empty? ? pallets_selected : params[:pallets_affected]
-      @affected_pallet_sequences = params[:pallet_sequence_id].nil_or_empty? ? repo.find_pallet_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
+      @affected_pallet_sequences = params[:pallet_sequence_id].nil_or_empty? ? repo.find_sequence_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
       @make_changes = params[:make_changes]
       @reworks_action = reworks_action
       @changes = changes
@@ -55,7 +55,7 @@ module ProductionApp
 
     def update_existing_record?
       case reworks_action
-      when AppConst::REWORKS_ACTION_CLONE, AppConst::REWORKS_ACTION_REMOVE then
+      when AppConst::REWORKS_ACTION_CLONE, AppConst::REWORKS_ACTION_REMOVE, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT, AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS then
         false
       else
         true
@@ -65,9 +65,9 @@ module ProductionApp
     def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
-      repo.reworks_run_clone_pallet(pallets_affected) if reworks_run_booleans[:repack_pallets]
-      repo.update_reworks_run_pallets(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
-      repo.update_reworks_run_pallet_sequences(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
+      repo.repacking_reworks_run(pallets_affected) if reworks_run_booleans[:repack_pallets]
+      repo.scrapping_reworks_run(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
+      repo.existing_record_reworks_run_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
 
       success_response('ok', reworks_run_id: id)
     rescue Crossbeams::InfoError => e
@@ -98,10 +98,10 @@ module ProductionApp
       sequence_changes.to_json
     end
 
-    def pallet_sequences_objects(pallet_number)
-      pallet_seqs = Array(repo.where(:pallet_sequences, MesscadaApp::PalletSequence, id: affected_pallet_sequences) || repo.where(:pallet_sequences, MesscadaApp::PalletSequence, pallet_number: pallet_number))
+    def pallet_sequences_objects(_pallet_number)
       pallet_seqs_objs = {}
-      pallet_seqs.each  do |pallet_sequence|
+      Array(affected_pallet_sequences).each  do |pallet_sequence_id|
+        pallet_sequence = repo.where(:pallet_sequences, MesscadaApp::PalletSequence, id: pallet_sequence_id)
         pallet_seqs_objs['pallet_sequences'] = {
           pallet_id: pallet_sequence[:pallet_id],
           pallet_number: pallet_sequence[:pallet_number],

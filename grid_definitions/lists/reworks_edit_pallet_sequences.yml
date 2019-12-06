@@ -12,5 +12,5 @@
 :edit_rules:
   :url: /production/reworks/pallet_sequences/$:id$/edit_carton_quantities
   :editable_fields:
-    seq_carton_qty:
+    carton_quantity:
       :editor: :numeric

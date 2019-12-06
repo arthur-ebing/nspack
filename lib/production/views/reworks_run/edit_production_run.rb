@@ -5,7 +5,7 @@ module Production
     module ReworksRun
       class EditProductionRun
         def self.call(id, production_run_id, reworks_run_type_id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:reworks_run_sequence, :edit_production_run, reworks_run_type_id: reworks_run_type_id, old_production_run_id: production_run_id, pallet_sequence_id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:reworks_run_sequence, :change_production_run, reworks_run_type_id: reworks_run_type_id, old_production_run_id: production_run_id, pallet_sequence_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -14,7 +14,7 @@ module Production
             page.form_errors form_errors
             page.add_text rules[:compact_header]
             page.form do |form|
-              form.caption 'New Reworks Run'
+              form.caption 'Change Production Run'
               form.action "/production/reworks/pallet_sequences/#{id}/edit_reworks_production_run"
               form.remote!
               form.row do |row|

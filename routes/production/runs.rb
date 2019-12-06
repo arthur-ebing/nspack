@@ -96,7 +96,30 @@ class Nspack < Roda
 
         r.post do
           interactor.mark_setup_as_complete(id)
-          update_grid_row(id, changes: { setup_complete: true, status: 'SETUP_COMPLETED' }, notice: 'Production run setups have been marked as complete')
+          update_grid_row(id, changes: { setup_complete: true, reconfiguring: false, status: 'SETUP_COMPLETED' }, notice: 'Production run setups have been marked as complete')
+        end
+      end
+
+      r.on 'close' do
+        r.get do
+          check_auth!('runs', 'edit')
+          interactor.assert_permission!(:close, id)
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/close",
+                                                          notice: 'Press the button to close the run',
+                                                          button_captions: ['Close', 'Closing...'])
+          end
+        end
+
+        r.post do
+          res = interactor.close_run(id)
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          redirect_to_last_grid(r)
         end
       end
 

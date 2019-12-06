@@ -33,36 +33,48 @@ class Nspack < Roda # rubocop:disable ClassLength
       # r.on 'batch_pallet_edit' do
       #   check_auth!('reworks', 'new')
       #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BATCH_PALLET_EDIT)
+      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+      #
       #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       # end
 
       r.on 'scrap_pallet' do
         check_auth!('reworks', 'new')
         reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SCRAP_PALLET)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
 
       r.on 'unscrap_pallet' do
         check_auth!('reworks', 'new')
         reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_UNSCRAP_PALLET)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
 
       # r.on 'repack' do
       #   check_auth!('reworks', 'new')
       #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_REPACK)
+      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+      #
       #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       # end
       #
       # r.on 'buildup' do
       #   check_auth!('reworks', 'new')
       #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BUILDUP)
+      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+      #
       #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       # end
       #
       # r.on 'tip_bins' do
       #   check_auth!('reworks', 'new')
       #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
+      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+      #
       #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       # end
     end
@@ -132,6 +144,9 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength
+      reworks_run_type_id = retrieve_from_local_store(:reworks_run_type_id)
+      store_locally(:reworks_run_type_id, reworks_run_type_id)
+
       r.on 'pallet_shipping_details' do
         r.get do
           show_partial_or_page(r) { Production::Reworks::ReworksRun::ShowPalletShippingDetails.call(pallet_number) }
@@ -167,8 +182,62 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'edit_carton_quantities' do
         r.get do
-          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditSequenceQuantities.call(pallet_number) }
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::EditSequenceQuantities.call(pallet_number,
+                                                                         back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{pallet_number}/edit_pallet")
+          end
         end
+      end
+
+      r.on 'set_gross_weight' do
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::SetPalletGrossWeight.call(pallet_number, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_pallet_gross_weight(params[:reworks_run_pallet])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::SetPalletGrossWeight.call(pallet_number,
+                                                                         reworks_run_type_id,
+                                                                         form_values: params[:reworks_run_pallet],
+                                                                         form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'edit_pallet_details' do
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::EditPalletDetails.call(pallet_number, reworks_run_type_id) }
+        end
+        r.post do
+          res = interactor.update_pallet_details(params[:reworks_run_pallet])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::EditPalletDetails.call(pallet_number,
+                                                                      reworks_run_type_id,
+                                                                      form_values: params[:reworks_run_pallet],
+                                                                      form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'fruit_sticker_changed' do
+        second_fruit_stickers = if params[:changed_value].blank?
+                                  []
+                                else
+                                  interactor.second_fruit_stickers(params[:changed_value])
+                                end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_pallet_fruit_sticker_pm_product_2_id',
+                                     options_array: second_fruit_stickers)])
       end
     end
 
@@ -177,21 +246,19 @@ class Nspack < Roda # rubocop:disable ClassLength
       store_locally(:reworks_run_type_id, reworks_run_type_id)
 
       r.on 'edit_reworks_pallet_sequence' do # Edit pallet sequence
-        product_setup_id = ProductionApp::ReworksRepo.new.find_product_setup_id(id)
         r.get do
-          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditPalletSequence.call(id, product_setup_id, back_url: back_button_url) }
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::EditPalletSequence.call(id, back_url: back_button_url) }
         end
         r.patch do
-          res = interactor.update_reworks_run_pallet_sequence(params[:product_setup])
+          res = interactor.update_reworks_run_pallet_sequence(params[:reworks_run_sequence])
           if res.success
             store_locally(:reworks_run_sequence_changes, res.instance)
             show_partial_or_page(r) { Production::Reworks::ReworksRun::ShowPalletSequenceChanges.call(id, res.instance, back_url: back_button_url) }
           else
             re_show_form(r, res, url: "/production/reworks/pallet_sequences/#{id}/edit_reworks_pallet_sequence") do
               Production::Reworks::ReworksRun::EditPalletSequence.call(id,
-                                                                       product_setup_id,
                                                                        back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet",
-                                                                       form_values: params[:product_setup],
+                                                                       form_values: params[:reworks_run_sequence],
                                                                        form_errors: res.errors)
             end
           end
@@ -308,6 +375,118 @@ class Nspack < Roda # rubocop:disable ClassLength
                                      options_array: cultivars)])
       end
 
+      r.on 'basic_pack_code_changed' do
+        std_fruit_size_count_id = params[:reworks_run_sequence_std_fruit_size_count_id]
+        if std_fruit_size_count_id.blank? || params[:changed_value].blank?
+          actual_counts = []
+        else
+          basic_pack_code_id = params[:changed_value]
+          actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                     options_array: actual_counts)])
+      end
+
+      r.on 'actual_count_changed' do
+        if params[:changed_value].blank?
+          standard_pack_codes = []
+          size_references = []
+        else
+          fruit_actual_counts_for_pack_id = params[:changed_value]
+          actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
+          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
+          size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_standard_pack_code_id',
+                                     options_array: standard_pack_codes),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_fruit_size_reference_id',
+                                     options_array: size_references)])
+      end
+
+      r.on 'packed_tm_group_changed' do
+        if params[:changed_value].blank? || params[:reworks_run_sequence_marketing_variety_id].blank?
+          customer_variety_varieties = []
+        else
+          packed_tm_group_id = params[:changed_value]
+          marketing_variety_id = params[:reworks_run_sequence_marketing_variety_id]
+          customer_variety_varieties = interactor.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_customer_variety_variety_id',
+                                     options_array: customer_variety_varieties)])
+      end
+
+      r.on 'pallet_stack_type_changed' do
+        pallet_base_id = params[:reworks_run_sequence_pallet_base_id]
+        if pallet_base_id.blank? || params[:changed_value].blank?
+          pallet_formats = []
+        else
+          pallet_stack_type_id = params[:changed_value]
+          pallet_formats = interactor.for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pallet_format_id',
+                                     options_array: pallet_formats)])
+      end
+
+      r.on 'pallet_format_changed' do
+        basic_pack_code_id = params[:reworks_run_sequence_basic_pack_code_id]
+        if basic_pack_code_id.blank? || params[:changed_value].blank?
+          cartons_per_pallets = []
+        else
+          pallet_format_id = params[:changed_value]
+          cartons_per_pallets = interactor.for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_cartons_per_pallet_id',
+                                     options_array: cartons_per_pallets)])
+      end
+
+      r.on 'pm_type_changed' do
+        pm_subtypes = if params[:changed_value].blank?
+                        []
+                      else
+                        interactor.for_select_pm_type_pm_subtypes(params[:changed_value])
+                      end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_subtype_id',
+                                     options_array: pm_subtypes)])
+      end
+
+      r.on 'pm_subtype_changed' do
+        pm_boms = if params[:changed_value].blank?
+                    []
+                  else
+                    interactor.for_select_pm_subtype_pm_boms(params[:changed_value])
+                  end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_bom_id',
+                                     options_array: pm_boms)])
+      end
+
+      r.on 'pm_bom_changed' do
+        if params[:changed_value].blank?
+          pm_bom_products = []
+          pm_bom = nil
+        else
+          pm_bom_id = params[:changed_value]
+          pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_description',
+                                     value: pm_bom&.description),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_erp_bom_code',
+                                     value: pm_bom&.erp_bom_code),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: pm_bom_products)])
+      end
+
       r.on 'print_reworks_carton_label' do # Print Carton Label
         r.get do
           show_partial { Production::Reworks::ReworksRun::PrintReworksLabel.call(id, nil, true) }
@@ -346,7 +525,8 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'edit_carton_quantities' do
         res = interactor.edit_carton_quantities(id, reworks_run_type_id, params)
         if res.success
-          update_grid_row(id, changes: { seq_carton_qty: res.instance[:seq_carton_qty], carton_quantity: res.instance[:carton_quantity], sequence_nett_weight: res.instance[:sequence_nett_weight] }, notice: res.message)
+          flash[:notice] = res.message
+          redirect_via_json "/production/reworks/pallets/#{res.instance[:pallet_number]}/edit_carton_quantities"
         else
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end

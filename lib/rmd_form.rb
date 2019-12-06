@@ -39,6 +39,7 @@ module Crossbeams
       @button_id = options[:button_id]
       @button_initially_hidden = options[:button_initially_hidden]
       @reset_button = options.fetch(:reset_button, true)
+      @buttons = []
       @fields = []
       @rules = []
       @csrf_tag = nil
@@ -167,6 +168,27 @@ module Crossbeams
         <tr id="#{id}"#{initial_visibilty(options)}>
           <td colspan="2" class="b mid-gray">#{caption}</td>
         </tr>
+      HTML
+    end
+
+    # Add a button to the form.
+    # This button submits the same form, but to a different url (provided in action param)
+    #
+    # @param caption [string] the caption for the button.
+    # @param action [string] the url target for the form.
+    # @param options (Hash) options for the header
+    # @option options [String] :id the DOM id of the element
+    # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
+    # @return [void]
+    def add_button(caption, action, options = {})
+      raise ArgumentError, 'Button caption cannot be blank' if caption.nil_or_empty?
+      raise ArgumentError, 'Button action cannot be blank' if action.nil_or_empty?
+
+      id = options[:id] || "btn_#{caption.hash}"
+      @buttons << <<~HTML
+        <button id="#{id}" formaction="#{action}" type="submit" data-disable-with="Processing..." class="dim br2 pa3 bn white bg-gray mr3" data-rmd-btn="Y"#{initial_visibilty(options)} />
+          #{caption}
+        </button>
       HTML
     end
 
@@ -492,9 +514,15 @@ module Crossbeams
 
       <<~HTML
         <p>
-          <input type="submit" value="#{button_caption}" #{submit_id_str}data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"#{initial_hide}> #{links_section} #{reset_section}
+          <input type="submit" value="#{button_caption}" #{submit_id_str}data-disable-with="Submitting..." class="dim br2 pa3 bn white bg-green mr3" data-rmd-btn="Y"#{initial_hide}> #{buttons_section} #{links_section} #{reset_section}
         </p>
       HTML
+    end
+
+    def buttons_section
+      return '' if @buttons.empty?
+
+      @buttons.join(' ')
     end
 
     def initial_hide

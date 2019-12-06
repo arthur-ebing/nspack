@@ -69,25 +69,29 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
     end
 
+    def find_sequence_ids_from_pallet_number(pallet_numbers)
+      DB["SELECT id FROM pallet_sequences WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}') AND pallet_id IS NOT NULL"].map { |r| r[:id] } unless pallet_numbers.nil_or_empty?
+    end
+
     def affected_pallet_numbers(sequence_ids, attrs)
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:pallet_number] }
     end
 
-    def update_reworks_run_pallets(pallet_numbers, attrs, reworks_run_booleans)
+    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans)
       DB[:pallets].where(pallet_number: pallet_numbers).update(attrs)
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:scrap_pallets]
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = null, pallet_id = scrapped_from_pallet_id, scrapped_at = null, exit_ref = null WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:unscrap_pallets]
       DB[upd].update
     end
 
-    def update_reworks_run_pallet_sequences(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
+    def existing_record_reworks_run_update(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
       upd = "UPDATE pallets SET pallet_format_id = pallet_sequences.pallet_format_id FROM pallet_sequences
              WHERE pallets.id = pallet_sequences.pallet_id AND pallets.pallet_number IN ('#{pallet_numbers.join('\',\'')}');"
       DB[upd].update
       DB[:pallet_sequences].where(id: pallet_sequence_ids).update(pallet_sequence_attrs)
     end
 
-    def reworks_run_clone_pallet(pallet_numbers)
+    def repacking_reworks_run(pallet_numbers)
       pallet_number_ids = pallet_number_ids(pallet_numbers)
       return if pallet_number_ids.empty?
 
@@ -219,12 +223,12 @@ module ProductionApp
       DB[query].order(:treatment_code).get(:treatments)
     end
 
-    def find_product_setup_id(sequence_id)
-      DB[:pallet_sequences]
-        .join(:product_resource_allocations, id: :product_resource_allocation_id)
-        .where(Sequel[:pallet_sequences][:id] => sequence_id)
-        .get(:product_setup_id)
-    end
+    # def find_product_setup_id(sequence_id)
+    #   DB[:pallet_sequences]
+    #     .join(:product_resource_allocations, id: :product_resource_allocation_id)
+    #     .where(Sequel[:pallet_sequences][:id] => sequence_id)
+    #     .get(:product_setup_id)
+    # end
 
     def find_production_run_id(sequence_id)
       DB[:pallet_sequences].where(id: sequence_id).get(:production_run_id)
@@ -232,16 +236,16 @@ module ProductionApp
 
     def reworks_run_pallet_quantities(pallet_number)
       query = <<~SQL
-        SELECT pallet_sequence_number, seq_carton_qty
+        SELECT pallet_sequence_number, carton_quantity
         FROM vw_pallet_sequence_flat
         WHERE pallet_number = '#{pallet_number}'
         ORDER BY pallet_sequence_number
       SQL
-      DB[query].order(:puc_code).select_map(%i[pallet_sequence_number seq_carton_qty])
+      DB[query].order(:puc_code).select_map(%i[pallet_sequence_number carton_quantity])
     end
 
-    def edit_carton_quantities(id, seq_carton_qty)
-      update(:pallet_sequences, id, carton_quantity: seq_carton_qty)
+    def edit_carton_quantities(id, carton_quantity)
+      update(:pallet_sequences, id, carton_quantity: carton_quantity)
     end
 
     def pallet_seq_carton_quantity(pallet_id)
@@ -266,7 +270,7 @@ module ProductionApp
                farms.farm_code, pucs.puc_code, orchards.orchard_code, cultivar_groups.cultivar_group_code, cultivars.cultivar_name
         FROM production_runs
         LEFT JOIN plant_resources packhouse ON packhouse.id = production_runs.packhouse_resource_id
-        LEFT JOIN plant_resources line ON packhouse.id = production_runs.production_line_id
+        LEFT JOIN plant_resources line ON line.id = production_runs.production_line_id
         LEFT JOIN farms ON farms.id = production_runs.farm_id
         LEFT JOIN pucs ON pucs.id = production_runs.puc_id
         LEFT JOIN orchards ON orchards.id = production_runs.orchard_id
@@ -279,6 +283,86 @@ module ProductionApp
 
     def update_pallet_sequence(sequence_id, attrs)
       DB[:pallet_sequences].where(id: sequence_id).update(attrs)
+    end
+
+    def oldest_sequence_standard_pack_code(pallet_number)
+      query = <<~SQL
+        SELECT standard_pack_code_id
+        FROM pallet_sequences
+        WHERE pallet_number = '#{pallet_number}'
+          AND pallet_sequence_number = ( SELECT MIN(pallet_sequence_number)
+                                         FROM pallet_sequences
+                                         WHERE pallet_number = '#{pallet_number}' AND pallet_id IS NOT NULL)
+      SQL
+      DB[query].get(:standard_pack_code_id) unless pallet_number.nil_or_empty?
+    end
+
+    def update_pallet_gross_weight(pallet_id, attrs)
+      DB[:pallet_sequences].where(pallet_id: pallet_id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
+      DB[:pallets].where(id: pallet_id).update(gross_weight: attrs[:gross_weight])
+    end
+
+    def update_pallet(pallet_id, attrs)
+      DB[:pallets].where(id: pallet_id).update(attrs)
+    end
+
+    def unscrapped_sequences_count(pallet_id)
+      query = <<~SQL
+        SELECT count(id)
+        FROM pallet_sequences
+        WHERE pallet_id = #{pallet_id}
+      SQL
+      DB[query].single_value
+    end
+
+    def for_select_standard_pack_codes
+      DB[:standard_pack_codes]
+        .where(Sequel.lit('material_mass').> 0) # rubocop:disable Style/NumericPredicate
+        .order(:standard_pack_code)
+        .distinct
+        .select_map(%i[standard_pack_code id])
+    end
+
+    def find_pallet_sequence_setup_data(sequence_id)
+      hash = DB["SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_variety_id,
+                 ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
+                 ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
+                 ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code, --p.pallet_label_name,
+                 cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
+                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
+                 FROM pallet_sequences ps
+                 JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
+                 JOIN pallet_formats ON pallet_formats.id = ps.pallet_format_id
+                 LEFT JOIN pm_boms ON pm_boms.id = ps.pm_bom_id
+                 LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = ps.pm_bom_id
+                 LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+                 LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+                 WHERE ps.id = ?", sequence_id].first
+
+      return nil if hash.nil?
+
+      OpenStruct.new(hash)
+    end
+
+    def for_select_template_commodity_marketing_varieties(commodity_id)  # rubocop:disable Metrics/AbcSize
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .join(:cultivars, id: :cultivar_id)
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .where(Sequel[:cultivars][:commodity_id] => commodity_id)
+        .distinct(Sequel[:marketing_varieties][:id])
+        .select(
+          Sequel[:marketing_varieties][:id],
+          Sequel[:marketing_varieties][:marketing_variety_code]
+        ).map { |r| [r[:marketing_variety_code], r[:id]] }
+    end
+
+    def for_selected_second_pm_products(pm_type, fruit_sticker_pm_product_id)
+      DB["SELECT p.id, p.product_code
+          FROM pm_products p
+          JOIN pm_subtypes s on s.id = p.pm_subtype_id
+          JOIN pm_types t on t.id = s.pm_type_id
+          WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}"].map { |r| [r[:product_code], r[:id]] }
     end
   end
 end

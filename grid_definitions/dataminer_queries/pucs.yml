@@ -2,8 +2,8 @@
 :caption: Pucs
 :sql: "SELECT \"pucs\".\"id\", \"pucs\".\"puc_code\", \"pucs\".\"gap_code\",string_agg(farms.farm_code,
   '; ') AS farm_codes, \"pucs\".\"active\", \"pucs\".\"created_at\", \"pucs\".\"updated_at\"\r\nFROM
-  \"pucs\"\r\nJOIN \"farms_pucs\" on \"pucs\".id = \"farms_pucs\".puc_id\r\nJOIN \"farms\"
-  on \"farms_pucs\".farm_id = \"farms\".id\r\nGROUP BY pucs.id"
+  \"pucs\"\r\nLEFT JOIN \"farms_pucs\" on \"pucs\".id = \"farms_pucs\".puc_id\r\nLEFT
+  JOIN \"farms\" on \"farms_pucs\".farm_id = \"farms\".id\r\nGROUP BY pucs.id"
 :limit: 
 :offset: 
 :external_settings: {}

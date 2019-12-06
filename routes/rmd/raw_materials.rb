@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable ClassLength
   # --------------------------------------------------------------------------
   # DELIVERIES
   # --------------------------------------------------------------------------
@@ -14,7 +14,7 @@ class Nspack < Roda
       r.on 'new' do # rubocop:disable Metrics/BlockLength    # NEW
         delivery = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(id)
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-        details = retrieve_from_local_store(:bin) || { cultivar_id: delivery.cultivar_id, bin_fullness: :Full }
+        details = retrieve_from_local_store(:bin) || { cultivar_id: delivery[:cultivar_id], bin_fullness: :Full }
 
         capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil?
         capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
@@ -33,7 +33,14 @@ class Nspack < Roda
           behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
         end
 
-        form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(delivery.orchard_id), required: true, prompt: true)
+        form.add_label(:farm_code, 'Farm', delivery[:farm_code], nil, as_table_cell: true)
+        form.add_label(:puc_code, 'Puc', delivery[:puc_code], nil, as_table_cell: true)
+        form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code], nil, as_table_cell: true)
+        form.add_label(:date_picked, 'Date Picked', delivery[:date_picked], nil, as_table_cell: true)
+        form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered], nil, as_table_cell: true)
+        form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', delivery[:qty_bins_tipped], nil, as_table_cell: true)
+        form.add_label(:qty_bins_received, 'Qty Bins Received', delivery[:qty_bins_received], nil, as_table_cell: true)
+        form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(delivery[:orchard_id]), required: true, prompt: true)
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)

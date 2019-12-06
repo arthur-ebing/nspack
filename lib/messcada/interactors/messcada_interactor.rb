@@ -189,6 +189,7 @@ module MesscadaApp
     def pallet_changes_on_verify(params)
       changeset = {}
       changeset[:fruit_sticker_pm_product_id] = params[:fruit_sticker_pm_product_id] unless params[:fruit_sticker_pm_product_id].nil_or_empty?
+      changeset[:fruit_sticker_pm_product_2_id] = params[:fruit_sticker_pm_product_2_id] unless params[:fruit_sticker_pm_product_2_id].nil_or_empty?
       if AppConst::PALLET_IS_IN_STOCK_WHEN_VERIFIED
         changeset[:in_stock] = true
         changeset[:stock_created_at] = Time.now
