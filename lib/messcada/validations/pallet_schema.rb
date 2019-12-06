@@ -29,7 +29,7 @@ module MesscadaApp
     optional(:palletized_at, %i[nil time]).maybe(:time?)
     optional(:partially_palletized_at, %i[nil time]).maybe(:time?)
     required(:fruit_sticker_pm_product_id, :integer).maybe(:int?)
-    required(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
+    optional(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
     optional(:allocated, :bool).maybe(:bool?)
     optional(:allocated_at, %i[nil time]).maybe(:time?)
     optional(:reinspected, :bool).maybe(:bool?)

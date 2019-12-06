@@ -171,7 +171,10 @@ class Nspack < Roda # rubocop:disable ClassLength
                         value: pallet_sequence[:pallet_verification_failure_reason_id],
                         prompt: true,
                         required: false)
-        form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
+        if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
+          form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true)
+          form.add_select(:fruit_sticker_pm_product_2_id, 'Fruit Sticker 2', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_2_id], prompt: true)
+        end
         form.add_label(:gross_weight, 'Gross Weight', pallet_sequence[:gross_weight])
         if AppConst::CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION
           form.add_field(:nett_weight, 'Nett Weight', required: true, prompt: true, data_type: :number)
