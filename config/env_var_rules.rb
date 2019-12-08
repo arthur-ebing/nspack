@@ -40,7 +40,9 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' },
     { TITAN_ENVIRONMENT: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
     { TITAN_API_USER_ID: 'Titan API_UserId for government inspections.' },
-    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' }
+    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' },
+    { EDI_HUB_ADDRESS: 'Hub address for sending EDI documents' },
+    { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' }
   ].freeze
 
   NO_OVERRIDE = [
@@ -68,7 +70,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
-    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' }
+    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' },
+    { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' }
   ].freeze
 
   def print

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in-map name="ps" identifier_size="2" root_identifier="BH">
+  <sequence>
+    <record name="doc_header" identifier="BH" size="91" occurence="1">
+      <transformer>
+       <action type="ruby" name="map_header"/>
+      </transformer>
+      <fields>
+        <field name="header" size="2" default="BH" />
+        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
+        <field name="create_date" size="8" format="DATE" default="$:NOW$" />
+        <field name="create_time" size="8" format="HMS" default="$:NOW$"  />
+        <field name="new_fields" size="64" default="BH" />
+      </fields>
+      <children>
+        <record name="pallet_stock" identifier="PS" size="668" occurence="0..n" >
+          <transformer>
+           <action type="ruby" name="map_pallet_sequence"/>
+          </transformer>
+          <fields>
+            <field name="record_type" size="2" default="PS" />
+            <field name="pallet_id" size="9" />
+            <field name="sequence_number" size="6" format="ZEROES" map_to="pallet_sequence_number"/>
+            <field name="unit_type" size="1" default="P" />
+            <field name="store" size="2" default="UI" required="false" />
+            <field name="bay" size="2" default="OM" required="false" />
+            <field name="consignment_number" size="10" />
+            <field name="pro_number" size="11" format="ZEROES" default="1" />
+            <field name="location_code" size="7" default="$:INSTALL_LOCATION$" />
+            <field name="organisation" size="2" />
+            <field name="channel" size="1" default="E" />
+            <field name="country" size="2" default="ZA" />
+            <field name="commodity_group" size="2" />
+            <field name="commodity" size="2" map_to="commodity_code"/>
+            <field name="variety_group" size="2" required="false" />
+            <field name="variety" size="3" map_to="variety_code"/>
+            <field name="sub_variety" size="3" required="false" />
+            <field name="actual_variety" size="3" required="false" />
+            <field name="pack" size="4" />
+            <field name="grade" size="4" />
+            <field name="size_count" size="5" map_to="size_count_code"/>
+            <field name="mark" size="5" />
+            <field name="inventory_code" size="2" required="false" />
+            <field name="picking_reference" size="4" map_to="pick_reference" default="0000"/>
+            <field name="product_characteristic_group" size="2" required="false" />
+            <field name="product_characteristic_code" size="3" required="false" />
+            <field name="target_market" size="2" />
+            <field name="farm" size="7" map_to="puc"/>
+            <field name="carton_quantity" size="7" format="SIGNED" />
+            <field name="pallet_quantity" size="8" format="SIGNDEC" />
+            <field name="remarks" size="8" required="false" />
+            <field name="mixed_indicator" size="1" default="N" />
+            <field name="intake_date" size="8" format="DATE" />
+            <field name="original_depot" size="7" required="false" />
+            <field name="original_intake" size="8" format="DATE" />
+            <field name="cold_date" size="8" format="DATE" required="false"/>
+            <field name="temperature" size="5" format="TEMP1DEC" default="99.9" required="false" />
+            <field name="pallet_status" size="1" required="false" />
+            <field name="pallet_marks" size="1" required="false" />
+            <field name="stock_pool" size="2" />
+            <field name="revision" size="6" format="ZEROES" default="1" required="false" />
+            <field name="message_number" size="11" format="ZEROES" default="0" required="false" />
+            <field name="transaction_user" size="7" default="UI" required="false" />
+            <field name="transaction_date" size="8" format="DATE" />
+            <field name="transaction_time" size="5" format="HM" />
+            <field name="pallet_base_type" size="1" map_to="pallet_base_code"/>
+            <field name="original_cons_no" size="10" required="false" />
+            <field name="order_no" size="6" required="false" />
+            <field name="tracing_temperature" size="6" format="TEMP" required="false" />
+            <field name="minimum_temperature" size="6" format="TEMP" required="false" />
+            <field name="maximum_temperature" size="6" format="TEMP" required="false" />
+            <field name="calculation_method" size="1" required="false" />
+            <field name="boe_number" size="6" required="false" />
+            <field name="combo_pallet id" size="9" required="false" />
+            <field name="temperature_device id" size="20" required="false" />
+            <field name="temp_device_type" size="2" required="false" />
+            <field name="sender" size="2" required="false" />
+            <field name="agent" size="2" required="false" />
+            <field name="principal" size="2" required="false" />
+            <field name="sscc" size="18" />
+            <field name="mass" size="9" required="false" />
+            <field name="saftbin1" size="16" required="false" />
+            <field name="saftbin2" size="16" required="false" />
+            <field name="original_account" size="16" required="false" />
+            <field name="pallet_x" size="1" required="false" />
+            <field name="pallet_y" size="1" required="false" />
+            <field name="pallet_z" size="2" required="false" />
+            <field name="inspec_date" size="8" required="true" format="DATE" map_to="inspection_date"/>
+            <field name="stack_variance" size="1" required="false" />
+            <field name="store_type" size="1" required="false" />
+            <field name="batch_no" size="20" required="false" map_to="batch_code"/>
+            <field name="waybill_no" size="10" required="false" />
+            <field name="gtin" size="14" required="false" map_to="gtin_code"/>
+            <field name="packh_code" size="7" required="false" map_to="packhouse_code"/>
+            <field name="steri_flag" size="2" required="false" />
+            <field name="steri_dest" size="2" required="false" />
+            <field name="label_type" size="1" required="false" />
+            <field name="prov_flag" size="1" required="false" />
+            <field name="sellbycode" size="10" required="false" map_to="sell_by_date"/>
+            <field name="combo_sscc" size="18" required="false" />
+            <field name="expiry_code" size="10" required="false" />
+            <field name="orchard" size="15" required="false" />
+            <field name="target_region" size="5" required="false" />
+            <field name="target_country" size="2" required="false" />
+            <field name="global_gap_number" size="20" required="false" />
+            <field name="lot_no" size="20" required="false" />
+            <field name="traceability_code" size="20" required="false" />
+            <field name="season" size="4" required="false" />
+            <field name="orig_inspec_date" size="8" required="false" format="DATE"/>
+            <field name="inner_pack" size="10" required="false" />
+            <field name="inner_cartons" size="5" required="false" />
+            <field name="protocol_exception_indicator" size="2" required="false" />
+            <field name="upn" size="25" required="false" />
+            <field name="pallet_treatment" size="30" required="false" />
+            <field name="pallet_gross_mass" size="10" required="false" />
+            <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
+            <field name="weighing_date" size="8" format="DATE" required="false"  />
+            <field name="weighing_time" size="5" format="HM" required="false" />
+          </fields>
+        </record>
+      </children>
+    </record>
+    <record name="doc_trailer" identifier="BT" size="32" occurence="1">
+      <fields>
+        <field name="trailer" size="2" default="BT" />
+        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
+        <field name="record_count" size="7" format="ZEROES" />
+        <field name="ps_record_count" size="7" format="ZEROES" />
+        <field name="total_cartons" size="7" format="ZEROES" />
+      </fields>
+    </record>
+  </sequence>
+</in-map>
+
