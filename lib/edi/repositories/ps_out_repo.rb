@@ -68,9 +68,5 @@ module EdiApp
       SQL
       DB[query, marketing_org].all
     end
-
-    def ps_rows_vw(marketing_org)
-      DB[:vw_pallet_sequence_flat].where(in_stock: true, marketing_org: marketing_org).order(:pallet_number, :pallet_sequence_number).all
-    end
   end
 end

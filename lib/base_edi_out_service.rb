@@ -3,7 +3,7 @@
 # SOMEWHERE: which org code gets which flow type & which hub_address to use
 # EDI hub address optional field on Orgs table?
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
-  attr_reader :flow_type, :org_code, :hub_address, :seq_no, :schema, :record_definitions, :record_entries
+  attr_reader :flow_type, :org_code, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries
 
   # TODO: Job... Sequence for flows "ps_edi_out_seq"
   # Job creates edi_out record & service uses this & updates done/crashed etc.
@@ -15,6 +15,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @flow_type = edi_out_transaction.flow_type
     @org_code = edi_out_transaction.org_code
     @hub_address = edi_out_transaction.hub_address
+    @record_id = edi_out_transaction.record_id
     # If rerun, re-use filename...???
     @seq_no = repo.new_sequence_for_flow(flow_type)
     @formatted_seq = format('%<seq>03d', seq: @seq_no)
@@ -129,6 +130,10 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
             AppConst::EDI_NETWORK_ADDRESS
           when '$:INSTALL_LOCATION$'
             AppConst::INSTALL_LOCATION
+          when '$:SOLAS_VERIFICATION_METHOD$'
+            AppConst::SOLAS_VERIFICATION_METHOD
+          when '$:SAMSA_ACCREDITATION$'
+            AppConst::SAMSA_ACCREDITATION
           else
             raise ArgumentError, "BaseEdiOutService: Default code '#{code}' is unknown"
           end
@@ -209,6 +214,8 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       lines += build_flat_rows(key)
     end
     puts lines.join("\n")
+    File.open(File.join(AppConst::EDI_OUT_PATH, @output_filename), 'w') { |f| f.puts lines.join("\n") }
+    @output_filename
   end
 
   def build_flat_rows(key)

@@ -19,8 +19,8 @@ module EdiApp
 
       prepare_bt
       # validate_data('PS' => %i[sscc sequence_number])
-      create_flat_file
-      success_response('PsOut was successful', 'fname')
+      fname = create_flat_file
+      success_response('PsOut was successful', fname)
     end
 
     private
