@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :medium_description
               form.add_field :long_description
               form.add_field :vat_number
+              form.add_field :edi_hub_address
               # form.add_field :variants
               form.add_field :role_names
               form.add_address addresses

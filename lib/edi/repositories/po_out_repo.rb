@@ -68,12 +68,7 @@ module EdiApp
           load_containers.tare_weight AS container_tare_weight,
           load_containers.verified_gross_weight AS container_gross_mass,
           fn_party_role_name(loads.exporter_party_role_id) AS responsible_party,
-
-          -- ++++++++++++++++++++++++++++++++++++++++++++
-          -- ADD iso_country_code to dest_countries ad use that...
-          -- ++++++++++++++++++++++++++++++++++++++++++++
-
-          CASE WHEN destination_countries.country_name = 'ZA' THEN 'L' ELSE 'E' END AS channel,    -- THIS IS NOT SAFE ENOUGH... (should dest_countries have country_code...)
+          CASE WHEN destination_countries.iso_country_code = 'ZA' THEN 'L' ELSE 'E' END AS channel,
           loads.id AS cons_no,
           loads.shipped_at AS cons_date,
           EXTRACT(YEAR FROM seasons.end_date) AS season,
@@ -96,9 +91,7 @@ module EdiApp
           marks.mark_code AS mark,
           inventory_codes.inventory_code AS inv_code,
           govt_inspection_sheets.inspection_point AS inspect_pnt,
-
-          -- inspectors.inspector_code AS inspector,
-
+          inspectors.inspector_code AS inspector,
           pallet_sequences.pick_ref AS picking_reference,
           loads.shipped_at AS shipped_date,
           pallet_sequences.product_chars AS prod_char,

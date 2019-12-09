@@ -325,10 +325,15 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_country(id, params[:country])
           if res.success
+            row_keys = %i[
+              id
+              destination_region_id
+              country_name
+              region_name
+              iso_country_code
+            ]
             update_grid_row(id,
-                            changes: { destination_region_id: res.instance[:destination_region_id],
-                                       region_name: res.instance[:region_name],
-                                       country_name: res.instance[:country_name] },
+                            changes: select_attributes(res.instance, row_keys),
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::Country::Edit.call(id, params[:country], res.errors) }
@@ -360,6 +365,7 @@ class Nspack < Roda
             destination_region_id
             country_name
             region_name
+            iso_country_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

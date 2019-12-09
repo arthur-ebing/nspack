@@ -13,7 +13,7 @@ module MasterfilesApp
         city_id: 1,
         depot_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        edi_code: 'ABC',
+        edi_hub_address: 'ABC',
         active: true
       }
       MasterfilesApp::Depot.new(base_attrs.merge(attrs))

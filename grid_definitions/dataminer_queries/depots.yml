@@ -1,7 +1,7 @@
 ---
 :caption: Depots
 :sql: SELECT "depots"."id", "depots"."city_id", "depots"."depot_code", "depots"."description",
-  "depots"."edi_code", "depots"."active", "depots"."created_at", "depots"."updated_at",
+  "depots"."edi_hub_address", "depots"."active", "depots"."created_at", "depots"."updated_at",
   "destination_cities"."city_name" AS city_name FROM "depots" LEFT JOIN "destination_cities"
   ON "destination_cities"."id" = "depots"."city_id"
 :limit: 
@@ -72,11 +72,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  edi_code:
-    :name: edi_code
+  edi_hub_address:
+    :name: edi_hub_address
     :sequence_no: 5
-    :caption: Edi code
-    :namespaced_name: depots.edi_code
+    :caption: EDI Hub Address
+    :namespaced_name: depots.edi_hub_address
     :data_type: :string
     :width: 
     :format: 

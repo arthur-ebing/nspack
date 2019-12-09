@@ -1,14 +1,8 @@
 # frozen_string_literal: true
 
-# SOMEWHERE: which org code gets which flow type & which hub_address to use
-# EDI hub address optional field on Orgs table?
-# depots.edi_code is hub address. From loads to depots.to edi code :: rename to edi_hub_address constrain to be exactly 3 chars long
-# PS: use edi_hub_address added to Orgs table - also constrain...
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   attr_reader :flow_type, :org_code, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries
 
-  # TODO: Job... Sequence for flows "ps_edi_out_seq"
-  # Job creates edi_out record & service uses this & updates done/crashed etc.
   def initialize(flow_type, id) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, "#{self.class.name}: flow type must be provided" if flow_type.nil?
 
@@ -23,8 +17,8 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
     @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
-    # PO : hub matches to receiving depot (on load)
-    # PS : hub PROBABLY same as network addr
+
+    load_output_paths
     load_schema
   end
 
@@ -35,6 +29,29 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @schema = Nokogiri::XML(File.read(file_path))
     record_keys = schema.xpath('.//record/@identifier').map(&:value)
     record_keys.each { |key| build_field_definitions(key) }
+  end
+
+  def load_output_paths
+    raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_flow_config.yml"' unless File.exist?('config/edi_flow_config.yml')
+
+    config = YAML.load_file('config/edi_flow_config.yml')
+    raise Crossbeams::FrameworkError, "There is no EDI config for #{flow_type} out transformation" if config.dig(:out, flow_type.to_sym).nil?
+
+    build_edi_out_paths(config)
+  end
+
+  def build_edi_out_paths(config)
+    @output_paths = []
+    config[:out][flow_type.to_sym].each do |out_dest|
+      build_edi_out_path(config[:root], out_dest)
+    end
+  end
+
+  def build_edi_out_path(root, out_dest)
+    return if out_dest[:except] && out_dest[:except][:org_code] == org_code
+
+    base_path = root.sub('$HOME', ENV['HOME'])
+    @output_paths << out_dest[:path].sub('$ROOT', base_path)
   end
 
   # Services can use the field definition:
@@ -171,12 +188,8 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   #++
   def format_flat_edi_field(raw_value, len, format_def) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     # If no format provided, right-pad with spaces up to the field length.
-    # TODO: only for fixed text...
     return raw_value.to_s.ljust(len) if format_def.nil?  # || format_def == ''
     return ' ' * len if raw_value.nil?
-
-    # return raw_value if format_def.nil_or_empty?
-    # return nil if raw_value.nil?
 
     case format_def.upcase
     when 'ZEROES'
@@ -207,7 +220,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       format(format_def, raw_value)
     end
   end
-  # end
 
   # This should be moved to a EdiOutFlatFileFormatter perhaps
   def create_flat_file
@@ -215,8 +227,13 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     record_entries.each_key do |key|
       lines += build_flat_rows(key)
     end
+
     puts lines.join("\n")
-    File.open(File.join(AppConst::EDI_OUT_PATH, @output_filename), 'w') { |f| f.puts lines.join("\n") }
+    @output_paths.each do |path|
+      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
+
+      File.open(File.join(path, @output_filename), 'w') { |f| f.puts lines.join("\n") }
+    end
     @output_filename
   end
 

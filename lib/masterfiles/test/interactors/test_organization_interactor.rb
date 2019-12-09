@@ -203,17 +203,18 @@ module MasterfilesApp
         active: true,
         role_ids: [1, 2, 3],
         role_names: %w[One Two Three],
-        parent_organization: 'Test Parent Organization'
+        parent_organization: 'Test Parent Organization',
+        edi_hub_address: 'ABC'
       }
     end
 
     def organization_for_create
-      keys = %i[short_description medium_description long_description vat_number active role_ids]
+      keys = %i[short_description medium_description long_description vat_number active role_ids edi_hub_address]
       organization_attrs.select { |key, _| keys.include?(key) }
     end
 
     def invalid_organization
-      keys = %i[short_description medium_description long_description vat_number active role_ids]
+      keys = %i[short_description medium_description long_description vat_number active role_ids edi_hub_address]
       org_attrs = organization_attrs.select { |key, _| keys.include?(key) }
       org_attrs[:vat_number] = 789_456
       org_attrs

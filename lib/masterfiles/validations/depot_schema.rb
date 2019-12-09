@@ -8,6 +8,6 @@ module MasterfilesApp
     required(:city_id, :integer).maybe(:int?)
     required(:depot_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
-    required(:edi_code, Types::StrippedString).maybe(:str?)
+    required(:edi_hub_address, Types::StrippedString).maybe(:str?)
   end
 end

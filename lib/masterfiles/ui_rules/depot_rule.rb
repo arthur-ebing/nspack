@@ -18,7 +18,7 @@ module UiRules
       fields[:city_id] = { renderer: :label, with_value: city_id_label, caption: 'City' }
       fields[:depot_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:edi_code] = { renderer: :label }
+      fields[:edi_hub_address] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -30,7 +30,7 @@ module UiRules
                    prompt: 'Optional' },
         depot_code: { required: true },
         description: {},
-        edi_code: {}
+        edi_hub_address: {}
       }
     end
 
@@ -44,7 +44,7 @@ module UiRules
       @form_object = OpenStruct.new(city_id: nil,
                                     depot_code: nil,
                                     description: nil,
-                                    edi_code: nil)
+                                    edi_hub_address: nil)
     end
   end
 end

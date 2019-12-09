@@ -18,7 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :depot_code
               form.add_field :description
-              form.add_field :edi_code
+              form.add_field :edi_hub_address
               form.add_field :city_id
             end
           end

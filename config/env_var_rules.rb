@@ -72,7 +72,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' },
     { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' },
-    { EDI_HUB_ADDRESS: 'Hub address for sending EDI documents' },
     { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' }
   ].freeze
 

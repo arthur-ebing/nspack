@@ -219,6 +219,7 @@ class Nspack < Roda
                                       file: 'pack_out',
                                       params: { production_run_id: id,
                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
                                                 keep_file: false })
         if res.success
           change_window_location_via_json(res.instance, request.path)
