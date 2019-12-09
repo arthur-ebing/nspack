@@ -13,8 +13,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = govt_inspection_sheet(id)
-      success_response("Created govt inspection sheet #{instance.booking_reference}",
-                       instance)
+      success_response("Created govt inspection sheet #{instance.booking_reference}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { booking_reference: ['This govt inspection sheet already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = govt_inspection_sheet(id)
-      success_response("Updated govt inspection sheet #{instance.booking_reference}",
-                       instance)
+      success_response("Updated govt inspection sheet #{instance.booking_reference}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -49,6 +47,9 @@ module FinishedGoodsApp
     end
 
     def complete_govt_inspection_sheet(id)
+      res = repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
+      return failed_response('Must have at least one pallet attached.') unless res
+
       update_table_with_status(:govt_inspection_sheets,
                                id,
                                'FINDING_SHEET_COMPLETED',
@@ -62,16 +63,28 @@ module FinishedGoodsApp
                                field_changes: { completed: false })
     end
 
-    def complete_inspection_govt_inspection_sheet(id) # rubocop:disable Metrics/AbcSize
+    def update_pallet_statuses(sheet_id, status)
+      repo.all_hash(:govt_inspection_pallets, { govt_inspection_sheet_id: sheet_id }, true).select_map(:id).each do |id|
+        instance = repo.find_hash(:govt_inspection_pallets, id)
+        update_table_with_status(:pallets,
+                                 instance[:pallet_id],
+                                 status,
+                                 field_changes: { inspected: true,
+                                                  govt_inspection_passed: instance[:passed],
+                                                  govt_first_inspection_at: Time.now,
+                                                  last_govt_inspection_pallet_id: id })
+      end
+    end
+
+    def complete_inspection_govt_inspection_sheet(id)
       res = repo.validate_govt_inspection_sheet_inspected(id)
       return res unless res.success
 
-      field_changes = { inspected: true, results_captured: true, results_captured_at: Time.now }
+      attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
       repo.transaction do
-        repo.update_govt_inspection_sheet(id, field_changes)
-        log_status(:govt_inspection_sheets, id, 'INSPECTION_COMPLETED')
-        pallet_ids = repo.find_govt_inspection_sheet_pallet_ids(id)
-        log_multiple_statuses(:pallets, pallet_ids, 'INSPECTED')
+        repo.update_govt_inspection_sheet(id, attrs)
+        log_status(:govt_inspection_sheets, id, 'MANUALLY_INSPECTED_BY_GOVT')
+        update_pallet_statuses(id, 'MANUALLY_INSPECTED_BY_GOVT')
         log_transaction
       end
       success_response('INSPECTION_COMPLETED')

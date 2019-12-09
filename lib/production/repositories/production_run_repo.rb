@@ -27,12 +27,13 @@ module ProductionApp
     end
 
     def find_pallet_labels
-      qry = <<~SQL
-        SELECT label_name
-        FROM public.labels
-        where extended_columns  @> '{"label_type": "PALLET"}';
-      SQL
-      DB[qry].all.map { |r| r[:label_name] }
+      MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_PALLET }).map { |nm, _| nm }
+      # qry = <<~SQL
+      #   SELECT label_name
+      #   FROM public.label_templates
+      #   where extended_columns  @> '{"label_type": "PALLET"}';
+      # SQL
+      # DB[qry].all.map { |r| r[:label_name] }
     end
 
     def find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)

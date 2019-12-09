@@ -375,6 +375,17 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[doc_seq.next_sequence_update_sql(id)].update
   end
 
+  # Get the next document sequence number.
+  #
+  # Gets DocumentSequence to return the SQL to run.
+  #
+  # @param document_name [string] the document name (key to document sequence hash)
+  # @return [integer] the new sequence value.
+  def next_document_sequence_number(document_name)
+    doc_seq = DocumentSequence.new(document_name)
+    DB[doc_seq.next_sequence_sql_as_seq].get(:seq)
+  end
+
   # Run a query returning an array of column names and an array of data.
   # - useful for quickly passing to a Table renderer.
   #

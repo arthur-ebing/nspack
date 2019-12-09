@@ -184,7 +184,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   #
   # @param table_name [symbol] the name of the table
   # @param id [integer] the record id.
-  # @param status_change [symbol] the type of status change.
+  # @param status_change [string] the type of status change.
   # @param opts [Hash] the options.
   # @option opts [Hash] :field_changes The fields and their values to be updated.
   # @option opts [String] :status_text The optional text to record as the status. If not provided, the value of <tt>status_change</tt> will be capitalized and used.

@@ -40,7 +40,9 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_INSPECTION_BILLING: 'Default Inspection Billing Party for new inspections.' },
     { TITAN_ENVIRONMENT: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
     { TITAN_API_USER_ID: 'Titan API_UserId for government inspections.' },
-    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' }
+    { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' },
+    { SOLAS_VERIFICATION_METHOD: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
+    { SAMSA_ACCREDITATION: 'For sending EDI documents' }
   ].freeze
 
   NO_OVERRIDE = [
@@ -68,7 +70,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ERROR_MAIL_PREFIX: 'Prefix to be placed in subject of emails sent from exceptions.' },
     { ERROR_MAIL_RECIPIENTS: 'Comma-separated list of recipients of exception emails.' },
     { CLIENT_CODE: 'Short, lowercase code to identify the implementation client. Used e.g. in defining per-client behaviour.' },
-    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' }
+    { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' },
+    { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' },
+    { EDI_HUB_ADDRESS: 'Hub address for sending EDI documents' },
+    { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' }
   ].freeze
 
   def print
@@ -97,6 +102,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
       ==================================================================
       #{format(OPTIONAL)}
     STR
+  end
+
+  def list_keys # rubocop:disable Metrics/AbcSize
+    (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort.join("\n")
   end
 
   def root_path

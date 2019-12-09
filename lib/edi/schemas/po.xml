@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in-map name="po" identifier_size="2" root_identifier="BH">
+  <sequence>
+    <record name="doc_header" identifier="BH" size="89" occurence="1">
+      <transformer>
+        <action type="ruby" name="map_document_header"/>
+      </transformer>
+      <fields>
+        <field name="header" size="2" default="BH"/>
+        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
+        <field name="create_date" size="8" format="DATE" default="$:NOW$" />
+        <field name="create_time" size="8" format="HMS" default="$:NOW$" />
+        <field name="extra_chars" size="62" required="false" />
+      </fields>
+    </record>
+    <record name="truck_header" identifier="OH" size="309" occurence="1">
+      <transformer>
+        <action type="ruby" name="map_truck_header"/>
+      </transformer>
+      <fields>
+        <field name="record_type" size="2" default="OH"/>
+        <field name="load_id" size="10" required="false"/>
+        <field name="load_ref" size="10" required="false" map_to="load_reference"/>
+        <field name="load_name" size="25" required="false"/>
+        <field name="transport" size="1" required="false" default="T"/>
+        <field name="load_type" size="1" required="false"/>
+        <field name="load_status" size="1" required="false"/>
+        <field name="tk_date" size="13" required="false" format="DATETIME"/>
+        <field name="tk_user" size="7" required="false"/>
+        <field name="start_date" size="13" required="false" format="DATETIME"/>
+        <field name="user_id" size="7" required="false"/>
+        <field name="partner_id" size="7" required="false"/>
+        <field name="end_date" size="13" required="false" format="DATETIME"/>
+        <field name="dep_date" size="13" required="false" format="DATETIME"/>
+        <field name="handle_point" size="2" required="false" default="UI"/>
+        <field name="carrier" size="8" required="false"/>
+        <field name="plt_qty" size="5" type="number" format="ZEROES" required="false"/>
+        <field name="ctn_qty" size="8" type="number" format="ZEROES" required="false"/>
+        <field name="sub_load" size="12" required="false"/>
+        <field name="next_type" size="2" required="false" default="DP"/>
+        <field name="next_code" size="7" required="false"/>
+        <field name="saecs_voyage" size="6" required="false"/>
+        <field name="phyto_no" size="8" map_to="phytowaybill" required="false"/>
+        <field name="full_load" size="1" required="false" default="Y"/>
+        <field name="instr_type" size="1" required="false" default="D"/>
+        <field name="master_ord" size="6" required="false"/>
+        <field name="location_code" size="7" required="false"/>
+        <field name="season" size="4" required="false"/>
+        <field name="client_ref" size="6" required="false"/>
+        <field name="trip_no" size="8" required="false"/>
+        <field name="xmit_flag" size="1" required="false"/>
+        <field name="revision" size="5" required="false" format="ZEROES" default="1"/>
+        <field name="mesg_no" size="8" required="false" format="ZEROES"/>
+        <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
+        <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+        <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+        <field name="temperature" size="7" required="false" format="TEMP" default="99.99"/>
+        <field name="new_fields" size="54" required="false"/>
+      </fields>
+    </record>
+    <record name="truck_location_from" identifier="LF" size="100" occurence="1">
+      <transformer>
+        <action type="ruby" name="map_from_location"/>
+      </transformer>
+      <fields>
+        <field name="record_type" size="2" default="OL"/>
+        <field name="load_id" size="10" required="false"/>
+        <field name="locn_type" size="2" required="false" map_to="location_type" default="DP"/>
+        <field name="locn_code" size="7" required="false" map_to="location_code"/>
+        <field name="seq_no" size="5" type="number" required="false" format="ZEROES" default="1" map_to="sequence_number"/>
+        <field name="tran_type" size="1" required="false" default="L" map_to="transaction_type"/>
+        <field name="handle_point" size="2" required="false" default="UI"/>
+        <field name="arr_date" size="8" required="false" format="DATE" map_to="arrival_date"/>
+        <field name="arr_time" size="5" required="false" format="HM" map_to="arrival_time"/>
+        <field name="dep_date" size="8" required="false" format="DATE" map_to="departure_date"/>
+        <field name="dep_time" size="5" required="false" format="HM" map_to="departure_time"/>
+        <field name="conn_flight" size="10" required="false"/>
+        <field name="load_status" size="1" required="false"/>
+        <field name="xmit_flag" size="1" required="false" default="N" map_to="transmit_flag"/>
+        <field name="revision" size="5" required="false" format="ZEROES" default="1" map_to="revision_number"/>
+        <field name="mesg_no" size="8" required="false" format="ZEROES" default="0" map_to="message_number"/>
+        <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
+        <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+        <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+      </fields>
+    </record>
+    <record name="truck_location_to" identifier="LT" size="100" occurence="1">
+      <transformer>
+        <action type="ruby" name="map_to_location"/>
+      </transformer>
+      <fields>
+        <field name="record_type" size="2" default="OL"/>
+        <field name="load_id" size="10" required="false"/>
+        <field name="locn_type" size="2" required="false" map_to="location_type" default="DP"/>
+        <field name="locn_code" size="7" required="false" map_to="location_code"/>
+        <field name="seq_no" size="5" type="number" required="false" format="ZEROES" default="1"
+          map_to="sequence_number"/>
+        <field name="tran_type" size="1" required="false" default="D" map_to="transaction_type"/>
+        <field name="handle_point" size="2" required="false" default="UI"/>
+        <field name="arr_date" size="8" required="false" format="DATE" map_to="arrival_date"/>
+        <field name="arr_time" size="5" required="false" format="HM" map_to="arrival_time"/>
+        <field name="dep_date" size="8" required="false" format="DATE" map_to="departure_date"/>
+        <field name="dep_time" size="5" required="false" format="HM" map_to="departure_time"/>
+        <field name="conn_flight" size="10" required="false"/>
+        <field name="load_status" size="1" required="false"/>
+        <field name="xmit_flag" size="1" required="false" default="N" map_to="transmit_flag"/>
+        <field name="revision" size="5" required="false" format="ZEROES" default="1" map_to="revision_number"/>
+        <field name="mesg_no" size="8" required="false" format="ZEROES" default="0" map_to="message_number"/>
+        <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
+        <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+        <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+      </fields>
+      <children>
+        <sequence occurence="1..n">
+          <record name="container" identifier="OK" size="370" occurence="0..1">
+            <transformer>
+              <action type="ruby" name="map_container"/>
+            </transformer>
+            <fields>
+              <field name="record_type" size="2" default="OK"/>
+              <field name="load_id" size="10" required="false"/>
+              <field name="location_code" size="7" required="false"/>
+              <field name="container" size="11" required="false" map_to="container_number"/>
+              <field name="seal_no_old" size="8" required="false"/>
+              <field name="position" size="6" required="false"/>
+              <field name="consec_no_old" size="6" required="false" format="ZEROES" default="0"/>
+              <field name="pro_no" size="8" required="false" format="ZEROES" default="1"/>
+              <field name="stuff_date" size="13" required="false" format="DATETIME"/>
+              <field name="temp_set" size="6" required="false" format="TEMP" default="0"/>
+              <field name="disch_port" size="6" required="false"/>
+              <field name="cto_no_old" size="8" required="false" default="0"/>
+              <field name="ship_line" size="1" required="false"/>
+              <field name="doc_no" size="10" required="false" map_to="document_number"/>
+              <field name="sender" size="2" required="false"/>
+              <field name="agent" size="2" required="false"/>
+              <field name="ship_sender" size="2" required="false"/>
+              <field name="ship_agent" size="2" required="false"/>
+              <field name="orgzn" size="2" required="false" map_to="organization_code"/>
+              <field name="load_depot" size="7" required="false"/>
+              <field name="ctn_qty" size="5" type="number" required="false" format="ZEROES" map_to="carton_quantity"/>
+              <field name="plt_qty" size="5" type="number" required="false" format="ZEROES" map_to="pallet_quantity"/>
+              <field name="tk_user" size="7" required="false"/>
+              <field name="in_user" size="7" required="false"/>
+              <field name="in_partner" size="7" required="false"/>
+              <field name="ryan_no_old" size="8" required="false"/>
+              <field name="cont_status" size="1" required="false" default="T"/>
+              <field name="xmit_flag" size="1" required="false" default="Y" map_to="transmit_flag"/>
+              <field name="revision" size="5" required="false" format="ZEROES" default="1" map_to="revision_number"/>
+              <field name="mesg_no" size="8" required="false" format="ZEROES" default="0"/>
+              <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
+              <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+              <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+              <field name="ship_number" size="6" required="false"/>
+              <field name="pallet_btype" size="1" required="false" map_to="pallet_base_type"/>
+              <field name="container_type" size="1" required="false"/>
+              <field name="perc_vents" size="5" required="false" format="ZEROES" default="0"/>
+              <field name="principal" size="2" required="false"/>
+              <field name="ship_name" size="15" required="false"/>
+              <field name="container_size" size="2" required="false"/>
+              <field name="seal_no" size="15" required="false"/>
+              <field name="consec_no" size="10" required="false"/>
+              <field name="cto_no" size="10" required="false"/>
+              <field name="ryan_no" size="10" required="false"/>
+              <field name="ship_name2" size="25" required="false"/>
+              <field name="voyage_no" size="10" required="false"/>
+              <field name="ship_call_sign" size="10" required="false"/>
+              <field name="ship_line2" size="2" required="false"/>
+              <field name="verification_method" size="1" required="false" default="$:SOLAS_VERIFICATION_METHOD$" />
+              <field name="container_tare_weight" size="5" required="false"/>
+              <field name="container_gross_mass" size="10" required="false"/>
+              <field name="samsa_accreditation" size="10" required="false" default="$:SAMSA_ACCREDITATION$" />
+              <field name="responsible_party" size="2" required="false"/>
+              <field name="new_fields" size="25" required="false"/>
+            </fields>
+          </record>
+          <record name="intake_header" identifier="OC" size="220" occurence="1">
+            <transformer>
+              <action type="ruby" name="map_consignment"/>
+            </transformer>
+            <fields>
+              <field name="record_type" size="2" default="OC"/>
+              <field name="load_id" size="10" required="false"/>
+              <field name="locn_code" size="7" map_to="location_code"  required="true" default="$:INSTALL_LOCATION$" />
+              <field name="orgzn" size="2" map_to="organization_code"/>
+              <field name="cons_no" size="10" map_to="document_number"/>
+              <field name="cons_type" size="2" map_to="document_type" DEFAULT="DP" />
+              <field name="cons_date" size="8" format="DATE"/>
+              <field name="account" size="6" required="false" map_to="account_code"/>
+              <field name="channel" size="1" map_to="channel" default="E"/>
+              <field name="pro_no" size="8" required="false" format="ZEROES"/>
+              <field name="grower_alloc" size="6" required="false"/>
+              <field name="ctn_qty" size="8" type="number" map_to="qty_cartons" format="ZEROES"/>
+              <field name="plt_qty" size="5" type="number" map_to="qty_pallets" format="ZEROES"/>
+              <field name="full_pallet" size="5" required="false" format="ZEROES"/>
+              <field name="inc_pallet" size="5" required="false" format="ZEROES"/>
+              <field name="season" size="4"/>
+              <field name="client_ref" size="10" required="false" map_to="client_reference"/>
+              <field name="allow_code" size="4" required="false"/>
+              <field name="allow_del" size="1" required="false"/>
+              <field name="liner_bd" size="1" required="false"/>
+              <field name="plas_cover" size="1" required="false"/>
+              <field name="spoor_load" size="1" required="false"/>
+              <field name="repack_flag" size="1" required="false"/>
+              <field name="endorse1" size="2" required="false"/>
+              <field name="endorse2" size="2" required="false"/>
+              <field name="endorse3" size="2" required="false"/>
+              <field name="endorse4" size="2" required="false"/>
+              <field name="order_no" size="6" required="false" map_to="order_number"/>
+              <field name="dest_type" size="2" default="DP"/>
+              <field name="dest_code" size="7" default="$:INSTALL_LOCATION$" />
+              <field name="cnts_on_truck" size="5" format="ZEROES" required="false"/>
+              <field name="mix_cnt_pals" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="cons_count" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="pals_unstable" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="pals_damage" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="pals_sundry" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="cons_status" size="1" default="P" required="false"/>
+              <field name="batch" size="5" format="ZEROES" default="0" required="false"/>
+              <field name="xmit_flag" size="1" default="N" required="false"/>
+              <field name="revision" size="5" default="1" map_to="revision_number" required="false"/>
+              <field name="mesg_no" size="8" format="ZEROES" default="0" required="false"/>
+              <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
+              <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+              <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+              <field name="pallet_btype" size="1" required="false" map_to="pallet_base_code"/>
+              <field name="temperature" size="6" format="TEMP" default="99.99" map_to="temperature" required="false"/>
+              <field name="principal" size="2" required="false"/>
+              <field name="steri_flag" size="2" required="false"/>
+              <field name="steri_dest" size="2" required="false"/>
+              <field name="new_fields" size="6" required="false"/>
+            </fields>
+            <child>
+              <record name="pallet_sequence" identifier="OP" size="767" occurence="1..n" >
+                <transformer>
+                  <action type="ruby" name="map_pallet_sequence"/>
+                </transformer>
+                <fields>
+                  <field name="record_type" size="2" default="OP"/>
+                  <field name="load_id" size="10"/>
+                  <field name="blank_pallet_id" size="9" required="false"/>
+                  <field name="seq_no" size="5" map_to="pallet_sequence_number" format="ZEROES"/>
+                  <field name="unit_type" size="1" default="P" required="false"/>
+                  <field name="position" size="6" required="false"/>
+                  <field name="sender" size="2" required="false"/>
+                  <field name="agent" size="2" required="false"/>
+                  <field name="ship_sender" size="2" required="false"/>
+                  <field name="ship_agent" size="2" required="false"/>
+                  <field name="dest_type" size="2" required="false"/>
+                  <field name="dest_locn" size="7" required="false"/>
+                  <field name="cons_no" size="10" map_to="consignment_note_number"/>
+                  <field name="container" size="11" required="false"/>
+                  <field name="cont_split" size="1" required="false"/>
+                  <field name="channel" size="1" map_to="channel" default="E"/>
+                  <field name="orgzn" size="2" map_to="organization_code"/>
+                  <field name="country" size="2" default="ZA" required="false"/>
+                  <field name="comm_grp" size="2" required="false"/>
+                  <field name="commodity" size="2" map_to="commodity_code"/>
+                  <field name="var_grp" size="2" required="false"/>
+                  <field name="variety" size="3" map_to="variety_code"/>
+                  <field name="sub_var" size="3" required="false"/>
+                  <field name="act_var" size="3" required="false"/>
+                  <field name="pack" size="4" map_to="pack_code"/>
+                  <field name="grade" size="4" map_to="grade_code"/>
+                  <field name="mark" size="5" map_to="mark_code"/>
+                  <field name="size_count" size="5" map_to="size_count_code"/>
+                  <field name="inv_code" size="2" map_to="inventory_code" required="false"/>
+                  <field name="pick_ref" size="4" map_to="pick_reference" required="false"/>
+                  <field name="farm" size="7" map_to="puc"/>
+                  <field name="prod_grp" size="2" required="false"/>
+                  <field name="prod_char" size="3" required="false" map_to="product_characteristics"/>
+                  <field name="targ_mkt" size="2" map_to="target_market"/>
+                  <field name="ctn_qty" size="5" type="number" map_to="carton_quantity" format="ZEROES"/>
+                  <field name="plt_qty" size="9" type="number" map_to="pallet_quantity" format="DECIMAL"/>
+                  <field name="mixed_ind" size="1" default="N"/>
+                  <field name="remarks" size="8" required="false" map_to="remarks"/>
+                  <field name="reason" size="4" required="false"/>
+                  <field name="intake_date" size="8" format="DATE"/>
+                  <field name="orig_depot" size="7" required="false" map_to="original_depot"/>
+                  <field name="orig_intake" size="8" format="DATE"/>
+                  <field name="shift" size="1" required="false"/>
+                  <field name="shift_date" size="8" format="DATE" required="false"/>
+                  <field name="order_no" size="6" required="false"/>
+                  <field name="locn_code" size="7" default="$:INSTALL_LOCATION$" />
+                  <field name="store" size="2" required="false"/>
+                  <field name="stock_pool" size="2" required="false" default="CE" />
+                  <field name="shipped_date" size="13" format="DATETIME"/>
+                  <field name="xmit_flag" size="1" default="N" required="false"/>
+                  <field name="revision" size="5" format="ZEROES" default="0" required="false"/>
+                  <field name="mesg_no" size="8" format="ZEROES" default="0" required="false"/>
+                  <field name="tran_user" size="7" map_to="transaction_user" required="false"/>
+                  <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
+                  <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
+                  <field name="pallet_btype" size="1" map_to="pallet_base_code" map_to_table="depot_pallets"/>
+                  <field name="orig_cons" size="10" required="false"/>
+                  <field name="ship_number" size="6" required="false"/>
+                  <field name="temperature" size="6" format="TEMP" default="99.99" required="false"/>
+                  <field name="combo_pallet_id" size="9" required="false"/>
+                  <field name="temp_device_id" size="20" required="false"/>
+                  <field name="temp_device_type" size="2" required="false"/>
+                  <field name="boe_no" size="6" required="false"/>
+                  <field name="principal" size="2" required="false"/>
+                  <field name="sscc" size="18" map_to="pallet_id" />
+                  <field name="mass" size="9" type="number" format="DECIMAL" />
+                  <field name="saftbin1" size="16" required="false"/>
+                  <field name="saftbin2" size="16" required="false"/>
+                  <field name="saftbin3" size="16" required="false"/>
+                  <field name="orig_account" size="6" required="false"/>
+                  <field name="inspec_date" size="8" required="false" format="DATE" map_to="inspection_date"/>
+                  <field name="stack_variance" size="1" required="false"/>
+                  <field name="store_type" size="1" required="false"/>
+                  <field name="batch_no" size="20" required="false" map_to="batch_code"/>
+                  <field name="waybill_no" size="10" required="false"/>
+                  <field name="gtin" size="14" map_to="gtin_code" required="false" nullify_zeros="true" />
+                  <field name="packh_code" size="7" required="false" map_to="packhouse_code"/>
+                  <field name="steri_flag" size="2" required="false"/>
+                  <field name="steri_dest" size="2" required="false"/>
+                  <field name="label_type" size="1" required="false"/>
+                  <field name="prov_Flag" size="1" required="false"/>
+                  <field name="sellbyCode" size="10" required="false" map_to="sell_by_date"/>
+                  <field name="combo_sscc" size="18" required="false"/>
+                  <field name="inspector" size="6" required="false" map_to="inspector_number"/>
+                  <field name="inspect_pnt" size="6" required="false" map_to="inspection_point"/>
+                  <field name="expiry_code" size="10" required="false"/>
+                  <field name="orchard" size="15" required="false"/>
+                  <field name="target_region" size="5" required="false"/>
+                  <field name="target_country" size="2" required="false"/>
+                  <field name="global_gap_number" size="20" required="false"/>
+                  <field name="lot_no" size="20" required="false"/>
+                  <field name="traceability_code" size="20" required="false"/>
+                  <field name="season" size="4" required="false" />
+                  <field name="orig_inspec_date" size="8" required="false" format="DATE"/>
+                  <field name="inner_pack" size="10" required="false" />
+                  <field name="inner_cartons" size="5" required="false" />
+                  <field name="production_id" size="20" required="false" />
+                  <field name="protocol_exception_indicator" size="2" required="false" />
+                  <field name="upn" size="25" required="false" />
+                  <field name="pallet_treatment" size="30" required="false" />
+                  <field name="pallet_gross_mass" size="10" required="false" format="DECIMAL" />
+                  <field name="samsa_accreditation" size="10" required="false" default="$:SAMSA_ACCREDITATION$"  />
+                  <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
+                  <field name="weighing_date" size="8" format="DATE" required="false"  />
+                  <field name="weighing_time" size="5" format="HM" required="false" />
+                  <field name="new_fields" size="18" required="false" />
+                  <field name="phyto_data" size="10" required="false"/>
+                </fields>
+              </record>
+            </child>
+          </record>
+        </sequence>
+      </children>
+    </record>
+    <record name="doc_trailer" identifier="BT" size="60" occurence="1">
+      <fields>
+        <field name="record_type" size="2" default="BT"/>
+        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
+        <field name="record_count" size="7" format="ZEROES"/>
+        <field name="oh_count" size="5" format="ZEROES"/>
+        <field name="ol_count" size="5" format="ZEROES"/>
+        <field name="oc_count" size="5" format="ZEROES"/>
+        <field name="ok_count" size="5" format="ZEROES"/>
+        <field name="op_count" size="5" format="ZEROES"/>
+        <field name="total_carton_count" size="8" format="ZEROES"/>
+        <field name="total_pallet_count" size="9" format="DECIMAL"/>
+      </fields>
+    </record>
+  </sequence>
+</in-map>

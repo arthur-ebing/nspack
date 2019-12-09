@@ -85,7 +85,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_IMPLEMENTATION_OWNER = 'IMPLEMENTATION_OWNER'
   ROLE_CUSTOMER = 'CUSTOMER'
   ROLE_SUPPLIER = 'SUPPLIER'
-  # ROLE_TRANSPORTER = 'TRANSPORTER'
   ROLE_MARKETER = 'MARKETER'
   ROLE_FARM_OWNER = 'FARM_OWNER'
   ROLE_SHIPPING_LINE = 'SHIPPING_LINE'
@@ -251,6 +250,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
+  INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
+  raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
   # Depots: Depot Code
   DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
@@ -272,4 +273,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV['TITAN_ENVIRONMENT'].to_sym]
   TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
   TITAN_API_SECRET = ENV['TITAN_API_SECRET']
+
+  # EDI Settings
+  EDI_OUT_PATH = "#{ENV['HOME']}/nspack_edi_out"
+  EDI_HUB_ADDRESS = ENV.fetch('EDI_HUB_ADDRESS')
+  EDI_NETWORK_ADDRESS = ENV.fetch('EDI_NETWORK_ADDRESS', '999')
+  EDI_FLOW_PS = 'PS'
+  EDI_FLOW_PO = 'PO'
+  SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
+  SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
 end

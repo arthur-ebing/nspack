@@ -43,8 +43,6 @@
       :val: $:id$
 :multiselect:
   :standard:
-    :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/inspect"
-    :section_caption: 'Assign pallets to inspection sheet'
     :multiselect_save_method: remote
     :can_be_cleared: false
     :conditions: standard

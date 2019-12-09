@@ -43,15 +43,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:complete, id)
         res = interactor.complete_govt_inspection_sheet(id)
-        flash[:notice] = res.message
-        r.redirect '/list/govt_inspection_sheets'
+        if res.success
+          flash[:notice] = res.message
+          r.redirect '/list/govt_inspection_sheets'
+        else
+          flash[:error] = res.message
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
+        end
       end
 
       r.on 'uncomplete' do
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:uncomplete, id)
         res = interactor.uncomplete_govt_inspection_sheet(id)
-        flash[:notice] = res.message
+        flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/govt_inspection_sheets'
       end
 
@@ -59,7 +64,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:edit, id)
         res = pallet_interactor.pass_govt_inspection_pallet_multiselect(multiselect_grid_choices(params))
-        flash[:notice] = res.message
+        flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer
       end
 
