@@ -10,7 +10,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen add_pallet capture_results].include? @mode
-
+      add_rules
       add_behaviours
 
       form_name 'govt_inspection_sheet'
@@ -128,6 +128,10 @@ module UiRules
       behaviours do |behaviour|
         behaviour.input_change(:completed, notify: [{ url: "/finished_goods/inspection/govt_inspection_sheets/#{@options[:id]}/add_pallets" }]) if @mode == :add_pallets
       end
+    end
+
+    def add_rules
+      rules[:inspected] = @form_object.inspected
     end
   end
 end
