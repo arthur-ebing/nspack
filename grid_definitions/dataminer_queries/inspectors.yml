@@ -1,9 +1,10 @@
 ---
 :caption: Inspectors
-:sql: "SELECT\r\n    fn_party_role_name(inspector_party_role_id) AS inspector,\r\n
-  \   id,\r\n    inspector_party_role_id,\r\n    tablet_ip_address,\r\n    tablet_port_number,\r\n
-  \   active,\r\n    created_at, \r\n    updated_at,\r\n    fn_current_status('inspectors',
-  id) AS status \r\nFROM inspectors"
+:sql: "SELECT\r\n    fn_party_role_name(inspectors.inspector_party_role_id) AS inspector,\r\n
+  \   inspectors.inspector_code,\r\n    inspectors.tablet_ip_address,\r\n    inspectors.tablet_port_number,\r\n
+  \   inspectors.id,\r\n    inspectors.inspector_party_role_id,\r\n    inspectors.active,\r\n
+  \   inspectors.created_at,\r\n    inspectors.updated_at,\r\n    fn_current_status('inspectors',
+  inspectors.id) AS status \r\nFROM inspectors"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -24,15 +25,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  id:
-    :name: id
+  inspector_code:
+    :name: inspector_code
     :sequence_no: 2
-    :caption: Id
-    :namespaced_name: id
-    :data_type: :integer
+    :caption: Inspector code
+    :namespaced_name: inspectors.inspector_code
+    :data_type: :string
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -40,27 +41,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  inspector_party_role_id:
-    :name: inspector_party_role_id
-    :sequence_no: 3
-    :caption: Inspector party role
-    :namespaced_name: inspector_party_role_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   tablet_ip_address:
     :name: tablet_ip_address
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Tablet ip address
-    :namespaced_name: tablet_ip_address
+    :namespaced_name: inspectors.tablet_ip_address
     :data_type: :string
     :width: 
     :format: 
@@ -74,9 +59,9 @@
     :group_max: false
   tablet_port_number:
     :name: tablet_port_number
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Tablet port number
-    :namespaced_name: tablet_port_number
+    :namespaced_name: inspectors.tablet_port_number
     :data_type: :integer
     :width: 
     :format: 
@@ -88,11 +73,43 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  id:
+    :name: id
+    :sequence_no: 5
+    :caption: Id
+    :namespaced_name: inspectors.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector_party_role_id:
+    :name: inspector_party_role_id
+    :sequence_no: 6
+    :caption: Inspector party role
+    :namespaced_name: inspectors.inspector_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
-    :namespaced_name: active
+    :namespaced_name: inspectors.active
     :data_type: :boolean
     :width: 
     :format: 
@@ -106,9 +123,9 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
-    :namespaced_name: created_at
+    :namespaced_name: inspectors.created_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -122,9 +139,9 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
-    :namespaced_name: updated_at
+    :namespaced_name: inspectors.updated_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -138,7 +155,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Status
     :namespaced_name: 
     :data_type: :string

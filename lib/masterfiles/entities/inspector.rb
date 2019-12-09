@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :inspector_party_role_id, Types::Integer
     attribute :tablet_ip_address, Types::String
     attribute :tablet_port_number, Types::Integer
+    attribute :inspector_code, Types::String
     attribute? :active, Types::Bool
   end
 
@@ -15,6 +16,7 @@ module MasterfilesApp
     attribute :inspector, Types::String
     attribute :tablet_ip_address, Types::String
     attribute :tablet_port_number, Types::Integer
+    attribute :inspector_code, Types::String
     attribute? :active, Types::Bool
   end
 end

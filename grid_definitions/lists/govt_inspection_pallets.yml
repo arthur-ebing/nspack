@@ -7,29 +7,12 @@
   :popup: true
   :hide_if_false: completed
   :hide_if_true: sheet_inspected
-#- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$"
-#  :text: view
-#  :icon: view-show
-#  :title: View
-#  :popup: true
-#- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/edit"
-#  :text: edit
-#  :icon: edit
-#  :title: Edit
-#  :popup: true
-#  :hide_if_true: completed
 - :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
   :popup: true
   :hide_if_true: completed
-#- :separator: true
-#- :url: "/development/statuses/list/govt_inspection_pallets/$:id$"
-#  :text: Status
-#  :icon: information-solid
-#  :title: Status
-#  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/inspection/govt_inspection_pallets/new"

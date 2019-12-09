@@ -19,6 +19,7 @@ module UiRules
       fields[:inspector_party_role_id] = { renderer: :label,
                                            with_value: inspector_party_name,
                                            caption: 'Inspector' }
+      fields[:inspector_code] = { renderer: :label }
       fields[:tablet_ip_address] = { renderer: :label,
                                      caption: 'Tablet IP Address' }
       fields[:tablet_port_number] = { renderer: :label,
@@ -34,8 +35,13 @@ module UiRules
                                    disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_INSPECTOR),
                                    caption: 'Inspector',
                                    required: true },
-        tablet_ip_address: { caption: 'Tablet IP Address' },
-        tablet_port_number: { caption: 'Tablet Port Number' }
+        inspector_code: { caption: 'Inspector Code',
+                          force_uppercase: true,
+                          required: true },
+        tablet_ip_address: { caption: 'Tablet IP Address',
+                             required: true },
+        tablet_port_number: { caption: 'Tablet Port Number',
+                              required: true }
       }
     end
 
@@ -47,6 +53,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inspector_party_role_id: nil,
+                                    inspector_code: nil,
                                     tablet_ip_address: nil,
                                     tablet_port_number: nil)
     end

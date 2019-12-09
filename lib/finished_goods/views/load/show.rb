@@ -30,6 +30,11 @@ module FinishedGoods
                                   url: "/finished_goods/reports/picklist/#{id}",
                                   loading_window: true,
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Addendum',
+                                  url: "/finished_goods/reports/addendum/#{id}",
+                                  loading_window: true,
+                                  style: :button)
             end
             page.form do |form| # rubocop:disable Metrics/BlockLength
               form.action '/list/loads'
