@@ -290,12 +290,36 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
           if res.success
-            store_locally(:flash_notice, "Labels for Pallet: #{params[:pallet][:pallet_number]} printet successfully")
+            store_locally(:flash_notice, "Labels For Pallet: #{params[:pallet][:pallet_number]} Printed Successfully")
             r.redirect('/rmd/production/palletizing/create_new_pallet')
           else
-            store_locally(:errors, "Error: #{unwrap_failed_response(res)}")
+            store_locally(:errors, "Printing Error: #{unwrap_failed_response(res)}")
             r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{id}")
           end
+        end
+      end
+
+      r.on 'print_pallet_labels_for_edit_pallet_sequence', Integer do |id|
+        r.post do
+          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          if res.success
+            store_locally(:flash_notice, 'Labels Printed Successfully')
+          else
+            store_locally(:errors, error_message: "Printing Error: #{unwrap_failed_response(res)}")
+          end
+          r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
+        end
+      end
+
+      r.on 'print_pallet_labels_for_add_sequence', Integer do |id|
+        r.post do
+          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          if res.success
+            store_locally(:flash_notice, 'Labels Printed Successfully')
+          else
+            store_locally(:errors, error_message: "Printing Error: #{unwrap_failed_response(res)}")
+          end
+          r.redirect("/rmd/production/palletizing/print_pallet_view/#{id}")
         end
       end
 
@@ -311,11 +335,11 @@ class Nspack < Roda # rubocop:disable ClassLength
                                          form_name: :pallet,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: nil,
-                                         caption: 'Scan Pallet',
+                                         caption: 'Add New Sequence To Pallet',
                                          action: '/rmd/production/palletizing/add_sequence_to_pallet',
                                          button_caption: 'Submit')
           form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
-          form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true)
+          form.add_field(:carton_number, 'Carton Number<br>(For New Sequence)', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true, prompt: false)
           form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
@@ -370,7 +394,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence, [:carton_quantity])
         form.add_csrf_tag csrf_tag
         form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
-        form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
+        form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
         form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
         form.add_select(:pallet_label_name, 'Pallet Label', value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: interactor.find_pallet_labels, required: false)
         form.add_button('Print', "/rmd/production/palletizing/print_pallet_labels/#{pallet_sequence[:id]}")
@@ -384,17 +408,24 @@ class Nspack < Roda # rubocop:disable ClassLength
         pallet_sequence = interactor.find_pallet_sequence_attrs(id)
         ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
 
-        form = Crossbeams::RMDForm.new({},
+        notice = retrieve_from_local_store(:flash_notice)
+        form_state = {}
+        error = retrieve_from_local_store(:errors)
+        form_state.merge!(error_message: error[:error_message], errors: error[:errors]) unless error.nil?
+
+        form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
                                        caption: "Print Pallet #{pallet_sequence[:pallet_number]}",
                                        step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       notes: notice,
                                        reset_button: false,
                                        no_submit: false,
-                                       action: "/rmd/production/palletizing/print_pallet_labels/#{id}",
+                                       action: "/rmd/production/palletizing/print_pallet_labels_for_add_sequence/#{id}",
                                        button_caption: 'Print')
+        form.add_prev_next_nav('/rmd/production/palletizing/print_pallet_view/$:id$', ps_ids, id)
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
-        form.add_field(:qty_to_print, 'Qty To Print', required: true, prompt: true, data_type: :number)
+        form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
         form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
         form.add_select(:pallet_label_name, 'Pallet Label', value: prod_interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: prod_interactor.find_pallet_labels, required: false)
         form.add_csrf_tag csrf_tag
@@ -404,6 +435,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'edit_pallet_sequence_view', Integer do |id|
         interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        prod_interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
         pallet_sequence = interactor.find_pallet_sequence_attrs(id)
         ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
@@ -416,18 +448,23 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        notes: notice,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: "Print Pallet #{pallet_sequence[:pallet_number]}",
+                                       caption: "Edit Pallet Sequence",
                                        step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
                                        reset_button: false,
                                        no_submit: false,
                                        action: "/rmd/production/palletizing/edit_pallet_sequence_submit/#{pallet_sequence[:id]}",
                                        button_caption: 'Update')
-        form.add_field(:carton_number, 'Carton Number', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: false)
+        form.add_prev_next_nav('/rmd/production/palletizing/edit_pallet_sequence_view/$:id$', ps_ids, id)
+        form.add_field(:carton_number, 'Carton Number<br>(To Replace Sequence)', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: false)
         form.add_field(:carton_quantity, 'Carton Qty', required: false, prompt: true, data_type: :number)
         form.add_label(:current_carton_quantity, 'Current Carton Qty', pallet_sequence[:carton_quantity])
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence, [:carton_quantity])
+        form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
+        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
+        form.add_select(:pallet_label_name, 'Pallet Label', value: prod_interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: prod_interactor.find_pallet_labels, required: false)
         form.add_csrf_tag csrf_tag
         form.add_prev_next_nav('/rmd/production/palletizing/edit_pallet_sequence_view/$:id$', ps_ids, id)
+        form.add_button('Print', "/rmd/production/palletizing/print_pallet_labels_for_edit_pallet_sequence/#{pallet_sequence[:id]}")
         view(inline: form.render, layout: :layout_rmd)
       end
 
