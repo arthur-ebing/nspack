@@ -2,6 +2,8 @@
 
 # SOMEWHERE: which org code gets which flow type & which hub_address to use
 # EDI hub address optional field on Orgs table?
+# depots.edi_code is hub address. From loads to depots.to edi code :: rename to edi_hub_address constrain to be exactly 3 chars long
+# PS: use edi_hub_address added to Orgs table - also constrain...
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   attr_reader :flow_type, :org_code, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries
 
@@ -16,12 +18,13 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @org_code = edi_out_transaction.org_code
     @hub_address = edi_out_transaction.hub_address
     @record_id = edi_out_transaction.record_id
-    # If rerun, re-use filename...???
     @seq_no = repo.new_sequence_for_flow(flow_type)
     @formatted_seq = format('%<seq>03d', seq: @seq_no)
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
     @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
+    # PO : hub matches to receiving depot (on load)
+    # PS : hub PROBABLY same as network addr
     load_schema
   end
 
@@ -36,7 +39,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   # Services can use the field definition:
   # - name        (the name as defined in the spec)
-  # - source_name (the name in the application)
   # - offset      (for flat text records, the starting position)
   # - length      (the length of the field in characters)
   # - required    (boolean: must the field be present)
@@ -53,8 +55,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
                            required: field_node['required'] == 'true',
                            format: field_node['format'])
       rec[:default] = field_node.attributes['default'].to_s if field_node.attributes['default']
-      # rec[:source_name] = field_node.attributes['map_to'].to_s
-      # rec[:source_name] =  rec[:name] if rec[:source_name].nil_or_empty?
       raise "There is already a rule for #{field_node['name']} in #{flow_type.downcase}.xml for #{key}. Please make it unique" unless record_definitions[key][field_node['name'].to_s.to_sym].nil?
 
       record_definitions[key][field_node['name'].to_s.to_sym] = rec
@@ -63,6 +63,8 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     # Idea: perhaps build a Dry:Schema for validation?
   end
 
+  # VALIDATE fixed len record size vs sum of fields... (include end_padding field)
+  # send in "for fixed" and raise err if field leng too long after formatting
   def validate_data(identifiers)
     @validation_errors = []
     @identifiers = identifiers

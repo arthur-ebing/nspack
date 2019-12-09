@@ -69,7 +69,11 @@ module EdiApp
           load_containers.verified_gross_weight AS container_gross_mass,
           fn_party_role_name(loads.exporter_party_role_id) AS responsible_party,
 
-          CASE WHEN destination_countries.country_name = 'ZA' THEN 'L' ELSE 'E' END AS channel,    -- THIS IS NOT SAFE ENOuGH... (should dest_countries have country_code...)
+          -- ++++++++++++++++++++++++++++++++++++++++++++
+          -- ADD iso_country_code to dest_countries ad use that...
+          -- ++++++++++++++++++++++++++++++++++++++++++++
+
+          CASE WHEN destination_countries.country_name = 'ZA' THEN 'L' ELSE 'E' END AS channel,    -- THIS IS NOT SAFE ENOUGH... (should dest_countries have country_code...)
           loads.id AS cons_no,
           loads.shipped_at AS cons_date,
           EXTRACT(YEAR FROM seasons.end_date) AS season,
@@ -92,7 +96,9 @@ module EdiApp
           marks.mark_code AS mark,
           inventory_codes.inventory_code AS inv_code,
           govt_inspection_sheets.inspection_point AS inspect_pnt,
-          -- govt_inspection_sheets.inspector_code AS inspector, --- [[[[[[[ FROM inspectors to org code MAYBE...]]]
+
+          -- inspectors.inspector_code AS inspector,
+
           pallet_sequences.pick_ref AS picking_reference,
           loads.shipped_at AS shipped_date,
           pallet_sequences.product_chars AS prod_char,
@@ -105,7 +111,6 @@ module EdiApp
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS inspec_date,
           pallets.govt_first_inspection_at AS original_inspec_date,
           pallets.first_cold_storage_at AS cold_date,
-          'CE' AS stock_pool,                                                                            -- IS THIS UM-specific....
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_btype,
@@ -140,6 +145,7 @@ module EdiApp
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
         LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = pallets.last_govt_inspection_pallet_id
+        LEFT OUTER JOIN inspectors ON inspectors.id = govt_inspection_sheets.inspector_id
         LEFT OUTER JOIN container_stack_types ON container_stack_types.id = load_containers.stack_type_id
         LEFT OUTER JOIN destination_cities ON destination_cities.id = loads.final_destination_id
         LEFT OUTER JOIN destination_countries ON destination_countries.id = destination_cities.destination_country_id

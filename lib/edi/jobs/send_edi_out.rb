@@ -24,12 +24,6 @@ module EdiApp
           expire
         end
       end
-
-      private
-
-      def do_work
-        # work..
-      end
     end
   end
 end

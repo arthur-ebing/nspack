@@ -283,7 +283,7 @@
                   <field name="order_no" size="6" required="false"/>
                   <field name="locn_code" size="7" default="$:INSTALL_LOCATION$" />
                   <field name="store" size="2" required="false"/>
-                  <field name="stock_pool" size="2" required="false"/>
+                  <field name="stock_pool" size="2" required="false" default="CE" />
                   <field name="shipped_date" size="13" format="DATETIME"/>
                   <field name="xmit_flag" size="1" default="N" required="false"/>
                   <field name="revision" size="5" format="ZEROES" default="0" required="false"/>
