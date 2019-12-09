@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PoOutRepo < BaseRepo
+  class PoOutRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def po_header_row(load_id)
       query = <<~SQL
         SELECT
@@ -57,8 +57,8 @@ module EdiApp
           fn_party_role_name(load_voyages.shipper_party_role_id) AS ship_sender,
           fn_party_role_name(load_voyages.shipper_party_role_id) AS ship_agent,
           marketing_org.short_description AS orgzn,
-          (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS ctn_qty,
-          (SELECT COUNT(*) FROM pallets p WHERE p.load_id = loads.id) AS plt_qty,
+          (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS tot_ctn_qty,
+          (SELECT COUNT(*) FROM pallets p WHERE p.load_id = loads.id) AS tot_plt_qty,
           load_containers.container_temperature_rhine AS ryan_no_old,
           SUBSTR(container_stack_types.stack_type_code, 1, 1) AS container_type,
           SUBSTR(container_stack_types.stack_type_code, 1, 1) AS container_size,
@@ -75,7 +75,51 @@ module EdiApp
           EXTRACT(YEAR FROM seasons.end_date) AS season,
           loads.customer_order_number AS client_ref,
           loads.customer_order_number AS order_no,
-          (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS cnts_on_truck
+          (SELECT SUM(carton_quantity) FROM pallets p WHERE p.load_id = loads.id) AS cnts_on_truck,
+
+          depots.depot_code AS dest_locn,
+          destination_regions.destination_region_name AS target_region,
+          destination_countries.country_name AS target_country,
+          substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
+          pallet_sequences.pallet_sequence_number AS seq_no,
+          govt_inspection_sheets.id AS consignment_number,
+          substring(commodity_groups.code FROM '..') AS comm_grp,
+          commodities.code AS commodity,
+          marketing_varieties.marketing_variety_code AS variety,
+          standard_pack_codes.standard_pack_code AS pack,
+          grades.grade_code AS grade,
+          COALESCE(fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text) AS size_count,
+          marks.mark_code AS mark,
+          inventory_codes.inventory_code AS inv_code,
+          govt_inspection_sheets.inspection_point AS inspect_pnt,
+          -- govt_inspection_sheets.inspector_code AS inspector, --- [[[[[[[ FROM inspectors to org code MAYBE...]]]
+          pallet_sequences.pick_ref AS picking_reference,
+          loads.shipped_at AS shipped_date,
+          pallet_sequences.product_chars AS prod_char,
+          govt_inspection_sheets.id AS orig_cons,
+          target_market_groups.target_market_group_name AS targ_mkt,
+          pucs.puc_code AS farm,
+          pallet_sequences.carton_quantity AS ctn_qty,
+          pallets.carton_quantity AS plt_qty,
+          CASE WHEN (SELECT count(*) FROM pallet_sequences m WHERE m.pallet_id = pallet_sequences.pallet_id AND NOT scrapped) > 1 THEN 'Y' ELSE 'N' END AS mixed_indicator,
+          COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS inspec_date,
+          pallets.govt_first_inspection_at AS original_inspec_date,
+          pallets.first_cold_storage_at AS cold_date,
+          'CE' AS stock_pool,                                                                            -- IS THIS UM-specific....
+          COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
+          COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
+          pallet_bases.edi_out_pallet_base AS pallet_btype,
+          pallets.pallet_number AS sscc,
+          govt_inspection_sheets.id AS waybill_no,
+          pallet_sequences.sell_by_code AS sellbycode,
+          pallets.pallet_number AS combo_sscc,
+          pallets.phc AS packh_code,
+          orchards.orchard_code AS orchard,
+          pallets.gross_weight AS pallet_gross_mass,
+          pallets.gross_weight_measured_at AS weighing_date,
+          pallets.gross_weight_measured_at AS weighing_time,
+          pallets.nett_weight AS mass
+
         FROM loads
         JOIN pallets ON pallets.load_id = loads.id AND NOT scrapped
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id AND NOT scrapped
@@ -95,9 +139,24 @@ module EdiApp
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
+        LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = pallets.last_govt_inspection_pallet_id
         LEFT OUTER JOIN container_stack_types ON container_stack_types.id = load_containers.stack_type_id
         LEFT OUTER JOIN destination_cities ON destination_cities.id = loads.final_destination_id
         LEFT OUTER JOIN destination_countries ON destination_countries.id = destination_cities.destination_country_id
+        LEFT OUTER JOIN destination_regions ON destination_regions.id = destination_countries.destination_region_id
+        JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
+        JOIN commodities ON commodities.id = cultivar_groups.commodity_id
+        JOIN commodity_groups ON commodity_groups.id = commodities.commodity_group_id
+        JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
+        JOIN marks ON marks.id = pallet_sequences.mark_id
+        JOIN inventory_codes ON inventory_codes.id = pallet_sequences.inventory_code_id
+        JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+        JOIN grades ON grades.id = pallet_sequences.grade_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
+        LEFT JOIN fruit_size_references ON fruit_size_references.id = pallet_sequences.fruit_size_reference_id
+        LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = pallet_sequences.fruit_actual_counts_for_pack_id
+        JOIN pucs ON pucs.id = pallet_sequences.puc_id
+        JOIN orchards ON orchards.id = pallet_sequences.orchard_id
         WHERE loads.id = ?
       SQL
       DB[query, load_id].all

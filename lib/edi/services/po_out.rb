@@ -30,11 +30,12 @@ module EdiApp
 
       recs = repo.po_details(record_id).group_by { |r| r[:container] }
       recs.each do |container, details|
+        @current_row = details.first
         prepare_ok if container
         prepare_oc
-        # details.each do |row|
-        #   prepare_op(row)
-        # end
+        details.each do |row|
+          prepare_op(row)
+        end
       end
 
       prepare_bt
@@ -71,15 +72,25 @@ module EdiApp
     end
 
     def prepare_ok
-      hash = build_hash_from_data(@header_rec, 'OK')
+      hash = build_hash_from_data(@current_row, 'OK')
+      hash[:ctn_qty] = @current_row[:tot_ctn_qty]
+      hash[:plt_qty] = @current_row[:tot_plt_qty]
       add_record('OK', hash)
       @ok_count += 1
     end
 
     def prepare_oc
-      hash = build_hash_from_data(@header_rec, 'OC')
+      hash = build_hash_from_data(@current_row, 'OC')
+      hash[:ctn_qty] = @current_row[:tot_ctn_qty]
+      hash[:plt_qty] = @current_row[:tot_plt_qty]
       add_record('OC', hash)
       @oc_count += 1
+    end
+
+    def prepare_op(row)
+      hash = build_hash_from_data(row, 'OP')
+      add_record('OP', hash)
+      @op_count += 1
     end
 
     def prepare_bt

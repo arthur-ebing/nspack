@@ -55,7 +55,7 @@
         <field name="tran_user" size="7" required="false" map_to="transaction_user"/>
         <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
         <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
-        <field name="Temperature" size="7" required="false" format="TEMP" default="99.99"/>
+        <field name="temperature" size="7" required="false" format="TEMP" default="99.99"/>
         <field name="new_fields" size="54" required="false"/>
       </fields>
     </record>
@@ -281,7 +281,7 @@
                   <field name="shift" size="1" required="false"/>
                   <field name="shift_date" size="8" format="DATE" required="false"/>
                   <field name="order_no" size="6" required="false"/>
-                  <field name="locn_code" size="7"/>
+                  <field name="locn_code" size="7" default="$:INSTALL_LOCATION$" />
                   <field name="store" size="2" required="false"/>
                   <field name="stock_pool" size="2" required="false"/>
                   <field name="shipped_date" size="13" format="DATETIME"/>
@@ -302,32 +302,32 @@
                   <field name="principal" size="2" required="false"/>
                   <field name="sscc" size="18" map_to="pallet_id" />
                   <field name="mass" size="9" type="number" format="DECIMAL" />
-                  <field name="Saftbin1" size="16" required="false"/>
-                  <field name="Saftbin2" size="16" required="false"/>
-                  <field name="Saftbin3" size="16" required="false"/>
-                  <field name="Orig_account" size="6" required="false"/>
-                  <field name="Inspec_date" size="8" required="false" format="DATE" map_to="inspection_date"/>
-                  <field name="Stack_variance" size="1" required="false"/>
-                  <field name="Store_type" size="1" required="false"/>
-                  <field name="Batch_no" size="20" required="false" map_to="batch_code"/>
-                  <field name="Waybill_no" size="10" required="false"/>
-                  <field name="Gtin" size="14" map_to="gtin_code" required="false" nullify_zeros="true" />
-                  <field name="Packh_code" size="7" required="false" map_to="packhouse_code"/>
-                  <field name="Steri_flag" size="2" required="false"/>
-                  <field name="Steri_dest" size="2" required="false"/>
-                  <field name="Label_type" size="1" required="false"/>
-                  <field name="Prov_Flag" size="1" required="false"/>
-                  <field name="SellbyCode" size="10" required="false" map_to="sell_by_date"/>
-                  <field name="Combo_sscc" size="18" required="false"/>
-                  <field name="Inspector" size="6" required="false" map_to="inspector_number"/>
-                  <field name="Inspect_pnt" size="6" required="false" map_to="inspection_point"/>
-                  <field name="Expiry_code" size="10" required="false"/>
-                  <field name="Orchard" size="15" required="false"/>
-                  <field name="Target_region" size="5" required="false"/>
-                  <field name="Target_country" size="2" required="false"/>
-                  <field name="Global_gap_number" size="20" required="false"/>
-                  <field name="Lot_no" size="20" required="false"/>
-                  <field name="Traceability_code" size="20" required="false"/>
+                  <field name="saftbin1" size="16" required="false"/>
+                  <field name="saftbin2" size="16" required="false"/>
+                  <field name="saftbin3" size="16" required="false"/>
+                  <field name="orig_account" size="6" required="false"/>
+                  <field name="inspec_date" size="8" required="false" format="DATE" map_to="inspection_date"/>
+                  <field name="stack_variance" size="1" required="false"/>
+                  <field name="store_type" size="1" required="false"/>
+                  <field name="batch_no" size="20" required="false" map_to="batch_code"/>
+                  <field name="waybill_no" size="10" required="false"/>
+                  <field name="gtin" size="14" map_to="gtin_code" required="false" nullify_zeros="true" />
+                  <field name="packh_code" size="7" required="false" map_to="packhouse_code"/>
+                  <field name="steri_flag" size="2" required="false"/>
+                  <field name="steri_dest" size="2" required="false"/>
+                  <field name="label_type" size="1" required="false"/>
+                  <field name="prov_Flag" size="1" required="false"/>
+                  <field name="sellbyCode" size="10" required="false" map_to="sell_by_date"/>
+                  <field name="combo_sscc" size="18" required="false"/>
+                  <field name="inspector" size="6" required="false" map_to="inspector_number"/>
+                  <field name="inspect_pnt" size="6" required="false" map_to="inspection_point"/>
+                  <field name="expiry_code" size="10" required="false"/>
+                  <field name="orchard" size="15" required="false"/>
+                  <field name="target_region" size="5" required="false"/>
+                  <field name="target_country" size="2" required="false"/>
+                  <field name="global_gap_number" size="20" required="false"/>
+                  <field name="lot_no" size="20" required="false"/>
+                  <field name="traceability_code" size="20" required="false"/>
                   <field name="season" size="4" required="false" />
                   <field name="orig_inspec_date" size="8" required="false" format="DATE"/>
                   <field name="inner_pack" size="10" required="false" />
@@ -337,8 +337,8 @@
                   <field name="upn" size="25" required="false" />
                   <field name="pallet_treatment" size="30" required="false" />
                   <field name="pallet_gross_mass" size="10" required="false" format="DECIMAL" />
-                  <field name="samsa_accreditation" size="10" required="false" />
-                  <field name="weighing_location" size="7" required="false" />
+                  <field name="samsa_accreditation" size="10" required="false" default="$:SAMSA_ACCREDITATION$"  />
+                  <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
                   <field name="weighing_date" size="8" format="DATE" required="false"  />
                   <field name="weighing_time" size="5" format="HM" required="false" />
                   <field name="new_fields" size="18" required="false" />

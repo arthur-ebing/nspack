@@ -118,7 +118,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def default_value_for(code)
+  def default_value_for(code) # rubocop:disable Metrics/CyclomaticComplexity
     val = case code
           when '$:NOW$'
             Time.now
