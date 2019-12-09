@@ -53,6 +53,21 @@ class Nspack < Roda
         show_error(res.message, fetch?(r))
       end
     end
+
+    # ADDENDUM
+    # --------------------------------------------------------------------------
+    r.on 'addendum', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'addendum',
+                                    user: current_user.login_name,
+                                    file: 'addendum',
+                                    params: { load_id: id,
+                                              keep_file: false })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
