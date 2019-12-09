@@ -3,19 +3,18 @@
 :sql: "SELECT\r\n    govt_inspection_sheets.id,\r\n    fn_current_status('govt_inspection_sheets',
   govt_inspection_sheets.id) AS status,\r\n    fn_party_role_name(exporter_party_role_id)
   AS exporter,\r\n    fn_party_role_name(inspector_party_role_id) AS inspector,\r\n
-  \   fn_party_role_name(inspection_billing_party_role_id) AS inspection_billing,\r\n\r\n
-  \   inspector_id,\r\n    inspection_billing_party_role_id,\r\n    exporter_party_role_id,\r\n
-  \   booking_reference,\r\n    inspection_point,\r\n    destination_countries.country_name
-  AS destination_country_country_name,\r\n    results_captured,\r\n    results_captured_at,\r\n
-  \   api_results_received,\r\n    completed,\r\n    completed_at,\r\n    inspected,\r\n
-  \   awaiting_inspection_results,\r\n    destination_country_id,\r\n    govt_inspection_sheets.active,\r\n
-  \   govt_inspection_sheets.created_at,\r\n    govt_inspection_sheets.updated_at,\r\n
-  \   govt_inspection_api_result_id,\r\n    govt_inspection_api_results.upn_number
-  AS govt_inspection_api_result_upn_number\r\n\r\nFROM govt_inspection_sheets\r\n
-  \        JOIN destination_countries ON destination_countries.id = destination_country_id\r\n
-  \        LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
-  = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id
-  = inspector_id"
+  \   inspectors.inspector_code,\r\n    fn_party_role_name(inspection_billing_party_role_id)
+  AS inspection_billing,\r\n\r\n    inspector_id,\r\n    inspection_billing_party_role_id,\r\n
+  \   exporter_party_role_id,\r\n    booking_reference,\r\n    inspection_point,\r\n
+  \   destination_countries.country_name AS destination_country_country_name,\r\n
+  \   results_captured,\r\n    results_captured_at,\r\n    api_results_received,\r\n
+  \   completed,\r\n    completed_at,\r\n    inspected,\r\n    awaiting_inspection_results,\r\n
+  \   destination_country_id,\r\n    govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
+  \   govt_inspection_sheets.updated_at,\r\n    govt_inspection_api_result_id,\r\n
+  \   govt_inspection_api_results.upn_number AS govt_inspection_api_result_upn_number\r\n\r\nFROM
+  govt_inspection_sheets\r\n         JOIN destination_countries ON destination_countries.id
+  = destination_country_id\r\n         LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
+  = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id = inspector_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -84,9 +83,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspector_code:
+    :name: inspector_code
+    :sequence_no: 5
+    :caption: Inspector code
+    :namespaced_name: inspectors.inspector_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   inspection_billing:
     :name: inspection_billing
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Inspection billing
     :namespaced_name: 
     :data_type: :string
@@ -102,7 +117,7 @@
     :group_max: false
   inspector_id:
     :name: inspector_id
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Inspector
     :namespaced_name: inspector_id
     :data_type: :integer
@@ -118,7 +133,7 @@
     :group_max: false
   inspection_billing_party_role_id:
     :name: inspection_billing_party_role_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Inspection billing party role
     :namespaced_name: inspection_billing_party_role_id
     :data_type: :integer
@@ -134,7 +149,7 @@
     :group_max: false
   exporter_party_role_id:
     :name: exporter_party_role_id
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Exporter party role
     :namespaced_name: exporter_party_role_id
     :data_type: :integer
@@ -150,7 +165,7 @@
     :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Booking reference
     :namespaced_name: booking_reference
     :data_type: :string
@@ -166,7 +181,7 @@
     :group_max: false
   inspection_point:
     :name: inspection_point
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Inspection point
     :namespaced_name: inspection_point
     :data_type: :string
@@ -182,7 +197,7 @@
     :group_max: false
   destination_country_country_name:
     :name: destination_country_country_name
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Destination country country name
     :namespaced_name: destination_countries.country_name
     :data_type: :string
@@ -198,7 +213,7 @@
     :group_max: false
   results_captured:
     :name: results_captured
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Results captured
     :namespaced_name: results_captured
     :data_type: :boolean
@@ -214,7 +229,7 @@
     :group_max: false
   results_captured_at:
     :name: results_captured_at
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Results captured at
     :namespaced_name: results_captured_at
     :data_type: :datetime
@@ -230,7 +245,7 @@
     :group_max: false
   api_results_received:
     :name: api_results_received
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Api results received
     :namespaced_name: api_results_received
     :data_type: :boolean
@@ -246,7 +261,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Completed
     :namespaced_name: completed
     :data_type: :boolean
@@ -262,7 +277,7 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Completed at
     :namespaced_name: completed_at
     :data_type: :datetime
@@ -278,7 +293,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Inspected
     :namespaced_name: inspected
     :data_type: :boolean
@@ -294,7 +309,7 @@
     :group_max: false
   awaiting_inspection_results:
     :name: awaiting_inspection_results
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Awaiting inspection results
     :namespaced_name: awaiting_inspection_results
     :data_type: :boolean
@@ -310,7 +325,7 @@
     :group_max: false
   destination_country_id:
     :name: destination_country_id
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Destination country
     :namespaced_name: destination_country_id
     :data_type: :integer
@@ -326,7 +341,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Active
     :namespaced_name: govt_inspection_sheets.active
     :data_type: :boolean
@@ -342,7 +357,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Created at
     :namespaced_name: govt_inspection_sheets.created_at
     :data_type: :datetime
@@ -358,7 +373,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Updated at
     :namespaced_name: govt_inspection_sheets.updated_at
     :data_type: :datetime
@@ -374,7 +389,7 @@
     :group_max: false
   govt_inspection_api_result_id:
     :name: govt_inspection_api_result_id
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Govt inspection api result
     :namespaced_name: govt_inspection_api_result_id
     :data_type: :integer
@@ -390,7 +405,7 @@
     :group_max: false
   govt_inspection_api_result_upn_number:
     :name: govt_inspection_api_result_upn_number
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Govt inspection api result upn number
     :namespaced_name: govt_inspection_api_results.upn_number
     :data_type: :string

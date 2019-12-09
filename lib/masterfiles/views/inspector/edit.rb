@@ -18,6 +18,7 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :inspector_party_role_id
+              form.add_field :inspector_code
               form.add_field :tablet_ip_address
               form.add_field :tablet_port_number
             end

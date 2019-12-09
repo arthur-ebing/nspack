@@ -4,7 +4,7 @@ module Masterfiles
   module Quality
     module Inspector
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:inspector, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -17,6 +17,7 @@ module Masterfiles
               form.action '/masterfiles/quality/inspectors'
               form.remote! if remote
               form.add_field :inspector_party_role_id
+              form.add_field :inspector_code
               form.add_field :tablet_ip_address
               form.add_field :tablet_port_number
             end

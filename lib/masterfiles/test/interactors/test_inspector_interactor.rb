@@ -47,10 +47,10 @@ module MasterfilesApp
 
     def test_update_inspector_fail
       id = create_inspector
-      attrs = interactor.send(:repo).find_hash(:inspectors, id).reject { |k, _| %i[id tablet_ip_address].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:inspectors, id).reject { |k, _| %i[id inspector_code].include?(k) }
       res = interactor.update_inspector(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:tablet_ip_address]
+      assert_equal ['is missing'], res.errors[:inspector_code]
     end
 
     def test_delete_inspector
@@ -69,6 +69,7 @@ module MasterfilesApp
       {
         id: 1,
         inspector_party_role_id: party_role_id,
+        inspector_code: Faker::Lorem.unique.word,
         tablet_ip_address: Faker::Lorem.unique.word,
         tablet_port_number: 1,
         active: true

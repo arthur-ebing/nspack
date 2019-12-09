@@ -167,11 +167,13 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.patch do     # UPDATE
           res = interactor.update_inspector(id, params[:inspector])
           if res.success
-            update_grid_row(id,
-                            changes: { inspector_party_role_id: res.instance[:inspector_party_role_id],
-                                       tablet_ip_address: res.instance[:tablet_ip_address],
-                                       tablet_port_number: res.instance[:tablet_port_number] },
-                            notice: res.message)
+            row_keys = %i[
+              inspector_party_role_id
+              tablet_ip_address
+              tablet_port_number
+              inspector_code
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Quality::Inspector::Edit.call(id, form_values: params[:inspector], form_errors: res.errors) }
           end
@@ -200,11 +202,11 @@ class Nspack < Roda # rubocop:disable ClassLength
         if res.success
           row_keys = %i[
             id
-            inspector_party_role_id
+            inspector
             tablet_ip_address
             tablet_port_number
-            inspector
             active
+            inspector_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

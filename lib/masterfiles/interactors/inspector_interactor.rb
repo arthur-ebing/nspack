@@ -9,14 +9,14 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_inspector(res)
-        log_status('inspectors', id, 'CREATED')
+        log_status(:inspectors, id, 'CREATED')
         log_transaction
       end
       instance = inspector(id)
-      success_response("Created inspector #{instance.tablet_ip_address}",
+      success_response("Created inspector #{instance.inspector_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { tablet_ip_address: ['This inspector already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { inspector_code: ['This inspector code already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,54 +30,23 @@ module MasterfilesApp
         log_transaction
       end
       instance = inspector(id)
-      success_response("Updated inspector #{instance.tablet_ip_address}",
+      success_response("Updated inspector #{instance.inspector_code}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_inspector(id)
-      name = inspector(id).tablet_ip_address
+      name = inspector(id).inspector_code
       repo.transaction do
         repo.delete_inspector(id)
-        log_status('inspectors', id, 'DELETED')
+        log_status(:inspectors, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted inspector #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
-
-    # def complete_a_inspector(id, params)
-    #   res = complete_a_record(:inspectors, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, inspector(id))
-    #   else
-    #     failed_response(res.message, inspector(id))
-    #   end
-    # end
-
-    # def reopen_a_inspector(id, params)
-    #   res = reopen_a_record(:inspectors, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, inspector(id))
-    #   else
-    #     failed_response(res.message, inspector(id))
-    #   end
-    # end
-
-    # def approve_or_reject_a_inspector(id, params)
-    #   res = if params[:approve_action] == 'a'
-    #           approve_a_record(:inspectors, id, params.merge(enqueue_job: false))
-    #         else
-    #           reject_a_record(:inspectors, id, params.merge(enqueue_job: false))
-    #         end
-    #   if res.success
-    #     success_response(res.message, inspector(id))
-    #   else
-    #     failed_response(res.message, inspector(id))
-    #   end
-    # end
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::Inspector.call(task, id)
