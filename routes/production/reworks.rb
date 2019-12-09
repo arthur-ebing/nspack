@@ -167,7 +167,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.print_reworks_pallet_label(pallet_number, params[:reworks_run_print])
           if res.success
             flash[:notice] = res.message
-            r.redirect(back_button_url)
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
           else
             re_show_form(r, res) do
               Production::Reworks::ReworksRun::PrintReworksLabel.call(nil,
@@ -494,8 +494,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           res = interactor.print_reworks_carton_label(id, params[:reworks_run_print])
           if res.success
-            flash[:notice] = res.message
-            r.redirect(back_button_url)
+            update_grid_row(id, changes: {}, notice: res.message)
           else
             re_show_form(r, res) do
               Production::Reworks::ReworksRun::PrintReworksLabel.call(id,
