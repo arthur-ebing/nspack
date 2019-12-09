@@ -8,7 +8,7 @@ module UiRules
       @delivery = if @options[:delivery_id].nil?
                     @repo.find_rmt_delivery_by_bin_id(@options[:id])
                   else
-                    @repo.find_rmt_delivery(@options[:delivery_id])
+                    @repo.get_bin_delivery(@options[:delivery_id])
                   end
       make_form_object
       apply_form_values
@@ -115,15 +115,15 @@ module UiRules
       @default_rmt_container_type = @repo.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
       @form_object = OpenStruct.new(rmt_delivery_id: nil,
                                     season_id: nil,
-                                    cultivar_id: @delivery.cultivar_id,
-                                    orchard_id: @delivery.orchard_id,
-                                    farm_code: @delivery.farm_code,
-                                    puc_code: @delivery.puc_code,
-                                    orchard_code: @delivery.orchard_code,
-                                    date_picked: @delivery.date_picked,
-                                    date_delivered: @delivery.date_delivered,
-                                    qty_bins_received: @delivery.qty_bins_received,
-                                    qty_bins_tipped: @delivery.qty_bins_tipped,
+                                    cultivar_id: @delivery[:cultivar_id],
+                                    orchard_id: @delivery[:orchard_id],
+                                    farm_code: @delivery[:farm_code],
+                                    puc_code: @delivery[:puc_code],
+                                    orchard_code: @delivery[:orchard_code],
+                                    date_picked: @delivery[:date_picked],
+                                    date_delivered: @delivery[:date_delivered],
+                                    qty_bins_received: @delivery[:qty_bins_received],
+                                    qty_bins_tipped: @delivery[:qty_bins_tipped],
                                     farm_id: nil,
                                     rmt_class_id: nil,
                                     rmt_material_owner_party_role_id: nil,

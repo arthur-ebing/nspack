@@ -23,7 +23,7 @@ module RawMaterialsApp
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
 
-    def find_rmt_delivery(id)
+    def get_bin_delivery(id)
       qry = <<~SQL
         SELECT d.*,f.farm_code,p.puc_code, o.orchard_code
         ,(select sum(qty_bins) from rmt_bins where rmt_delivery_id=d.id and bin_tipped is true) as qty_bins_tipped
@@ -34,7 +34,7 @@ module RawMaterialsApp
         join orchards o on o.id=d.orchard_id
         WHERE d.id = ?
       SQL
-      OpenStruct.new(DB[qry, id].first)
+      DB[qry, id].first
     end
 
     def update_rmt_bins_inherited_field(id, res)
