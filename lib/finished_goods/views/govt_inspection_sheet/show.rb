@@ -10,6 +10,20 @@ module FinishedGoods
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Print Passed Inspection Report',
+                                  url: "/finished_goods/reports/passed_inspection_report/#{id}",
+                                  visible: rules[:inspected],
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Failed Inspection Report',
+                                  url: "/finished_goods/reports/failed_inspection_report/#{id}",
+                                  visible: rules[:inspected],
+                                  loading_window: true,
+                                  style: :button)
+            end
             page.form do |form|
               form.caption 'Govt Inspection Sheet'
               form.action '/list/govt_inspection_sheets'
