@@ -58,7 +58,7 @@
             <field name="temperature" size="5" format="TEMP1DEC" default="99.9" required="false" />
             <field name="pallet_status" size="1" required="false" />
             <field name="pallet_marks" size="1" required="false" />
-            <field name="stock_pool" size="2" />
+            <field name="stock_pool" size="2" default="CE" />
             <field name="revision" size="6" format="ZEROES" default="1" required="false" />
             <field name="message_number" size="11" format="ZEROES" default="0" required="false" />
             <field name="transaction_user" size="7" default="UI" required="false" />
@@ -117,6 +117,7 @@
             <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
             <field name="weighing_date" size="8" format="DATE" required="false"  />
             <field name="weighing_time" size="5" format="HM" required="false" />
+            <field name="end_padding" size="5" required="false" />
           </fields>
         </record>
       </children>

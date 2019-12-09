@@ -27,7 +27,6 @@ module EdiApp
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS intake_date,
           pallets.govt_first_inspection_at AS original_intake,
           pallets.first_cold_storage_at AS cold_date,
-          'CE' AS stock_pool,                                                                            -- IS THIS UM-specific....
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_date,
           COALESCE(pallets.stock_created_at, pallets.created_at) AS transaction_time,
           pallet_bases.edi_out_pallet_base AS pallet_base_type,
