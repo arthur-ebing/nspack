@@ -4,7 +4,7 @@ module MesscadaApp
   TipRmtBinSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:bin_number, :integer).maybe(:int?)
+    required(:bin_number, Types::StrippedString).maybe(:str?)
     required(:device, Types::StrippedString).maybe(:str?)
   end
 end

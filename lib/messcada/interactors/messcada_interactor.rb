@@ -213,12 +213,14 @@ module MesscadaApp
       @repo ||= MesscadaRepo.new
     end
 
+    # TODO: split validation if using asset no or not (string asset vs int id)
     def validate_update_rmt_bin_weights_params(params)
       # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
       # UpdateRmtBinWeightsSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
       UpdateRmtBinWeightsSchema.call(params)
     end
 
+    # TODO: split validation if using asset no or not (string asset vs int id)
     def validate_tip_rmt_bin_params(params)
       # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
       # TipRmtBinSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
