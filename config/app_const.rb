@@ -200,14 +200,15 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   BARCODE_SCAN_RULES = [
     { regex: '^LC(\\d+)$', type: 'location', field: 'id' },
-    { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
+    # { regex: '^(\\D\\D\\D)$', type: 'location', field: 'location_short_code' },
     # { regex: '^(\\D\\D\\D)$', type: 'dummy', field: 'code' },
     # { regex: '^SK(\\d+)', type: 'sku', field: 'sku_number' },
     # { regex: '^DN(\\d+)', type: 'delivery', field: 'delivery_number' },
     { regex: '^BN(\\d+)', type: 'bin', field: 'id' },
     { regex: '^(\\d+)', type: 'pallet_number', field: 'pallet_number' },
     { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
-    { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
+    # { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
+    { regex: '^([A-Z0-9]+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
     { regex: '^(\\d+)', type: 'load', field: 'id' }
   ].freeze
 

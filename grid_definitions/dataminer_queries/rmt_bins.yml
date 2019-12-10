@@ -266,7 +266,7 @@
     :sequence_no: 15
     :caption: Bin asset number
     :namespaced_name: rmt_bins.bin_asset_number
-    :data_type: :integer
+    :data_type: :string
     :width: 
     :format: 
     :hide: false

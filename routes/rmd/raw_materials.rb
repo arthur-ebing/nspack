@@ -57,7 +57,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                           items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
                           required: true, prompt: true)
         end
-        form.add_field(:bin_asset_number, 'Asset Number', data_type: :number, scan: 'key248_all', scan_type: :bin_asset, required: true)
+        form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end

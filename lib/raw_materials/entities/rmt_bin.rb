@@ -16,8 +16,8 @@ module RawMaterialsApp
     attribute :puc_id, Types::Integer
     attribute :exit_ref, Types::String
     attribute :qty_bins, Types::Integer
-    attribute :bin_asset_number, Types::Integer
-    attribute :tipped_asset_number, Types::Integer
+    attribute :bin_asset_number, Types::String
+    attribute :tipped_asset_number, Types::String
     attribute :rmt_inner_container_type_id, Types::Integer
     attribute :rmt_inner_container_material_id, Types::Integer
     attribute :qty_inner_bins, Types::Integer
@@ -52,8 +52,8 @@ module RawMaterialsApp
     attribute :puc_id, Types::Integer
     attribute :exit_ref, Types::String
     attribute :qty_bins, Types::Integer
-    attribute :bin_asset_number, Types::Integer
-    attribute :tipped_asset_number, Types::Integer
+    attribute :bin_asset_number, Types::String
+    attribute :tipped_asset_number, Types::String
     attribute :rmt_inner_container_type_id, Types::Integer
     attribute :rmt_inner_container_material_id, Types::Integer
     attribute :qty_inner_bins, Types::Integer
