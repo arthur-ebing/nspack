@@ -215,12 +215,14 @@ module MesscadaApp
 
     def validate_update_rmt_bin_weights_params(params)
       # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
-      UpdateRmtBinWeightsSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
+      # UpdateRmtBinWeightsSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
+      UpdateRmtBinWeightsSchema.call(params)
     end
 
     def validate_tip_rmt_bin_params(params)
       # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
-      TipRmtBinSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
+      # TipRmtBinSchema.call(params.transform_values { |v| v.match?(/SK/) ? v.sub('SK', '') : v })
+      TipRmtBinSchema.call(params)
     end
 
     def resource_code_exists?(resource_code)
