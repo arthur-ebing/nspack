@@ -22,6 +22,27 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     load_schema
   end
 
+  # Reads an XML schema and compares each record size attribute against the sum of its field sizes.
+  def self.check_schema_size_differences(flow_type) # rubocop:disable Metrics/AbcSize
+    file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.xml", __dir__)
+    raise "There is no XML schema for EDI flow type #{flow_type}" unless File.exist?(file_path)
+
+    yml_path = File.expand_path('edi/schemas/schema_record_sizes.yml', __dir__)
+    raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
+
+    schema = Nokogiri::XML(File.read(file_path))
+    keys = schema.xpath('.//record/@identifier').map(&:value)
+    required_sizes = YAML.load_file(yml_path)[flow_type]
+
+    out = {}
+    keys.each do |key|
+      rec_size = schema.xpath(".//record[@identifier='#{key}']/@size").map(&:value).first.to_i
+      tot_size = schema.xpath(".//record[@identifier='#{key}']/fields/field/@size").map(&:value).map(&:to_i).sum
+      out[key] = { rec: rec_size, fields: tot_size, required_size: required_sizes[key], xml_to_required_diff: required_sizes[key] - rec_size, diff: rec_size - tot_size }
+    end
+    out
+  end
+
   def load_schema
     file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.xml", __dir__)
     raise "There is no XML schema for EDI flow type #{flow_type}" unless File.exist?(file_path)

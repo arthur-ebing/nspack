@@ -448,7 +448,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        notes: notice,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: "Edit Pallet Sequence",
+                                       caption: 'Edit Pallet Sequence',
                                        step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
                                        reset_button: false,
                                        no_submit: false,

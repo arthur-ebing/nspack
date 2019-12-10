@@ -9,7 +9,7 @@ module MasterfilesApp
         city_id: destination_city_id,
         depot_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        edi_hub_address: Faker::Lorem.word,
+        edi_hub_address: Faker::Lorem.characters(3),
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

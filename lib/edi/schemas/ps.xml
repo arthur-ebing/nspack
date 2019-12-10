@@ -117,7 +117,6 @@
             <field name="weighing_location" size="7" required="false" default="$:INSTALL_LOCATION$" />
             <field name="weighing_date" size="8" format="DATE" required="false"  />
             <field name="weighing_time" size="5" format="HM" required="false" />
-            <field name="end_padding" size="5" required="false" />
           </fields>
         </record>
       </children>

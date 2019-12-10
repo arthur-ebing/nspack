@@ -12,7 +12,7 @@ module MasterfilesApp
     required(:long_description, Types::StrippedString).maybe(:str?)
     required(:vat_number, Types::StrippedString).maybe(:str?)
     required(:role_ids, Types::IntArray).filled { each(:int?) }
-    required(:edi_hub_address, Types::StrippedString).maybe(:str?)
+    required(:edi_hub_address, Types::StrippedString).maybe(:str?, min_size?: 3, max_size?: 3)
     # required(:variants, Types::StrippedString).maybe(:str?)
     # required(:active, :bool).filled(:bool?)
   end
