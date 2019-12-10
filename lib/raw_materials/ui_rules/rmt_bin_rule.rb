@@ -2,7 +2,7 @@
 
 module UiRules
   class RmtBinRule < Base # rubocop:disable ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       @delivery = if @options[:delivery_id].nil?
@@ -10,6 +10,7 @@ module UiRules
                   else
                     @repo.get_bin_delivery(@options[:delivery_id])
                   end
+
       make_form_object
       apply_form_values
 
@@ -25,7 +26,7 @@ module UiRules
 
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
-      compact_header(columns: %i[farm_code puc_code orchard_code date_picked date_delivered qty_bins_tipped qty_bins_received], display_columns: 1)
+      compact_header(columns: %i[farm_code puc_code orchard_code date_picked date_delivered qty_bins_tipped qty_bins_received], display_columns: 1) if @mode == :new
 
       common_values_for_fields common_fields
 
