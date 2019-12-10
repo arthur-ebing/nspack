@@ -184,6 +184,27 @@ module MesscadaApp
       repo.pallet_exists?(pallet_number)
     end
 
+    def fg_pallet_weighing(params)  # rubocop:disable Metrics/AbcSize
+      res = FgPalletWeighingSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      return failed_response("Pallet Number :#{res[:pallet_number]} could not be found") unless pallet_exists?(res[:pallet_number])
+
+      fpw_res = nil
+      repo.transaction do
+        fpw_res = MesscadaApp::FgPalletWeighing.call(res)
+        log_status('pallets', fpw_res.instance[:pallet_id], AppConst::PALLET_WEIGHED)
+        log_transaction
+      end
+      fpw_res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     private
 
     def pallet_changes_on_verify(params)
