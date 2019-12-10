@@ -16,7 +16,7 @@ module ProductionApp
     required(:marketing_org_party_role_id, :integer).filled(:int?)
     required(:packed_tm_group_id, :integer).filled(:int?)
     required(:mark_id, :integer).filled(:int?)
-    required(:inventory_code_id, :integer).maybe(:int?)
+    required(:inventory_code_id, :integer).filled(:int?)
     required(:pallet_format_id, :integer).filled(:int?)
     required(:cartons_per_pallet_id, :integer).filled(:int?)
     required(:pm_bom_id, :integer).maybe(:int?)
