@@ -95,6 +95,18 @@ module MesscadaApp
       id
     end
 
+    def create_serialized_stock_movement_log(serialized_stock_movement_log)
+      DB[:serialized_stock_movement_logs].insert(serialized_stock_movement_log)
+    end
+
+    def find_business_process(process)
+      DB[:business_processes].where(process: process).first
+    end
+
+    def find_stock_type(stock_type_code)
+      DB[:stock_types].where(stock_type_code: stock_type_code).first
+    end
+
     def create_sequences(pallet_sequence, pallet_id)
       pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
       DB[:pallet_sequences].insert(pallet_sequence)
