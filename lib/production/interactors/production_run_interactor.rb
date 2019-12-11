@@ -115,7 +115,7 @@ module ProductionApp
     end
 
     def print_pallet_label(pallet_id, params)
-      instance = get_palet_label_data(pallet_id)
+      instance = get_pallet_label_data(pallet_id)
       LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -123,8 +123,8 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def get_palet_label_data(pallet_id)
-      repo.get_palet_label_data(pallet_id)
+    def get_pallet_label_data(pallet_id)
+      repo.get_pallet_label_data(pallet_id)
     end
 
     def find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)
