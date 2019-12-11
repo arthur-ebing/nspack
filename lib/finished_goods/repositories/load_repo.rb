@@ -60,7 +60,7 @@ module FinishedGoodsApp
 
     def find_pallet_ids_from(pallet_sequence_id: nil, load_id: nil, pallet_numbers: nil)
       ds = DB[:pallets]
-      ds = ds.where(id: B[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
+      ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
       ds = ds.where(load_id: load_id) unless load_id.nil?
       ds = ds.where(pallet_number: pallet_numbers) unless pallet_numbers.nil?
       ds.select_map(:id).flatten
@@ -95,13 +95,13 @@ module FinishedGoodsApp
       log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user_name)
 
       # find unallocated loads
-      allocated_loads = DB[:pallets].where(load_id: load_id).distinct.select_map(:load_id)
-      unallocated_loads = [load_id] - allocated_loads
+      allocated_load_ids = DB[:pallets].where(load_id: load_id).distinct.select_map(:load_id)
+      unallocated_load_ids = [load_id] - allocated_load_ids
 
       # log status for loads where all pallets have been unallocated
-      unless unallocated_loads.empty?
-        DB[:loads].where(id: unallocated_loads).update(allocated: false)
-        log_multiple_statuses(:loads, unallocated_loads, 'UNALLOCATED', user_name: user_name)
+      unless unallocated_load_ids.empty?
+        DB[:loads].where(id: unallocated_load_ids).update(allocated: false)
+        log_multiple_statuses(:loads, unallocated_load_ids, 'UNALLOCATED', user_name: user_name)
       end
 
       ok_response

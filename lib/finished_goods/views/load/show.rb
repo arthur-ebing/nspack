@@ -10,7 +10,7 @@ module FinishedGoods
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Back',
                                   url: back_url,
@@ -34,6 +34,16 @@ module FinishedGoods
                                   text: 'Print Addendum',
                                   url: "/finished_goods/reports/addendum/#{id}",
                                   loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Unship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/unship",
+                                  visible: rules[:can_unship],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Ship Load',
+                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
+                                  visible: rules[:can_ship],
                                   style: :button)
             end
             page.form do |form| # rubocop:disable Metrics/BlockLength
@@ -106,16 +116,6 @@ module FinishedGoods
               end
             end
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Unship Load',
-                                  url: "/finished_goods/dispatch/loads/#{id}/unship",
-                                  visible: rules[:can_unship],
-                                  style: :button)
-              section.add_control(control_type: :link,
-                                  text: 'Ship Load',
-                                  url: "/finished_goods/dispatch/loads/#{id}/ship",
-                                  visible: rules[:can_ship],
-                                  style: :button)
               section.add_grid('stock_pallets',
                                "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
                                caption: 'Pallets')

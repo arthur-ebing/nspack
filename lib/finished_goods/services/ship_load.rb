@@ -11,9 +11,13 @@ module FinishedGoodsApp
     end
 
     def call
-      ship_load
-      ship_pallets
+      repo.transaction do
+        res = ship_pallets
+        return res unless res.success
 
+        res = ship_load
+        return res unless res.success
+      end
       success_response("Shipped Load #{load_id}")
     end
 
@@ -26,7 +30,13 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def ship_pallets
+    def ship_pallets # rubocop:disable Metrics/AbcSize
+      location_to = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::IN_TRANSIT_LOCATION)&.id
+      pallet_ids.each do |pallet_id|
+        res = MoveStockService.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
+        return res unless res.success
+      end
+
       repo.ship_pallets(pallet_ids)
       repo.log_multiple_statuses(:pallets, pallet_ids, 'SHIPPED', user_name: user_name)
 
