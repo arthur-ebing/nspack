@@ -6,11 +6,11 @@ Sequel.migration do
       primary_key :id
       foreign_key :location_from_id, :locations, type: :integer, null: false
       foreign_key :location_to_id, :locations, type: :integer, null: false
-      Integer :stock_item_id
+      foreign_key :business_process_id, :business_processes, type: :integer, null: false
+      foreign_key :serialized_stock_type_id, :stock_types, type: :integer, null: false
+      Integer :stock_item_id, null: false
       String :stock_item_number
-      Integer :business_process_id
       Integer :business_process_object_id
-      Integer :serialized_stock_type_id
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false

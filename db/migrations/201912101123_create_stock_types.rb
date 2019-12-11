@@ -4,7 +4,7 @@ Sequel.migration do
     extension :pg_triggers
     create_table(:stock_types, ignore_index_errors: true) do
       primary_key :id
-      String :stock_type_code
+      String :stock_type_code, null: false
       String :description
       TrueClass :active, default: true
       DateTime :created_at, null: false
