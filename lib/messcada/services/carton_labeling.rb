@@ -20,7 +20,7 @@ module MesscadaApp
     private
 
     def print_command
-      setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s).gsub('$:pallet_number$', pallet_number)
+      setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s).gsub('$:pallet_number$', pallet_number.to_s)
     end
 
     def carton_labeling  # rubocop:disable Metrics/AbcSize
