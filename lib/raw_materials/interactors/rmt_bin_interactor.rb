@@ -3,6 +3,8 @@
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
+      vres = validate_bin_asset_no_format(params)
+      return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && in_stock_bin_for_asset_number?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
@@ -23,6 +25,13 @@ module RawMaterialsApp
       validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def validate_bin_asset_no_format(params)
+      return ok_response unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in the correct format'] })) unless AppConst::BIN_ASSET_REGEX.match?(params[:bin_asset_number])
+
+      ok_response
     end
 
     def in_stock_bin_for_asset_number?(bin_asset_number)

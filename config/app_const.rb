@@ -55,6 +55,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DELIVERY_CAPTURE_EMPTY_BINS = make_boolean('CAPTURE_EMPTY_BINS')
   DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION = make_boolean('CAPTURE_TRUCK_AT_FRUIT_RECEPTION')
   USE_PERMANENT_RMT_BIN_BARCODES = make_boolean('USE_PERMANENT_RMT_BIN_BARCODES')
+  # Regular expression to validate bin asset numbers when present (in case they are typed in incorrectly)
+  BIN_ASSET_REGEX = Regexp.new(ENV.fetch('BIN_ASSET_REGEX', '.+'))
 
   # Resources
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')
