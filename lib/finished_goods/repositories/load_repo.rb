@@ -50,6 +50,10 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
+    def get_location_id_by_barcode(location_barcode)
+      DB[:locations].where(location_short_code: location_barcode).get(:id)
+    end
+
     def find_pallet_numbers_from(pallet_sequence_id: nil, load_id: nil, pallet_id: nil)
       ds = DB[:pallets]
       ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?

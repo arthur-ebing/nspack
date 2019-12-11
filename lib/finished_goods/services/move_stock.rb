@@ -29,7 +29,7 @@ module FinishedGoodsApp
     private
 
     def validate
-      return failed_response('Location does not exist') unless valid_location?
+      return validation_failed_response(messages: { location: ['Location does not exist'] }) unless valid_location?
 
       res = validate_stock_type
       return res unless res.success
@@ -59,7 +59,7 @@ module FinishedGoodsApp
     def validate_business_process
       if business_process
         process = repo.find_business_process(business_process)
-        return failed_response('Location does not exist') unless process
+        return failed_response('Business Process does not exist') unless process
 
         @business_process_id = process[:id]
       end
@@ -71,10 +71,10 @@ module FinishedGoodsApp
       if stock_type.to_s.upcase == 'PALLET'
         @stock_item = repo.find_pallet(stock_item_id)
 
-        return failed_response('Pallet does not exist') unless @stock_item
-        return failed_response('Pallet has been scrapped') if @stock_item.scrapped
-        return failed_response('Pallet has been shipped') if @stock_item.shipped
-        return failed_response('Pallet is already in this location') if @stock_item.location_id == location_to_id
+        return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless @stock_item
+        return validation_failed_response(messages: { pallet_number: ['Pallet has been scrapped'] }) if @stock_item.scrapped
+        return validation_failed_response(messages: { pallet_number: ['Pallet has been shipped'] }) if @stock_item.shipped
+        return validation_failed_response(messages: { location: ['Pallet is already in this location'] }) if @stock_item.location_id == location_to_id
 
         @location_from_id = @stock_item.location_id
         @stock_item_number = @stock_item.pallet_number
