@@ -100,6 +100,7 @@ module Crossbeams
       CLR_T = COLOURS[19]
       CLR_U = COLOURS[20]
       CLR_V = COLOURS[21]
+      CLR_W = COLOURS[32]
       # CLR_A = COLOURS[20]
       # CLR_B = COLOURS[21]
       # CLR_C = COLOURS[22]
@@ -179,6 +180,7 @@ module Crossbeams
       BIN_VERIFICATION_ROBOT = 'BIN_VERIFICATION_ROBOT'
       PRINT_STATION = 'PRINT_STATION'
       PRINT_STATION_ROBOT = 'PRINT_STATION_ROBOT'
+      WEIGHING_STATION = 'WEIGHING_STATION'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -205,10 +207,10 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM],
                   icon: { file: 'globe', colour: CLR_H } },
         PACKHOUSE => { description: 'Packhouse',
-                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER, BIN_VERIFICATION_STATION],
+                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER, BIN_VERIFICATION_STATION, WEIGHING_STATION],
                        icon: { file: 'factory', colour: CLR_N } },
         ROOM => { description: 'Room',
-                  allowed_children: [QC_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
+                  allowed_children: [QC_ROBOT, SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
                   allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
@@ -287,6 +289,9 @@ module Crossbeams
                                     icon: { file: 'server3', colour: CLR_C },
                                     create_with_system_resource: 'MODULE',
                                     code_prefix: 'BVM-' },
+        WEIGHING_STATION => { description: 'Weighing station',
+                              allowed_children: [SCALE_ROBOT, SCALE, PRINTER],
+                              icon: { file: 'square', colour: CLR_W } },
         PRINT_STATION => { description: 'Print station',
                            allowed_children: [PRINT_STATION_ROBOT, PRINTER],
                            icon: { file: 'square-o', colour: CLR_J } },
