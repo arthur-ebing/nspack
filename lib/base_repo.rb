@@ -327,7 +327,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
 
   # Log the status of several records.
   #
-  # @param table_name [String] the name of the table.
+  # @param table_name [Symbol] the name of the table.
   # @param in_ids [Array/Integer] the ids of the records with the changed status.
   # @param status [String] the status to be logged.
   # @param comment [String] extra information about the status change.
