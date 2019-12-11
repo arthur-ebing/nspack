@@ -110,7 +110,7 @@ module LabelApp
     end
 
     def printers_for(px_per_mm)
-      DB[:printers].where(pixels_per_mm: px_per_mm).map { |p| [p[:printer_name], p[:printer_code]] }
+      DB[:printers].where(pixels_per_mm: px_per_mm, active: true).map { |p| [p[:printer_name], p[:printer_code]] }
     end
 
     def find_printer_application(id)
@@ -123,16 +123,16 @@ module LabelApp
                             ])
     end
 
-    def select_printers_for_application(application)
+    def select_printers_for_application(application) # rubocop:disable Metrics/AbcSize
       DB[:printers].join(:printer_applications, printer_id: :id)
-                   .where(application: application)
+                   .where(application: application, Sequel[:printers][:active] => true, Sequel[:printer_applications][:active] => true)
                    .select(Sequel[:printers][:printer_name], Sequel[:printers][:id])
                    .order(:printer_name)
                    .map { |p| [p[:printer_name], p[:id]] }
     end
 
     def default_printer_for_application(application)
-      DB[:printer_applications].where(application: application, default_printer: true).get(:printer_id)
+      DB[:printer_applications].where(application: application, default_printer: true, active: true).get(:printer_id)
     end
 
     def refresh_and_add_mes_modules(ip_or_address, module_list) # rubocop:disable Metrics/AbcSize
