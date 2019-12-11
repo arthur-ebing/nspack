@@ -14,14 +14,17 @@ module MesscadaApp
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
     end
 
-    def update_rmt_bin_weights(params)
+    def update_rmt_bin_weights(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       MesscadaApp::UpdateBinWeights.new(res).call
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
@@ -42,6 +45,7 @@ module MesscadaApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      puts e.message
       puts e.backtrace.join("\n")
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
@@ -60,8 +64,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      puts e
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
@@ -90,8 +98,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      puts e
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
@@ -112,6 +124,8 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
       puts e.message
@@ -137,6 +151,8 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
       puts e.message
