@@ -17,23 +17,17 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).get(:id)
     end
 
-    def get_palet_label_data(pallet_id)
+    def get_pallet_label_data(pallet_sequence_id)
       qry = <<~SQL
         SELECT *
-        FROM vw_pallet_sequence_flat
+        FROM vw_pallet_label
         WHERE id = ?
       SQL
-      DB[qry, pallet_id].first
+      DB[qry, pallet_sequence_id].first
     end
 
     def find_pallet_labels
       MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_PALLET }).map { |nm, _| nm }
-      # qry = <<~SQL
-      #   SELECT label_name
-      #   FROM public.label_templates
-      #   where extended_columns  @> '{"label_type": "PALLET"}';
-      # SQL
-      # DB[qry].all.map { |r| r[:label_name] }
     end
 
     def find_pallet_label_name_by_resource_allocation_id(product_resource_allocation_id)
