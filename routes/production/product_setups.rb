@@ -394,7 +394,19 @@ class Nspack < Roda # rubocop:disable ClassLength
                       end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_pm_subtype_id',
-                                     options_array: pm_subtypes)])
+                                     options_array: pm_subtypes),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'product_setup_pm_bom_id',
+                                     options_array: []),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'product_setup_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'product_setup_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'product_setup_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'pm_subtype_changed' do
@@ -405,23 +417,36 @@ class Nspack < Roda # rubocop:disable ClassLength
                   end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_pm_bom_id',
-                                     options_array: pm_boms)])
+                                     options_array: pm_boms),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'product_setup_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'product_setup_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'product_setup_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'pm_bom_changed' do
         if params[:changed_value].blank?
+          pm_bom_description = nil
+          pm_bom_erp_bom_code = nil
           pm_bom_products = []
         else
           pm_bom_id = params[:changed_value]
           pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
+          pm_bom_description = pm_bom&.description
+          pm_bom_erp_bom_code = pm_bom&.erp_bom_code
           pm_bom_products = interactor.pm_bom_products_table(pm_bom_id)
         end
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',
-                                     value: pm_bom&.description),
+                                     value: pm_bom_description),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_erp_bom_code',
-                                     value: pm_bom&.erp_bom_code),
+                                     value: pm_bom_erp_bom_code),
                       OpenStruct.new(type: :replace_inner_html,
                                      dom_id: 'product_setup_pm_boms_products',
                                      value: pm_bom_products)])

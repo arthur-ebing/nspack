@@ -37,7 +37,8 @@ module ProductionApp
         scrap_pallets: scrap_pallets?,
         unscrap_pallets: unscrap_pallets?,
         repack_pallets: repack_pallets?,
-        update_existing_record: update_existing_record?
+        single_edit: single_edit?,
+        batch_edit: batch_edit?
       }
     end
 
@@ -53,21 +54,22 @@ module ProductionApp
       AppConst::RUN_TYPE_REPACK == reworks_run_type[:run_type]
     end
 
-    def update_existing_record?
-      case reworks_action
-      when AppConst::REWORKS_ACTION_CLONE, AppConst::REWORKS_ACTION_REMOVE, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT, AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS then
-        false
-      else
-        true
-      end
+    def single_edit?
+      AppConst::REWORKS_ACTION_SINGLE_EDIT == reworks_action
     end
 
-    def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def batch_edit?
+      AppConst::REWORKS_ACTION_BATCH_EDIT == reworks_action
+    end
+
+    def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
-      repo.repacking_reworks_run(pallets_affected) if reworks_run_booleans[:repack_pallets]
-      repo.scrapping_reworks_run(pallets_affected, pallet_update_attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
-      repo.existing_record_reworks_run_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:update_existing_record]
+      attrs = pallet_update_attrs
+      repo.repacking_reworks_run(pallets_affected, attrs) if reworks_run_booleans[:repack_pallets]
+      repo.scrapping_reworks_run(pallets_affected, attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
+      repo.update_pallets_pallet_format(pallets_affected.first) if make_changes && reworks_run_booleans[:single_edit]
+      repo.existing_records_batch_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:batch_edit]
 
       success_response('ok', reworks_run_id: id)
     rescue Crossbeams::InfoError => e

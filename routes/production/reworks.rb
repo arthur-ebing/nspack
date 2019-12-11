@@ -453,7 +453,19 @@ class Nspack < Roda # rubocop:disable ClassLength
                       end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_pm_subtype_id',
-                                     options_array: pm_subtypes)])
+                                     options_array: pm_subtypes),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_bom_id',
+                                     options_array: []),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'pm_subtype_changed' do
@@ -464,7 +476,16 @@ class Nspack < Roda # rubocop:disable ClassLength
                   end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_pm_bom_id',
-                                     options_array: pm_boms)])
+                                     options_array: pm_boms),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'pm_bom_changed' do

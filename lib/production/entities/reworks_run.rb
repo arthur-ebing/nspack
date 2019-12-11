@@ -30,6 +30,8 @@ module ProductionApp
     attribute :pallet_sequence_number, Types::String
     attribute :before_state, Types::Hash
     attribute :after_state, Types::Hash
+    attribute :before_descriptions_state, Types::Hash
+    attribute :after_descriptions_state, Types::Hash
     attribute :changes_made, Types::Hash
   end
 end

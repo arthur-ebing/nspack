@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunRule < Base
+  class ReworksRunRule < Base # rubocop:disable ClassLength
     def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
       make_form_object
@@ -21,6 +21,18 @@ module UiRules
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
+
+      left_record = if @form_object.before_state.nil_or_empty?
+                      { id: nil }
+                    else
+                      @form_object.before_descriptions_state.nil_or_empty? ? @form_object.before_state : @form_object.before_descriptions_state
+                    end
+
+      right_record = if @form_object.after_state.nil_or_empty?
+                       { id: nil }
+                     else
+                       @form_object.after_descriptions_state.nil_or_empty? ? @form_object.after_state : @form_object.after_descriptions_state
+                     end
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
                                        caption: 'Reworks Run Type' }
@@ -53,8 +65,8 @@ module UiRules
       fields[:changes_made] = {
         left_caption: 'Before',
         right_caption: 'After',
-        left_record: @form_object.before_state.nil_or_empty? ? { id: nil } : @form_object.before_state,
-        right_record: @form_object.after_state.nil_or_empty? ? { id: nil } : @form_object.after_state
+        left_record: left_record,
+        right_record: right_record
       }
     end
 
