@@ -257,7 +257,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
   DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
-  IN_TRANSIT_LOCATION = ENV.fetch('IN_TRANSIT_LOCATION')
+  IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
 
   # Load_containers:
   VGM_REQUIRED = make_boolean(ENV['VGM_REQUIRED'])
