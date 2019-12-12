@@ -14,6 +14,7 @@ module LabelPrintingApp
       @printer_id = params[:printer]
       @host = host
       raise ArgumentError if label_name.nil?
+      raise ArgumentError, 'Nothing to print' if instance.nil?
     end
 
     def call

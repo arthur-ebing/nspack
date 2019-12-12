@@ -73,18 +73,9 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def carton_verification(params)  # rubocop:disable Metrics/AbcSize, CyclomaticComplexity, PerceivedComplexity
-      carton_and_pallet_verification = AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION && (params[:device].nil? ? true : false)
-      if carton_and_pallet_verification
-        res = CartonAndPalletVerificationSchema.call(params)
-        return validation_failed_response(res) unless res.messages.empty?
-      else
-        res = CartonVerificationSchema.call(params)
-        return validation_failed_response(res) unless res.messages.empty?
-
-        check_res = validate_device_exists(res[:device])
-        return check_res unless check_res.success
-      end
+    def carton_verification(params)  # rubocop:disable Metrics/AbcSize
+      res = CartonAndPalletVerificationSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
       check_res = validate_carton_label_exists(res[:carton_number])
       return check_res unless check_res.success
@@ -93,7 +84,7 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(res, carton_and_pallet_verification)
+        cvl_res = MesscadaApp::CartonVerification.call(res)
         log_transaction
       end
       cvl_res

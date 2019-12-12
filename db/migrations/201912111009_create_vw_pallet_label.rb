@@ -53,7 +53,7 @@ Sequel.migration do
            JOIN production_runs ON production_runs.id = pallet_sequences.production_run_id
            JOIN plant_resources packhouses ON packhouses.id = pallet_sequences.packhouse_resource_id
            JOIN plant_resources lines ON lines.id = pallet_sequences.production_line_id
-           JOIN farms ON farms.id = (SELECT farm_id FROM rmt_bins WHERE production_run_tipped_id = production_runs.id LIMIT 1)
+           LEFT JOIN farms ON farms.id = (SELECT farm_id FROM rmt_bins WHERE production_run_tipped_id = production_runs.id LIMIT 1)
            JOIN orchards ON orchards.id = pallet_sequences.orchard_id
            JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
            LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
