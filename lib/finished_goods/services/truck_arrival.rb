@@ -17,7 +17,7 @@ module FinishedGoodsApp
     end
 
     def call
-      success_response("Load #{load_id}, already Shipped", load_id) if shipped
+      success_response("Load:#{load_id}, already Shipped", load_id) if shipped
 
       create_vehicle
       update_vehicle
