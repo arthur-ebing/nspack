@@ -23,10 +23,6 @@ module MasterfilesApp
                             wrapper: DepotFlat)
     end
 
-    def find_depot_id(depot_code)
-      DB[:depots].where(depot_code: depot_code).get(:id)
-    end
-
     def for_select_depots(depot_code: nil)
       ds = DB[:depots]
       ds = ds.where(depot_code: depot_code) unless depot_code.nil?

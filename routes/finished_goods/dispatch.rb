@@ -284,7 +284,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.allocate_multiselect(id, multiselect_grid_choices(params))
+        res = interactor.allocate_multiselect(id, pallet_sequence_id: multiselect_grid_choices(params))
         flash[:notice] = res.message
         r.redirect request.referer
       end
@@ -296,13 +296,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Allocate.call(id, back_url: session[:last_grid_url]) }
         end
 
-        r.patch do     # UPDATE
-          res = interactor.allocate(id, params[:load])
+        r.patch do # UPDATE
+          res = interactor.allocate(id, params[:load][:pallet_list])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/dispatch/loads/#{id}/allocate"
           else
-            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::Allocate.call(id, form_values: params[:load], form_errors: res.errors) }
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::Allocate.call(id, form_values: params[:load], form_errors: { pallet_list: res.errors }) }
           end
         end
       end

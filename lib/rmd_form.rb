@@ -49,7 +49,7 @@ module Crossbeams
     # The field will render as an input with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the input.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
@@ -81,7 +81,7 @@ module Crossbeams
     # and id = FORM_NAME_FIELD_NAME.
     # The value returned in params is 't' or 'f'.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the input.
     # @param options (Hash) options for the field
     # @option options [Boolean] :hide_on_load should this element be hidden when the form loads?
@@ -105,7 +105,7 @@ module Crossbeams
     # The field will render as an input with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the select.
     # @param options (Hash) options for the field
     # @option options [Boolean] :required Is the field required? Defaults to true.
@@ -135,7 +135,7 @@ module Crossbeams
     #    with name = FORM_NAME[FIELD_NAME]
     #    and id = FORM_NAME_FIELD_NAME.
     #
-    # @param name [string] the name of the form field.
+    # @param name [symbol] the name of the form field.
     # @param label [string] the caption for the label to appear beside the input.
     # @param value [string] the value to be displayed in the label.
     # @param hidden_value [string] the value of the hidden field. If nil, no hidden field will be generated.

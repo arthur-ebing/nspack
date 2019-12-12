@@ -11,19 +11,21 @@ module FinishedGoodsApp
     end
 
     def call
-      res = ship_pallets
-      return res unless res.success
+      repo.transaction do
+        res = ship_pallets
+        return res unless res.success
 
-      res = ship_load
-      return res unless res.success
-
-      success_response("Shipped Load #{load_id}")
+        res = ship_load
+        return res unless res.success
+      end
+      success_response("Shipped Load:#{load_id}")
     end
 
     private
 
     def ship_load
-      repo.ship_load(load_id)
+      attrs = { shipped: true, shipped_at: Time.now }
+      repo.update(:loads, load_id, attrs)
       repo.log_status(:loads, load_id, 'SHIPPED', user_name: user_name)
 
       ok_response
@@ -38,7 +40,8 @@ module FinishedGoodsApp
         return res unless res.success
       end
 
-      repo.ship_pallets(pallet_ids)
+      attrs = { shipped: true, shipped_at: Time.now, exit_ref: 'SHIPPED', in_stock: false }
+      repo.update(:pallets, pallet_ids, attrs)
       repo.log_multiple_statuses(:pallets, pallet_ids, 'SHIPPED', user_name: user_name)
 
       ok_response

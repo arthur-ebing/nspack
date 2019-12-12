@@ -3,6 +3,115 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'dispatch', 'rmd' do |r|
+    # ALLOCATE PALLETS TO LOAD
+    # --------------------------------------------------------------------------
+    r.on 'allocate' do
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      # --------------------------------------------------------------------------
+      r.on 'load', Integer do |load_id|
+        r.on 'submit' do
+          pallet_numbers = interactor.stepper(:allocate).allocated
+          res = interactor.allocate_multiselect(load_id, pallet_number: pallet_numbers)
+          if res.success
+            interactor.stepper(:allocate).clear
+            store_locally(:flash_notice, rmd_success_message(res.message))
+            r.redirect('/rmd/dispatch/allocate/load')
+          else
+            store_locally(:flash_notice, rmd_error_message(res.message))
+            r.redirect("/rmd/dispatch/allocate/load/#{load_id}")
+          end
+        end
+
+        r.get do
+          form_state = interactor.stepper(:allocate).form_state
+          r.redirect('/rmd/dispatch/allocate/load') if form_state.empty?
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :allocate,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         progress: interactor.stepper(:allocate).allocation_progress,
+                                         links: [{ caption: 'Cancel', url: '/rmd/dispatch/allocate/load/clear', prompt: 'Cancel Load?' },
+                                                 { caption: 'Complete allocation', url: "/rmd/dispatch/allocate/load/#{load_id}/submit", prompt: 'Complete allocation?' }],
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Allocate Pallets',
+                                         action: "/rmd/dispatch/allocate/load/#{load_id}",
+                                         button_caption: 'Submit')
+
+          form.add_label(:load_id, 'Load', load_id)
+          form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
+          form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
+
+          form.add_field(:pallet_number,
+                         'Pallet',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: true,
+                         data_type: 'number',
+                         required: true)
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          scanned_number = params[:allocate][:pallet_number]
+          res = interactor.stepper_allocate_pallet(:allocate, load_id, scanned_number)
+          if res.success
+            store_locally(:flash_notice, rmd_success_message(res.message))
+          else
+            store_locally(:flash_notice, rmd_error_message(res.message))
+          end
+          r.redirect("/rmd/dispatch/allocate/load/#{load_id}")
+        end
+      end
+
+      r.on 'load' do
+        r.on 'clear' do
+          interactor.stepper(:allocate).clear
+          r.redirect('/rmd/dispatch/allocate/load')
+        end
+
+        r.get do
+          form_state = {}
+          current_load = interactor.stepper(:allocate)
+          r.redirect("/rmd/dispatch/allocate/load/#{current_load.id}") unless current_load&.id.nil?
+
+          form_state = current_load.form_state if current_load&.error?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :allocate,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Scan Load',
+                                         action: '/rmd/dispatch/allocate/load',
+                                         button_caption: 'Submit')
+
+          form.add_field(:load_id,
+                         'Load',
+                         data_type: 'number',
+                         scan: 'key248_all',
+                         scan_type: :load,
+                         submit_form: true,
+                         required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          current_load = interactor.stepper(:allocate)
+          load_id = params[:allocate][:load_id]
+          res = interactor.validate_load(load_id)
+
+          if res.success
+            current_load.setup_load(load_id)
+            r.redirect("/rmd/dispatch/allocate/load/#{load_id}")
+          else
+            current_load.write(form_state: { error_message: res.message, errors: res.errors })
+            r.redirect('/rmd/dispatch/allocate/load')
+          end
+        end
+      end
+    end
+
     # TRUCK ARRIVAL
     # --------------------------------------------------------------------------
     r.on 'truck_arrival' do
@@ -255,12 +364,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
-          form_state = interactor.current_load_truck.form_state
+          form_state = interactor.stepper(:load_truck).form_state
           r.redirect('/rmd/dispatch/load_truck/load') if form_state.empty?
 
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :load_truck,
-                                         progress: interactor.current_load_truck.progress,
+                                         progress: interactor.stepper(:load_truck).progress,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          links: [{ caption: 'Cancel', url: '/rmd/dispatch/load_truck/load/clear', prompt: 'Cancel Load?' }],
                                          notes: retrieve_from_local_store(:flash_notice),
@@ -287,35 +396,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           scanned_number = params[:load_truck][:pallet_number]
-          res = interactor.scan_pallet(load_id, scanned_number)
-
-          if res.success
-            if res.instance[:load_complete]
-              store_locally(:flash_notice, rmd_success_message(res.message))
-              r.redirect('/rmd/dispatch/load_truck/load')
-            else
-              r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
-            end
-          else
-            r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
+          res = interactor.stepper_load_pallet(:load_truck, load_id, scanned_number)
+          if res.instance[:load_complete]
+            interactor.stepper(:load_truck).clear
+            store_locally(:flash_notice, rmd_success_message(res.message))
+            r.redirect('/rmd/dispatch/load_truck/load')
           end
+          store_locally(:flash_notice, rmd_error_message(res.message)) unless res.success
+          r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
         end
       end
 
       r.on 'load' do
         r.on 'clear' do
-          interactor.stepper.clear
+          interactor.stepper(:load_truck).clear
           r.redirect('/rmd/dispatch/load_truck/load')
         end
 
         r.get do
           form_state = {}
-          current_load = interactor.current_load_truck
-
+          current_load = interactor.stepper(:load_truck)
           r.redirect("/rmd/dispatch/load_truck/load/#{current_load.id}") unless current_load&.id.nil?
 
           form_state = current_load.form_state if current_load&.error?
-
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :load,
                                          scan_with_camera: @rmd_scan_with_camera,
@@ -336,12 +439,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          current_load = interactor.current_load_truck
+          current_load = interactor.stepper(:load_truck)
           load_id = params[:load][:load_id]
           res = interactor.validate_load_truck(load_id)
 
           if res.success
-            interactor.setup_load_truck(load_id)
+            current_load.setup_load(load_id)
             r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
           else
             current_load.write(form_state: { error_message: res.message, errors: res.errors })

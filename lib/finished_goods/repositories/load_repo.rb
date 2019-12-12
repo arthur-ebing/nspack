@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class LoadRepo < BaseRepo
     build_for_select :loads,
                      label: :order_number,
                      value: :id,
@@ -54,19 +54,17 @@ module FinishedGoodsApp
       DB[:locations].where(location_short_code: location_barcode).get(:id)
     end
 
-    def find_pallet_numbers_from(pallet_sequence_id: nil, load_id: nil, pallet_id: nil)
+    def find_pallet_numbers_from(args)
       ds = DB[:pallets]
-      ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
-      ds = ds.where(load_id: load_id) unless load_id.nil?
-      ds = ds.where(id: pallet_id) unless pallet_id.nil?
+      ds = ds.where(id: DB[:pallet_sequences].where(id: args.delete(:pallet_sequence_id)).select_map(:pallet_id)) if args.key?(:pallet_sequence_id)
+      ds = ds.where(args) unless args.nil_or_empty?
       ds.select_map(:pallet_number).flatten
     end
 
-    def find_pallet_ids_from(pallet_sequence_id: nil, load_id: nil, pallet_numbers: nil)
+    def find_pallet_ids_from(args)
       ds = DB[:pallets]
-      ds = ds.where(id: DB[:pallet_sequences].where(id: pallet_sequence_id).select_map(:pallet_id)) unless pallet_sequence_id.nil?
-      ds = ds.where(load_id: load_id) unless load_id.nil?
-      ds = ds.where(pallet_number: pallet_numbers) unless pallet_numbers.nil?
+      ds = ds.where(id: DB[:pallet_sequences].where(id: args.delete(:pallet_sequence_id)).select_map(:pallet_id)) if args.key?(:pallet_sequence_id)
+      ds = ds.where(args) unless args.nil_or_empty?
       ds.select_map(:id).flatten
     end
 
@@ -109,28 +107,6 @@ module FinishedGoodsApp
       end
 
       ok_response
-    end
-
-    def ship_load(id)
-      DB[:loads].where(id: id).update(shipped: true, shipped_at: Time.now)
-    end
-
-    def unship_load(id)
-      DB[:loads].where(id: id).update(shipped: false, shipped_at: nil)
-    end
-
-    def ship_pallets(ids)
-      DB[:pallets].where(id: ids).update(shipped: true, shipped_at: Time.now, exit_ref: 'SHIPPED', in_stock: false)
-    end
-
-    def unship_pallets(ids)
-      DB[:pallets].where(id: ids).update(shipped: false, shipped_at: nil, exit_ref: nil, in_stock: true)
-    end
-
-    def org_code_for_po(load_id)
-      pr_id = DB[:loads].where(id: load_id).get(:exporter_party_role_id)
-      DB.get(Sequel.function(:fn_party_role_name, pr_id))
-      # MasterfilesApp::PartyRepo.new.org_code_for_party_role(pr_id)
     end
   end
 end
