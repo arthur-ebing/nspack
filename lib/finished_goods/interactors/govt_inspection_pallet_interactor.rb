@@ -42,10 +42,12 @@ module FinishedGoodsApp
       attrs[:inspected] = true
       attrs[:passed] = false
       attrs[:inspected_at] = Time.now
-      attrs[:in_stock] = false
 
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)
+        pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
+        attrs = { in_stock: false }
+        repo.update(:pallets, pallet_id, attrs)
       end
       instance = govt_inspection_pallet(id)
       success_response('Updated govt inspection pallet', instance)
@@ -58,12 +60,13 @@ module FinishedGoodsApp
                 inspected_at: Time.now,
                 passed: true,
                 failure_reason_id: nil,
-                failure_remarks: nil,
-                in_stock: true,
-                stock_created_at: Time.now }
+                failure_remarks: nil }
       repo.transaction do
         govt_inspection_pallet_ids.each do |id|
           repo.update_govt_inspection_pallet(id, attrs)
+          pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
+          attrs = { in_stock: true,  stock_created_at: Time.now }
+          repo.update(:pallets, pallet_id, attrs)
         end
       end
       success_response('Updated govt inspection pallets')
