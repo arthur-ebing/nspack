@@ -72,3 +72,17 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS', 'Tip Bi
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS');
 INSERT INTO location_storage_types (storage_type_code) VALUES('RMT_PALLETS');
 
+-- IN-TRANSIT LOCATION (Not part of locations tree)
+INSERT INTO location_types (location_type_code, short_code) VALUES('IN_TRANSIT', 'IN_TRANSIT') ON CONFLICT DO NOTHING;
+INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;
+INSERT INTO location_assignments (assignment_code) VALUES('TRANSIT') ON CONFLICT DO NOTHING;
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true);
+
+-- BUSINESS PROCESSES
+INSERT INTO business_processes(process) VALUES('MOVE_PALLET');
+INSERT INTO business_processes(process) VALUES('LOAD_SHIPPED');
+
+-- STOCK TYPES
+INSERT INTO stock_types(stock_type_code) VALUES('PALLET');
+

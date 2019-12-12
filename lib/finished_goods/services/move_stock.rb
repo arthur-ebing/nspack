@@ -49,7 +49,7 @@ module FinishedGoodsApp
 
     def validate_stock_type
       stock_type_rec = repo.find_stock_type(stock_type)
-      return failed_response("Stock Type: #{stock_type} does not exist") unless stock_type_rec
+      return failed_response("Stock Type: \"#{stock_type}\" does not exist") unless stock_type_rec
 
       @stock_type_id = stock_type_rec[:id]
 
@@ -59,7 +59,7 @@ module FinishedGoodsApp
     def validate_business_process
       if business_process
         process = repo.find_business_process(business_process)
-        return failed_response('Business Process does not exist') unless process
+        return failed_response("Business Process \"#{business_process}\"does not exist") unless process
 
         @business_process_id = process[:id]
       end
