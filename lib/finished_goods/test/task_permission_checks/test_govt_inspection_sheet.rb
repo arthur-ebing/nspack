@@ -35,57 +35,15 @@ module FinishedGoodsApp
     end
 
     def test_edit
-      FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:edit, 1)
       assert res.success, 'Should be able to edit a govt_inspection_sheet'
-
-      # FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed govt_inspection_sheet'
     end
 
     def test_delete
-      FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:delete, 1)
       assert res.success, 'Should be able to delete a govt_inspection_sheet'
-
-      # FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed govt_inspection_sheet'
     end
-
-    # def test_complete
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a govt_inspection_sheet'
-
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed govt_inspection_sheet'
-    # end
-
-    # def test_approve
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true, approved: false))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed govt_inspection_sheet'
-
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed govt_inspection_sheet'
-
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved govt_inspection_sheet'
-    # end
-
-    # def test_reopen
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a govt_inspection_sheet that has not been approved'
-
-    #   FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved govt_inspection_sheet'
-    # end
   end
 end

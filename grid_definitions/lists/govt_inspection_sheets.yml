@@ -30,12 +30,12 @@
     :function: Finished Goods
     :program: inspection
     :permission: edit
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/uncomplete"
-  :text: uncomplete sheet
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/reopen"
+  :text: reopen sheet
   :icon: edit-pencil
   :hide_if_false: completed
   :hide_if_true: inspected
-  :prompt: 'Are you sure you want to Uncomplete this Inspection Sheet?'
+  :prompt: 'Are you sure you want to reopen this Inspection Sheet?'
   :auth:
     :function: Finished Goods
     :program: inspection

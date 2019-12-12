@@ -6,7 +6,7 @@ module FinishedGoods
       class CaptureResult
         def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:govt_inspection_pallet, :capture_result, id: id, form_values: form_values)
-          rules   = ui_rule.compile
+          rules = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object

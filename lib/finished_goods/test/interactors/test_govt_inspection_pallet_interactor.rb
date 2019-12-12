@@ -11,12 +11,12 @@ module FinishedGoodsApp
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(FinishedGoodsApp::GovtInspectionPalletRepo)
+      assert repo.is_a?(FinishedGoodsApp::GovtInspectionRepo)
     end
 
     def test_govt_inspection_pallet
       skip 'pallet_factory needed'
-      FinishedGoodsApp::GovtInspectionPalletRepo.any_instance.stubs(:find_govt_inspection_pallet).returns(fake_govt_inspection_pallet)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_pallet).returns(fake_govt_inspection_pallet)
       entity = interactor.send(:govt_inspection_pallet, 1)
       assert entity.is_a?(GovtInspectionPallet)
     end

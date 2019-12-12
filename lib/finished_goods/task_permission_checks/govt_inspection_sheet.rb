@@ -6,7 +6,7 @@ module FinishedGoodsApp
       attr_reader :task, :entity
       def initialize(task, govt_inspection_sheet_id = nil)
         @task = task
-        @repo = GovtInspectionSheetRepo.new
+        @repo = GovtInspectionRepo.new
         @id = govt_inspection_sheet_id
         @entity = @id ? @repo.find_govt_inspection_sheet(@id) : nil
       end

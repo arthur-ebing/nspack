@@ -1,23 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable ClassLength
-    def add_pallets_govt_inspection_pallet(params)
-      res = validate_govt_inspection_add_pallet_params(params)
-      return res unless res.success
-
-      id = nil
-      repo.transaction do
-        id = repo.create_govt_inspection_pallet(res.instance)
-      end
-      instance = govt_inspection_pallet(id)
-      success_response('Created govt inspection pallet', instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { failure_remarks: ['This govt inspection pallet already exists'] }))
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
+  class GovtInspectionPalletInteractor < BaseInteractor
     def create_govt_inspection_pallet(params)
       res = validate_govt_inspection_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -46,8 +30,8 @@ module FinishedGoodsApp
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)
         pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
-        attrs = { in_stock: false }
-        repo.update(:pallets, pallet_id, attrs)
+        pallet_attrs = { in_stock: false }
+        repo.update(:pallets, pallet_id, pallet_attrs)
       end
       instance = govt_inspection_pallet(id)
       success_response('Updated govt inspection pallet', instance)
@@ -65,8 +49,8 @@ module FinishedGoodsApp
         govt_inspection_pallet_ids.each do |id|
           repo.update_govt_inspection_pallet(id, attrs)
           pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
-          attrs = { in_stock: true,  stock_created_at: Time.now }
-          repo.update(:pallets, pallet_id, attrs)
+          pallet_attrs = { in_stock: true,  stock_created_at: Time.now }
+          repo.update(:pallets, pallet_id, pallet_attrs)
         end
       end
       success_response('Updated govt inspection pallets')
@@ -104,7 +88,7 @@ module FinishedGoodsApp
     private
 
     def repo
-      @repo ||= GovtInspectionPalletRepo.new
+      @repo ||= GovtInspectionRepo.new
     end
 
     def govt_inspection_pallet(id)
@@ -117,18 +101,6 @@ module FinishedGoodsApp
 
     def validate_govt_inspection_failed_pallet_params(params)
       GovtInspectionFailedPalletSchema.call(params)
-    end
-
-    def validate_govt_inspection_add_pallet_params(params)
-      res = GovtInspectionAddPalletSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
-
-      attrs = res.to_h
-      res = repo.validate_pallet_number(attrs.delete(:pallet_number))
-      return res unless res.success
-
-      attrs[:pallet_id] = res.instance
-      success_response('ok', attrs)
     end
   end
 end

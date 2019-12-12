@@ -56,7 +56,7 @@ module FinishedGoodsApp
     private
 
     def repo
-      @repo ||= GovtInspectionPalletApiResultRepo.new
+      @repo ||= GovtInspectionRepo.new
     end
 
     def govt_inspection_pallet_api_result(id)

@@ -3,7 +3,7 @@
 module UiRules
   class GovtInspectionPalletApiResultRule < Base
     def generate_rules
-      @repo = FinishedGoodsApp::GovtInspectionPalletApiResultRepo.new
+      @repo = FinishedGoodsApp::GovtInspectionRepo.new
       make_form_object
       apply_form_values
 
@@ -14,8 +14,8 @@ module UiRules
     end
 
     def set_show_fields
-      govt_inspection_pallet_id_label = FinishedGoodsApp::GovtInspectionPalletRepo.new.find_govt_inspection_pallet(@form_object.govt_inspection_pallet_id)&.failure_remarks
-      govt_inspection_api_result_id_label = FinishedGoodsApp::GovtInspectionApiResultRepo.new.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
+      govt_inspection_pallet_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_pallet(@form_object.govt_inspection_pallet_id)&.failure_remarks
+      govt_inspection_api_result_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:passed] = { renderer: :label, as_boolean: true }
       fields[:failure_reasons] = { renderer: :label }
       fields[:govt_inspection_pallet_id] = { renderer: :label, with_value: govt_inspection_pallet_id_label, caption: 'Govt Inspection Pallet' }
@@ -27,8 +27,8 @@ module UiRules
       {
         passed: { renderer: :checkbox },
         failure_reasons: {},
-        govt_inspection_pallet_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionPalletRepo.new.for_select_govt_inspection_pallets, disabled_options: FinishedGoodsApp::GovtInspectionPalletRepo.new.for_select_inactive_govt_inspection_pallets, caption: 'Govt Inspection Pallet' },
-        govt_inspection_api_result_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionApiResultRepo.new.for_select_govt_inspection_api_results, disabled_options: FinishedGoodsApp::GovtInspectionApiResultRepo.new.for_select_inactive_govt_inspection_api_results, caption: 'Govt Inspection Api Result' }
+        govt_inspection_pallet_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_govt_inspection_pallets, disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_pallets, caption: 'Govt Inspection Pallet' },
+        govt_inspection_api_result_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_govt_inspection_api_results, disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_api_results, caption: 'Govt Inspection Api Result' }
       }
     end
 

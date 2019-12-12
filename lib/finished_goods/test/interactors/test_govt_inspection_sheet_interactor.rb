@@ -10,11 +10,11 @@ module FinishedGoodsApp
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(FinishedGoodsApp::GovtInspectionSheetRepo)
+      assert repo.is_a?(FinishedGoodsApp::GovtInspectionRepo)
     end
 
     def test_govt_inspection_sheet
-      FinishedGoodsApp::GovtInspectionSheetRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(fake_govt_inspection_sheet)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(fake_govt_inspection_sheet)
       entity = interactor.send(:govt_inspection_sheet, 1)
       assert entity.is_a?(GovtInspectionSheet)
     end

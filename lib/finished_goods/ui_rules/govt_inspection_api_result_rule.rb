@@ -3,7 +3,7 @@
 module UiRules
   class GovtInspectionApiResultRule < Base
     def generate_rules
-      @repo = FinishedGoodsApp::GovtInspectionApiResultRepo.new
+      @repo = FinishedGoodsApp::GovtInspectionRepo.new
       make_form_object
       apply_form_values
 
@@ -15,7 +15,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      govt_inspection_sheet_id_label = FinishedGoodsApp::GovtInspectionSheetRepo.new.find_govt_inspection_sheet(@form_object.govt_inspection_sheet_id)&.booking_reference
+      govt_inspection_sheet_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_sheet(@form_object.govt_inspection_sheet_id)&.booking_reference
       fields[:govt_inspection_sheet_id] = { renderer: :label, with_value: govt_inspection_sheet_id_label, caption: 'Govt Inspection Sheet' }
       fields[:govt_inspection_request_doc] = { renderer: :label }
       fields[:govt_inspection_result_doc] = { renderer: :label }
@@ -29,7 +29,7 @@ module UiRules
 
     def common_fields
       {
-        govt_inspection_sheet_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionSheetRepo.new.for_select_govt_inspection_sheets, disabled_options: FinishedGoodsApp::GovtInspectionSheetRepo.new.for_select_inactive_govt_inspection_sheets, caption: 'Govt Inspection Sheet' },
+        govt_inspection_sheet_id: { renderer: :select, options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_govt_inspection_sheets, disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_sheets, caption: 'Govt Inspection Sheet' },
         govt_inspection_request_doc: {},
         govt_inspection_result_doc: {},
         results_requested: { renderer: :checkbox },
