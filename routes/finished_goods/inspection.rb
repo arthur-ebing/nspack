@@ -63,7 +63,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'capture_results_multiselect' do
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = pallet_interactor.pass_govt_inspection_pallet_multiselect(multiselect_grid_choices(params))
+        res = pallet_interactor.pass_govt_inspection_pallet(multiselect_grid_choices(params))
         flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer
       end

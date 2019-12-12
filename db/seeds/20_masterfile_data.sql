@@ -86,3 +86,4 @@ INSERT INTO business_processes(process) VALUES('LOAD_SHIPPED');
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code) VALUES('PALLET');
 
+INSERT INTO inspection_failure_types (failure_type_code) VALUES('GOVERNMENT');

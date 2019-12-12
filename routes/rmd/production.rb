@@ -376,6 +376,8 @@ class Nspack < Roda # rubocop:disable ClassLength
         pallet_sequence = interactor.find_pallet_sequence_attrs_by_id(id)
         pallet_sequence.merge!(qty_to_print: 4)
 
+        printer_repo = LabelApp::PrinterRepo.new
+
         error = retrieve_from_local_store(:errors)
         pallet_sequence.merge!(error_message: error) unless error.nil?
         form = Crossbeams::RMDForm.new(pallet_sequence,
@@ -395,7 +397,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_csrf_tag csrf_tag
         form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
         form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
-        form.add_select(:printer, 'Printer', items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false)
+        form.add_select(:printer, 'Printer', items: printer_repo.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false, value: printer_repo.default_printer_for_application(AppConst::PRINT_APP_PALLET))
         form.add_select(:pallet_label_name, 'Pallet Label', value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]), items: interactor.find_pallet_labels, required: false)
         form.add_button('Print', "/rmd/production/palletizing/print_pallet_labels/#{pallet_sequence[:id]}")
         view(inline: form.render, layout: :layout_rmd)

@@ -4,9 +4,8 @@ module MesscadaApp
   class CartonVerification < BaseService
     attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code
 
-    def initialize(params, carton_and_pallet_verification)
+    def initialize(params)
       @carton_label_id = params[:carton_number]
-      @resource_code = params[:device] unless carton_and_pallet_verification
     end
 
     def call
