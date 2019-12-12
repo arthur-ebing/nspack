@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionPalletInteractor < BaseInteractor
+  class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable ClassLength
     def add_pallets_govt_inspection_pallet(params)
       res = validate_govt_inspection_add_pallet_params(params)
       return res unless res.success
@@ -34,7 +34,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def fail_govt_inspection_pallet(id, params)  # rubocop:disable Metrics/AbcSize
+    def fail_govt_inspection_pallet(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_govt_inspection_failed_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -42,9 +42,10 @@ module FinishedGoodsApp
       attrs[:inspected] = true
       attrs[:passed] = false
       attrs[:inspected_at] = Time.now
+      attrs[:in_stock] = false
 
       repo.transaction do
-        repo.update_govt_inspection_pallet(id, res)
+        repo.update_govt_inspection_pallet(id, attrs)
       end
       instance = govt_inspection_pallet(id)
       success_response('Updated govt inspection pallet', instance)
@@ -52,8 +53,14 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def pass_govt_inspection_pallet_multiselect(govt_inspection_pallet_ids)
-      attrs = { inspected: true, inspected_at: Time.now, passed: true, failure_reason_id: nil, failure_remarks: nil }
+    def pass_govt_inspection_pallet(govt_inspection_pallet_ids)
+      attrs = { inspected: true,
+                inspected_at: Time.now,
+                passed: true,
+                failure_reason_id: nil,
+                failure_remarks: nil,
+                in_stock: true,
+                stock_created_at: Time.now }
       repo.transaction do
         govt_inspection_pallet_ids.each do |id|
           repo.update_govt_inspection_pallet(id, attrs)
