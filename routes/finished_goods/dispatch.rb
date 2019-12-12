@@ -259,7 +259,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'ship' do
         check_auth!('dispatch', 'edit')
         res = interactor.ship_load(id)
-        p res
+
         if res.success
           flash[:notice] = res.message
           r.redirect '/list/loads'
@@ -267,6 +267,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           flash[:error] = res.message
           r.redirect "/finished_goods/dispatch/loads/#{id}"
         end
+      end
+
+      r.on 're_send_po_edi' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.send_po_edi(id)
+
+        error = if res.success
+                  nil
+                else
+                  res.message
+                end
+        update_dialog_content(content: wrap_content_in_style(res.message, error.nil? ? :success : :error, caption: ''))
       end
 
       r.on 'allocate_multiselect' do
