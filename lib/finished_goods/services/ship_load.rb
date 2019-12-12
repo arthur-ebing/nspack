@@ -32,6 +32,8 @@ module FinishedGoodsApp
 
     def ship_pallets # rubocop:disable Metrics/AbcSize
       location_to = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::IN_TRANSIT_LOCATION)&.id
+      raise Crossbeams::InfoError, "There is no location named #{AppConst::IN_TRANSIT_LOCATION}. Please contact support." if location_to.nil?
+
       pallet_ids.each do |pallet_id|
         res = MoveStockService.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
         return res unless res.success

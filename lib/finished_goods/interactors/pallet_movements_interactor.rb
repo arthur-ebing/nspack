@@ -2,7 +2,7 @@
 
 module FinishedGoodsApp
   class PalletMovementsInteractor < BaseInteractor
-    def move_pallet(pallet_number, location, is_location_scanned)
+    def move_pallet(pallet_number, location, is_location_scanned) # rubocop:disable Metrics/AbcSize
       pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
