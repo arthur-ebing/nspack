@@ -506,12 +506,15 @@ module ProductionApp
       repo.sequence_setup_data(id)
     end
 
-    def reworks_run_pallet_print_data(sequence_id)
-      repo.reworks_run_pallet_data(sequence_id)
+    # def reworks_run_pallet_print_data(sequence_id)
+    #   repo.reworks_run_pallet_data(sequence_id)
+    # end
+    def reworks_run_pallet_print_data(pallet_number)
+      repo.reworks_run_pallet_print_data(pallet_number)
     end
 
     def reworks_run_carton_print_data(sequence_id)
-      repo.reworks_run_pallet_seq_data(sequence_id)
+      repo.reworks_run_pallet_seq_print_data(sequence_id)
     end
 
     def vw_flat_sequence_data(sequence_id)

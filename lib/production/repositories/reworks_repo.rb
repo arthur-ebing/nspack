@@ -163,10 +163,28 @@ module ProductionApp
       }
     end
 
+    def reworks_run_pallet_print_data(pallet_number)
+      qry = <<~SQL
+        SELECT DISTINCT *
+        FROM vw_pallet_label
+        WHERE pallet_number = ?
+      SQL
+      DB[qry, pallet_number].first
+    end
+
     def reworks_run_pallet_data(pallet_number)
       DB["SELECT *
           FROM vw_pallet_sequence_flat
           WHERE pallet_number = ?", pallet_number].first
+    end
+
+    def reworks_run_pallet_seq_print_data(id)
+      qry = <<~SQL
+        SELECT *
+        FROM vw_pallet_label
+        WHERE id = ?
+      SQL
+      DB[qry, id].first
     end
 
     def reworks_run_pallet_seq_data(id)
