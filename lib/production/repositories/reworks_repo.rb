@@ -32,6 +32,8 @@ module ProductionApp
                  COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number', '')  AS pallet_sequence_number,
                  COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'before', null) AS before_state,
                  COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after', null) AS after_state,
+                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
+                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
                  reworks_runs.created_at, reworks_runs.updated_at
                  FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
                  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
@@ -84,19 +86,29 @@ module ProductionApp
       DB[upd].update
     end
 
-    def existing_record_reworks_run_update(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
-      upd = "UPDATE pallets SET pallet_format_id = pallet_sequences.pallet_format_id FROM pallet_sequences
-             WHERE pallets.id = pallet_sequences.pallet_id AND pallets.pallet_number IN ('#{pallet_numbers.join('\',\'')}');"
-      DB[upd].update
+    def existing_records_batch_update(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)
       DB[:pallet_sequences].where(id: pallet_sequence_ids).update(pallet_sequence_attrs)
+      pallet_numbers.each do |pallet_number|
+        update_pallets_pallet_format(pallet_number)
+      end
     end
 
-    def repacking_reworks_run(pallet_numbers)
+    def update_pallets_pallet_format(pallet_number)
+      pallet_format_id = where_hash(:pallet_sequences, id: oldest_sequence_id(pallet_number))[:pallet_format_id]
+
+      upd = "UPDATE pallets SET pallet_format_id = #{pallet_format_id} WHERE pallet_number = '#{pallet_number}';"
+      DB[upd].update unless pallet_format_id.nil_or_empty?
+    end
+
+    def repacking_reworks_run(pallet_numbers, attrs)
       pallet_number_ids = pallet_number_ids(pallet_numbers)
       return if pallet_number_ids.empty?
 
       pallet_number_ids.each do |pallet_id|
         clone_pallet(pallet_id)
+        DB[:pallets].where(od: pallet_id).update(attrs)
+        upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_id = #{pallet_id};"
+        DB[upd].update
       end
     end
 
@@ -167,7 +179,7 @@ module ProductionApp
       DB["SELECT marketing_variety_id, customer_variety_variety_id, std_fruit_size_count_id, basic_pack_code_id,
           standard_pack_code_id, fruit_actual_counts_for_pack_id, fruit_size_reference_id, marketing_org_party_role_id,
           packed_tm_group_id, mark_id, inventory_code_id, pallet_format_id, cartons_per_pallet_id, pm_bom_id, client_size_reference,
-          client_product_code, treatment_ids, marketing_order_number, sell_by_code, grade_id, product_chars
+          client_product_code, treatment_ids, marketing_order_number, sell_by_code, grade_id, product_chars, pm_type_id, pm_subtype_id
           FROM pallet_sequences
           WHERE id = ?", id].first
     end
@@ -175,7 +187,7 @@ module ProductionApp
     def sequence_setup_data(id)
       DB["SELECT marketing_variety, customer_variety, std_size, basic_pack, std_pack, actual_count, size_ref, marketing_org,
           packed_tm_group, mark, inventory_code, pallet_base, stack_type, cpp, bom, client_size_ref,
-          client_product_code, treatments, order_number, sell_by_code, grade, product_chars
+          client_product_code, treatments, order_number, sell_by_code, grade, product_chars, pm_type, pm_subtype
           FROM vw_pallet_sequence_flat
           WHERE id = ?", id].first
     end
@@ -203,6 +215,8 @@ module ProductionApp
         order_number: attrs[:marketing_order_number],
         sell_by_code: attrs[:sell_by_code],
         grade: get(:grades, attrs[:grade_id], :grade_code),
+        pm_type: get(:pm_types, attrs[:pm_type_id], :pm_type_code),
+        pm_subtype: get(:pm_subtypes, attrs[:pm_subtype_id], :subtype_code),
         product_chars: attrs[:product_chars] }
     end
 
@@ -285,20 +299,22 @@ module ProductionApp
       DB[:pallet_sequences].where(id: sequence_id).update(attrs)
     end
 
-    def oldest_sequence_standard_pack_code(pallet_number)
-      query = <<~SQL
-        SELECT standard_pack_code_id
-        FROM pallet_sequences
-        WHERE pallet_number = '#{pallet_number}'
-          AND pallet_sequence_number = ( SELECT MIN(pallet_sequence_number)
-                                         FROM pallet_sequences
-                                         WHERE pallet_number = '#{pallet_number}' AND pallet_id IS NOT NULL)
-      SQL
-      DB[query].get(:standard_pack_code_id) unless pallet_number.nil_or_empty?
+    def oldest_sequence_id(pallet_number)
+      pallet_sequence_number = oldest_sequence_number(pallet_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_number).where(pallet_sequence_number: pallet_sequence_number).get(:id) unless pallet_sequence_number.nil_or_empty?
     end
 
-    def update_pallet_gross_weight(pallet_id, attrs)
-      DB[:pallet_sequences].where(pallet_id: pallet_id).update(standard_pack_code_id: attrs[:standard_pack_code_id])
+    def oldest_sequence_number(pallet_number)
+      query = <<~SQL
+        SELECT MIN(pallet_sequence_number) AS pallet_sequence_number
+        FROM pallet_sequences
+        WHERE pallet_number = '#{pallet_number}' AND pallet_id IS NOT NULL
+      SQL
+      DB[query].get(:pallet_sequence_number) unless pallet_number.nil_or_empty?
+    end
+
+    def update_pallet_gross_weight(pallet_id, attrs, same_standard_pack)
+      DB[:pallet_sequences].where(pallet_id: pallet_id).update(standard_pack_code_id: attrs[:standard_pack_code_id]) unless same_standard_pack
       DB[:pallets].where(id: pallet_id).update(gross_weight: attrs[:gross_weight])
     end
 
@@ -329,14 +345,13 @@ module ProductionApp
                  ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
                  ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code, --p.pallet_label_name,
                  cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-                 pm_subtypes.pm_type_id, pm_products.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
+                 ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
                  FROM pallet_sequences ps
                  JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
                  JOIN pallet_formats ON pallet_formats.id = ps.pallet_format_id
                  LEFT JOIN pm_boms ON pm_boms.id = ps.pm_bom_id
                  LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = ps.pm_bom_id
                  LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
-                 LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
                  WHERE ps.id = ?", sequence_id].first
 
       return nil if hash.nil?

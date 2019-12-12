@@ -160,5 +160,9 @@ module EdiApp
       SQL
       DB[query, load_id].all
     end
+
+    def store_edi_filename(file_name, record_id)
+      DB[:loads].where(id: record_id).update(edi_file_name: file_name)
+    end
   end
 end

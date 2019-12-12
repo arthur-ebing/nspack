@@ -74,6 +74,10 @@ module MasterfilesApp
       Organization.new(hash)
     end
 
+    def org_code_for_party_role(id)
+      DB.get(Sequel.function(:fn_party_role_name, id))
+    end
+
     def delete_organization(id)
       children = DB[:organizations].where(parent_id: id)
       return { error: 'This organization is set as a parent' } if children.any?

@@ -126,5 +126,11 @@ module FinishedGoodsApp
     def unship_pallets(ids)
       DB[:pallets].where(id: ids).update(shipped: false, shipped_at: nil, exit_ref: nil, in_stock: true)
     end
+
+    def org_code_for_po(load_id)
+      pr_id = DB[:loads].where(id: load_id).get(:exporter_party_role_id)
+      DB.get(Sequel.function(:fn_party_role_name, pr_id))
+      # MasterfilesApp::PartyRepo.new.org_code_for_party_role(pr_id)
+    end
   end
 end

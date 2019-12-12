@@ -11,13 +11,12 @@ module FinishedGoodsApp
     end
 
     def call
-      repo.transaction do
-        res = ship_pallets
-        return res unless res.success
+      res = ship_pallets
+      return res unless res.success
 
-        res = ship_load
-        return res unless res.success
-      end
+      res = ship_load
+      return res unless res.success
+
       success_response("Shipped Load #{load_id}")
     end
 

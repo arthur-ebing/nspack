@@ -92,7 +92,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:gross_weight, :decimal).filled(:decimal?)
   end
 
-  SequenceSetupDataSchema = Dry::Validation.Params do
+  SequenceSetupDataSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
@@ -119,7 +119,8 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pallet_label_name, Types::StrippedString).maybe(:str?)
     required(:grade_id, :integer).maybe(:int?)
     required(:product_chars, Types::StrippedString).maybe(:str?)
-    # required(:active, :bool).maybe(:bool?)
+    required(:pm_type_id, :integer).maybe(:int?)
+    required(:pm_subtype_id, :integer).maybe(:int?)
   end
 
   ReworksRunUpdatePalletSchema = Dry::Validation.Params do

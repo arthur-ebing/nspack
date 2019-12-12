@@ -41,6 +41,8 @@ module EdiApp
       prepare_bt
       validate_data('OC' => %i[load_id], 'OK' => %i[load_id container], 'OP' => %i[load_id sscc seq_no])
       fname = create_flat_file
+
+      repo.store_edi_filename(fname, record_id)
       success_response('PoOut was successful', fname)
     end
 

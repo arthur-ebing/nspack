@@ -25,6 +25,12 @@
   :icon: edit
   :title: Allocate Pallets
   :hide_if_true: shipped
+- :url: "/finished_goods/dispatch/loads/$:id$/re_send_po_edi"
+  :text: Re-send PO EDI
+  :icon: play
+  :title: Re-send PO EDI
+  :popup: true
+  :hide_if_false: shipped
 - :separator: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status

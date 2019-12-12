@@ -146,7 +146,8 @@ module UiRules
     end
 
     def standard_pack_code(pallet_number)
-      (@repo.oldest_sequence_standard_pack_code(pallet_number) unless rules[:provide_pack_type])
+      oldest_sequence_id = @repo.oldest_sequence_id(pallet_number)
+      @repo.where_hash(:pallet_sequences, id: oldest_sequence_id)[:standard_pack_code_id]
     end
 
     private

@@ -85,7 +85,13 @@ module UiRules
       cultivar_id = product_setup_template&.cultivar_id
       commodity_id = @form_object[:commodity_id] || @repo.commodity_id(cultivar_group_id, cultivar_id)
       default_mkting_org_id = @form_object[:marketing_org_party_role_id] || MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
-      default_pm_type_id = MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
+      default_pm_type_id = @form_object[:pm_type_id] || MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
+
+      pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
+                  []
+                else
+                  MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id)
+                end
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
@@ -247,7 +253,7 @@ module UiRules
                          remove_search_for_small_list: false,
                          hide_on_load: @rules[:require_packaging_bom] ? false : true },
         pm_bom_id: { renderer: :select,
-                     options: MasterfilesApp::BomsRepo.new.for_select_pm_boms,
+                     options: pm_boms,
                      disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
                      caption: 'PM BOM',
                      prompt: 'Select PM BOM',

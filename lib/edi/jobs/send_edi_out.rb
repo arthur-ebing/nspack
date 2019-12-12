@@ -9,6 +9,10 @@ module EdiApp
         @flow_type = flow_type
         @org_code = org_code
         @record_id = record_id
+        unless should_send_edi?
+          finish
+          return
+        end
 
         @repo = EdiOutRepo.new
         hub_address = work_out_hub_address(flow_type)
@@ -41,6 +45,16 @@ module EdiApp
         else
           raise Crossbeams::FrameworkError, "EDI out: no rule to generate Hub Address for flow '#{flow_type}'."
         end
+      end
+
+      def should_send_edi?
+        conf_file = 'config/edi_flow_config.yml'
+        return false unless File.exist?(conf_file)
+
+        config = YAML.load_file(conf_file)
+        return false if config.dig(:out, flow_type.to_sym).nil?
+
+        true
       end
     end
   end

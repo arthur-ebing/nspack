@@ -38,12 +38,21 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def send_po_edi(load_id)
+      org_code = repo.org_code_for_po(load_id)
+      EdiApp::Job::SendEdiOut.enqueue(AppConst::EDI_FLOW_PO, org_code, @user.user_name, load_id)
+
+      success_response('PO EDI has been added to the job queue')
+    end
+
     def ship_load(id) # rubocop:disable Metrics/AbcSize
       failed_response("Load #{id} already shipped") if load_entity(id)&.shipped
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
+
+        send_po_edi(id)
 
         log_transaction
       end
