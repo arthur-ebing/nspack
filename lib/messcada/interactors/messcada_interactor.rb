@@ -109,7 +109,7 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(res, false)
+        cvl_res = MesscadaApp::CartonVerification.call(res)
         cvl_res = MesscadaApp::CartonWeighing.call(res)
         log_transaction
       end
@@ -135,7 +135,7 @@ module MesscadaApp
 
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonVerification.call(res, false)
+        cvl_res = MesscadaApp::CartonVerification.call(res)
         cvl_res = MesscadaApp::CartonWeighing.call(res)
         cvl_res = MesscadaApp::CartonLabelPrinting.call(res, request_ip)
         log_transaction
