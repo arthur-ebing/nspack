@@ -18,7 +18,7 @@ module MesscadaApp
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      MesscadaApp::UpdateBinWeights.new(res).call
+      MesscadaApp::UpdateBinWeights.call(res)
     rescue Crossbeams::InfoError => e
       puts e.message
       puts e.backtrace.join("\n")

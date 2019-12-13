@@ -239,6 +239,7 @@ module MesscadaApp
         "basic_pack_codes"."basic_pack_code",
         "standard_pack_codes"."standard_pack_code",
         "standard_pack_codes"."std_pack_label_code",
+        "standard_product_weights"."nett_weight" AS pack_nett_weight,
         fn_party_role_name("carton_labels"."marketing_org_party_role_id") AS marketer,
         "marks"."mark_code",
         "inventory_codes"."inventory_code",
@@ -298,6 +299,8 @@ module MesscadaApp
         JOIN "cartons_per_pallet" ON "cartons_per_pallet"."id" = "carton_labels"."cartons_per_pallet_id"
         LEFT JOIN "pm_products" ON "pm_products"."id" = "carton_labels"."fruit_sticker_pm_product_id"
         JOIN "pallet_formats" ON "pallet_formats"."id" = "carton_labels"."pallet_format_id"
+        LEFT JOIN "standard_product_weights" ON "standard_product_weights"."commodity_id" = "commodities"."id"
+          AND "standard_product_weights"."standard_pack_id" = "carton_labels"."standard_pack_code_id"
         WHERE "carton_labels"."id" = ?
       SQL
       DB[query, id].first
@@ -327,6 +330,7 @@ module MesscadaApp
         "basic_pack_codes"."basic_pack_code",
         "standard_pack_codes"."standard_pack_code",
         "standard_pack_codes"."std_pack_label_code",
+        "standard_product_weights"."nett_weight" AS pack_nett_weight,
         fn_party_role_name("product_setups"."marketing_org_party_role_id") AS marketer,
         "marks"."mark_code",
         "inventory_codes"."inventory_code",
@@ -381,6 +385,8 @@ module MesscadaApp
         JOIN "seasons" ON "seasons"."id" = "production_runs"."season_id"
         JOIN "cartons_per_pallet" ON "cartons_per_pallet"."id" = "product_setups"."cartons_per_pallet_id"
         JOIN "pallet_formats" ON "pallet_formats"."id" = "product_setups"."pallet_format_id"
+        LEFT JOIN "standard_product_weights" ON "standard_product_weights"."commodity_id" = "commodities"."id"
+          AND "standard_product_weights"."standard_pack_id" = "product_setups"."standard_pack_code_id"
         WHERE "product_resource_allocations"."id" = ?
       SQL
       DB[query, id].first
