@@ -247,6 +247,8 @@ module ProductionApp
     end
 
     def treatments(treatment_ids)
+      return '' if treatment_ids.nil?
+
       query = <<~SQL
         SELECT array_agg(treatment_code) AS treatments
         FROM treatments
