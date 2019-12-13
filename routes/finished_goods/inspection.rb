@@ -53,27 +53,27 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'reopen' do
         check_auth!('inspection', 'edit')
-        interactor.assert_permission!(:uncomplete, id)
+        interactor.assert_permission!(:reopen, id)
         res = interactor.reopen_govt_inspection_sheet(id)
         flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/govt_inspection_sheets'
       end
 
-      r.on 'complete_inspection' do   # COMPLETE
+      r.on 'capture' do   # COMPLETE
         r.get do
           check_auth!('inspection', 'edit')
-          interactor.assert_permission!(:complete_inspection, id)
-          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::CompleteInspection.call(id) }
+          interactor.assert_permission!(:capture, id)
+          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::Capture.call(id, request.referer) }
         end
 
         r.post do
-          res = interactor.complete_inspection_govt_inspection_sheet(id)
+          res = interactor.inspect_govt_inspection_sheet(id)
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete_inspection") do
-              FinishedGoods::Inspection::GovtInspectionSheet::CompleteInspection.call(id)
+            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture") do
+              FinishedGoods::Inspection::GovtInspectionSheet::Capture.call(id, request.referer)
             end
           end
         end
@@ -135,30 +135,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
-      r.on 'capture_result' do # EDIT
+      r.on 'pass' do # EDIT
+        check_auth!('inspection', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.pass_govt_inspection_pallet(id)
+        flash[:notice] = res.message
+        r.redirect request.referer
+      end
+
+      r.on 'fail' do # EDIT
         r.get do
           check_auth!('inspection', 'edit')
           interactor.assert_permission!(:edit, id)
-          show_partial { FinishedGoods::Inspection::GovtInspectionPallet::CaptureResult.call(id) }
+          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionPallet::Capture.call(id) }
         end
 
         r.patch do
           res = interactor.fail_govt_inspection_pallet(id, params[:govt_inspection_pallet])
           if res.success
             flash[:notice] = res.message
-            row_keys = %i[pallet_id
-                          govt_inspection_sheet_id
-                          passed
-                          inspected
-                          inspected_at
-                          failure_reason_id
-                          failure_reason
-                          failure_remarks
-                          status]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            redirect_via_json(request.referer)
           else
-            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_pallets/#{id}/inspect") do
-              FinishedGoods::Inspection::GovtInspectionPallet::CaptureResult.call(id, form_values: params[:govt_inspection_pallet], form_errors: res.errors)
+            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_pallets/#{id}/capture") do
+              FinishedGoods::Inspection::GovtInspectionPallet::Capture.call(id, form_values: params[:govt_inspection_pallet], form_errors: res.errors)
             end
           end
         end
@@ -206,7 +205,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'govt_inspection_pallets' do
       interactor = FinishedGoodsApp::GovtInspectionPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      r.on 'capture_results' do
+      r.on 'capture' do
         res = interactor.pass_govt_inspection_pallet(multiselect_grid_choices(params))
         flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer

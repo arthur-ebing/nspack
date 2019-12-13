@@ -1,10 +1,15 @@
 ---
 :dataminer_definition: govt_inspection_pallets
 :actions:
-- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/capture_result"
+- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/fail"
   :text: fail pallet
   :icon: quit
   :popup: true
+  :hide_if_false: completed
+  :hide_if_true: sheet_inspected
+- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/pass"
+  :text: pass pallet
+  :icon: checkmark
   :hide_if_false: completed
   :hide_if_true: sheet_inspected
 - :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$"

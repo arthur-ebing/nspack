@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen add_pallet capture_results].include? @mode
+      set_show_fields if %i[show reopen add_pallet capture].include? @mode
       add_rules
       add_behaviours
 
