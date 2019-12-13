@@ -170,6 +170,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { Production::Resources::PlantResource::New.call(remote: fetch?(r)) }
       end
 
+      r.on 'add_buttons' do
+        interactor.add_3_4_buttons
+        'DONE'
+      end
+
       r.on 'next_code' do
         res = interactor.next_peripheral_code(params[:changed_value])
         json_actions(

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ResourceInteractor < BaseInteractor
+  class ResourceInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_root_plant_resource(params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -19,6 +19,22 @@ module ProductionApp
       validation_failed_response(OpenStruct.new(messages: { plant_resource_code: ['This plant resource already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def add_3_4_buttons # rubocop:disable Metrics/AbcSize
+      qry = <<~SQL
+        SELECT id, (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON') AS btn_type_id, plant_resource_code, description
+        FROM plant_resources
+        WHERE plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'CLM_ROBOT')
+      SQL
+      DB[qry].all.each do |robot|
+        btn3_code = "#{robot[:plant_resource_code]}-B3"
+        btn3_desc = "#{robot[:description]} Button 3"
+        btn4_code = "#{robot[:plant_resource_code]}-B4"
+        btn4_desc = "#{robot[:description]} Button 4"
+        create_plant_resource(robot[:id], plant_resource_type_id: robot[:btn_type_id].to_s, plant_resource_code: btn3_code, description: btn3_desc)
+        create_plant_resource(robot[:id], plant_resource_type_id: robot[:btn_type_id].to_s, plant_resource_code: btn4_code, description: btn4_desc)
+      end
     end
 
     def create_plant_resource(parent_id, params) # rubocop:disable Metrics/AbcSize
