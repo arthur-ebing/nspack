@@ -67,6 +67,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('UNSCRAP PALLET', '
 INSERT INTO reworks_run_types (run_type, description) VALUES('REPACK PALLET', 'Repack Pallet');
 INSERT INTO reworks_run_types (run_type, description) VALUES('BUILDUP', 'Buildup');
 INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS', 'Tip Bins');
+INSERT INTO reworks_run_types (run_type, description) VALUES('WEIGH RMT BINS', 'Weigh Rmt Bins');
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS');

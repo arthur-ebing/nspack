@@ -1,5 +1,5 @@
 ---
-:caption: Pallet Changes
+:caption: Pallet Changes Details
 :sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type,
   reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
   reworks_runs.changes_made ->> 'reworks_action' AS reworks_action, reworks_runs.user,
@@ -216,7 +216,7 @@
     :sequence_no: 13
     :caption: Pallet sequence number
     :namespaced_name: pallet_sequence_number
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false

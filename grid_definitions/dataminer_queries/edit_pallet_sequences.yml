@@ -62,7 +62,7 @@
     :sequence_no: 4
     :caption: Pallet sequence number
     :namespaced_name: pallet_sequence_number
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -94,7 +94,7 @@
     :sequence_no: 6
     :caption: Pallet carton quantity
     :namespaced_name: pallet_carton_quantity
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
