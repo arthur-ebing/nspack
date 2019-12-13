@@ -3,19 +3,24 @@
 module FinishedGoods
   module Inspection
     module GovtInspectionSheet
-      class CompleteInspection
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :complete_inspection, id: id, form_values: form_values)
+      class Capture
+        def self.call(id, back_url, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :capture, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: back_url,
+                                  style: :back_button)
+            end
             page.form do |form|
               form.caption 'Inspection Sheet'
-              form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete_inspection"
+              form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture"
               form.submit_captions 'Finish Inspection'
               form.row do |row|
                 row.column do |col|
@@ -39,7 +44,7 @@ module FinishedGoods
                                '/list/govt_inspection_pallets/grid_multi',
                                caption: 'Choose pallets that passed inspection.',
                                is_multiselect: true,
-                               multiselect_url: '/finished_goods/inspection/govt_inspection_pallets/capture_results',
+                               multiselect_url: '/finished_goods/inspection/govt_inspection_pallets/capture',
                                multiselect_key: 'standard',
                                multiselect_params: { key: 'standard',
                                                      id: id })

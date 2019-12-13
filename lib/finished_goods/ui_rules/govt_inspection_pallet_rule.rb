@@ -11,7 +11,7 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
-      set_capture_result_fields if @mode == :capture_result
+      set_capture_fields if @mode == :capture
 
       form_name 'govt_inspection_pallet'
     end
@@ -30,7 +30,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def set_capture_result_fields
+    def set_capture_fields
       pallet_id_label = FinishedGoodsApp::LoadRepo.new.find_pallet_numbers_from(id: @form_object.pallet_id).first
       fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
     end

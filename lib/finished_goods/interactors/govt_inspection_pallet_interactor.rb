@@ -46,7 +46,7 @@ module FinishedGoodsApp
                 failure_reason_id: nil,
                 failure_remarks: nil }
       repo.transaction do
-        govt_inspection_pallet_ids.each do |id|
+        [govt_inspection_pallet_ids].each do |id|
           repo.update_govt_inspection_pallet(id, attrs)
           pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
           pallet_attrs = { in_stock: true,  stock_created_at: Time.now }

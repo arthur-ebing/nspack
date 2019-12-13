@@ -8,16 +8,28 @@
   \   exporter_party_role_id,\r\n    booking_reference,\r\n    inspection_point,\r\n
   \   destination_countries.country_name AS destination_country_country_name,\r\n
   \   results_captured,\r\n    results_captured_at,\r\n    api_results_received,\r\n
-  \   completed,\r\n    completed_at,\r\n    inspected,\r\n    awaiting_inspection_results,\r\n
-  \   destination_country_id,\r\n    govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
-  \   govt_inspection_sheets.updated_at,\r\n    govt_inspection_api_result_id,\r\n
-  \   govt_inspection_api_results.upn_number AS govt_inspection_api_result_upn_number\r\n\r\nFROM
-  govt_inspection_sheets\r\n         JOIN destination_countries ON destination_countries.id
-  = destination_country_id\r\n         LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
-  = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id = inspector_id"
+  \   completed,\r\n    completed_at,\r\n    govt_inspection_sheets.inspected,\r\n
+  \   awaiting_inspection_results,\r\n    destination_country_id,\r\n    govt_inspection_sheets.active,\r\n
+  \   govt_inspection_sheets.created_at,\r\n    govt_inspection_sheets.updated_at,\r\n
+  \   govt_inspection_api_result_id,\r\n    govt_inspection_api_results.upn_number
+  AS govt_inspection_api_result_upn_number,\r\n    CASE\r\n        WHEN govt_inspection_sheets.inspected
+  AND NOT bool_and(govt_inspection_pallets.passed) THEN 'error'\r\n        WHEN govt_inspection_sheets.inspected
+  AND bool_and(govt_inspection_pallets.passed) THEN 'ok'\r\n        WHEN awaiting_inspection_results
+  THEN 'inprogress'\r\n        WHEN completed THEN 'ready'\r\n    END AS colour_rule\r\n\r\nFROM
+  govt_inspection_sheets\r\nJOIN destination_countries ON destination_countries.id
+  = destination_country_id\r\nLEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
+  = govt_inspection_api_result_id\r\nJOIN inspectors ON inspectors.id = inspector_id\r\nLEFT
+  JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nGROUP
+  BY govt_inspection_sheets.id, inspector_party_role_id, inspector_code, country_name,
+  upn_number\r\n"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    error: failed pallet
+    ok: passed pallets
+    inprogress: awaiting results
+    ready: ready
 :columns:
   id:
     :name: id
@@ -295,7 +307,7 @@
     :name: inspected
     :sequence_no: 18
     :caption: Inspected
-    :namespaced_name: inspected
+    :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :boolean
     :width: 
     :format: 
@@ -412,6 +424,22 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 26
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

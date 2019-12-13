@@ -15,9 +15,8 @@ module FinishedGoodsApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check,
-        complete_inspection: :complete_inspection_check,
+        capture: :capture_check,
         complete: :complete_check,
-        uncomplete: :uncomplete_check,
         approve: :approve_check,
         reopen: :reopen_check
       }.freeze
@@ -55,13 +54,13 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def uncomplete_check
+      def reopen_check
         return failed_response 'GovtInspectionSheet is not completed' unless completed?
 
         all_ok
       end
 
-      def complete_inspection_check
+      def capture_check
         return failed_response 'GovtInspectionSheet has already been inspected' if inspected?
 
         all_ok

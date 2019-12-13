@@ -21,7 +21,7 @@
   :hide_if_true: completed
   :is_delete: true
   :popup: true
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/complete_inspection"
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/capture"
   :text: capture results
   :icon: edit
   :hide_if_false: completed

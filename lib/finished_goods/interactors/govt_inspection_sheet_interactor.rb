@@ -62,7 +62,7 @@ module FinishedGoodsApp
 
     def complete_govt_inspection_sheet(id)
       res = repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
-      return failed_response('Must have at least one pallet attached.') unless res
+      return failed_response('Inspection sheet must have at least one pallet attached.') unless res
 
       update_table_with_status(:govt_inspection_sheets,
                                id,
@@ -90,8 +90,8 @@ module FinishedGoodsApp
       end
     end
 
-    def complete_inspection_govt_inspection_sheet(id)
-      res = repo.validate_govt_inspection_sheet_inspected(id)
+    def inspect_govt_inspection_sheet(id)
+      res = repo.validate_govt_inspection_sheet_inspect_params(id)
       return res unless res.success
 
       attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
@@ -101,7 +101,7 @@ module FinishedGoodsApp
         update_pallet_statuses(id, 'MANUALLY_INSPECTED_BY_GOVT')
         log_transaction
       end
-      success_response('Inspection Completed')
+      success_response('Finished Inspection')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

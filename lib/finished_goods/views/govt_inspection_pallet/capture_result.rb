@@ -3,9 +3,9 @@
 module FinishedGoods
   module Inspection
     module GovtInspectionPallet
-      class CaptureResult
+      class Capture
         def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:govt_inspection_pallet, :capture_result, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:govt_inspection_pallet, :capture, id: id, form_values: form_values)
           rules = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -14,7 +14,7 @@ module FinishedGoods
             page.form_errors form_errors
             page.form do |form|
               form.caption 'Fail Pallet'
-              form.action "/finished_goods/inspection/govt_inspection_pallets/#{id}/capture_result"
+              form.action "/finished_goods/inspection/govt_inspection_pallets/#{id}/fail"
               form.remote!
               form.method :update
               form.add_field :pallet_id

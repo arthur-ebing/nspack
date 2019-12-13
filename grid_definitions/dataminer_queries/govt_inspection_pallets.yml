@@ -8,13 +8,19 @@
   \   inspection_failure_reasons.failure_reason,\r\n    govt_inspection_pallets.failure_remarks,\r\n
   \   govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
   \   govt_inspection_pallets.updated_at,\r\n    govt_inspection_sheets.completed,\r\n
-  \   govt_inspection_sheets.inspected AS sheet_inspected\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
-  govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
-  JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nJOIN
-  pallets ON pallets.id = govt_inspection_pallets.pallet_id"
+  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    CASE\r\n    WHEN
+  govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed THEN 'error'\r\n
+  \   WHEN govt_inspection_pallets.passed THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM
+  govt_inspection_pallets\r\n         JOIN govt_inspection_sheets ON govt_inspection_sheets.id
+  = govt_inspection_pallets.govt_inspection_sheet_id\r\n         LEFT JOIN inspection_failure_reasons
+  ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\n
+  \        JOIN pallets ON pallets.id = govt_inspection_pallets.pallet_id"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    error: failed
+    ok: passed
 :columns:
   status:
     :name: status
@@ -261,6 +267,22 @@
     :sequence_no: 16
     :caption: Sheet inspected
     :namespaced_name: govt_inspection_sheets.inspected
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 17
+    :caption: Colour rule
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 

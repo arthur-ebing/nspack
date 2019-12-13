@@ -200,7 +200,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: @repo.where_hash(:depots, depot_code: AppConst::DEFAULT_DEPOT)[:id],
+      @form_object = OpenStruct.new(depot_id: (@repo.where_hash(:depots, depot_code: AppConst::DEFAULT_DEPOT) || {})[:id],
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,

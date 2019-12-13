@@ -278,9 +278,9 @@ class Nspack < Roda # rubocop:disable ClassLength
           pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number])
           res = interactor.update_pallet_sequence_carton_qty(pallet_sequence_id, params[:pallet][:carton_quantity])
           if res.success
-            store_locally(:flash_notice, "Pallet: #{params[:pallet][:pallet_number]} updated successfully")
+            store_locally(:flash_notice, "Pallet:#{params[:pallet][:pallet_number]} updated successfully.")
           else
-            store_locally(:errors, "Error: #{unwrap_failed_response(res)}")
+            store_locally(:errors, "Error:#{unwrap_failed_response(res)}")
           end
           r.redirect('/rmd/production/palletizing/create_new_pallet')
         end
