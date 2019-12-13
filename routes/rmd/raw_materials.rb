@@ -44,9 +44,13 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)
-        form.add_label(:qty_inner_bins, 'Qty Inner Bins', 1, 1, hide_on_load: capture_inner_bins ? false : true)
+        if capture_inner_bins
+          form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
+        else
+          form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
+        end
         form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
-        form.add_field(:nett_weight, 'Nett Weight', required: false, prompt: true) if capture_nett_weight
+        form.add_field(:nett_weight, 'Nett Weight', required: false) if capture_nett_weight
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                           items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
