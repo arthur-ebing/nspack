@@ -16,7 +16,7 @@ module FinishedGoods
             page.form do |form|
               form.caption 'Inspection Sheet'
               form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete_inspection"
-              form.submit_captions 'Complete Inspection'
+              form.submit_captions 'Finish Inspection'
               form.row do |row|
                 row.column do |col|
                   col.add_field :inspector_id
@@ -39,7 +39,7 @@ module FinishedGoods
                                '/list/govt_inspection_pallets/grid_multi',
                                caption: 'Choose pallets that passed inspection.',
                                is_multiselect: true,
-                               multiselect_url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture_results_multiselect",
+                               multiselect_url: '/finished_goods/inspection/govt_inspection_pallets/capture_results',
                                multiselect_key: 'standard',
                                multiselect_params: { key: 'standard',
                                                      id: id })

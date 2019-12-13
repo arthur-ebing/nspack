@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionSheetInteractor < BaseInteractor
+  class GovtInspectionSheetInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_govt_inspection_sheet(params) # rubocop:disable Metrics/AbcSize
       res = validate_govt_inspection_sheet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -46,6 +46,20 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def update_govt_inspection_add_pallets(params)
+      res = validate_govt_inspection_add_pallet_params(params)
+      return res unless res.success
+
+      repo.transaction do
+        repo.create_govt_inspection_pallet(res.instance)
+      end
+      success_response('Added pallet to sheet.')
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { failure_remarks: ['This govt inspection pallet already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def complete_govt_inspection_sheet(id)
       res = repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
       return failed_response('Must have at least one pallet attached.') unless res
@@ -56,10 +70,10 @@ module FinishedGoodsApp
                                field_changes: { completed: true })
     end
 
-    def uncomplete_govt_inspection_sheet(id)
+    def reopen_govt_inspection_sheet(id)
       update_table_with_status(:govt_inspection_sheets,
                                id,
-                               'FINDING_SHEET_UNCOMPLETED',
+                               'FINDING_SHEET_REOPENED',
                                field_changes: { completed: false })
     end
 
@@ -87,7 +101,7 @@ module FinishedGoodsApp
         update_pallet_statuses(id, 'MANUALLY_INSPECTED_BY_GOVT')
         log_transaction
       end
-      success_response('INSPECTION_COMPLETED')
+      success_response('Inspection Completed')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -100,7 +114,7 @@ module FinishedGoodsApp
     private
 
     def repo
-      @repo ||= GovtInspectionSheetRepo.new
+      @repo ||= GovtInspectionRepo.new
     end
 
     def govt_inspection_sheet(id)
@@ -109,6 +123,18 @@ module FinishedGoodsApp
 
     def validate_govt_inspection_sheet_params(params)
       GovtInspectionSheetSchema.call(params)
+    end
+
+    def validate_govt_inspection_add_pallet_params(params)
+      res = GovtInspectionAddPalletSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      res = repo.validate_pallet_number(attrs.delete(:pallet_number))
+      return res unless res.success
+
+      attrs[:pallet_id] = res.instance
+      success_response('ok', attrs)
     end
   end
 end

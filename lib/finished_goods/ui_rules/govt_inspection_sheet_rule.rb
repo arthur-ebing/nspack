@@ -3,7 +3,7 @@
 module UiRules
   class GovtInspectionSheetRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
-      @repo = FinishedGoodsApp::GovtInspectionSheetRepo.new
+      @repo = FinishedGoodsApp::GovtInspectionRepo.new
       make_form_object
       apply_form_values
 
@@ -21,7 +21,7 @@ module UiRules
       inspection_billing_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.inspection_billing_party_role_id)&.party_name
       exporter_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.exporter_party_role_id)&.party_name
       destination_country_id_label = MasterfilesApp::DestinationRepo.new.find_country(@form_object.destination_country_id)&.country_name
-      govt_inspection_api_result_id_label = FinishedGoodsApp::GovtInspectionApiResultRepo.new.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
+      govt_inspection_api_result_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
                                 with_value: inspector_id_label,
                                 caption: 'Inspector' }
@@ -89,8 +89,8 @@ module UiRules
                                   caption: 'Destination Country',
                                   required: true },
         govt_inspection_api_result_id: { renderer: :select,
-                                         options: FinishedGoodsApp::GovtInspectionApiResultRepo.new.for_select_govt_inspection_api_results,
-                                         disabled_options: FinishedGoodsApp::GovtInspectionApiResultRepo.new.for_select_inactive_govt_inspection_api_results,
+                                         options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_govt_inspection_api_results,
+                                         disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_api_results,
                                          caption: 'Govt Inspection Api Result' },
         pallet_number: { renderer: :input,
                          subtype: :numeric }

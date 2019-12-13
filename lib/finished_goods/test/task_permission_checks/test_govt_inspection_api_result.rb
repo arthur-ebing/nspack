@@ -29,57 +29,15 @@ module FinishedGoodsApp
     end
 
     def test_edit
-      FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:edit, 1)
       assert res.success, 'Should be able to edit a govt_inspection_api_result'
-
-      # FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed govt_inspection_api_result'
     end
 
     def test_delete
-      FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
+      FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
       res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:delete, 1)
       assert res.success, 'Should be able to delete a govt_inspection_api_result'
-
-      # FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true))
-      # res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed govt_inspection_api_result'
     end
-
-    # def test_complete
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a govt_inspection_api_result'
-
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed govt_inspection_api_result'
-    # end
-
-    # def test_approve
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true, approved: false))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed govt_inspection_api_result'
-
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed govt_inspection_api_result'
-
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved govt_inspection_api_result'
-    # end
-
-    # def test_reopen
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity)
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a govt_inspection_api_result that has not been approved'
-
-    #   FinishedGoodsApp::GovtInspectionApiResultRepo.any_instance.stubs(:find_govt_inspection_api_result).returns(entity(completed: true, approved: true))
-    #   res = FinishedGoodsApp::TaskPermissionCheck::GovtInspectionApiResult.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved govt_inspection_api_result'
-    # end
   end
 end
