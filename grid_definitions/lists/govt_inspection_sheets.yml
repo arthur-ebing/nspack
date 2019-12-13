@@ -39,7 +39,17 @@
   :auth:
     :function: Finished Goods
     :program: inspection
-    :permission: edit
+    :permission: reopen
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/cancel"
+  :text: cancel sheet
+  :icon: edit-pencil
+  :hide_if_false: inspected
+  :hide_if_true: cancelled
+  :prompt: 'Are you sure you want to cancel this Inspection Sheet?'
+  :auth:
+    :function: Finished Goods
+    :program: inspection
+    :permission: cancel
 - :separator: true
 - :url: "/development/statuses/list/govt_inspection_sheets/$:id$"
   :text: status

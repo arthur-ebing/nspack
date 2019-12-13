@@ -29,31 +29,25 @@ module FinishedGoodsApp
 
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)
-        pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
-        pallet_attrs = { in_stock: false }
-        repo.update(:pallets, pallet_id, pallet_attrs)
       end
       instance = govt_inspection_pallet(id)
-      success_response('Updated govt inspection pallet', instance)
+      success_response('Govt inspection: pallet failed.', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def pass_govt_inspection_pallet(govt_inspection_pallet_ids)
+    def pass_govt_inspection_pallet(ids)
       attrs = { inspected: true,
                 inspected_at: Time.now,
                 passed: true,
                 failure_reason_id: nil,
                 failure_remarks: nil }
       repo.transaction do
-        [govt_inspection_pallet_ids].each do |id|
+        [ids].each do |id|
           repo.update_govt_inspection_pallet(id, attrs)
-          pallet_id = repo.get(:govt_inspection_pallets, id, :pallet_id)
-          pallet_attrs = { in_stock: true,  stock_created_at: Time.now }
-          repo.update(:pallets, pallet_id, pallet_attrs)
         end
       end
-      success_response('Updated govt inspection pallets')
+      success_response('Govt inspection: pallets passed.')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

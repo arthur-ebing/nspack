@@ -59,6 +59,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect '/list/govt_inspection_sheets'
       end
 
+      r.on 'cancel' do
+        check_auth!('inspection', 'edit')
+        interactor.assert_permission!(:cancel, id)
+        res = interactor.cancel_govt_inspection_sheet(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect '/list/govt_inspection_sheets'
+      end
+
       r.on 'capture' do   # COMPLETE
         r.get do
           check_auth!('inspection', 'edit')
@@ -67,7 +75,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.inspect_govt_inspection_sheet(id)
+          res = interactor.finish_govt_inspection_sheet(id)
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)

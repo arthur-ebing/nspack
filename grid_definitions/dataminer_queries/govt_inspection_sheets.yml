@@ -4,28 +4,28 @@
   govt_inspection_sheets.id) AS status,\r\n    fn_party_role_name(exporter_party_role_id)
   AS exporter,\r\n    fn_party_role_name(inspector_party_role_id) AS inspector,\r\n
   \   inspectors.inspector_code,\r\n    fn_party_role_name(inspection_billing_party_role_id)
-  AS inspection_billing,\r\n\r\n    inspector_id,\r\n    inspection_billing_party_role_id,\r\n
-  \   exporter_party_role_id,\r\n    booking_reference,\r\n    inspection_point,\r\n
-  \   destination_countries.country_name AS destination_country_country_name,\r\n
-  \   results_captured,\r\n    results_captured_at,\r\n    api_results_received,\r\n
-  \   completed,\r\n    completed_at,\r\n    govt_inspection_sheets.inspected,\r\n
-  \   awaiting_inspection_results,\r\n    destination_country_id,\r\n    govt_inspection_sheets.active,\r\n
-  \   govt_inspection_sheets.created_at,\r\n    govt_inspection_sheets.updated_at,\r\n
-  \   govt_inspection_api_result_id,\r\n    govt_inspection_api_results.upn_number
-  AS govt_inspection_api_result_upn_number,\r\n    CASE\r\n        WHEN govt_inspection_sheets.inspected
-  AND NOT bool_and(govt_inspection_pallets.passed) THEN 'error'\r\n        WHEN govt_inspection_sheets.inspected
-  AND bool_and(govt_inspection_pallets.passed) THEN 'ok'\r\n        WHEN awaiting_inspection_results
-  THEN 'inprogress'\r\n        WHEN completed THEN 'ready'\r\n    END AS colour_rule\r\n\r\nFROM
-  govt_inspection_sheets\r\nJOIN destination_countries ON destination_countries.id
-  = destination_country_id\r\nLEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
-  = govt_inspection_api_result_id\r\nJOIN inspectors ON inspectors.id = inspector_id\r\nLEFT
-  JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nGROUP
+  AS inspection_billing,\r\n    booking_reference,\r\n    inspection_point,\r\n    destination_countries.country_name
+  AS destination_country_country_name,\r\n    results_captured,\r\n    results_captured_at,\r\n
+  \   api_results_received,\r\n    completed,\r\n    completed_at,\r\n    govt_inspection_sheets.inspected,\r\n
+  \   awaiting_inspection_results,\r\n    cancelled_id,\r\n    cancelled,\r\n    cancelled_at,\r\n
+  \   govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
+  \   govt_inspection_sheets.updated_at,\r\n    govt_inspection_api_results.upn_number
+  AS upn_number,\r\n    CASE\r\n        WHEN cancelled THEN 'warning'\r\n        WHEN
+  govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
+  THEN 'error'\r\n        WHEN govt_inspection_sheets.inspected AND bool_and(govt_inspection_pallets.passed)
+  THEN 'ok'\r\n        WHEN awaiting_inspection_results THEN 'inprogress'\r\n        WHEN
+  completed THEN 'ready'\r\n        END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\n
+  \        JOIN destination_countries ON destination_countries.id = destination_country_id\r\n
+  \        LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
+  = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id = inspector_id\r\n
+  \        LEFT JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nGROUP
   BY govt_inspection_sheets.id, inspector_party_role_id, inspector_code, country_name,
   upn_number\r\n"
 :limit: 
 :offset: 
 :external_settings:
   :colour_key:
+    warning: cancelled
     error: failed pallet
     ok: passed pallets
     inprogress: awaiting results
@@ -127,57 +127,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  inspector_id:
-    :name: inspector_id
-    :sequence_no: 7
-    :caption: Inspector
-    :namespaced_name: inspector_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  inspection_billing_party_role_id:
-    :name: inspection_billing_party_role_id
-    :sequence_no: 8
-    :caption: Inspection billing party role
-    :namespaced_name: inspection_billing_party_role_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  exporter_party_role_id:
-    :name: exporter_party_role_id
-    :sequence_no: 9
-    :caption: Exporter party role
-    :namespaced_name: exporter_party_role_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 10
+    :sequence_no: 7
     :caption: Booking reference
     :namespaced_name: booking_reference
     :data_type: :string
@@ -193,7 +145,7 @@
     :group_max: false
   inspection_point:
     :name: inspection_point
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: Inspection point
     :namespaced_name: inspection_point
     :data_type: :string
@@ -209,7 +161,7 @@
     :group_max: false
   destination_country_country_name:
     :name: destination_country_country_name
-    :sequence_no: 12
+    :sequence_no: 9
     :caption: Destination country country name
     :namespaced_name: destination_countries.country_name
     :data_type: :string
@@ -225,7 +177,7 @@
     :group_max: false
   results_captured:
     :name: results_captured
-    :sequence_no: 13
+    :sequence_no: 10
     :caption: Results captured
     :namespaced_name: results_captured
     :data_type: :boolean
@@ -241,7 +193,7 @@
     :group_max: false
   results_captured_at:
     :name: results_captured_at
-    :sequence_no: 14
+    :sequence_no: 11
     :caption: Results captured at
     :namespaced_name: results_captured_at
     :data_type: :datetime
@@ -257,7 +209,7 @@
     :group_max: false
   api_results_received:
     :name: api_results_received
-    :sequence_no: 15
+    :sequence_no: 12
     :caption: Api results received
     :namespaced_name: api_results_received
     :data_type: :boolean
@@ -273,7 +225,7 @@
     :group_max: false
   completed:
     :name: completed
-    :sequence_no: 16
+    :sequence_no: 13
     :caption: Completed
     :namespaced_name: completed
     :data_type: :boolean
@@ -289,7 +241,7 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 17
+    :sequence_no: 14
     :caption: Completed at
     :namespaced_name: completed_at
     :data_type: :datetime
@@ -305,7 +257,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 18
+    :sequence_no: 15
     :caption: Inspected
     :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :boolean
@@ -321,7 +273,7 @@
     :group_max: false
   awaiting_inspection_results:
     :name: awaiting_inspection_results
-    :sequence_no: 19
+    :sequence_no: 16
     :caption: Awaiting inspection results
     :namespaced_name: awaiting_inspection_results
     :data_type: :boolean
@@ -335,15 +287,47 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_country_id:
-    :name: destination_country_id
-    :sequence_no: 20
-    :caption: Destination country
-    :namespaced_name: destination_country_id
+  cancelled_id:
+    :name: cancelled_id
+    :sequence_no: 17
+    :caption: Cancelled Id
+    :namespaced_name: cancelled_id
     :data_type: :integer
     :width: 
     :format: 
-    :hide: true
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cancelled:
+    :name: cancelled
+    :sequence_no: 18
+    :caption: Cancelled
+    :namespaced_name: cancelled
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cancelled_at:
+    :name: cancelled_at
+    :sequence_no: 19
+    :caption: Cancelled at
+    :namespaced_name: cancelled_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -353,7 +337,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Active
     :namespaced_name: govt_inspection_sheets.active
     :data_type: :boolean
@@ -369,7 +353,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 22
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: govt_inspection_sheets.created_at
     :data_type: :datetime
@@ -385,7 +369,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 23
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: govt_inspection_sheets.updated_at
     :data_type: :datetime
@@ -399,26 +383,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  govt_inspection_api_result_id:
-    :name: govt_inspection_api_result_id
-    :sequence_no: 24
-    :caption: Govt inspection api result
-    :namespaced_name: govt_inspection_api_result_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  govt_inspection_api_result_upn_number:
-    :name: govt_inspection_api_result_upn_number
-    :sequence_no: 25
-    :caption: Govt inspection api result upn number
+  upn_number:
+    :name: upn_number
+    :sequence_no: 23
+    :caption: Upn number
     :namespaced_name: govt_inspection_api_results.upn_number
     :data_type: :string
     :width: 
@@ -433,7 +401,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 26
+    :sequence_no: 24
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
