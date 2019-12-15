@@ -55,24 +55,20 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
     end
 
-    def rmt_bins_exists?(rmt_bins, use_bin_asset_number)
-      if use_bin_asset_number
-        DB[:rmt_bins].where(bin_asset_number: rmt_bins).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins).select_map(:tipped_asset_number)
-      else
-        DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
-      end
+    def rmt_bins_exists?(rmt_bins)
+      return DB[:rmt_bins].where(bin_asset_number: rmt_bins).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins).select_map(:tipped_asset_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
     end
 
     def scrapped_pallets?(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
-    def tipped_bins?(rmt_bins, use_bin_asset_number)
-      if use_bin_asset_number
-        DB[:rmt_bins].where(bin_asset_number: rmt_bins, bin_tipped: false).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins, bin_tipped: false).select_map(:tipped_asset_number)
-      else
-        DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
-      end
+    def tipped_bins?(rmt_bins)
+      return DB[:rmt_bins].where(bin_asset_number: rmt_bins, bin_tipped: false).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins, bin_tipped: false).select_map(:tipped_asset_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
     end
 
     def rmt_bin_from_asset_number(asset_number)
@@ -91,7 +87,9 @@ module ProductionApp
       DB[:pallets].where(id: DB[:pallet_sequences].where(id: sequence_ids).select(:scrapped_from_pallet_id)).map { |p| p[:pallet_number] }
     end
 
-    def selected_rmt_bins(rmt_bin_ids)
+    def selected_rmt_bins(rmt_bin_ids)  # rubocop:disable Metrics/AbcSize
+      return DB[:rmt_bins].where(bin_asset_number: rmt_bin_ids.map(&:to_s)).where(bin_tipped: false).map { |p| p[:id] } || DB[:rmt_bins].where(tipped_asset_number: rmt_bin_ids.map(&:to_s)).where(bin_tipped: false).map { |p| p[:id] } if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
       DB[:rmt_bins].where(id: rmt_bin_ids).where(bin_tipped: false).map { |p| p[:id] }
     end
 

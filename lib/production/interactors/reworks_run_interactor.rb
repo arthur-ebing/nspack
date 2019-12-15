@@ -64,7 +64,7 @@ module ProductionApp
     def validate_pallets_selected_input(reworks_run_type, pallets_selected)
       case reworks_run_type
       when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS then
-        validate_rmt_bins(reworks_run_type, pallets_selected)
+        validate_rmt_bins(pallets_selected)
       else
         validate_pallet_numbers(reworks_run_type, pallets_selected)
       end
@@ -448,7 +448,7 @@ module ProductionApp
                               pallets_affected: nil, pallet_sequence_id: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
-                                           before: manually_tip_bin_before_state.sort.to_h, after: manually_tip_bin_after_state(attrs[:production_run_id]).sort.to_h)
+                                           before: manually_tip_bin_before_state(attrs[:pallets_selected].first).sort.to_h, after: manually_tip_bin_after_state(attrs[:pallets_selected].first, attrs[:production_run_id]).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_status('reworks_runs', rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
@@ -458,7 +458,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_tip_bin_before_state
+    def manually_tip_bin_before_state(rmt_bin_id)
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
                    exit_ref_date_time: nil,
@@ -469,7 +469,7 @@ module ProductionApp
       defaults
     end
 
-    def manually_tip_bin_after_state(production_run_id)
+    def manually_tip_bin_after_state(rmt_bin_id, production_run_id)
       defaults = { bin_tipped_date_time: Time.now,
                    production_run_tipped_id: production_run_id,
                    exit_ref_date_time: Time.now,
@@ -717,28 +717,23 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
-    def validate_rmt_bins(reworks_run_type, rmt_bins)  # rubocop:disable Metrics/AbcSize
+    def validate_rmt_bins(rmt_bins)  # rubocop:disable Metrics/AbcSize
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
-      use_bin_asset_number = use_bin_asset_number(reworks_run_type)
-      unless use_bin_asset_number
+      unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
         invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
       end
 
-      existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins, use_bin_asset_number)
+      existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins)
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_rmt_bins.join(', ')} doesn't exist"] }, pallets_selected: rmt_bins) unless missing_rmt_bins.nil_or_empty?
 
-      tipped_bins = repo.tipped_bins?(rmt_bins.map(&:to_i), use_bin_asset_number)
+      tipped_bins = repo.tipped_bins?(rmt_bins)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
 
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
-    end
-
-    def use_bin_asset_number(reworks_run_type)
-      AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
     end
 
     def validate_reworks_run_new_params(reworks_run_type, params)
