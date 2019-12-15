@@ -3,7 +3,7 @@
 require_relative './execute_label_cache'
 
 module ProductionApp
-  class ExecuteRun < BaseService
+  class ReExecuteRun < BaseService
     include ExecuteLabelCache
 
     attr_reader :production_run, :repo, :messcada_repo, :user_name
@@ -36,7 +36,7 @@ module ProductionApp
     private
 
     def do_labeling?
-      @do_labeling ||= begin
+      @do_labeling ||= production_run.labeling || begin
                          res = repo.find_production_runs_for_line_in_state(production_run.production_line_id, running: true, labeling: true)
                          if res.success
                            res.instance.include?(production_run.id) ? true : false
@@ -46,15 +46,13 @@ module ProductionApp
                        end
     end
 
-    def run_is_already_tipping?
-      production_run.tipping
-    end
-
     def active_stage
-      if run_is_already_tipping?
-        'LABELING'
-      elsif do_labeling?
-        'TIPPING_AND_LABELING'
+      if do_labeling?
+        if production_run.tipping
+          'TIPPING_AND_LABELING'
+        else
+          'LABELING'
+        end
       else
         'TIPPING_ONLY'
       end
@@ -62,15 +60,15 @@ module ProductionApp
 
     def build_changeset
       changeset = {
-        tipping: !run_is_already_tipping?,
         running: true,
+        tipping: production_run.tipping,
         setup_complete: true,
+        reconfiguring: false,
         labeling: do_labeling?,
-        active_run_stage: active_stage
+        active_run_stage: active_stage,
+        re_executed_at: Time.now
       }
 
-      changeset[:started_at] = Time.now unless run_is_already_tipping?
-      changeset[:re_executed_at] = Time.now unless production_run.started_at.nil?
       changeset
     end
   end

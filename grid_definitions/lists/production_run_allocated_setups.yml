@@ -11,6 +11,13 @@
   :icon: photo
   :title: Peview label
   :popup: true
+- :separator: true
+- :url: "/list/production_run_allocated_setups_view/multi?key=copy&id=$:id$&production_run_id=$:production_run_id$"
+  :text: Copy this allocation
+  :icon: copy
+  :title: Copy this allocation
+  :hide_if_null: product_setup_id
+  :popup: true
 :conditions:
   :standard:
     - :col: r.id

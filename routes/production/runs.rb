@@ -143,6 +143,34 @@ class Nspack < Roda
             labeling
             active_run_stage
             started_at
+            status
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        end
+      end
+
+      r.on 're_execute_run' do
+        r.get do
+          check_auth!('runs', 'edit')
+          interactor.assert_permission!(:re_execute_run, id)
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/re_execute_run",
+                                                          notice: 'Press the button to continue executing the run',
+                                                          button_captions: ['Re-execute', 'Executing...'])
+          end
+        end
+
+        r.post do
+          res = interactor.re_execute_run(id)
+          row_keys = %i[
+            running
+            tipping
+            labeling
+            active_run_stage
+            started_at
+            reconfiguring
+            status
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
@@ -440,8 +468,20 @@ class Nspack < Roda
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
-      r.on !interactor.exists?(:production_runs, id) do
+      r.on !interactor.exists?(:product_resource_allocations, id) do
         handle_not_found(r)
+      end
+
+      r.on 'copy' do
+        r.post do
+          res = interactor.copy_run_allocation(id, multiselect_grid_choices(params))
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          redirect_via_json("/production/runs/production_runs/#{res.instance}/allocate_setups")
+        end
       end
 
       r.on 'preview_label' do

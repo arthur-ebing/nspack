@@ -20,6 +20,8 @@ module UiRules
       build_stats_table if @mode == :show_stats
       set_stage_fields if @mode == :complete_stage
 
+      @rules[:locked_allocations] = !@form_object.reconfiguring || @form_object.setup_complete
+
       add_new_behaviours if @mode == :new
       add_edit_behaviours if @mode == :edit
 

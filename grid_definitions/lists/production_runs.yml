@@ -31,7 +31,7 @@
   :icon: toggle-on
   :title: Mark setup as complete
   :popup: true
-  :hide_if_true: setup_complete
+  :hide_if_true: setup_complete,reconfiguring
 - :url: "/production/runs/production_runs/$:id$/execute_run"
   :text: Execute run
   :icon: play
@@ -39,17 +39,25 @@
   :popup: true
   :hide_if_true: running,completed
   :hide_if_false: setup_complete
+- :url: "/production/runs/production_runs/$:id$/re_execute_run"
+  :text: Re-execute run
+  :icon: play
+  :title: Re-execute run
+  :popup: true
+  :hide_if_false: reconfiguring
 - :url: "/production/runs/production_runs/$:id$/complete_run"
   :text: Complete all run stages
   :icon: minus-solid
   :title: Complete all run stages
   :popup: true
+  :hide_if_true: reconfiguring
   :hide_if_false: running,tipping,labeling
 - :url: "/production/runs/production_runs/$:id$/complete_stage"
   :text: Complete current run stage
   :icon: minus-outline
   :title: Complete current run stage
   :popup: true
+  :hide_if_true: reconfiguring
   :hide_if_false: running
 - :url: "/production/runs/production_runs/$:id$/re_configure"
   :text: Re-configure
