@@ -19,9 +19,20 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
+      return failed_response('Bin selection cannot be empty') if multiselect_list.nil_or_empty?
+
+      rmt_bins = selected_rmt_bins(multiselect_list)
+      instance = { reworks_run_type_id: reworks_run_type_id,
+                   pallets_selected: rmt_bins.join("\n") }
+      success_response('', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
       reworks_run_type = reworks_run_type(reworks_run_type_id)
-      res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
+      res = validate_pallets_selected_input(reworks_run_type, params[:pallets_selected])
       return validation_failed_response(res) unless res.success
 
       params[:pallets_selected] = res.instance[:pallet_numbers]
@@ -30,7 +41,9 @@ module ProductionApp
 
       make_changes = make_changes?(reworks_run_type)
       attrs = res.to_h.merge(user: @user.user_name, make_changes: make_changes, pallets_affected: nil, pallet_sequence_id: nil)
-      return success_response('ok', attrs) if make_changes
+      return success_response('ok', attrs.merge(display_page: display_page(reworks_run_type))) if make_changes
+
+      return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
 
       rw_res = nil
       repo.transaction do
@@ -39,7 +52,31 @@ module ProductionApp
       end
       rw_res
     rescue Crossbeams::InfoError => e
+      puts e.message
+      puts e.backtrace.join("\n")
       failed_response(e.message)
+    rescue StandardError => e
+      puts e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def validate_pallets_selected_input(reworks_run_type, pallets_selected)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS then
+        validate_rmt_bins(reworks_run_type, pallets_selected)
+      else
+        validate_pallet_numbers(reworks_run_type, pallets_selected)
+      end
+    end
+
+    def display_page(reworks_run_type)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_WEIGH_RMT_BINS then
+        'edit_rmt_bin_gross_weight'
+      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT then
+        'edit_pallet'
+      end
     end
 
     def create_reworks_run_record(attrs, reworks_action, changes)
@@ -47,6 +84,8 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
+      return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+
       success_response('Pallet change was successful', reworks_run_id: rw_res.instance[:reworks_run_id])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -94,7 +133,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_CLONE,
                                            before: {}, after: instance)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CLONE)
       end
@@ -124,7 +163,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_REMOVE,
                                            before: before_attrs.sort.to_h, after: remove_sequence_changes(sequence_id).sort.to_h)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], before_attrs[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_REMOVE)
       end
@@ -155,7 +194,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_EDIT_CARTON_QUANTITY,
                                            before: { carton_quantity: instance[:carton_quantity] }, after: { carton_quantity: params[:column_value] })
-        return validation_failed_response(rw_res) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_EDIT_CARTON_QUANTITY)
       end
@@ -211,7 +250,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_SINGLE_EDIT,
                                            before: sequence_setup_attrs(sequence_id).sort.to_h, after: attrs.sort.to_h, change_descriptions: change_descriptions)
-        return validation_failed_response(rw_res) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         pallet_id = pallet_sequence(sequence_id)[:pallet_id]
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
@@ -254,7 +293,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN,
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h, change_descriptions: change_descriptions)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN)
       end
@@ -315,7 +354,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_CHANGE_FARM_DETAILS,
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h, change_descriptions: change_descriptions)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CHANGE_FARM_DETAILS)
       end
@@ -327,6 +366,12 @@ module ProductionApp
     def log_reworks_runs_status_and_transaction(id, pallet_id, sequence_id, status)
       log_status('pallets', pallet_id, status) unless pallet_id.nil_or_empty?
       log_status('pallet_sequences', sequence_id, status) unless sequence_id.nil_or_empty?
+      log_status('reworks_runs', id, 'CREATED')
+      log_transaction
+    end
+
+    def log_reworks_rmt_bin_status_and_transaction(id, rmt_bin_id, status)
+      log_status('rmt_bins', rmt_bin_id, status)
       log_status('reworks_runs', id, 'CREATED')
       log_transaction
     end
@@ -352,7 +397,7 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT,
                                            before: before_state, after: after_state, change_descriptions: change_descriptions)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:id], nil, AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT)
       end
@@ -384,13 +429,90 @@ module ProductionApp
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS,
                                            before: before_attrs, after: attrs, change_descriptions: change_descriptions)
-        return validation_failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:id], nil, AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS)
       end
       success_response('Pallet details updated successfully', pallet_number: pallet_number)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def manually_tip_bins(attrs)  # rubocop:disable Metrics/AbcSize
+      attrs = attrs.to_h
+
+      rw_res = nil
+      repo.transaction do
+        rw_res = ProductionApp::ManuallyTipBins.call(attrs)
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
+                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: false }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           nil,
+                                           before: manually_tip_bin_before_state.sort.to_h, after: manually_tip_bin_after_state(attrs[:production_run_id]).sort.to_h)
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_status('reworks_runs', rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
+      end
+      success_response('Rmt Bin tipped successfully', pallet_number: attrs[:pallets_selected])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def manually_tip_bin_before_state
+      defaults = { bin_tipped_date_time: nil,
+                   production_run_tipped_id: nil,
+                   exit_ref_date_time: nil,
+                   bin_tipped: false,
+                   exit_ref: nil,
+                   tipped_manually: false }
+      defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: rmt_bin_id) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults
+    end
+
+    def manually_tip_bin_after_state(production_run_id)
+      defaults = { bin_tipped_date_time: Time.now,
+                   production_run_tipped_id: production_run_id,
+                   exit_ref_date_time: Time.now,
+                   bin_tipped: true,
+                   exit_ref: 'TIPPED',
+                   tipped_manually: true }
+      defaults = defaults.merge!(tipped_asset_number: rmt_bin_id, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults
+    end
+
+    def manually_weigh_rmt_bin(params)  # rubocop:disable Metrics/AbcSize
+      res = validate_manually_weigh_rmt_bin_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+      rmt_bin_id = find_rmt_bin(attrs[:bin_number])
+      before_state = manually_weigh_rmt_bin_state(rmt_bin_id)
+
+      rw_res = nil
+      repo.transaction do
+        rw_res = MesscadaApp::UpdateBinWeights.call(attrs)
+        return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+
+        repo.update_rmt_bin(rmt_bin_id, weighed_manually: true)
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: Array(attrs[:bin_number]),
+                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: false }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           nil,
+                                           before: before_state, after: manually_weigh_rmt_bin_state(rmt_bin_id))
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_reworks_rmt_bin_status_and_transaction(rw_res.instance[:reworks_run_id], rmt_bin_id, AppConst::RMT_BIN_WEIGHED_MANUALLY)
+      end
+      success_response('Rmt Bin weighed successfully', pallet_number: attrs[:bin_number])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def manually_weigh_rmt_bin_state(rmt_bin_id)
+      instance = rmt_bin(rmt_bin_id)
+      { gross_weight: instance[:gross_weight],
+        nett_weight: instance[:nett_weight],
+        weighed_manually: instance[:weighed_manually] }
     end
 
     def production_run_details_table(production_run_id)
@@ -478,6 +600,10 @@ module ProductionApp
       end
     end
 
+    def selected_rmt_bins(rmt_bin_ids)
+      repo.selected_rmt_bins(rmt_bin_ids)
+    end
+
     def pallet_sequence_pallet_number(sequence_id)
       repo.selected_pallet_numbers(sequence_id)
     end
@@ -492,6 +618,16 @@ module ProductionApp
 
     def pallet_sequence(id)
       repo.where_hash(:pallet_sequences, id: id)
+    end
+
+    def find_rmt_bin(bin_number)
+      return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      repo.find_rmt_bin(bin_number.to_i)
+    end
+
+    def rmt_bin(id)
+      repo.where_hash(:rmt_bins, id: id)
     end
 
     def production_run(id)
@@ -551,7 +687,7 @@ module ProductionApp
 
     def make_changes?(reworks_run_type)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK then
+      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS then
         false
       else
         true
@@ -581,10 +717,36 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
+    def validate_rmt_bins(reworks_run_type, rmt_bins)  # rubocop:disable Metrics/AbcSize
+      rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
+      rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
+
+      use_bin_asset_number = use_bin_asset_number(reworks_run_type)
+      unless use_bin_asset_number
+        invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
+      end
+
+      existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins, use_bin_asset_number)
+      missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_rmt_bins.join(', ')} doesn't exist"] }, pallets_selected: rmt_bins) unless missing_rmt_bins.nil_or_empty?
+
+      tipped_bins = repo.tipped_bins?(rmt_bins.map(&:to_i), use_bin_asset_number)
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
+
+      OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
+    end
+
+    def use_bin_asset_number(reworks_run_type)
+      AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+    end
+
     def validate_reworks_run_new_params(reworks_run_type, params)
       case reworks_run_type
       when AppConst::RUN_TYPE_SCRAP_PALLET then
         ReworksRunScrapPalletsSchema.call(params)
+      when AppConst::RUN_TYPE_TIP_BINS then
+        ReworksRunTipBinsSchema.call(params)
       else
         ReworksRunNewSchema.call(params)
       end
@@ -620,6 +782,10 @@ module ProductionApp
 
     def validate_edit_carton_quantity_params(params)
       EditCartonQuantitySchema.call(params)
+    end
+
+    def validate_manually_weigh_rmt_bin_params(params)
+      ManuallyWeighRmtBinSchema.call(params)
     end
   end
 end

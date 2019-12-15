@@ -55,8 +55,32 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:pallet_number)
     end
 
+    def rmt_bins_exists?(rmt_bins, use_bin_asset_number)
+      if use_bin_asset_number
+        DB[:rmt_bins].where(bin_asset_number: rmt_bins).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins).select_map(:tipped_asset_number)
+      else
+        DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
+      end
+    end
+
     def scrapped_pallets?(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
+    end
+
+    def tipped_bins?(rmt_bins, use_bin_asset_number)
+      if use_bin_asset_number
+        DB[:rmt_bins].where(bin_asset_number: rmt_bins, bin_tipped: false).select_map(:bin_asset_number) || DB[:rmt_bins].where(tipped_asset_number: rmt_bins, bin_tipped: false).select_map(:tipped_asset_number)
+      else
+        DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
+      end
+    end
+
+    def rmt_bin_from_asset_number(asset_number)
+      DB[:rmt_bins].where(bin_asset_number: asset_number).get(:id) || DB[:rmt_bins].where(tipped_asset_number: asset_number).get(:id)
+    end
+
+    def find_rmt_bin(rmt_bin_id)
+      DB[:rmt_bins].where(id: rmt_bin_id).get(:id)
     end
 
     def selected_pallet_numbers(sequence_ids)
@@ -65,6 +89,10 @@ module ProductionApp
 
     def selected_scrapped_pallet_numbers(sequence_ids)
       DB[:pallets].where(id: DB[:pallet_sequences].where(id: sequence_ids).select(:scrapped_from_pallet_id)).map { |p| p[:pallet_number] }
+    end
+
+    def selected_rmt_bins(rmt_bin_ids)
+      DB[:rmt_bins].where(id: rmt_bin_ids).where(bin_tipped: false).map { |p| p[:id] }
     end
 
     def find_pallet_ids_from_pallet_number(pallet_numbers)
@@ -319,6 +347,10 @@ module ProductionApp
       DB[:pallet_sequences].where(id: sequence_id).update(attrs)
     end
 
+    def update_rmt_bin(rmt_bin_id, attrs)
+      DB[:rmt_bins].where(id: rmt_bin_id).update(attrs)
+    end
+
     def oldest_sequence_id(pallet_number)
       pallet_sequence_number = oldest_sequence_number(pallet_number)
       DB[:pallet_sequences].where(pallet_number: pallet_number).where(pallet_sequence_number: pallet_sequence_number).get(:id) unless pallet_sequence_number.nil_or_empty?
@@ -398,6 +430,16 @@ module ProductionApp
           JOIN pm_subtypes s on s.id = p.pm_subtype_id
           JOIN pm_types t on t.id = s.pm_type_id
           WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}"].map { |r| [r[:product_code], r[:id]] }
+    end
+
+    def for_select_open_production_runs
+      query = <<~SQL
+        SELECT fn_production_run_code(id) AS production_run_code, id
+        FROM production_runs
+        WHERE closed = false
+        LIMIT 500
+      SQL
+      DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
     end
   end
 end

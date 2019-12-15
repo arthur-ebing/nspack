@@ -192,6 +192,17 @@ module ProductionApp
       success_response("Applied #{label_template_name}", label_template_name: label_template_name)
     end
 
+    def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, label_template_id)
+      xtra = label_template_id.nil? ? '' : ", label_template_id = #{label_template_id}"
+      qry = <<~SQL
+        UPDATE product_resource_allocations
+        SET product_setup_id = #{product_setup_id} #{xtra}
+        WHERE id IN (#{allocation_ids.join(', ')})
+          AND id <> #{product_resource_allocation_id}
+      SQL
+      DB[qry].update
+    end
+
     # Find Production runs on a line in various states (tipping/labeling)
     def find_production_runs_for_line_in_state(line_id, running: true, tipping: nil, labeling: nil)
       ds = DB[:production_runs].where(production_line_id: line_id).where(running: running)

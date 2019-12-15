@@ -160,7 +160,8 @@ module ProductionApp
     end
 
     def update_production_run(id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_production_run_params(params)
+      run = production_run(id)
+      res = validate_production_run_params(run.reconfiguring, params)
       return validation_failed_response(res) unless res.messages.empty?
 
       template_res = validate_run_matches_template(id, res)
@@ -381,6 +382,12 @@ module ProductionApp
       success_response('ok', instance)
     end
 
+    def copy_run_allocation(product_resource_allocation_id, allocation_ids)
+      alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
+      repo.copy_allocations_for_run(product_resource_allocation_id, allocation_ids, alloc[:product_setup_id], alloc[:label_template_id])
+      success_response('Allocation copied', alloc[:production_run_id])
+    end
+
     def preview_allocation_carton_label(product_resource_allocation_id)
       alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
       return failed_response('Please choose a product setup') unless alloc[:product_setup_id]
@@ -411,6 +418,10 @@ module ProductionApp
 
     def execute_run(id)
       ExecuteRun.call(id, @user.user_name)
+    end
+
+    def re_execute_run(id)
+      ReExecuteRun.call(id, @user.user_name)
     end
 
     # Read the user profile to get line_no & then find active labeling run for that line
@@ -455,8 +466,12 @@ module ProductionApp
       ProductionRunNewSchema.call(params)
     end
 
-    def validate_production_run_params(params)
-      ProductionRunSchema.call(params)
+    def validate_production_run_params(reconfiguring, params)
+      if reconfiguring
+        ProductionRunReconfigureSchema.call(params)
+      else
+        ProductionRunSchema.call(params)
+      end
     end
 
     def validate_production_run_template_params(params)

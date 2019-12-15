@@ -27,7 +27,7 @@ module UiRules
                                                 grade pallet_size mark gross_weight nett_weight])
       end
 
-      edit_edit_pallet_details_behaviours if %i[edit_pallet_details].include? @mode
+      edit_pallet_details_behaviours if %i[edit_pallet_details].include? @mode
 
       form_name 'reworks_run_pallet'
     end
@@ -152,7 +152,7 @@ module UiRules
 
     private
 
-    def edit_edit_pallet_details_behaviours
+    def edit_pallet_details_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :fruit_sticker_pm_product_id,
                                   notify: [{ url: "/production/reworks/pallets/#{@options[:pallet_number]}/fruit_sticker_changed" }]

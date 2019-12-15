@@ -8,6 +8,8 @@ module Production
           ui_rule = UiRules::Compiler.new(:production_run, :allocate_setups, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
+          grid_name = rules[:locked_allocations] ? 'production_run_allocated_setups_view' : 'production_run_allocated_setups'
+
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -26,7 +28,7 @@ module Production
             page.section do |section|
               section.fit_height!
               section.add_grid('production_run_allocated_setups',
-                               "/list/production_run_allocated_setups/grid?key=standard&production_run_id=#{id}",
+                               "/list/#{grid_name}/grid?key=standard&production_run_id=#{id}",
                                caption: "Allocate Setups for production run #{ui_rule.form_object.production_run_code}")
             end
             # show grid

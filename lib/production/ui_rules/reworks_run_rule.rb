@@ -9,6 +9,7 @@ module UiRules
 
       @rules[:show_changes_made] = !@form_object.changes_made.nil_or_empty?
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
+      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       common_values_for_fields common_fields
 
@@ -21,6 +22,9 @@ module UiRules
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
+      @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
+
+      text_area_caption = @rules[:tip_bins] ? 'Bins' : 'Pallet Numbers'
 
       left_record = if @form_object.before_state.nil_or_empty?
                       { id: nil }
@@ -43,11 +47,12 @@ module UiRules
       fields[:remarks] = { renderer: :label,
                            hide_on_load: @rules[:scrap_pallet] ? false : true }
       fields[:reworks_action] = { renderer: :label,
-                                  hide_on_load: @rules[:show_changes_made] ? false : true }
+                                  hide_on_load: !@form_object.reworks_action.nil_or_empty? ? false : true }
       fields[:user] = { renderer: :label }
       fields[:pallets_selected] = { renderer: :textarea,
                                     rows: 10,
                                     disabled: true,
+                                    caption: "Selected #{text_area_caption}",
                                     hide_on_load: @rules[:single_pallet_selected] ? true : false }
       fields[:pallets_affected] = if @rules[:single_pallet_selected]
                                     { renderer: :label,
@@ -56,25 +61,36 @@ module UiRules
                                   else
                                     { renderer: :textarea,
                                       rows: 10,
-                                      disabled: true }
+                                      disabled: true,
+                                      caption: "Affected #{text_area_caption}" }
                                   end
       fields[:pallet_number] = { renderer: :label,
-                                 hide_on_load: @rules[:show_changes_made] ? false : true }
+                                 hide_on_load: !@form_object.pallet_number.nil_or_empty? ? false : true }
       fields[:pallet_sequence_number] = { renderer: :label,
-                                          hide_on_load: @rules[:show_changes_made] ? false : true }
+                                          hide_on_load: !@form_object.pallet_sequence_number.nil_or_empty? ? false : true }
       fields[:changes_made] = {
         left_caption: 'Before',
         right_caption: 'After',
-        left_record: left_record,
-        right_record: right_record
+        left_record: left_record.sort.to_h,
+        right_record: right_record.sort.to_h
       }
     end
 
-    def common_fields
+    def common_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:single_pallet_edit] = AppConst::RUN_TYPE_SINGLE_PALLET_EDIT == reworks_run_type_id_label
       @rules[:unscrap_pallet] = AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type_id_label
+      @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
+      @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
+      @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins]
+
+      text_caption = if @rules[:single_pallet_edit]
+                       'Pallet Number'
+                     else
+                       @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
+                     end
+      text_area_caption = @rules[:tip_bins] ? 'Bins' : 'Pallet Numbers'
       {
         reworks_run_type_id: { renderer: :hidden },
         reworks_run_type: { renderer: :label,
@@ -90,14 +106,21 @@ module UiRules
                    placeholder: 'Scrap remarks',
                    caption: 'Scrap Remarks',
                    hide_on_load: @rules[:scrap_pallet] ? false : true },
-        pallets_selected: if @rules[:single_pallet_edit]
-                            {}
+        pallets_selected: if @rules[:single_edit]
+                            { caption: text_caption }
                           else
                             { renderer: :textarea,
                               rows: 12,
-                              placeholder: 'Paste pallet numbers here',
-                              caption: 'Pallet Numbers' }
-                          end
+                              placeholder: "Paste #{text_area_caption} here",
+                              caption: text_area_caption }
+                          end,
+        production_run_id: { renderer: :select,
+                             options: ProductionApp::ReworksRepo.new.for_select_open_production_runs,
+                             caption: 'Production Runs',
+                             prompt: 'Select Production Run',
+                             searchable: true,
+                             remove_search_for_small_list: false,
+                             hide_on_load: @rules[:tip_bins] ? false : true }
       }
     end
 
@@ -114,7 +137,8 @@ module UiRules
       @form_object = OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id],
                                     remarks: nil,
                                     scrap_reason_id: nil,
-                                    pallets_selected: nil)
+                                    pallets_selected: nil,
+                                    production_run_id: nil)
     end
   end
 end

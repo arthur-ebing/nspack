@@ -21,7 +21,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
-    r.on 'reworks_runs' do
+    r.on 'reworks_runs' do # rubocop:disable Metrics/BlockLength
       r.on 'single_pallet_edit' do
         check_auth!('reworks', 'new')
         reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SINGLE_PALLET_EDIT)
@@ -69,14 +69,22 @@ class Nspack < Roda # rubocop:disable ClassLength
       #
       #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       # end
-      #
-      # r.on 'tip_bins' do
-      #   check_auth!('reworks', 'new')
-      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
-      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-      #
-      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      # end
+
+      r.on 'tip_bins' do
+        check_auth!('reworks', 'new')
+        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
+        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      end
+
+      r.on 'weigh_rmt_bins' do
+        check_auth!('reworks', 'new')
+        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_WEIGH_RMT_BINS)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
+        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      end
     end
 
     r.on 'reworks_run_types', Integer do |id| # rubocop:disable Metrics/BlockLength
@@ -93,7 +101,7 @@ class Nspack < Roda # rubocop:disable ClassLength
             res = interactor.create_reworks_run(id, params[:reworks_run])
             if res.success
               if res.instance[:make_changes]
-                redirect_via_json "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/edit_pallet"
+                redirect_via_json "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}"
               else
                 flash[:notice] = res.message
                 redirect_via_json(retrieve_from_local_store(:list_url))
@@ -123,9 +131,23 @@ class Nspack < Roda # rubocop:disable ClassLength
             end
           end
         end
+
+        r.on 'multiselect_reworks_run_rmt_bins' do
+          check_auth!('reworks', 'new')
+          res = interactor.resolve_rmt_bins_from_multiselect(id, multiselect_grid_choices(params))
+          if res.success
+            show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, form_values: res.instance) }
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::New.call(id,
+                                                        form_values: params[:reworks_run_pallet],
+                                                        form_errors: res.errors)
+            end
+          end
+        end
       end
 
-      r.on 'pallets', String do |pallet_number|
+      r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength
         r.on 'edit_pallet'  do
           pallet_numbers = pallet_number.split(',')
           r.get do
@@ -137,6 +159,32 @@ class Nspack < Roda # rubocop:disable ClassLength
               end
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::SelectPalletSequence.call(id, pallet_numbers) }
+            end
+          end
+        end
+
+        r.on 'edit_rmt_bin_gross_weight' do
+          bin_number = pallet_number.split(',').first
+          r.get do
+            show_partial_or_page(r)  do
+              Production::Reworks::ReworksRun::EditRmtBinGrossWeight.call(id,
+                                                                          bin_number,
+                                                                          back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}")
+            end
+          end
+          r.post do
+            res = interactor.manually_weigh_rmt_bin(params[:reworks_run_rmt_bin])
+            if res.success
+              flash[:notice] = res.message
+              r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+            else
+              re_show_form(r, res) do
+                Production::Reworks::ReworksRun::EditRmtBinGrossWeight.call(id,
+                                                                            bin_number,
+                                                                            back_url: "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}",
+                                                                            form_values: params[:reworks_run_rmt_bin],
+                                                                            form_errors: res.errors)
+              end
             end
           end
         end

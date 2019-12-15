@@ -72,6 +72,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLET_WEIGHED = 'PALLET WEIGHED'
   PALLET_MOVED = 'PALLET_MOVED'
 
+  # Constants for rmt bin statuses:
+  RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
+  RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'
+
   # Constants for PM Types
   PM_TYPE_FRUIT_STICKER = 'fruit_sticker'
 
@@ -126,6 +130,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_REPACK = 'REPACK PALLET'
   RUN_TYPE_BUILDUP = 'BUILDUP'
   RUN_TYPE_TIP_BINS = 'TIP BINS'
+  RUN_TYPE_WEIGH_RMT_BINS = 'WEIGH RMT BINS'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'

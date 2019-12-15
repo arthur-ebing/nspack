@@ -38,7 +38,8 @@ module ProductionApp
         unscrap_pallets: unscrap_pallets?,
         repack_pallets: repack_pallets?,
         single_edit: single_edit?,
-        batch_edit: batch_edit?
+        batch_edit: batch_edit?,
+        rmt_bin_change: rmt_bin_change?
       }
     end
 
@@ -62,6 +63,10 @@ module ProductionApp
       AppConst::REWORKS_ACTION_BATCH_EDIT == reworks_action
     end
 
+    def rmt_bin_change?
+      AppConst::RUN_TYPE_TIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type[:run_type]
+    end
+
     def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
@@ -76,23 +81,37 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def resolve_reworks_run_attrs  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+    def resolve_reworks_run_attrs  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       {
         user: user_name,
         reworks_run_type_id: reworks_run_type[:id],
         scrap_reason_id: reworks_run_booleans[:scrap_pallets] ? scrap_reason_id : nil,
         remarks: reworks_run_booleans[:scrap_pallets] ? scrap_remarks : nil,
-        pallets_selected: make_changes ? "{ #{pallets_selected.join(',')} }" : nil,
+        pallets_selected: resolve_pallets_selected,
         pallets_affected: "{ #{pallets_affected.join(',')} }",
-        changes_made: make_changes ? resolve_changes(pallets_affected) : nil,
+        changes_made: reworks_run_booleans[:rmt_bin_change] ? resolve_bin_changes : resolve_pallet_changes,
         pallets_scrapped: reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:repack_pallets] ? "{ #{pallets_selected.join(',')} }" : nil,
         pallets_unscrapped: reworks_run_booleans[:unscrap_pallets] ? "{ #{pallets_selected.join(',')} }" : nil
       }
     end
 
-    def resolve_changes(affected_pallets)
+    def resolve_pallets_selected
+      return nil if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets] || reworks_run_booleans[:repack_pallets]
+
+      "{ #{pallets_selected.join(',')} }"
+    end
+
+    def resolve_bin_changes
+      bin_changes = {}
+      bin_changes['pallets'] = { 'pallet_sequences' => { changes: changes } }
+      bin_changes.to_json
+    end
+
+    def resolve_pallet_changes
+      return nil unless make_changes
+
       sequence_changes = { reworks_action: reworks_action }
-      affected_pallets.each  do |pallet_number|
+      pallets_affected.each  do |pallet_number|
         sequence_changes['pallets'] = {
           pallet_number: pallet_number
         }.merge(pallet_sequences_objects(pallet_number))

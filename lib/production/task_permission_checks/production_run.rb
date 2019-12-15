@@ -20,6 +20,7 @@ module ProductionApp
         allocate_setups: :allocate_setups_check,
         complete_run_stage: :complete_run_stage_check,
         execute_run: :execute_check,
+        re_execute_run: :re_execute_check,
         close: :close_check
       }.freeze
 
@@ -73,6 +74,12 @@ module ProductionApp
       def execute_check
         return failed_response 'Setup is not yet complete' unless entity.setup_complete # || entity.reconfiguring
         return failed_response 'There is a tipping run already active on this line' if line_has_active_tipping_run?
+
+        all_ok
+      end
+
+      def re_execute_check
+        return failed_response 'Run is not in a re-configure state' unless entity.reconfiguring
 
         all_ok
       end

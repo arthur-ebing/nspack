@@ -11,11 +11,15 @@ module Production
           if rules[:unscrap_pallet]
             grid = 'scrapped_pallets'
             grid_key = 'unscrap_reworks_pallets'
+          elsif rules[:tip_bins]
+            grid = 'rmt_bins_reworks'
+            grid_key = 'tip_bins_reworks'
           else
             grid = 'stock_pallets'
             grid_key = 'reworks_pallets'
           end
 
+          multi_select_caption = rules[:tip_bins] ? 'Bins' : 'Pallets'
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -31,12 +35,13 @@ module Production
                   col.add_field :scrap_reason_id
                   col.add_field :remarks
                   col.add_field :pallets_selected
+                  col.add_field :production_run_id
                 end
-                unless rules[:single_pallet_edit]
+                unless rules[:single_edit]
                   row.column do |col|
-                    col.add_notice 'Click button to select multiple reworks pallets'
+                    col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
                     col.add_control(control_type: :link,
-                                    text: 'Select Pallets',
+                                    text: "Select #{multi_select_caption}",
                                     url: "/list/#{grid}/multi?key=#{grid_key}&id=#{reworks_run_type_id}",
                                     behaviour: :popup,
                                     style: :button)

@@ -39,7 +39,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
 
     optional(:id, :integer).filled(:int?)
     required(:user, Types::StrippedString).filled(:str?)
-    required(:reworks_run_type_id, :integer).filled(:int?)
+    # required(:reworks_run_type_id, :integer).filled(:int?)
     optional(:remarks, Types::StrippedString).maybe(:str?)
     optional(:scrap_reason_id, :integer).maybe(:int?)
     required(:pallets_selected, :array).filled(:array?) { each(:str?) }
@@ -48,6 +48,15 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:pallets_scrapped, :array).maybe(:array?) { each(:str?) }
     optional(:pallets_unscrapped, :array).maybe(:array?) { each(:str?) }
     optional(:pallet_sequence_id, :integer).maybe(:int?)
+    optional(:make_changes, :bool).maybe(:bool?)
+  end
+
+  ReworksRunTipBinsSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:production_run_id, :integer).filled(:int?)
+    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
     optional(:make_changes, :bool).maybe(:bool?)
   end
 
@@ -136,5 +145,14 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     configure { config.type_specs = true }
 
     required(:column_value, :integer).filled(:int?)
+  end
+
+  ManuallyWeighRmtBinSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:bin_number, Types::StrippedString).maybe(:str?)
+    required(:gross_weight, :decimal).filled(:decimal?)
+    required(:measurement_unit, Types::StrippedString).maybe(:str?)
   end
 end
