@@ -81,10 +81,11 @@ INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assign
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true);
 
 -- BUSINESS PROCESSES
-INSERT INTO business_processes(process) VALUES('MOVE_PALLET');
-INSERT INTO business_processes(process) VALUES('LOAD_SHIPPED');
+INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHOC individual FG Pallet movements');
+INSERT INTO business_processes(process, description) VALUES('LOAD_SHIPPED', 'Load truck pallets shipped');
 
 -- STOCK TYPES
-INSERT INTO stock_types(stock_type_code) VALUES('PALLET');
+INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS');
 
 INSERT INTO inspection_failure_types (failure_type_code) VALUES('GOVERNMENT');
+
