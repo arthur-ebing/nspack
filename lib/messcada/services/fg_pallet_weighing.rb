@@ -5,7 +5,8 @@ module MesscadaApp
     attr_reader :repo, :pallet_number, :gross_weight, :uom
 
     def initialize(params)
-      @pallet_number = params[:pallet_number]
+      # @pallet_number = params[:pallet_number]
+      @pallet_number = params[:bin_number]
       @gross_weight = BigDecimal(params[:gross_weight])
       @uom = params[:measurement_unit]
       @repo = MesscadaApp::MesscadaRepo.new
