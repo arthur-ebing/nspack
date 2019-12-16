@@ -2,12 +2,12 @@
 
 module ProductionApp
   class ManuallyTipBins < BaseService
-    attr_reader :repo, :messcada_repo, :rmt_bin_ids, :production_run_id, :rmt_bin_id, :run_attrs, :bin_attrs
+    attr_reader :repo, :messcada_repo, :rmt_bin_numbers, :production_run_id, :bin_number, :rmt_bin_id, :run_attrs, :bin_attrs
 
     def initialize(params)
       @repo = ProductionApp::ReworksRepo.new
       @messcada_repo = MesscadaApp::MesscadaRepo.new
-      @rmt_bin_ids = params[:pallets_selected]
+      @rmt_bin_numbers = params[:pallets_selected]
       @production_run_id = params[:production_run_id]
       @run_attrs = messcada_repo.get_run_setup_reqs(production_run_id)
     end
@@ -22,8 +22,10 @@ module ProductionApp
     private
 
     def manually_tip_bins
-      rmt_bin_ids.each  do |bin_id|
-        @rmt_bin_id = bin_id
+      rmt_bin_numbers.each  do |rmt_bin_number|
+        @bin_number = rmt_bin_number
+        @rmt_bin_id = find_rmt_bin
+
         @bin_attrs = messcada_repo.get_rmt_bin_setup_reqs(rmt_bin_id)
         errors = rmt_bin_validations
         return failed_response(errors) unless errors.nil?
@@ -36,20 +38,26 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def find_rmt_bin
+      return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      repo.find_rmt_bin(bin_number.to_i)
+    end
+
     def rmt_bin_validations
-      return "Bin:#{rmt_bin_id} could not be found" unless bin_exists?
-      return "Bin:#{rmt_bin_id} has already been tipped" unless bin_tipped?.nil_or_empty?
+      return "Bin:#{bin_number} could not be found" unless bin_exists?
+      return "Bin:#{bin_number} has already been tipped" unless bin_tipped?.nil_or_empty?
 
       setup_errors = validate_setup_requirements
       return setup_errors unless setup_errors.nil?
     end
 
     def bin_exists?
-      repo.rmt_bins_exists?(rmt_bin_id)
+      repo.rmt_bins_exists?(bin_number)
     end
 
     def bin_tipped?
-      repo.tipped_bins?(rmt_bin_id)
+      repo.tipped_bins?(bin_number)
     end
 
     def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -77,7 +85,7 @@ module ProductionApp
     end
 
     def rmt_bin_asset_number_updates
-      { tipped_asset_number: rmt_bin_id,
+      { tipped_asset_number: bin_number,
         bin_asset_number: nil }
     end
   end
