@@ -20,8 +20,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                 <red>false</red>
                 <green>true</green>
                 <orange>false</orange>
-                <msg>#{res.message}</msg>
-                <lcd1></lcd1>
+                <msg></msg>
+                <lcd1>#{res.message}</lcd1>
                 <lcd2></lcd2>
                 <lcd3></lcd3>
                 <lcd4></lcd4>
@@ -36,8 +36,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                 <red>true</red>
                 <green>false</green>
                 <orange>false</orange>
-                <msg>#{unwrap_failed_response(res)}</msg>
-                <lcd1></lcd1>
+                <msg></msg>
+                <lcd1>#{unwrap_failed_response(res)}</lcd1>
                 <lcd2></lcd2>
                 <lcd3></lcd3>
                 <lcd4></lcd4>
@@ -80,8 +80,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               <red>true</red>
               <green>false</green>
               <orange>false</orange>
-              <msg>#{unwrap_failed_response(res)}</msg>
-              <lcd1></lcd1>
+              <msg></msg>
+              <lcd1>#{unwrap_failed_response(res)}</lcd1>
               <lcd2></lcd2>
               <lcd3></lcd3>
               <lcd4></lcd4>
@@ -118,8 +118,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           <red>true</red>
           <green>false</green>
           <orange>false</orange>
-          <msg>#{unwrap_failed_response(res)}</msg>
-          <lcd1></lcd1>
+          <msg></msg>
+          <lcd1>#{unwrap_failed_response(res)}</lcd1>
           <lcd2></lcd2>
           <lcd3></lcd3>
           <lcd4></lcd4>
