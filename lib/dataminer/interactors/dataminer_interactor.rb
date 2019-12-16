@@ -522,7 +522,7 @@ module DataminerApp
 
     def unmodifiable_system_report(id)
       rpt_loc = ReportRepo::ReportLocation.new(id)
-      rpt_loc.db == 'system' && AppConst.development?
+      rpt_loc.db == 'system' && !AppConst.development?
     end
 
     # ------------------------------------------------------------------------------------------------------

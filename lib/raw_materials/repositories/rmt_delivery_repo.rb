@@ -167,10 +167,24 @@ module RawMaterialsApp
     end
 
     def get_rmt_bin_tare_weight(rmt_bin)
-      tare_weight = DB[:rmt_container_material_types].where(id: rmt_bin[:rmt_container_material_type_id]).map { |o| o[:tare_weight] }.first
-      return tare_weight unless tare_weight.nil?
+      inner_tare = calculate_inner_tare_weight(rmt_bin)
 
-      DB[:rmt_container_types].where(id: rmt_bin[:rmt_container_type_id]).map { |o| o[:tare_weight] }.first
+      tare_weight = get(:rmt_container_material_types, rmt_bin[:rmt_container_material_type_id], :tare_weight)
+      return tare_weight + inner_tare unless tare_weight.nil?
+
+      new_tare = get(:rmt_container_types, rmt_bin[:rmt_container_type_id], :tare_weight)
+      (new_tare || AppConst::BIG_ZERO) + inner_tare
+    end
+
+    def calculate_inner_tare_weight(rmt_bin)
+      return AppConst::BIG_ZERO if rmt_bin[:qty_inner_bins].nil? || rmt_bin[:qty_inner_bins].zero? # (OR One? is this always set to at least 1?
+
+      tare_weight = get(:rmt_container_material_types, rmt_bin[:rmt_inner_container_material_id], :tare_weight)
+      tare_weight = get(:rmt_container_types, rmt_bin[:rmt_inner_container_type_id], :tare_weight) if tare_weight.nil?
+
+      return AppConst::BIG_ZERO if tare_weight.nil?
+
+      tare_weight * rmt_bin[:qty_inner_bins]
     end
 
     def find_bins_by_delivery_id(id)

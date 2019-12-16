@@ -1,0 +1,139 @@
+---
+:caption: On Stock Bins
+:sql: "select bin_received_date_time,cultivar_name,cultivar_description,farm_code,puc_code,orchard_code
+  \r\n,SUM(qty_bins) as total_onstock_bins\r\n,sum(nett_weight) as total_onstock_weight\r\nfrom
+  vw_bins where status='BIN_RECEIVED'\r\ngroup by bin_received_date_time,\r\ncultivar_name,cultivar_description,farm_code,puc_code,orchard_code\r\n"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  bin_received_date_time:
+    :name: bin_received_date_time
+    :sequence_no: 1
+    :caption: Bin received date time
+    :namespaced_name: bin_received_date_time
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 2
+    :caption: Cultivar name
+    :namespaced_name: cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_description:
+    :name: cultivar_description
+    :sequence_no: 3
+    :caption: Cultivar description
+    :namespaced_name: cultivar_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 4
+    :caption: Farm code
+    :namespaced_name: farm_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 5
+    :caption: Puc code
+    :namespaced_name: puc_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 6
+    :caption: Orchard code
+    :namespaced_name: orchard_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_onstock_bins:
+    :name: total_onstock_bins
+    :sequence_no: 7
+    :caption: Total onstock bins
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_onstock_weight:
+    :name: total_onstock_weight
+    :sequence_no: 8
+    :caption: Total onstock weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []
