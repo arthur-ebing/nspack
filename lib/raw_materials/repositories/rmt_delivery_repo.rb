@@ -149,11 +149,11 @@ module RawMaterialsApp
     end
 
     def find_bin_by_asset_number(bin_asset_number)
-      bin_asset_number = DB["SELECT *
-                             FROM rmt_bins
-                             WHERE (bin_asset_number = '#{bin_asset_number}') AND (exit_ref is Null)"].first
+      rmt_bin = DB["SELECT *
+                    FROM rmt_bins
+                    WHERE (bin_asset_number = '#{bin_asset_number}') AND (exit_ref is Null)"].first
 
-      return bin_asset_number unless bin_asset_number.nil_or_empty?
+      return rmt_bin unless rmt_bin.nil_or_empty?
 
       DB["SELECT * FROM rmt_bins WHERE (tipped_asset_number = '#{bin_asset_number}')"].first
     end
