@@ -205,8 +205,10 @@ module MesscadaApp
       end
       fpw_res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: 'fg_pallet_weighing')
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: 'fg_pallet_weighing')
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)

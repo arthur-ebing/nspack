@@ -13,39 +13,41 @@ class Nspack < Roda
         r.is do
           r.get do
             res = interactor.fg_pallet_weighing(params)
-            if res.success
-              <<~HTML
-                <bin_tipping>
-                  <status>true</status>
-                  <red>false</red>
-                  <green>true</green>
-                  <orange>false</orange>
-                  <msg>#{res.message}</msg>
-                  <lcd1></lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </bin_tipping>
-              HTML
-            else
-              <<~HTML
-                <bin_tipping>
-                  <status>false</status>
-                  <red>true</red>
-                  <green>false</green>
-                  <orange>false</orange>
-                  <msg>#{unwrap_failed_response(res)}</msg>
-                  <lcd1></lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </bin_tipping>
-              HTML
-            end
+            htmls = if res.success
+                      <<~HTML
+                        <bin_tipping>
+                          <status>true</status>
+                          <red>false</red>
+                          <green>true</green>
+                          <orange>false</orange>
+                          <msg>#{res.message}</msg>
+                          <lcd1></lcd1>
+                          <lcd2></lcd2>
+                          <lcd3></lcd3>
+                          <lcd4></lcd4>
+                          <lcd5></lcd5>
+                          <lcd6></lcd6>
+                        </bin_tipping>
+                      HTML
+                    else
+                      <<~HTML
+                        <bin_tipping>
+                          <status>false</status>
+                          <red>true</red>
+                          <green>false</green>
+                          <orange>false</orange>
+                          <msg>#{unwrap_failed_response(res)}</msg>
+                          <lcd1></lcd1>
+                          <lcd2></lcd2>
+                          <lcd3></lcd3>
+                          <lcd4></lcd4>
+                          <lcd5></lcd5>
+                          <lcd6></lcd6>
+                        </bin_tipping>
+                      HTML
+                    end
+            ErrorMailer.send_error_email(subject: 'Check FG Pallet weighing call result', message: "Result: #{res.message}\nXML is #{htmls}")
+            htmls
           end
         end
       end

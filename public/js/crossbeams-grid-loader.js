@@ -1627,6 +1627,9 @@ const crossbeamsGridStaticLoader = {
     loadGrid(grid, gridOptions);
   };
 
+  // reloadGrid(id)
+  // get options from id, reload url (delete grid and call loadGrid again)
+
   document.addEventListener('DOMContentLoaded', () => {
     listenForGrid();
   });
