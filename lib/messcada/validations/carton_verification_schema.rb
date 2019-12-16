@@ -32,7 +32,8 @@ module MesscadaApp
   FgPalletWeighingSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:pallet_number, Types::StrippedString).filled(:str?)
+    # required(:pallet_number, Types::StrippedString).filled(:str?)
+    required(:bin_number, Types::StrippedString).filled(:str?)
     required(:gross_weight, :decimal).filled(:decimal?)
     required(:measurement_unit, Types::StrippedString).filled(:str?)
   end
