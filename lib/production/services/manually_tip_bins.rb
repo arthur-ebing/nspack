@@ -7,7 +7,7 @@ module ProductionApp
     def initialize(params)
       @repo = ProductionApp::ReworksRepo.new
       @messcada_repo = MesscadaApp::MesscadaRepo.new
-      @rmt_bin_ids = params[:pallets_selected].map(&:to_i)
+      @rmt_bin_ids = params[:pallets_selected]
       @production_run_id = params[:production_run_id]
       @run_attrs = messcada_repo.get_run_setup_reqs(production_run_id)
     end
@@ -45,11 +45,11 @@ module ProductionApp
     end
 
     def bin_exists?
-      repo.rmt_bins_exists?(rmt_bin_id, false)
+      repo.rmt_bins_exists?(rmt_bin_id)
     end
 
     def bin_tipped?
-      repo.tipped_bins?(rmt_bin_id, false)
+      repo.tipped_bins?(rmt_bin_id)
     end
 
     def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity

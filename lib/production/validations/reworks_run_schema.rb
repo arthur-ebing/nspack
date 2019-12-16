@@ -39,7 +39,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
 
     optional(:id, :integer).filled(:int?)
     required(:user, Types::StrippedString).filled(:str?)
-    # required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:reworks_run_type_id, :integer).filled(:int?)
     optional(:remarks, Types::StrippedString).maybe(:str?)
     optional(:scrap_reason_id, :integer).maybe(:int?)
     required(:pallets_selected, :array).filled(:array?) { each(:str?) }
