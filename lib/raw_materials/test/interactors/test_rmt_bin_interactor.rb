@@ -24,22 +24,22 @@ module RawMaterialsApp
       assert entity.is_a?(RmtBin)
     end
 
-    # def test_create_rmt_bin
-    #   delivery_id = create_rmt_delivery
-    #   attrs = fake_rmt_bin.to_h.reject { |k, _| k == :id }
-    #   res = interactor.create_rmt_bin(delivery_id, attrs)
-    #   assert res.success, "#{res.message} : #{res.errors.inspect}"
-    #   assert_instance_of(RmtBinFlat, res.instance)
-    #   assert res.instance.id.nonzero?
-    # end
-    #
-    # def test_create_rmt_bin_fail
-    #   rmt_delivery_id = create_rmt_delivery
-    #   attrs = fake_rmt_bin(rmt_container_type_id: nil).to_h.reject { |k, _| k == :id }
-    #   res = interactor.create_rmt_bin(rmt_delivery_id, attrs)
-    #   refute res.success, 'should fail validation'
-    #   assert_equal ['must be filled'], res.errors[:rmt_container_type_id]
-    # end
+    def test_create_rmt_bin
+      delivery_id = create_rmt_delivery
+      attrs = fake_rmt_bin.to_h.reject { |k, _| k == :id }
+      res = interactor.create_rmt_bin(delivery_id, attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(RmtBinFlat, res.instance)
+      assert res.instance.id.nonzero?
+    end
+
+    def test_create_rmt_bin_fail
+      rmt_delivery_id = create_rmt_delivery
+      attrs = fake_rmt_bin(rmt_container_type_id: nil).to_h.reject { |k, _| k == :id }
+      res = interactor.create_rmt_bin(rmt_delivery_id, attrs)
+      refute res.success, 'should fail validation'
+      assert_equal ['must be filled'], res.errors[:rmt_container_type_id]
+    end
 
     def test_update_rmt_bin
       id = create_rmt_bin

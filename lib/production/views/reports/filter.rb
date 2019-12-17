@@ -10,8 +10,9 @@ module Production
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
+              form.submit_in_loading_page!
               form.caption 'Packout Report'
-              form.action '/production/reports/aggregate_packout'
+              form.action '/production/reports/aggregate_packout_print'
               form.row do |row|
                 row.column do |col|
                   col.add_field :from_date

@@ -298,10 +298,20 @@
     }, false);
 
     /**
-     * Turn a form into a remote (AJAX) form on submit.
+     * Form submit:
+     * - Submit the form as a GET request in a "loading" page.
+     * - Turn a form into a remote (AJAX) form on submit.
      */
     document.body.addEventListener('submit', (event) => {
-      if (event.target.dataset && event.target.dataset.remote === 'true') {
+      if (event.target.dataset && event.target.dataset.convertToLoading) {
+        const searchParams = new URLSearchParams(new FormData(event.target));
+        const url = `${event.target.action}?${searchParams.toString()}`;
+
+        crossbeamsUtils.loadingWindow(url);
+
+        event.stopPropagation();
+        event.preventDefault();
+      } else if (event.target.dataset && event.target.dataset.remote === 'true') {
         fetch(event.target.action, {
           method: 'POST', // GET?
           credentials: 'same-origin',
