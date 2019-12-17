@@ -34,7 +34,8 @@ module UiRules
 
     def make_reworks_run_pallet_header_table(columns = nil, display_columns = 3)
       compact_header(columns: columns || %i[pallet_number production_run_id farm orchard puc commodity cultivar_group cultivar build_status
-                                            pallet_size gross_weight nett_weight in_stock inspected reinspected palletized partially_palletized allocated
+                                            pallet_size gross_weight nett_weight location pallet_base stack_type
+                                            in_stock inspected reinspected palletized partially_palletized allocated
                                             pallet_age stock_age cold_age ambient_age inspection_age reinspection_age
                                             created_at stock_created_at first_cold_storage_at govt_first_inspection_at govt_reinspection_at
                                             palletized_at partially_palletized_at allocated_at gross_weight_measured_at],

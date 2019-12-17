@@ -78,14 +78,14 @@ module UiRules
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
-      product_setup_template_id = @options[:product_setup_template_id] || @repo.find_product_setup(@options[:id]).product_setup_template_id
+      product_setup_template_id = @options[:product_setup_template_id].nil_or_empty? ? @repo.find_product_setup(@options[:id]).product_setup_template_id : @options[:product_setup_template_id]
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
       cultivar_id = product_setup_template&.cultivar_id
-      commodity_id = @form_object[:commodity_id] || @repo.commodity_id(cultivar_group_id, cultivar_id)
-      default_mkting_org_id = @form_object[:marketing_org_party_role_id] || MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
-      default_pm_type_id = @form_object[:pm_type_id] || MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
+      default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG) : @form_object[:marketing_org_party_role_id]
+      default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
 
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
                   []
