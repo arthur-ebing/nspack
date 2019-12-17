@@ -33,5 +33,9 @@ module FinishedGoodsApp
     def actual_payload_from(load_id:)
       DB[:pallets].where(load_id: load_id).select_map(:nett_weight).sum
     end
+
+    def verified_gross_weight_from(load_id:)
+      DB[:pallets].where(load_id: load_id).select_map(:gross_weight).sum
+    end
   end
 end

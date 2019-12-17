@@ -25,19 +25,22 @@ module FinishedGoodsApp
         current_step[:allocated] << current_step[:scanned].delete(scanned_number)
         form_state[:error_message] = nil
       else
-        form_state[:error_message] = "Pallet number '#{scanned_number}', not on load:#{form_state[:load_id]}"
+        form_state[:error_message] = "Pallet number: #{scanned_number}, not on load: #{form_state[:load_id]}"
       end
       write(current_step)
     end
 
     def setup_load(load_id)
       load_flat = LoadRepo.new.find_load_flat(load_id)
+      initial_count = LoadRepo.new.all_hash(:pallets, load_id: load_id).length
+
       raise 'Setup Load called without load_id' if load_flat.nil?
 
       form_state = { load_id: load_id,
                      voyage_code: load_flat.voyage_code,
                      vehicle_number: load_flat.vehicle_number,
-                     container_code: load_flat.container_code }
+                     container_code: load_flat.container_code,
+                     allocation_count: initial_count }
       allocated = LoadRepo.new.find_pallet_numbers_from(load_id: load_id)
 
       write(form_state: form_state, allocated: allocated, scanned: [])
@@ -67,14 +70,18 @@ module FinishedGoodsApp
       !form_state[:error_message].nil?
     end
 
+    def progress_count
+      current_step[:allocated].length
+    end
+
     def allocation_progress
-      current_step[:allocated].nil? ? '' : "<br>Allocated Pallets<br>#{current_step[:allocated].join('<br>')}"
+      current_step[:allocated].nil_or_empty? ? nil : "Pallets allocated: #{progress_count}<br>#{current_step[:allocated].join('<br>')}"
     end
 
     def progress
       scanned = current_step[:scanned].empty? ? '' : "<br>Scanned Pallets<br>#{current_step[:scanned].join('<br>')}"
       <<~HTML
-        Pallets still to scan<br>#{current_step[:allocated].join('<br>')}<br>
+        Pallets to scan: #{progress_count}<br>#{current_step[:allocated].join('<br>')}<br>
         #{scanned}
       HTML
     end

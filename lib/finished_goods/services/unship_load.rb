@@ -19,11 +19,11 @@ module FinishedGoodsApp
       if pallet_number.nil?
         unship_load
         unship_pallets
-        success_response("Unshipped Load:#{load_id}")
+        success_response("Unshipped Load: #{load_id}")
       else
         unship_pallets
         unallocate_pallet
-        success_response("Unshipped and Unallocated Pallet:#{pallet_number}")
+        success_response("Unshipped and Unallocated Pallet: #{pallet_number}")
       end
     end
 

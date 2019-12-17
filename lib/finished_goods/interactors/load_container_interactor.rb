@@ -27,7 +27,7 @@ module FinishedGoodsApp
 
       # test for changes
       instance = load_container(id).to_h.reject { |k, _| %i[id active].include?(k) }
-      return success_response("Load:#{instance[:load_id]}", instance) if instance == res.output
+      return success_response("Load: #{instance[:load_id]}", instance) if instance == res.output
 
       # update date field if weight changed
       res.output[:verified_gross_weight_date] = Time.now if instance[:verified_gross_weight] != res.output[:verified_gross_weight]

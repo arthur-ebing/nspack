@@ -6,9 +6,9 @@ module FinishedGoodsApp
       return failed_response("Value #{load_id} is too big to be a load. Perhaps you scanned a pallet number?") if load_id.to_i > AppConst::MAX_DB_INT
 
       load = repo.find_load(load_id)
-      return failed_response("Load:#{load_id} doesn't exist") if load.nil?
+      return failed_response("Load: #{load_id} doesn't exist") if load.nil?
 
-      return failed_response("Load:#{load_id} already Shipped") if load.shipped
+      return failed_response("Load: #{load_id} already Shipped") if load.shipped
 
       ok_response
     end
@@ -88,7 +88,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_entity(id)
-      success_response("Created load:#{id}", instance)
+      success_response("Created load: #{id}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { order_number: ['This load already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -106,7 +106,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_entity(id)
-      success_response("Updated load:#{id}", instance)
+      success_response("Updated load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -119,7 +119,7 @@ module FinishedGoodsApp
     end
 
     def ship_load(id) # rubocop:disable Metrics/AbcSize
-      failed_response("Load:#{id} already shipped") if load_entity(id)&.shipped
+      failed_response("Load: #{id} already shipped") if load_entity(id)&.shipped
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user.user_name)
@@ -135,10 +135,10 @@ module FinishedGoodsApp
     end
 
     def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
-      failed_response("Load:#{id} not shipped") unless load_entity(id)&.shipped
+      failed_response("Load: #{id} not shipped") unless load_entity(id)&.shipped
 
       pallet_shipped = repo.validate_pallets(pallet_number, shipped: true) == [pallet_number]
-      failed_response("Pallet Number:#{pallet_number} not shipped") unless pallet_shipped
+      failed_response("Pallet Number: #{pallet_number} not shipped") unless pallet_shipped
 
       res = nil
       repo.transaction do
@@ -165,7 +165,7 @@ module FinishedGoodsApp
         repo.unallocate_pallets(load_id, current_allocation - new_allocation, @user.user_name)
         log_transaction
       end
-      success_response("Allocation applied to load:#{load_id}")
+      success_response("Allocation applied to load: #{load_id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -180,7 +180,7 @@ module FinishedGoodsApp
 
         log_transaction
       end
-      success_response("Allocation applied to load:#{id}")
+      success_response("Allocation applied to load: #{id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -197,7 +197,7 @@ module FinishedGoodsApp
         log_status(:loads, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted load:#{id}")
+      success_response("Deleted load: #{id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -241,7 +241,7 @@ module FinishedGoodsApp
       stepper(step_key).allocate_pallet(scanned_number)
       failed_response('error') if stepper(step_key).error?
 
-      success_response("Scanned:#{scanned_number}")
+      success_response("Scanned: #{scanned_number}")
     end
 
     def stepper_load_pallet(step_key, load_id, scanned_number)

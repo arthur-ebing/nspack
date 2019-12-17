@@ -18,12 +18,17 @@ module FinishedGoodsApp
         res = ship_load
         return res unless res.success
       end
-      success_response("Shipped Load:#{load_id}")
+      success_response("Shipped Load: #{load_id}")
     end
 
     private
 
-    def ship_load
+    def ship_load # rubocop:disable Metrics/AbcSize
+      load_container_id = repo.where_hash(:load_containers, load_id: load_id)[:id]
+      verified_gross_weight = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight_from(load_id: load_id)
+      attrs = { verified_gross_weight: verified_gross_weight, verified_gross_weight_date: Time.now }
+      repo.update(:load_containers, load_container_id, attrs) unless load_container_id.nil?
+
       attrs = { shipped: true, shipped_at: Time.now }
       repo.update(:loads, load_id, attrs)
       repo.log_status(:loads, load_id, 'SHIPPED', user_name: user_name)

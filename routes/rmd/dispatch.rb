@@ -142,6 +142,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           # set defaults
           form_state = {}
           form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
+          form_state[:verified_gross_weight] = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight_from(load_id: load_id)
           form_state[:verified_gross_weight_date] = Time.now
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
 
@@ -237,13 +238,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
                          data_type: 'number',
-                         allow_decimals: true,
+                         scan: 'key248_all',
                          required: false,
                          hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine2,
                          'Temperature Rhine2',
                          data_type: 'number',
-                         allow_decimals: true,
+                         scan: 'key248_all',
                          required: false,
                          hide_on_load: !has_container)
           form.add_field(:max_gross_weight,
@@ -283,11 +284,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types,
                           required: false,
                           hide_on_load: !has_container)
-          form.add_field(:verified_gross_weight,
+          form.add_label(:verified_gross_weight,
                          'Verified Gross Weight',
-                         data_type: 'number',
-                         allow_decimals: true,
-                         required: false,
+                         form_state[:verified_gross_weight],
+                         form_state[:verified_gross_weight],
                          hide_on_load: !has_container)
           form.add_label(:verified_gross_weight_date,
                          'Verified Gross Weight Date',
@@ -381,6 +381,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
           form.add_label(:vehicle_number, 'Vehicle Number', form_state[:vehicle_number])
           form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
+          form.add_label(:allocation_count, 'Allocation Count', form_state[:allocation_count]) unless form_state[:allocation_count].zero?
 
           form.add_field(:pallet_number,
                          'Pallet',
