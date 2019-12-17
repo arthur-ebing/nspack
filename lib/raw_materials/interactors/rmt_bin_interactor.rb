@@ -5,7 +5,7 @@ module RawMaterialsApp
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
-      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && in_stock_bin_for_asset_number?(params[:bin_asset_number])
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
@@ -34,7 +34,7 @@ module RawMaterialsApp
       ok_response
     end
 
-    def in_stock_bin_for_asset_number?(bin_asset_number)
+    def bin_asset_number_available?(bin_asset_number)
       repo.bin_asset_number_available?(bin_asset_number)
     end
 
