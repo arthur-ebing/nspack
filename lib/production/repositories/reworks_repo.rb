@@ -156,7 +156,7 @@ module ProductionApp
 
       pallet_number_ids.each do |pallet_id|
         clone_pallet(pallet_id)
-        DB[:pallets].where(od: pallet_id).update(attrs)
+        DB[:pallets].where(id: pallet_id).update(attrs)
         upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_id = #{pallet_id};"
         DB[upd].update
       end

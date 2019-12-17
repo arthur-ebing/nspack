@@ -2,7 +2,7 @@
 
 module UiRules
   class ReworksRunSequenceRule < Base # rubocop:disable ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
@@ -12,7 +12,7 @@ module UiRules
 
       @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
-      @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id])
+      @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table
@@ -98,9 +98,9 @@ module UiRules
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       cultivar_group_id = @form_object[:cultivar_group_id]
       cultivar_id = @form_object[:cultivar_id]
-      commodity_id = @form_object[:commodity_id] || ProductionApp::ProductSetupRepo.new.commodity_id(cultivar_group_id, cultivar_id)
-      default_mkting_org_id = @form_object[:marketing_org_party_role_id] || MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG)
-      default_pm_type_id = @form_object[:pm_type_id] || MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
+      default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_MARKETING_ORG) : @form_object[:marketing_org_party_role_id]
+      default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
 
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
                   []

@@ -36,7 +36,7 @@ module Production
                                   url: "/production/reworks/pallets/#{pallet_number}/print_reworks_pallet_label",
                                   behaviour: :popup,
                                   style: :button,
-                                  visible: rules[:carton_equals_pallet])
+                                  visible: !rules[:carton_equals_pallet])
                   col.add_control(control_type: :link,
                                   text: 'Set Gross Weight',
                                   url: "/production/reworks/pallets/#{pallet_number}/set_gross_weight",
