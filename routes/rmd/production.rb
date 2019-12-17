@@ -245,8 +245,14 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.post do
           carton_number = params[:carton][:carton_number]
+          val_res = interactor.validate_carton_number_for_palletizing(params[:carton][:carton_number])
+          unless val_res.success
+            store_locally(:errors, val_res)
+            r.redirect('/rmd/production/palletizing/create_new_pallet')
+          end
+
           unless AppConst::CARTON_VERIFICATION_REQUIRED
-            carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])) ? carton[:id] : nil
+            carton_number = (interactor.find_carton_by_carton_label_id(params[:carton][:carton_number]) || {})[:id]
             unless carton_number
               res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:carton][:carton_number])
               unless res.success

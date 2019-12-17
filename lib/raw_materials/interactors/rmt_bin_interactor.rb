@@ -35,7 +35,7 @@ module RawMaterialsApp
     end
 
     def in_stock_bin_for_asset_number?(bin_asset_number)
-      !repo.find_bin_by_asset_number(bin_asset_number).nil?
+      repo.bin_asset_number_available?(bin_asset_number)
     end
 
     def get_header_inherited_field(delivery, container_type_id)

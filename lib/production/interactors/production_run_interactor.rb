@@ -43,6 +43,17 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def validate_carton_number_for_palletizing(carton_number)
+      res = Dry::Validation.Params do
+        configure { config.type_specs = true }
+        required(:carton_number, :integer).filled(:int?, lt?: AppConst::MAX_DB_INT)
+      end.call(carton_number: carton_number)
+
+      return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") unless res.messages.empty?
+
+      ok_response
+    end
+
     def find_carton_by_carton_label_id(carton_label_id)
       repo.find_carton_by_carton_label_id(carton_label_id)
     end

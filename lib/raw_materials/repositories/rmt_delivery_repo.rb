@@ -148,6 +148,10 @@ module RawMaterialsApp
       OpenStruct.new DB[:rmt_deliveries].where(id: DB[:rmt_bins].where(id: id).select(:rmt_delivery_id)).first
     end
 
+    def bin_asset_number_available?(bin_asset_number)
+      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).count.zero?
+    end
+
     def find_bin_by_asset_number(bin_asset_number)
       rmt_bin = DB["SELECT *
                     FROM rmt_bins
