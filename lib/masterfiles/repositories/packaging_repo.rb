@@ -88,5 +88,40 @@ module MasterfilesApp
 
       CartonsPerPallet.new(hash)
     end
+
+    def find_cartons_per_pallet_by_seq_and_format(pallet_number, pallet_sequence_number, pallet_format_id)
+      qry = <<~SQL
+        SELECT distinct c.*
+        FROM cartons_per_pallet c
+        JOIN pallet_formats p on p.id=c.pallet_format_id
+        JOIN pallet_sequences s on s.basic_pack_code_id=c.basic_pack_id
+        WHERE s.pallet_number='#{pallet_number}' and s.pallet_sequence_number=#{pallet_sequence_number} and p.id=#{pallet_format_id}
+      SQL
+      DB[qry].first
+    end
+
+    def get_current_pallet_format_for_sequence(sequence_id)
+      qry = <<~SQL
+        SELECT p.id, b.pallet_base_code, s.stack_type_code
+        FROM pallet_formats p
+        JOIN pallet_bases b on b.id=p.pallet_base_id
+        JOIN pallet_stack_types s on s.id=p.pallet_stack_type_id
+        JOIN pallet_sequences q on q.pallet_format_id=p.id
+        WHERE q.id=?
+      SQL
+
+      pallet_format = DB[qry, sequence_id].first
+      pallet_format ? pallet_format[:id] : nil
+    end
+
+    def pallet_formats_for_select
+      qry = <<~SQL
+        SELECT p.id, b.pallet_base_code, s.stack_type_code
+        FROM pallet_formats p
+        JOIN pallet_bases b on b.id=p.pallet_base_id
+        JOIN pallet_stack_types s on s.id=p.pallet_stack_type_id
+      SQL
+      DB[qry].all.map { |p| ["#{p[:pallet_base_code]}_#{p[:stack_type_code]}", p[:id]] }
+    end
   end
 end

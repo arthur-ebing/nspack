@@ -279,16 +279,31 @@ class Nspack < Roda # rubocop:disable ClassLength
         json_actions(actions)
       end
 
+      r.on 'pallet_format_changed' do
+        cpp = MasterfilesApp::PackagingRepo.new.find_cartons_per_pallet_by_seq_and_format(params[:pallet_pallet_number], params[:pallet_pallet_sequence_number], params[:changed_value])
+        actions = [OpenStruct.new(type: :show_element, dom_id: 'UpdateSeq'),
+                   OpenStruct.new(type: :replace_input_value,
+                                  dom_id: 'pallet_carton_quantity',
+                                  value: cpp ? cpp[:cartons_per_pallet] : nil)]
+        json_actions(actions)
+      end
+
       r.on 'update_pallet_sequence' do
         r.post do
           pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number])
-          res = interactor.update_pallet_sequence_carton_qty(pallet_sequence_id, params[:pallet][:carton_quantity])
+
+          new_pallet_format = MasterfilesApp::PackagingRepo.new.get_current_pallet_format_for_sequence(pallet_sequence_id) != params[:pallet][:pallet_format].to_i ? params[:pallet][:pallet_format].to_i : nil
+          cpp = MasterfilesApp::PackagingRepo.new.find_cartons_per_pallet_by_seq_and_format(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number], params[:pallet][:pallet_format])
+          current_cartons_per_pallet_id = MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)[:cartons_per_pallet_id]
+          new_cartons_per_pallet_id = cpp && cpp[:id] != current_cartons_per_pallet_id ? cpp[:id] : nil
+
+          res = interactor.update_pallet_sequence_carton_qty(pallet_sequence_id, params[:pallet][:carton_quantity], new_pallet_format, new_cartons_per_pallet_id)
           if res.success
             store_locally(:flash_notice, "Pallet:#{params[:pallet][:pallet_number]} updated successfully.")
           else
             store_locally(:errors, "Error:#{unwrap_failed_response(res)}")
           end
-          r.redirect('/rmd/production/palletizing/create_new_pallet')
+          r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{pallet_sequence_id}")
         end
       end
 
@@ -384,9 +399,11 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         printer_repo = LabelApp::PrinterRepo.new
 
+        notice = retrieve_from_local_store(:flash_notice)
         error = retrieve_from_local_store(:errors)
         pallet_sequence.merge!(error_message: error) unless error.nil?
         form = Crossbeams::RMDForm.new(pallet_sequence,
+                                       notes: notice,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
                                        caption: "Edit Pallet #{pallet_sequence[:pallet_number]}",
@@ -397,10 +414,13 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        button_initially_hidden: true,
                                        button_caption: 'Save')
         form.behaviours do |behaviour|
-          behaviour.input_change :carton_quantity, notify: [{ url: '/rmd/production/palletizing/carton_quantity_changed' }]
+          behaviour.input_change :carton_quantity, notify: [{ url: '/rmd/production/palletizing/carton_quantity_changed', param_keys: %i[pallet_pallet_number pallet_pallet_sequence_number pallet_carton_quantity] }]
+          behaviour.input_change :pallet_format, notify: [{ url: '/rmd/production/palletizing/pallet_format_changed', param_keys: %i[pallet_pallet_number pallet_pallet_sequence_number pallet_carton_quantity] }]
         end
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence, [:carton_quantity])
         form.add_csrf_tag csrf_tag
+        form.add_select(:pallet_format, 'Pallet Format', prompt: true, value: MasterfilesApp::PackagingRepo.new.get_current_pallet_format_for_sequence(id),
+                                                         items: MasterfilesApp::PackagingRepo.new.pallet_formats_for_select)
         form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
         form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
         form.add_select(:printer, 'Printer', items: printer_repo.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false, value: printer_repo.default_printer_for_application(AppConst::PRINT_APP_PALLET))
@@ -544,6 +564,46 @@ class Nspack < Roda # rubocop:disable ClassLength
             r.redirect('/rmd/production/palletizing/edit_pallet')
           end
         end
+      end
+    end
+
+    # --------------------------------------------------------------------------
+    # REPRINT PALLET LABEL
+    # --------------------------------------------------------------------------
+    r.on 'reprint_pallet_label' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      printer_repo = LabelApp::PrinterRepo.new
+      r.get do
+        pallet = {}
+        error = retrieve_from_local_store(:error)
+        pallet = { error_message: error[:error_message] } unless error.nil?
+
+        notice = retrieve_from_local_store(:flash_notice)
+        form = Crossbeams::RMDForm.new(pallet,
+                                       notes: notice,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Reprint Pallet Label',
+                                       action: '/rmd/production/reprint_pallet_label',
+                                       button_caption: 'Submit')
+
+        form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+        form.add_field(:qty_to_print, 'Qty To Print', required: false, prompt: true, data_type: :number)
+        form.add_select(:printer, 'Printer', items: printer_repo.select_printers_for_application(AppConst::PRINT_APP_PALLET), required: false, value: printer_repo.default_printer_for_application(AppConst::PRINT_APP_PALLET))
+        form.add_select(:pallet_label_name, 'Pallet Label', items: interactor.find_pallet_labels, required: false)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(params[:pallet][:pallet_number])
+        res = interactor.print_pallet_label(pallet[:id], pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+        if res.success
+          store_locally(:flash_notice, 'Labels Printed Successfully')
+        else
+          store_locally(:error, error_message: "Printing Error: #{unwrap_failed_response(res)}")
+        end
+        r.redirect('/rmd/production/reprint_pallet_label')
       end
     end
   end

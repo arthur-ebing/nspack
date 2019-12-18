@@ -110,12 +110,18 @@ module ProductionApp
       MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)
     end
 
-    def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity)
+    def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity, new_pallet_format, new_cartons_per_pallet_id)
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
 
       res = nil
       repo.transaction do
         res = MesscadaApp::UpdatePalletSequence.new(pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
+
+        upd = {}
+        upd[:pallet_format_id] = new_pallet_format if new_pallet_format
+        upd[:cartons_per_pallet_id] = new_cartons_per_pallet_id if new_cartons_per_pallet_id
+        MesscadaApp::MesscadaRepo.new.update_pallet_sequence(pallet_sequence_id, upd) unless upd.empty?
+
         log_transaction
       end
       res
