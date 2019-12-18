@@ -156,7 +156,7 @@
               <field name="container_type" size="1" required="false"/>
               <field name="perc_vents" size="5" required="false" format="ZEROES" default="0"/>
               <field name="principal" size="2" required="false"/>
-              <field name="ship_name" size="15" required="false"/>
+              <field name="ship_name" size="15" required="false" trim="true" />
               <field name="container_size" size="2" required="false"/>
               <field name="seal_no" size="15" required="false"/>
               <field name="consec_no" size="10" required="false"/>

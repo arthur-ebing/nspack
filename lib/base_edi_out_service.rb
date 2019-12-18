@@ -79,6 +79,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   # - name        (the name as defined in the spec)
   # - offset      (for flat text records, the starting position)
   # - length      (the length of the field in characters)
+  # - trim        (boolean: should the field be trimed to fit the length for a flat file?)
   # - required    (boolean: must the field be present)
   # - format      (rules for formatting the output)
   # - default     (the default value or nil)
@@ -91,6 +92,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
                            offset: offset,
                            length: len,
                            required: field_node['required'] == 'true',
+                           trim: field_node['trim'] == 'true',
                            format: field_node['format'])
       rec[:default] = field_node.attributes['default'].to_s if field_node.attributes['default']
       raise "There is already a rule for #{field_node['name']} in #{flow_type.downcase}.xml for #{key}. Please make it unique" unless record_definitions[key][field_node['name'].to_s.to_sym].nil?
@@ -130,7 +132,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     errors = []
     rules.each do |key, rule|
       errors << "#{key} is missing" if rule.required && row[key].nil?
-      errors << "#{key} length of \"#{row[key]}\" is longer than maxlength (#{rule.length})" if @check_lengths && row[key].is_a?(String) && row[key].length > rule.length.to_i
+      errors << "#{key} length of \"#{row[key]}\" is longer than maxlength (#{rule.length})" if @check_lengths && row[key].is_a?(String) && !rule.trim && row[key].length > rule.length.to_i
     end
     @validation_errors << "#{row_desc} - #{errors.join(', ')}." unless errors.empty?
   end
