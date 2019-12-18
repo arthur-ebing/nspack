@@ -1207,3 +1207,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: true, false
+- :column: packed_tm_group
+  :caption: Packed TM Group
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

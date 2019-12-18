@@ -19,6 +19,23 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def set_local_pallet # rubocop:disable Metrics/AbcSize
+      args = { in_stock: false, packed_tm_group: 'LO' }
+      pallet_sequence = repo.all_hash(:vw_pallet_sequence_flat, args)
+      pallet_ids = pallet_sequence.map { |seq| seq[:pallet_id] }
+      pallet_numbers = pallet_sequence.map { |seq| seq[:pallet_number] }
+
+      repo.transaction do
+        repo.update(:pallets, pallet_ids, in_stock: true, stock_created_at: Time.now)
+        log_multiple_statuses(:pallets, pallet_ids, 'ACCEPTED_AS_LOCAL_STOCK')
+        log_transaction
+      end
+
+      success_response("Updated pallets #{pallet_numbers.join(', ')}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def get_location_id_by_barcode(location_barcode)
