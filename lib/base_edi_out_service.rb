@@ -219,8 +219,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
           else
             raw_value.to_s.ljust(len)
           end
-      s[0..len - 1]
-      return s
+      return s[0..len - 1]
     end
     return ' ' * len if raw_value.nil?
 

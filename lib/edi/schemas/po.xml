@@ -162,7 +162,7 @@
               <field name="consec_no" size="10" required="false"/>
               <field name="cto_no" size="10" required="false"/>
               <field name="ryan_no" size="10" required="false"/>
-              <field name="ship_name2" size="25" required="false"/>
+              <field name="ship_name2" size="25" required="false" trim="true"/>
               <field name="voyage_no" size="10" required="false"/>
               <field name="ship_call_sign" size="10" required="false"/>
               <field name="ship_line2" size="2" required="false"/>
