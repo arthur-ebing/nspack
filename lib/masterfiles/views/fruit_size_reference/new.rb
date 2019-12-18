@@ -16,6 +16,7 @@ module Masterfiles
               form.action '/masterfiles/fruit/fruit_size_references'
               form.remote! if remote
               form.add_field :size_reference
+              form.add_field :edi_out_code
             end
           end
 

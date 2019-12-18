@@ -16,12 +16,14 @@ module UiRules
 
     def set_show_fields
       fields[:size_reference] = { renderer: :label }
+      fields[:edi_out_code] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        size_reference: { required: true }
+        size_reference: { required: true },
+        edi_out_code: {}
       }
     end
 
@@ -32,7 +34,8 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(size_reference: nil)
+      @form_object = OpenStruct.new(size_reference: nil,
+                                    edi_out_code: nil)
     end
   end
 end

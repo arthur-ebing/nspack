@@ -72,7 +72,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     return if out_dest[:except] && out_dest[:except][:org_code] == org_code
 
     base_path = root.sub('$HOME', ENV['HOME'])
-    @output_paths << out_dest[:path].sub('$ROOT', base_path)
+    @output_paths << File.join(out_dest[:path].sub('$ROOT', base_path), 'transmit')
   end
 
   # Services can use the field definition:
@@ -103,9 +103,10 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   # VALIDATE fixed len record size vs sum of fields... (include end_padding field)
   # send in "for fixed" and raise err if field leng too long after formatting
-  def validate_data(identifiers)
+  def validate_data(identifiers, check_lengths = false)
     @validation_errors = []
     @identifiers = identifiers
+    @check_lengths = check_lengths
     record_entries.each_key do |key|
       validate_entries(key)
     end
@@ -122,13 +123,14 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def validate_row(rec_id, row, rules)
+  def validate_row(rec_id, row, rules) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     row_desc = "#{rec_id} : "
     row_desc = "#{rec_id} : [#{@identifiers[rec_id].map { |field| "#{field} = #{row[field]}" }.join(', ')}]" if @identifiers[rec_id]
 
     errors = []
     rules.each do |key, rule|
       errors << "#{key} is missing" if rule.required && row[key].nil?
+      errors << "#{key} length of \"#{row[key]}\" is longer than maxlength (#{rule.length})" if @check_lengths && row[key].is_a?(String) && row[key].length > rule.length.to_i
     end
     @validation_errors << "#{row_desc} - #{errors.join(', ')}." unless errors.empty?
   end
@@ -207,7 +209,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   # NB:: If you add a format to this method, make sure you list and describe it
   # at the top of this file.
   #++
-  def format_flat_edi_field(raw_value, len, format_def) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+  def format_flat_edi_field(raw_value, len, format_def, rec_type, key) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     # If no format provided, right-pad with spaces up to the field length.
     return raw_value.to_s.ljust(len) if format_def.nil?  # || format_def == ''
     return ' ' * len if raw_value.nil?
@@ -236,10 +238,17 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     when 'TEMP1DEC' # +09.99, -09.99
       format("%+0#{len}.1f", raw_value)
     when '', nil # Default to string padded with zeroes on the right TODO: Check if default of padding to length is OK or error
-      raw_value.to_s.ljust(len)
+      s = if raw_value.is_a?(BigDecimal)
+            raw_value.to_s('F').ljust(len)
+          else
+            raw_value.to_s.ljust(len)
+          end
+      s[0..len - 1]
     else
       format(format_def, raw_value)
     end
+  rescue StandardError => e
+    raise Crossbeams::InfoError, "EDI OUT field format error for rec type \"#{rec_type}\", field \"#{key}\": #{e}"
   end
 
   # This should be moved to a EdiOutFlatFileFormatter perhaps
@@ -249,7 +258,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       lines += build_flat_rows(key)
     end
 
-    puts lines.join("\n")
+    # puts lines.join("\n")
     @output_paths.each do |path|
       raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
 
@@ -262,15 +271,15 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     rules = record_definitions[key]
     lines = []
     record_entries[key].each do |row|
-      lines << build_flat_row(rules, row)
+      lines << build_flat_row(rules, row, key)
     end
     lines
   end
 
-  def build_flat_row(rules, row)
+  def build_flat_row(rules, row, rec_type)
     fields = []
     rules.each do |key, rule|
-      fields << format_flat_edi_field(row[key], rule.length, rule.format)
+      fields << format_flat_edi_field(row[key], rule.length, rule.format, rec_type, key)
     end
     fields.join
   end

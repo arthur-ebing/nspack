@@ -72,6 +72,7 @@ module MasterfilesApp
       {
         id: 1,
         size_reference: Faker::Lorem.unique.word,
+        edi_out_code: 'ABC',
         active: true
       }
     end

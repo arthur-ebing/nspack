@@ -18,7 +18,7 @@ module EdiApp
       return success_response('No data for PS') if @ps_record_count.zero?
 
       prepare_bt
-      # validate_data('PS' => %i[sscc sequence_number])
+      validate_data({ 'PS' => %i[sscc sequence_number] }, check_lengths: true)
       fname = create_flat_file
       success_response('PsOut was successful', fname)
     end

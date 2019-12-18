@@ -17,6 +17,7 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :size_reference
+              form.add_field :edi_out_code
             end
           end
 

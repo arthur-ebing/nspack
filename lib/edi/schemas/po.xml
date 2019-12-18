@@ -7,7 +7,7 @@
       </transformer>
       <fields>
         <field name="header" size="2" default="BH"/>
-        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="network_address" size="3" default="$:NETWORK$" />
         <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
         <field name="create_date" size="8" format="DATE" default="$:NOW$" />
         <field name="create_time" size="8" format="HMS" default="$:NOW$" />
@@ -353,7 +353,7 @@
     <record name="doc_trailer" identifier="BT" size="60" occurence="1">
       <fields>
         <field name="record_type" size="2" default="BT"/>
-        <field name="network_address" size="3" format="ZEROES" default="$:NETWORK$" />
+        <field name="network_address" size="3" default="$:NETWORK$" />
         <field name="batch_number" size="6" format="ZEROES" default="$:BATCHNO$" />
         <field name="record_count" size="7" format="ZEROES"/>
         <field name="oh_count" size="5" format="ZEROES"/>

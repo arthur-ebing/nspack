@@ -46,7 +46,7 @@ class Nspack < Roda
                         </bin_tipping>
                       HTML
                     end
-            ErrorMailer.send_error_email(subject: 'Check FG Pallet weighing call result', message: "Result: #{res.message}\nXML is #{htmls}")
+            # ErrorMailer.send_error_email(subject: 'Check FG Pallet weighing call result', message: "Result: #{res.message}\nXML is #{htmls}")
             htmls
           end
         end

@@ -107,7 +107,8 @@ module MasterfilesApp
 
     def create_fruit_size_reference(opts = {})
       default = {
-        size_reference: Faker::Lorem.unique.word
+        size_reference: Faker::Lorem.unique.word,
+        edi_out_code: Faker::Lorem.word
       }
       DB[:fruit_size_references].insert(default.merge(opts))
     end

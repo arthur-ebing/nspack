@@ -10,7 +10,8 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        size_reference: Faker::Lorem.unique.word
+        size_reference: Faker::Lorem.unique.word,
+        edi_out_code: 'ABC'
       }
       MasterfilesApp::FruitSizeReference.new(base_attrs.merge(attrs))
     end

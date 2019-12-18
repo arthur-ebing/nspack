@@ -734,7 +734,7 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_fruit_size_reference(id, params[:fruit_size_reference])
           if res.success
-            update_grid_row(id, changes: { size_reference: res.instance[:size_reference] },
+            update_grid_row(id, changes: { size_reference: res.instance[:size_reference], edi_out_code: res.instance[:edi_out_code] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::FruitSizeReference::Edit.call(id, form_values: params[:fruit_size_reference], form_errors: res.errors) }
@@ -765,6 +765,7 @@ class Nspack < Roda
           row_keys = %i[
             id
             size_reference
+            edi_out_code
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

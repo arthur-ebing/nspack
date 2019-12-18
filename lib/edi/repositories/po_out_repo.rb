@@ -87,7 +87,7 @@ module EdiApp
           marketing_varieties.marketing_variety_code AS variety,
           standard_pack_codes.standard_pack_code AS pack,
           grades.grade_code AS grade,
-          COALESCE(fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text) AS size_count,
+          COALESCE(fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text) AS size_count,
           marks.mark_code AS mark,
           inventory_codes.inventory_code AS inv_code,
           govt_inspection_sheets.inspection_point AS inspect_pnt,

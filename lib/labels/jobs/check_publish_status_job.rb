@@ -6,6 +6,8 @@ module LabelApp
       lookup_label_publish_log(label_publish_log_id)
       lookup_user_name(user_id)
 
+      # Should only do if not retry (i.e. first call)
+      sleep(1)
       res = publish_labels_status
 
       if res.success

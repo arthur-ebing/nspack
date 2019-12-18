@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :size_reference
+              form.add_field :edi_out_code
               form.add_field :active
             end
           end
