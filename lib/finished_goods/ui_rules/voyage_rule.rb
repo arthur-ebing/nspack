@@ -44,7 +44,7 @@ module UiRules
                           disabled: false },
         vessel_id: { renderer: :select,
                      options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id),
-                     disabled_options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id, active: false),
+                     disabled_options: MasterfilesApp::VesselRepo.new.for_select_inactive_vessels(voyage_type_id: @form_object.voyage_type_id),
                      caption: 'Vessel',
                      prompt: true,
                      required: true },

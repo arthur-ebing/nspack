@@ -29,15 +29,22 @@ module MasterfilesApp
                             wrapper: PortFlat)
     end
 
-    def for_select_ports(port_type_id: nil, port_type_code: nil, voyage_type_id: nil, voyage_type_code: nil, active: true) # rubocop:disable Metrics/AbcSize
+    def for_select_ports(args = nil) # rubocop:disable Metrics/AbcSize
       ds = DB[:port_types]
       ds = ds.join(:ports, port_type_id: :id)
       ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(port_type_id: port_type_id) unless port_type_id.nil_or_empty?
-      ds = ds.where(port_type_code: port_type_code) unless port_type_code.nil_or_empty?
-      ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil_or_empty?
-      ds = ds.where(voyage_type_code: voyage_type_code) unless voyage_type_code.nil_or_empty?
-      ds = ds.where(Sequel[:ports][:active] => active)
+      ds = ds.where(args) unless args.nil?
+      ds = ds.where(Sequel[:ports][:active] => true)
+      ds = ds.order(:port_code)
+      ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
+    end
+
+    def for_select_inactive_ports(args = nil) # rubocop:disable Metrics/AbcSize
+      ds = DB[:port_types]
+      ds = ds.join(:ports, port_type_id: :id)
+      ds = ds.join(:voyage_types, id: :voyage_type_id)
+      ds = ds.where(args) unless args.nil?
+      ds = ds.where(Sequel[:ports][:active] => false)
       ds = ds.order(:port_code)
       ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
     end

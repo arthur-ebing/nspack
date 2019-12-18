@@ -50,7 +50,7 @@ module UiRules
         port_id: { hide_on_load: rules[:item_visibility][:port_id],
                    renderer: :select,
                    options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
-                   disabled_options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id, active: false),
+                   disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
                    caption: 'Port',
                    prompt: true,
                    required: true },

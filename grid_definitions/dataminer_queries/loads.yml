@@ -15,18 +15,22 @@
   \   loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
   \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
   \   load_vehicles.vehicle_number,\r\n    load_vehicles.driver_name,\r\n    load_vehicles.driver_cell_number,\r\n
-  \   load_vehicles.id IS NOT NULL AS truck_arrived,\r\n\r\n    CASE\r\n        WHEN
-  loads.shipped THEN 'ready'\r\n        WHEN loads.allocated THEN 'ok'\r\n        ELSE
-  NULL\r\n        END AS colour_rule\r\n\r\nFROM loads\r\nJOIN depots ON depots.id
-  = loads.depot_id\r\nJOIN destination_cities ON destination_cities.id = loads.final_destination_id\r\nJOIN
-  voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\nJOIN
-  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\nJOIN
-  ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\nJOIN ports pod_port
-  ON pod_port.id = pod_voyage_ports.port_id\r\nJOIN voyages ON pol_voyage_ports.voyage_id
-  = voyages.id\r\nLEFT JOIN vessels ON voyages.vessel_id = vessels.id\r\nLEFT JOIN
-  load_containers ON loads.id = load_containers.load_id\r\nLEFT JOIN load_voyages
-  ON loads.id = load_voyages.load_id\r\nLEFT JOIN load_vehicles ON loads.id = load_vehicles.load_id\r\nORDER
-  BY loads.id DESC"
+  \   load_vehicles.id IS NOT NULL AS truck_arrived,\r\n    pallets.pallet_quantity,\r\n
+  \   pallets.pallet_carton_quantity,\r\n\r\n    CASE\r\n        WHEN loads.shipped
+  THEN 'ready'\r\n        WHEN loads.allocated THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM
+  loads\r\nJOIN depots ON depots.id = loads.depot_id\r\nJOIN destination_cities ON
+  destination_cities.id = loads.final_destination_id\r\nJOIN voyage_ports pol_voyage_ports
+  ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\nJOIN voyage_ports pod_voyage_ports
+  ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\nJOIN ports pol_port ON pol_port.id
+  = pol_voyage_ports.port_id\r\nJOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\nJOIN
+  voyages ON pol_voyage_ports.voyage_id = voyages.id\r\nLEFT JOIN vessels ON voyages.vessel_id
+  = vessels.id\r\nLEFT JOIN load_containers ON loads.id = load_containers.load_id\r\nLEFT
+  JOIN load_voyages ON loads.id = load_voyages.load_id\r\nLEFT JOIN load_vehicles
+  ON loads.id = load_vehicles.load_id\r\nLEFT JOIN (\r\n    SELECT\r\n        COUNT(pallets.id)
+  AS pallet_quantity,\r\n        SUM(pallets.carton_quantity::numeric) AS pallet_carton_quantity,\r\n
+  \       loads.id\r\n    FROM loads\r\n    LEFT JOIN pallets ON loads.id = pallets.load_id\r\n
+  \   GROUP BY loads.id) pallets\r\n    ON loads.id = pallets.id\r\nORDER BY loads.id
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -642,9 +646,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_quantity:
+    :name: pallet_quantity
+    :sequence_no: 39
+    :caption: Pallet quantity
+    :namespaced_name: pallets.pallet_quantity
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_carton_quantity:
+    :name: pallet_carton_quantity
+    :sequence_no: 40
+    :caption: Pallet carton quantity
+    :namespaced_name: pallets.pallet_carton_quantity
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 39
+    :sequence_no: 41
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

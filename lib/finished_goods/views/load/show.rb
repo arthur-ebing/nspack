@@ -7,6 +7,7 @@ module FinishedGoods
         def self.call(id, user: nil, back_url: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, user.nil? ? :show : :ship, id: id, user: user)
           rules   = ui_rule.compile
+          form_object = ui_rule.form_object.to_h
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
@@ -61,6 +62,7 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :exporter_party_role_id
                     col.add_field :billing_client_party_role_id
+                    col.add_field :status
                   end
                 end
               end
@@ -91,12 +93,20 @@ module FinishedGoods
                     col.add_field :vessel_id
                     col.add_field :voyage_number
                     col.add_field :year
+                    col.add_field :final_destination_id
+                    col.add_field :transfer_load
                   end
                   row.column do |col|
                     col.add_field :pol_port_id
+                    col.add_field :eta
+                    col.add_field :ata
                     col.add_field :pod_port_id
-                    col.add_field :final_destination_id
-                    col.add_field :transfer_load
+                    col.add_field :etd
+                    col.add_field :atd
+                    col.add_control(control_type: :link,
+                                    text: 'Go to Voyage',
+                                    url: "/finished_goods/dispatch/voyages/#{form_object[:voyage_id]}",
+                                    style: :button)
                   end
                 end
               end
@@ -111,6 +121,43 @@ module FinishedGoods
                   end
                   row.column do |col|
                     col.add_field :memo_pad
+                  end
+                end
+              end
+              form.fold_up do |fold|
+                fold.caption 'Load Vehicles'
+                fold.open!
+                fold.row do |row|
+                  row.column do |col|
+                    col.add_field :vehicle_number
+                    col.add_field :driver
+                    col.add_field :driver_number
+                  end
+                  row.column do |col|
+                    col.add_field :vehicle_type
+                    col.add_field :haulier
+                    col.add_field :vehicle_weight_out
+                  end
+                end
+              end
+              form.fold_up do |fold|
+                fold.caption 'Load Container'
+                fold.open!
+                fold.row do |row|
+                  row.column do |col|
+                    col.add_field :container_code
+                    col.add_field :container_vents
+                    col.add_field :container_seal_code
+                    col.add_field :internal_container_code
+                    col.add_field :stack_type
+                  end
+                  row.column do |col|
+                    col.add_field :temperature_rhine
+                    col.add_field :temperature_rhine2
+                    col.add_field :max_gross_weight
+                    col.add_field :cargo_temperature
+                    col.add_field :verified_gross_weight
+                    col.add_field :verified_gross_weight_date
                   end
                 end
               end

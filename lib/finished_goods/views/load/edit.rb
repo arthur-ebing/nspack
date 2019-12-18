@@ -29,13 +29,13 @@ module FinishedGoods
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :customer_party_role_id
-
                     col.add_field :consignee_party_role_id
                     col.add_field :final_receiver_party_role_id
                   end
                   row.column do |col|
                     col.add_field :exporter_party_role_id
                     col.add_field :billing_client_party_role_id
+                    col.add_field :status
                   end
                 end
               end
@@ -66,12 +66,12 @@ module FinishedGoods
                     col.add_field :vessel_id
                     col.add_field :voyage_number
                     col.add_field :year
+                    col.add_field :final_destination_id
+                    col.add_field :transfer_load
                   end
                   row.column do |col|
                     col.add_field :pol_port_id
                     col.add_field :pod_port_id
-                    col.add_field :final_destination_id
-                    col.add_field :transfer_load
                   end
                 end
               end

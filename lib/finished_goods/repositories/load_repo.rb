@@ -17,13 +17,13 @@ module FinishedGoodsApp
       find_with_association(:loads,
                             id,
                             parent_tables: [{ parent_table: :voyage_ports,
-                                              columns: %i[port_id voyage_id],
+                                              columns: %i[port_id voyage_id eta ata],
                                               foreign_key: :pol_voyage_port_id,
-                                              flatten_columns: { port_id: :pol_port_id, voyage_id: :voyage_id } },
+                                              flatten_columns: { port_id: :pol_port_id, voyage_id: :voyage_id, eta: :eta, ata: :ata } },
                                             { parent_table: :voyage_ports,
-                                              columns: %i[port_id],
+                                              columns: %i[port_id etd atd],
                                               foreign_key: :pod_voyage_port_id,
-                                              flatten_columns: { port_id: :pod_port_id } },
+                                              flatten_columns: { port_id: :pod_port_id, etd: :etd, atd: :atd } },
                                             { parent_table: :voyages,
                                               columns: %i[voyage_type_id vessel_id voyage_number year voyage_code],
                                               foreign_key: :voyage_id,
@@ -47,6 +47,9 @@ module FinishedGoodsApp
                                          { sub_table: :load_containers,
                                            columns: %i[container_code],
                                            one_to_one: { container_code: :container_code } }],
+                            lookup_functions: [{ function: :fn_current_status,
+                                                 args: ['loads', id],
+                                                 col_name: :status }],
                             wrapper: LoadFlat)
     end
 

@@ -69,6 +69,7 @@ module FinishedGoodsApp
       destination_city_id = create_destination_city
       depot_id = create_depot
       voyage_port_id = create_voyage_port
+      voyage_id = create_voyage
       port_id = create_port
       voyage_type_id = create_voyage_type
       vessel_id = create_vessel
@@ -96,17 +97,23 @@ module FinishedGoodsApp
         active: true,
         voyage_type_id: voyage_type_id,
         vessel_id: vessel_id,
+        voyage_id: voyage_id,
         voyage_number: Faker::Number.number(4),
         voyage_code: Faker::Lorem.unique.word,
         year: 2019,
         pol_port_id: port_id,
+        eta: '2010-01-01',
+        ata: '2010-01-01',
         pod_port_id: port_id,
+        etd: '2010-01-01',
+        atd: '2010-01-01',
         shipping_line_party_role_id: party_role_id,
         shipper_party_role_id: party_role_id,
         booking_reference: Faker::Lorem.word,
         memo_pad: Faker::Lorem.word,
         vehicle_number: Faker::Lorem.word,
-        container_code: Faker::Lorem.word
+        container_code: Faker::Lorem.word,
+        status: Faker::Lorem.word
       }
     end
 

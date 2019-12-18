@@ -237,13 +237,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
-                         data_type: 'number',
+                         data_type: 'string',
                          scan: 'key248_all',
                          required: false,
                          hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine2,
                          'Temperature Rhine2',
-                         data_type: 'number',
+                         data_type: 'string',
                          scan: 'key248_all',
                          required: false,
                          hide_on_load: !has_container)

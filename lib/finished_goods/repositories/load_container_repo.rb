@@ -22,6 +22,20 @@ module FinishedGoodsApp
 
     crud_calls_for :load_containers, name: :load_container, wrapper: LoadContainer
 
+    def find_load_container_flat(id)
+      find_with_association(:load_containers,
+                            id,
+                            parent_tables: [{ parent_table: :container_stack_types,
+                                              columns: %i[stack_type_code],
+                                              foreign_key: :stack_type_id,
+                                              flatten_columns: { stack_type_code: :stack_type_code } },
+                                            { parent_table: :cargo_temperatures,
+                                              columns: %i[temperature_code],
+                                              foreign_key: :cargo_temperature_id,
+                                              flatten_columns: { temperature_code: :cargo_temperature_code } }],
+                            wrapper: LoadContainerFlat)
+    end
+
     def find_stack_type_id(stack_type_code)
       DB[:container_stack_types].where(stack_type_code: stack_type_code).get(:id)
     end

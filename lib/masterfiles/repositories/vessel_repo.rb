@@ -25,12 +25,20 @@ module MasterfilesApp
                             wrapper: VesselFlat)
     end
 
-    def for_select_vessels(voyage_type_id: nil, voyage_type_code: nil, active: true) # rubocop:disable Metrics/AbcSize
+    def for_select_vessels(args = nil)
       ds = DB[:vessels]
       ds = ds.join(:vessel_types, id: :vessel_type_id)
-      ds = ds.where(voyage_type_id: voyage_type_id) unless voyage_type_id.nil_or_empty?
-      ds = ds.where(voyage_type_code: voyage_type_code) unless voyage_type_code.nil_or_empty?
-      ds = ds.where(Sequel[:vessels][:active] => active)
+      ds = ds.where(args) unless args.nil?
+      ds = ds.where(Sequel[:vessels][:active] => true)
+      ds = ds.order(:vessel_type_code)
+      ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
+    end
+
+    def for_select_inactive_vessels(args = nil)
+      ds = DB[:vessels]
+      ds = ds.join(:vessel_types, id: :vessel_type_id)
+      ds = ds.where(args) unless args.nil?
+      ds = ds.where(Sequel[:vessels][:active] => false)
       ds = ds.order(:vessel_type_code)
       ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
     end

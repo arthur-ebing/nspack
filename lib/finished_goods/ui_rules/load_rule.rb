@@ -4,7 +4,7 @@ module UiRules
   class LoadRule < Base # rubocop:disable ClassLength
     def generate_rules
       @repo = FinishedGoodsApp::LoadRepo.new
-
+      @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -20,16 +20,17 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       # Parties and Locations
-      customer_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.customer_party_role_id)&.party_name
-      exporter_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.exporter_party_role_id)&.party_name
-      billing_client_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.billing_client_party_role_id)&.party_name
-      consignee_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.consignee_party_role_id)&.party_name
-      final_receiver_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.final_receiver_party_role_id)&.party_name
+      customer_label = @party_repo.find_party_role(@form_object.customer_party_role_id)&.party_name
+      exporter_label = @party_repo.find_party_role(@form_object.exporter_party_role_id)&.party_name
+      billing_client_label = @party_repo.find_party_role(@form_object.billing_client_party_role_id)&.party_name
+      consignee_label = @party_repo.find_party_role(@form_object.consignee_party_role_id)&.party_name
+      final_receiver_label = @party_repo.find_party_role(@form_object.final_receiver_party_role_id)&.party_name
       fields[:customer_party_role_id] = { renderer: :label, with_value: customer_label, caption: 'Customer' }
       fields[:exporter_party_role_id] = { renderer: :label, with_value: exporter_label, caption: 'Exporter' }
       fields[:billing_client_party_role_id] = { renderer: :label, with_value: billing_client_label, caption: 'Billing Client' }
       fields[:consignee_party_role_id] = { renderer: :label, with_value: consignee_label, caption: 'Consignee' }
       fields[:final_receiver_party_role_id] = { renderer: :label, with_value: final_receiver_label, caption: 'Final Receiver' }
+      fields[:status] = { renderer: :label }
 
       # Load Details
       depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
@@ -44,33 +45,55 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
 
       # Voyage Ports
-      voyage_type_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_type_code
-      voyage_vessel_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.vessel_code
-      voyage_number_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_number
-      voyage_year_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.year
-      pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_code
-      pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_code
-      final_destination_label = MasterfilesApp::DestinationRepo.new.find_city(@form_object.final_destination_id)&.city_name
-      fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_code_label, caption: 'Voyage Type' }
-      fields[:vessel_id] = { renderer: :label, with_value: voyage_vessel_label, caption: 'Vessel' }
-      fields[:voyage_number] = { renderer: :label, with_value: voyage_number_label, caption: 'Voyage Number' }
-      fields[:year] = { renderer: :label, with_value: voyage_year_label, caption: 'Year' }
-      fields[:pol_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
-      fields[:pod_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
-      fields[:final_destination_id] = { renderer: :label, with_value: final_destination_label, caption: 'Final Destination' }
+      pol = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)
+      pod = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)
+      final_destination = MasterfilesApp::DestinationRepo.new.find_city(@form_object.final_destination_id)&.city_name
+      fields[:voyage_type_id] = { renderer: :label, with_value: pol&.voyage_type_code, caption: 'Voyage Type' }
+      fields[:vessel_id] = { renderer: :label, with_value: pol&.vessel_code, caption: 'Vessel' }
+      fields[:voyage_number] = { renderer: :label, with_value: pol&.voyage_number, caption: 'Voyage Number' }
+      fields[:year] = { renderer: :label, with_value: pol&.year, caption: 'Year' }
+      fields[:final_destination_id] = { renderer: :label, with_value: final_destination, caption: 'Final Destination' }
       fields[:transfer_load] = { renderer: :label, as_boolean: true }
+      fields[:pol_port_id] = { renderer: :label, with_value: pol&.port_code, caption: 'POL Voyage Port' }
+      fields[:eta] = { renderer: :label, caption: 'ETA' }
+      fields[:ata] = { renderer: :label, caption: 'ATA' }
+      fields[:pod_port_id] = { renderer: :label, with_value: pod&.port_code, caption: 'POD Voyage Port' }
+      fields[:etd] = { renderer: :label, caption: 'ETD' }
+      fields[:atd] = { renderer: :label, caption: 'ATD' }
 
       # Load Voyage
-      shipping_line_party_role_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage(@form_object.id)&.shipping_line_party_role_id
-      shipper_party_role_id = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage(@form_object.id)&.shipper_party_role_id
-      shipping_line_label = MasterfilesApp::PartyRepo.new.find_party_role(shipping_line_party_role_id)&.party_name
-      shipper_label = MasterfilesApp::PartyRepo.new.find_party_role(shipper_party_role_id)&.party_name
-      booking_reference_label = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage(@form_object.id)&.booking_reference
-      memo_pad_label = FinishedGoodsApp::LoadVoyageRepo.new.find_load_voyage(@form_object.id)&.memo_pad
+      load_voyage = @repo.where(:load_voyages, FinishedGoodsApp::LoadVoyage, load_id: @form_object.id)
+      shipping_line_label = @party_repo.find_party_role(load_voyage&.shipping_line_party_role_id)&.party_name
+      shipper_label = @party_repo.find_party_role(load_voyage&.shipper_party_role_id)&.party_name
       fields[:shipping_line_party_role_id] = { renderer: :label, with_value: shipping_line_label, caption: 'Shipping Line' }
       fields[:shipper_party_role_id] = { renderer: :label, with_value: shipper_label, caption: 'Shipper' }
-      fields[:booking_reference] = { renderer: :label, with_value: booking_reference_label, caption: 'Booking Reference' }
-      fields[:memo_pad] = { renderer: :label, with_value: memo_pad_label, caption: 'Memo Pad' }
+      fields[:booking_reference] = { renderer: :label }
+      fields[:memo_pad] = { renderer: :label }
+
+      # Load Vehicles
+      load_vehicle_id = @repo.where_hash(:load_vehicles, load_id: @form_object.id)[:id]
+      vehicle = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(load_vehicle_id)
+      fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
+      fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
+      fields[:driver_number] = { renderer: :label, with_value: vehicle&.driver_cell_number }
+      fields[:vehicle_type] = { renderer: :label, with_value: vehicle&.vehicle_type_code }
+      fields[:haulier] = { renderer: :label, with_value: vehicle&.haulier_party_role }
+      fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
+
+      # Load Container
+      load_container_id = @repo.where_hash(:load_containers, load_id: @form_object.id)[:id]
+      container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(load_container_id)
+      fields[:container_code] = { renderer: :label, with_value: container&.container_code }
+      fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
+      fields[:container_seal_code] = { renderer: :label, with_value: container&.container_seal_code }
+      fields[:internal_container_code] = { renderer: :label, with_value: container&.internal_container_code }
+      fields[:stack_type] = { renderer: :label, with_value: container&.stack_type_code }
+      fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
+      fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
+      fields[:max_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_gross_weight) }
+      fields[:cargo_temperature] = { renderer: :label, with_value: container&.cargo_temperature_code }
+      fields[:verified_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.verified_gross_weight) }
+      fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
     end
 
     def set_allocate_fields # rubocop:disable Metrics/AbcSize
@@ -89,35 +112,36 @@ module UiRules
       {
         # Parties
         customer_party_role_id: { renderer: :select,
-                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CUSTOMER),
-                                  disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
+                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER),
+                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
                                   caption: 'Customer',
                                   required: true,
                                   prompt: true },
         billing_client_party_role_id: { renderer: :select,
-                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT),
-                                        disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_BILLING_CLIENT),
+                                        options: @party_repo.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT),
+                                        disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_BILLING_CLIENT),
                                         caption: 'Billing Client',
                                         required: true,
                                         prompt: true },
         exporter_party_role_id: { renderer: :select,
-                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_EXPORTER),
-                                  disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
+                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_EXPORTER),
+                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
                                   caption: 'Exporter',
                                   required: true,
                                   prompt: true },
         consignee_party_role_id: { renderer: :select,
-                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE),
-                                   disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_CONSIGNEE),
+                                   options: @party_repo.for_select_party_roles(AppConst::ROLE_CONSIGNEE),
+                                   disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CONSIGNEE),
                                    caption: 'Consignee',
                                    required: true,
                                    prompt: true },
         final_receiver_party_role_id: { renderer: :select,
-                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
-                                        disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                        options: @party_repo.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER),
+                                        disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_FINAL_RECEIVER),
                                         caption: 'Final Receiver',
                                         required: true,
                                         prompt: true },
+        status: { renderer: :label },
 
         # Load Details
         order_number: {},
@@ -143,27 +167,13 @@ module UiRules
                           disabled: false },
         vessel_id: { renderer: :select,
                      options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id),
-                     disabled_options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id, active: false),
+                     disabled_options: MasterfilesApp::VesselRepo.new.for_select_inactive_vessels(voyage_type_id: @form_object.voyage_type_id),
                      caption: 'Vessel',
                      prompt: true,
                      required: true },
         voyage_number: { required: true },
         year: { renderer: :input, subtype: :integer,
                 required: true },
-        pol_port_id: { renderer: :select,
-                       options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id),
-                       disabled_options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id, active: false),
-                       selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_id,
-                       caption: 'POL Voyage Port',
-                       prompt: true,
-                       required: true },
-        pod_port_id: { renderer: :select,
-                       options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id),
-                       disabled_options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id, active: false),
-                       selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_id,
-                       caption: 'POD Voyage Port',
-                       prompt: true,
-                       required: true },
         final_destination_id: { renderer: :select,
                                 options: MasterfilesApp::DestinationRepo.new.for_select_destination_cities,
                                 disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_cities,
@@ -171,16 +181,30 @@ module UiRules
                                 prompt: true,
                                 required: true },
         transfer_load: { renderer: :checkbox },
+        pol_port_id: { renderer: :select,
+                       options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id),
+                       disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(port_type_code: AppConst::PORT_TYPE_POL, voyage_type_id: @form_object.voyage_type_id),
+                       selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_id,
+                       caption: 'POL Voyage Port',
+                       prompt: true,
+                       required: true },
+        pod_port_id: { renderer: :select,
+                       options: MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id),
+                       disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(port_type_code: AppConst::PORT_TYPE_POD, voyage_type_id: @form_object.voyage_type_id),
+                       selected: FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_id,
+                       caption: 'POD Voyage Port',
+                       prompt: true,
+                       required: true },
 
         # Load Voyage
         shipping_line_party_role_id: { renderer: :select,
-                                       options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_SHIPPING_LINE),
-                                       disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_SHIPPING_LINE),
+                                       options: @party_repo.for_select_party_roles(AppConst::ROLE_SHIPPING_LINE),
+                                       disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_SHIPPING_LINE),
                                        caption: 'Shipping Line',
                                        prompt: true },
         shipper_party_role_id: { renderer: :select,
-                                 options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_SHIPPER),
-                                 disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_SHIPPER),
+                                 options: @party_repo.for_select_party_roles(AppConst::ROLE_SHIPPER),
+                                 disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_SHIPPER),
                                  caption: 'Shipper',
                                  prompt: true },
         booking_reference: {},

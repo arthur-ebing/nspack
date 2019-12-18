@@ -48,17 +48,23 @@ module FinishedGoodsApp
     attribute :transfer_load, Types::Bool
     attribute :voyage_type_id, Types::Integer
     attribute :vessel_id, Types::Integer
+    attribute :voyage_id, Types::Integer
     attribute :voyage_number, Types::String
     attribute :voyage_code, Types::String
     attribute :year, Types::Integer
     attribute :pol_port_id, Types::Integer
+    attribute :eta, Types::DateTime
+    attribute :ata, Types::DateTime
     attribute :pod_port_id, Types::Integer
+    attribute :etd, Types::DateTime
+    attribute :atd, Types::DateTime
     attribute :shipping_line_party_role_id, Types::Integer
     attribute :shipper_party_role_id, Types::Integer
     attribute :booking_reference, Types::String
     attribute :memo_pad, Types::String
     attribute :vehicle_number, Types::String
     attribute :container_code, Types::String
+    attribute :status, Types::String
     attribute? :active, Types::Bool
   end
 end
