@@ -39,7 +39,7 @@ module EdiApp
       end
 
       prepare_bt
-      validate_data('OC' => %i[load_id], 'OK' => %i[load_id container], 'OP' => %i[load_id sscc seq_no])
+      validate_data({ 'OC' => %i[load_id], 'OK' => %i[load_id container], 'OP' => %i[load_id sscc seq_no] }, check_lengths: true)
       fname = create_flat_file
 
       repo.store_edi_filename(fname, record_id)
@@ -77,6 +77,7 @@ module EdiApp
       hash = build_hash_from_data(@current_row, 'OK')
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
+      hash[:ship_line] = @current_row[:ship_line][0, 1] # Just the 1st char
       add_record('OK', hash)
       @ok_count += 1
     end
