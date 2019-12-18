@@ -65,7 +65,7 @@
             <field name="transaction_date" size="8" format="DATE" />
             <field name="transaction_time" size="5" format="HM" />
             <field name="pallet_base_type" size="1" map_to="pallet_base_code"/>
-            <field name="original_cons_no" size="10" required="false" />
+            <field name="original_cons_no" size="10" format="ZEROES" required="false" />
             <field name="order_no" size="6" required="false" />
             <field name="tracing_temperature" size="6" format="TEMP" required="false" />
             <field name="minimum_temperature" size="6" format="TEMP" required="false" />

@@ -211,7 +211,15 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   #++
   def format_flat_edi_field(raw_value, len, format_def, rec_type, key) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     # If no format provided, right-pad with spaces up to the field length.
-    return raw_value.to_s.ljust(len) if format_def.nil?  # || format_def == ''
+    if format_def.nil?
+      s = if raw_value.is_a?(BigDecimal)
+            raw_value.to_s('F').ljust(len)
+          else
+            raw_value.to_s.ljust(len)
+          end
+      s[0..len - 1]
+      return s
+    end
     return ' ' * len if raw_value.nil?
 
     case format_def.upcase

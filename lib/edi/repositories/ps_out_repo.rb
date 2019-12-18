@@ -8,6 +8,7 @@ module EdiApp
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS sequence_number,
           govt_inspection_sheets.id AS consignment_number,
+          govt_inspection_sheets.id AS original_cons_no,
           marketing_org.short_description AS organisation,
           substring(commodity_groups.code FROM '..') AS commodity_group,
           commodities.code AS commodity,
