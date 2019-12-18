@@ -267,7 +267,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
 
   # Load_containers:
-  VGM_REQUIRED = make_boolean(ENV['VGM_REQUIRED'])
+  VGM_REQUIRED = make_boolean('VGM_REQUIRED')
 
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
@@ -295,7 +295,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ].freeze
 
   # Titan: Govt Inspections
-  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV['TITAN_ENVIRONMENT'].to_sym]
+  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
   TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
   TITAN_API_SECRET = ENV['TITAN_API_SECRET']
 
