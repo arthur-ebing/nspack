@@ -183,7 +183,7 @@
               <field name="load_id" size="10" required="false"/>
               <field name="locn_code" size="7" map_to="location_code"  required="true" default="$:INSTALL_LOCATION$" />
               <field name="orgzn" size="2" map_to="organization_code"/>
-              <field name="cons_no" size="10" map_to="document_number"/>
+              <field name="cons_no" size="10" format="ZEROES" map_to="document_number"/>
               <field name="cons_type" size="2" map_to="document_type" DEFAULT="DP" />
               <field name="cons_date" size="8" format="DATE"/>
               <field name="account" size="6" required="false" map_to="account_code"/>
@@ -248,7 +248,7 @@
                   <field name="ship_agent" size="2" required="false"/>
                   <field name="dest_type" size="2" required="false"/>
                   <field name="dest_locn" size="7" required="false"/>
-                  <field name="cons_no" size="10" map_to="consignment_note_number"/>
+                  <field name="cons_no" size="10" format="ZEROES" map_to="consignment_note_number"/>
                   <field name="container" size="11" required="false"/>
                   <field name="cont_split" size="1" required="false"/>
                   <field name="channel" size="1" map_to="channel" default="E"/>
@@ -292,7 +292,7 @@
                   <field name="tran_date" size="8" required="false" format="DATE" default="$:NOW$" />
                   <field name="tran_time" size="5" required="false" format="HM" default="$:NOW$" />
                   <field name="pallet_btype" size="1" map_to="pallet_base_code" map_to_table="depot_pallets"/>
-                  <field name="orig_cons" size="10" required="false"/>
+                  <field name="orig_cons" size="10" format="ZEROES" required="false"/>
                   <field name="ship_number" size="6" required="false"/>
                   <field name="temperature" size="6" format="TEMP" default="99.99" required="false"/>
                   <field name="combo_pallet_id" size="9" required="false"/>
@@ -310,7 +310,7 @@
                   <field name="stack_variance" size="1" required="false"/>
                   <field name="store_type" size="1" required="false"/>
                   <field name="batch_no" size="20" required="false" map_to="batch_code"/>
-                  <field name="waybill_no" size="10" required="false"/>
+                  <field name="waybill_no" size="10" format="ZEROES" required="false"/>
                   <field name="gtin" size="14" map_to="gtin_code" required="false" nullify_zeros="true" />
                   <field name="packh_code" size="7" required="false" map_to="packhouse_code"/>
                   <field name="steri_flag" size="2" required="false"/>

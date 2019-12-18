@@ -48,7 +48,8 @@ module EdiApp
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
-        LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = pallets.last_govt_inspection_pallet_id
+        LEFT OUTER JOIN govt_inspection_pallets ON govt_inspection_pallets.id = pallets.last_govt_inspection_pallet_id
+        LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id
         JOIN cultivar_groups ON cultivar_groups.id = pallet_sequences.cultivar_group_id
         JOIN commodities ON commodities.id = cultivar_groups.commodity_id
         JOIN commodity_groups ON commodity_groups.id = commodities.commodity_group_id

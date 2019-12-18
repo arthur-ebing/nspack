@@ -92,14 +92,14 @@ module EdiApp
           inventory_codes.inventory_code AS inv_code,
           govt_inspection_sheets.inspection_point AS inspect_pnt,
           inspectors.inspector_code AS inspector,
-          pallet_sequences.pick_ref AS picking_reference,
+          pallet_sequences.pick_ref,
           loads.shipped_at AS shipped_date,
           pallet_sequences.product_chars AS prod_char,
           govt_inspection_sheets.id AS orig_cons,
           target_market_groups.target_market_group_name AS targ_mkt,
           pucs.puc_code AS farm,
           pallet_sequences.carton_quantity AS ctn_qty,
-          pallets.carton_quantity AS plt_qty,
+          1 AS plt_qty,
           CASE WHEN (SELECT count(*) FROM pallet_sequences m WHERE m.pallet_id = pallet_sequences.pallet_id AND NOT scrapped) > 1 THEN 'Y' ELSE 'N' END AS mixed_indicator,
           COALESCE(pallets.govt_reinspection_at, pallets.govt_first_inspection_at) AS inspec_date,
           pallets.govt_first_inspection_at AS original_inspec_date,
@@ -137,7 +137,8 @@ module EdiApp
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
-        LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = pallets.last_govt_inspection_pallet_id
+        LEFT OUTER JOIN govt_inspection_pallets ON govt_inspection_pallets.id = pallets.last_govt_inspection_pallet_id
+        LEFT OUTER JOIN govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id
         LEFT OUTER JOIN inspectors ON inspectors.id = govt_inspection_sheets.inspector_id
         LEFT OUTER JOIN container_stack_types ON container_stack_types.id = load_containers.stack_type_id
         LEFT OUTER JOIN destination_cities ON destination_cities.id = loads.final_destination_id
