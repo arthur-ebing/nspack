@@ -129,7 +129,7 @@ module DataminerApp
       rpt_list = if for_grids
                    repo.list_all_grid_reports
                  else
-                   repo.list_all_reports
+                   repo.list_all_reports(true)
                  end
       col_defs = Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
@@ -478,9 +478,9 @@ module DataminerApp
       crosstab_hash ||= {}
       # {"col"=>"users.department_id", "op"=>"=", "opText"=>"is", "val"=>"17", "text"=>"Finance", "caption"=>"Department"}
       input_parameters = ::JSON.parse(params[:json_var])
-      parms   = []
+      parms = []
       # Check if this should become an IN parmeter (list of equal checks for a column.
-      eq_sel  = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
+      eq_sel = input_parameters.select { |p| p['op'] == '=' }.group_by { |p| p['col'] }
       in_sets = {}
       in_keys = []
       eq_sel.each do |col, qp|
