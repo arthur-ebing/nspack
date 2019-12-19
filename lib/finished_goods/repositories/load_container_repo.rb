@@ -28,11 +28,13 @@ module FinishedGoodsApp
                             parent_tables: [{ parent_table: :container_stack_types,
                                               columns: %i[stack_type_code description],
                                               foreign_key: :stack_type_id,
-                                              flatten_columns: { stack_type_code: :stack_type_code, description: :stack_type_description } },
+                                              flatten_columns: { stack_type_code: :stack_type_code,
+                                                                 description: :stack_type_description } },
                                             { parent_table: :cargo_temperatures,
                                               columns: %i[temperature_code set_point_temperature],
                                               foreign_key: :cargo_temperature_id,
-                                              flatten_columns: { temperature_code: :cargo_temperature_code, set_point_temperature: :set_point_temperature } }],
+                                              flatten_columns: { temperature_code: :cargo_temperature_code,
+                                                                 set_point_temperature: :set_point_temperature } }],
                             wrapper: LoadContainerFlat)
     end
 

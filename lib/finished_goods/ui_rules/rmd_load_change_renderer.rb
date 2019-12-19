@@ -6,12 +6,11 @@ module UiRules
       container = options[:use_container]
       actions = {}
       actions[:set_checked] = [{ dom_id: 'truck_arrival_container', checked: container }]
-      # hide show if container
+      # hides show if container
       row_ids = %w[container_info_section
                    truck_arrival_container_code_row
                    truck_arrival_container_vents_row
                    truck_arrival_container_seal_code_row
-                   truck_arrival_internal_container_code_row
                    truck_arrival_container_temperature_rhine_row
                    truck_arrival_container_temperature_rhine2_row
                    truck_arrival_max_gross_weight_row

@@ -149,18 +149,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form_state[:verified_gross_weight_date] = Time.now
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
 
-          # check if load_container exists
+          # checks if load_container exists
           container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_from(load_id: load_id)
           unless container_id.nil?
-            form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container(container_id).to_h)
+            form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(container_id).to_h)
             form_state[:container] = 'true'
           end
 
-          # check if load_vehicle exists
+          # checks if load_vehicle exists
           vehicle_id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: load_id)
           form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(vehicle_id).to_h) unless vehicle_id.nil?
 
-          # override if redirect from error
+          # overrides if redirect from error
           res = retrieve_from_local_store(:res)
           unless res.nil?
             form_state = res.instance
@@ -194,7 +194,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_select(:vehicle_type_id,
                           'Vehicle Type',
                           items: MasterfilesApp::VehicleTypeRepo.new.for_select_vehicle_types,
-                          # disabled_items: MasterfilesApp::VehicleTypeRepo.new.for_select_inactive_vehicle_types,
                           prompt: true)
           form.add_select(:haulier_party_role_id,
                           'Haulier',
@@ -233,11 +232,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          form.add_field(:internal_container_code,
-                         'Internal Container Code',
-                         data_type: 'string',
-                         required: false,
-                         hide_on_load: !has_container)
+          # form.add_field(:internal_container_code,
+          #                'Internal Container Code',
+          #                data_type: 'string',
+          #                required: false,
+          #                hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
                          data_type: 'string',

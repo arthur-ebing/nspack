@@ -11,7 +11,7 @@ module FinishedGoodsApp
     required(:container_seal_code, Types::StrippedString).maybe(:str?)
     required(:container_temperature_rhine, Types::StrippedString).maybe(:str?)
     required(:container_temperature_rhine2, Types::StrippedString).maybe(:str?)
-    required(:internal_container_code, Types::StrippedString).maybe(:str?)
+    optional(:internal_container_code, Types::StrippedString).maybe(:str?)
     required(:max_gross_weight, %i[nil decimal]).filled(:decimal?)
     required(:verified_gross_weight, %i[nil decimal]).filled(:decimal?)
     required(:verified_gross_weight_date, %i[nil time]).filled(:time?)
