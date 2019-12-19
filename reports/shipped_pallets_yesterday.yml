@@ -1,0 +1,274 @@
+---
+:caption: Shipped Pallets Yesterday
+:sql: "SELECT\r\n        customer,\r\n        load_id,\r\n        marketing_variety,\r\n
+  \       shipped_at::date AS shipped_date,\r\n        grade,\r\n        inventory_code,\r\n
+  \       std_pack,\r\n        std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n
+  \       mark,\r\n        fruit_sticker,\r\n        fruit_sticker_2,\r\n        sum(carton_quantity)
+  AS carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
+  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n
+  \       load_id IS NOT NULL and shipped_at::date=current_date-1\r\n    GROUP BY\r\n
+  \       customer,\r\n        load_id,\r\n        marketing_variety,\r\n        shipped_at::date,\r\n
+  \       grade,\r\n        inventory_code,\r\n        std_pack,\r\n        std_size,\r\n
+  \       size_ref,\r\n        packed_tm_group,\r\n        mark,\r\n        fruit_sticker,\r\n
+  \       fruit_sticker_2"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  customer:
+    :name: customer
+    :sequence_no: 1
+    :caption: Customer
+    :namespaced_name: customer
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  load_id:
+    :name: load_id
+    :sequence_no: 2
+    :caption: Load
+    :namespaced_name: load_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 3
+    :caption: Marketing variety
+    :namespaced_name: marketing_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_date:
+    :name: shipped_date
+    :sequence_no: 4
+    :caption: Shipped date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 5
+    :caption: Grade
+    :namespaced_name: grade
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inventory_code:
+    :name: inventory_code
+    :sequence_no: 6
+    :caption: Inventory code
+    :namespaced_name: inventory_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_pack:
+    :name: std_pack
+    :sequence_no: 7
+    :caption: Std pack
+    :namespaced_name: std_pack
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_size:
+    :name: std_size
+    :sequence_no: 8
+    :caption: Std size
+    :namespaced_name: std_size
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_ref:
+    :name: size_ref
+    :sequence_no: 9
+    :caption: Size ref
+    :namespaced_name: size_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 10
+    :caption: Packed tm group
+    :namespaced_name: packed_tm_group
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mark:
+    :name: mark
+    :sequence_no: 11
+    :caption: Mark
+    :namespaced_name: mark
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker:
+    :name: fruit_sticker
+    :sequence_no: 12
+    :caption: Fruit sticker
+    :namespaced_name: fruit_sticker
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker_2:
+    :name: fruit_sticker_2
+    :sequence_no: 13
+    :caption: Fruit sticker 2
+    :namespaced_name: fruit_sticker_2
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 14
+    :caption: Carton quantity
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_size:
+    :name: pallet_size
+    :sequence_no: 15
+    :caption: Pallet size
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 16
+    :caption: Nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

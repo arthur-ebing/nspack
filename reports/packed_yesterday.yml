@@ -1,0 +1,75 @@
+---
+:caption: Packed yesterday
+:sql: " SELECT\r\n        created_at::date packed_date,\r\n        sum(carton_quantity)
+  AS packed_cartons,\r\n        sum(pallet_size) AS packed_pallets,\r\n        sum(nett_weight)
+  AS packed_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE
+  \ created_at::date = CURRENT_DATE-1\r\n    GROUP BY\r\n        created_at::date"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  packed_date:
+    :name: packed_date
+    :sequence_no: 1
+    :caption: Packed date
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_cartons:
+    :name: packed_cartons
+    :sequence_no: 2
+    :caption: Packed cartons
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_pallets:
+    :name: packed_pallets
+    :sequence_no: 3
+    :caption: Packed pallets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_weight:
+    :name: packed_weight
+    :sequence_no: 4
+    :caption: Packed weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

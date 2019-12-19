@@ -1,0 +1,205 @@
+---
+:caption: Yesterdays Dashboard
+:sql: "with shipped as (SELECT   shipped_at::date shipped_date,\r\ncount(distinct
+  load_id) as qty_loads,\r\n        sum(carton_quantity) AS carton_quantity,\r\n        sum(pallet_size)
+  AS pallet_size,\r\n        sum(nett_weight) AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n
+  \   WHERE\r\n        load_id IS NOT NULL and shipped_at::date=current_date-1\r\n
+  \   GROUP BY\r\n      shipped_at::date\r\n),\r\ntipped as (\r\n      \r\nselect
+  bin_tipped_date_time::date as bin_tipped_date\r\n \r\n,SUM(qty_bins) as total_tipped_bins\r\n,sum(nett_weight)
+  as total_tipped_weight\r\nfrom vw_bins where bin_tipped_date_time::date=current_date-1\r\ngroup
+  by bin_tipped_date_time::date\r\n      \r\n),\r\nreceived as (\r\n\r\nselect bin_received_date_time::date
+  as bin_received_date\r\n,SUM(qty_bins) as total_bins\r\n,sum(nett_weight) as total_nett_weight\r\nfrom
+  vw_bins where bin_received_date_time::date=current_date-1\r\ngroup by bin_received_date_time::date\r\n\r\n),\r\npacked
+  as (\r\n      \r\nSELECT   created_at::date packed_date,\r\n\r\n        sum(carton_quantity)
+  AS carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
+  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE
+  created_at::date=current_date-1\r\n    GROUP BY\r\n      created_at::date\r\n      \r\n)\r\n\r\n,dt
+  as (\r\nselect current_date-1 as ydate)\r\n\r\nselect \r\ndt.ydate as report_date\t\t\r\n,shipped.qty_loads
+  as shipped_loads\t\r\n,shipped.carton_quantity as shipped_cartons\t\r\n,shipped.pallet_size
+  as shipped_pallets\t\r\n,shipped.nett_weight as shipped_weight\t\t\r\n,total_bins\tas
+  received_bins\r\n,total_nett_weight\tas received_weight\t\r\n,total_tipped_bins\tas
+  tipped_bins\r\n,total_tipped_weight as tipped_weight\r\n,packed.pallet_size as packed_pallets\t\r\n,packed.nett_weight
+  as packed_weight\t\r\n\r\n\r\nfrom dt  \r\nleft join shipped on shipped.shipped_date=dt.ydate\r\nleft
+  join received on received.bin_received_date=dt.ydate\r\nleft join tipped on tipped.bin_tipped_date=dt.ydate\r\nleft
+  join packed on packed.packed_date=dt.ydate"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  report_date:
+    :name: report_date
+    :sequence_no: 1
+    :caption: Report date
+    :namespaced_name: dt.ydate
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_loads:
+    :name: shipped_loads
+    :sequence_no: 2
+    :caption: Shipped loads
+    :namespaced_name: shipped.qty_loads
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_cartons:
+    :name: shipped_cartons
+    :sequence_no: 3
+    :caption: Shipped cartons
+    :namespaced_name: shipped.carton_quantity
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_pallets:
+    :name: shipped_pallets
+    :sequence_no: 4
+    :caption: Shipped pallets
+    :namespaced_name: shipped.pallet_size
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_weight:
+    :name: shipped_weight
+    :sequence_no: 5
+    :caption: Shipped weight
+    :namespaced_name: shipped.nett_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  received_bins:
+    :name: received_bins
+    :sequence_no: 6
+    :caption: Received bins
+    :namespaced_name: total_bins
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  received_weight:
+    :name: received_weight
+    :sequence_no: 7
+    :caption: Received weight
+    :namespaced_name: total_nett_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_bins:
+    :name: tipped_bins
+    :sequence_no: 8
+    :caption: Tipped bins
+    :namespaced_name: total_tipped_bins
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_weight:
+    :name: tipped_weight
+    :sequence_no: 9
+    :caption: Tipped weight
+    :namespaced_name: total_tipped_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_pallets:
+    :name: packed_pallets
+    :sequence_no: 10
+    :caption: Packed pallets
+    :namespaced_name: packed.pallet_size
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_weight:
+    :name: packed_weight
+    :sequence_no: 11
+    :caption: Packed weight
+    :namespaced_name: packed.nett_weight
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

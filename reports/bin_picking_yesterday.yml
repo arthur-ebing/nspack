@@ -1,0 +1,206 @@
+---
+:caption: Bin Picking Yesterday
+:sql: "select bin_received_date_time,cultivar_name,farm_code,puc_code,orchard_code,cultivar_description
+  \r\n,sum(case when status='TIPPED' then qty_bins else 0 end) as qty_tipped\r\n,sum(case
+  when status='TIPPED' then nett_weight else 0 end) as weight_tipped\r\n,sum(case
+  when status='BIN_RECEIVED' then qty_bins else 0 end) as qty_received\r\n,sum(case
+  when status='BIN_RECEIVED' then nett_weight else 0 end) as weight_received\r\n,SUM(qty_bins)
+  as total_bins\r\n,sum(nett_weight) as total_nett_weight\r\nfrom vw_bins where bin_received_date_time::date=current_date-1\r\ngroup
+  by bin_received_date_time,cultivar_description,\r\ncultivar_name,farm_code,puc_code,orchard_code\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  bin_received_date_time:
+    :name: bin_received_date_time
+    :sequence_no: 1
+    :caption: Bin received date time
+    :namespaced_name: bin_received_date_time
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 2
+    :caption: Cultivar name
+    :namespaced_name: cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 3
+    :caption: Farm code
+    :namespaced_name: farm_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 4
+    :caption: Puc code
+    :namespaced_name: puc_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 5
+    :caption: Orchard code
+    :namespaced_name: orchard_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_description:
+    :name: cultivar_description
+    :sequence_no: 6
+    :caption: Cultivar description
+    :namespaced_name: cultivar_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_tipped:
+    :name: qty_tipped
+    :sequence_no: 7
+    :caption: Qty tipped
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weight_tipped:
+    :name: weight_tipped
+    :sequence_no: 8
+    :caption: Weight tipped
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_received:
+    :name: qty_received
+    :sequence_no: 9
+    :caption: Qty received
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weight_received:
+    :name: weight_received
+    :sequence_no: 10
+    :caption: Weight received
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_bins:
+    :name: total_bins
+    :sequence_no: 11
+    :caption: Total bins
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_nett_weight:
+    :name: total_nett_weight
+    :sequence_no: 12
+    :caption: Total nett weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

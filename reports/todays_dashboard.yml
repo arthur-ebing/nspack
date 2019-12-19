@@ -1,0 +1,211 @@
+---
+:caption: Todays Dashboard
+:sql: "WITH shipped AS (\r\n    SELECT\r\n        shipped_at::date shipped_date,\r\n
+  \       count(DISTINCT load_id) AS qty_loads,\r\n        sum(carton_quantity) AS
+  carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
+  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n
+  \       load_id IS NOT NULL\r\n        AND shipped_at::date = CURRENT_DATE\r\n    GROUP
+  BY\r\n        shipped_at::date\r\n),\r\ntipped AS (\r\n    SELECT\r\n        bin_tipped_date_time::date
+  AS bin_tipped_date,\r\n        SUM(qty_bins) AS total_tipped_bins,\r\n        sum(nett_weight)
+  AS total_tipped_weight\r\n    FROM\r\n        vw_bins\r\n    WHERE\r\n        bin_tipped_date_time::date
+  = CURRENT_DATE\r\n    GROUP BY\r\n        bin_tipped_date_time::date\r\n),\r\nreceived
+  AS (\r\n    SELECT\r\n        bin_received_date_time::date AS bin_received_date,\r\n
+  \       SUM(qty_bins) AS total_bins,\r\n        sum(nett_weight) AS total_nett_weight\r\n
+  \   FROM\r\n        vw_bins\r\n    WHERE\r\n        bin_received_date_time::date
+  = CURRENT_DATE\r\n    GROUP BY\r\n        bin_received_date_time::date\r\n),\r\npacked
+  AS (\r\n    SELECT\r\n        created_at::date packed_date,\r\n        sum(carton_quantity)
+  AS carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
+  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n
+  \     created_at::date = CURRENT_DATE\r\n    GROUP BY\r\n        created_at::date\r\n),\r\ndt
+  AS (\r\n    SELECT\r\n        CURRENT_DATE AS tdate\r\n)\r\nSELECT\r\n    dt.tdate
+  AS report_date,\r\n    coalesce(packed.pallet_size, 0) AS packed_pallets,\r\n    coalesce(packed.nett_weight,
+  0) AS packed_weight,\r\n    coalesce(shipped.qty_loads, 0) AS shipped_loads,\r\n
+  \   coalesce(shipped.carton_quantity, 0) AS shipped_cartons,\r\n    coalesce(shipped.pallet_size,
+  0) AS shipped_pallets,\r\n    coalesce(shipped.nett_weight, 0) AS shipped_weight,\r\n
+  \   coalesce(total_bins, 0) AS received_bins,\r\n    coalesce(total_nett_weight,
+  0) AS received_weight,\r\n    coalesce(total_tipped_bins, 0) AS tipped_bins,\r\n
+  \   coalesce(total_tipped_weight, 0) AS tipped_weight\r\nFROM\r\n    dt\r\n    LEFT
+  JOIN shipped ON shipped.shipped_date = dt.tdate\r\n    LEFT JOIN received ON received.bin_received_date
+  = dt.tdate\r\n    LEFT JOIN tipped ON tipped.bin_tipped_date = dt.tdate\r\n    LEFT
+  JOIN packed ON packed.packed_date = dt.tdate"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  report_date:
+    :name: report_date
+    :sequence_no: 1
+    :caption: Report date
+    :namespaced_name: dt.tdate
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_pallets:
+    :name: packed_pallets
+    :sequence_no: 2
+    :caption: Packed pallets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_weight:
+    :name: packed_weight
+    :sequence_no: 3
+    :caption: Packed weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_loads:
+    :name: shipped_loads
+    :sequence_no: 4
+    :caption: Shipped loads
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_cartons:
+    :name: shipped_cartons
+    :sequence_no: 5
+    :caption: Shipped cartons
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_pallets:
+    :name: shipped_pallets
+    :sequence_no: 6
+    :caption: Shipped pallets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_weight:
+    :name: shipped_weight
+    :sequence_no: 7
+    :caption: Shipped weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  received_bins:
+    :name: received_bins
+    :sequence_no: 8
+    :caption: Received bins
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  received_weight:
+    :name: received_weight
+    :sequence_no: 9
+    :caption: Received weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_bins:
+    :name: tipped_bins
+    :sequence_no: 10
+    :caption: Tipped bins
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_weight:
+    :name: tipped_weight
+    :sequence_no: 11
+    :caption: Tipped weight
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []
