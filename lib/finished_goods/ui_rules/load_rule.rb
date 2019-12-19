@@ -11,7 +11,7 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show ship].include? @mode
-      add_rules if @mode == :ship
+      add_rules
       set_allocate_fields if @mode == :allocate
       add_behaviours
 
@@ -256,11 +256,14 @@ module UiRules
     end
 
     def add_rules
-      rules[:can_unship] = @form_object.shipped && Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
+      if @mode == :ship
+        rules[:can_unship] = @form_object.shipped && Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
 
-      rules[:can_ship] = !@form_object.shipped &&
-                         Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
-                         !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
+        rules[:can_ship] = !@form_object.shipped &&
+                           Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
+                           !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
+      end
+      rules[:allocated] = @form_object.allocated
     end
   end
 end

@@ -53,6 +53,10 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
+    def last_load
+      DB[:loads].order(:updated_at).reverse.limit(1).get(:id)
+    end
+
     def get_location_id_by_barcode(location_barcode)
       DB[:locations].where(location_short_code: location_barcode).get(:id)
     end

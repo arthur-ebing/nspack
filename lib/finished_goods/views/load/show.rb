@@ -112,7 +112,6 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Load Voyage'
-                fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :shipping_line_party_role_id
@@ -126,7 +125,6 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Load Vehicles'
-                fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :vehicle_number
@@ -142,7 +140,6 @@ module FinishedGoods
               end
               form.fold_up do |fold|
                 fold.caption 'Load Container'
-                fold.open!
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :container_code

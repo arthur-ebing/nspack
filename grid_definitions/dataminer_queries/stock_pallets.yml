@@ -1,30 +1,31 @@
 ---
 :caption: Stock Pallets
-:sql: SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number,
-  location, carton_quantity, pallet_carton_quantity, pallet_size, pallet_age, stock_age,
-  cold_age, ambient_age, created_at, palletized_at, govt_first_inspection_at, shipped_at,
-  govt_reinspection_at, allocated_at, verified_at, allocated, load_id, shipped, in_stock,
-  inspected, palletized, production_run_id, farm, puc, orchard, commodity, cultivar,
-  marketing_variety, grade, std_size, actual_count, size_ref, std_pack, packed_tm_group,
-  mark, inventory_code, fruit_sticker, fruit_sticker_2, marketing_org, pallet_base,
-  stack_type, gross_weight, nett_weight, sequence_nett_weight, basic_pack, packhouse,
-  line, pick_ref, phc, verification_result, scrapped_at, scrapped, partially_palletized,
-  reinspected, verified, verification_passed, status, build_status, active, zero_load_id,
-  CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule
-  END AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT scrapped AND UPPER(COALESCE(exit_ref,
-  ''::character varying)::text) <> 'SCRAPPED'::text AND pallet_number::text IS NOT
-  NULL ORDER BY pallet_id, pallet_number DESC
+:sql: "SELECT DISTINCT ON (pallet_id, allocated_at)\r\n     id,\r\n     pallet_id,\r\n
+  \    pallet_number,\r\n     pallet_sequence_number,\r\n     location,\r\n     carton_quantity,\r\n
+  \    pallet_carton_quantity,\r\n     pallet_size,\r\n     pallet_age,\r\n     stock_age,\r\n
+  \    cold_age,\r\n     ambient_age,\r\n     created_at,\r\n     palletized_at,\r\n
+  \    govt_first_inspection_at,\r\n     shipped_at,\r\n     govt_reinspection_at,\r\n
+  \    allocated_at,\r\n     verified_at,\r\n     allocated,\r\n     load_id,\r\n
+  \    shipped,\r\n     in_stock,\r\n     inspected,\r\n     palletized,\r\n     production_run_id,\r\n
+  \    farm,\r\n     puc,\r\n     orchard,\r\n     commodity,\r\n     cultivar,\r\n
+  \    marketing_variety,\r\n     grade,\r\n     std_size,\r\n     actual_count,\r\n
+  \    size_ref,\r\n     std_pack,\r\n     packed_tm_group,\r\n     mark,\r\n     inventory_code,\r\n
+  \    fruit_sticker,\r\n     fruit_sticker_2,\r\n     marketing_org,\r\n     pallet_base,\r\n
+  \    stack_type,\r\n     gross_weight,\r\n     nett_weight,\r\n     sequence_nett_weight,\r\n
+  \    basic_pack,\r\n     packhouse,\r\n     line,\r\n     pick_ref,\r\n     phc,\r\n
+  \    verification_result,\r\n     scrapped_at,\r\n     scrapped,\r\n     partially_palletized,\r\n
+  \    reinspected,\r\n     verified,\r\n     verification_passed,\r\n     status,\r\n
+  \    build_status,\r\n     active,\r\n     zero_load_id,\r\n     CASE\r\n         WHEN
+  fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n         ELSE colour_rule\r\n
+  \        END AS colour_rule\r\n FROM vw_pallet_sequence_flat\r\n WHERE NOT scrapped\r\n
+  \  AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text\r\n
+  \  AND pallet_number::text IS NOT NULL\r\nORDER BY allocated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: In Stock Pallets
-    ready: Allocated Pallets
-    inactive: Shipped Pallets
-    warning: Scrapped Pallets
     error: Failed inspection and/or failed verifications Pallets
-    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id

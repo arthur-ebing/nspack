@@ -18,6 +18,11 @@ module FinishedGoods
                                   text: 'Back',
                                   url: back_url,
                                   style: :back_button)
+              section.add_control(control_type: :link,
+                                  text: 'Reports',
+                                  visible: rules[:allocated],
+                                  url: "/finished_goods/dispatch/loads/#{id}",
+                                  style: :button)
             end
             page.form do |form|
               form.action "/finished_goods/dispatch/loads/#{id}/allocate"

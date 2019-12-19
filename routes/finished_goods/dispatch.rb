@@ -349,6 +349,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'last', String do |mode|
+        id = FinishedGoodsApp::LoadRepo.new.last_load
+        r.redirect "/finished_goods/dispatch/loads/#{id}" if mode == 'view'
+        r.redirect "/finished_goods/dispatch/loads/#{id}/#{mode}"
+      end
 
       r.on 'voyage_type_changed' do
         if params[:changed_value].nil_or_empty?
