@@ -64,7 +64,7 @@ module ProductionApp
     def validate_pallets_selected_input(reworks_run_type, pallets_selected)
       case reworks_run_type
       when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS then
-        validate_rmt_bins(pallets_selected)
+        validate_rmt_bins(reworks_run_type, pallets_selected)
       else
         validate_pallet_numbers(reworks_run_type, pallets_selected)
       end
@@ -717,7 +717,7 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
-    def validate_rmt_bins(rmt_bins)  # rubocop:disable Metrics/AbcSize
+    def validate_rmt_bins(reworks_run_type, rmt_bins)  # rubocop:disable Metrics/AbcSize
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
@@ -731,8 +731,10 @@ module ProductionApp
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_rmt_bins.join(', ')} doesn't exist"] }, pallets_selected: rmt_bins) unless missing_rmt_bins.nil_or_empty?
 
-      tipped_bins = repo.tipped_bins?(rmt_bins)
-      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
+      if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
+        tipped_bins = repo.tipped_bins?(rmt_bins)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
+      end
 
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
     end
