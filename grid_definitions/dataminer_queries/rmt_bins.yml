@@ -359,13 +359,13 @@
     :group_max: false
   production_run_tipped_id:
     :name: production_run_tipped_id
-    :sequence_no: 21
-    :caption: Production run tipped
+    :sequence_no: 9
+    :caption: Tipped Run Id
     :namespaced_name: rmt_bins.production_run_tipped_id
     :data_type: :integer
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
