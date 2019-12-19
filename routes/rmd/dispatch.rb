@@ -277,13 +277,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
           form.add_select(:cargo_temperature_id,
                           'Cargo Temperature',
-                          # disabled_items: MasterfilesApp::CargoTemperatureRepo.new.for_select_inactive_cargo_temperatures,
                           items: MasterfilesApp::CargoTemperatureRepo.new.for_select_cargo_temperatures,
                           required: false,
                           hide_on_load: !has_container)
           form.add_select(:stack_type_id,
                           'Stack Type',
-                          # disabled_items: MasterfilesApp::LoadContainerRepo.new.for_select_inactive_container_stack_types,
                           items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types,
                           required: false,
                           hide_on_load: !has_container)

@@ -87,11 +87,11 @@ module UiRules
       fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
       fields[:container_seal_code] = { renderer: :label, with_value: container&.container_seal_code }
       fields[:internal_container_code] = { renderer: :label, with_value: container&.internal_container_code }
-      fields[:stack_type] = { renderer: :label, with_value: container&.stack_type_code }
+      fields[:stack_type] = { renderer: :label, with_value: "#{container&.stack_type_code} - #{container&.stack_type_description}" }
       fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
       fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
       fields[:max_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_gross_weight) }
-      fields[:cargo_temperature] = { renderer: :label, with_value: container&.cargo_temperature_code }
+      fields[:cargo_temperature] = { renderer: :label, with_value: "#{container&.cargo_temperature_code} - #{container&.set_point_temperature}" }
       fields[:verified_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.verified_gross_weight) }
       fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
     end

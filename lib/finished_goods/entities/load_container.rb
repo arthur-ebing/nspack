@@ -36,8 +36,10 @@ module FinishedGoodsApp
     attribute :actual_payload, Types::Decimal
     attribute :cargo_temperature_id, Types::Integer
     attribute :cargo_temperature_code, Types::String
+    attribute :set_point_temperature, Types::Decimal
     attribute :stack_type_id, Types::Integer
     attribute :stack_type_code, Types::String
+    attribute :stack_type_description, Types::String
     attribute :verified_gross_weight, Types::Decimal
     attribute :verified_gross_weight_date, Types::DateTime
     attribute? :active, Types::Bool
