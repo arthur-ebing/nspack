@@ -110,7 +110,7 @@ module ProductionApp
       MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)
     end
 
-    def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity, new_pallet_format, new_cartons_per_pallet_id)
+    def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity, new_pallet_format, new_cartons_per_pallet_id) # rubocop:disable Metrics/AbcSize
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
 
       res = nil

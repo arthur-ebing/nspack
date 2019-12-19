@@ -72,8 +72,8 @@
             <field name="maximum_temperature" size="6" format="TEMP" required="false" />
             <field name="calculation_method" size="1" required="false" />
             <field name="boe_number" size="6" required="false" />
-            <field name="combo_pallet id" size="9" required="false" />
-            <field name="temperature_device id" size="20" required="false" />
+            <field name="combo_pallet_id" size="9" required="false" />
+            <field name="temperature_device_id" size="20" required="false" />
             <field name="temp_device_type" size="2" required="false" />
             <field name="sender" size="2" required="false" />
             <field name="agent" size="2" required="false" />
