@@ -38,8 +38,8 @@ module FinishedGoodsApp
     end
 
     def unship_location
-      location_type_id = repo.where_hash(:location_types, location_type_code: 'SITE')[:id]
-      location_id = repo.where_hash(:locations, location_type_id: location_type_id)[:id]
+      location_type_id = (repo.where_hash(:location_types, location_type_code: 'SITE') || {})[:id]
+      location_id = (repo.where_hash(:locations, location_type_id: location_type_id) || {})[:id]
       return failed_response('Site location not defined, unable to unship pallet') if location_id.nil?
 
       success_response('ok', location_id)

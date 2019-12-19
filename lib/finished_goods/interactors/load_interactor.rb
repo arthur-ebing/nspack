@@ -35,7 +35,7 @@ module FinishedGoodsApp
     def validate_load_pallet(load_id, pallet_numbers)
       errors = []
       [pallet_numbers].flatten.each do |pallet_number|
-        pallet_load = repo.where_hash(:pallets, pallet_number: pallet_number)[:load_id]
+        pallet_load = (repo.where_hash(:pallets, pallet_number: pallet_number) || {})[:load_id]
         errors << pallet_number unless pallet_load == load_id || pallet_load.nil?
       end
       message = "#{errors.join(', ')} already allocated to other load"

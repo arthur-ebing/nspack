@@ -105,7 +105,7 @@ module FinishedGoodsApp
 
     def clone_govt_inspection_sheet(id) # rubocop:disable Metrics/AbcSize
       repo.transaction do
-        attrs = repo.where_hash(:govt_inspection_sheets, id: id)
+        attrs = (repo.where_hash(:govt_inspection_sheets, id: id) || {})
         attrs = attrs.slice(:inspector_id,
                             :inspection_billing_party_role_id,
                             :exporter_party_role_id,
