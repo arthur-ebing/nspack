@@ -71,7 +71,7 @@ module UiRules
       fields[:memo_pad] = { renderer: :label }
 
       # Load Vehicles
-      load_vehicle_id = @repo.where_hash(:load_vehicles, load_id: @form_object.id)[:id]
+      load_vehicle_id = (@repo.where_hash(:load_vehicles, load_id: @form_object.id) || {})[:id]
       vehicle = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(load_vehicle_id)
       fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
       fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
@@ -81,7 +81,7 @@ module UiRules
       fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
 
       # Load Container
-      load_container_id = @repo.where_hash(:load_containers, load_id: @form_object.id)[:id]
+      load_container_id = (@repo.where_hash(:load_containers, load_id: @form_object.id) || {})[:id]
       container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(load_container_id)
       fields[:container_code] = { renderer: :label, with_value: container&.container_code }
       fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
