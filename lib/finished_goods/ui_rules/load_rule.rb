@@ -255,7 +255,7 @@ module UiRules
       end
     end
 
-    def add_rules
+    def add_rules # rubocop:disable Metrics/AbcSize
       if @mode == :ship
         rules[:can_unship] = @form_object.shipped && Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
 

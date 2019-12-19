@@ -91,14 +91,26 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     where_hash(table_name, id: id.to_s.empty? ? nil : id)
   end
 
-  # Get a single value from a record
+  # Get a single value from a record matching on id
   #
   # @param table_name [Symbol] the db table name.
   # @param id [Integer] the id of the row.
-  # @param column [Symbol] the column to query.
-  # @return [any] the column value for the matching record.
+  # @param column [Symbol] the column (or array of columns) to query.
+  # @return [any] the column value for the matching record or nil.
   def get(table_name, id, column)
     DB[table_name].where(id: id).get(column)
+  end
+
+  # Get a single value from a record given any WHERE clause
+  # NB: only the first record is returned - even when the WHERE clause
+  #     would return more than one row.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param column [Symbol] the column (or array of columns) to query.
+  # @param args [Hash] the where-clause conditions.
+  # @return [any] the column value for the matching record or nil.
+  def get_with_args(table_name, column, args)
+    DB[table_name].where(args).get(column)
   end
 
   # Find the first row in a table matching some condition.
