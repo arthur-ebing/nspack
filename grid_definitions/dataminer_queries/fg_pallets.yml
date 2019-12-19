@@ -10,21 +10,17 @@
   marketing_variety, grade, std_size, actual_count, size_ref, std_pack, packed_tm_group,
   mark, inventory_code, fruit_sticker, fruit_sticker_2, marketing_org, pallet_base,
   stack_type, gross_weight, nett_weight, sequence_nett_weight, basic_pack, packhouse,
-  line, pick_ref, phc, reinspected, status, build_status, active, CASE WHEN fn_pallet_verification_failed(pallet_id)
-  THEN 'error' ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat WHERE
-  NOT scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text
-  AND pallet_number::text IS NOT NULL ORDER BY pallet_id, pallet_number DESC
+  line, pick_ref, phc, reinspected, status, build_status, active, temp_tail, CASE
+  WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END
+  AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT scrapped AND UPPER(COALESCE(exit_ref,
+  ''::character varying)::text) <> 'SCRAPPED'::text AND pallet_number::text IS NOT
+  NULL ORDER BY pallet_id, pallet_number DESC
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: In Stock Pallets
-    ready: Allocated Pallets
-    inactive: Shipped Pallets
-    warning: Scrapped Pallets
     error: Failed inspection and/or failed verifications Pallets
-    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id
@@ -1130,9 +1126,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 70
+    :caption: Temp tail
+    :namespaced_name: temp_tail
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 70
+    :sequence_no: 71
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

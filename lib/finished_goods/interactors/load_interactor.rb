@@ -18,15 +18,15 @@ module FinishedGoodsApp
       pallet_numbers = attrs.map { |x| x.gsub(/['"]/, '') }
 
       errors = pallet_numbers.reject { |x| x.match(/\A\d+\Z/) }
-      message = "#{errors.join(', ')} must be numeric"
+      message = "#{errors.join(', ')} must be numeric."
       return failed_response(message) unless errors.nil_or_empty?
 
       errors = (pallet_numbers - repo.validate_pallets(pallet_numbers))
-      message = "#{errors.join(', ')} doesn't exist"
+      message = "#{errors.join(', ')} doesn't exist."
       return failed_response(message) unless errors.nil_or_empty?
 
       errors = repo.validate_pallets(pallet_numbers, shipped: true)
-      message = "#{errors.join(', ')} already shipped"
+      message = "#{errors.join(', ')} already shipped."
       return failed_response(message) unless errors.nil_or_empty?
 
       success_response('ok', repo.find_pallet_ids_from(pallet_number: pallet_numbers))
@@ -111,6 +111,23 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def delete_load(id)
+      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_from(load_id: id)
+      repo.transaction do
+        # DELETE LOAD_VOYAGE
+        LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
+        log_status(:load_voyages, load_voyage_id, 'DELETED')
+
+        # DELETE LOAD
+        repo.delete_load(id)
+        log_status(:loads, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted load: #{id}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def send_po_edi(load_id)
       org_code = repo.org_code_for_po(load_id)
       EdiApp::Job::SendEdiOut.enqueue(AppConst::EDI_FLOW_PO, org_code, @user.user_name, load_id)
@@ -185,23 +202,6 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_load(id)
-      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_from(load_id: id)
-      repo.transaction do
-        # DELETE LOAD_VOYAGE
-        LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
-        log_status(:load_voyages, load_voyage_id, 'DELETED')
-
-        # DELETE LOAD
-        repo.delete_load(id)
-        log_status(:loads, id, 'DELETED')
-        log_transaction
-      end
-      success_response("Deleted load: #{id}")
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
     def truck_arrival_service(params) # rubocop:disable Metrics/AbcSize
       vehicle_res = validate_load_vehicle_params(params)
       return validation_failed_response(vehicle_res) unless vehicle_res.messages.empty?
@@ -256,6 +256,19 @@ module FinishedGoodsApp
       else
         failed_response(res.message)
       end
+    end
+
+    def update_pallets_temp_tail(params) # rubocop:disable Metrics/AbcSize
+      id = repo.get_with_args(:pallets, :id, pallet_number: params[:pallet_number])
+      return failed_response("Pallet: #{params[:pallet_number]} doesn't exist.") if id.nil?
+
+      repo.transaction do
+        repo.update(:pallets, id, temp_tail: params[:temp_tail])
+        log_transaction
+      end
+      success_response("Updated pallet: #{params[:pallet_number]}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def assert_permission!(task, id = nil)

@@ -19,9 +19,9 @@
   season, customer_variety, plt_packhouse,\r\n  plt_line, exit_ref, seq_exit_ref,
   gross_weight_measured_at, partially_palletized_at,\r\n  govt_inspection_passed,
   internal_inspection_passed, inspection_age, internal_inspection_at,\r\n  internal_reinspection_at,
-  \ intake_created_at, \r\n  active, extended_columns, seq_scrapped_at, CASE WHEN
-  fn_pallet_verification_failed(pallet_id)\r\n  THEN 'error' ELSE colour_rule END
-  AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT\r\n  scrapped AND UPPER(COALESCE(exit_ref,
+  \ intake_created_at, \r\n  active, temp_tail, extended_columns, seq_scrapped_at,
+  CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n  THEN 'error' ELSE colour_rule
+  END AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT\r\n  scrapped AND UPPER(COALESCE(exit_ref,
   ''::character varying)::text) <> 'SCRAPPED'::text\r\n  AND pallet_number::text IS
   NOT NULL ORDER BY pallet_id, pallet_number DESC"
 :limit: 
@@ -29,12 +29,7 @@
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: In Stock Pallets
-    ready: Allocated Pallets
-    inactive: Shipped Pallets
-    warning: Scrapped Pallets
     error: Failed inspection and/or failed verifications Pallets
-    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id
@@ -1796,9 +1791,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 111
+    :caption: Temp tail
+    :namespaced_name: temp_tail
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   extended_columns:
     :name: extended_columns
-    :sequence_no: 111
+    :sequence_no: 112
     :caption: Extended columns
     :namespaced_name: extended_columns
     :data_type: :string
@@ -1814,7 +1825,7 @@
     :group_max: false
   seq_scrapped_at:
     :name: seq_scrapped_at
-    :sequence_no: 112
+    :sequence_no: 113
     :caption: Seq scrapped at
     :namespaced_name: seq_scrapped_at
     :data_type: :datetime
@@ -1830,7 +1841,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 113
+    :sequence_no: 114
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

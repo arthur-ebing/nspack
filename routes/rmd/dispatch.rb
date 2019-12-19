@@ -7,6 +7,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'allocate' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'submit' do
@@ -115,6 +116,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # TRUCK ARRIVAL
     # --------------------------------------------------------------------------
     r.on 'truck_arrival' do
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'vehicle_type_changed' do
@@ -300,7 +303,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           attrs = params[:truck_arrival]
-          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           res = interactor.truck_arrival_service(attrs)
 
           if res.success
@@ -344,7 +346,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
           load_id = params[:load][:load_id]
           res = interactor.validate_load(load_id)
           if res.success
@@ -361,6 +362,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
@@ -452,6 +454,54 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             r.redirect('/rmd/dispatch/load_truck/load')
           end
         end
+      end
+    end
+
+    # SET TEMP TAIL
+    # --------------------------------------------------------------------------
+    r.on 'temp_tail' do
+      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        form_state = {}
+        res = retrieve_from_local_store(:res)
+        unless res.nil?
+          form_state = res.instance
+          form_state[:error_message] = res.message
+          form_state[:errors] = res.errors
+        end
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :set_temp_tail,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       notes: retrieve_from_local_store(:flash_notice),
+                                       caption: 'Set Temp Tail',
+                                       action: '/rmd/dispatch/temp_tail',
+                                       button_caption: 'Submit')
+
+        form.add_field(:pallet_number,
+                       'Pallet',
+                       scan: 'key248_all',
+                       scan_type: :pallet_number,
+                       data_type: 'number',
+                       required: true)
+        form.add_field(:temp_tail,
+                       'Temp',
+                       scan: 'key248_all',
+                       submit_form: true,
+                       data_type: 'string',
+                       required: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.update_pallets_temp_tail(params[:set_temp_tail])
+        if res.success
+          store_locally(:flash_notice, rmd_success_message(res.message))
+        else
+          store_locally(:res, res)
+        end
+        r.redirect('/rmd/dispatch/temp_tail')
       end
     end
   end
