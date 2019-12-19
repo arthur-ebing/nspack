@@ -133,9 +133,9 @@
               <field name="ship_line" size="1" required="false"/>
               <field name="doc_no" size="10" required="false" map_to="document_number"/>
               <field name="sender" size="2" required="false"/>
-              <field name="agent" size="2" required="false"/>
-              <field name="ship_sender" size="2" required="false"/>
-              <field name="ship_agent" size="2" required="false"/>
+              <field name="agent" size="2" required="false" trim="true" />
+              <field name="ship_sender" size="2" required="false" trim="true" />
+              <field name="ship_agent" size="2" required="false" trim="true" />
               <field name="orgzn" size="2" required="false" map_to="organization_code"/>
               <field name="load_depot" size="7" required="false"/>
               <field name="ctn_qty" size="5" type="number" required="false" format="ZEROES" map_to="carton_quantity"/>
@@ -243,9 +243,9 @@
                   <field name="unit_type" size="1" default="P" required="false"/>
                   <field name="position" size="6" required="false"/>
                   <field name="sender" size="2" required="false"/>
-                  <field name="agent" size="2" required="false"/>
-                  <field name="ship_sender" size="2" required="false"/>
-                  <field name="ship_agent" size="2" required="false"/>
+                  <field name="agent" size="2" required="false" trim="true" />
+                  <field name="ship_sender" size="2" required="false" trim="true" />
+                  <field name="ship_agent" size="2" required="false" trim="true" />
                   <field name="dest_type" size="2" required="false"/>
                   <field name="dest_locn" size="7" required="false"/>
                   <field name="cons_no" size="10" format="ZEROES" map_to="consignment_note_number"/>
