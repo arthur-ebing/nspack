@@ -56,7 +56,7 @@ module ProductionApp
     end
 
     def rmt_bins_exists?(rmt_bins)
-      return rmt_bin_asset_number_exists?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      # return rmt_bin_asset_number_exists?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
     end
@@ -73,7 +73,7 @@ module ProductionApp
     end
 
     def tipped_bins?(rmt_bins)
-      return rmt_bin_asset_number_tipped?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      # return rmt_bin_asset_number_tipped?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
     end
@@ -105,7 +105,7 @@ module ProductionApp
     end
 
     def selected_rmt_bins(rmt_bin_ids)
-      return selected_rmt_bin_asset_numbers?(rmt_bin_ids) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      # return selected_rmt_bin_asset_numbers?(rmt_bin_ids) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       DB[:rmt_bins].where(id: rmt_bin_ids).where(bin_tipped: false).map { |p| p[:id] }
     end

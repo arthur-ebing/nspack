@@ -2,13 +2,14 @@
 
 module MesscadaApp
   class UpdateBinWeights < BaseService
-    attr_reader :repo, :bin_number, :gross_weight, :measurement_unit
+    attr_reader :repo, :bin_number, :gross_weight, :measurement_unit, :force_find_by_id
 
-    def initialize(params)
+    def initialize(params, force_find_by_id = false)
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       @bin_number = params[:bin_number]
       @gross_weight = params[:gross_weight]
       @measurement_unit = params[:measurement_unit]
+      @force_find_by_id = force_find_by_id
     end
 
     def call
@@ -33,7 +34,9 @@ module MesscadaApp
     end
 
     def find_rmt_bin
-      return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      unless force_find_by_id
+        return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      end
 
       repo.find_rmt_bin(bin_number)
     end

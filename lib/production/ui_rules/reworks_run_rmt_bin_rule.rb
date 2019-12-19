@@ -53,7 +53,7 @@ module UiRules
     end
 
     def find_rmt_bin(bin_number)
-      return @repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      # return @repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       @repo.find_rmt_bin(bin_number.to_i)
     end

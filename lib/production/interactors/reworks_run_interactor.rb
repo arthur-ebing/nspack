@@ -490,7 +490,7 @@ module ProductionApp
 
       rw_res = nil
       repo.transaction do
-        rw_res = MesscadaApp::UpdateBinWeights.call(attrs)
+        rw_res = MesscadaApp::UpdateBinWeights.call(attrs, true)
         return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
 
         repo.update_rmt_bin(rmt_bin_id, weighed_manually: true)
@@ -621,7 +621,7 @@ module ProductionApp
     end
 
     def find_rmt_bin(bin_number)
-      return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       repo.find_rmt_bin(bin_number.to_i)
     end
@@ -721,10 +721,11 @@ module ProductionApp
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
-      unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-        invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
-        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
-      end
+      # unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      invalid_rmt_bins = rmt_bins.reject { |x| x.match(/\A\d+\Z/) }
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{invalid_rmt_bins.join(', ')} must be numeric"] }, pallets_selected: rmt_bins) unless invalid_rmt_bins.nil_or_empty?
+
+      # end
 
       existing_rmt_bins = repo.rmt_bins_exists?(rmt_bins)
       missing_rmt_bins = (rmt_bins - existing_rmt_bins.map(&:to_s))

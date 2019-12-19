@@ -23,8 +23,9 @@ module UiRules
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
+      @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
 
-      text_area_caption = @rules[:tip_bins] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] ? 'Bins' : 'Pallet Numbers'
 
       left_record = if @form_object.before_state.nil_or_empty?
                       { id: nil }
@@ -57,7 +58,7 @@ module UiRules
       fields[:pallets_affected] = if @rules[:single_pallet_selected]
                                     { renderer: :label,
                                       with_value: @form_object.pallets_affected,
-                                      caption: 'Affected pallet' }
+                                      caption: "Affected #{text_area_caption}" }
                                   else
                                     { renderer: :textarea,
                                       rows: 10,
@@ -88,9 +89,9 @@ module UiRules
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
                      else
-                       @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
+                       'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
-      text_area_caption = @rules[:tip_bins] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] ? 'Bins' : 'Pallet Numbers'
       {
         reworks_run_type_id: { renderer: :hidden },
         reworks_run_type: { renderer: :label,
