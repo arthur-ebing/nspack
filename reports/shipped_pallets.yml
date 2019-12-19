@@ -261,7 +261,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: shipped_date
-  :caption: shipped date
+  :caption: Shipped date
   :data_type: :date
   :control_type: :daterange
   :default_value: 
@@ -269,10 +269,10 @@
   :ui_priority: 1
   :list_def: 
 - :column: customer
-  :caption: customer
+  :caption: Customer
   :data_type: :string
-  :control_type: :text
+  :control_type: :list
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def: SELECT  medium_description, organizations.id FROM party_roles JOIN organizations ON party_roles.party_id = organizations.party_id WHERE party_roles.role_id = (SELECT id FROM roles WHERE "name" = 'CUSTOMER')

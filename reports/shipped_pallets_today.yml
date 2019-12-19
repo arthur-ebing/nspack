@@ -41,7 +41,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -73,7 +73,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -235,7 +235,7 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -251,7 +251,7 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false

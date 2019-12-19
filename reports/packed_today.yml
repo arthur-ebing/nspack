@@ -29,7 +29,7 @@
     :sequence_no: 2
     :caption: Packed cartons
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -45,7 +45,7 @@
     :sequence_no: 3
     :caption: Packed pallets
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
     :format: 
     :hide: false
@@ -61,9 +61,9 @@
     :sequence_no: 4
     :caption: Packed weight
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false

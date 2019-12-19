@@ -14,7 +14,7 @@
   bin_received_date_time:
     :name: bin_received_date_time
     :sequence_no: 1
-    :caption: Bin received date time
+    :caption: Bin received at
     :namespaced_name: bin_received_date_time
     :data_type: :datetime
     :width: 
@@ -30,7 +30,7 @@
   cultivar_name:
     :name: cultivar_name
     :sequence_no: 2
-    :caption: Cultivar name
+    :caption: Cultivar
     :namespaced_name: cultivar_name
     :data_type: :string
     :width: 
@@ -46,7 +46,7 @@
   farm_code:
     :name: farm_code
     :sequence_no: 3
-    :caption: Farm code
+    :caption: Farm
     :namespaced_name: farm_code
     :data_type: :string
     :width: 
@@ -62,7 +62,7 @@
   puc_code:
     :name: puc_code
     :sequence_no: 4
-    :caption: Puc code
+    :caption: PUC
     :namespaced_name: puc_code
     :data_type: :string
     :width: 
@@ -78,7 +78,7 @@
   orchard_code:
     :name: orchard_code
     :sequence_no: 5
-    :caption: Orchard code
+    :caption: Orchard
     :namespaced_name: orchard_code
     :data_type: :string
     :width: 
@@ -112,7 +112,7 @@
     :sequence_no: 7
     :caption: Qty tipped
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -128,9 +128,9 @@
     :sequence_no: 8
     :caption: Weight tipped
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -144,7 +144,7 @@
     :sequence_no: 9
     :caption: Qty received
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -160,9 +160,9 @@
     :sequence_no: 10
     :caption: Weight received
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -176,7 +176,7 @@
     :sequence_no: 11
     :caption: Total bins
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -192,9 +192,9 @@
     :sequence_no: 12
     :caption: Total nett weight
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false

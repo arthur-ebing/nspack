@@ -206,7 +206,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: bin_received_date_time
-  :caption: receive date
+  :caption: Date Received
   :data_type: :date
   :control_type: :daterange
   :default_value: 
