@@ -170,7 +170,7 @@ module DataminerApp
       NewReportSchema.call(params)
     end
 
-    def create_report(params) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+    def create_report(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_report_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -184,16 +184,12 @@ module DataminerApp
       repo = ReportRepo.new
 
       page.rpt = Crossbeams::Dataminer::Report.new(page.caption)
-      begin
-        page.rpt.sql = page.sql
-        colour_key = calculate_colour_key(page.rpt)
-        if colour_key.nil?
-          page.rpt.external_settings.delete(:colour_key)
-        else
-          page.rpt.external_settings[:colour_key] = colour_key
-        end
-      rescue StandardError => e
-        err = e.message
+      page.rpt.sql = page.sql
+      colour_key = calculate_colour_key(page.rpt)
+      if colour_key.nil?
+        page.rpt.external_settings.delete(:colour_key)
+      else
+        page.rpt.external_settings[:colour_key] = colour_key
       end
       # Check for existing file name...
       err = 'A file with this name already exists' if File.exist?(File.join(repo.admin_report_path(page.database), page.filename))

@@ -1,0 +1,165 @@
+---
+:caption: Pack by Date Range
+:sql: "SELECT\r\n  created_at::date AS pack_date,\r\n  cultivar,\r\n  marketing_variety,\r\n
+  \ std_pack,\r\n  size_ref,\r\n  std_size,\r\n  grade,\r\n  SUM(nett_weight) AS nett_weight,\r\n
+  \ SUM(pallet_size)::numeric(12,2) AS pallet_qty\r\nFROM\r\n  vw_pallet_sequence_flat\r\nGROUP
+  BY\r\n  created_at::date,\r\n  cultivar,\r\n  marketing_variety,\r\n  std_pack,\r\n
+  \ size_ref,\r\n  std_size,\r\n  grade\r\nORDER BY\r\n  created_at::date,\r\n  cultivar,\r\n
+  \ marketing_variety,\r\n  std_pack,\r\n  size_ref,\r\n  std_size,\r\n  grade"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  pack_date:
+    :name: pack_date
+    :sequence_no: 1
+    :caption: Pack date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar:
+    :name: cultivar
+    :sequence_no: 2
+    :caption: Cultivar
+    :namespaced_name: cultivar
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 3
+    :caption: Marketing variety
+    :namespaced_name: marketing_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_pack:
+    :name: std_pack
+    :sequence_no: 4
+    :caption: Std pack
+    :namespaced_name: std_pack
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_ref:
+    :name: size_ref
+    :sequence_no: 5
+    :caption: Size ref
+    :namespaced_name: size_ref
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  std_size:
+    :name: std_size
+    :sequence_no: 6
+    :caption: Std size
+    :namespaced_name: std_size
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  grade:
+    :name: grade
+    :sequence_no: 7
+    :caption: Grade
+    :namespaced_name: grade
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 8
+    :caption: Nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_qty:
+    :name: pallet_qty
+    :sequence_no: 9
+    :caption: Pallet qty
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: vw_pallet_sequence_flat.created_at
+  :caption: Pack date
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
