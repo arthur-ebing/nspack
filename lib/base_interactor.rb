@@ -46,6 +46,15 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
     repo.log_status(table_name, id, status, user_name: @user.user_name, comment: comment)
   end
 
+  # Add context to a message for emailing.
+  # (adds the route and ip address)
+  #
+  # @param message [string] the message to appear in the body of the message
+  # @return [string] the message decorated with path and ip data.
+  def decorate_mail_message(message)
+    "#{message}\n\nRoute: #{@context.route_url}\n\nIP: #{@context.request_ip}"
+  end
+
   # Add a created_by key to a changeset and set its value to the current user.
   #
   # @param changeset [Hash, DryStruct] the changeset.

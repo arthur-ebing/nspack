@@ -20,10 +20,12 @@ module MesscadaApp
 
       MesscadaApp::UpdateBinWeights.call(res)
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('update_bin_weights'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('update_bin_weights'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -43,8 +45,10 @@ module MesscadaApp
         res
       end
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('tip_rmt_bin'))
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('tip_rmt_bin'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
@@ -64,10 +68,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_labeling'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_labeling'))
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -89,10 +95,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification'))
       puts e
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -115,10 +123,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -142,10 +152,12 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing_and_labeling'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification_and_weighing_and_labeling'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -176,6 +188,7 @@ module MesscadaApp
       verification_completed = pallet_verified?(pallet_id)
       success_response('Pallet Sequence updated successfully', verification_completed: verification_completed)
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('verify_pallet_sequence'))
       failed_response(e.message)
     end
 
@@ -206,10 +219,10 @@ module MesscadaApp
       end
       fpw_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: 'fg_pallet_weighing')
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('fg_pallet_weighing'))
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: 'fg_pallet_weighing')
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('fg_pallet_weighing'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)

@@ -23,8 +23,8 @@ class Nspack < Roda
                           <msg></msg>
                           <lcd1>#{res.message}</lcd1>
                           <lcd2></lcd2>
-                          <lcd3></lcd3>
-                          <lcd4></lcd4>
+                          <lcd3>Pallet: #{res.instance[:pallet_number]}</lcd3>
+                          <lcd4>Weight: #{res.instance[:gross_weight]}</lcd4>
                           <lcd5></lcd5>
                           <lcd6></lcd6>
                         </bin_tipping>
@@ -36,8 +36,8 @@ class Nspack < Roda
                           <red>true</red>
                           <green>false</green>
                           <orange>false</orange>
-                          <msg></msg>
-                          <lcd1>#{unwrap_failed_response(res)}</lcd1>
+                          <msg>#{unwrap_failed_response(res)}</msg>
+                          <lcd1></lcd1>
                           <lcd2></lcd2>
                           <lcd3></lcd3>
                           <lcd4></lcd4>

@@ -16,7 +16,10 @@ module MesscadaApp
       res = fg_pallet_weighing
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      success_response('FgPalletWeighing was successful', pallet_id: res.instance[:pallet_id])
+      success_response('Pallet was successfully weighed.',
+                       pallet_id: res.instance[:pallet_id],
+                       pallet_number: pallet_number,
+                       gross_weight: gross_weight.to_s('F'))
     end
 
     private
