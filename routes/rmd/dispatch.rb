@@ -380,7 +380,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
           form.add_label(:vehicle_number, 'Vehicle Number', form_state[:vehicle_number])
           form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
-          form.add_label(:allocation_count, 'Allocation Count', form_state[:allocation_count]) unless form_state[:allocation_count].zero?
+          form.add_label(:allocation_count, 'Allocation Count', form_state[:allocation_count]) unless form_state[:allocation_count]&.zero?
 
           form.add_field(:pallet_number,
                          'Pallet',
