@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class ViewerInteractor < BaseInteractor
+  class ViewerInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def edi_upload(params)
       # res = validate_edi_upload_params(params)
       # p res
@@ -28,9 +28,35 @@ module EdiApp
     end
 
     def recent_sent_files
+      recent_edi_files(true)
+    end
+
+    def recent_received_files
+      recent_edi_files(false)
+    end
+
+    def search_sent_files(search_term)
+      search_edi_files(true, search_term)
+    end
+
+    def search_received_files(search_term)
+      search_edi_files(false, search_term)
+    end
+
+    def search_sent_files_for_content(search_term)
+      search_edi_files_for_content(true, search_term)
+    end
+
+    def search_received_files_for_content(search_term)
+      search_edi_files_for_content(false, search_term)
+    end
+
+    private
+
+    def recent_edi_files(for_send)
       edi_files = []
       row_count = 0
-      edi_paths.each do |path|
+      edi_paths(for_send: for_send).each do |path|
         Pathname.glob(path + '*').sort_by(&:mtime).reverse.take(20).each do |file|
           edi_files << file_row_for_grid(file) { row_count += 1 }
         end
@@ -42,10 +68,10 @@ module EdiApp
       }.to_json
     end
 
-    def search_sent_files(search_term)
+    def search_edi_files(for_send, search_term)
       edi_files = []
       row_count = 0
-      edi_paths.each do |path|
+      edi_paths(for_send: for_send).each do |path|
         path.find do |file|
           next unless file.fnmatch("*#{search_term}*")
           next unless file.file?
@@ -60,10 +86,10 @@ module EdiApp
       }.to_json
     end
 
-    def search_sent_files_for_content(search_term)
+    def search_edi_files_for_content(for_send, search_term)
       edi_files = []
       row_count = 0
-      cmd = "grep -hrn #{search_term} #{edi_paths.join(' ')} -l"
+      cmd = "grep -hrn #{search_term} #{edi_paths(for_send: for_send).join(' ')} -l"
       files = `#{cmd}`.split("\n")
       files.each do |str_file|
         file = Pathname.new(str_file)
@@ -76,8 +102,6 @@ module EdiApp
       }.to_json
     end
 
-    private
-
     def edi_config
       raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_flow_config.yml"' unless File.exist?('config/edi_flow_config.yml')
 
@@ -86,6 +110,8 @@ module EdiApp
     end
 
     def edi_path_list(config, root, key, suffix)
+      raise Crossbeams::FrameworkError, "There is no EDI config for \"#{key}\". Please contact support." unless config[key]
+
       config[key].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + suffix }
     end
 

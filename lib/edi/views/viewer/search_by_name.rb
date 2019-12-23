@@ -6,7 +6,7 @@ module Edi
       class SearchByName
         def self.call(caption, notice, url)
           rules = {
-            fields: { search: {} },
+            fields: { search: { required: true } },
             name: ''
           }
           layout = Crossbeams::Layout::Page.build(rules) do |page|

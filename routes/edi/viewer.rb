@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'viewer', 'edi' do |r|
     interactor = EdiApp::ViewerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -82,6 +82,64 @@ class Nspack < Roda
 
         r.on 'grid' do
           interactor.search_sent_files_for_content(params[:search])
+        rescue StandardError => e
+          p e
+          puts e.backtrace
+          show_json_exception(e)
+        end
+      end
+    end
+
+    # RECEIVED
+    # --------------------------------------------------------------------------
+    r.on 'received' do
+      r.on 'recently' do
+        r.is do
+          show_page { Edi::Viewer::File::ListFiles.call('Recently received EDI files', '/edi/viewer/received/recently/grid') }
+        end
+
+        r.on 'grid' do
+          interactor.recent_received_files
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+      end
+      r.on 'search_by_name' do
+        r.is do
+          show_page do
+            Edi::Viewer::File::SearchByName.call('Search received files by name',
+                                                 'Search for files where the file names contain the search term below',
+                                                 '/edi/viewer/received/search_by_name/list')
+          end
+        end
+
+        r.on 'list' do
+          show_page { Edi::Viewer::File::ListFiles.call('Search by name', "/edi/viewer/received/search_by_name/grid?search=#{URI.encode_www_form_component(params[:search])}") }
+        end
+
+        r.on 'grid' do
+          interactor.search_received_files(params[:search])
+        rescue StandardError => e
+          p e
+          puts e.backtrace
+          show_json_exception(e)
+        end
+      end
+      r.on 'search_by_content' do
+        r.is do
+          show_page do
+            Edi::Viewer::File::SearchByName.call('Search received files by content',
+                                                 'Search for files that contain the search term below',
+                                                 '/edi/viewer/received/search_by_content/list')
+          end
+        end
+
+        r.on 'list' do
+          show_page { Edi::Viewer::File::ListFiles.call('Search by content', "/edi/viewer/received/search_by_content/grid?search=#{URI.encode_www_form_component(params[:search])}") }
+        end
+
+        r.on 'grid' do
+          interactor.search_received_files_for_content(params[:search])
         rescue StandardError => e
           p e
           puts e.backtrace
