@@ -21,9 +21,7 @@ module FinishedGoods
             end
 
             page.form do |form|
-              # form.caption 'Edit Voyage'
               form.action "/finished_goods/dispatch/voyages/#{id}"
-              # form.remote!
               form.method :update
               form.row do |row|
                 row.column do |col|

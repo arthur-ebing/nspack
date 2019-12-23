@@ -42,6 +42,18 @@
   :url: "/finished_goods/dispatch/loads/new"
   :text: New Load
   :style: :button
+- :control_type: :link
+  :url: "/finished_goods/dispatch/loads/last/view"
+  :text: View Last Load
+  :style: :button
+- :control_type: :link
+  :url: "/finished_goods/dispatch/loads/last/edit"
+  :text: Edit Last Load
+  :style: :button
+- :control_type: :link
+  :url: "/finished_goods/dispatch/loads/last/allocate"
+  :text: Allocate Last Load
+  :style: :button
 :conditions:
   :standard:
     - :col: voyages.id

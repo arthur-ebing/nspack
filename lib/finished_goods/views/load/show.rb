@@ -62,7 +62,6 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :exporter_party_role_id
                     col.add_field :billing_client_party_role_id
-                    col.add_field :status
                   end
                 end
               end
@@ -71,12 +70,14 @@ module FinishedGoods
                 fold.open!
                 fold.row do |row|
                   row.column do |col|
+                    col.add_field :id
                     col.add_field :order_number
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
                     col.add_field :depot_id
                   end
                   row.column do |col|
+                    col.add_field :status
                     col.add_field :exporter_certificate_code
                     col.add_field :edi_file_name
                     col.add_field :shipped_at

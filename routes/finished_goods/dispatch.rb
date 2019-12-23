@@ -302,7 +302,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             flash[:notice] = res.message
             r.redirect "/finished_goods/dispatch/loads/#{id}/allocate"
           else
-            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::Allocate.call(id, form_values: params[:load], form_errors: { pallet_list: res.errors }) }
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::Allocate.call(id, form_values: params[:load], form_errors: res.errors) }
           end
         end
       end
@@ -330,7 +330,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
+            url = "/finished_goods/dispatch/loads/#{id}"
+            re_show_form(r, res, url: url) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
           end
         end
 
@@ -350,9 +351,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'last', String do |mode|
-        id = FinishedGoodsApp::LoadRepo.new.last_load
-        r.redirect "/finished_goods/dispatch/loads/#{id}" if mode == 'view'
-        r.redirect "/finished_goods/dispatch/loads/#{id}/#{mode}"
+        if mode == 'view'
+          id = FinishedGoodsApp::LoadRepo.new.last_load
+          r.redirect "/finished_goods/dispatch/loads/#{id}" unless id.nil?
+        else
+          id = FinishedGoodsApp::LoadRepo.new.last_load(exclude_shipped: true)
+          r.redirect "/finished_goods/dispatch/loads/#{id}/#{mode}" unless id.nil?
+        end
       end
 
       r.on 'voyage_type_changed' do
@@ -413,6 +418,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Unship.call(back_url: request.referer) }
         else
           show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(attrs[:id], back_url: request.referer) }
+        end
+      end
+
+      r.on 'search_load_by_pallet' do # SEARCH
+        r.get do
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Search.call(back_url: request.referer) }
+        end
+
+        r.post do # FIND
+          res = interactor.find_load_with(params[:load][:pallet_number])
+          if res.success
+            r.redirect "/finished_goods/dispatch/loads/#{res.instance}"
+          else
+            re_show_form(r, res, url: '/finished_goods/dispatch/loads/search_load_by_pallet') do
+              FinishedGoods::Dispatch::Load::Search.call(back_url: request.referer, form_values: params[:load], form_errors: res.errors)
+            end
+          end
         end
       end
 

@@ -53,8 +53,10 @@ module FinishedGoodsApp
                             wrapper: LoadFlat)
     end
 
-    def last_load
-      DB[:loads].order(:updated_at).reverse.limit(1).get(:id)
+    def last_load(exclude_shipped: false)
+      ds = DB[:loads].order(:updated_at)
+      ds = ds.exclude(shipped: true) if exclude_shipped
+      ds.reverse.limit(1).get(:id)
     end
 
     def get_location_id_by_barcode(location_barcode)
@@ -75,7 +77,7 @@ module FinishedGoodsApp
       ds.select_map(:id).flatten
     end
 
-    def validate_pallets(pallet_numbers, allocated: nil, shipped: nil, has_nett_weight: false, has_gross_weight: false)
+    def where_pallets(pallet_numbers, allocated: nil, shipped: nil, has_nett_weight: false, has_gross_weight: false)
       ds = DB[:pallets].where(pallet_number: pallet_numbers)
       ds = ds.where(allocated: allocated) unless allocated.nil?
       ds = ds.where(shipped: shipped) unless shipped.nil?

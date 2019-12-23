@@ -10,9 +10,8 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show ship].include? @mode
+      set_show_fields if %i[show ship allocate].include? @mode
       add_rules
-      set_allocate_fields if @mode == :allocate
       add_behaviours
 
       form_name 'load'
@@ -33,6 +32,9 @@ module UiRules
       fields[:status] = { renderer: :label }
 
       # Load Details
+      voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code
+      fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
       depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
       fields[:order_number] = { renderer: :label }
       fields[:customer_order_number] = { renderer: :label }
@@ -96,18 +98,6 @@ module UiRules
       fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
     end
 
-    def set_allocate_fields # rubocop:disable Metrics/AbcSize
-      depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
-      fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
-      voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code
-      pol_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.port_code
-      pod_voyage_port_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pod_voyage_port_id)&.port_code
-      fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
-      fields[:pol_port_id] = { renderer: :label, with_value: pol_voyage_port_label, caption: 'POL Voyage Port' }
-      fields[:pod_port_id] = { renderer: :label, with_value: pod_voyage_port_label, caption: 'POD Voyage Port' }
-      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
-    end
-
     def common_fields # rubocop:disable Metrics/AbcSize
       {
         # Parties
@@ -144,6 +134,8 @@ module UiRules
         status: { renderer: :label },
 
         # Load Details
+        id: { renderer: :label,
+              caption: 'Load Id' },
         order_number: {},
         customer_order_number: {},
         customer_reference: {},
@@ -172,7 +164,8 @@ module UiRules
                      prompt: true,
                      required: true },
         voyage_number: { required: true },
-        year: { renderer: :input, subtype: :integer,
+        year: { renderer: :input,
+                subtype: :integer,
                 required: true },
         final_destination_id: { renderer: :select,
                                 options: MasterfilesApp::DestinationRepo.new.for_select_destination_cities,
@@ -213,7 +206,13 @@ module UiRules
         # Allocate Pallets
         pallet_list: { renderer: :textarea, rows: 12,
                        placeholder: 'Paste pallet numbers here',
-                       caption: 'Allocate' }
+                       caption: 'Allocate',
+                       required: true },
+        # Search by Pallet
+        pallet_number: { renderer: :input,
+                         subtype: :integer,
+                         required: true },
+        spacer: { hide_on_load: true }
       }
     end
 
