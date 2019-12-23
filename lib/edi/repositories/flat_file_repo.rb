@@ -48,7 +48,7 @@ module EdiApp
     end
 
     def table_of_contents
-      rec_seq = @out.map { |m| m[:record_type] || m[:header] }
+      rec_seq = @out.map { |m| m[m.keys.first] }
       @toc = []
       rec_seq.each_with_index do |a, i|
         @toc << a if a != rec_seq[i - 1]
@@ -62,29 +62,16 @@ module EdiApp
       curr = nil
       key = nil
       @out.each do |rec|
-        if curr != (rec[:record_type] || rec[:header])
-          curr = (rec[:record_type] || rec[:header])
+        if curr != rec[rec.keys.first]
+          curr = rec[rec.keys.first]
           cnt += 1
           key = "#{toc[cnt]}-#{cnt}"
-          coldef = coldef_for(curr) # Get from definition doesnt work for OL-2... LF/LT == OL...
+          coldef = coldef_for(curr)
           grids << { key => { cols: coldef, rows: [] } }
         end
         grids.last[key][:rows] << rec
       end
       grids
-      # start at toc[0], with cnt = 0
-      # for each out
-      # if header/rectype <> toc[cnt], cnt += 1 and grids[toc[cnt]-cnt] = []
-      # add col def for toc[cnt] as well
-      # append row to array
-
-      # return:
-      # grids = { BH: { cols: [], rows: [] },
-      #         _ PS: { cols: [], rows: [] },
-      #         _ BT: { cols: [], rows: [] }
-      #         }
-      # (what to do when row has sub-rows and then the whole set repeats a few times..
-      # Page to render as many grids as keys in the hash...
     rescue StandardError => e
       p grids
       raise e
@@ -92,7 +79,9 @@ module EdiApp
 
     private
 
-    def coldef_for(key)
+    def coldef_for(rectype)
+      # Currently hard-codes - this should be config somewhere...
+      key = rectype == 'OL' ? 'LT' : rectype
       record_definitions[key].map { |_, v| { headerName: v[:name], field: v[:name] } }
     end
 
@@ -139,7 +128,7 @@ module EdiApp
       rec = {}
       rules.each do |field_name, rule|
         val = line[rule.offset, rule.length]&.strip
-        rec[field_name] = val.nil_or_empty? ? nil : val # ensure_ascii(val)
+        rec[field_name] = val.nil_or_empty? ? nil : val
       end
       rec
     end
