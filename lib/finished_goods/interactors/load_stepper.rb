@@ -79,7 +79,9 @@ module FinishedGoodsApp
     end
 
     def progress
-      scanned = current_step[:scanned].empty? ? '' : "<br>Scanned Pallets<br>#{current_step[:scanned].join('<br>')}"
+      return '' if current_step.nil?
+
+      scanned = current_step[:scanned].nil_or_empty? ? '' : "<br>Scanned Pallets<br>#{current_step[:scanned].join('<br>')}"
       <<~HTML
         Pallets to scan: #{progress_count}<br>#{current_step[:allocated].join('<br>')}<br>
         #{scanned}
