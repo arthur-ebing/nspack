@@ -1,4 +1,4 @@
-module UtilityFunctions
+module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   module_function
 
   TIME_DAY = 60 * 60 * 24
@@ -145,5 +145,22 @@ module UtilityFunctions
     iso_week1, iso_week2 = for_date.strftime('%V').split(//).reverse
 
     "#{iso_week1}#{for_date.strftime('%u')}#{packhouse_no}#{iso_week2}"
+  end
+
+  # Humanize bytes as Kb/Mb etc.
+  # From: https://stackoverflow.com/a/47486815/168006
+  #
+  # @param size [integer] the size in bytes
+  # @return [string] the human-readable version of the size
+  def filesize(size) # rubocop:disable Metrics/AbcSize
+    units = %w[B KiB MiB GiB TiB Pib EiB]
+
+    return '0.0 B' if size.zero?
+
+    exp = (Math.log(size) / Math.log(1024)).to_i
+    exp += 1 if size.to_f / 1024**exp >= 1024 - 0.05
+    exp = 6 if exp > 6
+
+    format('%<size>.1f %<unit>s', size: size.to_f / 1024**exp, unit: units[exp])
   end
 end

@@ -1,0 +1,134 @@
+# frozen_string_literal: true
+
+module EdiApp
+  class ViewerInteractor < BaseInteractor
+    def edi_upload(params)
+      # res = validate_edi_upload_params(params)
+      # p res
+      # return validation_failed_response(res) unless res.messages.empty?
+      # unless params[:convert] && params[:convert][:file] &&
+      #        (tempfile = params[:convert][:file][:tempfile]) &&
+      #        (filename = params[:convert][:file][:filename])
+
+      # repo = EdiApp::FlatFileRepo.new(params[:flow_type])
+      # repo.records_from_file(params[:file_name])
+      # grd = repo.grid_cols_and_rows
+      # success_response('ok', grd)
+      success_response('ok', flow_type: params[:flow_type], fn: params[:file_name][:tempfile], upload_name: params[:file_name][:filename])
+    end
+
+    def build_grids_for(flow_type, file_name, upload_name: nil)
+      repo = EdiApp::FlatFileRepo.new(flow_type)
+      repo.records_from_file(file_name)
+      OpenStruct.new(
+        grd: repo.grid_cols_and_rows,
+        flow_type: flow_type,
+        file_name: upload_name || file_name
+      )
+    end
+
+    def recent_sent_files
+      edi_files = []
+      row_count = 0
+      edi_paths.each do |path|
+        Pathname.glob(path + '*').sort_by(&:mtime).reverse.take(20).each do |file|
+          edi_files << file_row_for_grid(file) { row_count += 1 }
+        end
+      end
+
+      {
+        columnDefs: grid_columns_for_edi_files,
+        rowDefs: edi_files
+      }.to_json
+    end
+
+    def search_sent_files(search_term)
+      edi_files = []
+      row_count = 0
+      edi_paths.each do |path|
+        path.find do |file|
+          next unless file.fnmatch("*#{search_term}*")
+          next unless file.file?
+
+          edi_files << file_row_for_grid(file) { row_count += 1 }
+        end
+      end
+
+      {
+        columnDefs: grid_columns_for_edi_files,
+        rowDefs: edi_files
+      }.to_json
+    end
+
+    def search_sent_files_for_content(search_term)
+      edi_files = []
+      row_count = 0
+      cmd = "grep -hrn #{search_term} #{edi_paths.join(' ')} -l"
+      files = `#{cmd}`.split("\n")
+      files.each do |str_file|
+        file = Pathname.new(str_file)
+        edi_files << file_row_for_grid(file) { row_count += 1 }
+      end
+
+      {
+        columnDefs: grid_columns_for_edi_files,
+        rowDefs: edi_files
+      }.to_json
+    end
+
+    private
+
+    def edi_config
+      raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_flow_config.yml"' unless File.exist?('config/edi_flow_config.yml')
+
+      config = YAML.load_file('config/edi_flow_config.yml')
+      [config, Pathname.new(config[:root].sub('$HOME', ENV['HOME']))]
+    end
+
+    def edi_path_list(config, root, key, suffix)
+      config[key].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + suffix }
+    end
+
+    def edi_paths(for_send: true)
+      config, root = edi_config
+      if for_send
+        edi_path_list(config, root, :out, 'transmitted')
+        # config[:out].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + 'transmitted' }
+      else
+        edi_path_list(config, root, :in, 'receive')
+        # config[:in].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + 'receive' }
+      end
+    end
+
+    def file_row_for_grid(file)
+      {
+        id: yield,
+        flow_type: file.basename.to_s[0, 2],
+        file_name: file.basename.to_s,
+        modified_date: file.mtime,
+        directory: file.dirname.to_s,
+        size: UtilityFunctions.filesize(file.size),
+        file_path: URI.encode_www_form_component(file.to_s)
+      }
+    end
+
+    def grid_columns_for_edi_files
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          act.link 'view', '/edi/viewer/display_edi_file?flow_type=$col1$&file_path=$col2$', col1: 'flow_type', col2: 'file_path', icon: 'document-add'
+        end
+        mk.col 'id', 'ID', hide: true
+        mk.col 'flow_type', 'Type', width: 80
+        mk.col 'file_name', 'File name'
+        mk.col 'modified_date', 'Modified'
+        mk.col 'directory', 'Directory', width: 600
+        mk.col 'size', 'Size'
+        mk.col 'file_path', 'File path', hide: true
+      end
+    end
+
+    def validate_edi_upload_params(params)
+      EdiFileUploadSchema.call(params)
+    end
+  end
+end

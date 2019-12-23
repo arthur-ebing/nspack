@@ -1,0 +1,37 @@
+<h3><%= @page.flow_type %></h3>
+<p><%= @page.file_name %></p>
+<% page_config = Crossbeams::Layout::PageConfig.new %>
+
+<form>
+  <%= Crossbeams::Layout::ExpandCollapseFolds.new(page_config, 1, button: true).render %>
+  <% @page.grd.each do |grid|
+    key = grid.keys.first
+    caption = key.split('-').first
+    g_height = if grid[key][:rows].length < 3
+                 6
+               else
+                 20
+               end
+             %>
+        <% grd_str = Crossbeams::Layout::Grid.new(page_config, key, nil, caption: caption, bookmark_row_on_action: false, height: g_height).render
+           fold = Crossbeams::Layout::FoldUp.new(page_config, 1)
+           fold.caption(caption)
+           fold.add_text(grd_str) %>
+     <%= fold.render %>
+  <% end %>
+
+</form>
+
+<% content_for :late_javascript do %>
+  <script>
+    (function() {
+      document.addEventListener('DOMContentLoaded', () => {
+        <% @page.grd.each do |grid|
+         key = grid.keys.first %>
+        crossbeamsGridStaticLoader.loadGrid('<%= key %>', <%= grid[key][:cols].to_json %>, <%= grid[key][:rows].to_json %>);
+        <% end %>
+      });
+
+    }).call(this);
+  </script>
+<% end %>

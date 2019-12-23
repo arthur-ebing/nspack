@@ -19,6 +19,7 @@ module Production
             page.add_help_link path: %i[production allocate_setups]
             page.add_text 'Allocate setups', wrapper: :h2
             page.add_text rules[:compact_header]
+            page.add_notice 'This is a view-only list of allocations' if rules[:locked_allocations]
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
