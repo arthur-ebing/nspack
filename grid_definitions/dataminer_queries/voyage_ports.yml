@@ -1,21 +1,85 @@
 ---
 :caption: Voyage Ports
-:sql: "SELECT\r\n    voyage_ports.id,\r\n    voyage_ports.voyage_id,\r\n    voyage_ports.port_id,\r\n
-  \   voyage_ports.trans_shipment_vessel_id,\r\n    voyage_ports.ata,\r\n    voyage_ports.atd,\r\n
-  \   voyage_ports.eta,\r\n    voyage_ports.etd,\r\n    voyage_ports.active,\r\n    voyage_ports.created_at,\r\n
-  \   voyage_ports.updated_at,\r\n    ports.port_code,\r\n    port_types.port_type_code,\r\n
-  \   voyages.completed,\r\n    vessels.vessel_code AS trans_shipment_vessel\r\nFROM
-  voyage_ports\r\nJOIN ports ON ports.id = voyage_ports.port_id\r\nJOIN port_types
-  ON port_types.id = ports.port_type_id\r\nJOIN voyages ON voyages.id = voyage_ports.voyage_id\r\nLEFT
-  JOIN vessels ON vessels.id = voyage_ports.trans_shipment_vessel_id"
+:sql: "SELECT\r\n    ports.port_code,\r\n    port_types.port_type_code,\r\n    voyages.completed,\r\n
+  \   vessels.vessel_code AS trans_shipment_vessel,\r\n    voyage_ports.id,\r\n    voyage_ports.voyage_id,\r\n
+  \   voyage_ports.port_id,\r\n    voyage_ports.trans_shipment_vessel_id,\r\n    voyage_ports.ata,\r\n
+  \   voyage_ports.atd,\r\n    voyage_ports.eta,\r\n    voyage_ports.etd,\r\n    voyage_ports.active,\r\n
+  \   voyage_ports.created_at,\r\n    voyage_ports.updated_at\r\n\r\nFROM voyage_ports\r\nJOIN
+  ports ON ports.id = voyage_ports.port_id\r\nJOIN port_types ON port_types.id = voyage_ports.port_type_id\r\nJOIN
+  voyages ON voyages.id = voyage_ports.voyage_id\r\nLEFT JOIN vessels ON vessels.id
+  = voyage_ports.trans_shipment_vessel_id"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
 :columns:
+  port_code:
+    :name: port_code
+    :sequence_no: 1
+    :caption: Port code
+    :namespaced_name: ports.port_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  port_type_code:
+    :name: port_type_code
+    :sequence_no: 2
+    :caption: Port type code
+    :namespaced_name: port_types.port_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 3
+    :caption: Completed
+    :namespaced_name: voyages.completed
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  trans_shipment_vessel:
+    :name: trans_shipment_vessel
+    :sequence_no: 4
+    :caption: Trans shipment vessel
+    :namespaced_name: vessels.vessel_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   id:
     :name: id
-    :sequence_no: 1
+    :sequence_no: 5
     :caption: Id
     :namespaced_name: voyage_ports.id
     :data_type: :integer
@@ -31,7 +95,7 @@
     :group_max: false
   voyage_id:
     :name: voyage_id
-    :sequence_no: 2
+    :sequence_no: 6
     :caption: Voyage
     :namespaced_name: voyage_ports.voyage_id
     :data_type: :integer
@@ -47,7 +111,7 @@
     :group_max: false
   port_id:
     :name: port_id
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Port
     :namespaced_name: voyage_ports.port_id
     :data_type: :integer
@@ -63,7 +127,7 @@
     :group_max: false
   trans_shipment_vessel_id:
     :name: trans_shipment_vessel_id
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Trans shipment vessel
     :namespaced_name: voyage_ports.trans_shipment_vessel_id
     :data_type: :integer
@@ -95,7 +159,7 @@
     :group_max: false
   atd:
     :name: atd
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: ATD
     :namespaced_name: voyage_ports.atd
     :data_type: :date
@@ -111,7 +175,7 @@
     :group_max: false
   eta:
     :name: eta
-    :sequence_no: 8
+    :sequence_no: 11
     :caption: ETA
     :namespaced_name: voyage_ports.eta
     :data_type: :date
@@ -127,7 +191,7 @@
     :group_max: false
   etd:
     :name: etd
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: ETD
     :namespaced_name: voyage_ports.etd
     :data_type: :date
@@ -143,7 +207,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Active
     :namespaced_name: voyage_ports.active
     :data_type: :boolean
@@ -159,7 +223,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Created at
     :namespaced_name: voyage_ports.created_at
     :data_type: :datetime
@@ -175,77 +239,13 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Updated at
     :namespaced_name: voyage_ports.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  port_code:
-    :name: port_code
-    :sequence_no: 4
-    :caption: Port code
-    :namespaced_name: ports.port_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  port_type_code:
-    :name: port_type_code
-    :sequence_no: 3
-    :caption: Port type code
-    :namespaced_name: port_types.port_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  completed:
-    :name: completed
-    :sequence_no: 15
-    :caption: Completed
-    :namespaced_name: voyages.completed
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  trans_shipment_vessel:
-    :name: trans_shipment_vessel
-    :sequence_no: 7
-    :caption: Trans shipment vessel
-    :namespaced_name: vessels.vessel_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

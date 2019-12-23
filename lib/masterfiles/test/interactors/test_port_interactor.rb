@@ -64,14 +64,12 @@ module MasterfilesApp
     private
 
     def port_attrs
-      port_type_id = create_port_type
-      voyage_type_id = create_voyage_type
       destination_city_id = create_destination_city
 
       {
         id: 1,
-        port_type_id: port_type_id,
-        voyage_type_id: voyage_type_id,
+        port_type_ids: [1, 2, 3],
+        voyage_type_ids: [1, 2, 3],
         city_id: destination_city_id,
         port_code: Faker::Lorem.unique.word,
         description: 'ABC',

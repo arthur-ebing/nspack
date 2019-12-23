@@ -25,6 +25,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial { FinishedGoods::Dispatch::VoyagePort::Show.call(id) }
         end
         r.patch do     # UPDATE
+          p params
           res = interactor.update_voyage_port(id, params[:voyage_port])
           if res.success
             row_keys = %i[

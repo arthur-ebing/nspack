@@ -5,7 +5,7 @@ module FinishedGoodsApp
     attr_reader :user_name, :params, :voyage_id, :load_id
 
     def initialize(params, user_name)
-      @params = params.output
+      @params = params.to_h
       @user_name = user_name
     end
 
@@ -41,8 +41,15 @@ module FinishedGoodsApp
                                 :exporter_certificate_code,
                                 :final_destination_id,
                                 :transfer_load)
-      load_attrs[:pol_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id, port_id: params[:pol_port_id])
-      load_attrs[:pod_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id, port_id: params[:pod_port_id])
+
+      pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+      load_attrs[:pol_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id,
+                                                                                      port_id: params[:pol_port_id],
+                                                                                      port_type_id: pol_port_type_id)
+      load_attrs[:pod_voyage_port_id] = VoyagePortRepo.new.find_or_create_voyage_port(voyage_id: voyage_id,
+                                                                                      port_id: params[:pod_port_id],
+                                                                                      port_type_id: pod_port_type_id)
       @load_id = repo.create_load(load_attrs)
       repo.log_status(:loads, load_id, 'CREATED', user_name: user_name)
     end

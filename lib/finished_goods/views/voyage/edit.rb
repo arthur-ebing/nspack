@@ -54,7 +54,7 @@ module FinishedGoods
               section.add_grid('voyage_ports',
                                "/list/voyage_ports/grid?key=standard&voyage_id=#{id}",
                                caption: 'Voyage Ports',
-                               height: 6)
+                               height: 10)
               section.add_grid('loads',
                                "/list/loads/grid?key=standard&voyage_id=#{id}",
                                caption: 'Loads')

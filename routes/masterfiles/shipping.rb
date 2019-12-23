@@ -238,13 +238,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_port(id, params[:port])
           if res.success
             row_keys = %i[
-              port_type_id
-              voyage_type_id
+              port_type_ids
+              voyage_type_ids
               port_code
               city_name
               description
-              port_type_code
-              voyage_type_code
+              port_type_codes
+              voyage_type_codes
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -276,13 +276,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            port_type_id
-            voyage_type_id
+            port_type_ids
+            voyage_type_ids
             port_code
             city_name
             description
-            port_type_code
-            voyage_type_code
+            port_type_codes
+            voyage_type_codes
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

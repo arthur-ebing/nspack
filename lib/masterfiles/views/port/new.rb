@@ -16,11 +16,11 @@ module Masterfiles
               form.caption 'New Port'
               form.action '/masterfiles/shipping/ports'
               form.remote! if remote
-              form.add_field :port_type_id
-              form.add_field :voyage_type_id
               form.add_field :port_code
               form.add_field :description
               form.add_field :city_id
+              form.add_field :port_type_ids
+              form.add_field :voyage_type_ids
             end
           end
 

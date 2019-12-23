@@ -14,39 +14,57 @@ module MasterfilesApp
     crud_calls_for :ports, name: :port, wrapper: Port
 
     def find_port_flat(id)
-      find_with_association(:ports,
-                            id,
-                            parent_tables: [{ parent_table: :voyage_types,
-                                              columns: %i[voyage_type_code],
-                                              flatten_columns: { voyage_type_code: :voyage_type_code } },
-                                            { parent_table: :destination_cities,
-                                              columns: %i[city_name],
-                                              foreign_key: :city_id,
-                                              flatten_columns: { city_name: :city_name } },
-                                            { parent_table: :port_types,
-                                              columns: %i[port_type_code],
-                                              flatten_columns: { port_type_code: :port_type_code } }],
-                            wrapper: PortFlat)
+      query = "SELECT
+                    ports.id,
+                    ports.port_code,
+                    ports.description,
+                    ports.port_type_ids,
+                    string_agg(distinct port_types.port_type_code, ', ') AS port_type_codes,
+                    ports.voyage_type_ids,
+                    string_agg(distinct voyage_types.voyage_type_code, ', ') AS voyage_type_codes,
+                    ports.city_id,
+                    destination_cities.city_name AS city_name,
+                    ports.active
+                FROM ports
+                LEFT JOIN destination_cities ON destination_cities.id = ports.city_id
+                JOIN port_types ON port_types.id = ANY(ports.port_type_ids)
+                JOIN voyage_types ON voyage_types.id = ANY(ports.voyage_type_ids)
+                WHERE ports.id = #{id}
+                GROUP BY ports.id, destination_cities.city_name"
+      hash = DB[query].first
+      return nil if hash.nil?
+
+      PortFlat.new(hash)
     end
 
-    def for_select_ports(args = nil) # rubocop:disable Metrics/AbcSize
-      ds = DB[:port_types]
-      ds = ds.join(:ports, port_type_id: :id)
-      ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:ports][:active] => true)
-      ds = ds.order(:port_code)
-      ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
+    def for_select_ports(args = {})
+      query = 'SELECT *,
+               ports.id AS id,
+               port_types.id AS port_type_id,
+               voyage_types.id AS voyage_type_id
+               FROM ports
+               LEFT JOIN destination_cities ON destination_cities.id = ports.city_id
+               JOIN port_types ON port_types.id = ANY(ports.port_type_ids)
+               JOIN voyage_types ON voyage_types.id = ANY(ports.voyage_type_ids)
+               WHERE ports.active = true'
+      hash = DB[query].all
+      args.each { |k, v| hash = hash.find_all { |row| row[k].to_s == v.to_s } }
+      hash.map { |row| [row[:port_code],  row[:id].to_i] }
     end
 
-    def for_select_inactive_ports(args = nil) # rubocop:disable Metrics/AbcSize
-      ds = DB[:port_types]
-      ds = ds.join(:ports, port_type_id: :id)
-      ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:ports][:active] => false)
-      ds = ds.order(:port_code)
-      ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
+    def for_select_inactive_ports(args = {})
+      query = 'SELECT *,
+               ports.id AS id,
+               port_types.id AS port_type_id,
+               voyage_types.id AS voyage_type_id
+               FROM ports
+               LEFT JOIN destination_cities ON destination_cities.id = ports.city_id
+               JOIN port_types ON port_types.id = ANY(ports.port_type_ids)
+               JOIN voyage_types ON voyage_types.id = ANY(ports.voyage_type_ids)
+               WHERE ports.active = false'
+      hash = DB[query].all
+      args.each { |k, v| hash = hash.find_all { |row| row[k].to_s == v.to_s } }
+      hash.map { |row| [row[:port_code],  row[:id].to_i] }
     end
   end
 end

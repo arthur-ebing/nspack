@@ -8,11 +8,10 @@ module MasterfilesApp
 
       id = nil
       repo.transaction do
-        id = repo.create_port(res)
+        id = repo.create_port(res.instance)
       end
       instance = port(id)
-      success_response("Created port #{instance.port_code}",
-                       instance)
+      success_response("Created port #{instance.port_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { port_code: ['This port already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -24,11 +23,10 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        repo.update_port(id, res)
+        repo.update_port(id, res.instance)
       end
       instance = port(id)
-      success_response("Updated port #{instance.port_code}",
-                       instance)
+      success_response("Updated port #{instance.port_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -59,7 +57,12 @@ module MasterfilesApp
     end
 
     def validate_port_params(params)
-      PortSchema.call(params)
+      res = PortSchema.call(params)
+      return res unless res.errors.empty?
+
+      attrs = res.to_h
+      %i[port_type_ids voyage_type_ids].each { |k| attrs[k] = Sequel.pg_array(attrs[k].map(&:to_i)) }
+      OpenStruct.new(instance: attrs, messages: {})
     end
   end
 end

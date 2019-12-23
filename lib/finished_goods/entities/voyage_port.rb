@@ -5,6 +5,7 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :voyage_id, Types::Integer
     attribute :port_id, Types::Integer
+    attribute :port_type_id, Types::Integer
     attribute :trans_shipment_vessel_id, Types::Integer
     attribute :ata, Types::DateTime
     attribute :atd, Types::DateTime
@@ -17,6 +18,7 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :voyage_id, Types::Integer
     attribute :port_id, Types::Integer
+    attribute :port_type_id, Types::Integer
     attribute :trans_shipment_vessel_id, Types::Integer
     attribute :ata, Types::DateTime
     attribute :atd, Types::DateTime
@@ -24,7 +26,6 @@ module FinishedGoodsApp
     attribute :etd, Types::DateTime
     attribute :trans_shipment_vessel, Types::String
     attribute :port_code, Types::String
-    attribute :port_type_id, Types::Integer
     attribute :port_type_code, Types::String
     attribute :voyage_type_id, Types::Integer
     attribute :voyage_type_code, Types::String
