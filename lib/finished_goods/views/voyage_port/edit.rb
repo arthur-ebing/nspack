@@ -19,6 +19,7 @@ module FinishedGoods
               form.method :update
               form.add_field :voyage_id
               form.add_field :port_type_id
+              form.add_field :port_type_code
               form.add_field :port_id
               form.add_field :eta
               form.add_field :ata

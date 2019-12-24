@@ -4,6 +4,13 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module FinishedGoodsApp
   class TestVoyagePortInteractor < MiniTestWithHooks
+    include LoadFactory
+    include MasterfilesApp::PartyFactory
+    include MasterfilesApp::DepotFactory
+    include MasterfilesApp::VesselFactory
+    include MasterfilesApp::PortFactory
+    include MasterfilesApp::PortTypeFactory
+    include VoyageFactory
     include VoyagePortFactory
 
     def test_repo
@@ -69,11 +76,13 @@ module FinishedGoodsApp
       voyage_id = create_voyage
       port_id = create_port
       vessel_id = create_vessel
+      port_type_id = create_port_type
 
       {
         id: 1,
         voyage_id: voyage_id,
         port_id: port_id,
+        port_type_id: port_type_id,
         trans_shipment_vessel_id: vessel_id,
         ata: '2010-01-01 12:00',
         atd: '2010-01-01 12:00',

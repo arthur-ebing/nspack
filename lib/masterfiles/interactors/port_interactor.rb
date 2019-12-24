@@ -32,7 +32,7 @@ module MasterfilesApp
     end
 
     def delete_port(id)
-      name = port(id).port_code
+      name = port(id)&.port_code
       repo.transaction do
         repo.delete_port(id)
       end

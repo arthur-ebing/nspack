@@ -2,15 +2,16 @@
 
 module UiRules
   class VoyageRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = FinishedGoodsApp::VoyageRepo.new
       make_form_object
+      add_rules
       apply_form_values
 
       if @mode == :edit
-        common_fields_hash = common_fields
-        common_fields_hash[:voyage_type_id][:disabled_options] = common_fields_hash[:voyage_type_id].delete(:options)
-        common_values_for_fields common_fields_hash
+        hash = common_fields
+        hash[:voyage_type_id][:disabled_options] = hash[:voyage_type_id].delete :options
+        common_values_for_fields hash
       else
         common_values_for_fields common_fields
       end
@@ -79,13 +80,20 @@ module UiRules
 
     private
 
+    def add_rules
+      pol_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+      has_pod =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pol_port_type_id)
+      has_pol =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pod_port_type_id)
+
+      rules[:can_complete] = (has_pol & has_pod & !@form_object.completed)
+      rules[:completed] = @form_object.completed
+    end
+
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/voyages/voyage_type_changed' }]
       end
-
-      rules[:can_complete] = !(true & @form_object.completed)
-      rules[:completed] = @form_object.completed
     end
   end
 end

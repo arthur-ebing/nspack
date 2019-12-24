@@ -45,15 +45,5 @@ module FinishedGoodsApp
                                               flatten_columns: { vessel_code: :trans_shipment_vessel } }],
                             wrapper: VoyagePortFlat)
     end
-
-    def find_or_create_voyage_port(args)
-      voyage_port_id = DB[:voyage_ports].where(args).where(active: true).get(:id)
-      return voyage_port_id unless voyage_port_id.nil?
-
-      voyage_port_id = DB[:voyage_ports].insert(args)
-      log_status(:voyage_ports, voyage_port_id, 'CREATED')
-
-      voyage_port_id
-    end
   end
 end

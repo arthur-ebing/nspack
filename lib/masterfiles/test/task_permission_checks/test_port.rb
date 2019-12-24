@@ -10,11 +10,11 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
-        port_type_ids: [1, 2, 3],
-        voyage_type_ids: [1, 2, 3],
         city_id: 1,
         port_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        port_type_ids: [1, 2, 3],
+        voyage_type_ids: [1, 2, 3],
         active: true
       }
       MasterfilesApp::Port.new(base_attrs.merge(attrs))

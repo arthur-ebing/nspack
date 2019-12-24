@@ -12,9 +12,5 @@ module FinishedGoodsApp
                           order_by: :booking_reference
 
     crud_calls_for :load_voyages, name: :load_voyage, wrapper: LoadVoyage
-
-    def find_load_voyage_from(load_id:)
-      DB[:load_voyages].where(load_id: load_id).get(:id)
-    end
   end
 end

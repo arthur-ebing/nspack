@@ -9,16 +9,15 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'port'
     end
 
     def set_show_fields
-      city_id_label = MasterfilesApp::DestinationRepo.new.find_city(@form_object.city_id)&.city_name
-      fields[:port_type_ids] = { renderer: :label, caption: 'Port Type' }
-      fields[:voyage_type_ids] = { renderer: :label, caption: 'Voyage Type' }
-      fields[:city_id] = { renderer: :label, with_value: city_id_label, caption: 'City' }
+      fields[:port_type_ids] = { renderer: :label, with_value: @form_object&.port_type_codes, caption: 'Port Type' }
+      fields[:voyage_type_ids] = { renderer: :label, with_value: @form_object&.voyage_type_codes, caption: 'Voyage Type' }
+      fields[:city_id] = { renderer: :label, with_value: @form_object&.city_name, caption: 'City' }
       fields[:port_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -48,7 +47,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_port(@options[:id])
+      @form_object = @repo.find_port_flat(@options[:id])
     end
 
     def make_new_form_object

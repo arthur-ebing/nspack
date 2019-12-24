@@ -18,7 +18,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: completed
+  :hide_if_true: has_load,completed
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/dispatch/voyage_ports/new"

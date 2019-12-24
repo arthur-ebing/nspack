@@ -7,6 +7,11 @@ module FinishedGoodsApp
     include LoadFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::DepotFactory
+    include MasterfilesApp::VesselFactory
+    include MasterfilesApp::PortFactory
+    include MasterfilesApp::PortTypeFactory
+    include VoyageFactory
+    include VoyagePortFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -65,12 +70,18 @@ module FinishedGoodsApp
     private
 
     def load_attrs
+      repo = BaseRepo.new
+      create_port_type(port_type_code: AppConst::PORT_TYPE_POL) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL).nil?
+      create_port_type(port_type_code: AppConst::PORT_TYPE_POD) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD).nil?
+
       party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
       depot_id = create_depot
-      voyage_port_id = create_voyage_port
+      pol_voyage_port_id = create_voyage_port
+      pod_voyage_port_id = create_voyage_port
       voyage_id = create_voyage
-      port_id = create_port
+      pol_port_id = create_port
+      pod_port_id = create_port
       voyage_type_id = create_voyage_type
       vessel_id = create_vessel
       {
@@ -82,8 +93,8 @@ module FinishedGoodsApp
         final_receiver_party_role_id: party_role_id,
         final_destination_id: destination_city_id,
         depot_id: depot_id,
-        pol_voyage_port_id: voyage_port_id,
-        pod_voyage_port_id: voyage_port_id,
+        pol_voyage_port_id: pol_voyage_port_id,
+        pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,
         edi_file_name: 'ABC',
         customer_order_number: 'ABC',
@@ -101,10 +112,10 @@ module FinishedGoodsApp
         voyage_number: Faker::Number.number(4),
         voyage_code: Faker::Lorem.unique.word,
         year: 2019,
-        pol_port_id: port_id,
+        pol_port_id: pol_port_id,
         eta: '2010-01-01',
         ata: '2010-01-01',
-        pod_port_id: port_id,
+        pod_port_id: pod_port_id,
         etd: '2010-01-01',
         atd: '2010-01-01',
         shipping_line_party_role_id: party_role_id,

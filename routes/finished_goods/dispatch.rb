@@ -25,7 +25,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial { FinishedGoods::Dispatch::VoyagePort::Show.call(id) }
         end
         r.patch do     # UPDATE
-          p params
           res = interactor.update_voyage_port(id, params[:voyage_port])
           if res.success
             row_keys = %i[
@@ -66,7 +65,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           blank_json_response
         else
           actions = []
-          voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(params[:voyage_port_voyage_id])&.voyage_type_id
+          voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(params[:voyage_id])&.voyage_type_id
           port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_id: params[:changed_value], voyage_type_id: voyage_type_id)
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'voyage_port_port_id', options_array: port_list)
           port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code

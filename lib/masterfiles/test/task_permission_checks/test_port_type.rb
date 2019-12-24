@@ -23,13 +23,13 @@ module MasterfilesApp
     end
 
     def test_edit
-      MasterfilesApp::PortRepo.any_instance.stubs(:find_port_type).returns(entity)
+      MasterfilesApp::PortTypeRepo.any_instance.stubs(:find_port_type).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PortType.call(:edit, 1)
       assert res.success, 'Should be able to edit a port_type'
     end
 
     def test_delete
-      MasterfilesApp::PortRepo.any_instance.stubs(:find_port_type).returns(entity)
+      MasterfilesApp::PortTypeRepo.any_instance.stubs(:find_port_type).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PortType.call(:delete, 1)
       assert res.success, 'Should be able to delete a port_type'
     end

@@ -38,7 +38,11 @@ module FinishedGoods
             page.section do |section|
               section.add_grid('voyage_ports',
                                "/list/voyage_ports/grid?key=standard&voyage_id=#{id}",
-                               caption: 'Voyage Ports')
+                               caption: 'Voyage Ports',
+                               height: 10)
+              section.add_grid('loads',
+                               "/list/loads/grid?key=standard&voyage_id=#{id}",
+                               caption: 'Loads')
             end
           end
 

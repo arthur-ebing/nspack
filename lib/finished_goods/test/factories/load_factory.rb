@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  module LoadFactory # rubocop:disable Metrics/ModuleLength
+  module LoadFactory
     def create_load(opts = {}) # rubocop:disable Metrics/AbcSize
+      repo = BaseRepo.new
+      pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL) || create_port_type(port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD) || create_port_type(port_type_code: AppConst::PORT_TYPE_POD)
+
       party_role_id = create_party_role[:id]
       destination_city_id = create_destination_city
       depot_id = create_depot
       voyage_id = create_voyage
-      pol_voyage_port_id = create_voyage_port(voyage_id: voyage_id)
-      pod_voyage_port_id = create_voyage_port(voyage_id: voyage_id)
+      pol_voyage_port_id = create_voyage_port(voyage_id: voyage_id, port_type_id: pol_port_type_id)
+      pod_voyage_port_id = create_voyage_port(voyage_id: voyage_id, port_type_id: pod_port_type_id)
 
       default = {
         customer_party_role_id: party_role_id,
@@ -33,109 +37,6 @@ module FinishedGoodsApp
         updated_at: '2010-01-01 12:00'
       }
       DB[:loads].insert(default.merge(opts))
-    end
-
-    def create_depot(opts = {})
-      destination_city_id = create_destination_city
-
-      default = {
-        city_id: destination_city_id,
-        depot_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        edi_hub_address: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:depots].insert(default.merge(opts))
-    end
-
-    def create_voyage_port(opts = {})
-      voyage_id = create_voyage
-      port_id = create_port
-      vessel_id = create_vessel
-
-      default = {
-        voyage_id: voyage_id,
-        port_id: port_id,
-        trans_shipment_vessel_id: vessel_id,
-        ata: '2010-01-01',
-        atd: '2010-01-01',
-        eta: '2010-01-01',
-        etd: '2010-01-01',
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:voyage_ports].insert(default.merge(opts))
-    end
-
-    def create_voyage(opts = {})
-      vessel_id = create_vessel
-
-      default = {
-        vessel_id: vessel_id,
-        voyage_type_id: 1,
-        voyage_number: Faker::Lorem.unique.word,
-        voyage_code: Faker::Lorem.unique.word,
-        year: Faker::Number.number(4),
-        completed: false,
-        completed_at: '2010-01-01 12:00',
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:voyages].insert(default.merge(opts))
-    end
-
-    def create_vessel(opts = {})
-      vessel_type_id = create_vessel_type
-
-      default = {
-        vessel_type_id: vessel_type_id,
-        vessel_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:vessels].insert(default.merge(opts))
-    end
-
-    def create_vessel_type(opts = {})
-      default = {
-        voyage_type_id: 1,
-        vessel_type_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:vessel_types].insert(default.merge(opts))
-    end
-
-    def create_voyage_type(opts = {})
-      default = {
-        voyage_type_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:voyage_types].insert(default.merge(opts))
-    end
-
-    def create_port(opts = {})
-      default = {
-        port_type_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
-        voyage_type_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
-        port_code: Faker::Lorem.unique.word,
-        description: Faker::Lorem.word,
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:ports].insert(default.merge(opts))
     end
   end
 end

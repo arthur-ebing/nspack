@@ -23,9 +23,6 @@ module FinishedGoods
               form.add_field :voyage_number
               form.add_field :voyage_code
               form.add_field :year
-              # form.add_field :completed
-              # form.add_field :completed_at
-              # form.add_field :active
             end
           end
 

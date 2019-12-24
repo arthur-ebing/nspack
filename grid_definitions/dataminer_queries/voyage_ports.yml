@@ -4,10 +4,12 @@
   \   vessels.vessel_code AS trans_shipment_vessel,\r\n    voyage_ports.id,\r\n    voyage_ports.voyage_id,\r\n
   \   voyage_ports.port_id,\r\n    voyage_ports.trans_shipment_vessel_id,\r\n    voyage_ports.ata,\r\n
   \   voyage_ports.atd,\r\n    voyage_ports.eta,\r\n    voyage_ports.etd,\r\n    voyage_ports.active,\r\n
-  \   voyage_ports.created_at,\r\n    voyage_ports.updated_at\r\n\r\nFROM voyage_ports\r\nJOIN
+  \   voyage_ports.created_at,\r\n    voyage_ports.updated_at,\r\n    EXISTS(SELECT
+  id FROM loads WHERE voyage_ports.id = loads.pod_voyage_port_id\r\n                                   OR
+  voyage_ports.id = loads.pol_voyage_port_id) AS has_load\r\n\r\nFROM voyage_ports\r\nJOIN
   ports ON ports.id = voyage_ports.port_id\r\nJOIN port_types ON port_types.id = voyage_ports.port_type_id\r\nJOIN
   voyages ON voyages.id = voyage_ports.voyage_id\r\nLEFT JOIN vessels ON vessels.id
-  = voyage_ports.trans_shipment_vessel_id"
+  = voyage_ports.trans_shipment_vessel_id\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -243,6 +245,22 @@
     :caption: Updated at
     :namespaced_name: voyage_ports.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_load:
+    :name: has_load
+    :sequence_no: 16
+    :caption: Has load
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
