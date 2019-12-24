@@ -61,15 +61,22 @@ module EdiApp
       cnt = -1
       curr = nil
       key = nil
+      row_cnt = 0
       @out.each do |rec|
         if curr != rec[rec.keys.first]
           curr = rec[rec.keys.first]
           cnt += 1
+          row_cnt = 0
           key = "#{toc[cnt]}-#{cnt}"
           coldef = coldef_for(curr)
           grids << { key => { cols: coldef, rows: [] } }
         end
-        grids.last[key][:rows] << rec
+        row_cnt += 1
+        grids.last[key][:rows] << if @has_id
+                                    rec
+                                  else
+                                    rec.merge(id: row_cnt)
+                                  end
       end
       grids
     rescue StandardError => e
@@ -80,9 +87,19 @@ module EdiApp
     private
 
     def coldef_for(rectype)
-      # Currently hard-codes - this should be config somewhere...
+      # Currently hard-coded - this should be config somewhere...
       key = rectype == 'OL' ? 'LT' : rectype
-      record_definitions[key].map { |_, v| { headerName: v[:name], field: v[:name] } }
+
+      cols = record_definitions[key].map do |_, v|
+        @has_id = true if v[:name] == :id
+        { headerName: v[:name], field: v[:name] }
+      end
+
+      if @has_id
+        cols
+      else
+        cols << { headerName: :id, field: :id, hide: true }
+      end
     end
 
     def field_definitions
