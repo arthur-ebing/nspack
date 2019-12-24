@@ -50,12 +50,12 @@ module MesscadaApp
 
     def retrieve_resource_cached_setup_data
       @setup_data = search_cache_files
-      raise Crossbeams::FrameworkError, "No setup data cached for resource #{resource_code}." if setup_data.empty?
+      raise Crossbeams::InfoError, "No setup data cached for resource #{resource_code}." if setup_data.empty?
 
       # return failed_response("No setup data cached for resource #{resource_code}.") if setup_data.empty?
 
       @production_run_id = setup_data[:production_run_data][:production_run_id]
-      raise Crossbeams::FrameworkError, "Production Run:#{production_run_id} could not be found" unless production_run_exists?
+      raise Crossbeams::InfoError, "Production Run:#{production_run_id} could not be found" unless production_run_exists?
 
       # return failed_response("Production Run:#{production_run_id} could not be found") unless production_run_exists?
 

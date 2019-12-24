@@ -16,7 +16,7 @@ module UiRules
       set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code]) if %i[allocate_setups complete_stage show_stats confirm].include?(@mode)
+      make_header_table(%i[production_run_code template_name packhouse_code line_code status active_run_stage]) if %i[allocate_setups complete_stage show_stats confirm].include?(@mode)
       build_stats_table if @mode == :show_stats
       set_stage_fields if @mode == :complete_stage
 
@@ -52,7 +52,7 @@ module UiRules
       compact_header(columns: columns || %i[production_run_code template_name packhouse_code
                                             line_code farm_code puc_code orchard_code season_code
                                             cultivar_group_code cultivar_name allow_cultivar_mixing
-                                            allow_orchard_mixing],
+                                            allow_orchard_mixing status active_run_stage],
                      display_columns: display_columns,
                      header_captions: {
                        production_run_code: 'Run',
@@ -66,7 +66,9 @@ module UiRules
                        cultivar_group_code: 'Cultivar group',
                        cultivar_code: 'Cultivar',
                        allow_cultivar_mixing: 'Mix Cultivar?',
-                       allow_orchard_mixing: 'Mix Orchard?'
+                       allow_orchard_mixing: 'Mix Orchard?',
+                       status: 'Status',
+                       active_run_stage: 'Run stage'
                      })
     end
 

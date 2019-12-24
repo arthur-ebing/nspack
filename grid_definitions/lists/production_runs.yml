@@ -79,6 +79,11 @@
   :icon: list
   :hide_if_null: product_setup_template_id
   :hide_if_false: allocation_required
+  :hide_if_true: view_allocs
+- :url: "/production/runs/production_runs/$:id$/allocate_setups"
+  :text: view allocated product setups
+  :icon: list
+  :hide_if_false: view_allocs
 - :url: "/list/product_setups_on_runs/with_params?key=standard&production_run_id=$:id$"
   :text: view product setups
   :icon: list

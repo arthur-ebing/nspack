@@ -82,5 +82,6 @@ module ProductionApp
     attribute :season_code, Types::String
     attribute :packhouse_code, Types::String
     attribute :line_code, Types::String
+    attribute :status, Types::String
   end
 end
