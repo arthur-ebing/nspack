@@ -73,7 +73,10 @@ module FinishedGoodsApp
       id = DB[:pallets].where(pallet_number: pallet_number).get(:id)
       return failed_response("Pallet: #{pallet_number} doesn't exist.") if id.nil?
 
-      pallet_id = DB[:govt_inspection_pallets].where(pallet_id: id).get(:pallet_id)
+      pallet_id = DB[:govt_inspection_pallets]
+                  .join(:govt_inspection_sheets, id: :govt_inspection_sheet_id)
+                  .where(cancelled: false, completed: false, pallet_id: id)
+                  .get(:pallet_id)
       return failed_response("Pallet: #{pallet_number} is already on an inspection sheet.") unless pallet_id.nil?
 
       success_response('ok', id)
