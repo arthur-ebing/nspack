@@ -221,6 +221,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          'Container Code',
                          data_type: 'string',
                          required: false,
+                         force_uppercase: true,
                          hide_on_load: !has_container)
           form.add_field(:container_vents,
                          'Container Vents',

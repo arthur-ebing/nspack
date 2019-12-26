@@ -9,7 +9,7 @@ module FinishedGoodsApp
 
       default = {
         load_id: load_id,
-        container_code: Faker::Lorem.unique.word,
+        container_code: Faker::Lorem.unique.word[0, 11],
         container_vents: Faker::Lorem.word,
         container_seal_code: Faker::Lorem.word,
         container_temperature_rhine: Faker::Number.decimal,

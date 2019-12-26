@@ -32,7 +32,7 @@ module FinishedGoodsApp
       attrs = fake_load_container(container_code: nil).to_h.reject { |k, _| k == :id }
       res = interactor.create_load_container(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:container_code]
+      assert_includes res.errors[:container_code], 'must be filled'
     end
 
     def test_update_load_container
@@ -52,7 +52,7 @@ module FinishedGoodsApp
       attrs = interactor.send(:repo).find_hash(:load_containers, id).reject { |k, _| %i[id container_code].include?(k) }
       res = interactor.update_load_container(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:container_code]
+      assert_includes res.errors[:container_code], 'is missing'
     end
 
     def test_delete_load_container
@@ -73,7 +73,7 @@ module FinishedGoodsApp
       {
         id: 1,
         load_id: load_id,
-        container_code: Faker::Lorem.unique.word,
+        container_code: Faker::Lorem.unique.word[0, 11],
         container_vents: 'ABC',
         container_seal_code: 'ABC',
         container_temperature_rhine: '234',
