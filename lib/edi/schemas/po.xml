@@ -143,7 +143,7 @@
               <field name="tk_user" size="7" required="false"/>
               <field name="in_user" size="7" required="false"/>
               <field name="in_partner" size="7" required="false"/>
-              <field name="ryan_no_old" size="8" required="false"/>
+              <field name="ryan_no_old" size="8" required="false" trim="true" />
               <field name="cont_status" size="1" required="false" default="T"/>
               <field name="xmit_flag" size="1" required="false" default="Y" map_to="transmit_flag"/>
               <field name="revision" size="5" required="false" format="ZEROES" default="1" map_to="revision_number"/>
@@ -161,7 +161,7 @@
               <field name="seal_no" size="15" required="false"/>
               <field name="consec_no" size="10" required="false"/>
               <field name="cto_no" size="10" required="false"/>
-              <field name="ryan_no" size="10" required="false"/>
+              <field name="ryan_no" size="10" required="false" />
               <field name="ship_name2" size="25" required="false" trim="true"/>
               <field name="voyage_no" size="10" required="false"/>
               <field name="ship_call_sign" size="10" required="false"/>
