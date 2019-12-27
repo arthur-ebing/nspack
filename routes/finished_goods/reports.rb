@@ -12,6 +12,7 @@ class Nspack < Roda
                                     params: { load_id: id,
                                               pallet_report: 'detail',
                                               for_picklist: 'false|boolean',
+                                              cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
@@ -29,6 +30,7 @@ class Nspack < Roda
                                     params: { load_id: id,
                                               pallet_report: 'summary',
                                               for_picklist: 'false|boolean',
+                                              cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
@@ -46,6 +48,7 @@ class Nspack < Roda
                                     params: { load_id: id,
                                               pallet_report: 'detail',
                                               for_picklist: 'true|boolean',
+                                              cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
