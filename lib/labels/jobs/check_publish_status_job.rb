@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LabelApp
-  class CheckPublishStatusJob < BaseQueJob
+  class CheckPublishStatusJob < BaseQueJob # rubocop:disable Metrics/ClassLength
     def run(user_id, label_publish_log_id)
       lookup_label_publish_log(label_publish_log_id)
       lookup_user_name(user_id)
@@ -70,10 +70,26 @@ module LabelApp
       mes_repo.send_publish_status(@label_publish_log.printer_type, @label_publish_log.publish_name)
     end
 
-    def apply_log_changes(labels, messerver_states) # rubocop:disable Metrics/AbcSize
+    # messerver states includes local and remote publishing targets.
+    # The local ones match to log records, the remote are "incidental"
+    def apply_log_changes(labels, messerver_states) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       details = @repo.all(:label_publish_log_details, LabelApp::LabelPublishLogDetail, label_publish_log_id: @label_publish_log.id)
+      # {"Data"=>[{"File"=>"MAIN_BIN.zip", "Status"=>"200 OK", "To"=>"10.0.6.6", "PrinterType"=>"Local", "Date"=>"zebra", "Time"=>"12-24-2019"}]}
+      # {"Data"=>[{"File"=>"MAIN_BIN.zip", "Status"=>"200 OK", "To"=>"10.0.6.6", "Module"=>"MES-01", "Location"=>"Local", "PrinterType"=>"zebra", "Date"=>"12-26-2019", "Time"=>65251}]}
 
+      failed_remotes = []
+      passed_remotes = []
+      server_states = []
       messerver_states.each do |state|
+        if state['Location'] && state['Location'] != 'Local' # add these to main log...
+          if state['Status'].start_with?('200')
+            passed_remotes << "MODULE: #{state['Module']} - IP: #{state['To']}"
+          else
+            failed_remotes << "MODULE: #{state['Module']} - IP: #{state['To']} - #{state['Status']}"
+          end
+          next
+        end
+
         key = state['File'].delete_suffix('.zip')
         label_id = labels[key]
         match_detail = details.find { |d| d.label_id == label_id && d.server_ip.to_s == state['To'] }
@@ -84,14 +100,28 @@ module LabelApp
           @repo.update_label_publish_log_detail(match_detail.id, complete: true, status: 'PUBLISHED')
           # status for lbl
           @repo.log_status(:labels, label_id, 'PUBLISHED', comment: "to #{match_detail.server_ip}", user_name: @user_name)
+          server_states << "#{state['Module']} (#{state['To']}) - OK"
         else
           @repo.update_label_publish_log_detail(match_detail.id, complete: true, failed: true, errors: state['Status'], status: 'FAILED TO PUBLISH')
           @repo.log_status(:labels, label_id, 'FAILED TO PUBLISH', comment: "to #{match_detail.server_ip}", user_name: @user_name)
+          server_states << "#{state['Module']} (#{state['To']}) - #{state['Status']}"
         end
       end
+      summary = ["Published to #{server_states.length} server#{server_states.length == 1 ? '' : 's'}"]
+      summary << "and to #{passed_remotes.length} out of #{passed_remotes.length + failed_remotes.length} remote modules" unless failed_remotes.empty? && passed_remotes.empty?
+      details = {
+        failed_remotes: failed_remotes,
+        passed_remotes: passed_remotes,
+        server_states: server_states,
+        summary: summary.join(' ')
+      }
 
       complete, failed = @repo.published_label_conditions(@label_publish_log.id)
-      @repo.update(:label_publish_logs, @label_publish_log.id, failed: failed, status: 'PUBLISHED', complete: true) if complete
+      if complete
+        @repo.update(:label_publish_logs, @label_publish_log.id, failed: failed, status: 'PUBLISHED', complete: true, publish_summary: @repo.hash_for_jsonb_col(details))
+      else
+        @repo.update(:label_publish_logs, @label_publish_log.id, publish_summary: @repo.hash_for_jsonb_col(details))
+      end
       complete
     end
 

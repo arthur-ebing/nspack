@@ -8,7 +8,12 @@ module MesserverApp
       res = request_uri(printer_list_uri)
       return res unless res.success
 
-      printer_list = YAML.safe_load(res.instance.body)
+      begin
+        printer_list = YAML.safe_load(res.instance.body)
+      rescue Psych::Error => e
+        ErrorMailer.send_exception_email(e, subject: "#{self.class.name}#printer_list", message: "YAML string from MesServer is #{res.instance.body}")
+        return failed_response('There was an error in the response from MesServer')
+      end
       success_response('Refreshed printers', printer_list['PrinterList'])
     end
 
@@ -16,7 +21,12 @@ module MesserverApp
       res = request_uri(module_list_uri)
       return res unless res.success
 
-      module_list = YAML.safe_load(res.instance.body)
+      begin
+        module_list = YAML.safe_load(res.instance.body)
+      rescue Psych::Error => e
+        ErrorMailer.send_exception_email(e, subject: "#{self.class.name}#module_list", message: "YAML string from MesServer is #{res.instance.body}")
+        return failed_response('There was an error in the response from MesServer')
+      end
       success_response('Refreshed modules', module_list['ModuleList'])
     end
 
@@ -24,7 +34,12 @@ module MesserverApp
       res = request_uri(publish_target_list_uri)
       return res unless res.success
 
-      yaml_list = YAML.safe_load(res.instance.body)
+      begin
+        yaml_list = YAML.safe_load(res.instance.body)
+      rescue Psych::Error => e
+        ErrorMailer.send_exception_email(e, subject: "#{self.class.name}#publish_target_list", message: "YAML string from MesServer is #{res.instance.body}")
+        return failed_response('There was an error in the response from MesServer')
+      end
       success_response('Target destinations', yaml_list['PublishServerList'])
     end
 
@@ -39,7 +54,13 @@ module MesserverApp
       res = request_uri(publish_status_uri(printer_type, filename))
       return res unless res.success
 
-      yaml_list = YAML.safe_load(res.instance.body)
+      begin
+        yaml_list = YAML.safe_load(res.instance.body)
+      rescue Psych::Error => e
+        ErrorMailer.send_exception_email(e, subject: "#{self.class.name}#send_publish_status", message: "YAML string from MesServer is #{res.instance.body}")
+        return failed_response('There was an error in the response from MesServer')
+      end
+      # p yaml_list
       success_response('Status', yaml_list['Data'])
     end
 

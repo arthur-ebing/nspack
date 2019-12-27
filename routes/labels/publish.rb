@@ -65,6 +65,10 @@ class Nspack < Roda
         end
       end
     end
+
+    r.on 'publish_summary', Integer do |label_publish_log_id|
+      show_partial { Labels::Publish::Publish::Summary.call(label_publish_log_id) }
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
