@@ -597,16 +597,15 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.post do
         pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(params[:pallet][:pallet_number])
-        res = if pallet.nil?
-                failed_response("Pallet #{params[:pallet][:pallet_number]} not found")
-              else
-                interactor.print_pallet_label(pallet[:id], pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
-              end
-
-        if res.success
-          store_locally(:flash_notice, 'Labels Printed Successfully')
+        if pallet.nil?
+          store_locally(:error, error_message: "Pallet #{params[:pallet][:pallet_number]} not found")
         else
-          store_locally(:error, error_message: "Printing Error: #{unwrap_failed_response(res)}")
+          res = interactor.print_pallet_label(pallet[:id], pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          if res.success
+            store_locally(:flash_notice, 'Labels Printed Successfully')
+          else
+            store_locally(:error, error_message: "Printing Error: #{unwrap_failed_response(res)}")
+          end
         end
         r.redirect('/rmd/production/reprint_pallet_label')
       end
