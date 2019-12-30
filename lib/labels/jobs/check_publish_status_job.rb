@@ -2,7 +2,7 @@
 
 module LabelApp
   class CheckPublishStatusJob < BaseQueJob # rubocop:disable Metrics/ClassLength
-    def run(user_id, label_publish_log_id)
+    def run(user_id, label_publish_log_id) # rubocop:disable Metrics/AbcSize
       lookup_label_publish_log(label_publish_log_id)
       lookup_user_name(user_id)
 
@@ -10,9 +10,9 @@ module LabelApp
       sleep(1)
       res = publish_labels_status
 
-      if res.success
+      if res.success && res.instance[:response_code].to_s != '204'
         handle_success(res.instance)
-      elsif res.instance[:response_code].to_s.start_with?('404') # Nothing sent from MesServer to CMS/MesScada yet...
+      elsif res.instance[:response_code].to_s.start_with?('404') || res.instance[:response_code].to_s.start_with?('204') # Nothing sent from MesServer to CMS/MesScada yet...
         handle_retry
       else
         handle_fail(res)
@@ -35,7 +35,11 @@ module LabelApp
 
     def handle_retry
       # Give up after 45 seconds without an answer.
-      if (Time.now - @label_publish_log.created_at) > 45
+      # This kludge to get around some UTC/SAST issues - created_at should be stored as UTC, not without zone...
+      diff = (Time.now.getutc.to_i - @label_publish_log.created_at.to_i)
+      diff -= 7200 if diff > 7200
+      # if (Time.now.utc - @label_publish_log.created_at.utc) > 45
+      if diff > 45
         @repo.update(:label_publish_logs, @label_publish_log.id, failed: true, status: 'NOT_FOUND', errors: 'MesServer failed to respond', complete: true)
         expire
       else
