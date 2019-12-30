@@ -64,6 +64,7 @@ class Nspack < Roda
                                     user: current_user.login_name,
                                     file: 'addendum',
                                     params: { load_id: id,
+                                              place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)

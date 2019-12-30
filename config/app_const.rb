@@ -299,6 +299,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
   TITAN_API_SECRET = ENV['TITAN_API_SECRET']
 
+  # Addendum: place of issue for export certificate
+  ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
+  raise Crossbeams::FrameworkError, "#{ADDENDUM_PLACE_OF_ISSUE} is not a valid code" unless ADDENDUM_PLACE_OF_ISSUE.match?(/cpt|dbn|plz|mpm|oth/i)
+
   # EDI Settings
   EDI_NETWORK_ADDRESS = ENV.fetch('EDI_NETWORK_ADDRESS', '999')
   EDI_FLOW_PS = 'PS'

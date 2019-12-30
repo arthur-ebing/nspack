@@ -41,6 +41,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { TITAN_ENVIRONMENT: "Titan API environment for government inspections. { UAT: 'uat', STAGING: 'staging', PRODUCTION: '' }" },
     { TITAN_API_USER_ID: 'Titan API_UserId for government inspections.' },
     { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' },
+    { ADDENDUM_PLACE_OF_ISSUE: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
     { SOLAS_VERIFICATION_METHOD: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
     { SAMSA_ACCREDITATION: 'For sending EDI documents' }
   ].freeze
