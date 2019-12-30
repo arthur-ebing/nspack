@@ -15,7 +15,7 @@
   \   line,\r\n    pick_ref,\r\n    phc,\r\n    verification_result,\r\n    scrapped_at,\r\n
   \   scrapped,\r\n    partially_palletized,\r\n    reinspected,\r\n    verified,\r\n
   \   verification_passed,\r\n    status,\r\n    build_status,\r\n    active,\r\n
-  \   zero_load_id,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
+  \   zero_load_id,\r\n    temp_tail,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
   THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE
   NOT scrapped\r\n  AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <>
   'SCRAPPED'::text\r\n  AND pallet_number::text IS NOT NULL\r\nORDER BY zero_load_id
@@ -1051,9 +1051,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 65
+    :caption: Temp tail
+    :namespaced_name: temp_tail
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 65
+    :sequence_no: 66
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
