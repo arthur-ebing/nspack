@@ -41,7 +41,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             .display {
               border: thin solid black;
               background-color: white;
-              margin: 2em;
+              margin: 0.5em 1em 0 1em;
               padding: 0.4em 0;
             }
 
@@ -81,6 +81,10 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             #btn1 {
               background-color: lightgreen;
             }
+            #url_sent {
+              color: #999;
+              margin: 0.3em 0;
+            }
           </style>
           </head>
           <body>
@@ -114,7 +118,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               </div>
             </div>
             <div>
-              <div id="url_sent" style="color:#999;">&nbsp;</div>
+              <div id="url_sent">&nbsp;</div>
               <select id="sel_urls"></select>
               <table>
               <tr>
@@ -125,16 +129,16 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 <th style="text-align:right">Port</th><td><input type="text" id="url_port" value="9296" /></td>
               </tr>
               <tr>
-                <th style="text-align:right"><label id="l_p1"></label></th><td><input type="text" id="p1" /></td>
+                <th style="text-align:right">&nbsp;<label id="l_p1"></label></th><td><input type="text" id="p1" hidden /></td>
               </tr>
               <tr>
-                <th style="text-align:right"><label id="l_p2"></label></th><td><input type="text" id="p2" /></td>
+                <th style="text-align:right">&nbsp;<label id="l_p2"></label></th><td><input type="text" id="p2" hidden /></td>
               </tr>
               <tr>
-                <th style="text-align:right"><label id="l_p3"></label></th><td><input type="text" id="p3" /></td>
+                <th style="text-align:right">&nbsp;<label id="l_p3"></label></th><td><input type="text" id="p3" hidden /></td>
               </tr>
               <tr>
-                <th style="text-align:right"><label id="l_p4"></label></th><td><input type="text" id="p4" /></td>
+                <th style="text-align:right">&nbsp;<label id="l_p4"></label></th><td><input type="text" id="p4" hidden /></td>
               </tr>
               </table>
             </div>
@@ -346,47 +350,47 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 }
                 if (thisSet.p1) {
                   lP1.textContent = thisSet.p1;
-                  p1.readOnly = false;
+                  p1.hidden = false;
                   if (thisSet.dp1) {
                     p1.value = thisSet.dp1;
                   }
                 } else {
                   lP1.textContent = '';
                   p1.value = '';
-                  p1.readOnly = true;
+                  p1.hidden = true;
                 }
                 if (thisSet.p2) {
                   lP2.textContent = thisSet.p2;
-                  p2.readOnly = false;
+                  p2.hidden = false;
                   if (thisSet.dp2) {
                     p2.value = thisSet.dp2;
                   }
                 } else {
                   lP2.textContent = '';
                   p2.value = '';
-                  p2.readOnly = true;
+                  p2.hidden = true;
                 }
                 if (thisSet.p3) {
                   lP3.textContent = thisSet.p3;
-                  p3.readOnly = false;
+                  p3.hidden = false;
                   if (thisSet.dp3) {
                     p3.value = thisSet.dp3;
                   }
                 } else {
                   lP3.textContent = '';
                   p3.value = '';
-                  p3.readOnly = true;
+                  p3.hidden = true;
                 }
                 if (thisSet.p4) {
                   lP4.textContent = thisSet.p4;
-                  p4.readOnly = false;
+                  p4.hidden = false;
                   if (thisSet.dp4) {
                     p4.value = thisSet.dp4;
                   }
                 } else {
                   lP4.textContent = '';
                   p4.value = '';
-                  p4.readOnly = true;
+                  p4.hidden = true;
                 }
               }, false);
             });
