@@ -102,27 +102,28 @@ module EdiApp
       }.to_json
     end
 
-    def edi_config
-      raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_flow_config.yml"' unless File.exist?('config/edi_flow_config.yml')
-
-      config = YAML.load_file('config/edi_flow_config.yml')
+    def edi_config(for_send)
+      config = if for_send
+                 EdiOutRepo.new.load_config
+               else
+                 # EdiInRepo.new.load_config
+                 {}
+               end
       [config, Pathname.new(config[:root].sub('$HOME', ENV['HOME']))]
     end
 
     def edi_path_list(config, root, key, suffix)
-      raise Crossbeams::FrameworkError, "There is no EDI config for \"#{key}\". Please contact support." unless config[key]
+      dirs = config["#{key}_dirs".to_sym].values
 
-      config[key].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + suffix }
+      dirs.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + suffix }
     end
 
     def edi_paths(for_send: true)
-      config, root = edi_config
+      config, root = edi_config(for_send)
       if for_send
         edi_path_list(config, root, :out, 'transmitted')
-        # config[:out].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + 'transmitted' }
       else
         edi_path_list(config, root, :in, 'receive')
-        # config[:in].map { |_, v| v.map { |a| a[:path] } }.flatten.uniq.map { |p| Pathname.new(p.sub('$ROOT', root.to_s)) + 'receive' }
       end
     end
 

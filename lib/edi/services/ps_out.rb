@@ -5,10 +5,10 @@
 # Other logging...
 module EdiApp
   class PsOut < BaseEdiOutService
-    attr_reader :org_code, :repo
+    attr_reader :ps_repo
 
     def initialize(edi_out_transaction_id)
-      @repo = PsOutRepo.new
+      @ps_repo = PsOutRepo.new
       super(AppConst::EDI_FLOW_PS, edi_out_transaction_id)
     end
 
@@ -33,7 +33,7 @@ module EdiApp
       @ps_record_count = 0
       @total_cartons = 0
 
-      repo.ps_rows(org_code).each do |rec|
+      ps_repo.ps_rows(party_role_id).each do |rec|
         hash = build_hash_from_data(rec, 'PS')
         add_record('PS', hash)
         @ps_record_count += 1

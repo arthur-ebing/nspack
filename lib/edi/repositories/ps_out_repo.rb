@@ -2,7 +2,7 @@
 
 module EdiApp
   class PsOutRepo < BaseRepo
-    def ps_rows(marketing_org)
+    def ps_rows(marketing_org_party_role_id)
       query = <<~SQL
         SELECT
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
@@ -66,9 +66,9 @@ module EdiApp
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
         WHERE pallets.in_stock
-          AND marketing_org.short_description = ?
+          AND pallet_sequences.marketing_org_party_role_id = ?
       SQL
-      DB[query, marketing_org].all
+      DB[query, marketing_org_party_role_id].all
     end
   end
 end

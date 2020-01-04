@@ -78,6 +78,13 @@ module MasterfilesApp
       DB.get(Sequel.function(:fn_party_role_name, id))
     end
 
+    def find_organization_for_party_role(party_role_id)
+      id = DB[:organizations].where(id: DB[:party_roles].where(id: party_role_id).select(:organization_id)).get(:id)
+      return nil if id.nil?
+
+      find_organization(id)
+    end
+
     def delete_organization(id)
       children = DB[:organizations].where(parent_id: id)
       return { error: 'This organization is set as a parent' } if children.any?
@@ -363,6 +370,15 @@ module MasterfilesApp
                            .where(Sequel.function(:fn_party_role_name, :id) => party_role_name)
                            .select_map(:id)
       default_mkting_org[0] unless default_mkting_org.empty?
+    end
+
+    def find_party_role_from_party_name_for_role(party_role_name, role_name)
+      role_id = DB[:roles].where(name: role_name).get(:id)
+      raise Crossbeams::InfoError, "There is no role named #{role_name}" if role_id.nil?
+
+      DB[:party_roles]
+        .where(role_id: role_id, Sequel.function(:fn_party_role_name, :id) => party_role_name)
+        .get(:id)
     end
 
     private

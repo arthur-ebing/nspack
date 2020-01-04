@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
-  attr_reader :flow_type, :org_code, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries
+  attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries, :edi_out_rule_id, :party_role_id
 
   def initialize(flow_type, id) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, "#{self.class.name}: flow type must be provided" if flow_type.nil?
 
-    repo = EdiApp::EdiOutRepo.new
-    edi_out_transaction = repo.find_edi_out_transaction(id)
+    @repo = EdiApp::EdiOutRepo.new
+    edi_out_transaction = @repo.find_edi_out_transaction(id)
     @flow_type = edi_out_transaction.flow_type
-    @org_code = edi_out_transaction.org_code
+    @party_role_id = edi_out_transaction.party_role_id
     @hub_address = edi_out_transaction.hub_address
     @record_id = edi_out_transaction.record_id
-    @seq_no = repo.new_sequence_for_flow(flow_type)
+    @edi_out_rule_id = edi_out_transaction.edi_out_rule_id
+    @seq_no = @repo.new_sequence_for_flow(flow_type)
     @formatted_seq = format('%<seq>03d', seq: @seq_no)
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
@@ -53,26 +54,24 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   end
 
   def load_output_paths
-    raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_flow_config.yml"' unless File.exist?('config/edi_flow_config.yml')
+    dir_keys = @repo.edi_directory_keys(edi_out_rule_id)
+    raise Crossbeams::FrameworkError, "There are no directory keys for EDI rule #{edi_out_rule_id}" if dir_keys.nil_or_empty?
 
-    config = YAML.load_file('config/edi_flow_config.yml')
-    raise Crossbeams::FrameworkError, "There is no EDI config for #{flow_type} out transformation" if config.dig(:out, flow_type.to_sym).nil?
+    config = @repo.load_config
 
-    build_edi_out_paths(config)
+    build_edi_out_paths(config, dir_keys)
   end
 
-  def build_edi_out_paths(config)
+  def build_edi_out_paths(config, dir_keys)
     @output_paths = []
-    config[:out][flow_type.to_sym].each do |out_dest|
-      build_edi_out_path(config[:root], out_dest)
+    dir_keys.each do |key|
+      build_edi_out_path(config[:root], config[:out_dirs][key.to_sym])
     end
   end
 
   def build_edi_out_path(root, out_dest)
-    return if out_dest[:except] && out_dest[:except][:org_code] == org_code
-
     base_path = root.sub('$HOME', ENV['HOME'])
-    @output_paths << File.join(out_dest[:path].sub('$ROOT', base_path), 'transmit')
+    @output_paths << File.join(out_dest.sub('$ROOT', base_path), 'transmit')
   end
 
   # Services can use the field definition:
@@ -267,7 +266,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       lines += build_flat_rows(key)
     end
 
-    # puts lines.join("\n")
     @output_paths.each do |path|
       raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
 

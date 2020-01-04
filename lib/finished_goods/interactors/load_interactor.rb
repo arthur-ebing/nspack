@@ -136,10 +136,7 @@ module FinishedGoodsApp
     end
 
     def send_po_edi(load_id)
-      org_code = repo.org_code_for_po(load_id)
-      EdiApp::Job::SendEdiOut.enqueue(AppConst::EDI_FLOW_PO, org_code, @user.user_name, load_id)
-
-      success_response('PO EDI has been added to the job queue.')
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_PO, load_entity(load_id).customer_party_role_id, @user.user_name, load_id)
     end
 
     def ship_load(id) # rubocop:disable Metrics/AbcSize

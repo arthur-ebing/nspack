@@ -10,6 +10,8 @@ module EdiApp
     attribute :complete, Types::Bool
     attribute :edi_out_filename, Types::String
     attribute :record_id, Types::Integer
+    attribute :edi_out_rule_id, Types::Integer
+    attribute :party_role_id, Types::Integer
     attribute :error_message, Types::String
   end
 end

@@ -26,7 +26,7 @@ set :rack_env, :production # SET THESE UP IN deploy files (hm6, hm7, nosoft, sch
 
 # Default value for :linked_files is []
 # append :linked_files, 'config/database.yml', 'config/secrets.yml'
-append :linked_files, 'public/js/ag-enterprise-activation.js', '.env.local', 'config/mail_settings.rb', 'config/dataminer_connections.yml', 'config/edi_flow_config.yml'
+append :linked_files, 'public/js/ag-enterprise-activation.js', '.env.local', 'config/mail_settings.rb', 'config/dataminer_connections.yml', 'config/edi_out_config.yml'
 
 # Default value for linked_dirs is []
 # append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
@@ -119,7 +119,7 @@ namespace :devops do
     on roles(:app) do |_|
       upload! 'public/js/ag-enterprise-activation.js', "#{shared_path}/public/js/ag-enterprise-activation.js"
       upload! 'config/mail_settings.rb.example', "#{shared_path}/config/mail_settings.rb"
-      upload! 'config/edi_flow_config.yml.example', "#{shared_path}/config/edi_flow_config.yml"
+      upload! 'config/edi_out_config.yml.example', "#{shared_path}/config/edi_out_config.yml"
 
       # Copy over dataminer connections and automatically set up the "system" connection:
       upload! 'config/dataminer_connections.yml.example', "#{shared_path}/config/dataminer_connections.yml"

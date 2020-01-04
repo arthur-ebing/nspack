@@ -11,10 +11,10 @@
 #    Batch Trailer               -> BT
 module EdiApp
   class PoOut < BaseEdiOutService
-    attr_reader :org_code, :repo
+    attr_reader :org_code, :po_repo
 
     def initialize(edi_out_transaction_id)
-      @repo = PoOutRepo.new
+      @po_repo = PoOutRepo.new
       super(AppConst::EDI_FLOW_PO, edi_out_transaction_id)
     end
 
@@ -28,7 +28,7 @@ module EdiApp
       prepare_lf
       prepare_lt
 
-      recs = repo.po_details(record_id).group_by { |r| r[:container] }
+      recs = po_repo.po_details(record_id).group_by { |r| r[:container] }
       recs.each do |container, details|
         @current_row = details.first
         prepare_ok if container
@@ -42,7 +42,7 @@ module EdiApp
       validate_data({ 'OC' => %i[load_id], 'OK' => %i[load_id container], 'OP' => %i[load_id sscc seq_no] }, check_lengths: true)
       fname = create_flat_file
 
-      repo.store_edi_filename(fname, record_id)
+      po_repo.store_edi_filename(fname, record_id)
       success_response('PoOut was successful', fname)
     end
 
@@ -53,7 +53,7 @@ module EdiApp
     end
 
     def prepare_oh
-      @header_rec = repo.po_header_row(record_id)
+      @header_rec = po_repo.po_header_row(record_id)
       return if @header_rec.nil?
 
       hash = build_hash_from_data(@header_rec, 'OH')
