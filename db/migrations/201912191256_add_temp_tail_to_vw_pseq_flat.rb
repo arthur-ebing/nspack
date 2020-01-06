@@ -210,6 +210,7 @@ Sequel.migration do
 
   down do
     run <<~SQL
+      DROP VIEW public.vw_pallet_sequence_flat;
       CREATE OR REPLACE VIEW public.vw_pallet_sequence_flat AS 
        SELECT ps.id,
           ps.pallet_id,

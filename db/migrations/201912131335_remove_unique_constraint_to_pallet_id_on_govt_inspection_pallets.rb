@@ -16,5 +16,13 @@ Sequel.migration do
       drop_column :cancelled_at
       drop_foreign_key :cancelled_id
     end
+
+    run <<~SQL
+    DELETE FROM govt_inspection_pallets;
+    SQL
+
+    alter_table(:govt_inspection_pallets) do
+      add_index [:pallet_id], name: :pallet_unique_id, unique: true
+    end
   end
 end

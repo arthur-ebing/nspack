@@ -411,8 +411,6 @@ Sequel.migration do
         ALTER TABLE public.vw_pallet_sequence_flat
         OWNER TO postgres;
     SQL
-    alter_table(:pallets) do
-      drop_column :last_govt_inspection_pallet_id
-    end
+
   end
 end
