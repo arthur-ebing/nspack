@@ -8,12 +8,11 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
-
-      set_show_fields if %i[show ship allocate].include? @mode
       add_rules
       add_behaviours
 
+      common_values_for_fields common_fields
+      set_show_fields if %i[show ship allocate].include? @mode
       form_name 'load'
     end
 
