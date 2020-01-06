@@ -1,0 +1,208 @@
+---
+:caption: EDI out rules
+:sql: "SELECT edi_out_rules.id, edi_out_rules.flow_type,\r\n       depots.depot_code,\r\n
+  \      fn_party_role_name(edi_out_rules.party_role_id) AS party,\r\n       roles.name
+  AS role,\r\n       edi_out_rules.hub_address, array_to_string(edi_out_rules.directory_keys,
+  '; ') AS targets,\r\n       edi_out_rules.depot_id, edi_out_rules.party_role_id,\r\n
+  \      edi_out_rules.active, edi_out_rules.created_at, edi_out_rules.updated_at\r\n
+  \ FROM edi_out_rules\r\n  LEFT OUTER JOIN depots ON depots.id = edi_out_rules.depot_id\r\n
+  \ LEFT OUTER JOIN party_roles ON party_roles.id = edi_out_rules.party_role_id\r\n
+  \ LEFT OUTER JOIN roles ON roles.id = party_roles.role_id\r\n  ORDER BY edi_out_rules.flow_type,
+  depots.depot_code, fn_party_role_name(edi_out_rules.party_role_id), roles.name"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: edi_out_rules.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  flow_type:
+    :name: flow_type
+    :sequence_no: 2
+    :caption: Type
+    :namespaced_name: edi_out_rules.flow_type
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot_code:
+    :name: depot_code
+    :sequence_no: 3
+    :caption: Depot code
+    :namespaced_name: depots.depot_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party:
+    :name: party
+    :sequence_no: 4
+    :caption: Party
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  role:
+    :name: role
+    :sequence_no: 5
+    :caption: Role
+    :namespaced_name: roles.name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  hub_address:
+    :name: hub_address
+    :sequence_no: 6
+    :caption: Hub addr
+    :namespaced_name: edi_out_rules.hub_address
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  targets:
+    :name: targets
+    :sequence_no: 7
+    :caption: Targets
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot_id:
+    :name: depot_id
+    :sequence_no: 8
+    :caption: Depot
+    :namespaced_name: edi_out_rules.depot_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_role_id:
+    :name: party_role_id
+    :sequence_no: 9
+    :caption: Party role
+    :namespaced_name: edi_out_rules.party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 10
+    :caption: Active
+    :namespaced_name: edi_out_rules.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 11
+    :caption: Created at
+    :namespaced_name: edi_out_rules.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 12
+    :caption: Updated at
+    :namespaced_name: edi_out_rules.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []
