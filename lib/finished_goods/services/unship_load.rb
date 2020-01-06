@@ -30,7 +30,7 @@ module FinishedGoodsApp
     private
 
     def unship_load
-      attrs = { shipped: false, shipped_at: nil }
+      attrs = { shipped: false }
       repo.update(:loads, load_id, attrs)
       repo.log_status(:loads, load_id, 'UNSHIPPED', user_name: user_name)
 
@@ -38,8 +38,8 @@ module FinishedGoodsApp
     end
 
     def unship_location
-      location_type_id = (repo.where_hash(:location_types, location_type_code: 'SITE') || {})[:id]
-      location_id = (repo.where_hash(:locations, location_type_id: location_type_id) || {})[:id]
+      location_type_id = get_with_args(:location_types, :id, location_type_code: 'SITE')
+      location_id = get_with_args(:locations, :id, location_type_id: location_type_id)
       return failed_response('Site location not defined, unable to unship pallet') if location_id.nil?
 
       success_response('ok', location_id)
@@ -49,7 +49,7 @@ module FinishedGoodsApp
       res = unship_location
       return res unless res.success
 
-      attrs = { shipped: false, shipped_at: nil, exit_ref: nil, in_stock: true, location_id: res.instance }
+      attrs = { shipped: false, exit_ref: nil, in_stock: true, location_id: res.instance }
       repo.update(:pallets, pallet_ids, attrs)
       repo.log_multiple_statuses(:pallets, pallet_ids, 'UNSHIPPED', user_name: user_name)
 
