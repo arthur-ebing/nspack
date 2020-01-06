@@ -295,7 +295,7 @@ module FinishedGoodsApp
     end
 
     def assert_permission!(task, id = nil)
-      res = TaskPermissionCheck::Load.call(task, id)
+      res = TaskPermissionCheck::Load.call(task, id, @user)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 

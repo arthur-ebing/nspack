@@ -315,7 +315,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, user: current_user, back_url: request.referer) }
       end
 
       r.is do
