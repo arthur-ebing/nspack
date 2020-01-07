@@ -223,7 +223,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: (@repo.where_hash(:depots, depot_code: AppConst::DEFAULT_DEPOT) || {})[:id],
+      @form_object = OpenStruct.new(depot_id: @repo.get_with_args(:depots, :id, depot_code: AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,
@@ -256,13 +256,15 @@ module UiRules
 
     def add_rules # rubocop:disable Metrics/AbcSize
       if @mode == :ship
-        rules[:can_unship] = @form_object.shipped && Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
+        rules[:can_unship] = @form_object.shipped &&
+                             Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
 
         rules[:can_ship] = !@form_object.shipped &&
                            Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
                            !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
       end
       rules[:allocated] = @form_object.allocated
+      rules[:has_container] = !@form_object.container_code.nil_or_empty?
     end
   end
 end

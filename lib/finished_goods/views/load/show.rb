@@ -37,6 +37,12 @@ module FinishedGoods
                                   loading_window: true,
                                   style: :button)
               section.add_control(control_type: :link,
+                                  text: 'Verified Gross Mass',
+                                  url: "/finished_goods/reports/verified_gross_mass/#{id}",
+                                  visible: rules[:has_container],
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
                                   text: 'Unship Load',
                                   url: "/finished_goods/dispatch/loads/#{id}/unship",
                                   visible: rules[:can_unship],
