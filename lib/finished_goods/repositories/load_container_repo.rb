@@ -43,14 +43,6 @@ module FinishedGoodsApp
       DB[query].select_map(%i[code id])
     end
 
-    def find_stack_type_id(stack_type_code)
-      DB[:container_stack_types].where(stack_type_code: stack_type_code).get(:id)
-    end
-
-    def find_load_container_from(load_id:)
-      DB[:load_containers].where(load_id: load_id).get(:id)
-    end
-
     def actual_payload_from(load_id:)
       DB[:pallets].where(load_id: load_id).select_map(:nett_weight).map { |w| w.nil? ? AppConst::BIG_ZERO : w }.sum
     end

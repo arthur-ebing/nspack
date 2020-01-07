@@ -144,13 +144,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do
           # set defaults
           form_state = {}
-          form_state[:stack_type_id] = FinishedGoodsApp::LoadContainerRepo.new.find_stack_type_id('S')
+          form_state[:stack_type_id] = BaseRepo.new.get_with_args(:container_stack_types, :id, stack_type_code: 'S')
           form_state[:verified_gross_weight] = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight_from(load_id: load_id)
           form_state[:verified_gross_weight_date] = Time.now
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
 
           # checks if load_container exists
-          container_id = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_from(load_id: load_id)
+          container_id = BaseRepo.new.get_with_args(:load_containers, :id, load_id: load_id)
           unless container_id.nil?
             form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(container_id).to_h)
             form_state[:container] = 'true'

@@ -37,7 +37,7 @@ module FinishedGoodsApp
     end
 
     def delete_container_when_not_required
-      container_id = container_repo.find_load_container_from(load_id: load_id)
+      container_id = repo.get_with_args(:load_containers, :id, load_id: load_id)
       return if container_id.nil? | !@container_params.empty?
 
       container_repo.delete_load_container(container_id)
