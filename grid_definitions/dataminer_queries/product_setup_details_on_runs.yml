@@ -1,41 +1,46 @@
 ---
 :caption: Product Setup Details
-:sql: "SELECT product_setup_templates.template_name, fn_product_setup_code(product_setups.id)
-  AS product_setup_code, fn_product_setup_in_production(product_setups.id) AS in_production,
-  commodities.code AS commodity_code, marketing_varieties.marketing_variety_code,
-  standard_pack_codes.standard_pack_code AS standard_pack, basic_pack_codes.basic_pack_code
-  AS pack_code, std_fruit_size_counts.size_count_value AS size_count, fruit_actual_counts_for_packs.actual_count_for_pack
-  AS actual_count, fruit_size_references.size_reference, organizations.short_description
-  AS marketing_organization, target_market_groups.target_market_group_name, marks.mark_code,
-  cust_mkt.marketing_variety_code AS cust_mkt_variety, inventory_codes.inventory_code,
-  pallet_formats.description AS pallet_format_description, cartons_per_pallet.cartons_per_pallet,
-  pm_boms.bom_code, product_setups.id,product_setups.product_setup_template_id, product_setups.extended_columns,
-  product_setups.client_size_reference, product_setups.client_product_code, product_setups.marketing_order_number,
-  product_setups.sell_by_code, product_setups.pallet_label_name, product_setups.active,
-  product_setups.created_at, product_setups.updated_at, CASE WHEN fn_product_setup_in_production(product_setups.id)
-  THEN 'warning' WHEN NOT product_setups.active THEN 'inactive' ELSE NULL END AS colour_rule,
-  production_runs.id AS production_run_id, (SELECT array_agg(pst.treatment_code)\r\nFROM
-  (SELECT t.treatment_code FROM treatments t JOIN product_setups ps ON t.id = ANY
-  (ps.treatment_ids) WHERE ps.id = product_setups.id ORDER BY t.treatment_code DESC)
-  AS pst) AS product_setup_treatments FROM product_setups JOIN product_setup_templates
-  ON product_setup_templates.id = product_setups.product_setup_template_id JOIN marketing_varieties
-  ON marketing_varieties.id = product_setups.marketing_variety_id LEFT JOIN std_fruit_size_counts
-  ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id LEFT JOIN commodities
-  ON commodities.id = std_fruit_size_counts.commodity_id JOIN basic_pack_codes ON
-  basic_pack_codes.id = product_setups.basic_pack_code_id JOIN standard_pack_codes
-  ON standard_pack_codes.id = product_setups.standard_pack_code_id LEFT JOIN fruit_actual_counts_for_packs
-  ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id
-  LEFT JOIN fruit_size_references ON fruit_size_references.id = product_setups.fruit_size_reference_id
-  JOIN party_roles ON party_roles.id = product_setups.marketing_org_party_role_id
-  JOIN organizations ON organizations.id = party_roles.organization_id JOIN target_market_groups
-  ON target_market_groups.id = product_setups.packed_tm_group_id JOIN marks ON marks.id
-  = product_setups.mark_id LEFT JOIN customer_variety_varieties ON customer_variety_varieties.id
-  = product_setups.customer_variety_variety_id LEFT JOIN marketing_varieties cust_mkt
-  ON cust_mkt.id = customer_variety_varieties.marketing_variety_id LEFT JOIN inventory_codes
-  ON inventory_codes.id = product_setups.inventory_code_id JOIN pallet_formats ON
-  pallet_formats.id = product_setups.pallet_format_id JOIN cartons_per_pallet ON cartons_per_pallet.id
-  = product_setups.cartons_per_pallet_id LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id\r\nJOIN
-  production_runs ON production_runs.product_setup_template_id = product_setup_templates.id"
+:sql: "SELECT\r\n  product_setup_templates.template_name,\r\n  fn_product_setup_code
+  (product_setups.id) AS product_setup_code,\r\n  fn_product_setup_in_production (product_setups.id)
+  AS in_production,\r\n  commodities.code AS commodity_code,\r\n  marketing_varieties.marketing_variety_code,\r\n
+  \ standard_pack_codes.standard_pack_code AS standard_pack,\r\n  basic_pack_codes.basic_pack_code
+  AS pack_code,\r\n  std_fruit_size_counts.size_count_value AS size_count,\r\n  fruit_actual_counts_for_packs.actual_count_for_pack
+  AS actual_count,\r\n  fruit_size_references.size_reference,\r\n  organizations.medium_description
+  AS marketing_organization,\r\n  target_market_groups.target_market_group_name,\r\n
+  \ marks.mark_code,\r\n  cust_mkt.marketing_variety_code AS cust_mkt_variety,\r\n
+  \ inventory_codes.inventory_code,\r\n  pallet_formats.description AS pallet_format_description,\r\n
+  \ cartons_per_pallet.cartons_per_pallet,\r\n  pm_boms.bom_code,\r\n  product_setups.id,\r\n
+  \ product_setups.product_setup_template_id,\r\n  product_setups.extended_columns,\r\n
+  \ product_setups.client_size_reference,\r\n  product_setups.client_product_code,\r\n
+  \ product_setups.marketing_order_number,\r\n  product_setups.sell_by_code,\r\n  product_setups.pallet_label_name,\r\n
+  \ product_setups.active,\r\n  product_setups.created_at,\r\n  product_setups.updated_at,\r\n
+  \ CASE WHEN fn_product_setup_in_production (product_setups.id) THEN\r\n    'warning'\r\n
+  \ WHEN NOT product_setups.active THEN\r\n    'inactive'\r\n  ELSE\r\n    NULL\r\n
+  \ END AS colour_rule,\r\n  production_runs.id AS production_run_id,\r\n  (\r\n    SELECT\r\n
+  \     array_agg(pst.treatment_code)\r\n    FROM (\r\n      SELECT\r\n        t.treatment_code\r\n
+  \     FROM\r\n        treatments t\r\n        JOIN product_setups ps ON t.id = ANY
+  (ps.treatment_ids)\r\n      WHERE\r\n        ps.id = product_setups.id\r\n      ORDER
+  BY\r\n        t.treatment_code DESC) AS pst) AS product_setup_treatments\r\nFROM\r\n
+  \ product_setups\r\n  JOIN product_setup_templates ON product_setup_templates.id
+  = product_setups.product_setup_template_id\r\n  JOIN marketing_varieties ON marketing_varieties.id
+  = product_setups.marketing_variety_id\r\n  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id
+  = product_setups.std_fruit_size_count_id\r\n  LEFT JOIN commodities ON commodities.id
+  = std_fruit_size_counts.commodity_id\r\n  JOIN basic_pack_codes ON basic_pack_codes.id
+  = product_setups.basic_pack_code_id\r\n  JOIN standard_pack_codes ON standard_pack_codes.id
+  = product_setups.standard_pack_code_id\r\n  LEFT JOIN fruit_actual_counts_for_packs
+  ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id\r\n
+  \ LEFT JOIN fruit_size_references ON fruit_size_references.id = product_setups.fruit_size_reference_id\r\n
+  \ JOIN party_roles ON party_roles.id = product_setups.marketing_org_party_role_id\r\n
+  \ JOIN organizations ON organizations.id = party_roles.organization_id\r\n  JOIN
+  target_market_groups ON target_market_groups.id = product_setups.packed_tm_group_id\r\n
+  \ JOIN marks ON marks.id = product_setups.mark_id\r\n  LEFT JOIN customer_variety_varieties
+  ON customer_variety_varieties.id = product_setups.customer_variety_variety_id\r\n
+  \ LEFT JOIN marketing_varieties cust_mkt ON cust_mkt.id = customer_variety_varieties.marketing_variety_id\r\n
+  \ LEFT JOIN inventory_codes ON inventory_codes.id = product_setups.inventory_code_id\r\n
+  \ JOIN pallet_formats ON pallet_formats.id = product_setups.pallet_format_id\r\n
+  \ JOIN cartons_per_pallet ON cartons_per_pallet.id = product_setups.cartons_per_pallet_id\r\n
+  \ LEFT JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id\r\n  JOIN production_runs
+  ON production_runs.product_setup_template_id = product_setup_templates.id"
 :limit: 
 :offset: 
 :external_settings:
@@ -208,7 +213,7 @@
     :name: marketing_organization
     :sequence_no: 11
     :caption: Marketing organization
-    :namespaced_name: organizations.short_description
+    :namespaced_name: organizations.medium_description
     :data_type: :string
     :width: 
     :format: 

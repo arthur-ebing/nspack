@@ -6,9 +6,9 @@
 module MasterfilesApp
   class PartyRepo < BaseRepo
     build_for_select :organizations,
-                     label: :short_description,
+                     label: :medium_description,
                      value: :id,
-                     order_by: :short_description
+                     order_by: :medium_description
     build_for_select :people,
                      label: :surname,
                      value: :id,
@@ -70,7 +70,7 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
       parent_hash = DB[:organizations].where(id: hash[:parent_id]).first
-      hash[:parent_organization] = parent_hash ? parent_hash[:short_description] : nil
+      hash[:parent_organization] = parent_hash ? parent_hash[:medium_description] : nil
       Organization.new(hash)
     end
 
@@ -269,7 +269,7 @@ module MasterfilesApp
         LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
         LEFT OUTER JOIN people p ON p.id = pr.person_id
         WHERE r.name = ?
-          AND COALESCE(o.short_description, p.first_name || ' ' || p.surname) = ?
+          AND COALESCE(o.medium_description, p.first_name || ' ' || p.surname) = ?
           AND pr.active
       SQL
 

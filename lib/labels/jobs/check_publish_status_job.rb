@@ -10,7 +10,7 @@ module LabelApp
       sleep(1)
       res = publish_labels_status
 
-      if res.success && res.instance[:response_code].to_s != '204'
+      if response_is_200_or_204(res) # res.success && res.instance[:response_code].to_s != '204'
         handle_success(res.instance)
       elsif res.instance[:response_code].to_s.start_with?('404') || res.instance[:response_code].to_s.start_with?('204') # Nothing sent from MesServer to CMS/MesScada yet...
         handle_retry
@@ -20,6 +20,13 @@ module LabelApp
     end
 
     private
+
+    def response_is_200_or_204(res)
+      return false unless res.success
+      return false if res.instance&.is_a?(Hash) && res.instancee[:response_code].to_s == '204'
+
+      true
+    end
 
     def handle_success(instance)
       labels = @repo.published_label_lookup(@label_publish_log.id)

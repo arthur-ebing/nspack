@@ -275,4 +275,6 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def: SELECT  short_description FROM party_roles JOIN organizations ON party_roles.party_id = organizations.party_id WHERE party_roles.role_id = (SELECT id FROM roles WHERE "name" = 'CUSTOMER')
+  :list_def: SELECT medium_description FROM party_roles JOIN organizations ON party_roles.party_id
+    = organizations.party_id WHERE party_roles.role_id = (SELECT id FROM roles WHERE
+    "name" = 'CUSTOMER')

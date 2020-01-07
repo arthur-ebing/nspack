@@ -125,23 +125,21 @@ module RawMaterialsApp
     end
 
     def find_container_material_owners_by_container_material_type(container_material_type_id)
-      DB["SELECT pr.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS party_name
-          FROM rmt_container_material_owners co
-          JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
-          LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
-          LEFT OUTER JOIN people p ON p.id = pr.person_id
-          LEFT OUTER JOIN roles r ON r.id = pr.role_id
-          WHERE co.rmt_container_material_type_id = ?", container_material_type_id].map { |o| [o[:party_name], o[:id]] }
+      query = <<~SQL
+        SELECT rmt_material_owner_party_role_id AS id, fn_party_role_name_with_role(rmt_material_owner_party_role_id) AS party_name
+        FROM rmt_container_material_owners
+        WHERE rmt_container_material_type_id = ?
+      SQL
+      DB[query, container_material_type_id].select_map(%i[party_name id])
     end
 
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
-      DB["SELECT pr.id, COALESCE(o.short_description ||' - ' || r.name, p.first_name || ' ' || p.surname ||' - ' || r.name) AS container_material_owner
-          FROM rmt_container_material_owners co
-          JOIN party_roles pr on pr.id=co.rmt_material_owner_party_role_id
-          LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
-          LEFT OUTER JOIN people p ON p.id = pr.person_id
-          LEFT OUTER JOIN roles r ON r.id = pr.role_id
-          WHERE co.rmt_material_owner_party_role_id = #{rmt_material_owner_party_role_id} and co.rmt_container_material_type_id = #{rmt_container_material_type_id}"].first
+      DB[:rmt_container_material_owners]
+        .where(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id, rmt_container_material_type_id:  rmt_container_material_type_id)
+        .select(
+          Sequel.as(:rmt_material_owner_party_role_id, :id),
+          Sequel.function(:fn_party_role_name_with_role, :rmt_material_owner_party_role_id).as(:container_material_owner)
+        ).first
     end
 
     def find_rmt_delivery_by_bin_id(id)
