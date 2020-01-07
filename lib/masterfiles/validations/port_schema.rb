@@ -5,8 +5,8 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:port_type_ids, :array).maybe(:array?)
-    required(:voyage_type_ids, :array).maybe(:array?)
+    required(:port_type_ids, Types::IntArray).filled { each(:int?) }
+    required(:voyage_type_ids, Types::IntArray).filled { each(:int?) }
     optional(:city_id, :integer).maybe(:int?)
     required(:port_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)

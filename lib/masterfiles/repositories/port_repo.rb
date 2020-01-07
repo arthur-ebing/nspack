@@ -42,7 +42,7 @@ module MasterfilesApp
     def for_select_ports(params, active: true)
       args = params || {}
       query = <<~SQL
-        SELECT
+        SELECT DISTINCT
           ports.id AS id,
           port_code,
           port_types.id AS port_type_id,
@@ -62,6 +62,22 @@ module MasterfilesApp
 
     def for_select_inactive_ports(args)
       for_select_ports(args, active: false)
+    end
+
+    def create_port(params)
+      attrs = params.to_h
+      attrs[:port_type_ids] = array_for_db_col(attrs[:port_type_ids]) if attrs.key?(:port_type_ids)
+      attrs[:voyage_type_ids] = array_for_db_col(attrs[:voyage_type_ids]) if attrs.key?(:voyage_type_ids)
+
+      DB[:ports].insert(attrs)
+    end
+
+    def update_port(id, params)
+      attrs = params.to_h
+      attrs[:port_type_ids] = array_for_db_col(attrs[:port_type_ids]) if attrs.key?(:port_type_ids)
+      attrs[:voyage_type_ids] = array_for_db_col(attrs[:voyage_type_ids]) if attrs.key?(:voyage_type_ids)
+
+      DB[:ports].where(id: id).update(attrs)
     end
   end
 end

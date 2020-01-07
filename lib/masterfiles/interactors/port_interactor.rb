@@ -8,7 +8,7 @@ module MasterfilesApp
 
       id = nil
       repo.transaction do
-        id = repo.create_port(res.instance)
+        id = repo.create_port(res)
       end
       instance = port(id)
       success_response("Created port #{instance.port_code}", instance)
@@ -23,7 +23,7 @@ module MasterfilesApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        repo.update_port(id, res.instance)
+        repo.update_port(id, res)
       end
       instance = port(id)
       success_response("Updated port #{instance.port_code}", instance)
@@ -32,7 +32,7 @@ module MasterfilesApp
     end
 
     def delete_port(id)
-      name = port(id)&.port_code
+      name = port(id).port_code
       repo.transaction do
         repo.delete_port(id)
       end
@@ -57,12 +57,7 @@ module MasterfilesApp
     end
 
     def validate_port_params(params)
-      res = PortSchema.call(params)
-      return res unless res.errors.empty?
-
-      attrs = res.to_h
-      %i[port_type_ids voyage_type_ids].each { |k| attrs[k] = Sequel.pg_array(attrs[k].map(&:to_i)) }
-      OpenStruct.new(instance: attrs, messages: {})
+      PortSchema.call(params)
     end
   end
 end

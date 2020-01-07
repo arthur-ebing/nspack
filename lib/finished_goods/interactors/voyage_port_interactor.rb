@@ -13,14 +13,14 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = voyage_port(id)
-      success_response("Created voyage port #{id}", instance)
+      success_response("Created voyage port #{instance.port_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { port_id: ['Port already in voyage'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_voyage_port(id, params)
+    def update_voyage_port(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_voyage_port_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -29,18 +29,21 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = voyage_port(id)
-      success_response("Updated voyage port #{id}", instance)
+      success_response("Updated voyage port #{instance.port_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { port_id: ['Port already in voyage'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_voyage_port(id)
+      name = voyage_port(id).port_code
       repo.transaction do
         repo.delete_voyage_port(id)
         log_status(:voyage_ports, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted voyage port #{id}")
+      success_response("Deleted voyage port #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

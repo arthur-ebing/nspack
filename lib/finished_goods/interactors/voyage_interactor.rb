@@ -21,7 +21,7 @@ module FinishedGoodsApp
     end
 
     def update_voyage(id, params)
-      res = validate_voyage_params(params)
+      res = UpdateVoyageSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do

@@ -88,9 +88,9 @@ module FinishedGoodsApp
 
       id = nil
       repo.transaction do
-        ans = LoadService.call(nil, res, @user.user_name)
-        id = ans.instance
-        raise Crossbeams::InfoError, ans.message unless ans.success
+        load_res = LoadService.call(nil, res, @user.user_name)
+        id = load_res.instance
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
       end
@@ -105,8 +105,8 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        ans = LoadService.call(id, res, @user.user_name)
-        raise Crossbeams::InfoError, ans.message unless ans.success
+        load_res = LoadService.call(id, res, @user.user_name)
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
       end

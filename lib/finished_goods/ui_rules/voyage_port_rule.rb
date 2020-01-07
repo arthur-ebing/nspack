@@ -28,8 +28,6 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      voyage_id = @options[:voyage_id].nil? ? @form_object.voyage_id : @options[:voyage_id]
-      voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(voyage_id)&.voyage_type_id
       {
         port_type_id: { hide_on_load: @rules[:on_load],
                         renderer: :select,
@@ -49,8 +47,10 @@ module UiRules
                      required: true },
         port_id: { hide_on_load: rules[:item_visibility][:port_id],
                    renderer: :select,
-                   options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
-                   disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(voyage_type_id: voyage_type_id, port_type_id: @form_object.port_type_id),
+                   options: MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: @form_object.voyage_type_id,
+                                                                          port_type_id: @form_object.port_type_id),
+                   disabled_options: MasterfilesApp::PortRepo.new.for_select_inactive_ports(voyage_type_id: @form_object.voyage_type_id,
+                                                                                            port_type_id: @form_object.port_type_id),
                    caption: 'Port',
                    prompt: true,
                    required: true },
@@ -79,13 +79,15 @@ module UiRules
       make_new_form_object && return if @mode == :new
 
       @form_object = @repo.find_voyage_port_flat(@options[:id])
-      @rules[:on_load] = @repo.exists?(:loads, pol_voyage_port_id: @form_object.id) || @repo.exists?(:loads, pod_voyage_port_id: @form_object.id)
+      @rules[:on_load] = @repo.exists?(:loads, pol_voyage_port_id: @form_object.id) ||
+                         @repo.exists?(:loads, pod_voyage_port_id: @form_object.id)
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(voyage_id: nil,
-                                    port_type_id: nil,
+      @form_object = OpenStruct.new(voyage_id: @options[:voyage_id],
+                                    voyage_type_id: @repo.get(:voyages, @options[:voyage_id], :voyage_type_id),
                                     port_id: nil,
+                                    port_type_id: nil,
                                     trans_shipment_vessel_id: nil,
                                     ata: nil,
                                     atd: nil,
@@ -97,7 +99,7 @@ module UiRules
 
     def add_rules
       vis = { port_id: true, trans_shipment_vessel_id: true, ata: true, atd: true, eta: true, etd: true }
-      case @form_object.port_type_code
+      case @repo.get(:port_types, @form_object.port_type_id, :port_type_code)
       when 'POL'
         vis[:port_id] = vis[:ata] = vis[:eta] = false
       when 'POD'
@@ -112,8 +114,8 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :port_type_id, notify: [{ url: '/finished_goods/dispatch/voyage_ports/port_type_changed',
-                                                            param_keys: %i[voyage_id],
-                                                            param_values: { voyage_id: @options[:voyage_id] } }]
+                                                            param_keys: %i[voyage_type_id],
+                                                            param_values: { voyage_type_id: @form_object.voyage_type_id } }]
       end
     end
   end
