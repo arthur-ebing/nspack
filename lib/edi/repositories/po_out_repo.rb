@@ -79,7 +79,7 @@ module EdiApp
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
           destination_regions.destination_region_name AS target_region,
-          destination_countries.country_name AS target_country,
+          destination_countries.iso_country_code AS target_country,
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS seq_no,
           govt_inspection_sheets.id AS consignment_number,
@@ -167,6 +167,7 @@ module EdiApp
 
     def store_edi_filename(file_name, record_id)
       DB[:loads].where(id: record_id).update(edi_file_name: file_name)
+      log_status(:loads, record_id, 'PO SENT', user_name: 'System', comment: file_name)
     end
   end
 end
