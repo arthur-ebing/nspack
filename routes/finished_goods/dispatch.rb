@@ -335,7 +335,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             redirect_to_last_grid(r)
           else
             re_show_form(r, res, url: "/finished_goods/dispatch/loads/#{id}") do
-              FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors)
+              FinishedGoods::Dispatch::Load::Edit.call(id, user: current_user, form_values: params[:load], form_errors: res.errors)
             end
           end
         end
