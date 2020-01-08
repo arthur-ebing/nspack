@@ -256,11 +256,13 @@ module UiRules
     end
 
     def add_rules # rubocop:disable Metrics/AbcSize
-      rules[:can_unship] = @form_object.shipped &&
-                           Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
-      rules[:can_ship] = !@form_object.shipped &&
-                         Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
-                         !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
+      if %i[edit ship].include? @mode
+        rules[:can_unship] = @form_object.shipped &&
+                             Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
+        rules[:can_ship] = !@form_object.shipped &&
+                           Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
+                           !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
+      end
       rules[:allocated] = @form_object.allocated
       rules[:has_container] = !@form_object.container_code.nil_or_empty?
     end
