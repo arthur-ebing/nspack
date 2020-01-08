@@ -5,9 +5,9 @@ module FinishedGoods
   module Dispatch
     module Load
       class New
-        def self.call(id: nil, user: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           form_values = FinishedGoodsApp::LoadRepo.new.find_load_flat(id).to_h unless id.nil? # copy load
-          ui_rule = UiRules::Compiler.new(:load, :new, user: user, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:load, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
