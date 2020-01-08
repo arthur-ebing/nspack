@@ -6,9 +6,13 @@ module FinishedGoodsApp
   class TestLoadVoyageInteractor < MiniTestWithHooks
     include LoadFactory
     include VoyageFactory
+    include VoyagePortFactory
     include LoadVoyageFactory
     include MasterfilesApp::DepotFactory
     include MasterfilesApp::PartyFactory
+    include MasterfilesApp::VesselFactory
+    include MasterfilesApp::PortFactory
+    include MasterfilesApp::PortTypeFactory
 
     def test_repo
       repo = interactor.send(:repo)

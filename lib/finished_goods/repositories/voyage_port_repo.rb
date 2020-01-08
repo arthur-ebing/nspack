@@ -17,8 +17,8 @@ module FinishedGoodsApp
       find_with_association(:voyage_ports,
                             id,
                             parent_tables: [{ parent_table: :ports,
-                                              columns: %i[port_code port_type_id],
-                                              flatten_columns: { port_code: :port_code, port_type_id: :port_type_id } },
+                                              columns: %i[port_code],
+                                              flatten_columns: { port_code: :port_code } },
                                             { parent_table: :port_types,
                                               columns: %i[port_type_code],
                                               foreign_key: :port_type_id,
@@ -44,21 +44,6 @@ module FinishedGoodsApp
                                               foreign_key: :trans_shipment_vessel_id,
                                               flatten_columns: { vessel_code: :trans_shipment_vessel } }],
                             wrapper: VoyagePortFlat)
-    end
-
-    def find_or_create_voyage_port(voyage_id:, port_id:)
-      ds = DB[:voyage_ports]
-      ds = ds.where(voyage_id: voyage_id,
-                    port_id: port_id)
-      ds = ds.where(active: true)
-      voyage_port_id = ds.get(:id)
-
-      if voyage_port_id.nil?
-        voyage_port_id = DB[:voyage_ports].insert(voyage_id: voyage_id,
-                                                  port_id: port_id)
-        log_status(:voyage_ports, voyage_port_id, 'CREATED')
-      end
-      voyage_port_id
     end
   end
 end

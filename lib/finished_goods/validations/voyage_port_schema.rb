@@ -7,6 +7,7 @@ module FinishedGoodsApp
     optional(:id, :integer).filled(:int?)
     required(:voyage_id, :integer).filled(:int?)
     required(:port_id, :integer).filled(:int?)
+    required(:port_type_id, :integer).filled(:int?)
     optional(:trans_shipment_vessel_id, :integer).maybe(:int?)
     optional(:ata, %i[nil date]).maybe(:date?)
     optional(:atd, %i[nil date]).maybe(:date?)

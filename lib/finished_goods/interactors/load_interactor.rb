@@ -88,7 +88,7 @@ module FinishedGoodsApp
 
       id = nil
       repo.transaction do
-        load_res = CreateLoadService.call(res, @user.user_name)
+        load_res = LoadService.call(nil, res, @user.user_name)
         id = load_res.instance
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
@@ -96,8 +96,6 @@ module FinishedGoodsApp
       end
       instance = load_entity(id)
       success_response("Created load: #{id}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { order_number: ['This load already exists.'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -107,7 +105,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        load_res = UpdateLoadService.call(id, res, @user.user_name)
+        load_res = LoadService.call(id, res, @user.user_name)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -119,7 +117,7 @@ module FinishedGoodsApp
     end
 
     def delete_load(id)
-      load_voyage_id = LoadVoyageRepo.new.find_load_voyage_from(load_id: id)
+      load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: id)
       repo.transaction do
         # DELETE LOAD_VOYAGE
         LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
@@ -204,8 +202,8 @@ module FinishedGoodsApp
 
       pallet_ids = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
       repo.transaction do
-        load_res = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
-        raise Crossbeams::InfoError, load_res.message unless load_res.success
+        ans = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
+        raise Crossbeams::InfoError, ans.message unless ans.success
 
         log_transaction
       end
@@ -297,7 +295,7 @@ module FinishedGoodsApp
     end
 
     def assert_permission!(task, id = nil)
-      res = TaskPermissionCheck::Load.call(task, id)
+      res = TaskPermissionCheck::Load.call(task, id, @user)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 

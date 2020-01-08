@@ -5,8 +5,8 @@ module FinishedGoods
   module Dispatch
     module Load
       class Edit
-        def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:load, :edit, id: id, form_values: form_values)
+        def self.call(id, user: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:load, :edit, id: id, user: user, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

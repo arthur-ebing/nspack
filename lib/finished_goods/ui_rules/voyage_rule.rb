@@ -5,26 +5,19 @@ module UiRules
     def generate_rules
       @repo = FinishedGoodsApp::VoyageRepo.new
       make_form_object
+      add_rules
       apply_form_values
 
-      if @mode == :edit
-        common_fields_hash = common_fields
-        common_fields_hash[:voyage_type_id][:disabled_options] = common_fields_hash[:voyage_type_id].delete(:options)
-        common_values_for_fields common_fields_hash
-      else
-        common_values_for_fields common_fields
-      end
+      common_values_for_fields common_fields
 
       set_show_fields if %i[show complete].include? @mode
       add_behaviours
       form_name 'voyage'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      vessel_id_label = MasterfilesApp::VesselRepo.new.find_vessel(@form_object.vessel_id)&.vessel_code
-      voyage_type_id_label = MasterfilesApp::VoyageTypeRepo.new.find_voyage_type(@form_object.voyage_type_id)&.voyage_type_code
-      fields[:vessel_id] = { renderer: :label, with_value: vessel_id_label, caption: 'Vessel' }
-      fields[:voyage_type_id] = { renderer: :label, with_value: voyage_type_id_label, caption: 'Voyage Type' }
+    def set_show_fields
+      fields[:vessel_id] = { renderer: :label, with_value: @form_object.vessel_code, caption: 'Vessel' }
+      fields[:voyage_type_id] = { renderer: :label, with_value: @form_object.voyage_type_code, caption: 'Voyage Type' }
       fields[:voyage_number] = { renderer: :label }
       fields[:voyage_code] = { renderer: :label }
       fields[:year] = { renderer: :label }
@@ -34,14 +27,20 @@ module UiRules
     end
 
     def common_fields
+      voyage_type_renderer = if @mode == :edit
+                               { renderer: :label,
+                                 with_value: @form_object.voyage_type_code,
+                                 caption: 'Voyage Type' }
+                             else
+                               { renderer: :select,
+                                 options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types,
+                                 disabled_options: MasterfilesApp::VoyageTypeRepo.new.for_select_inactive_voyage_types,
+                                 caption: 'Voyage Type',
+                                 prompt: true,
+                                 required: true }
+                             end
       {
-        voyage_type_id: { renderer: :select,
-                          options: MasterfilesApp::VoyageTypeRepo.new.for_select_voyage_types,
-                          disabled_options: MasterfilesApp::VoyageTypeRepo.new.for_select_inactive_voyage_types,
-                          caption: 'Voyage Type',
-                          prompt: true,
-                          required: true,
-                          disabled: false },
+        voyage_type_id: voyage_type_renderer,
         vessel_id: { renderer: :select,
                      options: MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: @form_object.voyage_type_id),
                      disabled_options: MasterfilesApp::VesselRepo.new.for_select_inactive_vessels(voyage_type_id: @form_object.voyage_type_id),
@@ -64,7 +63,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_voyage(@options[:id])
+      @form_object = @repo.find_voyage_flat(@options[:id])
     end
 
     def make_new_form_object
@@ -79,13 +78,20 @@ module UiRules
 
     private
 
+    def add_rules
+      pol_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+      has_pod =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pol_port_type_id)
+      has_pol =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pod_port_type_id)
+
+      rules[:can_complete] = (has_pol & has_pod & !@form_object.completed)
+      rules[:completed] = @form_object.completed
+    end
+
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/voyages/voyage_type_changed' }]
       end
-
-      rules[:can_complete] = !(true & @form_object.completed)
-      rules[:completed] = @form_object.completed
     end
   end
 end

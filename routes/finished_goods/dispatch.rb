@@ -65,8 +65,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           blank_json_response
         else
           actions = []
-          voyage_type_id = FinishedGoodsApp::VoyageRepo.new.find_voyage_flat(params[:voyage_port_voyage_id])&.voyage_type_id
-          port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_id: params[:changed_value], voyage_type_id: voyage_type_id)
+          port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_id: params[:changed_value], voyage_type_id: params[:voyage_type_id])
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'voyage_port_port_id', options_array: port_list)
           port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code
           port_type_code = port_type_code.nil? ? 'stub' : port_type_code
@@ -126,7 +125,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             add_grid_row(attrs: select_attributes(res.instance, row_keys),
                          notice: res.message)
           else
-            re_show_form(r, res, url: "/finished_goods/dispatch/voyages#{id}/voyage_ports/new") do
+            re_show_form(r, res, url: "/finished_goods/dispatch/voyages/#{id}/voyage_ports/new") do
               FinishedGoods::Dispatch::VoyagePort::New.call(id,
                                                             form_values: params[:voyage_port],
                                                             form_errors: res.errors,
@@ -165,7 +164,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res) { FinishedGoods::Dispatch::Voyage::Edit.call(id, form_values: params[:voyage], form_errors: res.errors, back_url: request.referer) }
+            re_show_form(r, res, url: "/finished_goods/dispatch/voyages/#{id}/edit") do
+              FinishedGoods::Dispatch::Voyage::Edit.call(id,
+                                                         form_values: params[:voyage],
+                                                         form_errors: res.errors,
+                                                         back_url: request.referer)
+            end
           end
         end
         r.delete do    # DELETE
@@ -315,7 +319,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, user: current_user, back_url: request.referer) }
       end
 
       r.is do
@@ -330,8 +334,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            url = "/finished_goods/dispatch/loads/#{id}"
-            re_show_form(r, res, url: url) { FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors) }
+            re_show_form(r, res, url: "/finished_goods/dispatch/loads/#{id}") do
+              FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors)
+            end
           end
         end
 

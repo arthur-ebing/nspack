@@ -14,39 +14,69 @@ module MasterfilesApp
     crud_calls_for :ports, name: :port, wrapper: Port
 
     def find_port_flat(id)
-      find_with_association(:ports,
-                            id,
-                            parent_tables: [{ parent_table: :voyage_types,
-                                              columns: %i[voyage_type_code],
-                                              flatten_columns: { voyage_type_code: :voyage_type_code } },
-                                            { parent_table: :destination_cities,
-                                              columns: %i[city_name],
-                                              foreign_key: :city_id,
-                                              flatten_columns: { city_name: :city_name } },
-                                            { parent_table: :port_types,
-                                              columns: %i[port_type_code],
-                                              flatten_columns: { port_type_code: :port_type_code } }],
-                            wrapper: PortFlat)
+      query = <<~SQL
+        SELECT
+          ports.id,
+          ports.port_code,
+          ports.description,
+          ports.port_type_ids,
+          string_agg(distinct port_types.port_type_code, ', ') AS port_type_codes,
+          ports.voyage_type_ids,
+          string_agg(distinct voyage_types.voyage_type_code, ', ') AS voyage_type_codes,
+          ports.city_id,
+          destination_cities.city_name AS city_name,
+          ports.active
+        FROM ports
+        LEFT JOIN destination_cities ON destination_cities.id = ports.city_id
+        JOIN port_types ON port_types.id = ANY(ports.port_type_ids)
+        JOIN voyage_types ON voyage_types.id = ANY(ports.voyage_type_ids)
+        WHERE ports.id = ?
+        GROUP BY ports.id, destination_cities.city_name
+      SQL
+      hash = DB[query, id].first
+      return nil if hash.nil?
+
+      PortFlat.new(hash)
     end
 
-    def for_select_ports(args = nil) # rubocop:disable Metrics/AbcSize
-      ds = DB[:port_types]
-      ds = ds.join(:ports, port_type_id: :id)
-      ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:ports][:active] => true)
-      ds = ds.order(:port_code)
-      ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
+    def for_select_ports(params, active: true) # rubocop:disable Metrics/AbcSize
+      params ||= {}
+      port_type_code = params.delete(:port_type_code)
+      params[:port_type_id] = DB[:port_types].where(port_type_code: port_type_code).get(:id) unless port_type_code.nil?
+
+      where_port_type = " AND port_type_ids @> ARRAY[#{params[:port_type_id]}]" unless params[:port_type_id].nil?
+      where_voyage_type = " AND voyage_type_ids @> ARRAY[#{params[:voyage_type_id]}]" unless params[:voyage_type_id].nil?
+
+      query = <<~SQL
+        SELECT DISTINCT
+          id,
+          port_code
+        FROM ports
+        WHERE active = #{active}
+        #{where_port_type}
+        #{where_voyage_type}
+      SQL
+      DB[query].map { |row| [row[:port_code], row[:id]] }
     end
 
-    def for_select_inactive_ports(args = nil) # rubocop:disable Metrics/AbcSize
-      ds = DB[:port_types]
-      ds = ds.join(:ports, port_type_id: :id)
-      ds = ds.join(:voyage_types, id: :voyage_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:ports][:active] => false)
-      ds = ds.order(:port_code)
-      ds.select_map([Sequel[:ports][:port_code], Sequel[:ports][:id]])
+    def for_select_inactive_ports(params)
+      for_select_ports(params, active: false)
+    end
+
+    def create_port(params)
+      attrs = params.to_h
+      attrs[:port_type_ids] = array_for_db_col(attrs[:port_type_ids]) if attrs.key?(:port_type_ids)
+      attrs[:voyage_type_ids] = array_for_db_col(attrs[:voyage_type_ids]) if attrs.key?(:voyage_type_ids)
+
+      DB[:ports].insert(attrs)
+    end
+
+    def update_port(id, params)
+      attrs = params.to_h
+      attrs[:port_type_ids] = array_for_db_col(attrs[:port_type_ids]) if attrs.key?(:port_type_ids)
+      attrs[:voyage_type_ids] = array_for_db_col(attrs[:voyage_type_ids]) if attrs.key?(:voyage_type_ids)
+
+      DB[:ports].where(id: id).update(attrs)
     end
   end
 end

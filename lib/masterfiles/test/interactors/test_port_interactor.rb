@@ -5,6 +5,8 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestPortInteractor < MiniTestWithHooks
     include PortFactory
+    include PortTypeFactory
+    include VoyageTypeFactory
     include DepotFactory
 
     def test_repo
@@ -35,8 +37,11 @@ module MasterfilesApp
 
     def test_update_port
       id = create_port
-      attrs = interactor.send(:repo).find_hash(:ports, id).reject { |k, _| k == :id }
+      attrs = interactor.send(:repo).find_hash(:ports, id).reject { |k, _| %i[id].include?(k) }
+      attrs[:port_type_ids] = attrs[:port_type_ids].to_a
+      attrs[:voyage_type_ids] = attrs[:voyage_type_ids].to_a
       value = attrs[:port_code]
+
       attrs[:port_code] = 'a_change'
       res = interactor.update_port(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
@@ -67,14 +72,13 @@ module MasterfilesApp
       port_type_id = create_port_type
       voyage_type_id = create_voyage_type
       destination_city_id = create_destination_city
-
       {
         id: 1,
-        port_type_id: port_type_id,
-        voyage_type_id: voyage_type_id,
         city_id: destination_city_id,
         port_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        port_type_ids: BaseRepo.new.array_for_db_col([port_type_id.to_s]),
+        voyage_type_ids: BaseRepo.new.array_for_db_col([voyage_type_id.to_s]),
         active: true
       }
     end

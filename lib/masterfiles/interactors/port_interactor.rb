@@ -11,8 +11,7 @@ module MasterfilesApp
         id = repo.create_port(res)
       end
       instance = port(id)
-      success_response("Created port #{instance.port_code}",
-                       instance)
+      success_response("Created port #{instance.port_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { port_code: ['This port already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -27,8 +26,7 @@ module MasterfilesApp
         repo.update_port(id, res)
       end
       instance = port(id)
-      success_response("Updated port #{instance.port_code}",
-                       instance)
+      success_response("Updated port #{instance.port_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

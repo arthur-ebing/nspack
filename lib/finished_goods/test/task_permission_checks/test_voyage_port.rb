@@ -13,10 +13,11 @@ module FinishedGoodsApp
         voyage_id: 1,
         port_id: 1,
         trans_shipment_vessel_id: 1,
-        ata: '2010-01-01 12:00',
-        atd: '2010-01-01 12:00',
-        eta: '2010-01-01 12:00',
-        etd: '2010-01-01 12:00',
+        ata: '2010-01-01',
+        atd: '2010-01-01',
+        eta: '2010-01-01',
+        etd: '2010-01-01',
+        port_type_id: 1,
         active: true
       }
       FinishedGoodsApp::VoyagePort.new(base_attrs.merge(attrs))
