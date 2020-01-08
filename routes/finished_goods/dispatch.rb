@@ -445,7 +445,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(user: current_user, back_url: request.referer) }
       end
 
       r.post do        # CREATE
