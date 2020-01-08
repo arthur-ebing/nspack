@@ -19,11 +19,18 @@ module UiRules
       fields[:voyage_id] = { renderer: :label, with_value: @form_object&.voyage_number, caption: 'Voyage' }
       fields[:port_id] = { renderer: :label, with_value: @form_object&.port_code, caption: 'Port' }
       fields[:port_type_id] = { renderer: :label, with_value: @form_object.port_type_code, caption: 'Port type' }
-      fields[:trans_shipment_vessel_id] = { renderer: :label, with_value: @form_object&.vessel_code, caption: 'Trans shipment vessel' }
-      fields[:ata] = { renderer: :label }
-      fields[:atd] = { renderer: :label }
-      fields[:eta] = { renderer: :label }
-      fields[:etd] = { renderer: :label }
+      fields[:trans_shipment_vessel_id] = { renderer: :label,
+                                            with_value: @form_object&.vessel_code,
+                                            caption: 'Trans shipment vessel',
+                                            hide_on_load: rules[:item_visibility][:trans_shipment_vessel_id] }
+      fields[:ata] = { renderer: :label,
+                       hide_on_load: rules[:item_visibility][:ata] }
+      fields[:atd] = { renderer: :label,
+                       hide_on_load: rules[:item_visibility][:atd] }
+      fields[:eta] = { renderer: :label,
+                       hide_on_load: rules[:item_visibility][:eta] }
+      fields[:etd] = { renderer: :label,
+                       hide_on_load: rules[:item_visibility][:etd] }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
