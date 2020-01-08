@@ -40,24 +40,23 @@ module MasterfilesApp
     end
 
     def for_select_ports(params, active: true)
-      args = params || {}
+      params = params || {}
+      port_type_code = params.delete(:port_type_code)
+      params[:port_type_id] = DB[:port_types].where(port_type_code: port_type_code).get(:id) unless port_type_code.nil?
+
+      port_type = " AND port_type_ids @> ARRAY[#{params[:port_type_id]}]" unless params[:port_type_id].nil?
+      voyage_type = " AND voyage_type_ids @> ARRAY[#{params[:voyage_type_id]}]" unless params[:voyage_type_id].nil?
+
       query = <<~SQL
         SELECT DISTINCT
-          ports.id AS id,
-          port_code,
-          port_types.id AS port_type_id,
-          port_type_code,
-          voyage_types.id AS voyage_type_id,
-          voyage_type_code
+          id,
+          port_code
         FROM ports
-        LEFT JOIN destination_cities ON destination_cities.id = ports.city_id
-        JOIN port_types ON port_types.id = ANY(ports.port_type_ids)
-        JOIN voyage_types ON voyage_types.id = ANY(ports.voyage_type_ids)
-        WHERE ports.active = ?
+        WHERE active = #{active}
+        #{port_type}
+        #{voyage_type}
       SQL
-      hash = DB[query, active].all
-      args.each { |k, v| hash = hash.find_all { |row| row[k].to_s == v.to_s } }
-      hash.map { |row| [row[:port_code],  row[:id].to_i] }
+      DB[query].map { |row| [row[:port_code], row[:id]] }
     end
 
     def for_select_inactive_ports(args)
