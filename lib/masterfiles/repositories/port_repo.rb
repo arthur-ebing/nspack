@@ -44,8 +44,8 @@ module MasterfilesApp
       port_type_code = params.delete(:port_type_code)
       params[:port_type_id] = DB[:port_types].where(port_type_code: port_type_code).get(:id) unless port_type_code.nil?
 
-      port_type = " AND port_type_ids @> ARRAY[#{params[:port_type_id]}]" unless params[:port_type_id].nil?
-      voyage_type = " AND voyage_type_ids @> ARRAY[#{params[:voyage_type_id]}]" unless params[:voyage_type_id].nil?
+      where_port_type = " AND port_type_ids @> ARRAY[#{params[:port_type_id]}]" unless params[:port_type_id].nil?
+      where_voyage_type = " AND voyage_type_ids @> ARRAY[#{params[:voyage_type_id]}]" unless params[:voyage_type_id].nil?
 
       query = <<~SQL
         SELECT DISTINCT
@@ -53,14 +53,14 @@ module MasterfilesApp
           port_code
         FROM ports
         WHERE active = #{active}
-        #{port_type}
-        #{voyage_type}
+        #{where_port_type}
+        #{where_voyage_type}
       SQL
       DB[query].map { |row| [row[:port_code], row[:id]] }
     end
 
-    def for_select_inactive_ports(args)
-      for_select_ports(args, active: false)
+    def for_select_inactive_ports(params)
+      for_select_ports(params, active: false)
     end
 
     def create_port(params)
