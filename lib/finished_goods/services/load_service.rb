@@ -51,6 +51,7 @@ module FinishedGoodsApp
                                 :order_number,
                                 :customer_order_number,
                                 :customer_reference,
+                                :shipped_at,
                                 :depot_id,
                                 :exporter_certificate_code,
                                 :final_destination_id,
