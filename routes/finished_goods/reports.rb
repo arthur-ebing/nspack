@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'reports', 'finished_goods' do |r|
     # DELIVERY NOTE
     # --------------------------------------------------------------------------
