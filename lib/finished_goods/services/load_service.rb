@@ -2,94 +2,61 @@
 
 module FinishedGoodsApp
   class LoadService < BaseService
-    attr_reader :user_name, :params, :voyage_id, :load_id
+    attr_reader :params, :load_id, :load_voyage_id
 
-    def initialize(load_id, params, user_name)
+    def initialize(params:, user:, route_url:, request_ip:)
       @params = params.to_h
-      @load_id = load_id
-      @user_name = user_name
+      @load_id = @params[:load_id]
+      @load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: @load_id)
+      @pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
+      @pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+
+      @load_interactor = LoadInteractor.new(user, {}, { route_url: route_url, request_ip: request_ip }, {})
+      @voyage_interactor = VoyageInteractor.new(user, {}, { route_url: route_url, request_ip: request_ip }, {})
+      @voyage_port_interactor = VoyagePortInteractor.new(user, {}, { route_url: route_url, request_ip: request_ip }, {})
+      @load_voyage_interactor = LoadVoyageInteractor.new(user, {}, { route_url: route_url, request_ip: request_ip }, {})
     end
 
     def call
-      find_or_create_voyage
-      create_or_update_load
-      create_or_update_load_voyage
+      res = LoadServiceSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
-      success_response('ok', load_id)
+      find_or_create_voyage
+
+      update_or_create_load
+
+      update_or_create_load_voyage
+
+      success_response(@message, params[:load_id])
     end
 
     private
 
-    def find_or_create_voyage
-      voyage_attrs = params.slice(:voyage_type_id, :vessel_id, :voyage_number, :year)
-      args = voyage_attrs
-      args[:active] = true
-      args[:completed] = false
+    def find_or_create_voyage # rubocop:disable Metrics/AbcSize
+      params[:active] = true
+      params[:completed] = false
+      @params = params.merge(VoyageRepo.new.find_voyage_with_ports(params))
+      return ok_response unless params[:voyage_id].nil?
 
-      @voyage_id = repo.get_with_args(:voyages, :id, args)
-      return unless @voyage_id.nil?
+      params[:voyage_id] = @voyage_interactor.create_voyage(params).instance.id
 
-      @voyage_id = repo.create(:voyages, voyage_attrs)
-      repo.log_status(:voyages, voyage_id, 'CREATED', user_name: user_name)
+      attrs = { voyage_id: params[:voyage_id], port_id: params[:pol_port_id], port_type_id: @pol_port_type_id }
+      params[:pol_voyage_port_id] = @voyage_port_interactor.create_voyage_port(attrs).instance.id
+
+      attrs = { voyage_id: params[:voyage_id], port_id: params[:pod_port_id], port_type_id: @pod_port_type_id }
+      params[:pod_voyage_port_id] = @voyage_port_interactor.create_voyage_port(attrs).instance.id
+
+      ok_response
     end
 
-    def find_or_create_voyage_port(args)
-      voyage_port_id = repo.get_with_args(:voyage_ports, :id, args)
-      return voyage_port_id unless voyage_port_id.nil?
-
-      voyage_port_id = repo.create(:voyage_ports, args)
-      repo.log_status(:voyage_ports, voyage_port_id, 'CREATED', user_name: user_name)
-      voyage_port_id
+    def update_or_create_load
+      res = load_id.nil? ? @load_interactor.create_load(params) : @load_interactor.update_load(load_id, params)
+      params[:load_id] = res.instance.id
+      @message = res.message
     end
 
-    def create_or_update_load # rubocop:disable Metrics/AbcSize
-      load_attrs = params.slice(:customer_party_role_id,
-                                :exporter_party_role_id,
-                                :billing_client_party_role_id,
-                                :consignee_party_role_id,
-                                :final_receiver_party_role_id,
-                                :order_number,
-                                :customer_order_number,
-                                :customer_reference,
-                                :shipped_at,
-                                :depot_id,
-                                :exporter_certificate_code,
-                                :final_destination_id,
-                                :transfer_load)
-
-      pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
-      pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
-      load_attrs[:pol_voyage_port_id] = find_or_create_voyage_port(voyage_id: voyage_id,
-                                                                   port_id: params[:pol_port_id],
-                                                                   port_type_id: pol_port_type_id)
-      load_attrs[:pod_voyage_port_id] = find_or_create_voyage_port(voyage_id: voyage_id,
-                                                                   port_id: params[:pod_port_id],
-                                                                   port_type_id: pod_port_type_id)
-      if @load_id.nil?
-        @load_id = repo.create(:loads, load_attrs)
-        repo.log_status(:loads, load_id, 'CREATED', user_name: user_name)
-      else
-        repo.update(:loads, load_id, load_attrs)
-        repo.log_status(:loads, load_id, 'UPDATED', user_name: user_name)
-      end
-    end
-
-    def create_or_update_load_voyage # rubocop:disable Metrics/AbcSize
-      load_voyage_attrs = params.slice(:shipping_line_party_role_id,
-                                       :shipper_party_role_id,
-                                       :booking_reference,
-                                       :memo_pad)
-      load_voyage_attrs[:load_id] = load_id
-      load_voyage_attrs[:voyage_id] = voyage_id
-
-      load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: load_id)
-      if load_voyage_id.nil?
-        load_voyage_id = repo.create(:load_voyages, load_voyage_attrs)
-        repo.log_status(:load_voyages, load_voyage_id, 'CREATED', user_name: user_name)
-      else
-        repo.update(:load_voyages, load_voyage_id, load_voyage_attrs)
-        repo.log_status(:load_voyages, load_voyage_id, 'UPDATED', user_name: user_name)
-      end
+    def update_or_create_load_voyage
+      load_voyage_id.nil? ? @load_voyage_interactor.create_load_voyage(params) : @load_voyage_interactor.update_load_voyage(load_voyage_id, params)
     end
 
     def repo

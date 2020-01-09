@@ -2,8 +2,8 @@
 
 module FinishedGoodsApp
   class VoyagePortInteractor < BaseInteractor
-    def create_voyage_port(voyage_id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_voyage_port_params(params.merge(voyage_id: voyage_id))
+    def create_voyage_port(params) # rubocop:disable Metrics/AbcSize
+      res = validate_voyage_port_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil

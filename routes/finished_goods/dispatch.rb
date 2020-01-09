@@ -106,7 +106,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { FinishedGoods::Dispatch::VoyagePort::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = interactor.create_voyage_port(id, params[:voyage_port])
+          res = interactor.create_voyage_port(params[:voyage_port])
           if res.success
             row_keys = %i[
               id
@@ -329,7 +329,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.patch do     # UPDATE
-          res = interactor.update_load(id, params[:load])
+          res = FinishedGoodsApp::LoadService.call(params: params[:load], user: current_user, route_url: request.path, request_ip: request.ip)
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -449,7 +449,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do        # CREATE
-        res = interactor.create_load(params[:load])
+        res = FinishedGoodsApp::LoadService.call(params: params[:load], user: current_user, route_url: request.path, request_ip: request.ip)
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)

@@ -26,8 +26,7 @@ module FinishedGoodsApp
 
     def test_create_voyage_port
       attrs = fake_voyage_port.to_h.reject { |k, _| k == :id }
-      voyage_id = attrs[:voyage_id]
-      res = interactor.create_voyage_port(voyage_id, attrs)
+      res = interactor.create_voyage_port(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(VoyagePortFlat, res.instance)
       assert res.instance.id.nonzero?
@@ -35,8 +34,7 @@ module FinishedGoodsApp
 
     def test_create_voyage_port_fail
       attrs = fake_voyage_port(id: nil).to_h.reject { |k, _| k == :voyage_id }
-      voyage_id = attrs[:voyage_id]
-      res = interactor.create_voyage_port(voyage_id, attrs)
+      res = interactor.create_voyage_port(attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:id]
     end
