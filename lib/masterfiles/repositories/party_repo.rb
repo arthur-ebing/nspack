@@ -381,6 +381,15 @@ module MasterfilesApp
         .get(:id)
     end
 
+    def find_party_role_from_org_code_for_role(org_code, role_name)
+      role_id = DB[:roles].where(name: role_name).get(:id)
+      raise Crossbeams::InfoError, "There is no role named #{role_name}" if role_id.nil?
+
+      DB[:party_roles]
+        .where(role_id: role_id, Sequel.function(:fn_party_role_org_code, :id) => org_code)
+        .get(:id)
+    end
+
     private
 
     def add_party_name(hash)
