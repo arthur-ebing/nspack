@@ -43,7 +43,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { TITAN_API_SECRET: 'Titan API_Secret for government inspections.' },
     { ADDENDUM_PLACE_OF_ISSUE: 'Exporter ceritficate place of issue for addendum. Can be CPT, DBN. MPM, PLZ or OTH.' },
     { SOLAS_VERIFICATION_METHOD: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
-    { SAMSA_ACCREDITATION: 'For sending EDI documents' }
+    { SAMSA_ACCREDITATION: 'For sending EDI documents' },
+    { CLM_BUTTON_CAPTION_FORMAT: 'A format for captions to display on label printer robot buttons. See AppConst for more.' }
   ].freeze
 
   NO_OVERRIDE = [

@@ -268,5 +268,86 @@ module ProductionApp
     def line_has_active_tipping_run?(production_line_id)
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
     end
+
+    # For a production run, a list of line resources and which (if any) product spec is allocated.
+    def button_allocations(production_run_id)
+      query = <<~SQL
+        SELECT
+        "sysres"."system_resource_code" AS module,
+        REPLACE("btns"."system_resource_code", "sysres"."system_resource_code" || '-', '') AS button,
+        "a"."product_setup_id",
+        "commodities"."code" AS commodity_code,
+        "marketing_varieties"."marketing_variety_code",
+        "standard_pack_codes"."standard_pack_code",
+        "basic_pack_codes"."basic_pack_code",
+        "std_fruit_size_counts"."size_count_value",
+        "fruit_actual_counts_for_packs"."actual_count_for_pack",
+        "fruit_size_references"."size_reference",
+        "marks"."mark_code",
+        "target_market_groups"."target_market_group_name",
+        "organizations"."short_description" AS org_code
+        FROM "production_runs" r
+        JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."production_line_id"
+        JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id" AND "p"."plant_resource_type_id" = (SELECT
+        "id"
+        FROM "plant_resource_types"
+        WHERE "plant_resource_type_code" = 'ROBOT_BUTTON')
+        LEFT JOIN "system_resources" btns ON "btns"."id" = "p"."system_resource_id"
+        LEFT JOIN "product_resource_allocations" a ON "a"."production_run_id" = "r"."id" AND "a"."plant_resource_id" = "p"."id"
+        LEFT JOIN "product_setups" ON "product_setups"."id" = "a"."product_setup_id"
+        LEFT JOIN "tree_plant_resources" tpl ON "tpl"."descendant_plant_resource_id" = "p"."id" AND "tpl"."path_length" = 1
+        LEFT JOIN "plant_resources" parent ON "parent"."id" = "tpl"."ancestor_plant_resource_id"
+        LEFT JOIN "system_resources" sysres ON "sysres"."id" = "parent"."system_resource_id"
+
+        LEFT JOIN "marketing_varieties" ON "marketing_varieties"."id" = "product_setups"."marketing_variety_id"
+        LEFT JOIN "std_fruit_size_counts" ON "std_fruit_size_counts"."id" = "product_setups"."std_fruit_size_count_id"
+        LEFT JOIN "commodities" ON "commodities"."id" = "std_fruit_size_counts"."commodity_id"
+        LEFT JOIN "basic_pack_codes" ON "basic_pack_codes"."id" = "product_setups"."basic_pack_code_id"
+        LEFT JOIN "standard_pack_codes" ON "standard_pack_codes"."id" = "product_setups"."standard_pack_code_id"
+        LEFT JOIN "fruit_actual_counts_for_packs" ON "fruit_actual_counts_for_packs"."id" =
+        "product_setups"."fruit_actual_counts_for_pack_id"
+        LEFT JOIN "fruit_size_references" ON "fruit_size_references"."id" = "product_setups"."fruit_size_reference_id"
+        LEFT JOIN "party_roles" ON "party_roles"."id" = "product_setups"."marketing_org_party_role_id"
+        LEFT JOIN "organizations" ON "organizations"."id" = "party_roles"."organization_id"
+        LEFT JOIN "target_market_groups" ON "target_market_groups"."id" = "product_setups"."packed_tm_group_id"
+        LEFT JOIN "marks" ON "marks"."id" = "product_setups"."mark_id"
+
+        WHERE r.id = ?
+        ORDER BY "btns"."system_resource_code"
+      SQL
+
+      DB[query, production_run_id].all
+    end
+
+    def bin_verification_settings(production_run_id)
+      # Get the BVMs from the prod run packhouse and each of the below...
+      query = <<~SQL
+        SELECT plant_resource_button_indicator, material_mass
+        FROM public.standard_pack_codes
+        WHERE plant_resource_button_indicator IS NOT NULL
+        ORDER BY plant_resource_button_indicator
+      SQL
+      buttons = DB[query].select_map(%i[plant_resource_button_indicator material_mass])
+      return {} if buttons.empty?
+
+      query = <<~SQL
+        SELECT "sysres"."system_resource_code" AS module
+        FROM "production_runs" r
+        JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."packhouse_resource_id"
+        JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id"
+          AND "p"."plant_resource_type_id" = (SELECT "id"
+              FROM "plant_resource_types"
+              WHERE "plant_resource_type_code" = 'BIN_VERIFICATION_ROBOT')
+        LEFT JOIN "system_resources" sysres ON "sysres"."id" = "p"."system_resource_id"
+        WHERE r.id = ?
+        ORDER BY "sysres"."system_resource_code"
+      SQL
+      modules = DB[query, production_run_id].select_map(:module)
+      return {} if modules.empty?
+
+      grp = {}
+      modules.each { |mod| grp[mod] = buttons }
+      grp
+    end
   end
 end

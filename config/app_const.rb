@@ -269,6 +269,26 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Load_containers:
   VGM_REQUIRED = make_boolean('VGM_REQUIRED')
 
+  # CLM_BUTTON_CAPTION_FORMAT
+  #
+  # This string provides a format for captions to display on buttons
+  # of robots that print carton labels.
+  # The string can contain any text and fruitspec tokens that are
+  # delimited by $: and $. e.g. 'Count: $:actual_count_for_pack$'
+  #
+  # The possible fruitspec tokens are:
+  # * actual_count_for_pack
+  # * basic_pack_code
+  # * commodity_code
+  # * mark_code
+  # * marketing_variety_code
+  # * org_code
+  # * size_count_value
+  # * size_reference
+  # * standard_pack_code
+  # * target_market_group_name
+  CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
+
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'
