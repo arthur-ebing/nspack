@@ -106,8 +106,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inspector_id: nil,
-                                    inspection_billing_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_INSPECTION_BILLING),
-                                    exporter_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_role_name(AppConst::DEFAULT_EXPORTER),
+                                    inspection_billing_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT),
+                                    exporter_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER),
                                     booking_reference: @repo.last_record(:booking_reference),
                                     results_captured: nil,
                                     results_captured_at: nil,
