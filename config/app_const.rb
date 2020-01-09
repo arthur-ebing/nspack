@@ -277,6 +277,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # delimited by $: and $. e.g. 'Count: $:actual_count_for_pack$'
   #
   # The possible fruitspec tokens are:
+  # HBL: 'COUNT: $:actual_count_for_pack$'
+  # UM : 'SIZE: $:size_reference$'
   # * actual_count_for_pack
   # * basic_pack_code
   # * commodity_code

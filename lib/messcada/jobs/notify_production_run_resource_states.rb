@@ -53,10 +53,10 @@ module MesscadaApp
 
         builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
           xml.module_buttons do # rubocop:disable Metrics/BlockLength
-            unless grp_module.empty?
-              xml.clms do
+            xml.modules do # rubocop:disable Metrics/BlockLength
+              unless grp_module.empty?
                 grp_modules.each do |mod, buttons|
-                  xml.clm do
+                  xml.module do
                     xml.name mod
                     xml.buttons do
                       buttons.each do |rec|
@@ -70,11 +70,9 @@ module MesscadaApp
                   end
                 end
               end
-            end
-            unless grp_bvm.empty?
-              xml.bvms do
+              unless grp_bvm.empty?
                 grp_bvm.each do |mod, buttons|
-                  xml.bvm do
+                  xml.module do
                     xml.name mod
                     xml.buttons do
                       buttons.each do |name, tare|
@@ -96,7 +94,7 @@ module MesscadaApp
 
       def send_xml
         http = Crossbeams::HTTPCalls.new
-        http.xml_post("#{AppConst::LABEL_SERVER_URI}ModuleButtonCaptions", xml)
+        http.xml_post("#{AppConst::LABEL_SERVER_URI}SetModuleButtonState", xml)
       end
     end
   end
