@@ -3,10 +3,11 @@
 module MesscadaApp
   module Job
     class NotifyProductionRunResourceStates < BaseQueJob
-      attr_reader :production_run_id, :xml
+      attr_reader :production_run_id, :xml, :repo
 
       def run(production_run_id)
         @production_run_id = production_run_id
+        @repo = ProductionApp::ProductionRunRepo.new
         res = send_notification_for_resource_states
 
         unless res.success
@@ -36,26 +37,15 @@ module MesscadaApp
         ar.map { |s| s.start_with?(':') ? rec[s.delete_prefix(':').to_sym] : s }.compact.join
       end
 
-      def build_xml # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
-        repo = ProductionApp::ProductionRunRepo.new
-        if AppConst::CLM_BUTTON_CAPTION_FORMAT
-          lbl_modules = repo.button_allocations(production_run_id)
-          grp_modules = lbl_modules.group_by { |r| r[:module] }
-        else
-          grp_modules = {}
-        end
-
-        grp_bvm = if AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
-                    repo.bin_verification_settings(production_run_id)
-                  else
-                    {}
-                  end
+      def build_xml # rubocop:disable Metrics/AbcSize
+        modules_for_lbl = clm_modules
+        modules_for_bvm = bvm_modules
 
         builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
           xml.module_buttons do # rubocop:disable Metrics/BlockLength
             xml.modules do # rubocop:disable Metrics/BlockLength
-              unless grp_module.empty?
-                grp_modules.each do |mod, buttons|
+              unless modules_for_lbl.empty?
+                modules_for_lbl.each do |mod, buttons|
                   xml.module do
                     xml.name mod
                     xml.buttons do
@@ -70,8 +60,8 @@ module MesscadaApp
                   end
                 end
               end
-              unless grp_bvm.empty?
-                grp_bvm.each do |mod, buttons|
+              unless modules_for_bvm.empty?
+                modules_for_bvm.each do |mod, buttons|
                   xml.module do
                     xml.name mod
                     xml.buttons do
@@ -90,6 +80,19 @@ module MesscadaApp
           end
         end
         @xml = builder.to_xml
+      end
+
+      def clm_modules
+        return {} unless AppConst::CLM_BUTTON_CAPTION_FORMAT
+
+        lbl_modules = repo.button_allocations(production_run_id)
+        lbl_modules.group_by { |r| r[:module] }
+      end
+
+      def bvm_modules
+        return {} unless AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
+
+        repo.bin_verification_settings(production_run_id)
       end
 
       def send_xml
