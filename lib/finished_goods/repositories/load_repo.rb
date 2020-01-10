@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo
+  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :loads,
                      label: :order_number,
                      value: :id,

@@ -61,7 +61,7 @@ module FinishedGoodsApp
     end
 
     def update_shipped_at
-      repo.update_shipped_at(load_id: params[:load_id], shipped_at:params[:shipped_at])
+      repo.update_shipped_at(load_id: params[:load_id], shipped_at: params[:shipped_at])
     end
 
     def repo
