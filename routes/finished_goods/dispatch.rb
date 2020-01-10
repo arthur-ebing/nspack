@@ -106,7 +106,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { FinishedGoods::Dispatch::VoyagePort::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = interactor.create_voyage_port(params[:voyage_port])
+          res = interactor.create_voyage_port(id, params[:voyage_port])
           if res.success
             row_keys = %i[
               id
@@ -287,7 +287,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:allocate_pallets, id)
+        interactor.assert_permission!(:edit, id)
         res = interactor.allocate_multiselect(id, pallet_sequence_id: multiselect_grid_choices(params))
         flash[:notice] = res.message
         r.redirect request.referer
@@ -329,7 +329,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.patch do     # UPDATE
-          res = interactor.update_load_service(params[:load])
+          res = interactor.update_load(id, params[:load])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -449,7 +449,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do        # CREATE
-        res = interactor.create_load_service(params[:load])
+        res = interactor.create_load(params[:load])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)
