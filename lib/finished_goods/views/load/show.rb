@@ -158,6 +158,11 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :temperature_rhine
                     col.add_field :temperature_rhine2
+                    if AppConst::VGM_REQUIRED
+                      col.add_field :max_payload
+                      col.add_field :tare_weight
+                      col.add_field :actual_payload
+                    end
                     col.add_field :max_gross_weight
                     col.add_field :cargo_temperature
                     col.add_field :verified_gross_weight

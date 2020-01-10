@@ -31,13 +31,13 @@ module UiRules
 
       # Load Details
       voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code
-      fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
-      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
       depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
+      fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
+      fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:order_number] = { renderer: :label }
       fields[:customer_order_number] = { renderer: :label }
       fields[:customer_reference] = { renderer: :label }
-      fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:exporter_certificate_code] = { renderer: :label }
       fields[:edi_file_name] = { renderer: :label }
       fields[:shipped_at] = { renderer: :label }
@@ -71,7 +71,7 @@ module UiRules
       fields[:memo_pad] = { renderer: :label }
 
       # Load Vehicles
-      load_vehicle_id = (@repo.where_hash(:load_vehicles, load_id: @form_object.id) || {})[:id]
+      load_vehicle_id = @repo.get_with_args(:load_vehicles, :id, load_id: @form_object.id)
       vehicle = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(load_vehicle_id)
       fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
       fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
@@ -81,7 +81,7 @@ module UiRules
       fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
 
       # Load Container
-      load_container_id = (@repo.where_hash(:load_containers, load_id: @form_object.id) || {})[:id]
+      load_container_id = @repo.get_with_args(:load_containers, :id, load_id: @form_object.id)
       container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(load_container_id)
       fields[:container_code] = { renderer: :label, with_value: container&.container_code }
       fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
@@ -91,6 +91,9 @@ module UiRules
       fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
       fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
       fields[:max_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_gross_weight) }
+      fields[:tare_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.tare_weight) }
+      fields[:max_payload] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_payload) }
+      fields[:actual_payload] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.actual_payload) }
       fields[:cargo_temperature] = { renderer: :label, with_value: "#{container&.cargo_temperature_code} - #{container&.set_point_temperature}" }
       fields[:verified_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.verified_gross_weight) }
       fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }

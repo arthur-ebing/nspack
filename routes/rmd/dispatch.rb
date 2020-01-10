@@ -145,8 +145,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           # set defaults
           form_state = {}
           form_state[:stack_type_id] = BaseRepo.new.get_with_args(:container_stack_types, :id, stack_type_code: 'S')
-          form_state[:verified_gross_weight] = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight_from(load_id: load_id)
-          form_state[:verified_gross_weight_date] = Time.now
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
 
           # checks if load_container exists
@@ -233,11 +231,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          data_type: 'string',
                          required: false,
                          hide_on_load: !has_container)
-          # form.add_field(:internal_container_code,
-          #                'Internal Container Code',
-          #                data_type: 'string',
-          #                required: false,
-          #                hide_on_load: !has_container)
           form.add_field(:container_temperature_rhine,
                          'Temperature Rhine',
                          data_type: 'string',
@@ -285,16 +278,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           items: FinishedGoodsApp::LoadContainerRepo.new.for_select_container_stack_types,
                           required: false,
                           hide_on_load: !has_container)
-          form.add_label(:verified_gross_weight,
-                         'Verified Gross Weight',
-                         form_state[:verified_gross_weight],
-                         form_state[:verified_gross_weight],
-                         hide_on_load: !has_container)
-          form.add_label(:verified_gross_weight_date,
-                         'Verified Gross Weight Date',
-                         form_state[:verified_gross_weight_date],
-                         form_state[:verified_gross_weight_date],
-                         hide_on_load: !has_container)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end

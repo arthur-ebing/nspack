@@ -15,13 +15,11 @@ module UiRules
                    truck_arrival_container_temperature_rhine2_row
                    truck_arrival_max_gross_weight_row
                    truck_arrival_cargo_temperature_id_row
-                   truck_arrival_stack_type_id_row
-                   truck_arrival_verified_gross_weight_row
-                   truck_arrival_verified_gross_weight_date_row]
+                   truck_arrival_stack_type_id_row]
       if AppConst::VGM_REQUIRED
-        row_ids <<  'truck_arrival_tare_weight_row'
-        row_ids <<  'truck_arrival_max_payload_row'
-        row_ids <<  'truck_arrival_actual_payload_row'
+        row_ids << 'truck_arrival_tare_weight_row'
+        row_ids << 'truck_arrival_max_payload_row'
+        row_ids << 'truck_arrival_actual_payload_row'
       end
       actions[container ? :show_element : :hide_element] = row_ids.map { |a| { dom_id: a } }
 
@@ -42,13 +40,11 @@ module UiRules
                    truck_arrival_container_temperature_rhine
                    truck_arrival_max_gross_weight
                    truck_arrival_cargo_temperature_id
-                   truck_arrival_stack_type_id
-                   truck_arrival_verified_gross_weight
-                   truck_arrival_verified_gross_weight_date]
+                   truck_arrival_stack_type_id]
       if AppConst::VGM_REQUIRED
-        req_ids <<  'truck_arrival_tare_weight'
-        req_ids <<  'truck_arrival_max_payload'
-        req_ids <<  'truck_arrival_actual_payload'
+        req_ids << 'truck_arrival_tare_weight'
+        req_ids << 'truck_arrival_max_payload'
+        req_ids << 'truck_arrival_actual_payload'
       end
       actions[:set_required] = req_ids.map { |a| { dom_id: a, required: container } }
       build_actions(actions)
