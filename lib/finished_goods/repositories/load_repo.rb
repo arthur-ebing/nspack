@@ -123,7 +123,7 @@ module FinishedGoodsApp
       MasterfilesApp::PartyRepo.new.org_code_for_party_role(pr_id)
     end
 
-    def update_shipped_at(load_id:, shipped_at:)
+    def update_pallets_shipped_at(load_id:, shipped_at:)
       DB[:pallets].where(load_id: load_id).update(shipped_at: shipped_at)
     end
   end
