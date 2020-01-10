@@ -24,6 +24,7 @@ module FinishedGoodsApp
       find_or_create_voyage
 
       update_or_create_load
+      update_shipped_at unless @params[:shipped_at].nil?
 
       update_or_create_load_voyage
 
@@ -57,6 +58,10 @@ module FinishedGoodsApp
 
     def update_or_create_load_voyage
       load_voyage_id.nil? ? @load_voyage_interactor.create_load_voyage(params) : @load_voyage_interactor.update_load_voyage(load_voyage_id, params)
+    end
+
+    def update_shipped_at
+      repo.update_shipped_at(load_id: params[:load_id], shipped_at:params[:shipped_at])
     end
 
     def repo

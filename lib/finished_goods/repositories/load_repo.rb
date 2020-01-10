@@ -122,5 +122,9 @@ module FinishedGoodsApp
       pr_id = DB[:loads].where(id: load_id).get(:exporter_party_role_id)
       MasterfilesApp::PartyRepo.new.org_code_for_party_role(pr_id)
     end
+
+    def update_shipped_at(load_id:, shipped_at:)
+      DB[:pallets].where(load_id: load_id).update(shipped_at: shipped_at)
+    end
   end
 end
