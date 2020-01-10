@@ -25,7 +25,7 @@ module MasterfilesApp
                             wrapper: VesselFlat)
     end
 
-    def for_select_vessels(args = {}, active: true)
+    def for_select_vessels(args = {}, active = true) # rubocop:disable Metrics/AbcSize
       args = args.delete_if { |_, v| v.to_s.strip == '' }
 
       ds = DB[:vessels]
@@ -37,7 +37,7 @@ module MasterfilesApp
     end
 
     def for_select_inactive_vessels(args = nil)
-      for_select_vessels(args, active: false)
+      for_select_vessels(args, false)
     end
   end
 end

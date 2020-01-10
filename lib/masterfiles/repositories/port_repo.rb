@@ -39,7 +39,7 @@ module MasterfilesApp
       PortFlat.new(hash)
     end
 
-    def for_select_ports(params = {}, active: true) # rubocop:disable Metrics/AbcSize
+    def for_select_ports(params = {}, active = true) # rubocop:disable Metrics/AbcSize
       port_type_code = params.delete(:port_type_code)
       params[:port_type_id] = DB[:port_types].where(port_type_code: port_type_code).get(:id) unless port_type_code.nil_or_empty?
 
@@ -59,7 +59,7 @@ module MasterfilesApp
     end
 
     def for_select_inactive_ports(params)
-      for_select_ports(params, active: false)
+      for_select_ports(params, false)
     end
 
     def create_port(params)
