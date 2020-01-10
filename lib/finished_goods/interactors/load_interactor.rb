@@ -90,56 +90,32 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def create_load_service(params:, user:)
-      res = nil
-      repo.transaction do
-        res = FinishedGoodsApp::LoadService.call(mode: :create, params: params, user: user)
-        return failed_response(res.message) unless res.success
-
-        log_transaction
-      end
-      res
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
     def create_load(params) # rubocop:disable Metrics/AbcSize
       res = validate_load_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
       repo.transaction do
-        id = repo.create_load(res)
-        log_status(:loads, id, 'CREATED')
+        load_res = LoadService.call(nil, res, @user.user_name)
+        id = load_res.instance
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
+
         log_transaction
       end
       instance = load_entity(id)
       success_response("Created load: #{id}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { edi_file_name: ['This load already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_load_service(params:, user:)
-      res = nil
-      repo.transaction do
-        res = FinishedGoodsApp::LoadService.call(mode: :update, params: params, user: user)
-        return failed_response(res.message) unless res.success
-
-        log_transaction
-      end
-      res
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
-    def update_load(id, params)
+    def update_load(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_load_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        repo.update_load(id, res)
+        load_res = LoadService.call(id, res, @user.user_name)
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
+
         log_transaction
       end
       instance = load_entity(id)
