@@ -137,7 +137,6 @@ module UiRules
         # Load Details
         id: { renderer: :label,
               caption: 'Load Id' },
-        load_id: { hide_on_load: true },
         order_number: {},
         customer_order_number: {},
         customer_reference: {},
@@ -222,7 +221,7 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
       @form_object = @repo.find_load_flat(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil, load_id: @options[:id]))
+      @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil))
     end
 
     def make_new_form_object
@@ -258,7 +257,7 @@ module UiRules
     end
 
     def add_rules # rubocop:disable Metrics/AbcSize
-      unless @options[:user]&.permission_tree.nil?
+      if %i[edit ship].include? @mode
         rules[:can_unship] = @form_object.shipped &&
                              Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
         rules[:can_ship] = !@form_object.shipped &&
