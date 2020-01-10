@@ -25,22 +25,19 @@ module MasterfilesApp
                             wrapper: VesselFlat)
     end
 
-    def for_select_vessels(args = nil)
+    def for_select_vessels(args = {}, active: true)
+      args = args.delete_if { |_, v| v.to_s.strip == '' }
+
       ds = DB[:vessels]
       ds = ds.join(:vessel_types, id: :vessel_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:vessels][:active] => true)
+      ds = ds.where(args)
+      ds = ds.where(Sequel[:vessels][:active] => active)
       ds = ds.order(:vessel_type_code)
       ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
     end
 
     def for_select_inactive_vessels(args = nil)
-      ds = DB[:vessels]
-      ds = ds.join(:vessel_types, id: :vessel_type_id)
-      ds = ds.where(args) unless args.nil?
-      ds = ds.where(Sequel[:vessels][:active] => false)
-      ds = ds.order(:vessel_type_code)
-      ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
+      for_select_vessels(args, active: false)
     end
   end
 end
