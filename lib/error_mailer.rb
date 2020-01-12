@@ -23,7 +23,7 @@ module ErrorMailer
       subject: "[Error #{AppConst::ERROR_MAIL_PREFIX}] #{subject || error.message}",
       body: body.join("\n\n")
     }
-    DevelopmentApp::SendMailJob.enqueue(mail_opts)
+    Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end
 
   # Send an error email with subject and message passed in.
@@ -37,6 +37,6 @@ module ErrorMailer
       subject: "[Error #{AppConst::ERROR_MAIL_PREFIX}] #{subject}",
       body: message
     }
-    DevelopmentApp::SendMailJob.enqueue(mail_opts)
+    Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end
 end

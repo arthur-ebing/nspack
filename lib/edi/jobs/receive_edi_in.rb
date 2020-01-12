@@ -21,18 +21,23 @@ module EdiApp
         klass = "#{flow_type.capitalize}In"
 
         begin
+          raise Crossbeams::InfoError, "There is no EDI in processor for flow \"#{flow_type}\"" unless EdiApp.const_defined?(klass)
+
           repo.transaction do
-            res = EdiApp.const_get(klass).send(:call, id, @file_path)
+            res = EdiApp.const_get(klass).send(:call, id, @file_path, logger)
             if res.success
+              log "Completed: #{res.message}"
               repo.log_edi_in_complete(id, res.message)
               move_to_success_dir
             else
+              log "Failed: #{res.message}"
               repo.log_edi_in_failed(id, res.message)
               move_to_failed_dir
             end
             finish
           end
         rescue StandardError => e
+          log(e.message)
           repo.log_edi_in_error(id, e)
           move_to_failed_dir
           ErrorMailer.send_exception_email(e, subject: "EDI in transform failed (#{file_name})")
@@ -77,6 +82,14 @@ module EdiApp
         raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
 
         YAML.load_file(yml_path)
+      end
+
+      def log(msg)
+        logger.info "#{file_name}: #{msg}"
+      end
+
+      def logger
+        @logger ||= Logger.new(File.join(ENV['ROOT'], 'log', 'edi_in.log'), 'weekly')
       end
     end
   end
