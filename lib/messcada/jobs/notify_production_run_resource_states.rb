@@ -17,8 +17,8 @@ module MesscadaApp
             The instance returned was:
             #{res.instance.inspect}
           STR
-          ErrorMailer.send_error(subject: "#{self.class.name} failed to set button captions",
-                                 message: msg)
+          ErrorMailer.send_error_email(subject: "#{self.class.name} failed to set button captions",
+                                       message: msg)
         end
         finish
       end
@@ -97,7 +97,7 @@ module MesscadaApp
 
       def send_xml
         http = Crossbeams::HTTPCalls.new
-        http.xml_post("#{AppConst::LABEL_SERVER_URI}SetModuleButtonState", xml)
+        http.xml_post("#{AppConst::LABEL_SERVER_URI}SetModuleRobotButtonState", xml)
       end
     end
   end
