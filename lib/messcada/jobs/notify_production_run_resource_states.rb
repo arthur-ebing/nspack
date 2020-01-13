@@ -97,7 +97,7 @@ module MesscadaApp
 
       def send_xml
         http = Crossbeams::HTTPCalls.new
-        http.xml_post("#{AppConst::LABEL_SERVER_URI}SetModuleRobotButtonState", xml)
+        http.xml_post("#{AppConst::LABEL_SERVER_URI}SetModuleRobotButtonStates", xml)
       end
     end
   end
