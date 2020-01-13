@@ -181,8 +181,6 @@ module MesscadaApp
         update_pallet_sequence_verification_result(pallet_sequence_id, params)
 
         repo.update_pallet(pallet_id, changeset) unless changeset.empty?
-
-        update_pallet_nett_weight(pallet_id) if params[:nett_weight]
       end
 
       verification_completed = pallet_verified?(pallet_id)
@@ -234,6 +232,9 @@ module MesscadaApp
       changeset = {}
       changeset[:fruit_sticker_pm_product_id] = params[:fruit_sticker_pm_product_id] unless params[:fruit_sticker_pm_product_id].nil_or_empty?
       changeset[:fruit_sticker_pm_product_2_id] = params[:fruit_sticker_pm_product_2_id] unless params[:fruit_sticker_pm_product_2_id].nil_or_empty?
+
+      changeset[:gross_weight] = params[:gross_weight] if AppConst::CAPTURE_PALLET_WEIGHT_AT_VERIFICATION
+
       if AppConst::PALLET_IS_IN_STOCK_WHEN_VERIFIED
         changeset[:in_stock] = true
         changeset[:stock_created_at] = Time.now
@@ -243,10 +244,6 @@ module MesscadaApp
 
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)
       repo.update_pallet_sequence_verification_result(pallet_sequence_id, params)
-    end
-
-    def update_pallet_nett_weight(pallet_id)
-      repo.update_pallet_nett_weight(pallet_id)
     end
 
     def pallet_verified?(pallet_id)

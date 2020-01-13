@@ -143,7 +143,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         pallet_sequence = interactor.find_pallet_sequence_attrs(id)
         ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
 
-        form_state = { nett_weight: (!pallet_sequence[:sequence_nett_weight].nil_or_empty? ? pallet_sequence[:sequence_nett_weight].to_f : nil) }
+        form_state = { gross_weight: pallet_sequence[:gross_weight]&.to_f }
         notice = retrieve_from_local_store(:flash_notice)
         error = retrieve_from_local_store(:verification_errors)
         form_state.merge!(error_message: error.message, errors: error.errors) unless error.nil?
@@ -175,12 +175,12 @@ class Nspack < Roda # rubocop:disable ClassLength
           form.add_select(:fruit_sticker_pm_product_id, 'Fruit Sticker', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_id], prompt: true)
           form.add_select(:fruit_sticker_pm_product_2_id, 'Fruit Sticker 2', items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'), value: pallet_sequence[:fruit_sticker_pm_product_2_id], prompt: true)
         end
-        form.add_label(:gross_weight, 'Gross Weight', pallet_sequence[:gross_weight])
-        if AppConst::CAPTURE_PALLET_NETT_WEIGHT_AT_VERIFICATION
-          form.add_field(:nett_weight, 'Nett Weight', required: true, prompt: true, data_type: :number)
+        if AppConst::CAPTURE_PALLET_WEIGHT_AT_VERIFICATION
+          form.add_field(:gross_weight, 'Gross Weight', required: true, data_type: :number)
         else
-          form.add_label(:nett_weight, 'Nett Weight', (!pallet_sequence[:sequence_nett_weight].nil_or_empty? ? pallet_sequence[:sequence_nett_weight].to_f : nil))
+          form.add_label(:gross_weight, 'Gross Weight', pallet_sequence[:gross_weight])
         end
+        form.add_label(:nett_weight, 'Nett Weight', pallet_sequence[:nett_weight]&.to_f)
         form.add_prev_next_nav('/rmd/production/pallet_verification/verify_pallet_sequence/$:id$', ps_ids, id)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)

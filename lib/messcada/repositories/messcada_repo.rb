@@ -207,10 +207,6 @@ module MesscadaApp
       DB[upd].update
     end
 
-    def update_pallet_nett_weight(pallet_id)
-      DB["UPDATE pallets p set nett_weight=(select sum(nett_weight) from pallet_sequences where pallet_id=p.id) WHERE id = #{pallet_id};"].update
-    end
-
     def pallet_verified?(pallet_id)
       DB["select * from pallet_sequences where pallet_id = '#{pallet_id}' AND (verified is null or verified is false) "].first.nil?
     end
