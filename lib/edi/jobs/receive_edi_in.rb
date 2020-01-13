@@ -37,7 +37,7 @@ module EdiApp
             finish
           end
         rescue StandardError => e
-          log(e.message)
+          log_err(e.message)
           repo.log_edi_in_error(id, e)
           move_to_failed_dir
           ErrorMailer.send_exception_email(e, subject: "EDI in transform failed (#{file_name})")
@@ -86,6 +86,10 @@ module EdiApp
 
       def log(msg)
         logger.info "#{file_name}: #{msg}"
+      end
+
+      def log_err(msg)
+        logger.error "#{file_name}: #{msg}"
       end
 
       def logger

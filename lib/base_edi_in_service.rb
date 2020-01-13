@@ -17,4 +17,8 @@ class BaseEdiInService < BaseService
   def log(msg)
     logger.info "#{file_name}: #{msg}"
   end
+
+  def log_err(msg)
+    logger.error "#{file_name}: #{msg}"
+  end
 end

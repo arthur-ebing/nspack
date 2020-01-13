@@ -13,12 +13,13 @@ module EdiApp
   class PoOut < BaseEdiOutService
     attr_reader :org_code, :po_repo
 
-    def initialize(edi_out_transaction_id)
+    def initialize(edi_out_transaction_id, logger)
       @po_repo = PoOutRepo.new
-      super(AppConst::EDI_FLOW_PO, edi_out_transaction_id)
+      super(AppConst::EDI_FLOW_PO, edi_out_transaction_id, logger)
     end
 
     def call # rubocop:disable Metrics/AbcSize
+      log('Starting transform...')
       @oh_count, @ol_count, @oc_count, @ok_count, @op_count = [0, 0, 0, 0, 0] # rubocop:disable Style/ParallelAssignment
       @total_carton_count, @total_pallet_count = [0, 0] # rubocop:disable Style/ParallelAssignment
       prepare_bh
@@ -43,6 +44,7 @@ module EdiApp
       fname = create_flat_file
 
       po_repo.store_edi_filename(fname, record_id)
+      log('Ending transform...')
       success_response('PoOut was successful', fname)
     end
 

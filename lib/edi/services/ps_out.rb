@@ -7,12 +7,13 @@ module EdiApp
   class PsOut < BaseEdiOutService
     attr_reader :ps_repo
 
-    def initialize(edi_out_transaction_id)
+    def initialize(edi_out_transaction_id, logger)
       @ps_repo = PsOutRepo.new
-      super(AppConst::EDI_FLOW_PS, edi_out_transaction_id)
+      super(AppConst::EDI_FLOW_PS, edi_out_transaction_id, logger)
     end
 
     def call
+      log('Starting transform...')
       prepare_bh
       prepare_ps
       return success_response('No data for PS') if @ps_record_count.zero?
@@ -20,6 +21,7 @@ module EdiApp
       prepare_bt
       validate_data({ 'PS' => %i[sscc sequence_number] }, check_lengths: true)
       fname = create_flat_file
+      log('Ending transform...')
       success_response('PsOut was successful', fname)
     end
 

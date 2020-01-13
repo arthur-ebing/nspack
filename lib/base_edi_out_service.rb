@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
 class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
-  attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions, :record_entries, :edi_out_rule_id, :party_role_id
+  attr_reader :flow_type, :hub_address, :record_id, :seq_no, :schema, :record_definitions,
+              :record_entries, :edi_out_rule_id, :party_role_id, :logger
 
-  def initialize(flow_type, id) # rubocop:disable Metrics/AbcSize
+  def initialize(flow_type, id, logger) # rubocop:disable Metrics/AbcSize
     raise ArgumentError, "#{self.class.name}: flow type must be provided" if flow_type.nil?
 
     @repo = EdiApp::EdiOutRepo.new
     edi_out_transaction = @repo.find_edi_out_transaction(id)
     @flow_type = edi_out_transaction.flow_type
+    @logger = logger
     @party_role_id = edi_out_transaction.party_role_id
     @hub_address = edi_out_transaction.hub_address
     @record_id = edi_out_transaction.record_id
@@ -295,5 +297,13 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     hs = {}
     record_definitions[rec_id].keys.each { |key| hs[key] = rec[key] if rec[key] }
     hs
+  end
+
+  def log(msg)
+    logger.info "#{flow_type}: #{msg}"
+  end
+
+  def log_err(msg)
+    logger.error "#{flow_type}: #{msg}"
   end
 end
