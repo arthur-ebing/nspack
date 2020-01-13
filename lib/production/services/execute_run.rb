@@ -25,12 +25,8 @@ module ProductionApp
                         'RUNNING',
                         comment: changeset[:active_run_stage],
                         user_name: user_name)
-        # MesscadaApp::Job::NotifyProductionRunResourceStates.enqueue(production_run.id) if AppConst::CLM_BUTTON_CAPTION_FORMAT || AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
 
-        # Kick off a job to send the new button labels to MesServer
-        # get all CLM buttons for a line and if not allocated, set "unallocated" else set to the count.
-        # get all BVM buttons for a line and if not allocated, set "unallocated" else set to the tare.
-        # Separate calls for JF? or all in one XML string?
+        MesscadaApp::Job::NotifyProductionRunResourceStates.enqueue(production_run.id) if AppConst::CLM_BUTTON_CAPTION_FORMAT || AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       end
       success_response('Run is executing', changeset.to_h.merge(status: "RUNNING #{changeset[:active_run_stage]}"))
     end
