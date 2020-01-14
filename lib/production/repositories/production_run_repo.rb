@@ -275,7 +275,7 @@ module ProductionApp
         SELECT
         "sysres"."system_resource_code" AS module,
         REPLACE("btns"."system_resource_code", "sysres"."system_resource_code" || '-', '') AS button,
-        "a"."product_setup_id",
+        "a"."product_setup_id", "a"."label_template_id",
         "commodities"."code" AS commodity_code,
         "marketing_varieties"."marketing_variety_code",
         "standard_pack_codes"."standard_pack_code",
@@ -289,9 +289,9 @@ module ProductionApp
         FROM "production_runs" r
         JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."production_line_id"
         JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id" AND "p"."plant_resource_type_id" = (SELECT
-        "id"
-        FROM "plant_resource_types"
-        WHERE "plant_resource_type_code" = 'ROBOT_BUTTON')
+          "id"
+          FROM "plant_resource_types"
+          WHERE "plant_resource_type_code" = 'ROBOT_BUTTON')
         LEFT JOIN "system_resources" btns ON "btns"."id" = "p"."system_resource_id"
         LEFT JOIN "product_resource_allocations" a ON "a"."production_run_id" = "r"."id" AND "a"."plant_resource_id" = "p"."id"
         LEFT JOIN "product_setups" ON "product_setups"."id" = "a"."product_setup_id"

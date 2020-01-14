@@ -32,6 +32,7 @@ module MesscadaApp
 
       def build_caption(rec)
         return 'Not in use' if rec[:product_setup_id].nil_or_empty?
+        return 'No template' if rec[:label_template_id].nil_or_empty?
 
         ar = AppConst::CLM_BUTTON_CAPTION_FORMAT.split('$')
         ar.map { |s| s.start_with?(':') ? rec[s.delete_prefix(':').to_sym] : s }.compact.join
