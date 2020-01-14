@@ -4,7 +4,7 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, user: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :edit, id: id, user: user, form_values: form_values)
           rules   = ui_rule.compile
@@ -90,17 +90,19 @@ module FinishedGoods
                 end
               end
             end
-            page.section do |section|
-              section.add_grid('stock_pallets',
-                               '/list/stock_pallets/grid_multi',
-                               caption: 'Choose Pallets',
-                               is_multiselect: true,
-                               can_be_cleared: true,
-                               multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                               multiselect_key: 'allocate',
-                               multiselect_params: { key: 'allocate',
-                                                     id: id,
-                                                     in_stock: true })
+            unless rules[:shipped]
+              page.section do |section|
+                section.add_grid('stock_pallets',
+                                 '/list/stock_pallets/grid_multi',
+                                 caption: 'Choose Pallets',
+                                 is_multiselect: true,
+                                 can_be_cleared: true,
+                                 multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
+                                 multiselect_key: 'allocate',
+                                 multiselect_params: { key: 'allocate',
+                                                       id: id,
+                                                       in_stock: true })
+              end
             end
           end
 

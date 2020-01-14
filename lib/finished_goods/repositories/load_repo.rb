@@ -102,7 +102,7 @@ module FinishedGoodsApp
     def unallocate_pallets(load_id, pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
       return ok_response if pallet_ids.empty?
 
-      DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false, shipped_at: nil)
+      DB[:pallets].where(id: pallet_ids, shipped: false).update(load_id: nil, allocated: false, shipped_at: nil)
       log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user_name)
 
       # find unallocated loads
@@ -111,7 +111,7 @@ module FinishedGoodsApp
 
       # log status for loads where all pallets have been unallocated
       unless unallocated_load_ids.empty?
-        DB[:loads].where(id: unallocated_load_ids).update(allocated: false)
+        DB[:loads].where(id: unallocated_load_ids, shipped: false).update(allocated: false)
         log_multiple_statuses(:loads, unallocated_load_ids, 'UNALLOCATED', user_name: user_name)
       end
 
