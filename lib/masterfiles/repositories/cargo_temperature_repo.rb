@@ -17,5 +17,11 @@ module MasterfilesApp
       query = "SELECT temperature_code || ' - ' || set_point_temperature, id FROM cargo_temperatures"
       DB[query].select_map(%i[code id])
     end
+
+    def cargo_temperature_id_for(code)
+      return nil if code.nil_or_empty?
+
+      DB[:cargo_temperatures].where(temperature_code: code).get(:id)
+    end
   end
 end
