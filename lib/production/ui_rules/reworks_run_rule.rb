@@ -115,12 +115,9 @@ module UiRules
                               placeholder: "Paste #{text_area_caption} here",
                               caption: text_area_caption }
                           end,
-        production_run_id: { renderer: :select,
-                             options: ProductionApp::ReworksRepo.new.for_select_open_production_runs,
-                             caption: 'Production Runs',
-                             prompt: 'Select Production Run',
-                             sort_items: false,
-                             remove_search_for_small_list: false,
+        production_run_id: { renderer: :integer,
+                             required: true,
+                             caption: 'Production Run Id',
                              hide_on_load: @rules[:tip_bins] ? false : true }
       }
     end

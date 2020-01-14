@@ -453,15 +453,5 @@ module ProductionApp
           JOIN pm_types t on t.id = s.pm_type_id
           WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}"].map { |r| [r[:product_code], r[:id]] }
     end
-
-    def for_select_open_production_runs
-      query = <<~SQL
-        SELECT id::text || ' - ' || fn_production_run_code(id) AS production_run_code, id
-        FROM production_runs
-        WHERE closed = false
-        ORDER BY id DESC
-      SQL
-      DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
-    end
   end
 end
