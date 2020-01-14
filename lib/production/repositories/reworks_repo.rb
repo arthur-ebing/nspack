@@ -456,9 +456,10 @@ module ProductionApp
 
     def for_select_open_production_runs
       query = <<~SQL
-        SELECT fn_production_run_code(id) AS production_run_code, id
+        SELECT id::text || ' - ' || fn_production_run_code(id) AS production_run_code, id
         FROM production_runs
         WHERE closed = false
+        ORDER BY id DESC
         LIMIT 500
       SQL
       DB[query].all.map { |r| [r[:production_run_code], r[:id]] }

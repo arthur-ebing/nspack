@@ -24,7 +24,7 @@ module Production
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.form do |form|
+            page.form do |form| # rubocop:disable Metrics/BlockLength
               form.caption 'New Pallet Change'
               form.action "/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/new"
               form.remote! if remote
@@ -35,7 +35,6 @@ module Production
                   col.add_field :scrap_reason_id
                   col.add_field :remarks
                   col.add_field :pallets_selected
-                  col.add_field :production_run_id
                 end
                 unless rules[:single_edit]
                   row.column do |col|
@@ -46,6 +45,11 @@ module Production
                                     behaviour: :popup,
                                     style: :button)
                   end
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :production_run_id
                 end
               end
             end

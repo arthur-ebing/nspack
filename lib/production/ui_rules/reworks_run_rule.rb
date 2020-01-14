@@ -119,7 +119,7 @@ module UiRules
                              options: ProductionApp::ReworksRepo.new.for_select_open_production_runs,
                              caption: 'Production Runs',
                              prompt: 'Select Production Run',
-                             searchable: true,
+                             sort_items: false,
                              remove_search_for_small_list: false,
                              hide_on_load: @rules[:tip_bins] ? false : true }
       }
