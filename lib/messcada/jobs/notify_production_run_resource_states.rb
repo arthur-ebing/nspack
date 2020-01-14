@@ -54,7 +54,7 @@ module MesscadaApp
                         xml.button do
                           xml.name rec[:button]
                           xml.caption build_caption(rec)
-                          xml.enabled !rec[:product_setup_id].nil?
+                          xml.enabled !rec[:product_setup_id].nil? && !rec[:label_template_id].nil?
                         end
                       end
                     end
