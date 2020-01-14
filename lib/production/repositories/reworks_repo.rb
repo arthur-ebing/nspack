@@ -460,7 +460,6 @@ module ProductionApp
         FROM production_runs
         WHERE closed = false
         ORDER BY id DESC
-        LIMIT 500
       SQL
       DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
     end
