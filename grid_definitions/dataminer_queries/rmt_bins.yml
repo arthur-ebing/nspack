@@ -1,36 +1,38 @@
 ---
 :caption: Rmt Bins
-:sql: "SELECT \"rmt_bins\".\"id\", \"rmt_bins\".\"rmt_delivery_id\", \"rmt_bins\".\"season_id\",
-  case when \"rmt_bins\".\"qty_bins\"=1 then true else false end as discrete_bin,
-  \"rmt_bins\".\"cultivar_id\", \"rmt_bins\".\"orchard_id\", \"rmt_bins\".\"farm_id\",
-  \"rmt_bins\".\"rmt_class_id\", \"rmt_bins\".\"rmt_container_type_id\", \"rmt_bins\".\"rmt_container_material_type_id\",
-  \"rmt_bins\".\"cultivar_group_id\", \"rmt_bins\".\"puc_id\", \"rmt_bins\".\"exit_ref\",
-  \"rmt_bins\".\"qty_bins\", \"rmt_bins\".\"bin_asset_number\", \"rmt_bins\".\"tipped_asset_number\",
-  \"rmt_bins\".\"rmt_inner_container_type_id\", \"rmt_bins\".\"rmt_inner_container_material_id\",
-  \"rmt_bins\".\"qty_inner_bins\", \"rmt_bins\".\"production_run_rebin_id\", \"rmt_bins\".\"production_run_tipped_id\",
-  \"rmt_bins\".\"bin_tipping_plant_resource_id\", \"rmt_bins\".\"bin_fullness\", \"rmt_bins\".\"nett_weight\",
-  \"rmt_bins\".\"gross_weight\", \"rmt_bins\".\"active\", \"rmt_bins\".\"bin_tipped\",
-  \"rmt_bins\".\"created_at\", \"rmt_bins\".\"updated_at\", \"rmt_bins\".\"bin_received_date_time\",
-  \"rmt_bins\".\"bin_tipped_date_time\", \"rmt_bins\".\"exit_ref_date_time\", \"rmt_bins\".\"rebin_created_at\",
-  \"rmt_bins\".\"scrapped\", \"rmt_bins\".\"scrapped_at\", \"cultivar_groups\".\"cultivar_group_code\",
-  \"cultivars\".\"cultivar_name\", \"farms\".\"farm_code\", \"orchards\".\"orchard_code\",
-  \"pucs\".\"puc_code\", \"rmt_classes\".\"rmt_class_code\", \"rmt_container_material_types\".\"container_material_type_code\",
-  \"rmt_container_types\".\"container_type_code\", \"rmt_deliveries\".\"truck_registration_number\"
-  AS rmt_delivery_truck_registration_number, \"seasons\".\"season_code\", \r\nCASE
-  WHEN bin_tipped THEN 'gray' ELSE NULL END AS colour_rule, \r\nfn_current_status('rmt_bins',
-  rmt_bins.id) AS status \r\nFROM \"rmt_bins\" \r\nLEFT OUTER JOIN \"cultivar_groups\"
-  ON \"cultivar_groups\".\"id\" = \"rmt_bins\".\"cultivar_group_id\" \r\nLEFT OUTER
-  JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"rmt_bins\".\"cultivar_id\" \r\nLEFT
-  OUTER JOIN \"farms\" ON \"farms\".\"id\" = \"rmt_bins\".\"farm_id\" \r\nLEFT OUTER
-  JOIN \"orchards\" ON \"orchards\".\"id\" = \"rmt_bins\".\"orchard_id\" \r\nLEFT
-  OUTER JOIN \"pucs\" ON \"pucs\".\"id\" = \"rmt_bins\".\"puc_id\" \r\nLEFT OUTER
-  JOIN \"rmt_classes\" ON \"rmt_classes\".\"id\" = \"rmt_bins\".\"rmt_class_id\" \r\nLEFT
-  OUTER JOIN \"rmt_container_material_types\" ON \"rmt_container_material_types\".\"id\"
-  = \"rmt_bins\".\"rmt_container_material_type_id\" \r\nLEFT OUTER JOIN \"rmt_container_types\"
-  ON \"rmt_container_types\".\"id\" = \"rmt_bins\".\"rmt_container_type_id\" \r\nLEFT
-  OUTER JOIN \"rmt_deliveries\" ON \"rmt_deliveries\".\"id\" = \"rmt_bins\".\"rmt_delivery_id\"
-  \r\nJOIN \"seasons\" ON \"seasons\".\"id\" = \"rmt_bins\".\"season_id\" order by
-  \"rmt_bins\".\"id\" desc"
+:sql: "SELECT\r\n  \"rmt_bins\".\"id\",\r\n  \"rmt_bins\".\"rmt_delivery_id\",\r\n
+  \ \"rmt_bins\".\"season_id\",\r\n  CASE WHEN \"rmt_bins\".\"qty_bins\" = 1 THEN\r\n
+  \   TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS discrete_bin,\r\n  \"rmt_bins\".\"cultivar_id\",\r\n
+  \ \"rmt_bins\".\"orchard_id\",\r\n  \"rmt_bins\".\"farm_id\",\r\n  \"rmt_bins\".\"rmt_class_id\",\r\n
+  \ \"rmt_bins\".\"rmt_container_type_id\",\r\n  \"rmt_bins\".\"rmt_container_material_type_id\",\r\n
+  \ \"cultivar_groups\".\"id\" AS cultivar_group_id,\r\n  \"rmt_bins\".\"puc_id\",\r\n
+  \ \"rmt_bins\".\"exit_ref\",\r\n  \"rmt_bins\".\"qty_bins\",\r\n  \"rmt_bins\".\"bin_asset_number\",\r\n
+  \ \"rmt_bins\".\"tipped_asset_number\",\r\n  \"rmt_bins\".\"rmt_inner_container_type_id\",\r\n
+  \ \"rmt_bins\".\"rmt_inner_container_material_id\",\r\n  \"rmt_bins\".\"qty_inner_bins\",\r\n
+  \ \"rmt_bins\".\"production_run_rebin_id\",\r\n  \"rmt_bins\".\"production_run_tipped_id\",\r\n
+  \ \"rmt_bins\".\"bin_tipping_plant_resource_id\",\r\n  \"rmt_bins\".\"bin_fullness\",\r\n
+  \ \"rmt_bins\".\"nett_weight\",\r\n  \"rmt_bins\".\"gross_weight\",\r\n  \"rmt_bins\".\"active\",\r\n
+  \ \"rmt_bins\".\"bin_tipped\",\r\n  \"rmt_bins\".\"created_at\",\r\n  \"rmt_bins\".\"updated_at\",\r\n
+  \ \"rmt_bins\".\"bin_received_date_time\",\r\n  \"rmt_bins\".\"bin_tipped_date_time\",\r\n
+  \ \"rmt_bins\".\"exit_ref_date_time\",\r\n  \"rmt_bins\".\"rebin_created_at\",\r\n
+  \ \"rmt_bins\".\"scrapped\",\r\n  \"rmt_bins\".\"scrapped_at\",\r\n  \"cultivar_groups\".\"cultivar_group_code\",\r\n
+  \ \"cultivars\".\"cultivar_name\",\r\n  \"farms\".\"farm_code\",\r\n  \"orchards\".\"orchard_code\",\r\n
+  \ \"pucs\".\"puc_code\",\r\n  \"rmt_classes\".\"rmt_class_code\",\r\n  \"rmt_container_material_types\".\"container_material_type_code\",\r\n
+  \ \"rmt_container_types\".\"container_type_code\",\r\n  \"rmt_deliveries\".\"truck_registration_number\"
+  AS rmt_delivery_truck_registration_number,\r\n  \"seasons\".\"season_code\",\r\n
+  \ CASE WHEN \"bin_tipped\" THEN\r\n    'gray'\r\n  ELSE\r\n    NULL\r\n  END AS
+  colour_rule,\r\n  fn_current_status ('rmt_bins', \"rmt_bins\".\"id\") AS status\r\nFROM\r\n
+  \ \"rmt_bins\"\r\n  LEFT JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"rmt_bins\".\"cultivar_id\"\r\n
+  \ LEFT JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\" = \"cultivars\".\"cultivar_group_id\"\r\n
+  \ LEFT JOIN \"farms\" ON \"farms\".\"id\" = \"rmt_bins\".\"farm_id\"\r\n  LEFT JOIN
+  \"orchards\" ON \"orchards\".\"id\" = \"rmt_bins\".\"orchard_id\"\r\n  LEFT JOIN
+  \"pucs\" ON \"pucs\".\"id\" = \"rmt_bins\".\"puc_id\"\r\n  LEFT JOIN \"rmt_classes\"
+  ON \"rmt_classes\".\"id\" = \"rmt_bins\".\"rmt_class_id\"\r\n  LEFT JOIN \"rmt_container_material_types\"
+  ON \"rmt_container_material_types\".\"id\" = \"rmt_bins\".\"rmt_container_material_type_id\"\r\n
+  \ LEFT JOIN \"rmt_container_types\" ON \"rmt_container_types\".\"id\" = \"rmt_bins\".\"rmt_container_type_id\"\r\n
+  \ LEFT JOIN \"rmt_deliveries\" ON \"rmt_deliveries\".\"id\" = \"rmt_bins\".\"rmt_delivery_id\"\r\n
+  \ JOIN \"seasons\" ON \"seasons\".\"id\" = \"rmt_bins\".\"season_id\"\r\nORDER BY\r\n
+  \ \"rmt_bins\".\"id\" DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -201,7 +203,7 @@
     :name: cultivar_group_id
     :sequence_no: 11
     :caption: Cultivar group
-    :namespaced_name: rmt_bins.cultivar_group_id
+    :namespaced_name: cultivar_groups.id
     :data_type: :integer
     :width: 
     :format: 
@@ -359,7 +361,7 @@
     :group_max: false
   production_run_tipped_id:
     :name: production_run_tipped_id
-    :sequence_no: 9
+    :sequence_no: 21
     :caption: Tipped Run Id
     :namespaced_name: rmt_bins.production_run_tipped_id
     :data_type: :integer
