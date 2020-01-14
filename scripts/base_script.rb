@@ -66,6 +66,74 @@ class BaseScript
   def send_error_email(subject: nil, message: nil)
     ErrorMailer.send_error_email(subject, message)
   end
+
+  # Log the status of a record.
+  #
+  # @param table_name [Symbol, String] the name of the table.
+  # @param id [Integer] the id of the record with the changed status.
+  # @param status [String] the status to be logged.
+  # @param comment [String] extra information about the status change.
+  # @param user_name [String] the current user's name.
+  def log_status(table_name, id, status, comment: nil, user_name: nil) # rubocop:disable Metrics/AbcSize
+    # 1. UPSERT the current status.
+    DB[Sequel[:audit][:current_statuses]].insert_conflict(target: %i[table_name row_data_id],
+                                                          update: {
+                                                            user_name: Sequel[:excluded][:user_name],
+                                                            row_data_id: Sequel[:excluded][:row_data_id],
+                                                            status: Sequel[:excluded][:status],
+                                                            comment: Sequel[:excluded][:comment],
+                                                            transaction_id: Sequel.function(:txid_current),
+                                                            action_tstamp_tx: Time.now
+                                                          }).insert(user_name: user_name,
+                                                                    table_name: table_name.to_s,
+                                                                    row_data_id: id,
+                                                                    status: status.upcase,
+                                                                    comment: comment)
+
+    # 2. INSERT into log.
+    DB[Sequel[:audit][:status_logs]].insert(user_name: user_name,
+                                            table_name: table_name.to_s,
+                                            row_data_id: id,
+                                            status: status.upcase,
+                                            comment: comment)
+  end
+
+  # Log the status of several records.
+  #
+  # @param table_name [Symbol] the name of the table.
+  # @param in_ids [Array/Integer] the ids of the records with the changed status.
+  # @param status [String] the status to be logged.
+  # @param comment [String] extra information about the status change.
+  # @param user_name [String] the current user's name.
+  def log_multiple_statuses(table_name, in_ids, status, comment: nil, user_name: nil) # rubocop:disable Metrics/AbcSize
+    ids = Array(in_ids)
+
+    ids.each do |id|
+      DB[Sequel[:audit][:current_statuses]].insert_conflict(target: %i[table_name row_data_id],
+                                                            update: {
+                                                              user_name: Sequel[:excluded][:user_name],
+                                                              row_data_id: Sequel[:excluded][:row_data_id],
+                                                              status: Sequel[:excluded][:status],
+                                                              comment: Sequel[:excluded][:comment],
+                                                              transaction_id: Sequel.function(:txid_current),
+                                                              action_tstamp_tx: Time.now
+                                                            }).insert(user_name: user_name,
+                                                                      table_name: table_name.to_s,
+                                                                      row_data_id: id,
+                                                                      status: status.upcase,
+                                                                      comment: comment)
+    end
+
+    items = []
+    ids.each do |id|
+      items << { user_name: user_name,
+                 table_name: table_name.to_s,
+                 row_data_id: id,
+                 status: status.upcase,
+                 comment: comment }
+    end
+    DB[Sequel[:audit][:status_logs]].multi_insert(items)
+  end
 end
 
 class EgScript < BaseScript
