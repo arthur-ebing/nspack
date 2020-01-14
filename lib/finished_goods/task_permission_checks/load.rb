@@ -15,6 +15,7 @@ module FinishedGoodsApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
+        allocate_pallets: :allocate_pallets_check,
         unship: :unship_check,
         delete: :delete_check
       }.freeze
@@ -38,6 +39,12 @@ module FinishedGoodsApp
         return all_ok if !@entity&.shipped || Crossbeams::Config::UserPermissions.can_user?(@user, :load, :can_unship)
 
         failed_response "Load#{@id} has already been shipped"
+      end
+
+      def allocate_pallets_check
+        return failed_response('Load has been shipped - no pallet allocation possible') if @entity.shipped
+
+        all_ok
       end
 
       def unship_check
