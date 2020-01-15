@@ -116,7 +116,7 @@ module UiRules
                               caption: text_area_caption }
                           end,
         production_run_id: { renderer: :integer,
-                             required: true,
+                             required: @rules[:tip_bins],
                              caption: 'Production Run Id',
                              hide_on_load: @rules[:tip_bins] ? false : true }
       }
