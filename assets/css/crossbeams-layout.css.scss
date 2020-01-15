@@ -541,6 +541,17 @@ input[readonly] {
   padding:        4px;
   border: none;
 }
+.grid-row-view thead {
+  border: thin solid gray;
+}
+.grid-row-view th {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: darkgray;
+  padding: 0.25em 0;
+}
 
 /* START: Table row alternate background and hover background */
 tr.hover-row:hover {
