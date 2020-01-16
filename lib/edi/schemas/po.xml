@@ -317,7 +317,7 @@
                   <field name="steri_dest" size="2" required="false"/>
                   <field name="label_type" size="1" required="false"/>
                   <field name="prov_Flag" size="1" required="false"/>
-                  <field name="sellbyCode" size="10" required="false" map_to="sell_by_date"/>
+                  <field name="sellbycode" size="10" required="false" map_to="sell_by_date"/>
                   <field name="combo_sscc" size="18" required="false"/>
                   <field name="inspector" size="6" required="false" map_to="inspector_number"/>
                   <field name="inspect_pnt" size="6" required="false" map_to="inspection_point"/>

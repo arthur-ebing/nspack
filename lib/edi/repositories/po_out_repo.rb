@@ -169,5 +169,9 @@ module EdiApp
       DB[:loads].where(id: record_id).update(edi_file_name: file_name)
       log_status(:loads, record_id, 'PO SENT', user_name: 'System', comment: file_name)
     end
+
+    def log_po_fail(record_id, message)
+      log_status(:loads, record_id, 'PO SEND FAILURE', user_name: 'System', comment: message)
+    end
   end
 end

@@ -48,6 +48,10 @@ module EdiApp
       success_response('PoOut was successful', fname)
     end
 
+    def on_fail(message)
+      po_repo.log_po_fail(record_id, message)
+    end
+
     private
 
     def prepare_bh

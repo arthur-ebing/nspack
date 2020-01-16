@@ -23,16 +23,18 @@ module EdiApp
         log("Transform started for party role '#{party_role_id}', record '#{record_id}', rule id '#{edi_out_rule_id}' and transaction id '#{id}'...")
 
         klass = "#{flow_type.capitalize}Out"
+        transformer = EdiApp.const_get(klass).send(:new, id, logger)
 
         begin
           repo.transaction do
-            res = EdiApp.const_get(klass).send(:call, id, logger)
+            res = transformer.call
             if res.success
               log "Completed: #{res.message}"
               repo.log_edi_out_complete(id, res.instance, res.message)
             else
               log "Failed: #{res.message}"
               repo.log_edi_out_failed(id, res.message)
+              transformer.on_fail(res.message) if transformer.respond_to?(:on_fail)
             end
             finish
           end
@@ -40,6 +42,7 @@ module EdiApp
           log_err(e.message)
           repo.log_edi_out_error(id, e)
           ErrorMailer.send_exception_email(e, subject: "EDI out transform failed (#{flow_type} for rule: #{edi_out_rule_id})")
+          transformer.on_fail('an error occurred') if transformer&.respond_to?(:on_fail)
           expire
         end
       end
