@@ -108,7 +108,7 @@ class Nspack < Roda # rubocop:disable ClassLength
               end
             else
               pallets_selected = interactor.resolve_selected_pallet_numbers(res.instance[:pallets_selected])
-              params[:reworks_run][:pallets_selected] = pallets_selected.empty? ? '' : pallets_selected
+              params[:reworks_run][:pallets_selected] = pallets_selected.nil_or_empty? ? '' : pallets_selected
               re_show_form(r, res) do
                 Production::Reworks::ReworksRun::New.call(id,
                                                           form_values: params[:reworks_run],

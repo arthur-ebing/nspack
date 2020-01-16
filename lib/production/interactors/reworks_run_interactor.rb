@@ -267,7 +267,7 @@ module ProductionApp
     end
 
     def resolve_selected_pallet_numbers(pallets_selected)
-      return pallets_selected if pallets_selected.nil_or_empty?
+      return '' if pallets_selected.nil_or_empty?
 
       pallet_numbers = pallets_selected.join(',').split(/\n|,/).map(&:strip).reject(&:empty?)
       pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
