@@ -119,7 +119,8 @@ module EdiApp
           pallets.gross_weight AS pallet_gross_mass,
           pallets.gross_weight_measured_at AS weighing_date,
           pallets.gross_weight_measured_at AS weighing_time,
-          pallets.nett_weight AS mass
+          pallets.nett_weight AS mass,
+          pallets.temp_tail AS temp_device_id
 
         FROM loads
         JOIN pallets ON pallets.load_id = loads.id AND NOT scrapped
