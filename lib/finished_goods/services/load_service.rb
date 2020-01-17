@@ -12,9 +12,6 @@ module FinishedGoodsApp
     end
 
     def call
-      res = validate_service_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
-
       return create_call if @mode == :create
 
       update_call if @mode == :update
@@ -105,10 +102,6 @@ module FinishedGoodsApp
 
     def load_entity(id)
       repo.find_load_flat(id)
-    end
-
-    def validate_service_params(params)
-      LoadServiceSchema.call(params)
     end
 
     def validate_load_params(params)

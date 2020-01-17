@@ -91,6 +91,9 @@ module FinishedGoodsApp
     end
 
     def create_load_service(params:, user:)
+      res = LoadServiceSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       res = nil
       repo.transaction do
         res = FinishedGoodsApp::LoadService.call(mode: :create, params: params, user: user)
@@ -122,6 +125,9 @@ module FinishedGoodsApp
     end
 
     def update_load_service(params:, user:)
+      res = LoadServiceSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       res = nil
       repo.transaction do
         res = FinishedGoodsApp::LoadService.call(mode: :update, params: params, user: user)
