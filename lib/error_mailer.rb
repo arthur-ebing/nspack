@@ -13,6 +13,7 @@ module ErrorMailer
     body << message unless message.nil?
     body << "Job context:\n#{job_context.map { |k, v| "#{k.to_s.ljust(20)}: #{v}" }.join("\n")}\n" unless job_context.empty?
 
+    body << "Time: #{Time.now}\n"
     body << error.message
     body << error.full_message
     body << 'CAUSE:' if error.cause
@@ -35,7 +36,7 @@ module ErrorMailer
     mail_opts = {
       to: AppConst::ERROR_MAIL_RECIPIENTS,
       subject: "[Error #{AppConst::ERROR_MAIL_PREFIX}] #{subject}",
-      body: message
+      body: "Time: #{Time.now}\n#{message}"
     }
     Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end

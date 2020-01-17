@@ -84,6 +84,19 @@ module EdiApp
       raise e
     end
 
+    def missing_required_fields(only_rows: []) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      missing = []
+      @out.each do |rec|
+        this_key = rec[:record_type] || rec[:header] || rec[:trailer]
+        next unless only_rows.empty? || only_rows.include?(this_key.to_s)
+
+        rec.each do |key, val|
+          missing << "#{this_key}: #{key}" if record_definitions[this_key][key].required && val.nil_or_empty?
+        end
+      end
+      raise Crossbeams::InfoError, "Required fields are missing: #{missing.join(', ')}" unless missing.empty?
+    end
+
     private
 
     def coldef_for(rectype)
