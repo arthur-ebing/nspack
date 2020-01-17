@@ -67,6 +67,14 @@ class BaseScript
     ErrorMailer.send_error_email(subject, message)
   end
 
+  # Write out a dump of information for later inspection.
+  def log_infodump(keyname, key, description, information)
+    dir = File.join(root_dir, 'log', 'infodump')
+    Dir.mkdir(dir) unless Dir.exist?(dir)
+    fn = File.join(dir, "#{keyname}_#{key}_#{Time.now.strftime('%Y_%m_%d_%H_%M_%S')}_#{description}.log")
+    File.open(fn, 'w') { |f| f.puts information }
+  end
+
   # Log the status of a record.
   #
   # @param table_name [Symbol, String] the name of the table.
