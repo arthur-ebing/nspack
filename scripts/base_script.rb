@@ -56,7 +56,7 @@ class BaseScript
   rescue StandardError => e
     puts "Exception: #{e.message}\n#{e.backtrace.join("\n")}" if debug_mode
     ErrorMailer.send_exception_email(e, subject: "Script #{self.class} failed", message: "Script args: #{args.inspect}\n")
-    abort "Failed: #{e.message}"
+    abort "Failed: #{e.message}\n#{e.backtrace.join("\n")}"
   end
 
   def send_exception_email(error, subject: nil, message: nil)
