@@ -27,7 +27,7 @@ module MesscadaApp
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
       id = DB[:cartons].insert(carton_params)
-      MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity, user).call if carton_is_pallet
+      MesscadaApp::CreatePalletFromCarton.new(user, id, carton_quantity).call if carton_is_pallet
 
       ok_response
     rescue Crossbeams::InfoError => e

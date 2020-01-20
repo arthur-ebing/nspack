@@ -72,8 +72,10 @@ module ProductionApp
       end
       res
     rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('fg_pallet_weighing'))
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification'))
       failed_response(e.message)
     end
 

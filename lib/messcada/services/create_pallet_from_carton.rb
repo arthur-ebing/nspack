@@ -4,10 +4,10 @@ module MesscadaApp
   class CreatePalletFromCarton < BaseService
     attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet, :pallet_sequence, :user_name
 
-    def initialize(carton_id, carton_quantity, user)
+    def initialize(user, carton_id, carton_quantity)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
-      @user_name = user&.name
+      @user_name = user&.user_name
     end
 
     def call
