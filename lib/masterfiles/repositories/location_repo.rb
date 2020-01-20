@@ -85,6 +85,10 @@ module MasterfilesApp
       DB[:locations].where(location_long_code: location_long_code).get(:id)
     end
 
+    def location_id_from_short_code(location_short_code)
+      DB[:locations].where(location_short_code: location_short_code).get(:id)
+    end
+
     def create_root_location(params)
       id = create_location(params)
       DB[:location_storage_types_locations].insert(location_id: id,

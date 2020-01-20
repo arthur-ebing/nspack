@@ -134,7 +134,7 @@ module EdiApp
     end
 
     def build_pallet(pallet_number, seq) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-      location_id = MasterfilesApp::LocationRepo.new.location_id_from_long_code(AppConst::INSTALL_LOCATION)
+      location_id = MasterfilesApp::LocationRepo.new.location_id_from_short_code(AppConst::INSTALL_LOCATION)
       raise Crossbeams::InfoError, "There is no INSTALL location named #{AppConst::INSTALL_LOCATION}" if location_id.nil?
 
       records[pallet_number] = {
