@@ -3,8 +3,9 @@
 module EdiApp
   class PoInRepo < BaseRepo
     def create_pallet(attrs)
-      DB[:pallets].insert(attrs)
+      id = DB[:pallets].insert(attrs)
       log_status('pallets', id, 'DEPOT PALLET CREATED FROM PO', user_name: 'System')
+      id
     end
 
     def create_pallet_sequence(attrs)
@@ -29,13 +30,8 @@ module EdiApp
       find_variant_id(:standard_pack_codes, code)
     end
 
-    def find_basic_pack_id(standard_pack_code_id, size_reference_id)
-      # .where(actual_count_for_pack: tot_cartons, active: true) #  Surely not tot_ctns?
-      DB[:fruit_actual_counts_for_packs]
-        .where(active: true)
-        .where(Sequel.lit('? = ANY(size_reference_ids)', size_reference_id))
-        .where(Sequel.lit('? = ANY(standard_pack_code_ids)', standard_pack_code_id))
-        .get(:basic_pack_code_id)
+    def find_basic_pack_code_id(standard_pack_code_id)
+      DB[:standard_pack_codes].where(id: standard_pack_code_id).get(:basic_pack_code_id)
     end
 
     def find_puc_id(code)
@@ -72,6 +68,10 @@ module EdiApp
       return nil if marketing_variety_id.nil?
 
       DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: marketing_variety_id).get(:cultivar_id)
+    end
+
+    def find_cultivar_group_id(cultivar_id)
+      DB[:cultivars].where(id: cultivar_id).get(:cultivar_group_id)
     end
 
     def find_season_id(date, cultivar_id)
