@@ -10,7 +10,8 @@
   \       std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n        mark,\r\n
   \       fruit_sticker,\r\n        fruit_sticker_2\r\n)\r\nSELECT\r\n    customer,\r\n
   \   marketing_variety,\r\n    mark,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
-  \   shipped_date,\r\n    carton_quantity,\r\n    pallet_size\r\nFROM\r\n    shipped\r\n"
+  \   shipped_date,\r\n    carton_quantity,\r\n    pallet_size,\r\n    nett_weight\r\nFROM\r\n
+  \   shipped\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -141,6 +142,22 @@
     :groupable: true
     :group_by_seq: 
     :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 9
+    :caption: Nett weight
+    :namespaced_name: nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
