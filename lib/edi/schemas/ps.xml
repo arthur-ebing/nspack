@@ -86,7 +86,7 @@
             <field name="pallet_x" size="1" required="false" />
             <field name="pallet_y" size="1" required="false" />
             <field name="pallet_z" size="2" required="false" />
-            <field name="inspec_date" size="8" required="true" format="DATE" map_to="inspection_date"/>
+            <field name="inspec_date" size="8" required="false" format="DATE" map_to="inspection_date"/>
             <field name="stack_variance" size="1" required="false" />
             <field name="store_type" size="1" required="false" />
             <field name="batch_no" size="20" required="false" map_to="batch_code"/>

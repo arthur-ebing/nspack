@@ -36,6 +36,8 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     schema = Nokogiri::XML(File.read(file_path))
     keys = schema.xpath('.//record/@identifier').map(&:value)
     required_sizes = YAML.load_file(yml_path)[flow_type]
+    # Flow type might point to another flow type (RL -> PO)
+    required_sizes = YAML.load_file(yml_path)[required_sizes] if required_sizes.is_a?(String)
 
     out = {}
     keys.each do |key|
@@ -114,7 +116,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       validate_entries(key)
     end
 
-    raise "Validation of #{flow_type} failed - #{@validation_errors.join("\n")}" unless @validation_errors.empty?
+    raise "Validation of #{flow_type} failed:\n#{@validation_errors.join("\n")}" unless @validation_errors.empty?
 
     ok_response
   end

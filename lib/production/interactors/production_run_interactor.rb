@@ -67,7 +67,7 @@ module ProductionApp
 
       res = nil
       repo.transaction do
-        res = MesscadaApp::CreatePalletFromCarton.new(carton_id, cpp[:cartons_per_pallet]).call
+        res = MesscadaApp::CreatePalletFromCarton.new(@user, carton_id, cpp[:cartons_per_pallet]).call
         log_transaction
       end
       res

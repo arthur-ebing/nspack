@@ -1,6 +1,6 @@
 module EdiApp
   class PoIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
-    attr_reader :org_code, :po_repo, :tot_ctns, :records
+    attr_reader :org_code, :po_repo, :tot_cartons, :records
 
     def initialize(edi_in_transaction_id, file_path, logger)
       @po_repo = PoInRepo.new
@@ -8,14 +8,14 @@ module EdiApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      p "Got: #{edi_records.length} recs"
+      # p "Got: #{edi_records.length} recs"
       log "Got: #{edi_records.length} recs"
       subset = edi_records.select { |rec| rec[:record_type].to_s == 'OP' }.group_by { |rec| rec[:sscc] }
-      p subset.length
+      # p subset.length
       missing_required_fields(only_rows: 'OP')
       @records = {}
       subset.each do |pallet_number, sequences|
-        @tot_ctns = sum_cartons(sequences)
+        @tot_cartons = sum_cartons(sequences)
         build_pallet(pallet_number, sequences.first)
         sequences.each do |sequence|
           build_sequence(pallet_number, sequence)
@@ -24,7 +24,7 @@ module EdiApp
       create_missing_masterfiles if AppConst::EDI_AUTO_CREATE_MF
 
       mf_res = check_missing_mf
-      p mf_res.instance unless mf_res.success
+      # p mf_res.instance unless mf_res.success
       return mf_res unless mf_res.success
 
       create_po_records
@@ -38,8 +38,12 @@ module EdiApp
         records.each do |_, pallet|
           attrs = pallet[:record]
           pallet[:lookup_data].each do |field, val|
+            next if %i[standard_pack_code_id basic_pack_code_id cartons_per_pallet_id fruit_size_reference_id].include?(field)
+
             attrs[field] = val
           end
+          # p '>>> PALLET'
+          # p attrs
           # validate attrs: PalletPoInSchema
           pallet_id = po_repo.create_pallet(attrs)
 
@@ -47,8 +51,15 @@ module EdiApp
             seq_attrs = rec[:record]
             seq_attrs[:pallet_id] = pallet_id
             pallet[:lookup_data].each do |field, val|
+              next unless %i[standard_pack_code_id basic_pack_code_id cartons_per_pallet_id fruit_size_reference_id pallet_format_id].include?(field)
+
               seq_attrs[field] = val
             end
+            rec[:lookup_data].each do |field, val|
+              seq_attrs[field] = val
+            end
+            # p '>>> SEQUENCE'
+            # p seq_attrs
             # validate attrs: PalletSequencePoInSchema
             po_repo.create_pallet_sequence(seq_attrs)
           end
@@ -123,8 +134,8 @@ module EdiApp
     end
 
     def build_pallet(pallet_number, seq) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-      location_id = ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::SITE).first&.last
-      raise Crossbeams::InfoError, 'There is no SITE location' if location_id.nil?
+      location_id = MasterfilesApp::LocationRepo.new.location_id_from_long_code(AppConst::INSTALL_LOCATION)
+      raise Crossbeams::InfoError, "There is no INSTALL location named #{AppConst::INSTALL_LOCATION}" if location_id.nil?
 
       records[pallet_number] = {
         lookup_data: {},  # data looked up from masterfiles.
@@ -148,15 +159,15 @@ module EdiApp
       rec[:lookup_data][:fruit_size_reference_id] = fruit_size_reference_id
       rec[:missing_mf][:fruit_size_reference_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if fruit_size_reference_id.nil?
 
-      basic_pack_id = po_repo.find_basic_pack_id(standard_pack_code_id, fruit_size_reference_id)
-      rec[:lookup_data][:basic_pack_id] = basic_pack_id
-      rec[:missing_mf][:basic_pack_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if basic_pack_id.nil?
+      basic_pack_code_id = po_repo.find_basic_pack_code_id(standard_pack_code_id)
+      rec[:lookup_data][:basic_pack_code_id] = basic_pack_code_id
+      rec[:missing_mf][:basic_pack_code_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if basic_pack_code_id.nil?
 
-      pallet_format_id, cartons_per_pallet_id = po_repo.find_pallet_format_and_cpp_id(seq[:pallet_btype], tot_ctns, basic_pack_id)
+      pallet_format_id, cartons_per_pallet_id = po_repo.find_pallet_format_and_cpp_id(seq[:pallet_btype], tot_cartons, basic_pack_code_id)
       rec[:lookup_data][:pallet_format_id] = pallet_format_id
-      rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype] } } if pallet_format_id.nil?
+      rec[:missing_mf][:pallet_format_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id } } if pallet_format_id.nil?
       rec[:lookup_data][:cartons_per_pallet_id] = cartons_per_pallet_id
-      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_ctns, pack_id: basic_pack_id } } if cartons_per_pallet_id.nil?
+      rec[:missing_mf][:cartons_per_pallet_id] = { mode: :direct, raise: true, keys: { pallet_btype: seq[:pallet_btype], cartons: tot_cartons, basic_pack_code_id: basic_pack_code_id } } if cartons_per_pallet_id.nil?
 
       # pallet_format_id: 0, # lookup
       rec[:record] = {
@@ -172,7 +183,7 @@ module EdiApp
         stock_created_at: intake_date || inspec_date || Time.now,
         phc: seq[:packh_code],
         intake_created_at: intake_date,
-        gross_weight: seq[:pallet_gross_mass],
+        gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].zero? ? nil : seq[:pallet_gross_mass],
         gross_weight_measured_at: weighed_date,
         palletized: true,
         palletized_at: intake_date,
@@ -241,6 +252,9 @@ module EdiApp
       cultivar_id = po_repo.find_cultivar_id_from_mkv(marketing_variety_id)
       rec[:lookup_data][:cultivar_id] = cultivar_id
       rec[:missing_mf][:cultivar_id] = { mode: :indirect, keys: { marketing_variety_id: marketing_variety_id } } if cultivar_id.nil?
+      cultivar_group_id = po_repo.find_cultivar_group_id(cultivar_id)
+      rec[:lookup_data][:cultivar_group_id] = cultivar_group_id
+      rec[:missing_mf][:cultivar_group_id] = { mode: :indirect, keys: { cultivar_id: cultivar_id } } if cultivar_group_id.nil?
       season_id = po_repo.find_season_id(inspec_date || tran_date, cultivar_id)
       rec[:lookup_data][:season_id] = season_id
       rec[:missing_mf][:season_id] = { mode: :direct, raise: true, keys: { date: inspec_date || tran_date, cultivar_id: cultivar_id } } if season_id.nil?
@@ -267,6 +281,7 @@ module EdiApp
       rec[:lookup_data][:cartons_per_pallet_id] = parent[:lookup_data][:cartons_per_pallet_id]
 
       rec[:record] = {
+        depot_pallet: true,
         pallet_number: pallet_number,
         # pallet_id: 0,
         # farm_id: farm_id,

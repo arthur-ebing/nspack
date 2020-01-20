@@ -63,16 +63,20 @@ module EdiApp
         FileUtils.mv(file_path, new_path)
       end
 
-      def work_out_flow_type
+      def work_out_flow_type # rubocop:disable Metrics/AbcSize
         # Ensure longest flow types are matched first
         # (in case of something like flows: PO and POS)
         keys = config.keys.sort_by(&:length).reverse
 
         keys.each do |key|
-          if file_name.upcase.start_with?(key.upcase)
-            @flow_type = key.upcase
-            break
-          end
+          next unless file_name.upcase.start_with?(key.upcase)
+
+          @flow_type = if config[key].is_a?(String)
+                         config[key]
+                       else
+                         key.upcase
+                       end
+          break
         end
         raise Crossbeams::InfoError, "There is no EDI in flow type to match file #{file_name}" unless @flow_type
       end
