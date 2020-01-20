@@ -45,7 +45,7 @@ class DumpLocalStorage < BaseScript
     id, ip = file.delete_prefix('usr_').split('_')
     ar = []
     ar << @users[id.to_i] if id
-    ar << ip
+    ar << ip.gsub('-', '.') if ip
     "USER: #{ar.compact.join(' - ')}"
   end
 end
