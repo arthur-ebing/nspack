@@ -2,10 +2,11 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code
+    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user
 
-    def initialize(params)
+    def initialize(user, params)
       @carton_label_id = params[:carton_number]
+      @user = user
     end
 
     def call
@@ -26,7 +27,7 @@ module MesscadaApp
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
       id = DB[:cartons].insert(carton_params)
-      MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity).call if carton_is_pallet
+      MesscadaApp::CreatePalletFromCarton.new(id, carton_quantity, user).call if carton_is_pallet
 
       ok_response
     rescue Crossbeams::InfoError => e

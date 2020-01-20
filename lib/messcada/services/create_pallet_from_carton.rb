@@ -2,11 +2,12 @@
 
 module MesscadaApp
   class CreatePalletFromCarton < BaseService
-    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet, :pallet_sequence
+    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet, :pallet_sequence, :user_name
 
-    def initialize(carton_id, carton_quantity)
+    def initialize(carton_id, carton_quantity, user)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
+      @user_name = user&.name
     end
 
     def call
@@ -48,7 +49,7 @@ module MesscadaApp
       res = validate_pallet_params(pallet_params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @pallet = repo.create_pallet(res.to_h)
+      @pallet = repo.create_pallet(user_name, res.to_h)
 
       ok_response
     end

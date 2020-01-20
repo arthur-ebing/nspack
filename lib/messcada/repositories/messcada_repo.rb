@@ -88,9 +88,9 @@ module MesscadaApp
       DB[:carton_labels].where(id: carton_label_id).get(:pallet_number)
     end
 
-    def create_pallet(pallet)
+    def create_pallet(user_name, pallet)
       id = DB[:pallets].insert(pallet)
-      log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET)
+      log_status('pallets', id, AppConst::PALLETIZED_NEW_PALLET, user_name: user_name)
 
       id
     end
