@@ -43,7 +43,7 @@ module FinishedGoodsApp
                      allocation_count: initial_count }
       allocated = LoadRepo.new.find_pallet_numbers_from(load_id: load_id)
 
-      write(form_state: form_state, allocated: allocated, scanned: [])
+      write(form_state: form_state, allocated: allocated, initial_allocated: allocated.clone, scanned: [])
     end
 
     def id
@@ -56,6 +56,10 @@ module FinishedGoodsApp
 
     def allocated
       current_step[:allocated] ||= []
+    end
+
+    def initial_allocated
+      current_step[:initial_allocated] ||= []
     end
 
     def scanned

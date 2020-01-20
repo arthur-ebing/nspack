@@ -301,7 +301,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.patch do # UPDATE
-          res = interactor.allocate(id, params[:load][:pallet_list])
+          res = interactor.allocate_list(id, params[:load][:pallet_list])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/dispatch/loads/#{id}/allocate"

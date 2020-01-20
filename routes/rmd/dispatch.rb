@@ -10,9 +10,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
-        r.on 'submit' do
-          pallet_numbers = interactor.stepper(:allocate).allocated
-          res = interactor.allocate_multiselect(load_id, pallet_number: pallet_numbers)
+        r.on 'complete_allocation' do
+          allocated = { pallet_number: interactor.stepper(:allocate).allocated }
+          initial_allocated = { pallet_number: interactor.stepper(:allocate).initial_allocated }
+
+          res = interactor.allocate_multiselect(load_id, allocated, initial_allocated)
           if res.success
             interactor.stepper(:allocate).clear
             store_locally(:flash_notice, rmd_success_message(res.message))
@@ -32,7 +34,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          scan_with_camera: @rmd_scan_with_camera,
                                          progress: interactor.stepper(:allocate).allocation_progress,
                                          links: [{ caption: 'Cancel', url: '/rmd/dispatch/allocate/load/clear', prompt: 'Cancel Load?' },
-                                                 { caption: 'Complete allocation', url: "/rmd/dispatch/allocate/load/#{load_id}/submit", prompt: 'Complete allocation?' }],
+                                                 { caption: 'Complete allocation', url: "/rmd/dispatch/allocate/load/#{load_id}/complete_allocation", prompt: 'Complete allocation?' }],
                                          notes: retrieve_from_local_store(:flash_notice),
                                          caption: 'Allocate Pallets',
                                          action: "/rmd/dispatch/allocate/load/#{load_id}",

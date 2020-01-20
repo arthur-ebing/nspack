@@ -41,7 +41,7 @@ module FinishedGoodsApp
 
     def validate_pallets_on_load(load_id, pallet_numbers)
       errors = []
-      [pallet_numbers].flatten.each do |pallet_number|
+      Array(pallet_numbers).each do |pallet_number|
         pallet_load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number) || load_id
         errors << pallet_number if pallet_load_id != load_id
       end
@@ -171,13 +171,18 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_multiselect(load_id, args) # rubocop:disable Metrics/AbcSize
-      pallet_numbers = repo.find_pallet_numbers_from(args)
+    def allocate_multiselect(load_id, params, initial_params = nil) # rubocop:disable Metrics/AbcSize
+      pallet_numbers = repo.find_pallet_numbers_from(params)
       res = validate_pallets_on_load(load_id, pallet_numbers)
       return res unless res.success
 
       new_allocation = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
       current_allocation = repo.find_pallet_ids_from(load_id: load_id)
+
+      unless initial_params.nil?
+        initial_allocation = repo.find_pallet_ids_from(initial_params)
+        return failed_response('Allocation mismatch') unless current_allocation.sort == initial_allocation.sort
+      end
 
       repo.transaction do
         repo.allocate_pallets(load_id, new_allocation - current_allocation, @user.user_name)
@@ -189,7 +194,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate(load_id, pallet_numbers) # rubocop:disable Metrics/AbcSize
+    def allocate_list(load_id, pallet_numbers) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_numbers(pallet_numbers)
       return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
 
