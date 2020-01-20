@@ -18,7 +18,7 @@ Sequel.migration do
     else
       run <<~SQL
         UPDATE standard_pack_codes
-        SET basic_pack_code_id = (SELECT id
+        SET basic_pack_code_id = (SELECT basic_pack_id
                                   FROM fruit_actual_counts_for_packs f
                                   WHERE standard_pack_codes.id = ANY(f.standard_pack_code_ids)
                                   LIMIT 1)
