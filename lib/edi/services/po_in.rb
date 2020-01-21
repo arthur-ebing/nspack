@@ -113,7 +113,7 @@ module EdiApp
       if errs.empty?
         ok_response
       else
-        failed_response('Missing masterfiles', errs.uniq)
+        failed_response('Missing masterfiles', "\n#{errs.uniq.join("\n").gsub('{', '(').gsub('}', ')')}")
       end
     end
 
@@ -183,7 +183,7 @@ module EdiApp
         stock_created_at: intake_date || inspec_date || Time.now,
         phc: seq[:packh_code],
         intake_created_at: intake_date,
-        gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].zero? ? nil : seq[:pallet_gross_mass],
+        gross_weight: seq[:pallet_gross_mass].nil? || seq[:pallet_gross_mass].to_f.zero? ? nil : seq[:pallet_gross_mass],
         gross_weight_measured_at: weighed_date,
         palletized: true,
         palletized_at: intake_date,

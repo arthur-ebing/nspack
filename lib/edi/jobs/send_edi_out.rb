@@ -9,6 +9,7 @@ module EdiApp
       self.maximum_retry_count = 0
 
       def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id) # rubocop:disable Metrics/AbcSize
+        # get email group...
         @flow_type = flow_type
         @edi_out_rule_id = edi_out_rule_id
         @repo = EdiOutRepo.new

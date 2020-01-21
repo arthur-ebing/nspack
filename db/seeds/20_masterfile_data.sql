@@ -89,3 +89,8 @@ INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLE
 
 INSERT INTO inspection_failure_types (failure_type_code) VALUES('GOVERNMENT');
 
+-- USER_EMAIL_GROUPS --
+INSERT INTO user_email_groups (mail_group) VALUES('label_approvers');
+INSERT INTO user_email_groups (mail_group) VALUES('label_publishers');
+INSERT INTO user_email_groups (mail_group) VALUES('edi_notifiers');
+

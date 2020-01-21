@@ -3,7 +3,7 @@
 module EdiApp
   module Job
     class ReceiveEdiIn < BaseQueJob
-      attr_reader :repo, :file_path, :file_name, :flow_type
+      attr_reader :repo, :file_path, :file_name, :flow_type, :email_notifiers
 
       # No point in retrying
       self.maximum_retry_count = 0
@@ -12,6 +12,7 @@ module EdiApp
         @file_path = File.expand_path(file_path)
         raise ArgumentError, "File \"#{@file_path}\" does not exist" unless File.exist?(@file_path)
 
+        @email_notifiers = DevelopmentApp::UserRepo.new.email_addresses(user_email_group: AppConst::EMAIL_GROUP_EDI_NOTIFIERS)
         @file_name = File.basename(file_path)
         @repo = EdiInRepo.new
         id = repo.create_edi_in_transaction(file_name: file_name)
@@ -32,6 +33,10 @@ module EdiApp
             else
               log "Failed: #{res.message}"
               repo.log_edi_in_failed(id, res.message)
+              msg = res.instance.empty? ? res.message : "\n#{res.message}\n#{res.instance}"
+              ErrorMailer.send_error_email(subject: "EDI in #{flow_type} transform failed (#{file_name})",
+                                           message: msg,
+                                           append_recipients: email_notifiers)
               move_to_failed_dir
             end
             finish
@@ -40,7 +45,7 @@ module EdiApp
           log_err(e.message)
           repo.log_edi_in_error(id, e)
           move_to_failed_dir
-          ErrorMailer.send_exception_email(e, subject: "EDI in transform failed (#{file_name})")
+          ErrorMailer.send_exception_email(e, subject: "EDI in transform failed (#{file_name})", append_recipients: email_notifiers)
           expire
         end
       end
