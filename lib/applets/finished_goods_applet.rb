@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 root_dir = File.expand_path('..', __dir__)
+
+# Pre-load included module:
+require "#{root_dir}/finished_goods/services/find_or_create_voyage.rb"
+
 Dir["#{root_dir}/finished_goods/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/finished_goods/interactors/*.rb"].each { |f| require f }
 # Dir["#{root_dir}/finished_goods/jobs/*.rb"].each { |f| require f }

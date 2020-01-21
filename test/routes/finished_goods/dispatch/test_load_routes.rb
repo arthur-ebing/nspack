@@ -5,7 +5,6 @@ require File.join(File.expand_path('./../../../', __dir__), 'test_helper_for_rou
 class TestLoadRoutes < RouteTester
 
   INTERACTOR = FinishedGoodsApp::LoadInteractor
-  SERVICE = FinishedGoodsApp::LoadService
 
   def test_edit
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::Load
@@ -42,10 +41,9 @@ class TestLoadRoutes < RouteTester
   def test_update
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    ensure_exists!(SERVICE)
     row_vals = Hash.new(1)
-    INTERACTOR.any_instance.stubs(:update_load_service).returns(ok_response(instance: row_vals))
-    SERVICE.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:update_load).returns(ok_response(instance: row_vals))
+    FinishedGoodsApp::UpdateLoad.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
     patch_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
   end
@@ -53,9 +51,8 @@ class TestLoadRoutes < RouteTester
   def test_update_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    ensure_exists!(SERVICE)
-    INTERACTOR.any_instance.stubs(:update_load_service).returns(bad_response)
-    SERVICE.any_instance.stubs(:call).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:update_load).returns(bad_response)
+    FinishedGoodsApp::UpdateLoad.any_instance.stubs(:call).returns(bad_response)
     FinishedGoods::Dispatch::Load::Edit.stub(:call, bland_page) do
       patch_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -97,10 +94,9 @@ class TestLoadRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    ensure_exists!(SERVICE)
     row_vals = Hash.new(1)
-    INTERACTOR.any_instance.stubs(:create_load_service).returns(ok_response(instance: row_vals))
-    SERVICE.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
+    INTERACTOR.any_instance.stubs(:create_load).returns(ok_response(instance: row_vals))
+    FinishedGoodsApp::CreateLoad.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
     post_as_fetch 'finished_goods/dispatch/loads', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -108,9 +104,8 @@ class TestLoadRoutes < RouteTester
   def test_create_remotely_fail
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    ensure_exists!(SERVICE)
-    INTERACTOR.any_instance.stubs(:create_load_service).returns(bad_response)
-    SERVICE.any_instance.stubs(:call).returns(bad_response)
+    INTERACTOR.any_instance.stubs(:create_load).returns(bad_response)
+    FinishedGoodsApp::CreateLoad.any_instance.stubs(:call).returns(bad_response)
     FinishedGoods::Dispatch::Load::New.stub(:call, bland_page) do
       post_as_fetch 'finished_goods/dispatch/loads', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

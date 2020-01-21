@@ -90,13 +90,13 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def create_load_service(params:, user:)
+    def create_load(params, user)
       res = validate_service_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::LoadService.call(mode: :create, params: res, user: user)
+        load_res = FinishedGoodsApp::CreateLoad.call(res, user)
         return failed_response(load_res.message) unless load_res.success
 
         log_transaction
@@ -106,13 +106,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load_service(params:, user:)
+    def update_load(params, user)
       res = validate_service_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::LoadService.call(mode: :update, params: res, user: user)
+        load_res = FinishedGoodsApp::UpdateLoad.call(res, user)
         return failed_response(load_res.message) unless load_res.success
 
         log_transaction
