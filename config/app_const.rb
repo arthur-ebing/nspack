@@ -135,6 +135,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_BUILDUP = 'BUILDUP'
   RUN_TYPE_TIP_BINS = 'TIP BINS'
   RUN_TYPE_WEIGH_RMT_BINS = 'WEIGH RMT BINS'
+  RUN_TYPE_RECALC_NETT_WEIGHT = 'RECALC NETT WEIGHT'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'

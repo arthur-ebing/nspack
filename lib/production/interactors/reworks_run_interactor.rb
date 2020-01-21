@@ -364,15 +364,15 @@ module ProductionApp
     end
 
     def log_reworks_runs_status_and_transaction(id, pallet_id, sequence_id, status)
-      log_status('pallets', pallet_id, status) unless pallet_id.nil_or_empty?
-      log_status('pallet_sequences', sequence_id, status) unless sequence_id.nil_or_empty?
-      log_status('reworks_runs', id, 'CREATED')
+      log_status(:pallets, pallet_id, status) unless pallet_id.nil_or_empty?
+      log_status(:pallet_sequences, sequence_id, status) unless sequence_id.nil_or_empty?
+      log_status(:reworks_runs, id, 'CREATED')
       log_transaction
     end
 
     def log_reworks_rmt_bin_status_and_transaction(id, rmt_bin_id, status)
-      log_status('rmt_bins', rmt_bin_id, status)
-      log_status('reworks_runs', id, 'CREATED')
+      log_status(:rmt_bins, rmt_bin_id, status)
+      log_status(:reworks_runs, id, 'CREATED')
       log_transaction
     end
 
@@ -451,7 +451,7 @@ module ProductionApp
                                            before: manually_tip_bin_before_state(attrs[:pallets_selected].first).sort.to_h, after: manually_tip_bin_after_state(attrs[:pallets_selected].first, attrs[:production_run_id]).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_status('reworks_runs', rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
+        log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
       end
       success_response('Rmt Bin tipped successfully', pallet_number: attrs[:pallets_selected])
     rescue Crossbeams::InfoError => e
@@ -589,7 +589,7 @@ module ProductionApp
     end
 
     def reworks_run_type(id)
-      repo.find_reworks_run_type(id)
+      repo.get(:reworks_run_types, id, :run_type)
     end
 
     def selected_pallet_numbers(reworks_run_type, sequence_ids)
@@ -687,7 +687,7 @@ module ProductionApp
 
     def make_changes?(reworks_run_type)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS then
+      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_RECALC_NETT_WEIGHT then
         false
       else
         true

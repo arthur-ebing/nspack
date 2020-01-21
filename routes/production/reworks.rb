@@ -7,7 +7,20 @@ class Nspack < Roda # rubocop:disable ClassLength
 
     interactor = ProductionApp::ReworksRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-    r.on 'reworks_runs', Integer do |id|
+    r.on 'reworks_runs', String do |run_type|
+      if run_type.to_i.zero?
+        reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(run_type)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
+
+        r.on 'new' do
+          check_auth!('reworks', 'new')
+          r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/new"
+        end
+        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+      end
+
+      id = run_type.to_i
+
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do
         handle_not_found(r)
@@ -18,72 +31,6 @@ class Nspack < Roda # rubocop:disable ClassLength
           check_auth!('reworks', 'read')
           show_partial { Production::Reworks::ReworksRun::Show.call(id) }
         end
-      end
-    end
-
-    r.on 'reworks_runs' do # rubocop:disable Metrics/BlockLength
-      r.on 'single_pallet_edit' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SINGLE_PALLET_EDIT)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      # r.on 'batch_pallet_edit' do
-      #   check_auth!('reworks', 'new')
-      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BATCH_PALLET_EDIT)
-      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-      #
-      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      # end
-
-      r.on 'scrap_pallet' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_SCRAP_PALLET)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      r.on 'unscrap_pallet' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_UNSCRAP_PALLET)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      # r.on 'repack' do
-      #   check_auth!('reworks', 'new')
-      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_REPACK)
-      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-      #
-      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      # end
-      #
-      # r.on 'buildup' do
-      #   check_auth!('reworks', 'new')
-      #   reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_BUILDUP)
-      #   raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-      #
-      #   r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      # end
-
-      r.on 'tip_bins' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_TIP_BINS)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      r.on 'weigh_rmt_bins' do
-        check_auth!('reworks', 'new')
-        reworks_run_type_id = get_reworks_run_type_id(AppConst::RUN_TYPE_WEIGH_RMT_BINS)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
       end
     end
 
@@ -109,7 +56,8 @@ class Nspack < Roda # rubocop:disable ClassLength
             else
               pallets_selected = interactor.resolve_selected_pallet_numbers(res.instance[:pallets_selected])
               params[:reworks_run][:pallets_selected] = pallets_selected.nil_or_empty? ? '' : pallets_selected
-              re_show_form(r, res) do
+              url = "/production/reworks/reworks_run_types/#{id}/reworks_runs/new"
+              re_show_form(r, res, url: url) do
                 Production::Reworks::ReworksRun::New.call(id,
                                                           form_values: params[:reworks_run],
                                                           form_errors: res.errors)
@@ -600,9 +548,5 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
     end
-  end
-  def get_reworks_run_type_id(run_type)
-    repo = ProductionApp::ReworksRepo.new
-    repo.find_reworks_run_type_from_run_type(run_type)
   end
 end
