@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module FruitFactory
+  module FruitFactory # rubocop:disable Metrics/ModuleLength
     def create_grade(opts = {})
       default = {
         grade_code: Faker::Lorem.unique.word,
@@ -54,13 +54,15 @@ module MasterfilesApp
     end
 
     def create_standard_pack_code(opts = {})
+      basic_pack_code_id = create_basic_pack_code
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         std_pack_label_code: Faker::Lorem.word,
         active: true,
         material_mass: Faker::Number.decimal,
-        plant_resource_button_indicator: Faker::Lorem.word
+        plant_resource_button_indicator: Faker::Lorem.word,
+        basic_pack_code_id: basic_pack_code_id
       }
       DB[:standard_pack_codes].insert(default.merge(opts))
     end

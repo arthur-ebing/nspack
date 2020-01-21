@@ -15,12 +15,14 @@ module UiRules
     end
 
     def set_show_fields
+      basic_pack_code_id_label = @this_repo.find_basic_pack_code(@form_object.basic_pack_code_id)&.basic_pack_code
       fields[:standard_pack_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:std_pack_label_code] = { renderer: :label, caption: 'Label code' }
       fields[:material_mass] = { renderer: :label }
       fields[:plant_resource_button_indicator] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
     end
 
     def common_fields
@@ -35,7 +37,11 @@ module UiRules
                                            caption: 'Button Indicator',
                                            prompt: 'Select Button Indicator',
                                            searchable: true,
-                                           remove_search_for_small_list: false }
+                                           remove_search_for_small_list: false },
+        basic_pack_code_id: { renderer: :select,
+                              options: @this_repo.for_select_basic_pack_codes,
+                              disabled_options: @this_repo.for_select_inactive_basic_pack_codes,
+                              caption: 'Basic Pack Code' }
       }
     end
 
@@ -50,7 +56,8 @@ module UiRules
                                     description: nil,
                                     std_pack_label_code: nil,
                                     material_mass: nil,
-                                    plant_resource_button_indicator: nil)
+                                    plant_resource_button_indicator: nil,
+                                    basic_pack_code_id: nil)
     end
   end
 end

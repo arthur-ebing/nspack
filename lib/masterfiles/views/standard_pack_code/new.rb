@@ -15,6 +15,7 @@ module Masterfiles
             page.form do |form|
               form.action '/masterfiles/fruit/standard_pack_codes'
               form.remote! if remote
+              form.add_field :basic_pack_code_id
               form.add_field :standard_pack_code
               form.add_field :description
               form.add_field :std_pack_label_code

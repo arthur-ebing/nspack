@@ -42,7 +42,7 @@ module MasterfilesApp
     end
 
     def standard_pack_code(id)
-      repo.find_standard_pack_code(id)
+      repo.find_standard_pack_code_flat(id)
     end
 
     def validate_standard_pack_code_params(params)

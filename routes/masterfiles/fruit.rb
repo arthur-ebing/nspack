@@ -445,6 +445,7 @@ class Nspack < Roda
               plant_resource_button_indicator
               description
               std_pack_label_code
+              basic_pack_code
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -514,6 +515,7 @@ class Nspack < Roda
               commodity_code
               standard_pack_id
               standard_pack_code
+              basic_pack_code
               gross_weight
               nett_weight
             ]

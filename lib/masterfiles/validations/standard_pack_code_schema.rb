@@ -10,5 +10,6 @@ module MasterfilesApp
     required(:plant_resource_button_indicator, Types::StrippedString).maybe(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
     required(:std_pack_label_code, Types::StrippedString).maybe(:str?)
+    required(:basic_pack_code_id, :integer).filled(:int?)
   end
 end

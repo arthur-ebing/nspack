@@ -15,14 +15,14 @@ module MasterfilesApp
     def test_standard_pack_code
       MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_pack_code).returns(fake_standard_pack_code)
       entity = interactor.send(:standard_pack_code, 1)
-      assert entity.is_a?(StandardPackCode)
+      assert entity.is_a?(StandardPackCodeFlat)
     end
 
     def test_create_standard_pack_code
       attrs = fake_standard_pack_code.to_h.reject { |k, _| k == :id }
       res = interactor.create_standard_pack_code(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(StandardPackCode, res.instance)
+      assert_instance_of(StandardPackCodeFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -40,7 +40,7 @@ module MasterfilesApp
       attrs[:standard_pack_code] = 'a_change'
       res = interactor.update_standard_pack_code(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(StandardPackCode, res.instance)
+      assert_instance_of(StandardPackCodeFlat, res.instance)
       assert_equal 'a_change', res.instance.standard_pack_code
       refute_equal value, res.instance.standard_pack_code
     end
@@ -70,6 +70,7 @@ module MasterfilesApp
     private
 
     def standard_pack_code_attrs
+      basic_pack_code_id = create_basic_pack_code
       {
         id: 1,
         standard_pack_code: Faker::Lorem.unique.word,
@@ -77,7 +78,8 @@ module MasterfilesApp
         std_pack_label_code: 'ABC',
         active: true,
         material_mass: 1.0,
-        plant_resource_button_indicator: 'ABC'
+        plant_resource_button_indicator: 'ABC',
+        basic_pack_code_id: basic_pack_code_id
       }
     end
 

@@ -76,6 +76,15 @@ module MasterfilesApp
                             wrapper: StandardProductWeightFlat)
     end
 
+    def find_standard_pack_code_flat(id)
+      find_with_association(:standard_pack_codes,
+                            id,
+                            parent_tables: [{ parent_table: :basic_pack_codes,
+                                              columns: %i[basic_pack_code],
+                                              flatten_columns: { basic_pack_code: :basic_pack_code } }],
+                            wrapper: StandardPackCodeFlat)
+    end
+
     def delete_basic_pack_code(id)
       dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)
       return { error: 'This pack code is in use.' } unless dependents.empty?
