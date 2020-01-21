@@ -15,7 +15,6 @@ module MasterfilesApp
     def test_standard_pack_code
       MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_pack_code_flat).returns(fake_standard_pack_code)
       entity = interactor.send(:standard_pack_code, 1)
-      p entity.class
       assert entity.is_a?(StandardPackCodeFlat)
     end
 
