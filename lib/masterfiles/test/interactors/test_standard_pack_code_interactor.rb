@@ -13,8 +13,9 @@ module MasterfilesApp
     end
 
     def test_standard_pack_code
-      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_pack_code).returns(fake_standard_pack_code)
+      MasterfilesApp::FruitSizeRepo.any_instance.stubs(:find_standard_pack_code_flat).returns(fake_standard_pack_code)
       entity = interactor.send(:standard_pack_code, 1)
+      p entity.class
       assert entity.is_a?(StandardPackCodeFlat)
     end
 
@@ -79,12 +80,13 @@ module MasterfilesApp
         active: true,
         material_mass: 1.0,
         plant_resource_button_indicator: 'ABC',
-        basic_pack_code_id: basic_pack_code_id
+        basic_pack_code_id: basic_pack_code_id,
+        basic_pack_code: 'ABC'
       }
     end
 
     def fake_standard_pack_code(overrides = {})
-      StandardPackCode.new(standard_pack_code_attrs.merge(overrides))
+      StandardPackCodeFlat.new(standard_pack_code_attrs.merge(overrides))
     end
 
     def interactor
