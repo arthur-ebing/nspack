@@ -13,7 +13,7 @@ module FinishedGoodsApp
       success_response('ok', load)
     end
 
-    def validate_pallet_numbers(string) # rubocop:disable Metrics/AbcSize
+    def parse_pallet_numbers(string) # rubocop:disable Metrics/AbcSize
       attrs = string.split(/\n|,/).map(&:strip).reject(&:empty?)
       pallet_numbers = attrs.map { |x| x.gsub(/['"]/, '') }
 
@@ -21,8 +21,8 @@ module FinishedGoodsApp
       message = "\"#{errors.join(', ')}\" must be numeric."
       return failed_response(message) unless errors.nil_or_empty?
 
-      errors = (pallet_numbers - repo.where_pallets(pallet_numbers))
-      message = "\"#{errors.join(', ')}\" doesn't exist."
+      errors = (pallet_numbers - repo.where_pallets(pallet_number: pallet_numbers))
+      message = "Pallet: \"#{errors.join(', ')}\" doesn't exist."
       return failed_response(message) unless errors.nil_or_empty?
 
       message = 'Validation empty.'
@@ -32,8 +32,16 @@ module FinishedGoodsApp
     end
 
     def validate_pallets_not_shipped(pallet_numbers)
-      errors = repo.where_pallets(pallet_numbers, shipped: true)
+      errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
       message = "Pallet: #{errors.join(', ')} already shipped."
+      return failed_response(message) unless errors.nil_or_empty?
+
+      success_response('ok', pallet_numbers)
+    end
+
+    def validate_pallets_in_stock(pallet_numbers)
+      errors = repo.where_pallets(pallet_number: pallet_numbers, in_stock: false)
+      message = "Pallet: #{errors.join(', ')} not in stock."
       return failed_response(message) unless errors.nil_or_empty?
 
       success_response('ok', pallet_numbers)
@@ -65,17 +73,17 @@ module FinishedGoodsApp
     end
 
     def validate_load_truck_pallets(load_id) # rubocop:disable Metrics/AbcSize
-      pallets = repo.find_pallet_numbers_from(load_id: load_id)
+      pallet_numbers = repo.find_pallet_numbers_from(load_id: load_id)
       message = []
-      message << 'No pallets allocated' if pallets.nil_or_empty?
+      message << 'No pallets allocated' if pallet_numbers.nil_or_empty?
 
-      without_nett_weight = repo.where_pallets(pallets, has_nett_weight: true)
+      without_nett_weight = repo.where_pallets(pallet_number: pallet_numbers, has_nett_weight: true)
       message << "Pallets:\n#{without_nett_weight.join("\n")}\ndo not have nett weight\n" unless without_nett_weight.nil_or_empty?
 
-      without_gross_weight = repo.where_pallets(pallets, has_gross_weight: true)
+      without_gross_weight = repo.where_pallets(pallet_number: pallet_numbers, has_gross_weight: true)
       message << "Pallets:\n#{without_gross_weight.join("\n")}\ndo not have gross weight\n" unless without_gross_weight.nil_or_empty?
 
-      already_shipped = repo.where_pallets(pallets, shipped: true)
+      already_shipped = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
       message << "Pallets:\n#{already_shipped.join("\n")}\nalready Shipped\n" unless already_shipped.nil_or_empty?
       return failed_response(message.join("\n")) unless message.empty?
 
@@ -156,7 +164,7 @@ module FinishedGoodsApp
     def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
       failed_response("Load: #{id} not shipped.") unless load_entity(id)&.shipped
 
-      pallet_shipped = repo.where_pallets(pallet_number, shipped: true) == [pallet_number]
+      pallet_shipped = repo.where_pallets(pallet_number: pallet_number, shipped: true) == [pallet_number]
       failed_response("Pallet Number: #{pallet_number} not shipped.") unless pallet_shipped
 
       res = nil
@@ -194,21 +202,32 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_list(load_id, pallet_numbers) # rubocop:disable Metrics/AbcSize
-      res = validate_pallet_numbers(pallet_numbers)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
+    def validate_allocate_list(load_id, pallets_string)
+      res = parse_pallet_numbers(pallets_string)
+      return res unless res.success
 
       pallet_numbers = res.instance
       res = validate_pallets_on_load(load_id, pallet_numbers)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
+      return res unless res.success
 
       res = validate_pallets_not_shipped(pallet_numbers)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
+      return res unless res.success
+
+      res = validate_pallets_in_stock(pallet_numbers)
+      return res unless res.success
 
       pallet_ids = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
+      success_response('ok', pallet_ids)
+    end
+
+    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
+      res = validate_allocate_list(load_id, pallets_string)
+      return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
+
+      pallet_ids = res.instance
       repo.transaction do
-        ans = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
-        raise Crossbeams::InfoError, ans.message unless ans.success
+        res = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
+        raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
       end
@@ -217,7 +236,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def truck_arrival_service(params) # rubocop:disable Metrics/AbcSize
+    def truck_arrival(params) # rubocop:disable Metrics/AbcSize
       vehicle_res = validate_load_vehicle_params(params)
       return validation_failed_response(vehicle_res) unless vehicle_res.messages.empty?
 
@@ -246,14 +265,24 @@ module FinishedGoodsApp
       @stepper ||= LoadStep.new(step_key, @user, @context.request_ip)
     end
 
-    def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = validate_pallet_numbers(pallet_number)
+    def validate_stepper_allocate_pallet(load_id, pallet_number)
+      res = parse_pallet_numbers(pallet_number)
       return res unless res.success
 
       res = validate_pallets_not_shipped(pallet_number)
       return res unless res.success
 
+      res = validate_pallets_in_stock(pallet_number)
+      return res unless res.success
+
       res = validate_pallets_on_load(load_id, pallet_number)
+      return res unless res.success
+
+      ok_response
+    end
+
+    def stepper_allocate_pallet(step_key, load_id, pallet_number)
+      res = validate_stepper_allocate_pallet(load_id, pallet_number)
       return res unless res.success
 
       stepper(step_key).allocate_pallet(pallet_number)
@@ -290,7 +319,7 @@ module FinishedGoodsApp
     end
 
     def find_load_with(pallet_number)
-      res = validate_pallet_numbers(pallet_number)
+      res = parse_pallet_numbers(pallet_number)
       return OpenStruct.new(success: false, instance: nil, errors: { pallet_number: [res.message] }, message: 'Validation error') unless res.success
 
       load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number)

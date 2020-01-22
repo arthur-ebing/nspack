@@ -287,7 +287,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           attrs = params[:truck_arrival]
-          res = interactor.truck_arrival_service(attrs)
+          res = interactor.truck_arrival(attrs)
 
           if res.success
             store_locally(:flash_notice, rmd_success_message(res.message))

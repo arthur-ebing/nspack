@@ -77,10 +77,11 @@ module FinishedGoodsApp
       ds.select_map(:id).flatten
     end
 
-    def where_pallets(pallet_numbers, allocated: nil, shipped: nil, has_nett_weight: false, has_gross_weight: false)
-      ds = DB[:pallets].where(pallet_number: pallet_numbers)
-      ds = ds.where(allocated: allocated) unless allocated.nil?
-      ds = ds.where(shipped: shipped) unless shipped.nil?
+    def where_pallets(args)
+      has_nett_weight = args.delete(:has_nett_weight)
+      has_gross_weight = args.delete(:has_gross_weight)
+
+      ds = DB[:pallets].where(args)
       ds = ds.exclude { nett_weight.> 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
       ds = ds.exclude { gross_weight.> 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
       ds.select_map(:pallet_number)
