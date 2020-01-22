@@ -23,10 +23,10 @@ module FinishedGoodsApp
 
       errors = (pallet_numbers - repo.where_pallets(pallet_number: pallet_numbers))
       message = "Pallet: \"#{errors.join(', ')}\" doesn't exist."
-      return failed_response(message) unless errors.nil_or_empty?
+      return failed_response(message) unless errors.empty?
 
       message = 'Validation empty.'
-      return failed_response(message) if pallet_numbers.nil_or_empty?
+      return failed_response(message) if pallet_numbers.empty?
 
       success_response('ok', pallet_numbers)
     end
@@ -34,7 +34,7 @@ module FinishedGoodsApp
     def validate_pallets_not_shipped(pallet_numbers)
       errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
       message = "Pallet: #{errors.join(', ')} already shipped."
-      return failed_response(message) unless errors.nil_or_empty?
+      return failed_response(message) unless errors.empty?
 
       success_response('ok', pallet_numbers)
     end
@@ -42,7 +42,7 @@ module FinishedGoodsApp
     def validate_pallets_in_stock(pallet_numbers)
       errors = repo.where_pallets(pallet_number: pallet_numbers, in_stock: false)
       message = "Pallet: #{errors.join(', ')} not in stock."
-      return failed_response(message) unless errors.nil_or_empty?
+      return failed_response(message) unless errors.empty?
 
       success_response('ok', pallet_numbers)
     end
@@ -78,13 +78,13 @@ module FinishedGoodsApp
       message << 'No pallets allocated' if pallet_numbers.nil_or_empty?
 
       without_nett_weight = repo.where_pallets(pallet_number: pallet_numbers, has_nett_weight: true)
-      message << "Pallets:\n#{without_nett_weight.join("\n")}\ndo not have nett weight\n" unless without_nett_weight.nil_or_empty?
+      message << "Pallets:\n#{without_nett_weight.join("\n")}\ndo not have nett weight\n" unless without_nett_weight.empty?
 
       without_gross_weight = repo.where_pallets(pallet_number: pallet_numbers, has_gross_weight: true)
-      message << "Pallets:\n#{without_gross_weight.join("\n")}\ndo not have gross weight\n" unless without_gross_weight.nil_or_empty?
+      message << "Pallets:\n#{without_gross_weight.join("\n")}\ndo not have gross weight\n" unless without_gross_weight.empty?
 
       already_shipped = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
-      message << "Pallets:\n#{already_shipped.join("\n")}\nalready Shipped\n" unless already_shipped.nil_or_empty?
+      message << "Pallets:\n#{already_shipped.join("\n")}\nalready Shipped\n" unless already_shipped.empty?
       return failed_response(message.join("\n")) unless message.empty?
 
       ok_response
