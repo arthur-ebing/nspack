@@ -31,7 +31,7 @@ module UiRules
       {
         parent_id: { renderer: :select, options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) }, prompt: true },
         short_description: { required: true },
-        medium_description: {},
+        medium_description: { required: true },
         long_description: {},
         vat_number: {},
         role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  },

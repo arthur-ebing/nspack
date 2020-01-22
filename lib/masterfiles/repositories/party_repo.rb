@@ -50,8 +50,7 @@ module MasterfilesApp
       role_ids = params.delete(:role_ids)
       return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?
 
-      params[:medium_description] = params[:short_description] unless params[:medium_description]
-      params[:long_description] = params[:short_description] unless params[:long_description]
+      params[:long_description] = params[:medium_description] unless params[:long_description]
       party_id = DB[:parties].insert(party_type: 'O')
       org_id = DB[:organizations].insert(params.merge(party_id: party_id))
       role_ids.each do |r_id|

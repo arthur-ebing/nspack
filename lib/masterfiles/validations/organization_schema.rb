@@ -8,7 +8,7 @@ module MasterfilesApp
     # required(:party_id, :integer).filled(:int?)
     optional(:parent_id, :integer).maybe(:int?)
     required(:short_description, Types::StrippedString).filled(:str?)
-    required(:medium_description, Types::StrippedString).maybe(:str?)
+    required(:medium_description, Types::StrippedString).filled(:str?)
     required(:long_description, Types::StrippedString).maybe(:str?)
     required(:vat_number, Types::StrippedString).maybe(:str?)
     required(:role_ids, Types::IntArray).filled { each(:int?) }

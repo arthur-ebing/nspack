@@ -46,13 +46,11 @@ module MasterfilesApp
 
       role_id = create_role[:id]
       new_attrs = attrs.merge(role_ids: [role_id],
-                              medium_description: nil,
                               long_description: nil)
       result_code = repo.create_organization(new_attrs)
       org = repo.find_hash(:organizations, result_code[:id])
-      short_code = org[:short_description]
-      assert_equal short_code, org[:medium_description]
-      assert_equal short_code, org[:long_description]
+      medium_code = org[:medium_description]
+      assert_equal medium_code, org[:long_description]
 
       assert repo.exists?(:parties, id: org[:party_id])
       assert repo.exists?(:party_roles,
