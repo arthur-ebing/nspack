@@ -132,7 +132,7 @@ module FinishedGoods
                 end
               end
               form.fold_up do |fold|
-                fold.caption 'Load Vehicles'
+                fold.caption 'Load Vehicle'
                 fold.row do |row|
                   row.column do |col|
                     col.add_field :vehicle_number
@@ -143,6 +143,10 @@ module FinishedGoods
                     col.add_field :vehicle_type
                     col.add_field :haulier
                     col.add_field :vehicle_weight_out
+                    col.add_control(control_type: :link,
+                                    text: 'Go to Load Vehicle',
+                                    url: "/rmd/dispatch/truck_arrival/load/#{id}",
+                                    style: :button)
                   end
                 end
               end

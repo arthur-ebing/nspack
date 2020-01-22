@@ -3,7 +3,8 @@
 module FinishedGoodsApp
   class UpdateLoad < BaseService
     include FindOrCreateVoyage
-    attr_reader :params, :load_id, :load_voyage_id
+    attr_reader :load_id, :load_voyage_id
+    attr_accessor :params
 
     def initialize(params, user)
       @params = params.to_h
@@ -11,13 +12,18 @@ module FinishedGoodsApp
       @user = user
     end
 
-    def call
+    def call # rubocop:disable Metrics/AbcSize
       res = find_voyage
-      create_voyage unless res.success
+      res = create_voyage unless res.success
+      return res unless res.success
 
-      update_load
+      res = update_load
+      return res unless res.success
+
       update_pallets_shipped_at unless @params[:shipped_at].nil?
-      update_load_voyage
+
+      res = update_load_voyage
+      return res unless res.success
 
       instance = load_entity(load_id)
       success_response("Updated load: #{load_id}", instance)
@@ -26,14 +32,24 @@ module FinishedGoodsApp
     private
 
     def update_load
-      repo.update(:loads, load_id, validate_load_params(params))
+      res = validate_load_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.update(:loads, load_id, res)
       repo.log_status(:loads, load_id, 'UPDATED', user_name: @user.user_name)
+
+      ok_response
     end
 
     def update_load_voyage
+      res = validate_load_voyage_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: load_id)
-      repo.update(:load_voyages, load_voyage_id, validate_load_voyage_params(params))
+      repo.update(:load_voyages, load_voyage_id, res)
       repo.log_status(:load_voyages, load_voyage_id, 'UPDATED', user_name: @user.user_name)
+
+      ok_response
     end
 
     def update_pallets_shipped_at

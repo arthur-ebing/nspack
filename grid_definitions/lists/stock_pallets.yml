@@ -89,7 +89,7 @@
   :unallocated_load_stock:
     - :col: in_stock
       :op: =
-      :val: $:in_stock$
+      :val: true
     - :col: zero_load_id
       :op: IN
       :val: $:id$,0

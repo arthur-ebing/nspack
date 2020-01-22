@@ -17,7 +17,7 @@
   \   verified,\r\n    verification_passed,\r\n    status,\r\n    build_status,\r\n
   \   active,\r\n    zero_load_id,\r\n    temp_tail,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
   THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nWHERE
-  NOT scrapped\r\nAND in_stock\r\nORDER BY zero_load_id DESC, pallet_id DESC"
+  NOT scrapped\r\nORDER BY zero_load_id DESC, pallet_id DESC"
 :limit: 
 :offset: 
 :external_settings:

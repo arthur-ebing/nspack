@@ -3,7 +3,8 @@
 module FinishedGoodsApp
   class CreateLoad < BaseService
     include FindOrCreateVoyage
-    attr_reader :params, :load_id, :load_voyage_id
+    attr_reader :load_id, :load_voyage_id
+    attr_accessor :params
 
     def initialize(params, user)
       @params = params.to_h
@@ -13,10 +14,14 @@ module FinishedGoodsApp
 
     def call
       res = find_voyage
-      create_voyage unless res.success
+      res = create_voyage unless res.success
+      return res unless res.success
 
-      create_load
-      create_load_voyage
+      res = create_load
+      return res unless res.success
+
+      res = create_load_voyage
+      return res unless res.success
 
       instance = load_entity(load_id)
       success_response("Created load: #{load_id}", instance)
@@ -25,14 +30,24 @@ module FinishedGoodsApp
     private
 
     def create_load
-      @load_id = repo.create(:loads, validate_load_params(params))
+      res = validate_load_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      @load_id = repo.create(:loads, res)
       @params[:load_id] = load_id
       repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name)
+
+      ok_response
     end
 
     def create_load_voyage
-      load_voyage_id = repo.create(:load_voyages, validate_load_voyage_params(params))
+      res = validate_load_voyage_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      load_voyage_id = repo.create(:load_voyages, res)
       repo.log_status(:load_voyages, load_voyage_id, 'CREATED', user_name: @user.user_name)
+
+      ok_response
     end
 
     def repo

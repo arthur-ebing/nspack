@@ -97,7 +97,7 @@ module FinishedGoodsApp
       load_res = nil
       repo.transaction do
         load_res = FinishedGoodsApp::CreateLoad.call(res, user)
-        return failed_response(load_res.message) unless load_res.success
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
       end
@@ -113,7 +113,7 @@ module FinishedGoodsApp
       load_res = nil
       repo.transaction do
         load_res = FinishedGoodsApp::UpdateLoad.call(res, user)
-        return failed_response(load_res.message) unless load_res.success
+        raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
       end
