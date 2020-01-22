@@ -43,6 +43,7 @@ class TestLoadRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_load).returns(ok_response(instance: row_vals))
+    FinishedGoodsApp::UpdateLoad.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
     patch_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_flash_notice
   end
@@ -51,6 +52,7 @@ class TestLoadRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:update_load).returns(bad_response)
+    FinishedGoodsApp::UpdateLoad.any_instance.stubs(:call).returns(bad_response)
     FinishedGoods::Dispatch::Load::Edit.stub(:call, bland_page) do
       patch_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end
@@ -94,6 +96,7 @@ class TestLoadRoutes < RouteTester
     ensure_exists!(INTERACTOR)
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_load).returns(ok_response(instance: row_vals))
+    FinishedGoodsApp::CreateLoad.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
     post_as_fetch 'finished_goods/dispatch/loads', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     expect_ok_json_redirect
   end
@@ -102,6 +105,7 @@ class TestLoadRoutes < RouteTester
     authorise_pass!
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:create_load).returns(bad_response)
+    FinishedGoodsApp::CreateLoad.any_instance.stubs(:call).returns(bad_response)
     FinishedGoods::Dispatch::Load::New.stub(:call, bland_page) do
       post_as_fetch 'finished_goods/dispatch/loads', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
     end

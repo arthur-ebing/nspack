@@ -90,36 +90,34 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def create_load(params) # rubocop:disable Metrics/AbcSize
-      res = validate_load_params(params)
+    def create_load(params, user)
+      res = validate_service_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      id = nil
+      load_res = nil
       repo.transaction do
-        load_res = LoadService.call(nil, res, @user.user_name)
-        id = load_res.instance
-        raise Crossbeams::InfoError, load_res.message unless load_res.success
+        load_res = FinishedGoodsApp::CreateLoad.call(res, user)
+        return failed_response(load_res.message) unless load_res.success
 
         log_transaction
       end
-      instance = load_entity(id)
-      success_response("Created load: #{id}", instance)
+      load_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_load(id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_load_params(params)
+    def update_load(params, user)
+      res = validate_service_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      load_res = nil
       repo.transaction do
-        load_res = LoadService.call(id, res, @user.user_name)
-        raise Crossbeams::InfoError, load_res.message unless load_res.success
+        load_res = FinishedGoodsApp::UpdateLoad.call(res, user)
+        return failed_response(load_res.message) unless load_res.success
 
         log_transaction
       end
-      instance = load_entity(id)
-      success_response("Updated load: #{id}", instance)
+      load_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -341,6 +339,10 @@ module FinishedGoodsApp
 
     def load_entity(id)
       repo.find_load_flat(id)
+    end
+
+    def validate_service_params(params)
+      LoadServiceSchema.call(params)
     end
 
     def validate_load_params(params)
