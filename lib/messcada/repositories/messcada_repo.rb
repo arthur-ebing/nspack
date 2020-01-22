@@ -208,7 +208,7 @@ module MesscadaApp
     end
 
     def pallet_verified?(pallet_id)
-      DB["select * from pallet_sequences where pallet_id = '#{pallet_id}' AND (verified is null or verified is false) "].first.nil?
+      !repo.exists?(:pallet_sequences, pallet_id: pallet_id, verified: false)
     end
 
     # instance of a carton label with all its relevant lookup columns

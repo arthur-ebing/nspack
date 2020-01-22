@@ -181,6 +181,7 @@ module MesscadaApp
         update_pallet_sequence_verification_result(pallet_sequence_id, params)
 
         repo.update_pallet(pallet_id, changeset) unless changeset.empty?
+        log_transaction
       end
 
       verification_completed = pallet_verified?(pallet_id)
