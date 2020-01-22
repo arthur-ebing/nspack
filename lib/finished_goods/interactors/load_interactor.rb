@@ -222,7 +222,7 @@ module FinishedGoodsApp
 
     def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
       res = validate_allocate_list(load_id, pallets_string)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_list: [res.message] }, message: 'Validation error') unless res.success
+      return validation_failed_response(messages: { pallet_list: [res.message] }) unless res.success
 
       pallet_ids = res.instance
       repo.transaction do
@@ -320,10 +320,10 @@ module FinishedGoodsApp
 
     def find_load_with(pallet_number)
       res = parse_pallet_numbers(pallet_number)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_number: [res.message] }, message: 'Validation error') unless res.success
+      return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
 
       load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number)
-      return OpenStruct.new(success: false, instance: nil, errors: { pallet_number: ['Pallet not on a load.'] }, message: 'Validation error') if load_id.nil?
+      return validation_failed_response(messages: { pallet_number: ['Pallet not on a load.'] }) if load_id.nil?
 
       success_response('ok', load_id)
     end
