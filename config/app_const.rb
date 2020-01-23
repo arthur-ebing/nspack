@@ -338,6 +338,17 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PO = 'PO'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
 
+  MF_VARIANT_TABLES = %i[
+    standard_pack_codes
+    pucs
+    marketing_varieties
+    fruit_size_references
+    marks
+    inventory_codes
+    grades
+    packed_tm_group
+  ].freeze
+
   SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
 end

@@ -1,0 +1,146 @@
+---
+:caption: Masterfile Variants
+:sql: "SELECT\r\n  \"masterfile_variants\".\"id\",\r\n  \"masterfile_variants\".\"masterfile_table\",\r\n
+  \ CASE masterfile_table\r\n  WHEN 'marks' THEN\r\n  (\r\n    SELECT\r\n      mark_code\r\n
+  \   FROM\r\n      marks\r\n    WHERE\r\n      id = masterfile_id)\r\n  WHEN 'grades'
+  THEN\r\n  (\r\n    SELECT\r\n      grade_code\r\n    FROM\r\n      grades\r\n    WHERE\r\n
+  \     id = masterfile_id)\r\n  WHEN 'pucs' THEN\r\n  (\r\n    SELECT\r\n      puc_code\r\n
+  \   FROM\r\n      pucs\r\n    WHERE\r\n      id = masterfile_id)\r\n  WHEN 'inventory_codes'
+  THEN\r\n  (\r\n    SELECT\r\n      inventory_code\r\n    FROM\r\n      inventory_codes\r\n
+  \   WHERE\r\n      id = masterfile_id)\r\n  WHEN 'standard_pack_codes' THEN\r\n
+  \ (\r\n    SELECT\r\n      standard_pack_code\r\n    FROM\r\n      standard_pack_codes\r\n
+  \   WHERE\r\n      id = masterfile_id)\r\n  WHEN 'marketing_varieties' THEN\r\n
+  \ (\r\n    SELECT\r\n      marketing_variety_code\r\n    FROM\r\n      marketing_varieties\r\n
+  \   WHERE\r\n      id = masterfile_id)\r\n  WHEN 'fruit_size_references' THEN\r\n
+  \ (\r\n    SELECT\r\n      size_reference\r\n    FROM\r\n      fruit_size_references\r\n
+  \   WHERE\r\n      id = masterfile_id)\r\n  WHEN 'packed_tm_group' THEN\r\n  (\r\n
+  \   SELECT\r\n      target_market_group_name\r\n    FROM\r\n      target_market_groups\r\n
+  \   WHERE\r\n      id = masterfile_id)\r\nELSE\r\n  NULL\r\n  END AS masterfile_value,\r\n
+  \ \"masterfile_variants\".\"code\",\r\n  \"masterfile_variants\".\"masterfile_id\",\r\n
+  \ \"masterfile_variants\".\"created_at\",\r\n  \"masterfile_variants\".\"updated_at\"\r\nFROM\r\n
+  \ \"masterfile_variants\"\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: masterfile_variants.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  masterfile_table:
+    :name: masterfile_table
+    :sequence_no: 2
+    :caption: Masterfile table
+    :namespaced_name: masterfile_variants.masterfile_table
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  masterfile_value:
+    :name: masterfile_value
+    :sequence_no: 3
+    :caption: Masterfile code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  code:
+    :name: code
+    :sequence_no: 4
+    :caption: Variant code
+    :namespaced_name: masterfile_variants.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  masterfile_id:
+    :name: masterfile_id
+    :sequence_no: 5
+    :caption: Masterfile
+    :namespaced_name: masterfile_variants.masterfile_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 6
+    :caption: Created at
+    :namespaced_name: masterfile_variants.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 7
+    :caption: Updated at
+    :namespaced_name: masterfile_variants.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: masterfile_variants.masterfile_id
+  :caption: Masterfile
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

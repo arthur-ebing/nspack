@@ -1,0 +1,24 @@
+---
+:dataminer_definition: masterfile_variants
+:actions:
+- :url: "/masterfiles/general/masterfile_variants/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/general/masterfile_variants/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/general/masterfile_variants/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/general/masterfile_variants/new"
+  :text: New Masterfile Variant
+  :style: :button
+  :behaviour: :popup

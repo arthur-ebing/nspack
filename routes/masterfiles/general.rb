@@ -139,6 +139,74 @@ class Nspack < Roda
         end
       end
     end
+
+    # MASTERFILE VARIANTS
+    # --------------------------------------------------------------------------
+    r.on 'masterfile_variants', Integer do |id|
+      interactor = MasterfilesApp::MasterfileVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:masterfile_variants, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('general', 'edit')
+        show_partial { Masterfiles::General::MasterfileVariant::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('general', 'read')
+          show_partial { Masterfiles::General::MasterfileVariant::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_masterfile_variant(id, params[:masterfile_variant])
+          if res.success
+            update_grid_row(id, changes: { masterfile_table: res.instance[:masterfile_table], code: res.instance[:code], masterfile_id: res.instance[:masterfile_id] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::General::MasterfileVariant::Edit.call(id, form_values: params[:masterfile_variant], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('general', 'delete')
+          res = interactor.delete_masterfile_variant(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'masterfile_variants' do
+      interactor = MasterfilesApp::MasterfileVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('general', 'new')
+        show_partial_or_page(r) { Masterfiles::General::MasterfileVariant::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_masterfile_variant(params[:masterfile_variant])
+        if res.success
+          row_keys = %i[
+            id
+            masterfile_table
+            code
+            masterfile_id
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/general/masterfile_variants/new') do
+            Masterfiles::General::MasterfileVariant::New.call(form_values: params[:masterfile_variant],
+                                                              form_errors: res.errors,
+                                                              remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 
