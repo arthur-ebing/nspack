@@ -6,8 +6,8 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   end
 
   down do
-    drop_program_function 'Create New Pallet', functional_area: 'RMD', program: 'Production'
-    drop_program_function 'Add Sequence', functional_area: 'RMD', program: 'Production'
-    drop_program_function 'Edit Pallet', functional_area: 'RMD', program: 'Production'
+    drop_program_function 'Create New Pallet', functional_area: 'RMD', program: 'Production', match_group: 'Palletizing'
+    drop_program_function 'Add Sequence', functional_area: 'RMD', program: 'Production', match_group: 'Palletizing'
+    drop_program_function 'Edit Pallet', functional_area: 'RMD', program: 'Production', match_group: 'Palletizing'
   end
 end

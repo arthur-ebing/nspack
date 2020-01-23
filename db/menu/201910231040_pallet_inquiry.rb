@@ -6,6 +6,5 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
 
   down do
     drop_program 'Production', functional_area: 'RMD'
-    drop_program_function 'Pallet Enquiry', functional_area: 'RMD', program: 'Production'
   end
 end

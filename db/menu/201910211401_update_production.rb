@@ -1,7 +1,7 @@
 Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   up do
-    drop_program_function 'Cartons', functional_area: 'Production', program: 'Runs'
-    drop_program_function 'Cartons', functional_area: 'Production', program: 'Runs'
+    drop_program_function 'Cartons', functional_area: 'Production', program: 'Runs', match_group: 'List Objects'
+    drop_program_function 'Cartons', functional_area: 'Production', program: 'Runs', match_group: 'List Objects'
   end
 
   down do

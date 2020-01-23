@@ -8,10 +8,10 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
     add_program_function 'New', functional_area: 'Production', program: 'Reworks', group: 'Tip Bins', url: '/production/reworks/reworks_runs/tip_bins/new', seq: 13
     add_program_function 'New', functional_area: 'Production', program: 'Reworks', group: 'Weigh Rmt Bins', url: '/production/reworks/reworks_runs/weigh_rmt_bins/new', seq: 15
 
-    change_program_function 'Single Pallet Edit', rename: 'List', group: 'Single Pallet Edit', functional_area: 'Production', program: 'Reworks', seq: 4
-    change_program_function 'Batch Pallet Edit', rename: 'List', group: 'Batch Pallet Edit', functional_area: 'Production', program: 'Reworks', seq: 6
-    change_program_function 'Scrap Pallet', rename: 'List', group: 'Scrap Pallet', functional_area: 'Production', program: 'Reworks', seq: 8
-    change_program_function 'Unscrap Pallet', rename: 'List', group: 'Unscrap Pallet', functional_area: 'Production', program: 'Reworks', seq: 10
+    change_program_function 'Single Pallet Edit', rename: 'List', group: 'Single Pallet Edit', functional_area: 'Production', program: 'Reworks', match_group: 'Data Change', seq: 4
+    change_program_function 'Batch Pallet Edit', rename: 'List', group: 'Batch Pallet Edit', functional_area: 'Production', program: 'Reworks', match_group: 'Data Change',seq: 6
+    change_program_function 'Scrap Pallet', rename: 'List', group: 'Scrap Pallet', functional_area: 'Production', program: 'Reworks', match_group: 'Scrap Pallet', seq: 8
+    change_program_function 'Unscrap Pallet', rename: 'List', group: 'Unscrap Pallet', functional_area: 'Production', program: 'Reworks', match_group: 'Scrap Pallet', seq: 10
     change_program_function 'Buildup', rename: 'List', group: 'Buildup', functional_area: 'Production', program: 'Reworks', seq: 12
     change_program_function 'Tip Bins', rename: 'List', group: 'Tip Bins', functional_area: 'Production', program: 'Reworks', seq: 14
     change_program_function 'Weigh Rmt Bins', rename: 'List', group: 'Weigh Rmt Bins', functional_area: 'Production', program: 'Reworks', seq: 16
