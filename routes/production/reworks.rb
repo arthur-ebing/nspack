@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
+
 class Nspack < Roda # rubocop:disable ClassLength
-  route 'reworks', 'production' do |r| # rubocop:disable Metrics/BlockLength
+  route 'reworks', 'production' do |r|
     # REWORKS RUNS
     # --------------------------------------------------------------------------
 
@@ -21,7 +23,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
-    r.on 'reworks_run_types', String do |run_type| # rubocop:disable Metrics/BlockLength
+    r.on 'reworks_run_types', String do |run_type|
       if run_type.match?(/\A\d+\Z/)
         id = run_type.to_i
       else
@@ -30,7 +32,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
       store_locally(:reworks_run_type_id, id)
 
-      r.on 'reworks_runs' do # rubocop:disable Metrics/BlockLength
+      r.on 'reworks_runs' do
         r.on 'new' do
           r.get do
             store_locally(:list_url, back_button_url)
@@ -92,7 +94,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
 
-      r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength
+      r.on 'pallets', String do |pallet_number|
         r.on 'edit_pallet'  do
           pallet_numbers = pallet_number.split(',')
           r.get do
@@ -138,7 +140,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
     end
 
-    r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength
+    r.on 'pallets', String do |pallet_number|
       reworks_run_type_id = retrieve_from_local_store(:reworks_run_type_id)
       store_locally(:reworks_run_type_id, reworks_run_type_id)
 
@@ -236,7 +238,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
-    r.on 'pallet_sequences', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_sequences', Integer do |id|
       reworks_run_type_id = retrieve_from_local_store(:reworks_run_type_id)
       store_locally(:reworks_run_type_id, reworks_run_type_id)
 
@@ -549,3 +551,4 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
