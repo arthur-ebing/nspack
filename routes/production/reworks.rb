@@ -43,7 +43,11 @@ class Nspack < Roda # rubocop:disable ClassLength
             res = interactor.create_reworks_run(id, params[:reworks_run])
             if res.success
               if res.instance[:make_changes]
-                r.redirect "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}"
+                if fetch?(r)
+                  redirect_via_json("/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}")
+                else
+                  r.redirect "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}"
+                end
               else
                 flash[:notice] = res.message
                 if fetch?(r)
