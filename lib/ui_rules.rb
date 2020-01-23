@@ -59,7 +59,7 @@ module UiRules
     end
 
     # Generate HTML for a table of columns from the +@form_object+.
-    def compact_header(columns:, display_columns: 2, header_captions: {}) # rubocop:disable Metrics/AbcSize
+    def compact_header(columns:, display_columns: 2, header_captions: {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       raise("#{self.class} form object has not been set up before calling 'compact_header`") if @form_object.nil?
 
       row = 0
