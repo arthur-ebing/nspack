@@ -122,6 +122,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Defaults for Packaging
   DEFAULT_FG_PACKAGING_TYPE = ENV.fetch('DEFAULT_FG_PACKAGING_TYPE', 'CARTON') # Can be BIN or CARTON
   REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
+  BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
 
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'

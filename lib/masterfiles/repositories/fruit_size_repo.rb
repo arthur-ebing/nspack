@@ -93,12 +93,37 @@ module MasterfilesApp
       { success: true }
     end
 
-    def delete_standard_pack_code(id)
+    def create_standard_pack_code(attrs)
+      if AppConst::BASE_PACK_EQUALS_STD_PACK
+        base_pack_id = DB[:basic_pack_codes].insert(basic_pack_code: attrs[:standard_pack_code])
+        DB[:standard_pack_codes].insert(attrs.to_h.merge(basic_pack_code_id: base_pack_id))
+      else
+        DB[:standard_pack_codes].insert(attrs.to_h)
+      end
+    end
+
+    def update_standard_pack_code(id, attrs)
+      if AppConst::BASE_PACK_EQUALS_STD_PACK && attrs.to_h.key?(:standard_pack_code)
+        bp_id = DB[:standard_pack_codes].where(id: id).get(:basic_pack_code_id)
+        DB[:basic_pack_codes].where(id: bp_id).update(basic_pack_code: attrs[:standard_pack_code])
+      end
+      DB[:standard_pack_codes].where(id: id).update(attrs.to_h)
+    end
+
+    def delete_standard_pack_code(id) # rubocop:disable Metrics/AbcSize
       dependents = standard_pack_code_dependents(id)
-      return { error: 'This pack code is in use.' } unless dependents.empty?
+      return failed_response('This pack code is in use.') unless dependents.empty?
+
+      bp_id = nil
+      if AppConst::BASE_PACK_EQUALS_STD_PACK
+        bp_id = DB[:standard_pack_codes].where(id: id).get(:basic_pack_code_id)
+        cnt = DB[:standard_pack_codes].where(basic_pack_code_id: bp_id).count
+        bp_id = nil if cnt > 1
+      end
 
       DB[:standard_pack_codes].where(id: id).delete
-      { success: true }
+      DB[:basic_pack_codes].where(id: bp_id).delete if bp_id
+      ok_response
     end
 
     def delete_std_fruit_size_count(id)

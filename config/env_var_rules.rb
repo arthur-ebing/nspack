@@ -45,7 +45,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SOLAS_VERIFICATION_METHOD: 'SOLAS verification method (1 or 2). required for some EDI out documents' },
     { SAMSA_ACCREDITATION: 'For sending EDI documents' },
     { CLM_BUTTON_CAPTION_FORMAT: 'A format for captions to display on label printer robot buttons. See AppConst for more.' },
-    { DEFAULT_CARGO_TEMP_ON_ARRIVAL: 'The cargo temperature_code to default for containers on truck arrival.' }
+    { DEFAULT_CARGO_TEMP_ON_ARRIVAL: 'The cargo temperature_code to default for containers on truck arrival.' },
+    { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' }
   ].freeze
 
   NO_OVERRIDE = [

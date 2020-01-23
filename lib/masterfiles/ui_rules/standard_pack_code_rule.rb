@@ -41,7 +41,8 @@ module UiRules
         basic_pack_code_id: { renderer: :select,
                               options: @this_repo.for_select_basic_pack_codes,
                               disabled_options: @this_repo.for_select_inactive_basic_pack_codes,
-                              caption: 'Basic Pack Code' }
+                              caption: 'Basic Pack Code',
+                              invisible: AppConst::BASE_PACK_EQUALS_STD_PACK }
       }
     end
 
