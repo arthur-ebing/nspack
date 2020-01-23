@@ -68,6 +68,7 @@ module UiRules
         row += 1 if (i % display_columns).zero?
         cells[row] ||= []
         val = @form_object[a]
+        val = val.to_s('F') if val.is_a?(BigDecimal)
         val = <<~HTML if val.is_a?(TrueClass)
           <div class="cbl-input dark-green">
             #{Crossbeams::Layout::Icon.render(:checkon, css_class: 'mr1')}

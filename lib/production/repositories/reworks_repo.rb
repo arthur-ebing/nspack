@@ -21,33 +21,33 @@ module ProductionApp
     crud_calls_for :reworks_runs, name: :reworks_run, wrapper: ReworksRun
 
     def find_reworks_run(id)
-      hash = DB["SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type AS reworks_run_type,
-                 reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
-                 COALESCE(reworks_runs.changes_made, null) AS changes_made,
-                 COALESCE(reworks_runs.changes_made ->> 'reworks_action', '') AS reworks_action, reworks_runs.user,
-                 array_to_string(COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected), '\n') AS pallets_selected,
-                 array_to_string(reworks_runs.pallets_affected, '\n') AS pallets_affected,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' ->> 'pallet_number', '') AS pallet_number,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id', '')  AS pallet_id,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number', '')  AS pallet_sequence_number,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'before', null) AS before_state,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after', null) AS after_state,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
-                 COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
-                 reworks_runs.created_at, reworks_runs.updated_at
-                 FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
-                 LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
-                 WHERE reworks_runs.id = ?", id].first
+      query = <<~SQL
+        SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type AS reworks_run_type,
+        reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
+        COALESCE(reworks_runs.changes_made, null) AS changes_made,
+        COALESCE(reworks_runs.changes_made ->> 'reworks_action', '') AS reworks_action, reworks_runs.user,
+        array_to_string(COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected), '\n') AS pallets_selected,
+        array_to_string(reworks_runs.pallets_affected, '\n') AS pallets_affected,
+        COALESCE(reworks_runs.changes_made -> 'pallets' ->> 'pallet_number', '') AS pallet_number,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id', '')  AS pallet_id,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number', '')  AS pallet_sequence_number,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'before', null) AS before_state,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after', null) AS after_state,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
+        reworks_runs.created_at, reworks_runs.updated_at
+        FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
+        LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
+        WHERE reworks_runs.id = #{id}
+      SQL
+      hash = DB[query].first
       return nil if hash.nil?
 
       ReworksRunFlat.new(hash)
     end
 
-    def find_reworks_run_type(id)
-      find_hash(:reworks_run_types, id)[:run_type]
-    end
-
-    def find_reworks_run_type_from_run_type(run_type)
+    def get_reworks_run_type_id(attrs)
+      run_type = attrs.gsub('_', ' ').upcase
       DB[:reworks_run_types].where(run_type: run_type).get(:id)
     end
 
@@ -141,6 +141,13 @@ module ProductionApp
       pallet_numbers.each do |pallet_number|
         update_pallets_pallet_format(pallet_number)
       end
+    end
+
+    def update_pallets_recalc_nett_weight(pallet_numbers, user_name)
+      ds = DB[:pallets].where(pallet_number: pallet_numbers)
+      ids = ds.select_map(:id)
+      ds.update(re_calculate_nett: true)
+      log_multiple_statuses(:pallets, ids, 'NETT_WEIGHT_RECALCULATED', user_name: user_name)
     end
 
     def update_pallets_pallet_format(pallet_number)
@@ -414,20 +421,22 @@ module ProductionApp
     end
 
     def find_pallet_sequence_setup_data(sequence_id)
-      hash = DB["SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_variety_id,
-                 ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
-                 ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
-                 ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code, --p.pallet_label_name,
-                 cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-                 ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
-                 FROM pallet_sequences ps
-                 JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
-                 JOIN pallet_formats ON pallet_formats.id = ps.pallet_format_id
-                 LEFT JOIN pm_boms ON pm_boms.id = ps.pm_bom_id
-                 LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = ps.pm_bom_id
-                 LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
-                 WHERE ps.id = ?", sequence_id].first
-
+      query = <<~SQL
+        SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_variety_id,
+        ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
+        ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
+        ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code,
+        cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
+        ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
+        FROM pallet_sequences ps
+        JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
+        JOIN pallet_formats ON pallet_formats.id = ps.pallet_format_id
+        LEFT JOIN pm_boms ON pm_boms.id = ps.pm_bom_id
+        LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = ps.pm_bom_id
+        LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+        WHERE ps.id = #{sequence_id}
+      SQL
+      hash = DB[query].first
       return nil if hash.nil?
 
       OpenStruct.new(hash)
@@ -447,11 +456,14 @@ module ProductionApp
     end
 
     def for_selected_second_pm_products(pm_type, fruit_sticker_pm_product_id)
-      DB["SELECT p.id, p.product_code
-          FROM pm_products p
-          JOIN pm_subtypes s on s.id = p.pm_subtype_id
-          JOIN pm_types t on t.id = s.pm_type_id
-          WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}"].map { |r| [r[:product_code], r[:id]] }
+      query = <<~SQL
+        SELECT p.id, p.product_code
+        FROM pm_products p
+        JOIN pm_subtypes s on s.id = p.pm_subtype_id
+        JOIN pm_types t on t.id = s.pm_type_id
+        WHERE t.pm_type_code = #{pm_type} AND p.id != #{fruit_sticker_pm_product_id}
+      SQL
+      DB[query].map { |r| [r[:product_code], r[:id]] }
     end
   end
 end

@@ -4,6 +4,6 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   end
 
   down do
-    drop_program_function 'Std Product Weights', functional_area: 'Masterfiles', program: 'Packaging'
+    drop_program_function 'Std Product Weights', functional_area: 'Masterfiles', program: 'Packaging', match_group: 'Pack codes'
   end
 end

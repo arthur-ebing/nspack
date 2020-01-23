@@ -39,7 +39,8 @@ module ProductionApp
         repack_pallets: repack_pallets?,
         single_edit: single_edit?,
         batch_edit: batch_edit?,
-        rmt_bin_change: rmt_bin_change?
+        rmt_bin_change: rmt_bin_change?,
+        recalc_nett_weight: recalc_nett_weight?
       }
     end
 
@@ -67,6 +68,10 @@ module ProductionApp
       AppConst::RUN_TYPE_TIP_BINS == reworks_run_type[:run_type] || AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type[:run_type]
     end
 
+    def recalc_nett_weight?
+      AppConst::RUN_TYPE_RECALC_NETT_WEIGHT == reworks_run_type[:run_type]
+    end
+
     def create_reworks_run  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       reworks_run_attrs = resolve_reworks_run_attrs
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
@@ -75,6 +80,7 @@ module ProductionApp
       repo.scrapping_reworks_run(pallets_affected, attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
       repo.update_pallets_pallet_format(pallets_affected.first) if make_changes && reworks_run_booleans[:single_edit]
       repo.existing_records_batch_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:batch_edit]
+      repo.update_pallets_recalc_nett_weight(pallets_affected, user_name) if reworks_run_booleans[:recalc_nett_weight]
 
       success_response('ok', reworks_run_id: id)
     rescue Crossbeams::InfoError => e
@@ -103,7 +109,7 @@ module ProductionApp
 
     def resolve_bin_changes
       bin_changes = {}
-      bin_changes['pallets'] = { 'pallet_sequences' => { changes: changes } }
+      bin_changes['pallets'] = { pallet_sequences: { changes: changes } }
       bin_changes.to_json
     end
 

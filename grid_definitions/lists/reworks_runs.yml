@@ -9,7 +9,7 @@
 :page_controls:
 - :control_type: :link
   :url: "/production/reworks/reworks_run_types/$:reworks_runs.reworks_run_type_id$/reworks_runs/new"
-  :text: New Pallet Change
+  :text: New Rework Run
   :style: :button
   :behaviour: :popup
 :conditions:

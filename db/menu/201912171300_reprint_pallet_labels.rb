@@ -4,6 +4,6 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   end
 
   down do
-    drop_program_function 'Reprint Pallet Label', functional_area: 'RMD', program: 'Production'
+    drop_program_function 'Reprint Pallet Label', functional_area: 'RMD', program: 'Production', match_group: 'Palletizing'
   end
 end

@@ -1,8 +1,8 @@
 Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   up do
-    drop_program_function 'View', functional_area: 'Finished Goods', program: 'Dispatch'
-    drop_program_function 'Edit', functional_area: 'Finished Goods', program: 'Dispatch'
-    drop_program_function 'Allocate', functional_area: 'Finished Goods', program: 'Dispatch'
+    drop_program_function 'View', functional_area: 'Finished Goods', program: 'Dispatch', match_group: 'Last Load'
+    drop_program_function 'Edit', functional_area: 'Finished Goods', program: 'Dispatch', match_group: 'Last Load'
+    drop_program_function 'Allocate', functional_area: 'Finished Goods', program: 'Dispatch', match_group: 'Last Load'
   end
 
   down do
