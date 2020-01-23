@@ -102,13 +102,8 @@ module EdiApp
       }.to_json
     end
 
-    def edi_config(for_send)
-      config = if for_send
-                 EdiOutRepo.new.load_config
-               else
-                 # EdiInRepo.new.load_config
-                 {}
-               end
+    def edi_config_for_send
+      config = EdiOutRepo.new.load_config
       [config, Pathname.new(config[:root].sub('$HOME', ENV['HOME']))]
     end
 
@@ -119,18 +114,20 @@ module EdiApp
     end
 
     def edi_paths(for_send: true)
-      config, root = edi_config(for_send)
       if for_send
+        config, root = edi_config_for_send
         edi_path_list(config, root, :out, 'transmitted')
       else
-        edi_path_list(config, root, :in, 'receive')
+        [Pathname.new(AppConst::EDI_RECEIVE_DIR).parent + 'processed']
       end
     end
 
     def file_row_for_grid(file)
+      flow = file.basename.to_s[0, 2]
+      flow = 'PO' if flow == 'RL'
       {
         id: yield,
-        flow_type: file.basename.to_s[0, 2],
+        flow_type: flow,
         file_name: file.basename.to_s,
         modified_date: file.mtime,
         directory: file.dirname.to_s,
