@@ -7,20 +7,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
     interactor = ProductionApp::ReworksRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-    r.on 'reworks_runs', String do |run_type|
-      if run_type.to_i.zero?
-        reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(run_type)
-        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if reworks_run_type_id.nil?
-
-        r.on 'new' do
-          check_auth!('reworks', 'new')
-          r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/new"
-        end
-        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
-      end
-
-      id = run_type.to_i
-
+    r.on 'reworks_runs',  Integer do |id|
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do
         handle_not_found(r)
@@ -34,7 +21,13 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
-    r.on 'reworks_run_types', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'reworks_run_types', String do |run_type| # rubocop:disable Metrics/BlockLength
+      if run_type.match?(/\A\d+\Z/)
+        id = run_type.to_i
+      else
+        id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(run_type)
+        raise Crossbeams::FrameworkError, 'Run type does not exist. Perhaps required seeds were not run. Please contact support.' if id.nil?
+      end
       store_locally(:reworks_run_type_id, id)
 
       r.on 'reworks_runs' do # rubocop:disable Metrics/BlockLength
@@ -48,10 +41,14 @@ class Nspack < Roda # rubocop:disable ClassLength
             res = interactor.create_reworks_run(id, params[:reworks_run])
             if res.success
               if res.instance[:make_changes]
-                redirect_via_json "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}"
+                r.redirect "/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}"
               else
                 flash[:notice] = res.message
-                redirect_via_json(retrieve_from_local_store(:list_url))
+                if fetch?(r)
+                  redirect_via_json(retrieve_from_local_store(:list_url))
+                else
+                  r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+                end
               end
             else
               pallets_selected = interactor.resolve_selected_pallet_numbers(res.instance[:pallets_selected])
@@ -137,6 +134,8 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
       end
+
+      r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
     end
 
     r.on 'pallets', String do |pallet_number| # rubocop:disable Metrics/BlockLength

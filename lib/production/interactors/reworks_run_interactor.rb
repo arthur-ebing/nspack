@@ -45,7 +45,7 @@ module ProductionApp
 
       return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
 
-      rw_res = nil
+      rw_res = failed_response('create_reworks_run_record')
       repo.transaction do
         rw_res = create_reworks_run_record(attrs, nil, nil)
         log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], nil, nil, nil)
