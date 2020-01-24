@@ -64,6 +64,13 @@
     - :col: in_stock
       :op: =
       :val: $:in_stock$
+  :in_stock_depot_pallet:
+    - :col: in_stock
+      :op: =
+      :val: true
+    - :col: depot_pallet
+      :op: =
+      :val: true
   :unallocated_stock:
     - :col: in_stock
       :op: =

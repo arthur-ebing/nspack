@@ -1289,3 +1289,11 @@
   :list_def:
   - true
   - false
+- :column: depot_pallet
+  :caption: Depot Pallet
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

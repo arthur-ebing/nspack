@@ -31,3 +31,10 @@
     - :col: shipped
       :op: =
       :val: $:shipped$
+  :shipped_depot_pallet:
+    - :col: shipped
+      :op: =
+      :val: true
+    - :col: depot_pallet
+      :op: =
+      :val: true
