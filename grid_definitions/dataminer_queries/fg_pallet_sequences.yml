@@ -1,33 +1,34 @@
 ---
 :caption: Finished Goods Pallet Sequences
-:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, carton_quantity,
-  pallet_carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age,
-  allocated, shipped, load_id, vessel, voyage, container, internal_container, temp_code,
-  vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
-  exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
-  AS departure_date, farm, puc, orchard, cultivar, marketing_variety, grade, std_size,
-  actual_count, size_ref, std_pack, packed_tm_group, mark, inventory_code, marketing_org,
-  created_at, palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at,
-  allocated_at, pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight,
-  basic_pack, packhouse, line, pick_ref, phc, reinspected, status, build_status, scanned_carton,
-  cpp, bom, client_size_ref, treatments, order_number, pm_type, pm_subtype, fruit_sticker,
-  fruit_sticker_2, cultivar_group, season, customer_variety, plt_packhouse, plt_line,
-  exit_ref, seq_exit_ref, gross_weight_measured_at, govt_inspection_passed, internal_inspection_passed,
-  inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
-  intake_created_at, first_cold_storage_at, active, extended_columns, seq_scrapped_at
-  in_stock, billing_client, colour_rule FROM vw_pallet_sequence_flat ORDER BY pallet_id,
-  pallet_number DESC
+:sql: "SELECT \r\n   id,\r\n   pallet_id,\r\n   pallet_number,\r\n   pallet_sequence_number,\r\n
+  \  carton_quantity,\r\n   pallet_carton_quantity,\r\n   pallet_size,\r\n   pallet_age,\r\n
+  \  stock_age,\r\n   cold_age,\r\n   ambient_age,\r\n   allocated,\r\n   shipped,\r\n
+  \  load_id,\r\n   vessel,\r\n   voyage,\r\n   container,\r\n   internal_container,\r\n
+  \  temp_code,\r\n   vehicle_number,\r\n   cooled,\r\n   pol,\r\n   pod,\r\n   final_destination,\r\n
+  \  customer,\r\n   consignee,\r\n   final_receiver,\r\n   exporter,\r\n   country,\r\n
+  \  region,\r\n   COALESCE(ata, eta) AS arrival_date,\r\n   COALESCE(atd, etd) AS
+  departure_date,\r\n   farm,\r\n   puc,\r\n   orchard,\r\n   cultivar,\r\n   marketing_variety,\r\n
+  \  grade,\r\n   std_size,\r\n   actual_count,\r\n   size_ref,\r\n   std_pack,\r\n
+  \  packed_tm_group,\r\n   mark,\r\n   inventory_code,\r\n   marketing_org,\r\n   created_at,\r\n
+  \  palletized_at,\r\n   govt_first_inspection_at,\r\n   shipped_at,\r\n   govt_reinspection_at,\r\n
+  \  allocated_at,\r\n   pallet_base,\r\n   stack_type,\r\n   gross_weight,\r\n   nett_weight,\r\n
+  \  sequence_nett_weight,\r\n   basic_pack,\r\n   packhouse,\r\n   line,\r\n   pick_ref,\r\n
+  \  phc,\r\n   reinspected,\r\n   status,\r\n   build_status,\r\n   scanned_carton,\r\n
+  \  cpp,\r\n   bom,\r\n   client_size_ref,\r\n   treatments,\r\n   order_number,\r\n
+  \  pm_type,\r\n   pm_subtype,\r\n   fruit_sticker,\r\n   fruit_sticker_2,\r\n   cultivar_group,\r\n
+  \  season,\r\n   customer_variety,\r\n   plt_packhouse,\r\n   plt_line,\r\n   exit_ref,\r\n
+  \  seq_exit_ref,\r\n   gross_weight_measured_at,\r\n   govt_inspection_passed,\r\n
+  \  inspected_dest_country,\r\n   internal_inspection_passed,\r\n   inspection_age,\r\n
+  \  internal_inspection_at,\r\n   internal_reinspection_at,\r\n   stock_created_at,\r\n
+  \  intake_created_at,\r\n   first_cold_storage_at,\r\n   active,\r\n   extended_columns,\r\n
+  \  seq_scrapped_at in_stock,\r\n   billing_client,\r\n   depot_pallet,\r\n   edi_in_file,\r\n
+  \  edi_in_consignment_note_number,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
 :external_settings:
-  :render_url:
-  :colour_key:
-    ok: In Stock Pallet Sequences
-    ready: Allocated Pallet Sequences
-    inactive: Shipped Pallet Sequences
-    warning: Scrapped Pallet Sequences
-    error: Failed inspection and/or failed verifications Pallet Sequences
-    inprogress: Palletized and/or partially palletized Pallet Sequences
+  :render_url: 
+  :colour_key: {}
 :columns:
   id:
     :name: id
@@ -1373,9 +1374,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspected_dest_country:
+    :name: inspected_dest_country
+    :sequence_no: 85
+    :caption: Inspected dest country
+    :namespaced_name: inspected_dest_country
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   internal_inspection_passed:
     :name: internal_inspection_passed
-    :sequence_no: 85
+    :sequence_no: 86
     :caption: Internal inspection passed
     :namespaced_name: internal_inspection_passed
     :data_type: :boolean
@@ -1391,7 +1408,7 @@
     :group_max: false
   inspection_age:
     :name: inspection_age
-    :sequence_no: 86
+    :sequence_no: 87
     :caption: Inspection age
     :namespaced_name: inspection_age
     :data_type: :number
@@ -1407,7 +1424,7 @@
     :group_max: false
   internal_inspection_at:
     :name: internal_inspection_at
-    :sequence_no: 87
+    :sequence_no: 88
     :caption: Internal inspection at
     :namespaced_name: internal_inspection_at
     :data_type: :datetime
@@ -1423,7 +1440,7 @@
     :group_max: false
   internal_reinspection_at:
     :name: internal_reinspection_at
-    :sequence_no: 88
+    :sequence_no: 89
     :caption: Internal reinspection at
     :namespaced_name: internal_reinspection_at
     :data_type: :datetime
@@ -1439,7 +1456,7 @@
     :group_max: false
   stock_created_at:
     :name: stock_created_at
-    :sequence_no: 89
+    :sequence_no: 90
     :caption: Stock created at
     :namespaced_name: stock_created_at
     :data_type: :datetime
@@ -1455,7 +1472,7 @@
     :group_max: false
   intake_created_at:
     :name: intake_created_at
-    :sequence_no: 90
+    :sequence_no: 91
     :caption: Intake created at
     :namespaced_name: intake_created_at
     :data_type: :datetime
@@ -1471,7 +1488,7 @@
     :group_max: false
   first_cold_storage_at:
     :name: first_cold_storage_at
-    :sequence_no: 91
+    :sequence_no: 92
     :caption: First cold storage at
     :namespaced_name: first_cold_storage_at
     :data_type: :datetime
@@ -1487,7 +1504,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 92
+    :sequence_no: 93
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1503,7 +1520,7 @@
     :group_max: false
   extended_columns:
     :name: extended_columns
-    :sequence_no: 93
+    :sequence_no: 94
     :caption: Extended columns
     :namespaced_name: extended_columns
     :data_type: :string
@@ -1519,7 +1536,7 @@
     :group_max: false
   in_stock:
     :name: in_stock
-    :sequence_no: 94
+    :sequence_no: 95
     :caption: In stock
     :namespaced_name: seq_scrapped_at
     :data_type: :datetime
@@ -1535,7 +1552,7 @@
     :group_max: false
   billing_client:
     :name: billing_client
-    :sequence_no: 95
+    :sequence_no: 96
     :caption: Billing client
     :namespaced_name: billing_client
     :data_type: :string
@@ -1549,9 +1566,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  depot_pallet:
+    :name: depot_pallet
+    :sequence_no: 97
+    :caption: Depot pallet
+    :namespaced_name: depot_pallet
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_file:
+    :name: edi_in_file
+    :sequence_no: 98
+    :caption: Edi in file
+    :namespaced_name: edi_in_file
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_consignment_note_number:
+    :name: edi_in_consignment_note_number
+    :sequence_no: 99
+    :caption: Edi in consignment note number
+    :namespaced_name: edi_in_consignment_note_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 96
+    :sequence_no: 100
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
