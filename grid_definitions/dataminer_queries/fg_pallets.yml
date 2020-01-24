@@ -25,6 +25,11 @@
 :external_settings:
   :render_url: 
   :colour_key:
+    ok: In Stock Pallet Sequences
+    ready: Allocated Pallet Sequences
+    inactive: Shipped Pallet Sequences
+    warning: Scrapped Pallet Sequences
+    inprogress: Palletized and/or partially palletized Pallet Sequences
     error: Failed inspection and/or failed verifications Pallets
 :columns:
   id:
