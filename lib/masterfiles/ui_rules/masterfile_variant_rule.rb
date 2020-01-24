@@ -24,14 +24,20 @@ module UiRules
 
     def common_fields
       mf_table_render = if @mode == :edit
-                          { renderer: :label }
+                          { readonly: true }
                         else
                           { renderer: :select, options: AppConst::MF_VARIANT_TABLES, required: true }
                         end
       {
         masterfile_table: mf_table_render,
         code: { required: true },
-        masterfile_id: {}
+        masterfile_id: { renderer: :lookup,
+                         lookup_name: :masterfiles_for_variants,
+                         lookup_key: :standard,
+                         param_keys: %i[masterfile_variant_masterfile_table],
+                         hidden_fields: %i[masterfile_id],
+                         show_field: :masterfile_code,
+                         caption: 'Select masterfile value' }
       }
     end
 
@@ -47,7 +53,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(masterfile_table: nil,
                                     code: nil,
-                                    masterfile_id: nil)
+                                    masterfile_id: nil,
+                                    masterfile_code: nil)
     end
   end
 end

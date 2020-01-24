@@ -1,0 +1,72 @@
+---
+:caption: Masterfiles
+:sql: "SELECT masterfile_table, lookup_code, id\r\nFROM public.vw_masterfiles_for_variants\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  masterfile_table:
+    :name: masterfile_table
+    :sequence_no: 1
+    :caption: Masterfile table
+    :namespaced_name: masterfile_table
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  lookup_code:
+    :name: lookup_code
+    :sequence_no: 2
+    :caption: Lookup code
+    :namespaced_name: lookup_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 3
+    :caption: Id
+    :namespaced_name: id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: masterfile_table
+  :caption: Masterfile Table
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - standard_pack_codes
+  - pucs
+  - marketing_varieties
+  - fruit_size_references
+  - marks
+  - inventory_codes
+  - grades
+  - packed_tm_group

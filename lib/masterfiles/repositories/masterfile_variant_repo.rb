@@ -38,5 +38,9 @@ module MasterfilesApp
       SQL
       DB[query, id].get(:masterfile_value)
     end
+
+    def selected_masterfile(table_name, id)
+      DB[:vw_masterfiles_for_variants].where(masterfile_table: table_name, id: id).select(:id, :lookup_code).first
+    end
   end
 end

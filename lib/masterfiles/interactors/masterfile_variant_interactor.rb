@@ -48,6 +48,15 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def selected_masterfile(table_name, id)
+      rec = repo.selected_masterfile(table_name, id)
+      if rec.empty?
+        failed_response('Could not find masterfile record')
+      else
+        success_response('Lookup successful', rec)
+      end
+    end
+
     private
 
     def repo

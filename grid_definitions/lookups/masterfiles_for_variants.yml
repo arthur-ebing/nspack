@@ -1,0 +1,12 @@
+---
+:dataminer_definition: masterfiles_for_variants
+:lookups:
+  :standard:
+    :url: /masterfiles/general/masterfile_variants/selected_masterfile/$:masterfile_table$/$:id$
+    :section_caption: Select a masterfile code
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: masterfile_table
+      :op: =
+      :val: $:masterfile_variant_masterfile_table$

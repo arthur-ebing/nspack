@@ -163,8 +163,8 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_masterfile_variant(id, params[:masterfile_variant])
           if res.success
-            update_grid_row(id, changes: { masterfile_table: res.instance[:masterfile_table], code: res.instance[:code], masterfile_id: res.instance[:masterfile_id] },
-                                notice: res.message)
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
           else
             re_show_form(r, res) { Masterfiles::General::MasterfileVariant::Edit.call(id, form_values: params[:masterfile_variant], form_errors: res.errors) }
           end
@@ -187,17 +187,30 @@ class Nspack < Roda
         check_auth!('general', 'new')
         show_partial_or_page(r) { Masterfiles::General::MasterfileVariant::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'selected_masterfile', String, Integer do |table, id|
+        res = interactor.selected_masterfile(table, id)
+        if res.success
+          json_actions(
+            [
+              OpenStruct.new(type: :replace_input_value,
+                             dom_id: 'masterfile_variant_masterfile_id',
+                             value: res.instance[:id]),
+              OpenStruct.new(type: :replace_input_value,
+                             dom_id: 'masterfile_variant_masterfile_code',
+                             value: res.instance[:lookup_code])
+            ]
+          )
+        else
+          show_json_error(res.message)
+        end
+      end
+
       r.post do        # CREATE
         res = interactor.create_masterfile_variant(params[:masterfile_variant])
         if res.success
-          row_keys = %i[
-            id
-            masterfile_table
-            code
-            masterfile_id
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
         else
           re_show_form(r, res, url: '/masterfiles/general/masterfile_variants/new') do
             Masterfiles::General::MasterfileVariant::New.call(form_values: params[:masterfile_variant],
