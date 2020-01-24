@@ -1,12 +1,16 @@
 ---
 :caption: Bin Picking Today
-:sql: "select bin_received_date_time,cultivar_name,farm_code,puc_code,orchard_code,cultivar_description
-  \r\n,sum(case when status='TIPPED' then qty_bins else 0 end) as qty_tipped\r\n,sum(case
-  when status='TIPPED' then nett_weight else 0 end) as weight_tipped\r\n,sum(case
-  when status='BIN_RECEIVED' then qty_bins else 0 end) as qty_received\r\n,sum(case
-  when status='BIN_RECEIVED' then nett_weight else 0 end) as weight_received\r\n,SUM(qty_bins)
-  as total_bins\r\n,sum(nett_weight) as total_nett_weight\r\nfrom vw_bins where bin_received_date_time::date=current_date\r\ngroup
-  by bin_received_date_time,cultivar_description,\r\ncultivar_name,farm_code,puc_code,orchard_code\r\n"
+:sql: "SELECT\r\n  bin_received_date_time,\r\n  cultivar_name,\r\n  farm_code,\r\n
+  \ puc_code,\r\n  orchard_code,\r\n  cultivar_description,\r\n  sum(\r\n    CASE
+  WHEN bin_tipped THEN\r\n      qty_bins\r\n    ELSE\r\n      0\r\n    END) AS qty_tipped,\r\n
+  \ sum(\r\n    CASE WHEN bin_tipped THEN\r\n      nett_weight\r\n    ELSE\r\n      0\r\n
+  \   END) AS weight_tipped,\r\n  sum(\r\n    CASE WHEN scrapped THEN\r\n      qty_bins\r\n
+  \   ELSE\r\n      0\r\n    END) AS qty_scrapped,\r\n  sum(\r\n    CASE WHEN scrapped
+  THEN\r\n      nett_weight\r\n    ELSE\r\n      0\r\n    END) AS weight_scrapped,\r\n
+  \ sum(qty_bins) AS qty_received,\r\n  sum(nett_weight) AS weight_received,\r\n  SUM(qty_bins)
+  AS total_bins,\r\n  sum(nett_weight) AS total_nett_weight\r\nFROM\r\n  vw_bins\r\nWHERE\r\n
+  \ bin_received_date_time::date = CURRENT_DATE\r\nGROUP BY\r\n  bin_received_date_time,\r\n
+  \ cultivar_description,\r\n  cultivar_name,\r\n  farm_code,\r\n  puc_code,\r\n  orchard_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -139,9 +143,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  qty_scrapped:
+    :name: qty_scrapped
+    :sequence_no: 9
+    :caption: Qty scrapped
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weight_scrapped:
+    :name: weight_scrapped
+    :sequence_no: 10
+    :caption: Weight scrapped
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   qty_received:
     :name: qty_received
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Qty received
     :namespaced_name: 
     :data_type: :integer
@@ -157,7 +193,7 @@
     :group_max: false
   weight_received:
     :name: weight_received
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Weight received
     :namespaced_name: 
     :data_type: :number
@@ -173,7 +209,7 @@
     :group_max: false
   total_bins:
     :name: total_bins
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Total bins
     :namespaced_name: 
     :data_type: :integer
@@ -189,7 +225,7 @@
     :group_max: false
   total_nett_weight:
     :name: total_nett_weight
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Total nett weight
     :namespaced_name: 
     :data_type: :number
