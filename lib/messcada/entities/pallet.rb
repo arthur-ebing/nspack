@@ -43,4 +43,35 @@ module MesscadaApp
     attribute :load_id, Types::Integer
     attribute? :cooled, Types::Bool
   end
+
+  class ScannedPalletNumber < Dry::Struct
+    attribute :scanned_pallet_number, Types::String
+
+    # Munge the scanned pallet number to get a valid number
+    # by discarding extra characters from known deviations.
+    def pallet_number # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      return nil if scanned_pallet_number.nil_or_empty?
+
+      case scanned_pallet_number.length
+      when 9, 18
+        scanned_pallet_number
+      when 11
+        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 11 digits." unless %w[46 47 48 49].include?(scanned_pallet_number[0, 2])
+
+        scanned_pallet_number[-9, 9]
+      when 15
+        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 15 digits." unless scanned_pallet_number.start_with?(']C')
+
+        scanned_pallet_number[-9, 9]
+      when 19
+        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised format for 19 digits." unless scanned_pallet_number.start_with?('0')
+
+        scanned_pallet_number.delete_prefix('0')
+      when 20, 21, 23
+        scanned_pallet_number[-18, 18]
+      else
+        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised length."
+      end
+    end
+  end
 end
