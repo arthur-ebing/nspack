@@ -2,7 +2,15 @@
 
 module MesscadaApp
   class MesscadaInteractor < BaseInteractor # rubocop:disable ClassLength
-    def validate_pallet_to_be_verified(pallet_number)
+    # Take a scanned pallet number and convert it to a system pallet number
+    # Sometimes a pallet scanned from an external supplier will not be a
+    # valid SSCC format.
+    def pallet_number_from_scan(scanned_pallet_number)
+      ScannedPalletNumber.new(scanned_pallet_number: scanned_pallet_number).pallet_number
+    end
+
+    def validate_pallet_to_be_verified(scanned_pallet_number)
+      pallet_number = pallet_number_from_scan(scanned_pallet_number)
       pallet_sequences = find_pallet_sequences_by_pallet_number(pallet_number)
       return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") if pallet_sequences.empty?
       return failed_response("Scanned Pallet:#{pallet_number} has already been inspected") if pallet_sequences.first[:inspected]
@@ -10,7 +18,8 @@ module MesscadaApp
       success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     end
 
-    def find_pallet_sequences_by_pallet_number(pallet_number)
+    def find_pallet_sequences_by_pallet_number(scanned_pallet_number)
+      pallet_number = pallet_number_from_scan(scanned_pallet_number)
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
     end
 

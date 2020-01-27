@@ -304,14 +304,15 @@ module FinishedGoodsApp
     end
 
     def update_pallets_temp_tail(params) # rubocop:disable Metrics/AbcSize
-      id = repo.get_with_args(:pallets, :id, pallet_number: params[:pallet_number])
-      return failed_response("Pallet: #{params[:pallet_number]} doesn't exist.") if id.nil?
+      pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
+      id = repo.get_with_args(:pallets, :id, pallet_number: pallet_number)
+      return failed_response("Pallet: #{pallet_number} doesn't exist.") if id.nil?
 
       repo.transaction do
         repo.update(:pallets, id, temp_tail: params[:temp_tail])
         log_transaction
       end
-      success_response("Updated pallet: #{params[:pallet_number]}")
+      success_response("Updated pallet: #{pallet_number}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

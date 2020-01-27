@@ -32,7 +32,8 @@ class Nspack < Roda
         end
 
         r.post do
-          res = interactor.move_pallet(params[:pallet][:pallet_number], params[:pallet][:location], !params[:pallet][:location_scan_field].nil_or_empty?)
+          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
+          res = interactor.move_pallet(pallet_number, params[:pallet][:location], !params[:pallet][:location_scan_field].nil_or_empty?)
 
           if res.success
             store_locally(:flash_notice, res.message)

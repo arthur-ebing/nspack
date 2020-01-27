@@ -57,7 +57,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          scanned_number = params[:allocate][:pallet_number]
+          scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:allocate][:pallet_number]).pallet_number
           res = interactor.stepper_allocate_pallet(:allocate, load_id, scanned_number)
           if res.success
             store_locally(:flash_notice, rmd_success_message(res.message))
@@ -382,7 +382,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          scanned_number = params[:load_truck][:pallet_number]
+          scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:load_truck][:pallet_number]).pallet_number
           res = interactor.stepper_load_pallet(:load_truck, load_id, scanned_number)
           if res.instance[:load_complete]
             interactor.stepper(:load_truck).clear
