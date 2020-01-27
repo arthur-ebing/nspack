@@ -107,9 +107,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # GOVT INSPECTION SHEET PASSED
     # --------------------------------------------------------------------------
     r.on 'passed_inspection_report', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'govt_inspection_sheet',
+      res = CreateJasperReport.call(report_name: 'govt_inspection_report',
                                     user: current_user.login_name,
-                                    file: 'govt_inspection_sheet',
+                                    file: 'govt_inspection_report',
                                     params: { govt_inspection_sheet_id: id,
                                               QueryCondition: 'govt_inspection_pallets.passed = true',
                                               keep_file: false })
@@ -123,9 +123,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # GOVT INSPECTION SHEET FAILED
     # --------------------------------------------------------------------------
     r.on 'failed_inspection_report', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'govt_inspection_sheet',
+      res = CreateJasperReport.call(report_name: 'govt_inspection_report',
                                     user: current_user.login_name,
-                                    file: 'govt_inspection_sheet',
+                                    file: 'govt_inspection_report',
+                                    params: { govt_inspection_sheet_id: id,
+                                              QueryCondition: 'govt_inspection_pallets.passed = false',
+                                              keep_file: false })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
+    # GOVT FINDING SHEET
+    # --------------------------------------------------------------------------
+    r.on 'finding_sheet', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'govt_finding_sheet',
+                                    user: current_user.login_name,
+                                    file: 'govt_finding_sheet',
+                                    parent_folder: AppConst::RPT_INDUSTRY,
                                     params: { govt_inspection_sheet_id: id,
                                               QueryCondition: 'govt_inspection_pallets.passed = false',
                                               keep_file: false })

@@ -132,6 +132,7 @@ module UiRules
 
     def add_rules
       rules[:inspected] = @form_object.inspected
+      rules[:pallets_allocated] = !BaseRepo.new.get_with_args(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:id]).nil?
     end
   end
 end

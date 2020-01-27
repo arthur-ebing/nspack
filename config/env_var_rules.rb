@@ -46,7 +46,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SAMSA_ACCREDITATION: 'For sending EDI documents' },
     { CLM_BUTTON_CAPTION_FORMAT: 'A format for captions to display on label printer robot buttons. See AppConst for more.' },
     { DEFAULT_CARGO_TEMP_ON_ARRIVAL: 'The cargo temperature_code to default for containers on truck arrival.' },
-    { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' }
+    { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' },
+    { RPT_INDUSTRY: 'Industry specific reporting folder' }
   ].freeze
 
   NO_OVERRIDE = [

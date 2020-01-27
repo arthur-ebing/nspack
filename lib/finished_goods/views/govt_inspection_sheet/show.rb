@@ -23,6 +23,12 @@ module FinishedGoods
                                   visible: rules[:inspected],
                                   loading_window: true,
                                   style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Finding Sheet',
+                                  url: "/finished_goods/reports/finding_sheet/#{id}",
+                                  visible: rules[:pallets_allocated],
+                                  loading_window: true,
+                                  style: :button)
             end
             page.form do |form|
               form.caption 'Govt Inspection Sheet'

@@ -15,15 +15,16 @@
 # - printer: 'no_printer'. In PRINT mode, this MUST be provided.
 # - OUT_FILE_TYPE: 'PDF'. This can be PDF, CSV, XLS, RTF. Ignored in PRINT mode.
 # - top_level_dir: ''. Use this if the report is stored in a subdir of the report dir.
-class CreateJasperReport < BaseService
-  attr_reader :report_name, :user, :keep_file, :top_level_dir, :printer, :report_parameters
+class CreateJasperReport < BaseService # rubocop:disable Metrics/ClassLength
+  attr_reader :report_name, :user, :parent_folder, :keep_file, :top_level_dir, :printer, :report_parameters
 
   NO_PRINTER = 'no_printer'
 
-  def initialize(report_name:, user:, file:, params: {})
+  def initialize(report_name:, user:, file:, parent_folder: nil, params: {})
     params = params.dup
     @report_name = report_name
     @user = user
+    @parent_folder = parent_folder
     @keep_file = params.delete(:keep_file)
     @return_full_path = params.delete(:return_full_path)
     @top_level_dir = params.delete(:top_level_dir) || ''
@@ -120,7 +121,11 @@ class CreateJasperReport < BaseService
   end
 
   def report_definitions_dir
-    @report_definitions_dir ||= ENV['JASPER_REPORTS_PATH']
+    @report_definitions_dir ||= if parent_folder.nil_or_empty?
+                                  ENV['JASPER_REPORTS_PATH']
+                                else
+                                  "#{ENV['JASPER_REPORTS_PATH']}/#{parent_folder}"
+                                end
   end
 
   def add_output_path(file)
