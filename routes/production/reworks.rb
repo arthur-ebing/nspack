@@ -9,6 +9,83 @@ class Nspack < Roda # rubocop:disable ClassLength
 
     interactor = ProductionApp::ReworksRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+    r.on 'change_deliveries_orchard' do
+      r.is do
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.validate_change_delivery_orchard_screen_params(params[:change_deliveries_orchard])
+          if res.success
+            store_locally(:from_orchard, params[:change_deliveries_orchard][:from_orchard])
+            store_locally(:to_orchard, params[:change_deliveries_orchard][:to_orchard])
+            store_locally(:to_cultivar, params[:change_deliveries_orchard][:to_cultivar])
+            show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(params[:change_deliveries_orchard][:from_orchard], remote: fetch?(r)) }
+          else
+            re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
+              Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_values: params[:change_deliveries_orchard],
+                                                                                form_errors: res.errors,
+                                                                                remote: fetch?(r))
+            end
+          end
+        end
+      end
+
+      r.on 'selected_deliveries' do
+        from_orchard = retrieve_from_local_store(:from_orchard)
+        to_orchard = retrieve_from_local_store(:to_orchard)
+        to_cultivar = retrieve_from_local_store(:to_cultivar)
+        form_values = { from: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(from_orchard),
+                        to: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard),
+                        to_cultivar: MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name,
+                        affected_deliveries: params[:selection][:list].gsub(',', "\n").to_s }
+        store_locally(:deliveries, params[:selection][:list])
+        store_locally(:to_orchard, to_orchard)
+        store_locally(:to_cultivar, to_cultivar)
+        show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::Summary.call(form_values: form_values, remote: fetch?(r)) }
+      end
+
+      r.on 'apply_change_deliveries_orchard_changes' do
+        reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS)
+        res = interactor.apply_change_deliveries_orchard_changes(retrieve_from_local_store(:to_orchard), retrieve_from_local_store(:to_cultivar), retrieve_from_local_store(:deliveries), reworks_run_type_id)
+        if res.success
+          flash[:notice] = 'Delivery Orchards Changed Successfully'
+          r.redirect('/production/reworks/change_deliveries_orchard')
+        else
+          re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
+            Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_errors: res.errors,
+                                                                              remote: fetch?(r))
+          end
+        end
+      end
+
+      r.on 'from_orchard_combo_changed' do
+        to_orchards = if !params[:changed_value].to_s.empty?
+                        interactor.for_select_to_orchards(params[:changed_value])
+                      else
+                        []
+                      end
+
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'change_deliveries_orchard_to_orchard',
+                                     options_array: to_orchards),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'change_deliveries_orchard_to_cultivar',
+                                     options_array: [])])
+      end
+
+      r.on 'to_orchard_combo_changed' do
+        to_cultivars = if !params[:changed_value].to_s.empty?
+                         RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(params[:changed_value])
+                       else
+                         []
+                       end
+
+        json_replace_select_options('change_deliveries_orchard_to_cultivar', to_cultivars)
+      end
+    end
+
     r.on 'reworks_runs',  Integer do |id|
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do

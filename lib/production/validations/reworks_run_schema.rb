@@ -155,4 +155,12 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:gross_weight, :decimal).filled(:decimal?)
     required(:measurement_unit, Types::StrippedString).maybe(:str?)
   end
+
+  ChangeDeliveriesOrchardSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:to_orchard, :integer).filled(:int?)
+    required(:from_orchard, :integer).filled(:int?)
+    required(:to_cultivar, :integer).filled(:int?)
+  end
 end

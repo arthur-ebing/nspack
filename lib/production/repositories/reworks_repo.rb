@@ -442,6 +442,32 @@ module ProductionApp
       OpenStruct.new(hash)
     end
 
+    def find_orchard_cultivar_group(orchard_id)
+      query = <<~SQL
+        SELECT DISTINCT g.cultivar_group_code
+        FROM orchards o
+        JOIN farms f ON f.id=o.farm_id
+        JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
+        JOIN cultivar_groups g ON g.id=c.cultivar_group_id
+        WHERE o.id=#{orchard_id}
+        LIMIT 1
+      SQL
+      DB[query].map { |s| s[:cultivar_group_code] }.first
+    end
+
+    def find_to_farm_orchards(from_orchard_id, cultivar_group_code)
+      query = <<~SQL
+        SELECT DISTINCT o.id, f.farm_code || '_' || o.orchard_code  AS farm_orchard_code
+        FROM orchards o
+        JOIN farms f ON f.id=o.farm_id
+        JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
+        JOIN cultivar_groups g ON g.id=c.cultivar_group_id
+        where o.id<>#{from_orchard_id} AND g.cultivar_group_code='#{cultivar_group_code}'
+        ORDER BY o.id ASC
+      SQL
+      DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }
+    end
+
     def for_select_template_commodity_marketing_varieties(commodity_id)  # rubocop:disable Metrics/AbcSize
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
@@ -464,6 +490,43 @@ module ProductionApp
         WHERE t.pm_type_code = #{pm_type} AND p.id != #{fruit_sticker_pm_product_id}
       SQL
       DB[query].map { |r| [r[:product_code], r[:id]] }
+    end
+
+    def find_deliveries(delivery_ids)
+      query = <<~SQL
+        SELECT DISTINCT d.*, o.orchard_code, c.cultivar_name, f.farm_code
+        FROM rmt_deliveries d
+        JOIN orchards o on o.id=d.orchard_id
+        JOIN cultivars c on c.id=d.cultivar_id
+        JOIN farms f on f.id=d.farm_id
+        WHERE d.id IN (#{delivery_ids})
+      SQL
+      DB[query].all
+    end
+
+    def find_from_deliveries_cultivar(delivery_ids)
+      query = <<~SQL
+        SELECT DISTINCT c.cultivar_name, f.farm_code || '_' || o.orchard_code AS farm_orchard_code
+        FROM rmt_deliveries d
+        JOIN orchards o on o.id=d.orchard_id
+        JOIN cultivars c on c.id=d.cultivar_id
+        JOIN farms f on f.id=d.farm_id
+        WHERE d.id IN (#{delivery_ids})
+      SQL
+      DB[query].all
+    end
+
+    def find_bins(delivery_ids)
+      query = <<~SQL
+        SELECT DISTINCT *
+        FROM rmt_bins b
+        WHERE b.rmt_delivery_id IN (#{delivery_ids})
+      SQL
+      DB[query].all
+    end
+
+    def bin_bulk_update(delivery_ids, to_orchard, to_cultivar)
+      DB[:rmt_bins].where(rmt_delivery_id: delivery_ids).update(orchard_id: to_orchard, cultivar_id: to_cultivar)
     end
   end
 end

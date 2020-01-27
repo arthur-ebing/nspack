@@ -171,6 +171,25 @@ module MasterfilesApp
       DB[query].order(:cultivar_name).select_map(:cultivar_name)
     end
 
+    def find_farm_orchards
+      query = <<~SQL
+        SELECT DISTINCT o.id, f.farm_code || '_' || o.orchard_code AS farm_orchard_code
+        FROM orchards o
+        JOIN farms f ON f.id=o.farm_id
+      SQL
+      DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }
+    end
+
+    def find_farm_orchard_by_orchard_id(orchard_id)
+      query = <<~SQL
+        SELECT DISTINCT f.farm_code || '_' || o.orchard_code AS farm_orchard_code
+        FROM orchards o
+        JOIN farms f ON f.id=o.farm_id
+        WHERE o.id=#{orchard_id}
+      SQL
+      DB[query].map { |s| s[:farm_orchard_code] }.first
+    end
+
     def find_farm_group_farm_codes(id)
       DB[:farms].join(:farm_groups, id: :farm_group_id).where(farm_group_id: id).order(:farm_code).select_map(:farm_code)
     end

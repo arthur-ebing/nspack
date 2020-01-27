@@ -1,0 +1,10 @@
+---
+:dataminer_definition: rmt_deliveries
+:conditions:
+  :standard:
+    - :col: rmt_deliveries.orchard_id
+      :op: =
+      :val: $:orchard_id$
+:multiselect:
+  :standard:
+    :conditions: standard

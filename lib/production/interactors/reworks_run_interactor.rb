@@ -7,6 +7,63 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def validate_change_delivery_orchard_screen_params(params)
+      res = validate_change_delivery_orchard_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      ok_response
+    end
+
+    def apply_change_deliveries_orchard_changes(to_orchard, to_cultivar, delivery_ids, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
+      reworks_run_attrs = { user: @user.user_name, pallets_affected: delivery_ids.split(','), pallets_selected: delivery_ids.split(','), reworks_run_type_id: reworks_run_type_id }
+      res = validate_reworks_run_params(reworks_run_attrs)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard, to_cultivar, delivery_ids)
+      return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
+
+      repo.transaction do
+        repo.bin_bulk_update(delivery_ids.split(','), to_orchard, to_cultivar)
+        repo.update(:rmt_deliveries, delivery_ids.split(','), orchard_id: to_orchard, cultivar_id: to_cultivar)
+
+        log_deliveries_and_bins_statuses(delivery_ids)
+
+        create_change_deliveries_orchards_reworks_run(reworks_run_attrs)
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def create_change_deliveries_orchards_reworks_run(reworks_run_attrs)
+      reworks_run_attrs[:pallets_affected] = "{ #{reworks_run_attrs[:pallets_affected].join(',')} }"
+      reworks_run_attrs[:pallets_selected] = "{ #{reworks_run_attrs[:pallets_selected].join(',')} }"
+      reworks_run_attrs[:changes_made] = reworks_run_attrs[:changes_made].to_json
+      repo.create_reworks_run(reworks_run_attrs)
+    end
+
+    def calc_changes_made(to_orchard, to_cultivar, delivery_ids)
+      orchard = MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard)
+      cultivar = MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name
+      if (from_deliveries_cultivar = repo.find_from_deliveries_cultivar(delivery_ids)).length > 1
+        return 'Deliveries have different cultivars'
+      end
+
+      { pallets: { pallet_sequences: { changes: { after: { orchard: from_deliveries_cultivar[0][:farm_orchard_code], cultivar: from_deliveries_cultivar[0][:cultivar_name] }, before: { orchard: orchard, cultivar: cultivar } } } } }
+    end
+
+    def log_deliveries_and_bins_statuses(delivery_ids)
+      repo.find_bins(delivery_ids).each do |bin|
+        log_status('rmt_bins', bin[:id], 'DELIVERY_ORCHARD_CHANGE')
+      end
+
+      repo.find_deliveries(delivery_ids).each do |del|
+        log_status('rmt_deliveries', del[:id], 'DELIVERY_ORCHARD_CHANGE')
+      end
+    end
+
     def resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
       return failed_response('Pallet selection cannot be empty') if multiselect_list.nil_or_empty?
 
@@ -578,6 +635,11 @@ module ProductionApp
       repo.for_selected_second_pm_products(AppConst::PM_TYPE_FRUIT_STICKER, fruit_sticker_pm_product_id)
     end
 
+    def for_select_to_orchards(from_orchard_id)
+      cultivar_group_code = repo.find_orchard_cultivar_group(from_orchard_id)
+      cultivar_group_code ? repo.find_to_farm_orchards(from_orchard_id, cultivar_group_code) : []
+    end
+
     private
 
     def repo
@@ -784,6 +846,10 @@ module ProductionApp
 
     def validate_manually_weigh_rmt_bin_params(params)
       ManuallyWeighRmtBinSchema.call(params)
+    end
+
+    def validate_change_delivery_orchard_params(params)
+      ChangeDeliveriesOrchardSchema.call(params)
     end
   end
 end
