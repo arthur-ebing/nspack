@@ -18,7 +18,8 @@ module MesscadaApp
       success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     end
 
-    def find_pallet_sequences_by_pallet_number(pallet_number)
+    def find_pallet_sequences_by_pallet_number(scanned_pallet_number)
+      pallet_number = pallet_number_from_scan(scanned_pallet_number)
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
     end
 

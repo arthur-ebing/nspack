@@ -119,7 +119,8 @@ class Nspack < Roda # rubocop:disable ClassLength
               end
             end
           else
-            pallet_number = params[:pallet][:pallet_number]
+            # pallet_number = params[:pallet][:pallet_number]
+            pallet_number = interactor.pallet_number_from_scan(params[:pallet][:pallet_number])
           end
 
           res = interactor.validate_pallet_to_be_verified(pallet_number)
@@ -290,10 +291,11 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'update_pallet_sequence' do
         r.post do
-          pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number])
+          pallet_number = interactor.pallet_number_from_scan(params[:pallet][:pallet_number])
+          pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, params[:pallet][:pallet_sequence_number])
 
           new_pallet_format = MasterfilesApp::PackagingRepo.new.get_current_pallet_format_for_sequence(pallet_sequence_id) != params[:pallet][:pallet_format].to_i ? params[:pallet][:pallet_format].to_i : nil
-          cpp = MasterfilesApp::PackagingRepo.new.find_cartons_per_pallet_by_seq_and_format(params[:pallet][:pallet_number], params[:pallet][:pallet_sequence_number], params[:pallet][:pallet_format])
+          cpp = MasterfilesApp::PackagingRepo.new.find_cartons_per_pallet_by_seq_and_format(pallet_number, params[:pallet][:pallet_sequence_number], params[:pallet][:pallet_format])
           current_cartons_per_pallet_id = MesscadaApp::MesscadaRepo.new.find_pallet_sequence(pallet_sequence_id)[:cartons_per_pallet_id]
           new_cartons_per_pallet_id = cpp && cpp[:id] != current_cartons_per_pallet_id ? cpp[:id] : nil
 
@@ -596,9 +598,10 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.post do
-        pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(params[:pallet][:pallet_number])
+        pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
+        pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
         if pallet.nil?
-          store_locally(:error, error_message: "Pallet #{params[:pallet][:pallet_number]} not found")
+          store_locally(:error, error_message: "Pallet #{pallet_number} not found")
         else
           res = interactor.print_pallet_label(pallet[:id], pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
           if res.success
