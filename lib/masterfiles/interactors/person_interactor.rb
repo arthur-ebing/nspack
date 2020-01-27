@@ -17,7 +17,7 @@ module MasterfilesApp
         validation_failed_response(OpenStruct.new(messages: response[:error]))
       end
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { person: ['This person already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { first_name: ['This person already exists'] }))
     end
 
     def update_person(id, params) # rubocop:disable Metrics/AbcSize
