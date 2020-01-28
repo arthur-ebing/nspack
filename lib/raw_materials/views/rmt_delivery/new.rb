@@ -23,7 +23,6 @@ module RawMaterials
               form.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
               form.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
               form.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
-              form.add_field :date_delivered
               form.add_field :date_picked
               form.add_field :truck_registration_number if rules[:show_truck_registration_number]
               form.add_field :current

@@ -4,6 +4,7 @@ module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable ClassLength
     def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       assert_permission!(:create)
+      params[:date_delivered] = Time.now.to_s
       if !params[:cultivar_id].nil_or_empty? && !params[:date_delivered].nil_or_empty?
         params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered])
         return failed_response("Season not found for selected cultivar and delivery_date:#{params[:date_delivered]}") if params[:season_id].nil_or_empty?
@@ -33,6 +34,7 @@ module RawMaterialsApp
     end
 
     def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
+      params[:date_delivered] = Time.now.to_s
       params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered]) unless params[:cultivar_id].nil_or_empty? || params[:date_delivered].to_s.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) unless res.messages.empty?

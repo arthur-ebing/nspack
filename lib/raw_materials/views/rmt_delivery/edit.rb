@@ -12,7 +12,7 @@ module RawMaterials
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.section do |section| # rubocop:disable Metrics/BlockLength
+            page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
                                   url: back_url,
@@ -34,7 +34,6 @@ module RawMaterials
                   row.column do |col|
                     form.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
                     form.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
-                    col.add_field :date_delivered
                     col.add_field :date_picked
                     form.add_field :truck_registration_number if rules[:show_truck_registration_number]
                   end
