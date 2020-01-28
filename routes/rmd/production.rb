@@ -291,7 +291,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'update_pallet_sequence' do
         r.post do
-          pallet_number = interactor.pallet_number_from_scan(params[:pallet][:pallet_number])
+          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
           pallet_sequence_id = interactor.find_pallet_sequence_by_pallet_number_and_pallet_sequence_number(pallet_number, params[:pallet][:pallet_sequence_number])
 
           new_pallet_format = MasterfilesApp::PackagingRepo.new.get_current_pallet_format_for_sequence(pallet_sequence_id) != params[:pallet][:pallet_format].to_i ? params[:pallet][:pallet_format].to_i : nil
