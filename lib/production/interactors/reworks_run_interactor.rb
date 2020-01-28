@@ -22,6 +22,8 @@ module ProductionApp
       reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard, to_cultivar, delivery_ids)
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
 
+      return failed_response('Cannot proceed. Some bins in some of the deliveries are in production_runs that do not allow orchard mixing') unless check_bins_production_runs_allow_mixing?(delivery_ids)
+
       repo.transaction do
         repo.bin_bulk_update(delivery_ids.split(','), to_orchard, to_cultivar)
         repo.update(:rmt_deliveries, delivery_ids.split(','), orchard_id: to_orchard, cultivar_id: to_cultivar)
@@ -35,6 +37,10 @@ module ProductionApp
       failed_response(e.message)
     rescue StandardError => e
       failed_response(e.message)
+    end
+
+    def check_bins_production_runs_allow_mixing?(delivery_ids)
+      repo.bins_production_runs_allow_mixing?(delivery_ids)
     end
 
     def create_change_deliveries_orchards_reworks_run(reworks_run_attrs)

@@ -529,6 +529,16 @@ module ProductionApp
       DB[query].all
     end
 
+    def bins_production_runs_allow_mixing?(delivery_ids)
+      query = <<~SQL
+        SELECT DISTINCT *
+        FROM rmt_bins b
+        JOIN production_runs r on r.id=b.production_run_tipped_id
+        WHERE b.rmt_delivery_id IN (#{delivery_ids}) and r.allow_orchard_mixing is false
+      SQL
+      DB[query].all.empty? ? true : false
+    end
+
     def bin_bulk_update(delivery_ids, to_orchard, to_cultivar)
       DB[:rmt_bins].where(rmt_delivery_id: delivery_ids).update(orchard_id: to_orchard, cultivar_id: to_cultivar)
     end
