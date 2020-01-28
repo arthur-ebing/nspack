@@ -5,6 +5,7 @@
   \ \"rmt_deliveries\".\"season_id\",\r\n  \"rmt_deliveries\".\"farm_id\",\r\n  \"rmt_deliveries\".\"puc_id\",\r\n
   \ \"rmt_deliveries\".\"truck_registration_number\",\r\n  \"rmt_deliveries\".\"qty_damaged_bins\",\r\n
   \ \"rmt_deliveries\".\"qty_empty_bins\",\r\n  \"rmt_deliveries\".\"current\",\r\n
+  \ fn_current_status ('rmt_deliveries', \"rmt_deliveries\".\"id\") AS \"status\",\r\n
   \ \"rmt_deliveries\".\"delivery_tipped\",\r\n  \"rmt_deliveries\".\"date_picked\",\r\n
   \ \"rmt_deliveries\".\"date_delivered\",\r\n  \"rmt_deliveries\".\"tipping_complete_date_time\",\r\n
   \ (\r\n    SELECT\r\n      sum(qty_bins)\r\n    FROM\r\n      rmt_bins\r\n    WHERE\r\n
@@ -447,10 +448,26 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 47
+    :caption: Status
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
