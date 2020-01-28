@@ -5,7 +5,7 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   end
 
   down do
-    drop_program_function 'New', functional_area: 'Production', program: 'Reworks'
-    drop_program_function 'List', functional_area: 'Production', program: 'Reworks'
+    drop_program_function 'New', functional_area: 'Production', program: 'Reworks', match_group: 'Change Deliveries Orchards'
+    drop_program_function 'List', functional_area: 'Production', program: 'Reworks', match_group: 'Change Deliveries Orchards'
   end
 end
