@@ -636,8 +636,8 @@ module ProductionApp
     end
 
     def for_select_to_orchards(from_orchard_id)
-      cultivar_group_code = repo.find_orchard_cultivar_group(from_orchard_id)
-      cultivar_group_code ? repo.find_to_farm_orchards(from_orchard_id, cultivar_group_code) : []
+      cultivar_and_farm = repo.find_orchard_cultivar_group_and_farm(from_orchard_id)
+      cultivar_and_farm ? repo.find_to_farm_orchards(from_orchard_id, cultivar_and_farm) : []
     end
 
     private

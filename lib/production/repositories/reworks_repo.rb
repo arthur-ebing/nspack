@@ -20,6 +20,10 @@ module ProductionApp
 
     crud_calls_for :reworks_runs, name: :reworks_run, wrapper: ReworksRun
 
+    def find_reworks_run_type(id)
+      DB[:reworks_run_types].where(id: id).first
+    end
+
     def find_reworks_run(id)
       query = <<~SQL
         SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type AS reworks_run_type,
@@ -442,9 +446,9 @@ module ProductionApp
       OpenStruct.new(hash)
     end
 
-    def find_orchard_cultivar_group(orchard_id)
+    def find_orchard_cultivar_group_and_farm(orchard_id)
       query = <<~SQL
-        SELECT DISTINCT g.cultivar_group_code
+        SELECT DISTINCT g.cultivar_group_code, f.id as farm_id
         FROM orchards o
         JOIN farms f ON f.id=o.farm_id
         JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
@@ -452,17 +456,17 @@ module ProductionApp
         WHERE o.id=#{orchard_id}
         LIMIT 1
       SQL
-      DB[query].map { |s| s[:cultivar_group_code] }.first
+      DB[query].first
     end
 
-    def find_to_farm_orchards(from_orchard_id, cultivar_group_code)
+    def find_to_farm_orchards(from_orchard_id, cultivar_and_farm)
       query = <<~SQL
         SELECT DISTINCT o.id, f.farm_code || '_' || o.orchard_code  AS farm_orchard_code
         FROM orchards o
         JOIN farms f ON f.id=o.farm_id
         JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
         JOIN cultivar_groups g ON g.id=c.cultivar_group_id
-        where o.id<>#{from_orchard_id} AND g.cultivar_group_code='#{cultivar_group_code}'
+        where o.id<>#{from_orchard_id} AND g.cultivar_group_code='#{cultivar_and_farm[:cultivar_group_code]}' AND f.id='#{cultivar_and_farm[:farm_id]}'
         ORDER BY o.id ASC
       SQL
       DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }

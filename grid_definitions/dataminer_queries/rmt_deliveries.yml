@@ -7,6 +7,7 @@
   "rmt_deliveries"."date_picked", "rmt_deliveries"."date_delivered", "rmt_deliveries"."tipping_complete_date_time",
   (select sum(qty_bins) from rmt_bins where rmt_delivery_id=rmt_deliveries.id and bin_tipped is true) as qty_bins_tipped,
   "rmt_deliveries"."created_at", "rmt_deliveries"."updated_at", "cultivars"."cultivar_name",
+  fn_current_status ('rmt_deliveries', "rmt_deliveries"."id") AS status,
   "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code", "rmt_delivery_destinations"."delivery_destination_code",
   "seasons"."season_code",SUM("rmt_bins".qty_bins) as qty_bins, CASE WHEN current
   THEN 'green' WHEN delivery_tipped THEN 'gray' ELSE NULL END AS colour_rule FROM "rmt_deliveries" JOIN "cultivars" ON "cultivars"."id" = "rmt_deliveries"."cultivar_id"
@@ -421,6 +422,38 @@
     :hide: false
     :pinned:
     :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 47
+    :caption: Status
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 70
+    :caption: Colour rule
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
     :group_by_seq:
     :group_sum: false
     :group_avg: false
