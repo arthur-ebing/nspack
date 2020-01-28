@@ -115,7 +115,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           r.get do
             store_locally(:list_url, back_button_url)
             check_auth!('reworks', 'new')
-            if ProductionApp::ReworksRepo.new.find_reworks_run_type(run_type)[:run_type] == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
+            if ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS
               show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(remote: fetch?(r)) }
             else
               show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, remote: fetch?(r)) }
