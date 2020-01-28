@@ -21,7 +21,7 @@ class Nspack < Roda # rubocop:disable ClassLength
             store_locally(:from_orchard, params[:change_deliveries_orchard][:from_orchard])
             store_locally(:to_orchard, params[:change_deliveries_orchard][:to_orchard])
             store_locally(:to_cultivar, params[:change_deliveries_orchard][:to_cultivar])
-            show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(params[:change_deliveries_orchard][:from_orchard], remote: fetch?(r)) }
+            show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(params[:change_deliveries_orchard][:from_orchard]) }
           else
             re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
               Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_values: params[:change_deliveries_orchard],
@@ -54,6 +54,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           r.redirect('/production/reworks/change_deliveries_orchard')
         else
           re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
+            res[:message] = unwrap_failed_response(res)
             Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_errors: res.errors,
                                                                               remote: fetch?(r))
           end

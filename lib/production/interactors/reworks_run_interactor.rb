@@ -51,7 +51,7 @@ module ProductionApp
         return 'Deliveries have different cultivars'
       end
 
-      { pallets: { pallet_sequences: { changes: { after: { orchard: from_deliveries_cultivar[0][:farm_orchard_code], cultivar: from_deliveries_cultivar[0][:cultivar_name] }, before: { orchard: orchard, cultivar: cultivar } } } } }
+      { pallets: { pallet_sequences: { changes: { before: { orchard: from_deliveries_cultivar[0][:farm_orchard_code], cultivar: from_deliveries_cultivar[0][:cultivar_name] }, after: { orchard: orchard, cultivar: cultivar } } } } }
     end
 
     def log_deliveries_and_bins_statuses(delivery_ids)
