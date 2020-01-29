@@ -10,10 +10,13 @@ module FinishedGoodsApp
       case scanned_number
       when *current_step[:allocated]
         current_step[:allocated].delete(scanned_number)
+        message = "Removed: #{scanned_number}"
       else
         current_step[:allocated] << scanned_number
+        message = "Added: #{scanned_number}"
       end
       write(current_step)
+      message
     end
 
     def load_pallet(scanned_number) # rubocop:disable Metrics/AbcSize
@@ -21,13 +24,16 @@ module FinishedGoodsApp
       when *current_step[:allocated]
         current_step[:scanned] << current_step[:allocated].delete(scanned_number)
         form_state[:error_message] = nil
+        message = "Loaded: #{scanned_number}"
       when *current_step[:scanned]
         current_step[:allocated] << current_step[:scanned].delete(scanned_number)
         form_state[:error_message] = nil
+        message = "Unloaded: #{scanned_number}"
       else
         form_state[:error_message] = "Pallet number: #{scanned_number}, not on load: #{form_state[:load_id]}"
       end
       write(current_step)
+      message
     end
 
     def setup_load(load_id)

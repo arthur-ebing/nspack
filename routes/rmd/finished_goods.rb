@@ -41,6 +41,9 @@ class Nspack < Roda
             store_locally(:error, res)
           end
           r.redirect('/rmd/finished_goods/pallet_movements/move_pallet')
+        rescue Crossbeams::InfoError => e
+          store_locally(:error, rmd_error_message(e))
+          r.redirect('/rmd/finished_goods/pallet_movements/move_pallet')
         end
       end
     end

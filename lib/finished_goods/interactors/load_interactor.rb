@@ -235,17 +235,17 @@ module FinishedGoodsApp
       res = validate_stepper_allocate_pallet(load_id, pallet_number)
       return res unless res.success
 
-      stepper(step_key).allocate_pallet(pallet_number)
+      message = stepper(step_key).allocate_pallet(pallet_number)
       failed_response('error') if stepper(step_key).error?
 
-      success_response("Scanned: #{pallet_number}")
+      success_response(message)
     end
 
     def stepper_load_pallet(step_key, load_id, pallet_number)
-      stepper(step_key).load_pallet(pallet_number)
+      message = stepper(step_key).load_pallet(pallet_number)
       return failed_response('Error') if stepper(step_key).error?
 
-      return ok_response unless stepper(step_key).ready_to_ship?
+      return success_response(message) unless stepper(step_key).ready_to_ship?
 
       res = ship_load(load_id)
       if res.success
@@ -266,7 +266,7 @@ module FinishedGoodsApp
       end
       success_response("Updated pallet: #{pallet_number}")
     rescue Crossbeams::InfoError => e
-      failed_response(e.message)
+      failed_response(e)
     end
 
     def find_load_with(pallet_number)

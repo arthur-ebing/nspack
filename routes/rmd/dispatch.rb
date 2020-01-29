@@ -59,11 +59,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:allocate][:pallet_number]).pallet_number
           res = interactor.stepper_allocate_pallet(:allocate, load_id, scanned_number)
-          if res.success
-            store_locally(:flash_notice, rmd_success_message(res.message))
-          else
-            store_locally(:flash_notice, rmd_error_message(res.message))
-          end
+          message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
+          store_locally(:flash_notice, message)
+          r.redirect("/rmd/dispatch/allocate/load/#{load_id}")
+        rescue Crossbeams::InfoError => e
+          store_locally(:flash_notice, rmd_error_message(e))
           r.redirect("/rmd/dispatch/allocate/load/#{load_id}")
         end
       end
@@ -389,7 +389,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             store_locally(:flash_notice, rmd_success_message(res.message))
             r.redirect('/rmd/dispatch/load_truck/load')
           end
-          store_locally(:flash_notice, rmd_error_message(res.message)) unless res.success
+          message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
+          store_locally(:flash_notice, message)
+          r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
+        rescue Crossbeams::InfoError => e
+          store_locally(:flash_notice, rmd_error_message(e))
           r.redirect("/rmd/dispatch/load_truck/load/#{load_id}")
         end
       end
