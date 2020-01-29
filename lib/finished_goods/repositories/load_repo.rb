@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class LoadRepo < BaseRepo
     build_for_select :loads,
                      label: :order_number,
                      value: :id,
@@ -75,16 +75,6 @@ module FinishedGoodsApp
       ds = ds.where(id: DB[:pallet_sequences].where(id: args.delete(:pallet_sequence_id)).select_map(:pallet_id)) if args.key?(:pallet_sequence_id)
       ds = ds.where(args) unless args.nil_or_empty?
       ds.select_map(:id).flatten
-    end
-
-    def where_pallets(args)
-      has_nett_weight = args.delete(:has_nett_weight)
-      has_gross_weight = args.delete(:has_gross_weight)
-
-      ds = DB[:pallets].where(args)
-      ds = ds.exclude { nett_weight.> 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
-      ds = ds.exclude { gross_weight.> 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
-      ds.select_map(:pallet_number)
     end
 
     def allocate_pallets(load_id, pallet_ids, user_name)

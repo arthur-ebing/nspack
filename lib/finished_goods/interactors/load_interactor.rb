@@ -5,66 +5,19 @@ module FinishedGoodsApp
     def validate_load(load_id)
       return failed_response("Value #{load_id} is too big to be a load. Perhaps you scanned a pallet number?") if load_id.to_i > AppConst::MAX_DB_INT
 
-      load = repo.find_load_flat(load_id)
-      return failed_response("Load: #{load_id} doesn't exist.") if load.nil?
+      instance = repo.find_load_flat(load_id)
+      return failed_response("Load: #{load_id} doesn't exist.") if instance.nil?
 
-      return failed_response("Load: #{load_id} already Shipped.") if load.shipped
+      return failed_response("Load: #{load_id} already Shipped.") if instance.shipped
 
-      success_response('ok', load)
-    end
-
-    def parse_pallet_numbers(string) # rubocop:disable Metrics/AbcSize
-      attrs = string.split(/\n|,/).map(&:strip).reject(&:empty?)
-      pallet_numbers = attrs.map { |x| x.gsub(/['"]/, '') }
-
-      errors = pallet_numbers.reject { |x| x.match(/\A\d+\Z/) }
-      message = "\"#{errors.join(', ')}\" must be numeric."
-      return failed_response(message) unless errors.nil_or_empty?
-
-      errors = (pallet_numbers - repo.where_pallets(pallet_number: pallet_numbers))
-      message = "Pallet: \"#{errors.join(', ')}\" doesn't exist."
-      return failed_response(message) unless errors.empty?
-
-      message = 'Validation empty.'
-      return failed_response(message) if pallet_numbers.empty?
-
-      success_response('ok', pallet_numbers)
-    end
-
-    def validate_pallets_not_shipped(pallet_numbers)
-      errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
-      message = "Pallet: #{errors.join(', ')} already shipped."
-      return failed_response(message) unless errors.empty?
-
-      success_response('ok', pallet_numbers)
-    end
-
-    def validate_pallets_in_stock(pallet_numbers)
-      errors = repo.where_pallets(pallet_number: pallet_numbers, in_stock: false)
-      message = "Pallet: #{errors.join(', ')} not in stock."
-      return failed_response(message) unless errors.empty?
-
-      success_response('ok', pallet_numbers)
-    end
-
-    def validate_pallets_on_load(load_id, pallet_numbers)
-      errors = []
-      Array(pallet_numbers).each do |pallet_number|
-        pallet_load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number) || load_id
-        errors << pallet_number if pallet_load_id != load_id
-      end
-      message = "Pallet: #{errors.join(', ')} already allocated to other load."
-      return failed_response(message) unless errors.nil_or_empty?
-
-      ok_response
+      success_response('ok', instance)
     end
 
     def validate_load_truck(load_id)
       res = validate_load(load_id)
       return res unless res.success
 
-      load = repo.find_load_flat(load_id)
-      return failed_response("Truck Arrival hasn't been done.") if load&.vehicle_number.nil?
+      return failed_response("Truck Arrival hasn't been done.") if res.instance.vehicle_number.nil?
 
       res = validate_load_truck_pallets(load_id)
       return res unless res.success
@@ -72,20 +25,18 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def validate_load_truck_pallets(load_id) # rubocop:disable Metrics/AbcSize
+    def validate_load_truck_pallets(load_id)
       pallet_numbers = repo.find_pallet_numbers_from(load_id: load_id)
-      message = []
-      message << 'No pallets allocated' if pallet_numbers.nil_or_empty?
+      return failed_response 'No pallets allocated' if pallet_numbers.empty?
 
-      without_nett_weight = repo.where_pallets(pallet_number: pallet_numbers, has_nett_weight: true)
-      message << "Pallets:\n#{without_nett_weight.join("\n")}\ndo not have nett weight\n" unless without_nett_weight.empty?
+      res = validate_pallets(:has_nett_weight, pallet_numbers)
+      return res unless res.success
 
-      without_gross_weight = repo.where_pallets(pallet_number: pallet_numbers, has_gross_weight: true)
-      message << "Pallets:\n#{without_gross_weight.join("\n")}\ndo not have gross weight\n" unless without_gross_weight.empty?
+      res = validate_pallets(:has_gross_weight, pallet_numbers)
+      return res unless res.success
 
-      already_shipped = repo.where_pallets(pallet_number: pallet_numbers, shipped: true)
-      message << "Pallets:\n#{already_shipped.join("\n")}\nalready Shipped\n" unless already_shipped.empty?
-      return failed_response(message.join("\n")) unless message.empty?
+      res = validate_pallets(:not_shipped, pallet_numbers)
+      return res unless res.success
 
       ok_response
     end
@@ -162,8 +113,9 @@ module FinishedGoodsApp
     def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
       failed_response("Load: #{id} not shipped.") unless load_entity(id)&.shipped
 
-      pallet_shipped = repo.where_pallets(pallet_number: pallet_number, shipped: true) == [pallet_number]
-      failed_response("Pallet Number: #{pallet_number} not shipped.") unless pallet_shipped
+      res = ok_response
+      res = validate_pallets(:shipped, pallet_number) unless pallet_number.nil?
+      return res unless res.success
 
       res = nil
       repo.transaction do
@@ -179,7 +131,7 @@ module FinishedGoodsApp
 
     def allocate_multiselect(load_id, params, initial_params = nil) # rubocop:disable Metrics/AbcSize
       pallet_numbers = repo.find_pallet_numbers_from(params)
-      res = validate_pallets_on_load(load_id, pallet_numbers)
+      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
       return res unless res.success
 
       new_allocation = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
@@ -201,17 +153,17 @@ module FinishedGoodsApp
     end
 
     def validate_allocate_list(load_id, pallets_string)
-      res = parse_pallet_numbers(pallets_string)
+      res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = validate_pallets_on_load(load_id, pallet_numbers)
+      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
       return res unless res.success
 
-      res = validate_pallets_not_shipped(pallet_numbers)
+      res = validate_pallets(:not_shipped, pallet_numbers)
       return res unless res.success
 
-      res = validate_pallets_in_stock(pallet_numbers)
+      res = validate_pallets(:in_stock, pallet_numbers)
       return res unless res.success
 
       pallet_ids = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
@@ -263,17 +215,17 @@ module FinishedGoodsApp
       @stepper ||= LoadStep.new(step_key, @user, @context.request_ip)
     end
 
-    def validate_stepper_allocate_pallet(load_id, pallet_number)
-      res = parse_pallet_numbers(pallet_number)
+    def validate_stepper_allocate_pallet(load_id, pallet_numbers)
+      res = validate_pallets(:exists, pallet_numbers)
       return res unless res.success
 
-      res = validate_pallets_not_shipped(pallet_number)
+      res = validate_pallets(:not_shipped, pallet_numbers)
       return res unless res.success
 
-      res = validate_pallets_in_stock(pallet_number)
+      res = validate_pallets(:in_stock, pallet_numbers)
       return res unless res.success
 
-      res = validate_pallets_on_load(load_id, pallet_number)
+      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
       return res unless res.success
 
       ok_response
@@ -318,7 +270,10 @@ module FinishedGoodsApp
     end
 
     def find_load_with(pallet_number)
-      res = parse_pallet_numbers(pallet_number)
+      res = MesscadaApp::ParseString.call(pallet_number)
+      return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
+
+      res = validate_pallets(:exists, pallet_number)
       return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
 
       load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number)
@@ -342,12 +297,12 @@ module FinishedGoodsApp
       repo.find_load_flat(id)
     end
 
-    def validate_service_params(params)
-      LoadServiceSchema.call(params)
+    def validate_pallets(check, pallet_numbers, load_id = nil)
+      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers, load_id)
     end
 
-    def validate_load_params(params)
-      LoadSchema.call(params)
+    def validate_service_params(params)
+      LoadServiceSchema.call(params)
     end
 
     def validate_load_vehicle_params(params)
