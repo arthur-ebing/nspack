@@ -17,5 +17,13 @@ module MasterfilesApp
                      order_by: :code
 
     crud_calls_for :contract_types, name: :contract_type, wrapper: ContractType
+
+    build_for_select :wage_levels,
+                     label: :description,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :description
+
+    crud_calls_for :wage_levels, name: :wage_level, wrapper: WageLevel
   end
 end

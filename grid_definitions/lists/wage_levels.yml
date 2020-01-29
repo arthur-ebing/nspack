@@ -1,0 +1,24 @@
+---
+:dataminer_definition: wage_levels
+:actions:
+- :url: "/masterfiles/human_resources/wage_levels/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/human_resources/wage_levels/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/human_resources/wage_levels/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/human_resources/wage_levels/new"
+  :text: New Wage Level
+  :style: :button
+  :behaviour: :popup
