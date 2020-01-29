@@ -404,5 +404,15 @@ module MesscadaApp
       SQL
       DB[query, id].first
     end
+
+    def get_run_bins_tipped(run_id)
+      query = <<~SQL
+        SELECT COALESCE(SUM(COALESCE(qty_bins, 0)), 0) as bins_tipped
+        FROM rmt_bins
+        WHERE rmt_bins.production_run_tipped_id = ?
+        AND NOT scrapped
+      SQL
+      DB[query, run_id].first[:bins_tipped]
+    end
   end
 end

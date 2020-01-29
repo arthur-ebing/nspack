@@ -16,7 +16,8 @@ module MesscadaApp
 
       update_bin
 
-      run_stats_bins_tipped = repo.production_run_stats(@run_id)
+      # run_stats_bins_tipped = repo.production_run_stats(@run_id)
+      run_stats_bins_tipped = repo.get_run_bins_tipped(@run_id)
       success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
 
