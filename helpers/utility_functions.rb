@@ -163,4 +163,21 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
 
     format('%<size>.1f %<unit>s', size: size.to_f / 1024**exp, unit: units[exp])
   end
+
+  # Takes a string and returns an array from text split on commas and new lines.
+  #
+  # @param  in_string [string] string to be parsed.
+  # @return [array]
+  def parse_string_to_array(in_string)
+    clean_string = in_string.split(/\n|,/).map(&:strip).reject(&:empty?)
+    clean_string.map { |x| x.gsub(/['"]/, '') }
+  end
+
+  # Returns the non numeric elements of an array of strings.
+  #
+  # @param  in_array [array] array to be checked
+  # @return [array] which might be empty.
+  def non_numeric_elements(in_array)
+    Array(in_array).reject { |x| x.match(/\A\d+\Z/) }
+  end
 end
