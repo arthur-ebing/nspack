@@ -1,0 +1,24 @@
+---
+:dataminer_definition: employment_types
+:actions:
+- :url: "/masterfiles/human_resources/employment_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/human_resources/employment_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/human_resources/employment_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/human_resources/employment_types/new"
+  :text: New Employment Type
+  :style: :button
+  :behaviour: :popup
