@@ -32,6 +32,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
+  URL_BASE = ENV.fetch('URL_BASE')
 
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)

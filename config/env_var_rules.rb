@@ -78,7 +78,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { GLN_OR_LINE_NUMBERS: 'A comma-separated list of GLN or line numbers. Must be composed of digits only' },
     { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' },
     { IN_TRANSIT_LOCATION: 'Long location code for pallets after shipped ' },
-    { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' }
+    { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' },
+    { URL_BASE: 'Base URL for this website - in the format http://xxxx' }
   ].freeze
 
   def print

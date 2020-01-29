@@ -64,7 +64,7 @@ module EdiApp
     end
 
     def log_edi_out_error(id, exception)
-      update_edi_out_transaction(id, error_message: exception.message)
+      update_edi_out_transaction(id, error_message: exception.message, backtrace: exception.backtrace.join("\n"))
     end
 
     def new_sequence_for_flow(flow_type)

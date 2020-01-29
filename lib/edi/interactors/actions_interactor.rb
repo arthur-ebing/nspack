@@ -15,5 +15,18 @@ module EdiApp
       # Check for anything enqueued within 5 mins...
       ok_response
     end
+
+    def re_receive_file(file)
+      logger = Logger.new(File.join(ENV['ROOT'], 'log', 'edi_in.log'), 'weekly')
+      new_path = File.join(AppConst::EDI_RECEIVE_DIR, File.basename(file))
+
+      logger.info("Re-receive: Moving: #{file} to #{new_path}")
+      FileUtils.mv(file, new_path)
+
+      logger.info("Re-receive: Enqueuing #{new_path} for EdiApp::Job::ReceiveEdiIn")
+      Que.enqueue new_path, job_class: 'EdiApp::Job::ReceiveEdiIn', queue: AppConst::QUEUE_NAME
+
+      success_response('The file has been enqued to be re-processed.')
+    end
   end
 end

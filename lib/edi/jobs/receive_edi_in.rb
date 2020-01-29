@@ -32,7 +32,7 @@ module EdiApp
               move_to_success_dir
             else
               log "Failed: #{res.message}"
-              repo.log_edi_in_failed(id, res.message)
+              repo.log_edi_in_failed(id, res.message, res.instance)
               msg = res.instance.empty? ? res.message : "\n#{res.message}\n#{res.instance}"
               ErrorMailer.send_error_email(subject: "EDI in #{flow_type} transform failed (#{file_name})",
                                            message: msg,

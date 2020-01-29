@@ -24,7 +24,6 @@ module EdiApp
       create_missing_masterfiles if AppConst::EDI_AUTO_CREATE_MF
 
       mf_res = check_missing_mf
-      # p mf_res.instance unless mf_res.success
       return mf_res unless mf_res.success
 
       create_po_records
@@ -113,7 +112,13 @@ module EdiApp
       if errs.empty?
         ok_response
       else
-        failed_response('Missing masterfiles', "\n#{errs.uniq.join("\n").gsub('{', '(').gsub('}', ')')}")
+        note = <<~STR
+          Please add the missing masterfiles or create variants for them if applicable.
+
+          Then go to #{AppConst::URL_BASE.chomp('/')}/edi/viewer/received/errors
+          Select the line for file #{file_name} and click on "re-process this file" to retry this process.
+        STR
+        failed_response('Missing masterfiles', "\n#{errs.uniq.join("\n").gsub('{', '(').gsub('}', ')')}\n\n#{note}")
       end
     end
 

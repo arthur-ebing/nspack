@@ -35,6 +35,10 @@ module EdiApp
       recent_edi_files(false)
     end
 
+    def received_files_in_error
+      error_in_edi_files
+    end
+
     def search_sent_files(search_term)
       search_edi_files(true, search_term)
     end
@@ -58,7 +62,22 @@ module EdiApp
       row_count = 0
       edi_paths(for_send: for_send).each do |path|
         Pathname.glob(path + '*').sort_by(&:mtime).reverse.take(20).each do |file|
-          edi_files << file_row_for_grid(file) { row_count += 1 }
+          edi_files << file_row_for_grid(file, edi_in: !for_send, edi_out: for_send) { row_count += 1 }
+        end
+      end
+
+      {
+        columnDefs: grid_columns_for_edi_files,
+        rowDefs: edi_files
+      }.to_json
+    end
+
+    def error_in_edi_files
+      edi_files = []
+      row_count = 0
+      [Pathname.new(AppConst::EDI_RECEIVE_DIR).parent + 'process_errors'].each do |path|
+        Pathname.glob(path + '*').sort_by(&:mtime).reverse.take(20).each do |file|
+          edi_files << file_row_for_grid(file, edi_in: true, in_error: true) { row_count += 1 }
         end
       end
 
@@ -76,7 +95,7 @@ module EdiApp
           next unless file.fnmatch("*#{search_term}*")
           next unless file.file?
 
-          edi_files << file_row_for_grid(file) { row_count += 1 }
+          edi_files << file_row_for_grid(file, edi_in: !for_send, edi_out: for_send) { row_count += 1 }
         end
       end
 
@@ -93,7 +112,7 @@ module EdiApp
       files = `#{cmd}`.split("\n")
       files.each do |str_file|
         file = Pathname.new(str_file)
-        edi_files << file_row_for_grid(file) { row_count += 1 }
+        edi_files << file_row_for_grid(file, edi_in: !for_send, edi_out: for_send) { row_count += 1 }
       end
 
       {
@@ -122,7 +141,7 @@ module EdiApp
       end
     end
 
-    def file_row_for_grid(file)
+    def file_row_for_grid(file, options = {}) # rubocop:disable Metrics/AbcSize
       flow = file.basename.to_s[0, 2]
       flow = 'PO' if flow == 'RL'
       {
@@ -132,7 +151,10 @@ module EdiApp
         modified_date: file.mtime,
         directory: file.dirname.to_s,
         size: UtilityFunctions.filesize(file.size),
-        file_path: URI.encode_www_form_component(file.to_s)
+        file_path: URI.encode_www_form_component(file.to_s),
+        edi_in: options[:edi_in] || false,
+        edi_out: options[:edi_out] || false,
+        in_error: options[:in_error] || false
       }
     end
 
@@ -140,6 +162,7 @@ module EdiApp
       Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
         mk.action_column do |act|
           act.link 'view', '/edi/viewer/display_edi_file?flow_type=$col1$&file_path=$col2$', col1: 'flow_type', col2: 'file_path', icon: 'document-add'
+          act.link 're-process this file', '/edi/actions/re_receive_file?file_path=$col1$', col1: 'file_path', icon: 'play', hide_if_false: 'in_error', prompt: 'Are you sure?'
         end
         mk.col 'id', 'ID', hide: true
         mk.col 'flow_type', 'Type', width: 80
@@ -148,6 +171,9 @@ module EdiApp
         mk.col 'directory', 'Directory', width: 600
         mk.col 'size', 'Size'
         mk.col 'file_path', 'File path', hide: true
+        mk.col 'edi_in', 'EDI in?', data_type: :boolean, hide: true
+        mk.col 'edi_out', 'EDI out?', data_type: :boolean, hide: true
+        mk.col 'in_error', 'Error?', data_type: :boolean, hide: true
       end
     end
 

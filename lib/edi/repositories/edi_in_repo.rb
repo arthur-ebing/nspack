@@ -8,12 +8,17 @@ module EdiApp
       update_edi_in_transaction(id, complete: true, error_message: message)
     end
 
-    def log_edi_in_failed(id, message)
-      update_edi_in_transaction(id, error_message: message)
+    def log_edi_in_failed(id, message, instance)
+      msg = if instance.empty?
+              message
+            else
+              "#{res.message}\n#{res.instance}"
+            end
+      update_edi_in_transaction(id, error_message: msg)
     end
 
     def log_edi_in_error(id, exception)
-      update_edi_in_transaction(id, error_message: exception.message)
+      update_edi_in_transaction(id, error_message: exception.message, backtrace: exception.backtrace.join("\n"))
     end
   end
 end

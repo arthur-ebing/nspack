@@ -21,5 +21,13 @@ class Nspack < Roda
         r.redirect '/edi/actions/send_ps'
       end
     end
+
+    # RE-RECEIVE
+    # --------------------------------------------------------------------------
+    r.on 're_receive_file' do
+      res = interactor.re_receive_file(params[:file_path])
+      flash[:notice] = res.message
+      redirect_to_last_grid(r)
+    end
   end
 end

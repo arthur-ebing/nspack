@@ -37,6 +37,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'sent' do
       r.on 'recently' do
         r.is do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Recently sent EDI files', '/edi/viewer/sent/recently/grid') }
         end
 
@@ -56,6 +57,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'list' do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Search by name', "/edi/viewer/sent/search_by_name/grid?search=#{URI.encode_www_form_component(params[:search])}") }
         end
 
@@ -77,6 +79,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'list' do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Search by content', "/edi/viewer/sent/search_by_content/grid?search=#{URI.encode_www_form_component(params[:search])}") }
         end
 
@@ -95,11 +98,24 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'received' do
       r.on 'recently' do
         r.is do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Recently received EDI files', '/edi/viewer/received/recently/grid') }
         end
 
         r.on 'grid' do
           interactor.recent_received_files
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+      end
+      r.on 'errors' do
+        r.is do
+          set_last_grid_url(request.path)
+          show_page { Edi::Viewer::File::ListFiles.call('Received EDI files in error', '/edi/viewer/received/errors/grid') }
+        end
+
+        r.on 'grid' do
+          interactor.received_files_in_error
         rescue StandardError => e
           show_json_exception(e)
         end
@@ -114,6 +130,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'list' do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Search by name', "/edi/viewer/received/search_by_name/grid?search=#{URI.encode_www_form_component(params[:search])}") }
         end
 
@@ -135,6 +152,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'list' do
+          set_last_grid_url(request.path)
           show_page { Edi::Viewer::File::ListFiles.call('Search by content', "/edi/viewer/received/search_by_content/grid?search=#{URI.encode_www_form_component(params[:search])}") }
         end
 
