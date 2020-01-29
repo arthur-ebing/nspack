@@ -34,7 +34,7 @@ module RawMaterialsApp
     end
 
     def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
-      params[:date_delivered] = Time.now.to_s
+      params[:date_delivered] = rmt_delivery(id).date_delivered
       params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered]) unless params[:cultivar_id].nil_or_empty? || params[:date_delivered].to_s.nil_or_empty?
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) unless res.messages.empty?

@@ -13,5 +13,6 @@ module EdiApp
     attribute :edi_out_rule_id, Types::Integer
     attribute :party_role_id, Types::Integer
     attribute :error_message, Types::String
+    attribute :backtrace, Types::String
   end
 end

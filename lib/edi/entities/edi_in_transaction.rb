@@ -7,5 +7,6 @@ module EdiApp
     attribute :flow_type, Types::String
     attribute :complete, Types::Bool
     attribute :error_message, Types::String
+    attribute :backtrace, Types::String
   end
 end
