@@ -61,7 +61,7 @@ module RawMaterials
                                       behaviour: :popup)
                 end
                 section.add_grid('rmt_bins_deliveries',
-                                 "/list/#{bin_type}rmt_bins/grid?key=standard&rmt_bins.delivery_id=#{id}",
+                                 "/list/#{bin_type}rmt_bins/grid?key=standard&delivery_id=#{id}",
                                  caption: 'Bins')
               end
             end

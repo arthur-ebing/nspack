@@ -2,7 +2,7 @@
 :dataminer_definition: rmt_bins
 :conditions:
   :tip_bins_reworks:
-    - :col: rmt_bins.bin_tipped
+    - :col: bin_tipped
       :op: =
       :val: false
 :multiselect:

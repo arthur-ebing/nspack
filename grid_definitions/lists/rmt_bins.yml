@@ -26,11 +26,11 @@
   :hide_if_false: discrete_bin
 :conditions:
   :standard:
-    - :col: rmt_bins.rmt_delivery_id
+    - :col: rmt_delivery_id
       :op: =
-      :val: $:rmt_bins.delivery_id$
+      :val: $:delivery_id$
   :tipped:
-    - :col: rmt_bins.bin_tipped
+    - :col: bin_tipped
       :op: =
       :val: $:tipped$
 

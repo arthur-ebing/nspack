@@ -45,7 +45,7 @@ module RawMaterials
 
             page.section do |section|
               section.add_grid('rmt_bins_deliveries',
-                               "/list/rmt_bins_view/grid?key=standard&rmt_bins.delivery_id=#{id}",
+                               "/list/rmt_bins_view/grid?key=standard&delivery_id=#{id}",
                                caption: 'Bins')
             end
           end

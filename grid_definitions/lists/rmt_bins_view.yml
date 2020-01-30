@@ -8,6 +8,6 @@
   :popup: true
 :conditions:
   :standard:
-    - :col: rmt_bins.rmt_delivery_id
+    - :col: rmt_delivery_id
       :op: =
-      :val: $:rmt_bins.delivery_id$
+      :val: $:delivery_id$
