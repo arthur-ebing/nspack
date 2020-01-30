@@ -28,3 +28,8 @@
   :icon: play
   :popup: false
   :hide_if_true: delivery_tipped
+- :url: "/development/statuses/list/rmt_deliveries/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
