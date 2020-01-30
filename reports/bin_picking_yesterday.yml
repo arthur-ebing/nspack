@@ -1,26 +1,26 @@
 ---
 :caption: Bin Picking Yesterday
-:sql: "SELECT\r\n  bin_received_date_time,\r\n  cultivar_name,\r\n  farm_code,\r\n
-  \ puc_code,\r\n  orchard_code,\r\n  cultivar_description,\r\n  sum(\r\n    CASE
-  WHEN bin_tipped THEN\r\n      qty_bins\r\n    ELSE\r\n      0\r\n    END) AS qty_tipped,\r\n
-  \ sum(\r\n    CASE WHEN bin_tipped THEN\r\n      nett_weight\r\n    ELSE\r\n      0\r\n
-  \   END) AS weight_tipped,\r\n  sum(\r\n    CASE WHEN scrapped THEN\r\n      qty_bins\r\n
+:sql: "SELECT\r\n  bin_received_date,\r\n  cultivar_name,\r\n  farm_code,\r\n  puc_code,\r\n
+  \ orchard_code,\r\n  cultivar_description,\r\n  sum(\r\n    CASE WHEN bin_tipped
+  THEN\r\n      qty_bins\r\n    ELSE\r\n      0\r\n    END) AS qty_tipped,\r\n  sum(\r\n
+  \   CASE WHEN bin_tipped THEN\r\n      nett_weight\r\n    ELSE\r\n      0\r\n    END)
+  AS weight_tipped,\r\n  sum(\r\n    CASE WHEN scrapped THEN\r\n      qty_bins\r\n
   \   ELSE\r\n      0\r\n    END) AS qty_scrapped,\r\n  sum(\r\n    CASE WHEN scrapped
   THEN\r\n      nett_weight\r\n    ELSE\r\n      0\r\n    END) AS weight_scrapped,\r\n
   \ sum(qty_bins) AS qty_received,\r\n  sum(nett_weight) AS weight_received,\r\n  SUM(qty_bins)
   AS total_bins,\r\n  sum(nett_weight) AS total_nett_weight\r\nFROM\r\n  vw_bins\r\nWHERE\r\n
-  \ bin_received_date_time::date = CURRENT_DATE - 1\r\nGROUP BY\r\n  bin_received_date_time,\r\n
-  \ cultivar_description,\r\n  cultivar_name,\r\n  farm_code,\r\n  puc_code,\r\n  orchard_code"
+  \ bin_received_date = CURRENT_DATE - 1\r\nGROUP BY\r\n  bin_received_date,\r\n  cultivar_description,\r\n
+  \ cultivar_name,\r\n  farm_code,\r\n  puc_code,\r\n  orchard_code"
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
-  bin_received_date_time:
-    :name: bin_received_date_time
+  bin_received_date:
+    :name: bin_received_date
     :sequence_no: 1
-    :caption: Bin received at
-    :namespaced_name: bin_received_date_time
-    :data_type: :datetime
+    :caption: Bin received date
+    :namespaced_name: bin_received_date
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
