@@ -48,7 +48,7 @@
     :caption: Shipped loads
     :namespaced_name: shipped.qty_loads
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -64,7 +64,7 @@
     :caption: Shipped cartons
     :namespaced_name: shipped.carton_quantity
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -80,7 +80,7 @@
     :caption: Shipped pallets
     :namespaced_name: shipped.pallet_size
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -96,7 +96,7 @@
     :caption: Shipped weight
     :namespaced_name: shipped.nett_weight
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -112,7 +112,7 @@
     :caption: Received bins
     :namespaced_name: total_bins
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -128,7 +128,7 @@
     :caption: Received weight
     :namespaced_name: total_nett_weight
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -144,7 +144,7 @@
     :caption: Tipped bins
     :namespaced_name: total_tipped_bins
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -160,7 +160,7 @@
     :caption: Tipped weight
     :namespaced_name: total_tipped_weight
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -176,7 +176,7 @@
     :caption: Packed pallets
     :namespaced_name: packed.pallet_size
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -192,7 +192,7 @@
     :caption: Packed weight
     :namespaced_name: packed.nett_weight
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 

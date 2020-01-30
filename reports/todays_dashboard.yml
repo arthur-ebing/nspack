@@ -54,7 +54,7 @@
     :caption: Packed pallets
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -70,7 +70,7 @@
     :caption: Packed weight
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -86,7 +86,7 @@
     :caption: Shipped loads
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -102,7 +102,7 @@
     :caption: Shipped cartons
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -118,7 +118,7 @@
     :caption: Shipped pallets
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -134,7 +134,7 @@
     :caption: Shipped weight
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -150,7 +150,7 @@
     :caption: Received bins
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -166,7 +166,7 @@
     :caption: Received weight
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -182,7 +182,7 @@
     :caption: Tipped bins
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -198,7 +198,7 @@
     :caption: Tipped weight
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 

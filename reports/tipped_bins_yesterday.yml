@@ -109,7 +109,7 @@
   total_tipped_bins:
     :name: total_tipped_bins
     :sequence_no: 7
-    :caption: Total tipped bins
+    :caption: Total bins
     :namespaced_name: 
     :data_type: :integer
     :width: 
@@ -125,7 +125,7 @@
   total_tipped_weight:
     :name: total_tipped_weight
     :sequence_no: 8
-    :caption: Total tipped weight
+    :caption: Total weight
     :namespaced_name: 
     :data_type: :number
     :width: 

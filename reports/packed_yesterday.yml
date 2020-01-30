@@ -30,7 +30,7 @@
     :caption: Packed cartons
     :namespaced_name: 
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -46,7 +46,7 @@
     :caption: Packed pallets
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -62,7 +62,7 @@
     :caption: Packed weight
     :namespaced_name: 
     :data_type: :number
-    :width: 
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 

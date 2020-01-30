@@ -72,7 +72,7 @@
     :sequence_no: 4
     :caption: Shipped date
     :namespaced_name: shipped_date
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
@@ -230,10 +230,10 @@
   carton_quantity:
     :name: carton_quantity
     :sequence_no: 14
-    :caption: Carton quantity
+    :caption: Carton qty
     :namespaced_name: carton_quantity
     :data_type: :integer
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 

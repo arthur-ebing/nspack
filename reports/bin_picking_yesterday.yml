@@ -114,7 +114,7 @@
   qty_tipped:
     :name: qty_tipped
     :sequence_no: 7
-    :caption: Qty tipped
+    :caption: Tip qty
     :namespaced_name: 
     :data_type: :integer
     :width: 
@@ -130,7 +130,7 @@
   weight_tipped:
     :name: weight_tipped
     :sequence_no: 8
-    :caption: Weight tipped
+    :caption: Tip wt.
     :namespaced_name: 
     :data_type: :number
     :width: 
@@ -146,7 +146,7 @@
   qty_scrapped:
     :name: qty_scrapped
     :sequence_no: 9
-    :caption: Qty scrapped
+    :caption: Scrap qty
     :namespaced_name: 
     :data_type: :integer
     :width: 
@@ -162,7 +162,7 @@
   weight_scrapped:
     :name: weight_scrapped
     :sequence_no: 10
-    :caption: Weight scrapped
+    :caption: Scrap wt.
     :namespaced_name: 
     :data_type: :number
     :width: 
@@ -178,7 +178,7 @@
   qty_received:
     :name: qty_received
     :sequence_no: 11
-    :caption: Qty received
+    :caption: Rec. qty
     :namespaced_name: 
     :data_type: :integer
     :width: 
@@ -194,7 +194,7 @@
   weight_received:
     :name: weight_received
     :sequence_no: 12
-    :caption: Weight received
+    :caption: Rec. wt.
     :namespaced_name: 
     :data_type: :number
     :width: 
@@ -226,7 +226,7 @@
   total_nett_weight:
     :name: total_nett_weight
     :sequence_no: 14
-    :caption: Total nett weight
+    :caption: Total nett wt.
     :namespaced_name: 
     :data_type: :number
     :width: 

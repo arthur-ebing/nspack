@@ -110,7 +110,7 @@
   total_onstock_bins:
     :name: total_onstock_bins
     :sequence_no: 7
-    :caption: Total onstock bins
+    :caption: Total bins
     :namespaced_name: 
     :data_type: :integer
     :width: 
@@ -126,7 +126,7 @@
   total_onstock_weight:
     :name: total_onstock_weight
     :sequence_no: 8
-    :caption: Total onstock weight
+    :caption: Total weight
     :namespaced_name: 
     :data_type: :number
     :width: 
