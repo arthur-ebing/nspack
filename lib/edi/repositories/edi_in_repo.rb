@@ -12,7 +12,7 @@ module EdiApp
       msg = if instance.empty?
               message
             else
-              "#{res.message}\n#{res.instance}"
+              "#{message}\n#{instance}"
             end
       update_edi_in_transaction(id, error_message: msg)
     end

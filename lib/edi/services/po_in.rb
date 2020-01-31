@@ -196,7 +196,8 @@ module EdiApp
         reinspected: !reinspect_at.nil?,
         govt_inspection_passed: !orig_inspec_date.nil? || !inspec_date.nil?,
         cooled: false,
-        temp_tail: seq[:temp_device_id]
+        temp_tail: seq[:temp_device_id],
+        edi_in_inspection_point: seq[:inspect_pnt]
       }
 
       # Ignore null and default fields:
