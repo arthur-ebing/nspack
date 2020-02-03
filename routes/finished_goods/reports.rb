@@ -111,7 +111,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     user: current_user.login_name,
                                     file: 'govt_inspection_report',
                                     params: { govt_inspection_sheet_id: id,
-                                              QueryCondition: 'govt_inspection_pallets.passed is true',
+                                              QueryCondition: 'govt_inspection_pallets.passed',
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
@@ -127,7 +127,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     user: current_user.login_name,
                                     file: 'govt_inspection_report',
                                     params: { govt_inspection_sheet_id: id,
-                                              QueryCondition: 'govt_inspection_pallets.passed is false',
+                                              QueryCondition: 'NOT govt_inspection_pallets.passed',
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
@@ -144,7 +144,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     file: 'govt_finding_sheet',
                                     parent_folder: AppConst::RPT_INDUSTRY,
                                     params: { govt_inspection_sheet_id: id,
-                                              QueryCondition: 'govt_inspection_pallets.passed is false',
                                               keep_file: false })
       if res.success
         change_window_location_via_json(res.instance, request.path)
