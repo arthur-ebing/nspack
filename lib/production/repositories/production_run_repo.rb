@@ -269,6 +269,14 @@ module ProductionApp
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
     end
 
+    def tipping_run_for_line(production_line_id)
+      DB[:production_runs]
+        .where(production_line_id: production_line_id)
+        .where(running: true)
+        .where(tipping: true)
+        .get(:id)
+    end
+
     # For a production run, a list of line resources and which (if any) product spec is allocated.
     def button_allocations(production_run_id)
       query = <<~SQL

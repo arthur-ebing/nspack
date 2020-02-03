@@ -141,11 +141,15 @@ class Nspack < Roda
             running
             tipping
             labeling
+            reconfiguring
+            setup_complete
             active_run_stage
             started_at
             status
           ]
-          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
+          acts << [OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at }))] if res.instance[:other_run]
+          json_actions(acts, res.message)
         end
       end
 
@@ -167,10 +171,11 @@ class Nspack < Roda
             running
             tipping
             labeling
-            active_run_stage
-            started_at
             reconfiguring
+            setup_complete
+            active_run_stage
             status
+            re_executed_at
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
@@ -203,11 +208,16 @@ class Nspack < Roda
               tipping
               labeling
               active_run_stage
+              reconfiguring
+              re_executed_at
+              setup_complete
               completed
               completed_at
               status
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
+            acts << [OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at }))] if res.instance[:other_run]
+            json_actions(acts, res.message)
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
           end
@@ -230,11 +240,16 @@ class Nspack < Roda
               tipping
               labeling
               active_run_stage
+              reconfiguring
+              re_executed_at
+              setup_complete
               completed
               completed_at
               status
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
+            acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
+            json_actions(acts, res.message)
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
           end

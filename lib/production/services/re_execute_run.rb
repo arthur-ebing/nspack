@@ -60,9 +60,9 @@ module ProductionApp
       changeset = {
         running: true,
         tipping: production_run.tipping,
-        setup_complete: true,
-        reconfiguring: false,
         labeling: do_labeling?,
+        reconfiguring: false,
+        setup_complete: true,
         active_run_stage: active_stage,
         re_executed_at: Time.now
       }

@@ -47,10 +47,10 @@
     :caption: Id
     :namespaced_name: production_runs.id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -66,7 +66,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -82,7 +82,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -92,13 +92,13 @@
   running:
     :name: running
     :sequence_no: 4
-    :caption: Running
+    :caption: Running?
     :namespaced_name: production_runs.running
     :data_type: :boolean
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -108,13 +108,13 @@
   reconfiguring:
     :name: reconfiguring
     :sequence_no: 5
-    :caption: Reconfiguring
+    :caption: Reconfig?
     :namespaced_name: production_runs.reconfiguring
     :data_type: :boolean
     :width: 120
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -130,7 +130,7 @@
     :width: 100
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -641,7 +641,7 @@
     :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -721,7 +721,7 @@
     :data_type: :string
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
