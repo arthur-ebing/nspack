@@ -216,8 +216,9 @@ module MesscadaApp
       res = FgPalletWeighingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      # return failed_response("Pallet Number :#{res[:pallet_number]} could not be found") unless pallet_exists?(res[:pallet_number])
-      return failed_response("Pallet Number :#{res[:bin_number]} could not be found") unless pallet_exists?(res[:bin_number])
+      pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: res[:bin_number]).pallet_number
+
+      return failed_response("Pallet Number :#{pallet_number} could not be found") unless pallet_exists?(pallet_number)
 
       fpw_res = nil
       repo.transaction do
