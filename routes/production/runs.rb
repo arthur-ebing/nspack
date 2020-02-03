@@ -148,7 +148,7 @@ class Nspack < Roda
             status
           ]
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
-          acts << [OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at }))] if res.instance[:other_run]
+          acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
           json_actions(acts, res.message)
         end
       end
@@ -216,7 +216,7 @@ class Nspack < Roda
               status
             ]
             acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
-            acts << [OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at }))] if res.instance[:other_run]
+            acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
             json_actions(acts, res.message)
           else
             re_show_form(r, res) { Production::Runs::ProductionRun::CompleteStage.call(id, res) }
