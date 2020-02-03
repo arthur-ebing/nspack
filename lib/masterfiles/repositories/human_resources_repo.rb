@@ -25,5 +25,30 @@ module MasterfilesApp
                      order_by: :description
 
     crud_calls_for :wage_levels, name: :wage_level, wrapper: WageLevel
+
+    build_for_select :contract_workers,
+                     label: :full_names,
+                     value: :id,
+                     order_by: :full_names
+    build_inactive_select :contract_workers,
+                          label: :full_names,
+                          value: :id,
+                          order_by: :full_names
+
+    crud_calls_for :contract_workers, name: :contract_worker, wrapper: ContractWorker
+
+    def find_contract_worker(id)
+      find_with_association(:contract_workers, id,
+                            wrapper: ContractWorker,
+                            parent_tables: [{ parent_table: :employment_types,
+                                              columns: [:code],
+                                              flatten_columns: { code: :employer_type_code } },
+                                            { parent_table: :contract_types,
+                                              columns: [:code],
+                                              flatten_columns: { code: :contract_type_code } },
+                                            { parent_table: :wage_levels,
+                                              columns: [:wage_level],
+                                              flatten_columns: { wage_level: :wage_level } }])
+    end
   end
 end

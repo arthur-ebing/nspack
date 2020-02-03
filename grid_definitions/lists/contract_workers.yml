@@ -1,0 +1,24 @@
+---
+:dataminer_definition: contract_workers
+:actions:
+- :url: "/masterfiles/human_resources/contract_workers/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/human_resources/contract_workers/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/human_resources/contract_workers/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/human_resources/contract_workers/new"
+  :text: New Contract Worker
+  :style: :button
+  :behaviour: :popup
