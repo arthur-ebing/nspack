@@ -454,6 +454,21 @@ module MethodBuilder
   # - Set to true if this table does not have an +active+ column,
   #   or to return inactive records as well as active ones.
   def build_for_select(table_name, options = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+    # POSSIBLE WAY OF DEFINING METHODS - faster?
+    # ds_ar = ["dataset = DB[:#{table_name}]"]
+    # ds_ar << "dataset = make_order(dataset, order_by: #{options[:order_by].inspect}#{', desc: true' if options[:desc]})" if options[:order_by]
+    # ds_ar << 'dataset = dataset.where(:active)' unless options[:no_active_check]
+    # ds_ar << 'dataset = dataset.where(opts[:where]) if opts[:where]'
+    # lbl = options[:label] || options[:value]
+    # val = options[:value]
+    # call_sel = lbl == val ? "select_single(dataset, :#{val})" : "select_two(dataset, #{lbl.inspect}, :#{val})"
+    #
+    # class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
+    #   def for_select_#{options[:alias] || table_name}(opts = {})
+    #     #{ds_ar.join("\n")}
+    #     #{call_sel}
+    #   end
+    # RUBY
     define_method(:"for_select_#{options[:alias] || table_name}") do |opts = {}|
       dataset = DB[table_name]
       dataset = make_order(dataset, options) if options[:order_by]
