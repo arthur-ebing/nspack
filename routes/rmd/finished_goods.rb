@@ -26,7 +26,7 @@ class Nspack < Roda
                                          button_caption: 'Submit')
 
           form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
-          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true)
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
