@@ -32,7 +32,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           progress = interactor.stepper(:allocate).allocation_progress
           links = [{ caption: 'Cancel', url: '/rmd/dispatch/allocate/load/clear', prompt: 'Cancel Load?' }]
           links << { caption: 'Complete allocation', url: "/rmd/dispatch/allocate/load/#{load_id}/complete_allocation", prompt: 'Complete allocation?' } unless progress.nil?
-          
+
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :allocate,
                                          scan_with_camera: @rmd_scan_with_camera,

@@ -213,10 +213,11 @@ module MesscadaApp
     end
 
     def fg_pallet_weighing(params)  # rubocop:disable Metrics/AbcSize
+      params[:bin_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:bin_number]).pallet_number
       res = FgPalletWeighingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: res[:bin_number]).pallet_number
+      pallet_number = res[:bin_number]
 
       return failed_response("Pallet Number :#{pallet_number} could not be found") unless pallet_exists?(pallet_number)
 
