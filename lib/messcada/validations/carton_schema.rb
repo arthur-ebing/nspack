@@ -2,7 +2,13 @@
 
 module MesscadaApp
   CartonSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
-    configure { config.type_specs = true }
+    configure do
+      config.type_specs = true
+
+      def self.messages
+        super.merge(en: { errors: { fruit_size_reference_or_fruit_actual_count: 'must provide either fruit_size_reference or fruit_actual_count' } })
+      end
+    end
 
     optional(:id, :integer).filled(:int?)
     required(:production_run_id, :integer).filled(:int?)
@@ -21,7 +27,7 @@ module MesscadaApp
     required(:basic_pack_code_id, :integer).filled(:int?)
     required(:standard_pack_code_id, :integer).filled(:int?)
     optional(:fruit_actual_counts_for_pack_id, :integer).maybe(:int?)
-    required(:fruit_size_reference_id, :integer).filled(:int?)
+    optional(:fruit_size_reference_id, :integer).maybe(:int?)
     required(:marketing_org_party_role_id, :integer).filled(:int?)
     required(:packed_tm_group_id, :integer).filled(:int?)
     required(:mark_id, :integer).filled(:int?)
@@ -47,5 +53,9 @@ module MesscadaApp
     required(:pallet_label_name, Types::StrippedString).maybe(:str?)
     optional(:pallet_number, Types::StrippedString).maybe(:str?)
     required(:phc, Types::StrippedString).filled(:str?)
+
+    validate(fruit_size_reference_or_fruit_actual_count: %i[fruit_size_reference_id fruit_actual_counts_for_pack_id]) do |fruit_size_reference_id, fruit_actual_counts_for_pack_id|
+      fruit_size_reference_id || fruit_actual_counts_for_pack_id
+    end
   end
 end
