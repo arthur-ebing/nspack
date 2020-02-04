@@ -1,0 +1,268 @@
+---
+:caption: Runs Summary
+:sql: "select\r\n    r.id as production_run_id,\r\n    r.allow_cultivar_mixing as
+  cult_mix,\r\n    r.allow_orchard_mixing as orc_mix,\r\n    r.started_at,\r\n    r.completed_at,\r\n
+  \   cultivar_group_code as cultivar_group,\r\n    cultivars.description as cultivar_description,\r\n
+  \   orchards.orchard_code,\r\n    pucs.puc_code,\r\n    seasons.season_code,\r\n
+  \   tipped_qty,\r\n    tipped_nett_weight,\r\n    packed_qty,\r\n    packed_nett_weight,\r\n
+  \   plant_resource_code as line\r\n\r\nfrom production_runs r\r\n\r\nleft join (
+  select production_run_id,\r\n            sum(nett_weight) packed_nett_weight,\r\n
+  \           count(*) packed_qty\r\n            from pallet_sequences\r\n            group
+  by production_run_id ) p on r.id = p.production_run_id\r\n\r\nleft join ( select
+  production_run_tipped_id,\r\n            sum(nett_weight) tipped_nett_weight,\r\n
+  \           count(*) tipped_qty\r\n            from  rmt_bins rb where bin_tipped
+  = true\r\n            group by  production_run_tipped_id)t on r.id = t.production_run_tipped_id\r\n\r\njoin
+  cultivars on r.cultivar_id = cultivars.id\r\nleft join cultivar_groups on cultivars.cultivar_group_id
+  = cultivar_groups.id\r\njoin orchards on r.orchard_id = orchards.id\r\nleft join
+  seasons on r.season_id = seasons.id\r\njoin pucs on r.puc_id = pucs.id\r\nleft join
+  plant_resources pr on r.production_line_id = pr.id\r\n\r\ngroup by\r\n    r.id,\r\n
+  \   r.allow_cultivar_mixing,\r\n    r.allow_orchard_mixing,\r\n    cultivar_group_code,\r\n
+  \   r.started_at,\r\n    r.completed_at,\r\n    cultivars.description,\r\n    orchards.orchard_code,\r\n
+  \   pucs.puc_code,\r\n    seasons.season_code,\r\n    packed_nett_weight,\r\n    tipped_nett_weight,\r\n
+  \   tipped_qty,\r\n    packed_qty,\r\n    plant_resource_code"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  production_run_id:
+    :name: production_run_id
+    :sequence_no: 1
+    :caption: Production run
+    :namespaced_name: r.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cult_mix:
+    :name: cult_mix
+    :sequence_no: 2
+    :caption: Cult mix
+    :namespaced_name: r.allow_cultivar_mixing
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orc_mix:
+    :name: orc_mix
+    :sequence_no: 3
+    :caption: Orc mix
+    :namespaced_name: r.allow_orchard_mixing
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  started_at:
+    :name: started_at
+    :sequence_no: 4
+    :caption: Started at
+    :namespaced_name: r.started_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 5
+    :caption: Completed at
+    :namespaced_name: r.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_group:
+    :name: cultivar_group
+    :sequence_no: 6
+    :caption: Cultivar group
+    :namespaced_name: cultivar_group_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_description:
+    :name: cultivar_description
+    :sequence_no: 7
+    :caption: Cultivar description
+    :namespaced_name: cultivars.description
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 8
+    :caption: Orchard code
+    :namespaced_name: orchards.orchard_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 9
+    :caption: Puc code
+    :namespaced_name: pucs.puc_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  season_code:
+    :name: season_code
+    :sequence_no: 15
+    :caption: Season code
+    :namespaced_name: seasons.season_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_qty:
+    :name: tipped_qty
+    :sequence_no: 10
+    :caption: Tipped qty
+    :namespaced_name: tipped_qty
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_nett_weight:
+    :name: tipped_nett_weight
+    :sequence_no: 11
+    :caption: Tipped nett weight
+    :namespaced_name: tipped_nett_weight
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_qty:
+    :name: packed_qty
+    :sequence_no: 12
+    :caption: Packed qty
+    :namespaced_name: packed_qty
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_nett_weight:
+    :name: packed_nett_weight
+    :sequence_no: 13
+    :caption: Packed nett weight
+    :namespaced_name: packed_nett_weight
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  line:
+    :name: line
+    :sequence_no: 14
+    :caption: Line
+    :namespaced_name: plant_resource_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []
