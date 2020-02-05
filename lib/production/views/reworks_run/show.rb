@@ -26,7 +26,13 @@ module Production
             if rules[:show_changes_made]
               page.add_notice 'The changes below were made to pallets affected list:'
               page.section do |section|
-                section.add_diff :changes_made
+                if rules[:array_of_changes_made]
+                  rules[:changes_made_array_count].times do |i|
+                    section.add_diff "changes_made_#{i}".to_sym
+                  end
+                else
+                  section.add_diff :changes_made
+                end
               end
             end
           end

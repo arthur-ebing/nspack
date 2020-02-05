@@ -85,8 +85,12 @@ module ProductionApp
     end
 
     def rmt_bin_asset_number_updates
-      { tipped_asset_number: bin_number,
+      { tipped_asset_number: rmt_bin_asset_number,
         bin_asset_number: nil }
+    end
+
+    def rmt_bin_asset_number
+      repo.get_rmt_bin_asset_number(bin_number)
     end
   end
 end

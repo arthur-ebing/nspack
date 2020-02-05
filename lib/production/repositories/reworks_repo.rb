@@ -39,6 +39,7 @@ module ProductionApp
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after', null) AS after_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
+        COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes', null) AS changes_made_array,
         reworks_runs.created_at, reworks_runs.updated_at
         FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
         LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
@@ -98,6 +99,10 @@ module ProductionApp
 
     def find_rmt_bin(rmt_bin_id)
       DB[:rmt_bins].where(id: rmt_bin_id).get(:id)
+    end
+
+    def get_rmt_bin_asset_number(rmt_bin_id)
+      DB[:rmt_bins].where(id: rmt_bin_id).get(:bin_asset_number)
     end
 
     def selected_pallet_numbers(sequence_ids)

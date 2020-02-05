@@ -33,5 +33,6 @@ module ProductionApp
     attribute :before_descriptions_state, Types::Hash
     attribute :after_descriptions_state, Types::Hash
     attribute :changes_made, Types::Hash
+    attribute :changes_made_array, Types::Hash
   end
 end

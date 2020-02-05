@@ -24,20 +24,11 @@ module UiRules
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
+      @rules[:array_of_changes_made] = !@form_object.changes_made_array.nil_or_empty? && !@form_object.changes_made_array.respond_to?(:to_hash)
+      @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
 
       text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] ? 'Bins' : 'Pallet Numbers'
 
-      left_record = if @form_object.before_state.nil_or_empty?
-                      { id: nil }
-                    else
-                      @form_object.before_descriptions_state.nil_or_empty? ? @form_object.before_state : @form_object.before_descriptions_state
-                    end
-
-      right_record = if @form_object.after_state.nil_or_empty?
-                       { id: nil }
-                     else
-                       @form_object.after_descriptions_state.nil_or_empty? ? @form_object.after_state : @form_object.after_descriptions_state
-                     end
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
                                        caption: 'Reworks Run Type' }
@@ -69,12 +60,36 @@ module UiRules
                                  hide_on_load: !@form_object.pallet_number.nil_or_empty? ? false : true }
       fields[:pallet_sequence_number] = { renderer: :label,
                                           hide_on_load: !@form_object.pallet_sequence_number.nil_or_empty? ? false : true }
-      fields[:changes_made] = {
-        left_caption: 'Before',
-        right_caption: 'After',
-        left_record: left_record.sort.to_h,
-        right_record: right_record.sort.to_h
-      }
+      if @rules[:array_of_changes_made]
+        @form_object.changes_made_array.to_a.each_with_index do |change, i|
+          left_record = change['change_descriptions'].nil_or_empty? ? change['before'] : change['change_descriptions']['before']
+          right_record = change['change_descriptions'].nil_or_empty? ? change['after'] : change['change_descriptions']['after']
+          fields["changes_made_#{i}".to_sym] = {
+            left_caption: 'Before',
+            right_caption: 'After',
+            left_record: left_record.sort.to_h,
+            right_record: right_record.sort.to_h
+          }
+        end
+      else
+        left_record = if @form_object.before_state.nil_or_empty?
+                        { id: nil }
+                      else
+                        @form_object.before_descriptions_state.nil_or_empty? ? @form_object.before_state : @form_object.before_descriptions_state
+                      end
+
+        right_record = if @form_object.after_state.nil_or_empty?
+                         { id: nil }
+                       else
+                         @form_object.after_descriptions_state.nil_or_empty? ? @form_object.after_state : @form_object.after_descriptions_state
+                       end
+        fields[:changes_made] = {
+          left_caption: 'Before',
+          right_caption: 'After',
+          left_record: left_record.sort.to_h,
+          right_record: right_record.sort.to_h
+        }
+      end
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
