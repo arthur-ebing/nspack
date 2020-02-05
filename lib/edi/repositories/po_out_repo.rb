@@ -84,7 +84,7 @@ module EdiApp
           pallet_sequences.pallet_sequence_number AS seq_no,
           govt_inspection_sheets.id AS consignment_number,
           COALESCE(pallets.intake_created_at, pallets.govt_reinspection_at, pallets.govt_first_inspection_at, current_timestamp) AS intake_date,
-          pallets.govt_first_inspection_at AS orig_intake,
+          COALESCE(pallets.intake_created_at, pallets.govt_first_inspection_at) AS orig_intake,
           substring(commodity_groups.code FROM '..') AS comm_grp,
           commodities.code AS commodity,
           marketing_varieties.marketing_variety_code AS variety,
