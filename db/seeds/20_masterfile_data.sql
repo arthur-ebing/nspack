@@ -70,6 +70,9 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('TIP BINS', 'Tip Bi
 INSERT INTO reworks_run_types (run_type, description) VALUES('WEIGH RMT BINS', 'Weigh Rmt Bins') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('RECALC NETT WEIGHT', 'Recalc Nett Weight') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('CHANGE DELIVERIES ORCHARDS', 'Change orchards on deliveries') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('SCRAP BIN', 'Scrap Bin') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('UNSCRAP BIN', 'Unscrap Bin') ON CONFLICT DO NOTHING;
+
 
 -- LOCATION STORAGE TYPES
 INSERT INTO location_storage_types (storage_type_code) VALUES('PALLETS') ON CONFLICT DO NOTHING;

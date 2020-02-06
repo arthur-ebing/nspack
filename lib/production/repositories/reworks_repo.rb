@@ -77,6 +77,10 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
+    def scrapped_bins?(bins)
+      DB[:rmt_bins].where(id: bins, scrapped: true).select_map(:id)
+    end
+
     def tipped_bins?(rmt_bins)
       # return rmt_bin_asset_number_tipped?(rmt_bins) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
@@ -464,14 +468,14 @@ module ProductionApp
       DB[query].first
     end
 
-    def find_to_farm_orchards(from_orchard_id, cultivar_and_farm)
+    def find_to_farm_orchards(cultivar_and_farm)
       query = <<~SQL
         SELECT DISTINCT o.id, f.farm_code || '_' || o.orchard_code  AS farm_orchard_code
         FROM orchards o
         JOIN farms f ON f.id=o.farm_id
         JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
         JOIN cultivar_groups g ON g.id=c.cultivar_group_id
-        where o.id<>#{from_orchard_id} AND g.cultivar_group_code='#{cultivar_and_farm[:cultivar_group_code]}' AND f.id='#{cultivar_and_farm[:farm_id]}'
+        where g.cultivar_group_code='#{cultivar_and_farm[:cultivar_group_code]}' AND f.id='#{cultivar_and_farm[:farm_id]}'
         ORDER BY o.id ASC
       SQL
       DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }
@@ -515,7 +519,7 @@ module ProductionApp
 
     def find_from_deliveries_cultivar(delivery_ids)
       query = <<~SQL
-        SELECT DISTINCT c.cultivar_name, f.farm_code || '_' || o.orchard_code AS farm_orchard_code
+        SELECT DISTINCT o.id as orchard_id, c.id as cultivar_id, c.cultivar_name, f.farm_code || '_' || o.orchard_code AS farm_orchard_code
         FROM rmt_deliveries d
         JOIN orchards o on o.id=d.orchard_id
         JOIN cultivars c on c.id=d.cultivar_id
@@ -546,6 +550,10 @@ module ProductionApp
 
     def bin_bulk_update(delivery_ids, to_orchard, to_cultivar)
       DB[:rmt_bins].where(rmt_delivery_id: delivery_ids).update(orchard_id: to_orchard, cultivar_id: to_cultivar)
+    end
+
+    def scrapped_bin_bulk_update(params)
+      DB[:rmt_bins].where(id: params[:pallets_selected]).update(scrap_remarks: params[:remarks], scrap_reason_id: params[:scrap_reason_id], scrapped_at: Time.now, scrapped: true, exit_ref: 'SCRAPPED', exit_ref_date_time: Time.now)
     end
   end
 end

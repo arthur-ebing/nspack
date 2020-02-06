@@ -17,6 +17,7 @@ module Production
               form.action '/production/reworks/change_deliveries_orchard/apply_change_deliveries_orchard_changes'
               form.remote! if remote
               form.add_field :from
+              form.add_field :from_cultivar if form_values[:from_cultivar]
               form.add_field :to
               form.add_field :to_cultivar
               form.add_text 'For The Following Deliveries'

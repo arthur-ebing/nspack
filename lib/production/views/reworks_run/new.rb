@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ReworksRun
       class New
-        def self.call(reworks_run_type_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(reworks_run_type_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
           ui_rule = UiRules::Compiler.new(:reworks_run, :new, form_values: form_values, reworks_run_type_id: reworks_run_type_id)
           rules   = ui_rule.compile
 
@@ -36,7 +36,7 @@ module Production
                   col.add_field :remarks
                   col.add_field :pallets_selected
                 end
-                unless rules[:single_edit]
+                unless rules[:single_edit] || rules[:scrap_bin]
                   row.column do |col|
                     col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
                     col.add_control(control_type: :link,

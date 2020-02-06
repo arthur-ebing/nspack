@@ -27,7 +27,7 @@ module UiRules
       @rules[:array_of_changes_made] = !@form_object.changes_made_array.nil_or_empty? && !@form_object.changes_made_array.respond_to?(:to_hash)
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
 
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] ? 'Bins' : 'Pallet Numbers'
 
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
@@ -35,9 +35,9 @@ module UiRules
       fields[:scrap_reason_id] = { renderer: :label,
                                    with_value: scrap_reason_id_label,
                                    caption: 'Scrap Reason',
-                                   hide_on_load: @rules[:scrap_pallet] ? false : true }
+                                   hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true }
       fields[:remarks] = { renderer: :label,
-                           hide_on_load: @rules[:scrap_pallet] ? false : true }
+                           hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true }
       fields[:reworks_action] = { renderer: :label,
                                   hide_on_load: !@form_object.reworks_action.nil_or_empty? ? false : true }
       fields[:user] = { renderer: :label }
@@ -95,6 +95,8 @@ module UiRules
     def common_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
+      @rules[:scrap_bin] = AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type_id_label
+      @rules[:unscrap_bin] = AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type_id_label
       @rules[:single_pallet_edit] = AppConst::RUN_TYPE_SINGLE_PALLET_EDIT == reworks_run_type_id_label
       @rules[:unscrap_pallet] = AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
@@ -106,22 +108,23 @@ module UiRules
                      else
                        'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallet Numbers'
+      scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_bins) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_pallets)
       {
         reworks_run_type_id: { renderer: :hidden },
         reworks_run_type: { renderer: :label,
                             with_value: reworks_run_type_id_label,
                             caption: 'Reworks Run Type' },
         scrap_reason_id: { renderer: :select,
-                           options: MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_pallets),
+                           options: scrap_reason,
                            disabled_options: MasterfilesApp::QualityRepo.new.for_select_inactive_scrap_reasons,
                            caption: 'Scrap Reason',
-                           hide_on_load: @rules[:scrap_pallet] ? false : true },
+                           hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
         remarks: { renderer: :textarea,
                    rows: 5,
                    placeholder: 'Scrap remarks',
                    caption: 'Scrap Remarks',
-                   hide_on_load: @rules[:scrap_pallet] ? false : true },
+                   hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
         pallets_selected: if @rules[:single_edit]
                             { caption: text_caption }
                           else

@@ -18,10 +18,12 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           res = interactor.validate_change_delivery_orchard_screen_params(params[:change_deliveries_orchard])
           if res.success
+            store_locally(:allow_cultivar_mixing, params[:change_deliveries_orchard][:allow_cultivar_mixing])
             store_locally(:from_orchard, params[:change_deliveries_orchard][:from_orchard])
+            store_locally(:from_cultivar, params[:change_deliveries_orchard][:from_cultivar])
             store_locally(:to_orchard, params[:change_deliveries_orchard][:to_orchard])
             store_locally(:to_cultivar, params[:change_deliveries_orchard][:to_cultivar])
-            show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(params[:change_deliveries_orchard][:from_orchard]) }
+            show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(nil, form_values: params[:change_deliveries_orchard]) }
           else
             re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
               Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_values: params[:change_deliveries_orchard],
@@ -34,9 +36,11 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'selected_deliveries' do
         from_orchard = retrieve_from_local_store(:from_orchard)
+        from_cultivar = retrieve_from_local_store(:from_cultivar)
         to_orchard = retrieve_from_local_store(:to_orchard)
         to_cultivar = retrieve_from_local_store(:to_cultivar)
         form_values = { from: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(from_orchard),
+                        from_cultivar: from_cultivar.nil_or_empty? ? ProductionApp::ReworksRepo.new.find_from_deliveries_cultivar(params[:selection][:list]).group_by { |h| h[:cultivar_name] }.keys.join(',') : MasterfilesApp::CultivarRepo.new.find_cultivar(from_cultivar)&.cultivar_name,
                         to: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard),
                         to_cultivar: MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name,
                         affected_deliveries: params[:selection][:list].gsub(',', "\n").to_s }
@@ -48,7 +52,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'apply_change_deliveries_orchard_changes' do
         reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS)
-        res = interactor.apply_change_deliveries_orchard_changes(retrieve_from_local_store(:to_orchard), retrieve_from_local_store(:to_cultivar), retrieve_from_local_store(:deliveries), reworks_run_type_id)
+        res = interactor.apply_change_deliveries_orchard_changes(retrieve_from_local_store(:allow_cultivar_mixing), retrieve_from_local_store(:to_orchard), retrieve_from_local_store(:to_cultivar), retrieve_from_local_store(:deliveries), reworks_run_type_id)
         if res.success
           flash[:notice] = 'Delivery Orchards Changed Successfully'
           r.redirect('/production/reworks/change_deliveries_orchard')
@@ -62,15 +66,20 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'from_orchard_combo_changed' do
-        to_orchards = if !params[:changed_value].to_s.empty?
-                        interactor.for_select_to_orchards(params[:changed_value])
-                      else
-                        []
-                      end
+        if !params[:changed_value].to_s.empty?
+          to_orchards = interactor.for_select_to_orchards(params[:changed_value])
+          from_cultivars = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(params[:changed_value])
+        else
+          to_orchards = []
+          from_cultivars = []
+        end
 
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'change_deliveries_orchard_to_orchard',
                                      options_array: to_orchards),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'change_deliveries_orchard_from_cultivar',
+                                     options_array: from_cultivars),
                       OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'change_deliveries_orchard_to_cultivar',
                                      options_array: [])])
@@ -84,6 +93,15 @@ class Nspack < Roda # rubocop:disable ClassLength
                        end
 
         json_replace_select_options('change_deliveries_orchard_to_cultivar', to_cultivars)
+      end
+
+      r.on 'allow_cultivar_mixing_changed' do
+        actions = if params[:changed_value] == 't'
+                    [OpenStruct.new(type: :hide_element, dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper')]
+                  else
+                    [OpenStruct.new(type: :show_element, dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper')]
+                  end
+        json_actions(actions)
       end
     end
 

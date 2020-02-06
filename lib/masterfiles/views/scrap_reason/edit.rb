@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :scrap_reason
               form.add_field :description
               form.add_field :applies_to_pallets
+              form.add_field :applies_to_bins
             end
           end
 

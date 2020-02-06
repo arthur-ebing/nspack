@@ -19,13 +19,15 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:applies_to_pallets] = { renderer: :label, as_boolean: true }
+      fields[:applies_to_bins] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         scrap_reason: { required: true },
         description: {},
-        applies_to_pallets: { renderer: :checkbox }
+        applies_to_pallets: { renderer: :checkbox },
+        applies_to_bins: { renderer: :checkbox }
       }
     end
 
@@ -41,7 +43,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(scrap_reason: nil,
                                     description: nil,
-                                    applies_to_pallets: true)
+                                    applies_to_pallets: true,
+                                    applies_to_bins: true)
     end
   end
 end

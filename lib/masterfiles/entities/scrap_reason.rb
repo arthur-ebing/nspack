@@ -7,5 +7,6 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute? :active, Types::Bool
     attribute :applies_to_pallets, Types::Bool
+    attribute :applies_to_bins, Types::Bool
   end
 end

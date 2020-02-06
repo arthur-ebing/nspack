@@ -22,6 +22,7 @@ module UiRules
                                caption: '' }
       }
 
+      fields[:from_cultivar] = { renderer: :label } if @options[:form_values][:from_cultivar]
       fields
     end
   end

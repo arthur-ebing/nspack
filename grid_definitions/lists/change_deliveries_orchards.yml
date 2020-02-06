@@ -5,6 +5,15 @@
     - :col: rmt_deliveries.orchard_id
       :op: =
       :val: $:orchard_id$
+  :disallow_cultivar_mixing:
+    - :col: rmt_deliveries.orchard_id
+      :op: =
+      :val: $:orchard_id$
+    - :col: rmt_deliveries.cultivar_id
+      :op: =
+      :val: $:cultivar_id$
 :multiselect:
   :standard:
     :conditions: standard
+  :disallow_cultivar_mixing:
+    :conditions: disallow_cultivar_mixing

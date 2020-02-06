@@ -15,7 +15,9 @@ module UiRules
 
     def common_fields
       fields = {
+        allow_cultivar_mixing: { renderer: :checkbox },
         from_orchard: { renderer: :select, options: MasterfilesApp::FarmRepo.new.find_farm_orchards, required: true, prompt: true },
+        from_cultivar: { renderer: :select, options: [], required: true, prompt: true },
         to_orchard: { renderer: :select, options: [], required: true, prompt: true },
         to_cultivar: { renderer: :select, options: [], required: true, prompt: true }
       }
@@ -31,6 +33,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
+        behaviour.input_change :allow_cultivar_mixing, notify: [{ url: '/production/reworks/change_deliveries_orchard/allow_cultivar_mixing_changed' }]
         behaviour.dropdown_change :from_orchard, notify: [{ url: '/production/reworks/change_deliveries_orchard/from_orchard_combo_changed' }]
         behaviour.dropdown_change :to_orchard, notify: [{ url: '/production/reworks/change_deliveries_orchard/to_orchard_combo_changed' }]
       end

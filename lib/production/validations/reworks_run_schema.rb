@@ -160,7 +160,20 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     configure { config.type_specs = true }
 
     required(:to_orchard, :integer).filled(:int?)
+    optional(:from_cultivar, :integer)
     required(:from_orchard, :integer).filled(:int?)
     required(:to_cultivar, :integer).filled(:int?)
+  end
+
+  FromCultivarSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:from_cultivar, :integer).filled(:int?)
+  end
+
+  ChangeCultivarOnlyCultivarSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:allow_cultivar_mixing, :bool).filled(:bool?)
   end
 end

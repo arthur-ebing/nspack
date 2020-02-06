@@ -7,19 +7,49 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def validate_change_delivery_orchard_screen_params(params)
+    def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
+      res = validate_only_cultivar_change(params)
+      unless res.messages.empty?
+        error_res = validation_failed_response(res)
+        error_res.message = "#{error_res.message}: you must allow_cultivar_mixing when changing only the cultivar"
+        return error_res
+      end
+
       res = validate_change_delivery_orchard_params(params)
       return validation_failed_response(res) unless res.messages.empty?
+
+      res = validate_changes_made?(params)
+      return failed_response('No Changes were made') unless res
+
+      if params[:allow_cultivar_mixing] == 'f'
+        res = validate_from_cultivar_param(params)
+        return validation_failed_response(res) unless res.messages.empty?
+      end
 
       ok_response
     end
 
-    def apply_change_deliveries_orchard_changes(to_orchard, to_cultivar, delivery_ids, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
-      reworks_run_attrs = { user: @user.user_name, pallets_affected: delivery_ids.split(','), pallets_selected: delivery_ids.split(','), reworks_run_type_id: reworks_run_type_id }
+    def validate_only_cultivar_change(params)
+      params[:allow_cultivar_mixing] = nil if (params[:from_orchard] == params[:to_orchard]) && (!params[:to_cultivar].nil_or_empty? && params[:allow_cultivar_mixing] == 'f')
+      ChangeCultivarOnlyCultivarSchema.call(params)
+    end
+
+    def validate_changes_made?(params)
+      return false if params[:from_orchard] == params[:to_orchard] && params[:from_cultivar] == params[:to_cultivar]
+
+      true
+    end
+
+    def validate_from_cultivar_param(params)
+      FromCultivarSchema.call(params)
+    end
+
+    def apply_change_deliveries_orchard_changes(allow_cultivar_mixing, to_orchard, to_cultivar, delivery_ids, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
+      reworks_run_attrs = { allow_cultivar_mixing: allow_cultivar_mixing == 't', user: @user.user_name, pallets_affected: delivery_ids.split(','), pallets_selected: delivery_ids.split(','), reworks_run_type_id: reworks_run_type_id }
       res = validate_reworks_run_params(reworks_run_attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
-      reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard, to_cultivar, delivery_ids)
+      reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard.to_i, to_cultivar.to_i, delivery_ids)
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
 
       return failed_response('Cannot proceed. Some bins in some of the deliveries are in production_runs that do not allow orchard mixing') unless check_bins_production_runs_allow_mixing?(delivery_ids)
@@ -50,14 +80,36 @@ module ProductionApp
       repo.create_reworks_run(reworks_run_attrs)
     end
 
-    def calc_changes_made(to_orchard, to_cultivar, delivery_ids)
+    def calc_changes_made(to_orchard, to_cultivar, delivery_ids) # rubocop:disable Metrics/AbcSize
       orchard = MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard)
       cultivar = MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name
-      if (from_deliveries_cultivar = repo.find_from_deliveries_cultivar(delivery_ids)).length > 1
-        return 'Deliveries have different cultivars'
+
+      changes = []
+      repo.find_from_deliveries_cultivar(delivery_ids).group_by { |h| h[:cultivar_name] }.each do |_k, v|
+        change = { before: {}, after: {}, change_descriptions: { before: {}, after: {} } }
+
+        if to_orchard != v[0][:orchard_id]
+          change[:before].store(:orchard_id, v[0][:orchard_id])
+          change[:after].store(:orchard_id, to_orchard)
+
+          change[:change_descriptions][:before].store(:orchard, v[0][:farm_orchard_code])
+          change[:change_descriptions][:after].store(:orchard, orchard)
+        end
+
+        if to_cultivar != v[0][:cultivar_id]
+          change[:before].store(:cultivar_id, v[0][:cultivar_id])
+          change[:after].store(:cultivar_id, to_cultivar)
+
+          change[:change_descriptions][:before].store(:cultivar, v[0][:cultivar_name])
+          change[:change_descriptions][:after].store(:cultivar, cultivar)
+        end
+
+        changes << change
       end
 
-      { pallets: { pallet_sequences: { changes: { before: { orchard: from_deliveries_cultivar[0][:farm_orchard_code], cultivar: from_deliveries_cultivar[0][:cultivar_name] }, after: { orchard: orchard, cultivar: cultivar } } } } }
+      return 'No Changes were applied. No Changes were made' if changes.length == 1 && changes[0][:before].empty?
+
+      { pallets: { pallet_sequences: { changes: changes } } }
     end
 
     def log_deliveries_and_bins_statuses(delivery_ids)
@@ -126,7 +178,7 @@ module ProductionApp
 
     def validate_pallets_selected_input(reworks_run_type, pallets_selected)
       case reworks_run_type
-      when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS then
+      when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS, AppConst::RUN_TYPE_SCRAP_BIN then
         validate_rmt_bins(reworks_run_type, pallets_selected)
       else
         validate_pallet_numbers(reworks_run_type, pallets_selected)
@@ -142,9 +194,11 @@ module ProductionApp
       end
     end
 
-    def create_reworks_run_record(attrs, reworks_action, changes)
+    def create_reworks_run_record(attrs, reworks_action, changes) # rubocop:disable Metrics/AbcSize
       res = validate_reworks_run_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
+
+      return create_scrap_bin_reworks_run(res) if ProductionApp::ReworksRepo.new.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
       return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
@@ -152,6 +206,15 @@ module ProductionApp
       success_response('Pallet change was successful', reworks_run_id: rw_res.instance[:reworks_run_id])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def create_scrap_bin_reworks_run(params) # rubocop:disable Metrics/AbcSize
+      repo.scrapped_bin_bulk_update(params)
+      id = repo.create_reworks_run(user: params[:user], reworks_run_type_id: params[:reworks_run_type_id], scrap_reason_id: params[:scrap_reason_id], remarks: params[:remarks], pallets_selected: "{ #{params[:pallets_selected].join(',')} }", pallets_affected: "{ #{params[:pallets_selected].join(',')} }", changes_made: nil, bins_scrapped: "{ #{params[:pallets_selected].join(',')} }", pallets_unscrapped: nil)
+      params[:pallets_selected].each do |bin|
+        log_status(:rmt_bins, bin, 'SCRAPPED')
+      end
+      success_response('Bins Scrapped successfully', reworks_run_id: id)
     end
 
     def print_reworks_pallet_label(pallet_number, params)  # rubocop:disable Metrics/AbcSize
@@ -643,7 +706,7 @@ module ProductionApp
 
     def for_select_to_orchards(from_orchard_id)
       cultivar_and_farm = repo.find_orchard_cultivar_group_and_farm(from_orchard_id)
-      cultivar_and_farm ? repo.find_to_farm_orchards(from_orchard_id, cultivar_and_farm) : []
+      cultivar_and_farm ? repo.find_to_farm_orchards(cultivar_and_farm) : []
     end
 
     private
@@ -755,7 +818,7 @@ module ProductionApp
 
     def make_changes?(reworks_run_type)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_RECALC_NETT_WEIGHT then
+      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_SCRAP_BIN, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_RECALC_NETT_WEIGHT then
         false
       else
         true
@@ -785,7 +848,7 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
-    def validate_rmt_bins(reworks_run_type, rmt_bins)  # rubocop:disable Metrics/AbcSize
+    def validate_rmt_bins(reworks_run_type, rmt_bins) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
@@ -804,12 +867,17 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
       end
 
+      if AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type
+        scrapped_bins = repo.scrapped_bins?(rmt_bins)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ['already scrapped'] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
+      end
+
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
     end
 
     def validate_reworks_run_new_params(reworks_run_type, params)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET then
+      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_SCRAP_BIN then
         ReworksRunScrapPalletsSchema.call(params)
       when AppConst::RUN_TYPE_TIP_BINS then
         ReworksRunTipBinsSchema.call(params)
