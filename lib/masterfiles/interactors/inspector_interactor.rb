@@ -13,10 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = inspector(id)
-      success_response("Created inspector #{instance.inspector_code}",
-                       instance)
+      success_response("Created inspector #{instance.inspector_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { inspector_code: ['This inspector code already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { first_name: ['This person or inspector code already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,8 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = inspector(id)
-      success_response("Updated inspector #{instance.inspector_code}",
-                       instance)
+      success_response("Updated inspector #{instance.inspector_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -64,7 +62,7 @@ module MasterfilesApp
     end
 
     def validate_inspector_params(params)
-      InspectorSchema.call(params)
+      InspectorFlatSchema.call(params)
     end
   end
 end

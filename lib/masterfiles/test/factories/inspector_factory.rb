@@ -3,7 +3,7 @@
 module MasterfilesApp
   module InspectorFactory
     def create_inspector(opts = {})
-      party_role_id = create_party_role[:id]
+      party_role_id = create_party_role('P')[:id]
 
       default = {
         inspector_party_role_id: party_role_id,

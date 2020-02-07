@@ -4,7 +4,7 @@ module Masterfiles
   module Quality
     module Inspector
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:inspector, :show, id: id)
           rules   = ui_rule.compile
 
@@ -13,7 +13,10 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Inspector'
               form.view_only!
-              form.add_field :inspector_party_role_id
+              form.add_field :title
+              form.add_field :first_name
+              form.add_field :surname
+              form.add_field :role_ids
               form.add_field :inspector_code
               form.add_field :tablet_ip_address
               form.add_field :tablet_port_number
