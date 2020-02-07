@@ -44,7 +44,7 @@ module UiRules
       @form_object = OpenStruct.new(scrap_reason: nil,
                                     description: nil,
                                     applies_to_pallets: true,
-                                    applies_to_bins: true)
+                                    applies_to_bins: false)
     end
   end
 end

@@ -35,6 +35,9 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'selected_deliveries' do
+        # Fix set up repos and re-use them. ("farm_repo" instead of "MasterfilesApp::FarmRepo.new")
+        # FIX: USe helper "multiselect_grid_choices" to get ids from list and store and pass as an array, not string
+        # FIX: Use one Hash for all of these... { from_orchard: val, from_cultivar: val ... }
         from_orchard = retrieve_from_local_store(:from_orchard)
         from_cultivar = retrieve_from_local_store(:from_cultivar)
         to_orchard = retrieve_from_local_store(:to_orchard)

@@ -178,7 +178,9 @@ module ProductionApp
 
     def validate_pallets_selected_input(reworks_run_type, pallets_selected)
       case reworks_run_type
-      when AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_WEIGH_RMT_BINS, AppConst::RUN_TYPE_SCRAP_BIN then
+      when AppConst::RUN_TYPE_TIP_BINS,
+           AppConst::RUN_TYPE_WEIGH_RMT_BINS,
+           AppConst::RUN_TYPE_SCRAP_BIN
         validate_rmt_bins(reworks_run_type, pallets_selected)
       else
         validate_pallet_numbers(reworks_run_type, pallets_selected)
@@ -187,9 +189,9 @@ module ProductionApp
 
     def display_page(reworks_run_type)
       case reworks_run_type
-      when AppConst::RUN_TYPE_WEIGH_RMT_BINS then
+      when AppConst::RUN_TYPE_WEIGH_RMT_BINS
         'edit_rmt_bin_gross_weight'
-      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT then
+      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT
         'edit_pallet'
       end
     end
@@ -198,7 +200,7 @@ module ProductionApp
       res = validate_reworks_run_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
-      return create_scrap_bin_reworks_run(res) if ProductionApp::ReworksRepo.new.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
+      return create_scrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
       return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
@@ -210,8 +212,16 @@ module ProductionApp
 
     def create_scrap_bin_reworks_run(params) # rubocop:disable Metrics/AbcSize
       repo.scrapped_bin_bulk_update(params)
-      id = repo.create_reworks_run(user: params[:user], reworks_run_type_id: params[:reworks_run_type_id], scrap_reason_id: params[:scrap_reason_id], remarks: params[:remarks], pallets_selected: "{ #{params[:pallets_selected].join(',')} }", pallets_affected: "{ #{params[:pallets_selected].join(',')} }", changes_made: nil, bins_scrapped: "{ #{params[:pallets_selected].join(',')} }", pallets_unscrapped: nil)
-      params[:pallets_selected].each do |bin|
+      id = repo.create_reworks_run(user: params[:user],
+                                   reworks_run_type_id: params[:reworks_run_type_id],
+                                   scrap_reason_id: params[:scrap_reason_id],
+                                   remarks: params[:remarks],
+                                   pallets_selected: "{ #{params[:pallets_selected].join(',')} }",
+                                   pallets_affected: "{ #{params[:pallets_selected].join(',')} }",
+                                   changes_made: nil,
+                                   bins_scrapped: "{ #{params[:pallets_selected].join(',')} }",
+                                   pallets_unscrapped: nil)
+      params[:pallets_selected].each do |bin| # LOG MULTIPLE!!!!!!!!!!!!!!
         log_status(:rmt_bins, bin, 'SCRAPPED')
       end
       success_response('Bins Scrapped successfully', reworks_run_id: id)
@@ -642,7 +652,7 @@ module ProductionApp
     end
 
     def production_run_details_table(production_run_id)
-      Crossbeams::Layout::Table.new([], ProductionApp::ReworksRepo.new.production_run_details(production_run_id), [], pivot: true).render
+      Crossbeams::Layout::Table.new([], repo.production_run_details(production_run_id), [], pivot: true).render
     end
 
     def farm_pucs(farm_id)
@@ -818,7 +828,12 @@ module ProductionApp
 
     def make_changes?(reworks_run_type)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_SCRAP_BIN, AppConst::RUN_TYPE_UNSCRAP_PALLET, AppConst::RUN_TYPE_REPACK, AppConst::RUN_TYPE_TIP_BINS, AppConst::RUN_TYPE_RECALC_NETT_WEIGHT then
+      when AppConst::RUN_TYPE_SCRAP_PALLET,
+           AppConst::RUN_TYPE_SCRAP_BIN,
+           AppConst::RUN_TYPE_UNSCRAP_PALLET,
+           AppConst::RUN_TYPE_REPACK,
+           AppConst::RUN_TYPE_TIP_BINS,
+           AppConst::RUN_TYPE_RECALC_NETT_WEIGHT
         false
       else
         true
@@ -877,9 +892,10 @@ module ProductionApp
 
     def validate_reworks_run_new_params(reworks_run_type, params)
       case reworks_run_type
-      when AppConst::RUN_TYPE_SCRAP_PALLET, AppConst::RUN_TYPE_SCRAP_BIN then
+      when AppConst::RUN_TYPE_SCRAP_PALLET,
+           AppConst::RUN_TYPE_SCRAP_BIN # WHY NOT ReworksRunScrapBinSchema ????
         ReworksRunScrapPalletsSchema.call(params)
-      when AppConst::RUN_TYPE_TIP_BINS then
+      when AppConst::RUN_TYPE_TIP_BINS
         ReworksRunTipBinsSchema.call(params)
       else
         ReworksRunNewSchema.call(params)

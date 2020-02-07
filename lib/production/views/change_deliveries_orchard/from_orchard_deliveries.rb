@@ -3,6 +3,7 @@
 module Production
   module Reworks
     module ChangeDeliveriesOrchard
+      # FIX: remove the _id parameter
       class FromOrchardDeliveries
         def self.call(_id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:change_deliveries_orchard, :select_orchards, form_values: form_values)
