@@ -77,8 +77,8 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
-    def scrapped_bins?(bins)
-      DB[:rmt_bins].where(id: bins, scrapped: true).select_map(:id)
+    def scrapped_bins?(bin_ids)
+      DB[:rmt_bins].where(id: bin_ids, scrapped: true).select_map(:id)
     end
 
     def tipped_bins?(rmt_bins)
@@ -536,6 +536,7 @@ module ProductionApp
         WHERE b.rmt_delivery_id IN (#{delivery_ids})
       SQL
       DB[query].all
+      # all_hash(:rmt_bins, rmt_delivery_id: delivery_ids)
     end
 
     def bins_production_runs_allow_mixing?(delivery_ids)
@@ -546,6 +547,11 @@ module ProductionApp
         WHERE b.rmt_delivery_id IN (#{delivery_ids}) and r.allow_orchard_mixing is false
       SQL
       DB[query].all.empty? ? true : false
+      # DB[:rmt_bins]
+      #   .join(:production_runs, id: :production_run_tipped_id)
+      #   .where(rmt_delivery_id: delivery_ids, allow_orchard_mixing: false)
+      #   .count
+      #   .zero?
     end
 
     def bin_bulk_update(delivery_ids, to_orchard, to_cultivar)
@@ -553,7 +559,14 @@ module ProductionApp
     end
 
     def scrapped_bin_bulk_update(params)
-      DB[:rmt_bins].where(id: params[:pallets_selected]).update(scrap_remarks: params[:remarks], scrap_reason_id: params[:scrap_reason_id], scrapped_at: Time.now, scrapped: true, exit_ref: 'SCRAPPED', exit_ref_date_time: Time.now)
+      DB[:rmt_bins]
+        .where(id: params[:pallets_selected])
+        .update(scrap_remarks: params[:remarks],
+                scrap_reason_id: params[:scrap_reason_id],
+                scrapped_at: Time.now,
+                scrapped: true,
+                exit_ref: 'SCRAPPED',
+                exit_ref_date_time: Time.now)
     end
   end
 end

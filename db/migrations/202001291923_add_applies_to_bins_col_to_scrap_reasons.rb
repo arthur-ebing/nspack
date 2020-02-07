@@ -1,7 +1,7 @@
 Sequel.migration do
   up do
     alter_table(:scrap_reasons) do
-      add_column :applies_to_bins, TrueClass
+      add_column :applies_to_bins, TrueClass, default: false
     end
   end
 
