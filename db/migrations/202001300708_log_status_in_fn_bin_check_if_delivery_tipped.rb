@@ -58,6 +58,5 @@ Sequel.migration do
       ALTER FUNCTION public.fn_bin_check_if_delivery_tipped()
         OWNER TO postgres;
     SQL
-    SQL
   end
 end

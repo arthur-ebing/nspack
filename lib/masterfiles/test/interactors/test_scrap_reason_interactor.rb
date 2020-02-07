@@ -68,7 +68,8 @@ module MasterfilesApp
         scrap_reason: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true,
-        applies_to_pallets: true
+        applies_to_pallets: true,
+        applies_to_bins: true
       }
     end
 
