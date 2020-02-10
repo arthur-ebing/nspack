@@ -293,6 +293,74 @@ class Nspack < Roda
         end
       end
     end
+    # SHIFT TYPES
+    # --------------------------------------------------------------------------
+    r.on 'shift_types', Integer do |id|
+      interactor = MasterfilesApp::ShiftTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:shift_types, id) do
+        handle_not_found(r)
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('hr', 'read')
+          show_partial { Masterfiles::HumanResources::ShiftType::Show.call(id) }
+        end
+        r.delete do    # DELETE
+          check_auth!('hr', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_shift_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+    r.on 'shift_types' do
+      interactor = MasterfilesApp::ShiftTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        check_auth!('hr', 'new')
+        set_last_grid_url('/list/shift_types', r)
+        show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::New.call(remote: fetch?(r)) }
+      end
+      r.on 'ph_plant_resource_changed' do
+        ph_pr_id = params[:changed_value].empty? ? nil : params[:changed_value]
+        options_array = ph_pr_id ? interactor.line_plant_resources(ph_pr_id) : []
+        json_replace_select_options('shift_type_line_plant_resource_id', options_array, message: nil, keep_dialog_open: true)
+      end
+      r.post do        # CREATE
+        res = interactor.create_shift_type(params[:shift_type])
+        if res.success
+          if fetch?(r)
+            row_keys = %i[
+              id
+              employment_type_code
+              start_hour
+              end_hour
+              day_night_or_custom
+              shift_type_code
+              plant_resource_code
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        else
+          re_show_form(r, res, url: '/masterfiles/human_resources/shift_types/new') do
+            Masterfiles::HumanResources::ShiftType::New.call(form_values: params[:shift_type],
+                                                             form_errors: res.errors,
+                                                             remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

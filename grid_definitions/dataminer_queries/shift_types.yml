@@ -1,0 +1,173 @@
+---
+:caption: Shift Types
+:sql: SELECT "shift_types"."id", "shift_types"."plant_resource_id", "shift_types"."employment_type_id",
+  fn_shift_type_code(shift_types.id),  "shift_types"."start_hour", "shift_types"."end_hour",
+  "shift_types"."day_night_or_custom", "employment_types"."code" as employment_type_code,
+  "plant_resources"."plant_resource_code" FROM "shift_types" JOIN "employment_types"
+  ON "employment_types"."id" = "shift_types"."employment_type_id" JOIN "plant_resources"
+  ON "plant_resources"."id" = "shift_types"."plant_resource_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: shift_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_id:
+    :name: plant_resource_id
+    :sequence_no: 2
+    :caption: Plant resource
+    :namespaced_name: shift_types.plant_resource_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  employment_type_id:
+    :name: employment_type_id
+    :sequence_no: 3
+    :caption: Employment type
+    :namespaced_name: shift_types.employment_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fn_shift_type_code:
+    :name: fn_shift_type_code
+    :sequence_no: 4
+    :caption: Shift type code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 240
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  start_hour:
+    :name: start_hour
+    :sequence_no: 5
+    :caption: Start hour
+    :namespaced_name: shift_types.start_hour
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  end_hour:
+    :name: end_hour
+    :sequence_no: 6
+    :caption: End hour
+    :namespaced_name: shift_types.end_hour
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  day_night_or_custom:
+    :name: day_night_or_custom
+    :sequence_no: 7
+    :caption: DNC
+    :namespaced_name: shift_types.day_night_or_custom
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  employment_type_code:
+    :name: employment_type_code
+    :sequence_no: 8
+    :caption: Employment type code
+    :namespaced_name: employment_types.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 9
+    :caption: Plant resource code
+    :namespaced_name: plant_resources.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: shift_types.plant_resource_id
+  :caption: Plant resource
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT plant_resource_code, id FROM plant_resources ORDER BY plant_resource_code
+- :column: shift_types.employment_type_id
+  :caption: Employment type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM employment_types ORDER BY code
