@@ -17,6 +17,6 @@ module RawMaterialsApp
     required(:date_picked, :date).maybe(:date?)
     required(:date_delivered, :time).maybe(:time?)
     optional(:current, :bool).filled(:bool?)
-    optional(:keep_on, :bool).filled(:bool?)
+    optional(:keep_open, :bool).filled(:bool?)
   end
 end

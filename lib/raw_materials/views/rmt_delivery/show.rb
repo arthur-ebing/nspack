@@ -38,6 +38,7 @@ module RawMaterials
                     col.add_field :season_id
                     col.add_field :tipping_complete_date_time
                     col.add_field :active
+                    col.add_field :keep_open
                   end
                 end
               end

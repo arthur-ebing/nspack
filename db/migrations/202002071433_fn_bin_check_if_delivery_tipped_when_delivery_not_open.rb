@@ -6,7 +6,7 @@ Sequel.migration do
       $BODY$
         DECLARE
           tip_count INTEGER;
-		      keep_open BOOLEAN;
+          keep_open BOOLEAN;
         BEGIN
           IF (NEW.bin_tipped) THEN
             EXECUTE 'SELECT COUNT(*) FROM rmt_bins WHERE rmt_delivery_id = $1 AND NOT bin_tipped AND NOT bin_tipped AND id <> $2;' INTO tip_count USING NEW.rmt_delivery_id, NEW.id;
