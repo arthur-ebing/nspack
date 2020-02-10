@@ -16,6 +16,7 @@ module RawMaterialsApp
     attribute :date_picked, Types::Date
     attribute :date_delivered, Types::DateTime
     attribute :tipping_complete_date_time, Types::DateTime
+    attribute? :keep_open, Types::Bool
     attribute? :current, Types::Bool
     attribute? :active, Types::Bool
   end

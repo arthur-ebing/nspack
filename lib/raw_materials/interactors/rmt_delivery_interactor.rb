@@ -81,6 +81,32 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def open_delivery(id)
+      repo.transaction do
+        repo.update_rmt_delivery(id, keep_open: true)
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+      return failed_response('Delivery: Could Not Be Opened', instance) unless instance.keep_open
+
+      success_response('Delivery: Has Been Opened', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def close_delivery(id)
+      repo.transaction do
+        repo.update_rmt_delivery(id, keep_open: false)
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+      return failed_response('Delivery: Could Not Be Closed', instance) if instance.keep_open
+
+      success_response('Delivery: Has Been Closed', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize, Metrics/PerceivedComplexity
       repo.transaction do
         rmt_bins = repo.find_bins_by_delivery_id(id)
