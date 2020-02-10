@@ -473,9 +473,10 @@ module ProductionApp
         SELECT DISTINCT o.id, f.farm_code || '_' || o.orchard_code  AS farm_orchard_code
         FROM orchards o
         JOIN farms f ON f.id=o.farm_id
-        JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
-        JOIN cultivar_groups g ON g.id=c.cultivar_group_id
-        where g.cultivar_group_code='#{cultivar_and_farm[:cultivar_group_code]}' AND f.id='#{cultivar_and_farm[:farm_id]}'
+        -- JOIN cultivars c ON c.id = ANY (o.cultivar_ids)
+        -- JOIN cultivar_groups g ON g.id=c.cultivar_group_id
+        -- where g.cultivar_group_code='#{cultivar_and_farm[:cultivar_group_code]}' AND f.id='#{cultivar_and_farm[:farm_id]}'
+        where f.id='#{cultivar_and_farm[:farm_id]}'
         ORDER BY o.id ASC
       SQL
       DB[query].map { |s| [s[:farm_orchard_code], s[:id]] }

@@ -38,6 +38,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         # Fix set up repos and re-use them. ("farm_repo" instead of "MasterfilesApp::FarmRepo.new")
         # FIX: USe helper "multiselect_grid_choices" to get ids from list and store and pass as an array, not string
         # FIX: Use one Hash for all of these... { from_orchard: val, from_cultivar: val ... }
+        # TODO: show no of bins affected next to delivery id (336 - 25 bins)
         from_orchard = retrieve_from_local_store(:from_orchard)
         from_cultivar = retrieve_from_local_store(:from_cultivar)
         to_orchard = retrieve_from_local_store(:to_orchard)
