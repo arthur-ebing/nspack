@@ -13,7 +13,7 @@
   \   cultivar_name,\r\n    cultivar_description,\r\n    farm_code,\r\n    orchard_code,\r\n
   \   puc_code,\r\n    rmt_class_code,\r\n    container_material_type_code,\r\n    container_type_code,\r\n
   \   rmt_delivery_truck_registration_number,\r\n    season_code,\r\n    colour_rule,\r\n
-  \   status\r\nFROM vw_bins\r\nWHERE NOT scrapped\r\nORDER BY id DESC"
+  \   status\r\nFROM vw_bins\r\nWHERE scrapped\r\nORDER BY id DESC"
 :limit: 
 :offset: 
 :external_settings:
