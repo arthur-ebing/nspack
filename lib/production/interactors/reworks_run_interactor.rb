@@ -66,6 +66,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('apply_change_deliveries_orchard_changes'))
       failed_response(e.message)
     end
 
@@ -173,6 +174,7 @@ module ProductionApp
     rescue StandardError => e
       puts e
       puts e.backtrace.join("\n")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('create_reworks_run'))
       failed_response(e.message)
     end
 

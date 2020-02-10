@@ -36,43 +36,18 @@ module RawMaterialsApp
       end
 
       def edit_check
-        # return failed_response 'RmtDelivery has been completed' if completed?
+        return failed_response 'Bins on this delivery have been tipped' if bins_tipped?
 
         all_ok
       end
 
       def delete_check
-        # return failed_response 'RmtDelivery has been completed' if completed?
-
         all_ok
       end
 
-      # def complete_check
-      #   return failed_response 'RmtDelivery has already been completed' if completed?
-
-      #   all_ok
-      # end
-
-      # def approve_check
-      #   return failed_response 'RmtDelivery has not been completed' unless completed?
-      #   return failed_response 'RmtDelivery has already been approved' if approved?
-
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'RmtDelivery has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
+      def bins_tipped?
+        @repo.exists?(:rmt_bins, rmt_delivery_id: @id, bin_tipped: true)
+      end
     end
   end
 end
