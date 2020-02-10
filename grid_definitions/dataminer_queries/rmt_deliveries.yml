@@ -1,6 +1,6 @@
 ---
 :caption: Rmt Deliveries
-:sql: "SELECT\r\n  \"rmt_deliveries\".\"id\",\r\n  \"rmt_deliveries\".\"orchard_id\",\r\n
+:sql: "SELECT\r\n  \"rmt_deliveries\".\"id\",\r\n  \"rmt_deliveries\".\"orchard_id\",\r\n  \"rmt_deliveries\".\"keep_open\",\r\n
   \ \"rmt_deliveries\".\"cultivar_id\",\r\n  \"rmt_deliveries\".\"rmt_delivery_destination_id\",\r\n
   \ \"rmt_deliveries\".\"season_id\",\r\n  \"rmt_deliveries\".\"farm_id\",\r\n  \"rmt_deliveries\".\"puc_id\",\r\n
   \ \"rmt_deliveries\".\"truck_registration_number\",\r\n  \"rmt_deliveries\".\"qty_damaged_bins\",\r\n
@@ -15,7 +15,7 @@
   \ \"pucs\".\"puc_code\",\r\n  \"rmt_delivery_destinations\".\"delivery_destination_code\",\r\n
   \ \"seasons\".\"season_code\",\r\n  SUM(\"rmt_bins\".qty_bins) AS qty_bins,\r\n
   \ CASE WHEN \"rmt_deliveries\".\"current\" THEN\r\n    'green'\r\n  WHEN delivery_tipped
-  THEN\r\n    'gray'\r\n  ELSE\r\n    NULL\r\n  END AS colour_rule\r\nFROM\r\n  \"rmt_deliveries\"\r\n
+  THEN\r\n    'gray'\r\n WHEN keep_open THEN\r\n    'blue'\r\n  ELSE\r\n    NULL\r\n  END AS colour_rule\r\nFROM\r\n  \"rmt_deliveries\"\r\n
   \ JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"rmt_deliveries\".\"cultivar_id\"\r\n
   \ JOIN \"farms\" ON \"farms\".\"id\" = \"rmt_deliveries\".\"farm_id\"\r\n  JOIN
   \"orchards\" ON \"orchards\".\"id\" = \"rmt_deliveries\".\"orchard_id\"\r\n  JOIN
@@ -68,6 +68,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  keep_open:
+    :name: keep_open
+    :sequence_no: 8
+    :caption: Keep Open
+    :namespaced_name: rmt_deliveries.keep_open
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -154,7 +170,7 @@
     :group_max: false
   truck_registration_number:
     :name: truck_registration_number
-    :sequence_no: 8
+    :sequence_no: 14
     :caption: Truck registration number
     :namespaced_name: rmt_deliveries.truck_registration_number
     :data_type: :string
@@ -170,7 +186,7 @@
     :group_max: false
   qty_damaged_bins:
     :name: qty_damaged_bins
-    :sequence_no: 9
+    :sequence_no: 15
     :caption: Qty damaged bins
     :namespaced_name: rmt_deliveries.qty_damaged_bins
     :data_type: :integer
@@ -186,7 +202,7 @@
     :group_max: false
   qty_empty_bins:
     :name: qty_empty_bins
-    :sequence_no: 10
+    :sequence_no: 16
     :caption: Qty empty bins
     :namespaced_name: rmt_deliveries.qty_empty_bins
     :data_type: :integer
@@ -202,7 +218,7 @@
     :group_max: false
   current:
     :name: current
-    :sequence_no: 11
+    :sequence_no: 17
     :caption: Current
     :namespaced_name: rmt_deliveries.current
     :data_type: :boolean
@@ -218,7 +234,7 @@
     :group_max: false
   delivery_tipped:
     :name: delivery_tipped
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Delivery tipped
     :namespaced_name: rmt_deliveries.delivery_tipped
     :data_type: :boolean
@@ -234,7 +250,7 @@
     :group_max: false
   date_picked:
     :name: date_picked
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Date picked
     :namespaced_name: rmt_deliveries.date_picked
     :data_type: :date
@@ -250,7 +266,7 @@
     :group_max: false
   date_delivered:
     :name: date_delivered
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Date delivered
     :namespaced_name: rmt_deliveries.date_delivered
     :data_type: :datetime
@@ -282,7 +298,7 @@
     :group_max: false
   qty_bins_tipped:
     :name: qty_bins_tipped
-    :sequence_no: 16
+    :sequence_no: 7
     :caption: Qty Bins Tipped
     :namespaced_name: 
     :data_type: :string
@@ -330,7 +346,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 19
+    :sequence_no: 5
     :caption: Cultivar name
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
@@ -346,7 +362,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 20
+    :sequence_no: 2
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -362,7 +378,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 21
+    :sequence_no: 4
     :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -378,7 +394,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 22
+    :sequence_no: 3
     :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -426,7 +442,7 @@
     :group_max: false
   qty_bins:
     :name: qty_bins
-    :sequence_no: 25
+    :sequence_no: 6
     :caption: Qty Bins
     :namespaced_name: 
     :data_type: :string
@@ -473,11 +489,16 @@
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
+- :column: rmt_deliveries.id
+  :caption: Id
+  :data_type: :integer
+  :default_value:
+  :ui_priority: 1
 - :column: rmt_deliveries.orchard_id
   :caption: Orchard
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code

@@ -1,5 +1,10 @@
 ---
 :dataminer_definition: rmt_deliveries
+:conditions:
+  :standard:
+    - :col: rmt_deliveries.id
+      :op: =
+      :val: $:id$
 :actions:
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: view
@@ -33,3 +38,16 @@
   :icon: information-solid
   :title: Status
   :popup: true
+- :separator: true
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/open_delivery"
+  :text: open
+  :title: Status
+  :popup: false
+  :hide_if_true: keep_open,delivery_tipped
+  :prompt: 'You are about to open this delivery. Are you sure?'
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/close_delivery"
+  :text: close
+  :title: Status
+  :popup: false
+  :hide_if_false: keep_open
+  :prompt: 'You are about to close this delivery. Are you sure?'
