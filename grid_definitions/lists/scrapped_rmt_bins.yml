@@ -1,0 +1,8 @@
+---
+:dataminer_definition: scrapped_rmt_bins
+:actions:
+- :url: "/raw_materials/deliveries/rmt_bins/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
