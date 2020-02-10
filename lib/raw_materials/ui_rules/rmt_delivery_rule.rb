@@ -46,6 +46,7 @@ module UiRules
       fields[:date_picked] = { renderer: :label }
       fields[:date_delivered] = { renderer: :label }
       fields[:tipping_complete_date_time] = { renderer: :label }
+      fields[:keep_open] = { renderer: :label, as_boolean: true }
     end
 
     # def set_approve_fields
