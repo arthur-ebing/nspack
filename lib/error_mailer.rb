@@ -28,7 +28,7 @@ module ErrorMailer
     Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end
 
-  # Send an error email with subject and message passed in.
+  # Send an error email with subject and message passed in describing an error condition..
   #
   # @param subject [string] optional, the email subject.
   # @param message [string] optional, the mail body.

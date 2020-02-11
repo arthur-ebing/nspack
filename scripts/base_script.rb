@@ -8,14 +8,14 @@
 #
 # Call a script like this:
 #
-#     ruby scripts/base_script.rb EgScript one 2 three
+#     RACK_ENV=production ruby scripts/base_script.rb EgScript one 2 three
 #
 # Where the first parameter is the script class and
 # following parameters are args for the script itself.
 #
 # To get more visibility, use the DEBUG env var:
 #
-#     DEBUG=y ruby scripts/base_script.rb EgScript one 2 three
+#     DEBUG=y RACK_ENV=production ruby scripts/base_script.rb EgScript one 2 three
 #
 # In scripts, the variable "debug_mode" will be set to true.
 
@@ -45,11 +45,17 @@ class BaseScript
     puts '---'
   end
 
-  def exec # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+  # Called when the script is run.
+  # This in turn calls the inheriting class' run method.
+  #
+  # @return [exit status]
+  def exec # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     res = run
-    puts '---' if debug_mode
-    puts "Run response: #{res.inspect}" if debug_mode
-    puts res.message if res.success && res.message && debug_mode
+    if debug_mode
+      puts '---'
+      puts "Run response: #{res.inspect}"
+      puts res.message if res.success && res.message
+    end
     exit if res.success
 
     abort "Failed: #{res.message}"
@@ -59,15 +65,34 @@ class BaseScript
     abort "Failed: #{e.message}\n#{e.backtrace.join("\n")}"
   end
 
+  # Send an email based on an exception object.
+  #
+  # @param error [exception] the exception object.
+  # @param subject [string] optional, the email subject.
+  # @param message [string] optional, extra context to be included with the execption details in the mail body.
+  # @return [void]
   def send_exception_email(error, subject: nil, message: nil)
     ErrorMailer.send_exception_email(error, subject, message)
   end
 
+  # Send an error email with subject and message passed in describing an error condition..
+  #
+  # @param subject [string] optional, the email subject.
+  # @param message [string] optional, the mail body.
+  # @return [void]
   def send_error_email(subject: nil, message: nil)
     ErrorMailer.send_error_email(subject, message)
   end
 
   # Write out a dump of information for later inspection.
+  # The first three parameters are used to name the logfile.
+  # Log files are written to log/infodump.
+  #
+  # @param keyname [string] the general context of the action.
+  # @param key [string] the specific context of the action.
+  # @param description [string] A short description of the context (preferably without spaces)
+  # @param information [string] the text to dump in the logfile.
+  # @return [void]
   def log_infodump(keyname, key, description, information)
     dir = File.join(root_dir, 'log', 'infodump')
     Dir.mkdir(dir) unless Dir.exist?(dir)
@@ -145,6 +170,7 @@ class BaseScript
 end
 
 class EgScript < BaseScript
+  # Sample implementation of a run method.
   def run
     puts 'In EG'
     p root_dir
