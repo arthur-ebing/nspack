@@ -1,0 +1,18 @@
+---
+:dataminer_definition: reworks_bin_weight
+:actions:
+- :url: "/raw_materials/deliveries/rmt_bins/$:bin_id$"
+  :text: view bin
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:rmt_delivery_id$"
+  :text: view delivery
+  :icon: view-show
+  :title: View
+  :popup: false
+- :url: "/production/reworks/reworks_runs/$:id$"
+  :text: view rework
+  :icon: view-show
+  :title: View
+  :popup: true

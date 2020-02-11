@@ -1,0 +1,319 @@
+---
+:caption: 'Reworks: Bin weights'
+:sql: "SELECT\r\n  r.id,\r\n  r.pallets_affected[1]::int AS bin_id,\r\n  b.rmt_delivery_id,\r\n
+  \ b.qty_bins,\r\n  r.created_at::date AS reworks_date,\r\n  b.bin_received_date_time::date
+  AS received_date,\r\n  b.bin_tipped_date_time::date AS tipped_date,\r\n  COALESCE(b.bin_asset_number,
+  b.tipped_asset_number) AS asset_number,\r\n  b.gross_weight,\r\n  b.nett_weight
+  AS current_nett_weight,\r\n  CAST((COALESCE(r.changes_made -> 'pallets' -> 'pallet_sequences'
+  -> 'changes' -> 'before' ->> 'nett_weight', '0')) AS decimal(9, 3)) AS before_nett_weight,\r\n
+  \ CAST((COALESCE(r.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes'
+  -> 'after' ->> 'nett_weight', '0')) AS decimal(9, 3)) AS after_nett_weight,\r\n
+  \ CAST((COALESCE(r.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes'
+  -> 'after' ->> 'nett_weight', '0')) AS decimal(9, 3)) - CAST((COALESCE(r.changes_made
+  -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'before' ->> 'nett_weight', '0'))
+  AS decimal(9, 3)) AS after_less_before,\r\n  r.user,\r\n  b.scrapped,\r\n  b.tipped_manually,\r\n
+  \ b.weighed_manually\r\nFROM\r\n  reworks_runs r\r\n  JOIN rmt_bins b ON b.id =
+  r.pallets_affected[1]::int\r\nWHERE\r\n  r.reworks_run_type_id = (\r\n    SELECT\r\n
+  \     id\r\n    FROM\r\n      reworks_run_types\r\n    WHERE\r\n      run_type =
+  'WEIGH RMT BINS')"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: r.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_id:
+    :name: bin_id
+    :sequence_no: 2
+    :caption: Bin
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_delivery_id:
+    :name: rmt_delivery_id
+    :sequence_no: 3
+    :caption: Delivery
+    :namespaced_name: b.rmt_delivery_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_bins:
+    :name: qty_bins
+    :sequence_no: 4
+    :caption: Qty bins
+    :namespaced_name: b.qty_bins
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reworks_date:
+    :name: reworks_date
+    :sequence_no: 5
+    :caption: Reworks date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  received_date:
+    :name: received_date
+    :sequence_no: 6
+    :caption: Received date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_date:
+    :name: tipped_date
+    :sequence_no: 7
+    :caption: Tipped date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  asset_number:
+    :name: asset_number
+    :sequence_no: 8
+    :caption: Asset number
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 9
+    :caption: Gross weight
+    :namespaced_name: b.gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  current_nett_weight:
+    :name: current_nett_weight
+    :sequence_no: 10
+    :caption: Current nett
+    :namespaced_name: b.nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  before_nett_weight:
+    :name: before_nett_weight
+    :sequence_no: 11
+    :caption: Before nett
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  after_nett_weight:
+    :name: after_nett_weight
+    :sequence_no: 12
+    :caption: After nett
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  after_less_before:
+    :name: after_less_before
+    :sequence_no: 13
+    :caption: Difference
+    :namespaced_name: 
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user:
+    :name: user
+    :sequence_no: 14
+    :caption: User
+    :namespaced_name: r.user
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scrapped:
+    :name: scrapped
+    :sequence_no: 15
+    :caption: Scrapped
+    :namespaced_name: b.scrapped
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tipped_manually:
+    :name: tipped_manually
+    :sequence_no: 16
+    :caption: Tip manually
+    :namespaced_name: b.tipped_manually
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  weighed_manually:
+    :name: weighed_manually
+    :sequence_no: 17
+    :caption: Weigh manually
+    :namespaced_name: b.weighed_manually
+    :data_type: :boolean
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: b.rmt_delivery_id
+  :caption: Delivery
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: b.id
+  :caption: Bin
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: b.created_at
+  :caption: Reworks date
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
