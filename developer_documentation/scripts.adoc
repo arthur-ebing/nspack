@@ -1,0 +1,102 @@
+= Scripts
+:toc:
+
+link:/developer_documentation/start.adoc[Back to documentation home]
+
+== Scripts
+
+Scripts inherit from BaseScript.
+
+They are called in this way: 
+
+  RACK_ENV=production ruby base_script.rb ClassNameOfScriptToRun args
+
+See link:/yarddocthis/scripts=base_script.rb[BaseScript methods] for a list of built-in methods.
+
+There are two types of scripts - those that form part of the application and those created to perform data fixes.
+Application scripts live in the `scripts` dir, while data fix scripts live in the `scriptfixes` dir.
+
+When running a datafix on a server, copy it to the `scripts` dir before running it. After running, delete it or leave it - the next deploy will remove it.
+Note that on a production server, these directories will be in the `current` directory.
+
+=== Writing a script
+
+1. Inherit from BaseScript
+2. Implement a `run` method that performs the required work.
+3. Return a `Crossbeams::Response` object from the `run` method.
+4. If the script is run in debug mode, print output of what would change without updating anything.
+
+Scripts do not load the full application - there are no interactors, entities or repositories available.
+Scripts should implement their own DB calls.
+
+Basically the following is available:
+
+* `DB` - the Sequel databse connection.
+* `AppConst`
+* `Crossbeams::InfoError`
+* `Crossbeams::Responses`
+* `ErrorMailer`
+
+The `BaseScript` makes the following attributes available in the inheriting class:
+
+* `args` - the commandline arguments.
+* `root_dir` - the root path of the application.
+* `debug_mode` - `true` if the environment variable `DEBUG` has been set.
+
+The following helper methods are available in the script:
+
+send_exception_email(error, subject: nil, message: nil)::
+Send an email when an exception has occurred.
+send_error_email(subject: nil, message: nil)::
+Send an email to notfy of an error condition.
+log_infodump(keyname, key, description, information)::
+Write a dump of useful information about the run to a text log file. Be as descriptive as possible, including context.
+log_status(table_name, id, status, comment: nil, user_name: nil)::
+Log a status to a table - the same as for a repository class.
+log_multiple_statuses(table_name, in_ids, status, comment: nil, user_name: nil)::
+Log a status for several records - the same as for a repository class.
+
+=== Example
+
+[source,ruby]
+----
+# frozen_string_literal: true
+
+class HBBFixGrossNett < BaseScript
+  def run # rubocop:disable Metrics/AbcSize
+    pallet_ids = DB[:pallets]
+      .exclude(nett_weight: nil)
+      .where(gross_weight: nil)
+      .order(:id)
+      .select_map(:id)
+    p "Records affected: #{pallet_ids.count}"
+
+    pallet_ids.each do |pallet_id|
+      nett_weight = DB[:pallets]
+                    .where(id: pallet_id)
+                    .get(:nett_weight)
+
+      attrs = { gross_weight: nett_weight }
+      if debug_mode
+        p "Updated pallet #{pallet_id}: #{attrs}"
+      else
+        DB.transaction do
+          p "Updated pallet #{pallet_id}: #{attrs}"
+          DB[:pallets].where(id: pallet_id).update(attrs)
+        end
+      end
+    end
+
+    log_infodump(:data_fix,
+                 :badlands,
+                 :set_gross_weight,
+                 "Updated pallet gross_weight = nett_weight for pallet_ids:#{pallet_ids}")
+
+    if debug_mode
+      success_response('Dry run complete')
+    else
+      success_response('Bin weights set')
+    end
+  end
+end
+----
