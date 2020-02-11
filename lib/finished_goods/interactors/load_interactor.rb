@@ -131,8 +131,10 @@ module FinishedGoodsApp
 
     def allocate_multiselect(load_id, params, initial_params = nil) # rubocop:disable Metrics/AbcSize
       pallet_numbers = repo.find_pallet_numbers_from(params)
-      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
-      return res unless res.success
+      unless pallet_numbers.empty?
+        res = validate_pallets(:not_on_load, pallet_numbers, load_id)
+        return res unless res.success
+      end
 
       new_allocation = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
       current_allocation = repo.find_pallet_ids_from(load_id: load_id)
