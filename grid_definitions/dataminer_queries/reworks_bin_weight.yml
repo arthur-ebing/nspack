@@ -1,8 +1,8 @@
 ---
 :caption: 'Reworks: Bin weights'
 :sql: "SELECT\r\n  r.id,\r\n  r.pallets_affected[1]::int AS bin_id,\r\n  b.rmt_delivery_id,\r\n
-  \ b.qty_bins,\r\n  r.created_at::date AS reworks_date,\r\n  b.bin_received_date_time::date
-  AS received_date,\r\n  b.bin_tipped_date_time::date AS tipped_date,\r\n  COALESCE(b.bin_asset_number,
+  \ b.qty_bins,\r\n  b.bin_received_date_time::date AS received_date,\r\n  b.bin_tipped_date_time::date
+  AS tipped_date,\r\n  r.created_at::date AS reworks_date,\r\n  COALESCE(b.bin_asset_number,
   b.tipped_asset_number) AS asset_number,\r\n  b.gross_weight,\r\n  b.nett_weight
   AS current_nett_weight,\r\n  CAST((COALESCE(r.changes_made -> 'pallets' -> 'pallet_sequences'
   -> 'changes' -> 'before' ->> 'nett_weight', '0')) AS decimal(9, 3)) AS before_nett_weight,\r\n
@@ -15,7 +15,7 @@
   \ b.weighed_manually\r\nFROM\r\n  reworks_runs r\r\n  JOIN rmt_bins b ON b.id =
   r.pallets_affected[1]::int\r\nWHERE\r\n  r.reworks_run_type_id = (\r\n    SELECT\r\n
   \     id\r\n    FROM\r\n      reworks_run_types\r\n    WHERE\r\n      run_type =
-  'WEIGH RMT BINS')"
+  'WEIGH RMT BINS')\r\nORDER BY b.bin_received_date_time"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -84,25 +84,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  reworks_date:
-    :name: reworks_date
-    :sequence_no: 5
-    :caption: Reworks date
-    :namespaced_name: 
-    :data_type: :date
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   received_date:
     :name: received_date
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Received date
     :namespaced_name: 
     :data_type: :date
@@ -118,8 +102,24 @@
     :group_max: false
   tipped_date:
     :name: tipped_date
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Tipped date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reworks_date:
+    :name: reworks_date
+    :sequence_no: 7
+    :caption: Reworks date
     :namespaced_name: 
     :data_type: :date
     :width: 
@@ -138,7 +138,7 @@
     :caption: Asset number
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
