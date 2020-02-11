@@ -12,7 +12,7 @@ module RawMaterialsApp
     attribute :truck_registration_number, Types::String
     attribute :qty_damaged_bins, Types::Integer
     attribute :qty_empty_bins, Types::Integer
-    attribute :delivery_tipped, Types::DateTime
+    attribute :delivery_tipped, Types::Bool
     attribute :date_picked, Types::Date
     attribute :date_delivered, Types::DateTime
     attribute :tipping_complete_date_time, Types::DateTime

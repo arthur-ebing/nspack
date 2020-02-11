@@ -39,7 +39,7 @@
   :title: Keep open
   :icon: add-outline
   :popup: false
-  :hide_if_true: keep_open,delivery_tipped
+  :hide_if_true: keep_open
   :prompt: 'You are about to open this delivery. Are you sure?'
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/close_delivery"
   :text: allow to close

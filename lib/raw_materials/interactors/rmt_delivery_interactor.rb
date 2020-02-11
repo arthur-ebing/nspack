@@ -83,7 +83,8 @@ module RawMaterialsApp
 
     def open_delivery(id)
       repo.transaction do
-        repo.update_rmt_delivery(id, keep_open: true)
+        repo.update_rmt_delivery(id, keep_open: true, delivery_tipped: false)
+        log_status('rmt_deliveries', id, 'DELIVERY_OPENED')
         log_transaction
       end
       instance = rmt_delivery(id)
@@ -95,8 +96,12 @@ module RawMaterialsApp
     end
 
     def close_delivery(id)
+      changeset = { keep_open: false }
+      changeset[:delivery_tipped] = true if repo.all_bins_tipped?(id)
+
       repo.transaction do
-        repo.update_rmt_delivery(id, keep_open: false)
+        repo.update_rmt_delivery(id, changeset)
+        log_status('rmt_deliveries', id, 'DELIVERY_OPENED')
         log_transaction
       end
       instance = rmt_delivery(id)

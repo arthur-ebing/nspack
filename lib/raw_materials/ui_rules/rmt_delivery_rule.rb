@@ -17,10 +17,6 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode
-      # set_complete_fields if @mode == :complete
-      # set_approve_fields if @mode == :approve
-
-      # add_approve_behaviours if @mode == :approve
 
       form_name 'rmt_delivery'
     end
@@ -48,18 +44,6 @@ module UiRules
       fields[:tipping_complete_date_time] = { renderer: :label }
       fields[:keep_open] = { renderer: :label, as_boolean: true }
     end
-
-    # def set_approve_fields
-    #   set_show_fields
-    #   fields[:approve_action] = { renderer: :select, options: [%w[Approve a], %w[Reject r]], required: true }
-    #   fields[:reject_reason] = { renderer: :textarea, disabled: true }
-    # end
-
-    # def set_complete_fields
-    #   set_show_fields
-    #   user_repo = DevelopmentApp::UserRepo.new
-    #   fields[:to] = { renderer: :select, options: user_repo.email_addresses(user_email_group: AppConst::EMAIL_GROUP_RMT_DELIVERY_APPROVERS), caption: 'Email address of person to notify', required: true }
-    # end
 
     def common_fields # rubocop:disable Metrics/AbcSize
       fields = {
@@ -105,7 +89,7 @@ module UiRules
                                     truck_registration_number: nil,
                                     qty_damaged_bins: nil,
                                     qty_empty_bins: nil,
-                                    delivery_tipped: nil,
+                                    delivery_tipped: false,
                                     date_picked: Time.now,
                                     date_delivered: Time.now,
                                     tipping_complete_date_time: nil)
@@ -120,11 +104,5 @@ module UiRules
         behaviour.dropdown_change :orchard_id, notify: [{ url: '/raw_materials/deliveries/rmt_deliveries/orchard_combo_changed', param_keys: %i[rmt_delivery_orchard_id] }]
       end
     end
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
   end
 end

@@ -50,6 +50,14 @@ module RawMaterialsApp
       find_delivery_untipped_bins(id).update(updates)
     end
 
+    def all_bins_tipped?(id)
+      return false if DB[:rmt_bins].where(rmt_delivery_id: id).count.zero?
+
+      DB[:rmt_bins]
+        .where(rmt_delivery_id: id, bin_tipped: false)
+        .count.zero?
+    end
+
     def find_delivery_untipped_bins(id)
       DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false)
     end

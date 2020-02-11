@@ -16,16 +16,22 @@ module RawMaterials
               form.caption 'New Rmt Delivery'
               form.action '/raw_materials/deliveries/rmt_deliveries'
               form.remote! if remote
-              form.add_field :farm_id
-              form.add_field :puc_id
-              form.add_field :orchard_id
-              form.add_field :cultivar_id
-              form.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
-              form.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
-              form.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
-              form.add_field :date_picked
-              form.add_field :truck_registration_number if rules[:show_truck_registration_number]
-              form.add_field :current
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :farm_id
+                  col.add_field :puc_id
+                  col.add_field :orchard_id
+                  col.add_field :cultivar_id
+                end
+                row.column do |col|
+                  col.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
+                  col.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
+                  col.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
+                  col.add_field :date_picked
+                  col.add_field :truck_registration_number if rules[:show_truck_registration_number]
+                  col.add_field :current
+                end
+              end
             end
           end
 
