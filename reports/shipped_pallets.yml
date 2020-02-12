@@ -1,16 +1,18 @@
 ---
 :caption: Shipped Pallets
 :sql: "WITH shipped AS (\r\n    SELECT\r\n        customer,\r\n        load_id,\r\n
-  \       marketing_variety,\r\n        shipped_at::date AS shipped_date,\r\n        grade,\r\n
-  \       inventory_code,\r\n        std_pack,\r\n        std_size,\r\n        size_ref,\r\n
-  \       packed_tm_group,\r\n        mark,\r\n        fruit_sticker,\r\n        fruit_sticker_2,\r\n
-  \       sum(carton_quantity) AS carton_quantity,\r\n        sum(pallet_size) AS
-  pallet_size,\r\n        sum(nett_weight) AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n
-  \   WHERE\r\n        load_id IS NOT NULL\r\n    GROUP BY\r\n        customer,\r\n
-  \       load_id,\r\n        marketing_variety,\r\n        shipped_at::date,\r\n
-  \       grade,\r\n        inventory_code,\r\n        std_pack,\r\n        std_size,\r\n
-  \       size_ref,\r\n        packed_tm_group,\r\n        mark,\r\n        fruit_sticker,\r\n
-  \       fruit_sticker_2\r\n)\r\nSELECT\r\n    customer,\r\n    load_id,\r\n    marketing_variety,\r\n
+  \       inspected,\r\n        created_at::date,\r\n        depot_pallet,\r\n        marketing_variety,\r\n
+  \       shipped_at::date AS shipped_date,\r\n        grade,\r\n        inventory_code,\r\n
+  \       std_pack,\r\n        std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n
+  \       mark,\r\n        fruit_sticker,\r\n        fruit_sticker_2,\r\n        sum(carton_quantity)
+  AS carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
+  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n
+  \       load_id IS NOT NULL\r\n    GROUP BY\r\n        customer,\r\n        load_id,\r\n
+  \       inspected,\r\n        created_at::date,\r\n        depot_pallet,\r\n        marketing_variety,\r\n
+  \       shipped_at::date,\r\n        grade,\r\n        inventory_code,\r\n        std_pack,\r\n
+  \       std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n        mark,\r\n
+  \       fruit_sticker,\r\n        fruit_sticker_2\r\n)\r\nSELECT\r\n    customer,\r\n
+  \   load_id,\r\n    inspected,\r\n    created_at,\r\n    depot_pallet,\r\n    marketing_variety,\r\n
   \   shipped_date,\r\n    grade,\r\n    inventory_code,\r\n    std_pack,\r\n    std_size,\r\n
   \   size_ref,\r\n    packed_tm_group,\r\n    mark,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
   \   carton_quantity,\r\n    pallet_size,\r\n    nett_weight\r\nFROM\r\n    shipped\r\n"
@@ -51,9 +53,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspected:
+    :name: inspected
+    :sequence_no: 3
+    :caption: Inspected
+    :namespaced_name: inspected
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: created_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot_pallet:
+    :name: depot_pallet
+    :sequence_no: 5
+    :caption: Depot pallet
+    :namespaced_name: depot_pallet
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   marketing_variety:
     :name: marketing_variety
-    :sequence_no: 3
+    :sequence_no: 6
     :caption: Marketing variety
     :namespaced_name: marketing_variety
     :data_type: :string
@@ -69,7 +119,7 @@
     :group_max: false
   shipped_date:
     :name: shipped_date
-    :sequence_no: 4
+    :sequence_no: 7
     :caption: Shipped date
     :namespaced_name: shipped_date
     :data_type: :date
@@ -85,7 +135,7 @@
     :group_max: false
   grade:
     :name: grade
-    :sequence_no: 5
+    :sequence_no: 8
     :caption: Grade
     :namespaced_name: grade
     :data_type: :string
@@ -101,7 +151,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 6
+    :sequence_no: 9
     :caption: Inventory code
     :namespaced_name: inventory_code
     :data_type: :string
@@ -117,7 +167,7 @@
     :group_max: false
   std_pack:
     :name: std_pack
-    :sequence_no: 7
+    :sequence_no: 10
     :caption: Std pack
     :namespaced_name: std_pack
     :data_type: :string
@@ -133,7 +183,7 @@
     :group_max: false
   std_size:
     :name: std_size
-    :sequence_no: 8
+    :sequence_no: 11
     :caption: Std size
     :namespaced_name: std_size
     :data_type: :integer
@@ -149,7 +199,7 @@
     :group_max: false
   size_ref:
     :name: size_ref
-    :sequence_no: 9
+    :sequence_no: 12
     :caption: Size ref
     :namespaced_name: size_ref
     :data_type: :string
@@ -165,7 +215,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 10
+    :sequence_no: 13
     :caption: Packed tm group
     :namespaced_name: packed_tm_group
     :data_type: :string
@@ -181,7 +231,7 @@
     :group_max: false
   mark:
     :name: mark
-    :sequence_no: 11
+    :sequence_no: 14
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
@@ -197,7 +247,7 @@
     :group_max: false
   fruit_sticker:
     :name: fruit_sticker
-    :sequence_no: 12
+    :sequence_no: 15
     :caption: Fruit sticker
     :namespaced_name: fruit_sticker
     :data_type: :string
@@ -213,7 +263,7 @@
     :group_max: false
   fruit_sticker_2:
     :name: fruit_sticker_2
-    :sequence_no: 13
+    :sequence_no: 16
     :caption: Fruit sticker 2
     :namespaced_name: fruit_sticker_2
     :data_type: :string
@@ -229,7 +279,7 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 14
+    :sequence_no: 17
     :caption: Carton qty
     :namespaced_name: carton_quantity
     :data_type: :integer
@@ -245,7 +295,7 @@
     :group_max: false
   pallet_size:
     :name: pallet_size
-    :sequence_no: 15
+    :sequence_no: 18
     :caption: Pallet size
     :namespaced_name: pallet_size
     :data_type: :number
@@ -261,7 +311,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 16
+    :sequence_no: 19
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -294,3 +344,27 @@
   :list_def: SELECT medium_description FROM party_roles JOIN organizations ON party_roles.party_id
     = organizations.party_id WHERE party_roles.role_id = (SELECT id FROM roles WHERE
     "name" = 'CUSTOMER')
+- :column: created_at
+  :caption: Created at
+  :data_type: :date
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: depot_pallet
+  :caption: Depot Pallet
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: inspected
+  :caption: Inspected
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
