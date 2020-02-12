@@ -75,3 +75,24 @@ UtilityFunctions.non_numeric_elements(example)
 
 # => ['12C']
 ----
+
+Transforms a string in scientific notation to a string in float format.
+
+Especially useful for displaying JSON values.
+[source,ruby]
+----
+str  = '3.4e2'
+bool = true
+
+UtilityFunctions.scientific_notation_to_s(str)
+# => '340.0'
+
+UtilityFunctions.scientific_notation_to_s(bool)
+# => true
+
+json_hash = { "nett_weight" => "0.303e3",
+              "gross_weight" => "0.34e3",
+              "weighed_manually" => true }
+json_hash.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }
+# =>  { "nett_weight" => "303.0", "gross_weight" => "340.0", "weighed_manually" => true}
+----

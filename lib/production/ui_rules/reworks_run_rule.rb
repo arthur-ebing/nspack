@@ -86,8 +86,8 @@ module UiRules
         fields[:changes_made] = {
           left_caption: 'Before',
           right_caption: 'After',
-          left_record: left_record.sort.to_h,
-          right_record: right_record.sort.to_h
+          left_record: left_record.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }.sort.to_h,
+          right_record: right_record.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }.sort.to_h
         }
       end
     end

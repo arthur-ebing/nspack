@@ -67,6 +67,15 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     ' ' * ((initial_spaces || 0) + strings.sum(&:length))
   end
 
+  # If a string contains a number in scientific notation format, return it formatted as a float.
+  # e.g. 3.4e2 => 340.0
+  # If the value is not a string, returns the value as is.
+  # @param val [string,any] input value
+  # @return [string,any]
+  def scientific_notation_to_s(val)
+    val.is_a?(String) && val.match?(/-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?/) ? BigDecimal(val).to_s('F') : val
+  end
+
   # Commas as thousands separators for numbers.
   #
   # @param value [numeric] the number to be formatted.
