@@ -4,18 +4,21 @@
   \       inspected,\r\n        created_at::date,\r\n        depot_pallet,\r\n        marketing_variety,\r\n
   \       shipped_at::date AS shipped_date,\r\n        grade,\r\n        inventory_code,\r\n
   \       std_pack,\r\n        std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n
-  \       mark,\r\n        fruit_sticker,\r\n        fruit_sticker_2,\r\n        sum(carton_quantity)
-  AS carton_quantity,\r\n        sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight)
-  AS nett_weight\r\n    FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n
-  \       load_id IS NOT NULL\r\n    GROUP BY\r\n        customer,\r\n        load_id,\r\n
-  \       inspected,\r\n        created_at::date,\r\n        depot_pallet,\r\n        marketing_variety,\r\n
+  \       mark,\r\n        fruit_sticker,\r\n        fruit_sticker_2,\r\n        addendum_manifest,\r\n
+  \       edi_in_consignment_note_number,\r\n        sum(carton_quantity) AS carton_quantity,\r\n
+  \       sum(pallet_size) AS pallet_size,\r\n        sum(nett_weight) AS nett_weight\r\n
+  \   FROM\r\n        public.vw_pallet_sequence_flat\r\n    WHERE\r\n        load_id
+  IS NOT NULL\r\n    GROUP BY\r\n        customer,\r\n        load_id,\r\n        inspected,\r\n
+  \       created_at::date,\r\n        depot_pallet,\r\n        marketing_variety,\r\n
   \       shipped_at::date,\r\n        grade,\r\n        inventory_code,\r\n        std_pack,\r\n
   \       std_size,\r\n        size_ref,\r\n        packed_tm_group,\r\n        mark,\r\n
-  \       fruit_sticker,\r\n        fruit_sticker_2\r\n)\r\nSELECT\r\n    customer,\r\n
-  \   load_id,\r\n    inspected,\r\n    created_at,\r\n    depot_pallet,\r\n    marketing_variety,\r\n
+  \       fruit_sticker,\r\n        fruit_sticker_2,\r\n        addendum_manifest,\r\n
+  \       edi_in_consignment_note_number\r\n)\r\nSELECT\r\n    customer,\r\n    load_id,\r\n
+  \   inspected,\r\n    created_at,\r\n    depot_pallet,\r\n    marketing_variety,\r\n
   \   shipped_date,\r\n    grade,\r\n    inventory_code,\r\n    std_pack,\r\n    std_size,\r\n
   \   size_ref,\r\n    packed_tm_group,\r\n    mark,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
-  \   carton_quantity,\r\n    pallet_size,\r\n    nett_weight\r\nFROM\r\n    shipped\r\n"
+  \   addendum_manifest,\r\n    edi_in_consignment_note_number,\r\n    carton_quantity,\r\n
+  \   pallet_size,\r\n    nett_weight\r\nFROM\r\n    shipped\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -120,7 +123,7 @@
   shipped_date:
     :name: shipped_date
     :sequence_no: 7
-    :caption: Shipped date
+    :caption: Shipped at
     :namespaced_name: shipped_date
     :data_type: :date
     :width: 
@@ -277,9 +280,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  addendum_manifest:
+    :name: addendum_manifest
+    :sequence_no: 17
+    :caption: Consignment note number
+    :namespaced_name: addendum_manifest
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_consignment_note_number:
+    :name: edi_in_consignment_note_number
+    :sequence_no: 18
+    :caption: Edi in consignment note number
+    :namespaced_name: edi_in_consignment_note_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: Carton qty
     :namespaced_name: carton_quantity
     :data_type: :integer
@@ -295,7 +330,7 @@
     :group_max: false
   pallet_size:
     :name: pallet_size
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: Pallet size
     :namespaced_name: pallet_size
     :data_type: :number
@@ -311,7 +346,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -327,7 +362,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: shipped_date
-  :caption: Shipped date
+  :caption: Shipped at
   :data_type: :date
   :control_type: :daterange
   :default_value: 
@@ -353,7 +388,7 @@
   :ui_priority: 1
   :list_def: 
 - :column: depot_pallet
-  :caption: Depot Pallet
+  :caption: Depot Pallet?
   :data_type: :boolean
   :control_type: :text
   :default_value: 
@@ -361,8 +396,24 @@
   :ui_priority: 1
   :list_def: 
 - :column: inspected
-  :caption: Inspected
+  :caption: Inspected?
   :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: addendum_manifest
+  :caption: Consignment Note Number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: edi_in_consignment_note_number
+  :caption: EDI in Consignment Note Number
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false
