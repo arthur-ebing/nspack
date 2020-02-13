@@ -195,6 +195,7 @@ namespace :db do
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
+    db.extension :pg_timestamptz
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, 'db/migrations', target: args[:version].to_i)
