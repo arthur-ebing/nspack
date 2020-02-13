@@ -36,7 +36,6 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
       end
     end
 
-
     infodump = <<~STR
       Script: HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries
 
@@ -71,6 +70,7 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
       success_response('Out Of Sync Deliveries and Bins Fixed')
     end
   end
+
   private
 
   def rmt_delivery_season(cultivar_id, date_delivered)
