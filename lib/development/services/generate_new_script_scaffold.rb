@@ -44,7 +44,7 @@ module DevelopmentApp
             else
               DB.transaction do
                 puts "Updated something \#{some_value}: \#{some_change}"
-                DB[:talble].where(id: ids).update(attrs)
+                DB[:table].where(id: ids).update(attrs)
                 # log_status(:table, id, 'FIXED X', comment: 'because y', user_name: 'System')
                 # log_multiple_statuses(:table, ids, 'FIXED X', comment: 'because y', user_name: 'System')
               end
