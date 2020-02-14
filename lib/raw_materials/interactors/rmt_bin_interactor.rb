@@ -43,7 +43,7 @@ module RawMaterialsApp
       { rmt_delivery_id: delivery.id,
         orchard_id: delivery.orchard_id,
         season_id: delivery.season_id,
-        bin_received_date_time: delivery.date_delivered.to_s,
+        bin_received_date_time: Time.now.to_s,
         farm_id: delivery.farm_id,
         puc_id: delivery.puc_id,
         rmt_inner_container_type_id: rmt_inner_container_type_id }
