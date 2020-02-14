@@ -78,7 +78,7 @@ const crossbeamsGridEvents = {
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
     if (rowNode === undefined) {
-      Jackbox.error(`Could not find a grid with id "${id}".`, { time: 20 });
+      crossbeamsUtils.showError(`Could not find a grid with id "${id}".`);
       console.log('No grid with id:', id); // eslint-disable-line no-console
       return;
     }
@@ -167,7 +167,7 @@ const crossbeamsGridEvents = {
           body: form,
         }).then((response) => {
           if (response.status === 404) {
-            Jackbox.error('The requested resource was not found', { time: 20 });
+            crossbeamsUtils.showError('The requested resource was not found');
             return {};
           }
           return response.json();
@@ -210,11 +210,11 @@ const crossbeamsGridEvents = {
           // Only if not redirect...
           if (data.flash) {
             if (data.flash.notice) {
-              Jackbox.success(data.flash.notice);
+              crossbeamsUtils.showSuccess(data.flash.notice);
             }
             if (data.flash.error) {
               if (data.exception) {
-                Jackbox.error(data.flash.error, { time: 20 });
+                crossbeamsUtils.showError(data.flash.error);
                 if (data.backtrace) {
                   console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                   console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -222,7 +222,7 @@ const crossbeamsGridEvents = {
                   console.groupEnd(); // eslint-disable-line no-console
                 }
               } else {
-                Jackbox.error(data.flash.error);
+                crossbeamsUtils.showError(data.flash.error);
               }
             }
           }
@@ -289,7 +289,7 @@ const crossbeamsGridEvents = {
     }).then((response) => {
       if (response.status === 404) {
         crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
-        Jackbox.error('The requested resource was not found', { time: 20 });
+        crossbeamsUtils.showError('The requested resource was not found');
         return {};
       }
       return response.json();
@@ -307,18 +307,18 @@ const crossbeamsGridEvents = {
         // Only if not redirect...
         if (data.flash) {
           if (data.flash.notice) {
-            Jackbox.success(data.flash.notice);
+            crossbeamsUtils.showSuccess(data.flash.notice);
           }
           if (data.flash.info) {
-            Jackbox.information(data.flash.info);
+            crossbeamsUtils.showInformation(data.flash.info);
           }
           if (data.flash.warning) {
-            Jackbox.warning(data.flash.warning);
+            crossbeamsUtils.showWarning(data.flash.warning);
           }
           if (data.flash.error) {
             crossbeamsGridEvents.updateGridInPlace(event.data.id, errChanges);
             if (data.exception) {
-              Jackbox.error(data.flash.error, { time: 20 });
+              crossbeamsUtils.showError(data.flash.error);
               if (data.backtrace) {
                 console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                 console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -326,7 +326,7 @@ const crossbeamsGridEvents = {
                 console.groupEnd(); // eslint-disable-line no-console
               }
             } else {
-              Jackbox.error(data.flash.error);
+              crossbeamsUtils.showError(data.flash.error);
             }
           }
         }
@@ -1748,7 +1748,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // }).then(response => response.json())
               }).then((response) => {
                 if (response.status === 404) {
-                  Jackbox.error('The requested resource was not found', { time: 20 });
+                  crossbeamsUtils.showError('The requested resource was not found');
                   return {};
                 }
                 return response.json();
@@ -1772,11 +1772,11 @@ document.addEventListener('DOMContentLoaded', () => {
                   // Only if not redirect...
                   if (data.flash) {
                     if (data.flash.notice) {
-                      Jackbox.success(data.flash.notice);
+                      crossbeamsUtils.showSuccess(data.flash.notice);
                     }
                     if (data.flash.error) {
                       if (data.exception) {
-                        Jackbox.error(data.flash.error, { time: 20 });
+                        crossbeamsUtils.showError(data.flash.error);
                         if (data.backtrace) {
                           console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                           console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -1784,7 +1784,7 @@ document.addEventListener('DOMContentLoaded', () => {
                           console.groupEnd(); // eslint-disable-line no-console
                         }
                       } else {
-                        Jackbox.error(data.flash.error);
+                        crossbeamsUtils.showError(data.flash.error);
                       }
                     }
                   }

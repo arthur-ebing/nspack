@@ -140,10 +140,10 @@
 
       Jackbox.init();
       <% if flash[:notice] %>
-        Jackbox.success('<%= flash[:notice].tr("'", "`") %>');
+        crossbeamsUtils.showSuccess('<%= flash[:notice].tr("'", "`").tr("\n", ' ') %>');
       <% end %>
       <% if flash[:error] %>
-        Jackbox.error('<%= flash[:error].tr("'", "`") %>', { time: 20 });
+        crossbeamsUtils.showError('<%= flash[:error].tr("'", "`").tr("\n", ' ') %>', 20);
       <% end %>
 
       // MessageBus handling --- START
@@ -157,13 +157,13 @@
         }
         switch (msg.messageType) {
           case 'warning':
-            Jackbox.warning(msg.message);
+            crossbeamsUtils.showWarning(msg.message);
             return;
           case 'error':
-            Jackbox.error(msg.message);
+            crossbeamsUtils.showError(msg.message);
             return;
           default:
-            Jackbox.information(msg.message);
+            crossbeamsUtils.showInformation(msg.message);
         }
       });
       // MessageBus handling --- END

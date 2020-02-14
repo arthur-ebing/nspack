@@ -158,6 +158,55 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Display an ERROR notice on the page.
+   * @param {string} text - the message to display.
+   * @param {null/integer} - the time to keep the message on the screen.
+   */
+  showError: function showError(text, delay) {
+    if (delay) {
+      Jackbox.error(text, { time: delay });
+    } else {
+      Jackbox.error(text, { time: 20 });
+    }
+  },
+  /**
+   * Display a WARNING notice on the page.
+   * @param {string} text - the message to display.
+   * @param {null/integer} - the time to keep the message on the screen.
+   */
+  showWarning: function showWarning(text, delay) {
+    if (delay) {
+      Jackbox.warning(text, { time: delay });
+    } else {
+      Jackbox.warning(text);
+    }
+  },
+  /**
+   * Display a SUCCESS notice on the page.
+   * @param {string} text - the message to display.
+   * @param {null/integer} - the time to keep the message on the screen.
+   */
+  showSuccess: function showSuccess(text, delay) {
+    if (delay) {
+      Jackbox.success(text, { time: delay });
+    } else {
+      Jackbox.success(text);
+    }
+  },
+  /**
+   * Display an INFORMATION notice on the page.
+   * @param {string} text - the message to display.
+   * @param {null/integer} - the time to keep the message on the screen.
+   */
+  showInformation: function showInformation(text, delay) {
+    if (delay) {
+      Jackbox.information(text, { time: delay });
+    } else {
+      Jackbox.information(text);
+    }
+  },
+
+  /**
    * Save a grid's current row id for bookmarking.
    * Up to 20 grids row ids are cached.
    * @param {string/integer} rowId - the value of the `id` column of the current row.
@@ -260,9 +309,9 @@ const crossbeamsUtils = {
         if (data.replaceDialog) {
           crossbeamsUtils.setDialogContent(data.replaceDialog.content);
           if (data.flash.type && data.flash.type === 'permission') {
-            Jackbox.warn(data.flash.error, { time: 20 });
+            crossbeamsUtils.showWarning(data.flash.error, 20);
           } else {
-            Jackbox.error(data.flash.error, { time: 20 });
+            crossbeamsUtils.showError(data.flash.error);
           }
         } else {
           crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
@@ -810,11 +859,11 @@ const crossbeamsUtils = {
       }
       if (data.flash) {
         if (data.flash.notice) {
-          Jackbox.success(data.flash.notice);
+          crossbeamsUtils.showSuccess(data.flash.notice);
         }
         if (data.flash.error) {
           if (data.exception) {
-            Jackbox.error(data.flash.error, { time: 20 });
+            crossbeamsUtils.showError(data.flash.error);
             if (data.backtrace) {
               console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
               console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -822,7 +871,7 @@ const crossbeamsUtils = {
               console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
-            Jackbox.error(data.flash.error);
+            crossbeamsUtils.showError(data.flash.error);
           }
         }
       }
@@ -1247,7 +1296,7 @@ const crossbeamsUtils = {
               console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
-            Jackbox.error(body.flash.error);
+            crossbeamsUtils.showError(body.flash.error);
           }
         } else {
           // FIXME: Is this always applicable for all errors?
@@ -1255,7 +1304,7 @@ const crossbeamsUtils = {
         }
       });
     }
-    Jackbox.error(`An error occurred ${data}`, { time: 20 });
+    crossbeamsUtils.showError(`An error occurred ${data}`);
   },
 
   /**
@@ -1297,11 +1346,11 @@ const crossbeamsUtils = {
         }
         if (data.flash) {
           if (data.flash.notice) {
-            Jackbox.success(data.flash.notice);
+            crossbeamsUtils.showSuccess(data.flash.notice);
           }
           if (data.flash.error) {
             if (data.exception) {
-              Jackbox.error(data.flash.error, { time: 20 });
+              crossbeamsUtils.showError(data.flash.error);
               if (data.backtrace) {
                 console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                 console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -1309,7 +1358,7 @@ const crossbeamsUtils = {
                 console.groupEnd(); // eslint-disable-line no-console
               }
             } else {
-              Jackbox.error(data.flash.error);
+              crossbeamsUtils.showError(data.flash.error);
             }
           }
         }
@@ -1369,11 +1418,11 @@ const crossbeamsUtils = {
       }
       if (data.flash) {
         if (data.flash.notice) {
-          Jackbox.success(data.flash.notice);
+          crossbeamsUtils.showSuccess(data.flash.notice);
         }
         if (data.flash.error) {
           if (data.exception) {
-            Jackbox.error(data.flash.error, { time: 20 });
+            crossbeamsUtils.showError(data.flash.error);
             if (data.backtrace) {
               console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
               console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -1381,7 +1430,7 @@ const crossbeamsUtils = {
               console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
-            Jackbox.error(data.flash.error);
+            crossbeamsUtils.showError(data.flash.error);
           }
         }
       }

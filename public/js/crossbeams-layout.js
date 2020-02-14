@@ -111,11 +111,11 @@
       }
       if (data.flash) {
         if (data.flash.notice) {
-          Jackbox.success(data.flash.notice);
+          crossbeamsUtils.showSuccess(data.flash.notice);
         }
         if (data.flash.error) {
           if (data.exception) {
-            Jackbox.error(data.flash.error, { time: 20 });
+            crossbeamsUtils.showError(data.flash.error);
             if (data.backtrace) {
               console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
               console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -123,7 +123,7 @@
               console.groupEnd(); // eslint-disable-line no-console
             }
           } else {
-            Jackbox.error(data.flash.error);
+            crossbeamsUtils.showError(data.flash.error);
           }
         }
       }
@@ -282,11 +282,11 @@
         input.select();
         try {
           document.execCommand('copy');
-          Jackbox.information('Copied to clipboard');
+          crossbeamsUtils.showInformation('Copied to clipboard');
           window.getSelection().removeAllRanges();
           input.blur();
         } catch (e) {
-          Jackbox.warning('Cannot copy, hit Ctrl+C to copy the selected text');
+          crossbeamsUtils.showWarning('Cannot copy, hit Ctrl+C to copy the selected text');
         }
       }
       // Close a modal dialog
@@ -367,11 +367,11 @@
             // Only if not redirect...
             if (data.flash) {
               if (data.flash.notice) {
-                Jackbox.success(data.flash.notice);
+                crossbeamsUtils.showSuccess(data.flash.notice);
               }
               if (data.flash.error) {
                 if (data.exception) {
-                  Jackbox.error(data.flash.error, { time: 20 });
+                  crossbeamsUtils.showError(data.flash.error);
                   if (data.backtrace) {
                     console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
                     console.info('==Backend Backtrace=='); // eslint-disable-line no-console
@@ -379,7 +379,7 @@
                     console.groupEnd(); // eslint-disable-line no-console
                   }
                 } else {
-                  Jackbox.error(data.flash.error);
+                  crossbeamsUtils.showError(data.flash.error);
                 }
               }
             }
