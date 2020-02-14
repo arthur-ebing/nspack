@@ -24,8 +24,6 @@ module ProductionApp
 
     def add_sequence_to_pallet(pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize
       pallet = find_pallet_by_pallet_number(pallet_number)
-      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
-
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
