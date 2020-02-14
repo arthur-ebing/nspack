@@ -13,7 +13,7 @@ module LabelPrintingApp
       @quantity = params[:no_of_prints] || 1
       @printer_id = params[:printer]
       @host = host
-      raise ArgumentError if label_name.nil?
+      raise ArgumentError, 'No label name provided' if label_name.nil?
       raise ArgumentError, 'Nothing to print' if instance.nil?
     end
 
