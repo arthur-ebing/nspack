@@ -47,7 +47,7 @@ module EdiApp
     end
 
     def create_edi_out_transaction(changeset)
-      org_code = MasterfilesApp::PartyRepo.new.fn_party_role_name(changeset[:party_role_id]) || 'N/A'
+      org_code = MasterfilesApp::PartyRepo.new.org_code_for_party_role(changeset[:party_role_id]) || 'N/A'
       DB[:edi_out_transactions].insert(changeset.merge(org_code: org_code))
     end
 

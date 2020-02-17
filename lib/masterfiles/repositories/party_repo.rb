@@ -57,6 +57,10 @@ module MasterfilesApp
       Organization.new(hash)
     end
 
+    def org_code_for_party_role(id)
+      DB.get(Sequel.function(:fn_party_role_org_code, id))
+    end
+
     def fn_party_role_name(id)
       DB.get(Sequel.function(:fn_party_role_name, id))
     end
