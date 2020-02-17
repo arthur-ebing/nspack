@@ -19,18 +19,43 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
     rmt_delivery_bins = DB[query].all
     p "Bin Records affected: #{rmt_delivery_bins.count}"
 
+    text_data = []
     rmt_delivery_bins.group_by { |h| h[:delivery_id] }.each do |_k, v|
       if debug_mode
         v.group_by { |h| "#{h[:bin_orchard_id]},#{h[:bin_cultivar_id]}" }.each do |_key, val|
-          season_id = rmt_delivery_season(val[0][:bin_cultivar_id], val[0][:date_delivered])
-          p "Delivery To Be Created: #{{ tipping_complete_date_time: val[0][:tipping_complete_date_time], delivery_tipped: val[0][:delivery_tipped], date_delivered: val[0][:date_delivered], season_id: season_id, farm_id: val[0][:farm_id], puc_id: val[0][:puc_id], orchard_id: val[0][:bin_orchard_id], cultivar_id: val[0][:bin_cultivar_id], date_picked: val[0][:date_picked], current: false }}"
+          delivery = val.first
+          text_data << "Bins(#{val.map { |b| b[:bin_id] }.join(',')}) : delivery_id from #{delivery[:delivery_id]} to new_rmt_delivery_id"
+          season_id = rmt_delivery_season(delivery[:bin_cultivar_id], delivery[:date_delivered])
+          p "Delivery To Be Created: #{{ tipping_complete_date_time: delivery[:tipping_complete_date_time],
+                                         delivery_tipped: delivery[:delivery_tipped],
+                                         date_delivered: delivery[:date_delivered],
+                                         season_id: season_id,
+                                         farm_id: delivery[:farm_id],
+                                         puc_id: delivery[:puc_id],
+                                         orchard_id: delivery[:bin_orchard_id],
+                                         cultivar_id: delivery[:bin_cultivar_id],
+                                         date_picked: delivery[:date_picked],
+                                         current: false }}"
         end
       else
         v.group_by { |h| "#{h[:bin_orchard_id]},#{h[:bin_cultivar_id]}" }.each do |_key, val|
+          delivery = val.first
           DB.transaction do
-            season_id = rmt_delivery_season(val[0][:bin_cultivar_id], val[0][:date_delivered])
-            rmt_delivery_id = DB[:rmt_deliveries].insert(tipping_complete_date_time: val[0][:tipping_complete_date_time], delivery_tipped: val[0][:delivery_tipped], date_delivered: val[0][:date_delivered], season_id: season_id, farm_id: val[0][:farm_id], puc_id: val[0][:puc_id], orchard_id: val[0][:bin_orchard_id], cultivar_id: val[0][:bin_cultivar_id], date_picked: val[0][:date_picked], current: false)
+            season_id = rmt_delivery_season(delivery[:bin_cultivar_id], delivery[:date_delivered])
+            rmt_delivery_id = DB[:rmt_deliveries].insert(tipping_complete_date_time: delivery[:tipping_complete_date_time],
+                                                         delivery_tipped: delivery[:delivery_tipped],
+                                                         date_delivered: delivery[:date_delivered],
+                                                         season_id: season_id,
+                                                         farm_id: delivery[:farm_id],
+                                                         puc_id: delivery[:puc_id],
+                                                         orchard_id: delivery[:bin_orchard_id],
+                                                         cultivar_id: delivery[:bin_cultivar_id],
+                                                         date_picked: delivery[:date_picked],
+                                                         current: false)
             DB[:rmt_bins].where(id: val.map { |b| b[:bin_id] }).update(rmt_delivery_id: rmt_delivery_id)
+            log_status(:rmt_deliveries, rmt_delivery_id, 'DATA FIX: RMT_DELIVERY_ID', comment: "created from #{rmt_delivery_id}", user_name: 'System')
+            log_multiple_statuses(:rmt_bins, val.map { |b| b[:bin_id] }, 'DATA FIX: RMT_DELIVERY_ID', comment: "changed to #{rmt_delivery_id}", user_name: 'System')
+            text_data << "Bins(#{val.map { |b| b[:bin_id] }.join(',')}) : delivery_id from #{delivery[:delivery_id]} to #{rmt_delivery_id}"
           end
         end
       end
@@ -49,17 +74,16 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
 
       Results:
       --------
-      Updated something
 
-      data: bins.delivery_id = new_delivery.id
+      data: updated bins(#{rmt_delivery_bins.map { |b| b[:bin_id] }.join(',')})
 
       text data:
-      #{rmt_delivery_bins.map { |b| b[:bin_id] }.join("\n")}
+      #{text_data.join("\n")}
     STR
 
     unless rmt_delivery_bins.map { |b| b[:bin_id] }.empty?
       log_infodump(:data_fix,
-                   :badlands,
+                   :rmt_bins,
                    :hbb_fix_rmt_bins_orchard_cultivar_out_of_sync_with_deliveries,
                    infodump)
     end
@@ -74,12 +98,9 @@ class HbbFixRmtBinsOrchardCultivarOutOfSyncWithDeliveries < BaseScript
   private
 
   def rmt_delivery_season(cultivar_id, date_delivered)
-    hash = DB["SELECT s.*
-         FROM seasons s
-          JOIN cultivars c on c.commodity_id=s.commodity_id
-         WHERE c.id = #{cultivar_id} and '#{date_delivered}' between start_date and end_date"].first
-    return nil if hash.nil?
-
-    hash[:id]
+    DB["SELECT s.*
+        FROM seasons s
+        JOIN cultivars c on c.commodity_id=s.commodity_id
+        WHERE c.id = 4 and ('#{date_delivered}' >= start_date and '#{date_delivered}' <= end_date)"].get(:id)
   end
 end
