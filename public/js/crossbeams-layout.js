@@ -181,6 +181,13 @@
       if (event.target.dataset && event.target.dataset.observeInputChange) {
         crossbeamsUtils.observeInputChange(event.target, event.target.dataset.observeInputChange);
       }
+      // When the date or time portion of a datetime changes, update its hidden value.
+      if (event.target.dataset && event.target.dataset.datetime) {
+        const id = event.target.id.replace(/(_date|_time)$/, '');
+        const valD = document.getElementById(`${id}_date`).value;
+        const valT = document.getElementById(`${id}_time`).value;
+        document.getElementById(id).value = `${valD}T${valT}`;
+      }
     }, false);
 
     // Blur (lose focus) - check for observers
