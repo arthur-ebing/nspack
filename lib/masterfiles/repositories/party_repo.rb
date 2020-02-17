@@ -45,22 +45,6 @@ module MasterfilesApp
       PartyRole.new(hash)
     end
 
-    def create_organization(attrs)
-      params = attrs.to_h
-      role_ids = params.delete(:role_ids)
-      return { error: { roles: ['You did not choose a role'] } } if role_ids.empty?
-
-      params[:long_description] = params[:medium_description] unless params[:long_description]
-      party_id = DB[:parties].insert(party_type: 'O')
-      org_id = DB[:organizations].insert(params.merge(party_id: party_id))
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party_id,
-                                role_id: r_id,
-                                organization_id: org_id)
-      end
-      { id: org_id }
-    end
-
     def find_organization(id)
       hash = DB[:organizations].where(id: id).first
       return nil if hash.nil?
@@ -73,7 +57,7 @@ module MasterfilesApp
       Organization.new(hash)
     end
 
-    def org_code_for_party_role(id)
+    def fn_party_role_name(id)
       DB.get(Sequel.function(:fn_party_role_name, id))
     end
 
@@ -84,30 +68,34 @@ module MasterfilesApp
       find_organization(id)
     end
 
+    def create_organization(attrs)
+      params = attrs.to_h
+      role_ids = params.delete(:role_ids)
+
+      params[:long_description] = params[:medium_description] unless params[:long_description]
+      party_id = create(:parties, party_type: 'O')
+      org_id = create(:organizations, params.merge(party_id: party_id))
+
+      assign_roles(org_id, role_ids, 'O')
+      org_id
+    end
+
+    def update_organization(org_id, attrs)
+      params = attrs.to_h
+      role_ids = params.delete(:role_ids)
+
+      update(:organizations, org_id, params)
+      assign_roles(org_id, role_ids, 'O')
+    end
+
     def delete_organization(id)
       children = DB[:organizations].where(parent_id: id)
-      return { error: 'This organization is set as a parent' } if children.any?
+      raise Crossbeams::InfoError, 'This organization is set as a parent' if children.any?
 
       party_id = party_id_from_organization(id)
       DB[:party_roles].where(party_id: party_id).delete
       DB[:organizations].where(id: id).delete
       delete_party_dependents(party_id)
-      { success: true }
-    end
-
-    def create_person(attrs)
-      params = attrs.to_h
-      role_ids = params.delete(:role_ids)
-      return { error: 'Choose at least one role' } if role_ids.empty?
-
-      party_id = DB[:parties].insert(party_type: 'P')
-      person_id = DB[:people].insert(params.merge(party_id: party_id))
-      role_ids.each do |r_id|
-        DB[:party_roles].insert(party_id: party_id,
-                                role_id: r_id,
-                                person_id: person_id)
-      end
-      { id: person_id }
     end
 
     def find_person(id)
@@ -118,6 +106,25 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
       Person.new(hash)
+    end
+
+    def create_person(attrs)
+      params = attrs.to_h
+      role_ids = params.delete(:role_ids)
+
+      party_id = create(:parties, party_type: 'P')
+      person_id = create(:people, params.merge(party_id: party_id))
+      assign_roles(person_id, role_ids, 'P')
+
+      person_id
+    end
+
+    def update_person(id, attrs)
+      params = attrs.to_h
+      role_ids = params.delete(:role_ids)
+
+      assign_roles(id, role_ids, 'P')
+      update(:people, id, params)
     end
 
     def delete_person(id)
@@ -275,11 +282,11 @@ module MasterfilesApp
       hash = DB[query, AppConst::ROLE_IMPLEMENTATION_OWNER, AppConst::IMPLEMENTATION_OWNER].first
       raise Crossbeams::FrameworkError, "IMPLEMENTATION OWNER \"#{AppConst::ROLE_IMPLEMENTATION_OWNER}\" is not defined/active" if hash.nil?
 
-      MasterfilesApp::PartyRole.new(hash)
+      PartyRole.new(hash)
     end
 
     def assign_roles(id, role_ids, type = 'O')
-      return { error: 'Choose at least one role' } if role_ids.empty?
+      raise Crossbeams::InfoError, 'Choose at least one role' if role_ids.empty?
 
       party_details = party_details_by_type(id, type)
       current_role_ids = party_details[:party_roles].select_map(:role_id)
@@ -296,6 +303,26 @@ module MasterfilesApp
           role_id: r_id
         )
       end
+    end
+
+    # add append_role_to_org
+
+    def append_role(id, role_id, type = 'O')
+      organization_id = nil
+      person_id = nil
+
+      if type == 'P'
+        party_id = DB[:people].where(id: id).get(:party_id)
+        person_id = id
+      end
+      if type == 'O'
+        party_id = DB[:organizations].where(id: id).get(:party_id)
+        organization_id = id
+      end
+      DB[:party_roles].insert(party_id: party_id,
+                              organization_id: organization_id,
+                              person_id: person_id,
+                              role_id: role_id)
     end
 
     def party_details_by_type(id, type)
@@ -333,22 +360,6 @@ module MasterfilesApp
         AND p.active = true
       SQL
       DB[query].all.map { |r| [r[:fn_party_name] || 'Unknown party name', r[:id]] }
-    end
-
-    def create_party_role(party_id, role_name)
-      role_id = DB[:roles].where(name: role_name).first[:id]
-      return { success: false, error: { party_role: 'already exists' } } if exists?(:party_roles, party_id: party_id, role_id: role_id)
-
-      org_type = DB[:parties].where(id: party_id).get(:party_type) == 'O'
-      respective_id = DB[org_type ? :organizations : :people].where(party_id: party_id).get(:id)
-
-      party_role_id = DB[:party_roles].insert(
-        party_id: party_id,
-        role_id: DB[:roles].where(name: role_name).get(:id),
-        organization_id: (org_type ? respective_id : nil),
-        person_id: (org_type ? nil : respective_id)
-      )
-      { success: true, id: party_role_id }
     end
 
     def email_address_for_party_role(id)

@@ -11,7 +11,7 @@ module MasterfilesApp
     required(:inspector_code, Types::StrippedString).filled(:str?)
   end
 
-  InspectorFlatSchema = Dry::Validation.Params do
+  InspectorPersonSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)

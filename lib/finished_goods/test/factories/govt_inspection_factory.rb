@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   module GovtInspectionFactory
     def create_inspector(opts = {})
-      party_role_id = create_party_role[:id]
+      party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
 
       default = {
         inspector_party_role_id: party_role_id,
@@ -20,12 +20,13 @@ module FinishedGoodsApp
     def create_govt_inspection_sheet(opts = {})
       inspector_id = create_inspector
       destination_country_id = create_destination_country
-      party_role_id = create_party_role[:id]
+      inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
+      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
 
       default = {
         inspector_id: inspector_id,
-        inspection_billing_party_role_id: party_role_id,
-        exporter_party_role_id: party_role_id,
+        inspection_billing_party_role_id: inspection_billing_party_role_id,
+        exporter_party_role_id: exporter_party_role_id,
         booking_reference: Faker::Lorem.unique.word,
         results_captured: false,
         results_captured_at: '2010-01-01 12:00',

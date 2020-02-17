@@ -18,9 +18,9 @@
   \        JOIN destination_countries ON destination_countries.id = destination_country_id\r\n
   \        LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
   = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id = inspector_id\r\n
-  \        LEFT JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nGROUP
+  \        LEFT JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\n\r\nGROUP
   BY govt_inspection_sheets.id, inspector_party_role_id, inspector_code, country_name,
-  upn_number\r\n"
+  upn_number\r\nORDER BY govt_inspection_sheets.id DESC"
 :limit: 
 :offset: 
 :external_settings:

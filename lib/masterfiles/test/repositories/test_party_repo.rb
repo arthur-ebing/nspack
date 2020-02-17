@@ -23,13 +23,6 @@ module MasterfilesApp
       test_crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
     end
 
-    def test_find_party
-      party_role = create_party_role('O', nil)
-      party = repo.find_party(party_role[:party_id])
-      assert party
-      assert party.party_name
-    end
-
     def test_create_organization
       attrs = {
         # parent_id: nil,
@@ -40,15 +33,12 @@ module MasterfilesApp
         active: true,
         role_ids: []
       }
-      result_code = repo.create_organization(attrs)
-      exp = { roles: ['You did not choose a role'] }
-      assert_equal exp, result_code[:error]
 
-      role_id = create_role[:id]
+      role_id = create_role
       new_attrs = attrs.merge(role_ids: [role_id],
                               long_description: nil)
-      result_code = repo.create_organization(new_attrs)
-      org = repo.find_hash(:organizations, result_code[:id])
+      org_id = repo.create_organization(new_attrs)
+      org = repo.find_hash(:organizations, org_id)
       medium_code = org[:medium_description]
       assert_equal medium_code, org[:long_description]
 
@@ -57,18 +47,6 @@ module MasterfilesApp
                           party_id: org[:party_id],
                           role_id: role_id,
                           organization_id: org[:id])
-    end
-
-    def test_party_id_from_organization
-      org = create_organization
-      actual = repo.party_id_from_organization(org[:id])
-      assert_equal org[:party_id], actual
-    end
-
-    def test_party_id_from_person
-      person = create_person
-      actual = repo.party_id_from_person(person[:id])
-      assert_equal person[:party_id], actual
     end
 
     def test_party_address_ids
@@ -95,7 +73,7 @@ module MasterfilesApp
       party_id = create_party
       party_role_ids = []
       4.times do
-        party_role_ids << create_party_role('O', nil, party_id: party_id)[:id]
+        party_role_ids << create_party_role('O', nil, party_id: party_id)
       end
       res = repo.party_role_ids(party_id)
       assert party_role_ids.sort, res
@@ -104,15 +82,11 @@ module MasterfilesApp
     def test_assign_roles
       role_ids = []
       4.times do
-        role_ids << create_role[:id]
+        role_ids << create_role
       end
 
-      org_id = create_organization[:id]
-      person_id = create_person[:id]
-
-      result_code = repo.assign_roles(org_id, [], 'O')
-      exp = { error: 'Choose at least one role' }
-      assert_equal exp, result_code
+      org_id = create_organization
+      person_id = create_person
 
       repo.assign_roles(org_id, role_ids, 'O')
       party_role_created = repo.where_hash(:party_roles, organization_id: org_id)
@@ -123,17 +97,9 @@ module MasterfilesApp
       assert party_role_created
     end
 
-    def test_create_party_role
-      org = create_organization
-      role_id = create_role(name: 'Given Role Name')[:id]
-      repo.create_party_role(org[:party_id], 'Given Role Name')
-
-      party_role = repo.where_hash(:party_roles, role_id: role_id)
-      assert org[:party_id], party_role[:party_id]
-    end
-
     def test_add_party_name
-      party_role = create_party_role('O', nil)
+      party_role_id = create_party_role('O')
+      party_role = repo.find_hash(:party_roles, party_role_id)
       hash = repo.find_hash(:parties, party_role[:party_id])
       exp = { party_name: DB['SELECT fn_party_name(?)', party_role[:party_id]].single_value }
       res = repo.send(:add_party_name, hash)
@@ -151,7 +117,7 @@ module MasterfilesApp
       2.times do
         exp[:contact_method_ids] << create_party_contact_method(party_id: party_id)
         exp[:address_ids] << create_party_address(party_id: party_id)
-        exp[:role_ids] << create_party_role('O', nil, party_id: party_id)[:id]
+        exp[:role_ids] << create_party_role('O', nil, party_id: party_id)
       end
       res_hash = repo.send(:add_dependent_ids, hash)
       assert exp[:contact_method_ids], res_hash[:contact_method_ids]

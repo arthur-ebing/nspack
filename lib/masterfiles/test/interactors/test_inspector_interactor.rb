@@ -64,8 +64,8 @@ module MasterfilesApp
     private
 
     def inspector_attrs
-      party_role_id = create_party_role[:id]
-      role_id = create_role[:id]
+      party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
+      role_id = create_role
       {
         id: 1,
         surname: Faker::Lorem.unique.word,

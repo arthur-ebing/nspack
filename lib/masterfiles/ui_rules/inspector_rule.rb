@@ -7,9 +7,14 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
-
-      set_show_fields if %i[show reopen].include? @mode
+      case @mode
+      when :edit
+        common_values_for_fields common_fields_edit
+      when :new
+        common_values_for_fields common_fields
+      else
+        set_show_fields
+      end
 
       form_name 'inspector'
     end
@@ -26,6 +31,22 @@ module UiRules
                                       caption: 'Tablet Port Number' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
+    end
+
+    def common_fields_edit
+      {
+        inspector_party_role_id: { renderer: :select,
+                                   options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_INSPECTOR),
+                                   disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_INSPECTOR),
+                                   caption: 'Inspector' },
+        inspector_code: { caption: 'Inspector Code',
+                          force_uppercase: true,
+                          required: true },
+        tablet_ip_address: { caption: 'Tablet IP Address',
+                             required: true },
+        tablet_port_number: { caption: 'Tablet Port Number',
+                              required: true }
+      }
     end
 
     def common_fields

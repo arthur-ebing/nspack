@@ -6,36 +6,29 @@ module MasterfilesApp
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      response = nil
+      id = nil
       repo.transaction do
-        response = repo.create_person(res)
+        id = repo.create_person(res)
       end
-      if response[:id]
-        instance = person(response[:id])
-        success_response("Created person #{instance.party_name}", instance)
-      else
-        validation_failed_response(OpenStruct.new(messages: response[:error]))
-      end
+      instance = person(id)
+      success_response("Created person #{instance.party_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { first_name: ['This person already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
-    def update_person(id, params) # rubocop:disable Metrics/AbcSize
+    def update_person(id, params)
       res = validate_person_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      attrs = res.to_h
-      role_ids = attrs.delete(:role_ids)
-      roles_response = assign_person_roles(id, role_ids)
-      if roles_response.success
-        repo.transaction do
-          repo.update_person(id, attrs)
-        end
-        instance = person(id)
-        success_response("Updated person #{instance.party_name}, #{roles_response.message}", instance)
-      else
-        validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
+      repo.transaction do
+        repo.update_person(id, res)
       end
+      instance = person(id)
+      success_response("Updated person #{instance.party_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_person(id)
@@ -44,15 +37,6 @@ module MasterfilesApp
         repo.delete_person(id)
       end
       success_response("Deleted person #{name}")
-    end
-
-    def assign_person_roles(id, role_ids)
-      return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
-
-      repo.transaction do
-        repo.assign_roles(id, role_ids, 'P')
-      end
-      success_response('Roles assigned successfully')
     end
 
     private

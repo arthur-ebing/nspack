@@ -73,8 +73,8 @@ module FinishedGoodsApp
     def load_voyage_attrs
       load_id = create_load
       voyage_id = create_voyage
-      shipping_line_party_role_id = create_party_role[:id]
-      shipper_party_role_id = create_party_role[:id]
+      shipping_line_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPING_LINE)
+      shipper_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPER)
 
       {
         id: 1,

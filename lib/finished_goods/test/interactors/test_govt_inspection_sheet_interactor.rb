@@ -66,14 +66,15 @@ module FinishedGoodsApp
 
     def govt_inspection_sheet_attrs
       inspector_id = create_inspector
-      party_role_id = create_party_role[:id]
+      inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
+      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
       destination_country_id = create_destination_country
 
       {
         id: 1,
         inspector_id: inspector_id,
-        inspection_billing_party_role_id: party_role_id,
-        exporter_party_role_id: party_role_id,
+        inspection_billing_party_role_id: inspection_billing_party_role_id,
+        exporter_party_role_id: exporter_party_role_id,
         booking_reference: Faker::Lorem.unique.word,
         results_captured: false,
         results_captured_at: '2010-01-01 12:00',

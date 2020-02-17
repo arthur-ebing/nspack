@@ -21,10 +21,10 @@ module MasterfilesApp
     end
 
     def create_farm_group(opts = {})
-      party_role_id = create_party_role('O')[:id].to_i
+      owner_party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
 
       default = {
-        owner_party_role_id: party_role_id,
+        owner_party_role_id: owner_party_role_id,
         farm_group_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true
@@ -33,12 +33,12 @@ module MasterfilesApp
     end
 
     def create_farm(opts = {})
-      party_role_id = create_party_role('O')[:id].to_i
+      owner_party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
       production_region_id = create_production_region
       farm_group_id = create_farm_group
 
       default = {
-        owner_party_role_id: party_role_id,
+        owner_party_role_id: owner_party_role_id,
         pdn_region_id: production_region_id,
         farm_group_id: farm_group_id,
         farm_code: Faker::Lorem.unique.word,

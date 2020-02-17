@@ -3,7 +3,7 @@
 module MasterfilesApp
   class InspectorInteractor < BaseInteractor
     def create_inspector(params) # rubocop:disable Metrics/AbcSize
-      res = validate_inspector_params(params)
+      res = InspectorPersonSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -21,7 +21,7 @@ module MasterfilesApp
     end
 
     def update_inspector(id, params)
-      res = validate_inspector_params(params)
+      res = InspectorSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
@@ -30,6 +30,8 @@ module MasterfilesApp
       end
       instance = inspector(id)
       success_response("Updated inspector #{instance.inspector_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { inspector_code: ['This inspector code already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -59,10 +61,6 @@ module MasterfilesApp
 
     def inspector(id)
       repo.find_inspector_flat(id)
-    end
-
-    def validate_inspector_params(params)
-      InspectorFlatSchema.call(params)
     end
   end
 end
