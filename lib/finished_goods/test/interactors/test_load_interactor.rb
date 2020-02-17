@@ -75,7 +75,13 @@ module FinishedGoodsApp
       create_port_type(port_type_code: AppConst::PORT_TYPE_POL) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL).nil?
       create_port_type(port_type_code: AppConst::PORT_TYPE_POD) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD).nil?
 
-      party_role_id = create_party_role[:id]
+      customer_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
+      consignee_party_role_id = create_party_role('O', AppConst::ROLE_CONSIGNEE)
+      billing_client_party_role_id = create_party_role('O', AppConst::ROLE_BILLING_CLIENT)
+      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
+      final_receiver_party_role_id = create_party_role('O', AppConst::ROLE_FINAL_RECEIVER)
+      shipping_line_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPING_LINE)
+      shipper_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPER)
       destination_city_id = create_destination_city
       depot_id = create_depot
       pol_voyage_port_id = create_voyage_port
@@ -87,11 +93,11 @@ module FinishedGoodsApp
       vessel_id = create_vessel
       {
         id: 1,
-        customer_party_role_id: party_role_id,
-        consignee_party_role_id: party_role_id,
-        billing_client_party_role_id: party_role_id,
-        exporter_party_role_id: party_role_id,
-        final_receiver_party_role_id: party_role_id,
+        customer_party_role_id: customer_party_role_id,
+        consignee_party_role_id: consignee_party_role_id,
+        billing_client_party_role_id: billing_client_party_role_id,
+        exporter_party_role_id: exporter_party_role_id,
+        final_receiver_party_role_id: final_receiver_party_role_id,
         final_destination_id: destination_city_id,
         depot_id: depot_id,
         pol_voyage_port_id: pol_voyage_port_id,
@@ -119,8 +125,8 @@ module FinishedGoodsApp
         pod_port_id: pod_port_id,
         etd: '2010-01-01',
         atd: '2010-01-01',
-        shipping_line_party_role_id: party_role_id,
-        shipper_party_role_id: party_role_id,
+        shipping_line_party_role_id: shipping_line_party_role_id,
+        shipper_party_role_id: shipper_party_role_id,
         booking_reference: Faker::Lorem.word,
         memo_pad: Faker::Lorem.word,
         vehicle_number: Faker::Lorem.word,

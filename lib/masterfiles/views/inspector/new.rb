@@ -16,6 +16,11 @@ module Masterfiles
               form.caption 'New Inspector'
               form.action '/masterfiles/quality/inspectors'
               form.remote! if remote
+              form.add_field :title
+              form.add_field :first_name
+              form.add_field :surname
+              form.add_field :vat_number
+              form.add_field :role_ids
               form.add_field :inspector_party_role_id
               form.add_field :inspector_code
               form.add_field :tablet_ip_address

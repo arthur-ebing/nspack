@@ -102,29 +102,18 @@ module MasterfilesApp
       x = interactor.update_person(1, invalid_person)
       assert_equal(false, x.success)
 
-      # Updates successfully
-      success_response = OpenStruct.new(success: true,
-                                        instance: nil,
-                                        errors: {},
-                                        message: 'Roles assigned successfully')
-      PersonInteractor.any_instance.stubs(:assign_person_roles).returns(success_response)
       PartyRepo.any_instance.stubs(:update_person).returns(true)
       PersonInteractor.any_instance.stubs(:person).returns(fake_person)
       update_attrs = person_attrs.merge(vat_number: '7894561230')
       x = interactor.update_person(1, update_attrs)
-      expected = interactor.success_response('Updated person Title First Name Surname, Roles assigned successfully', fake_person)
+      expected = interactor.success_response('Updated person Title First Name Surname', fake_person)
       assert_equal(expected, x)
       assert x.success
 
-      # Gives validation failed response on fail
-      failed_response = OpenStruct.new(success: false,
-                                       instance: nil,
-                                       errors: {},
-                                       message: 'Roles assigned successfully')
-      PersonInteractor.any_instance.stubs(:assign_person_roles).returns(failed_response)
+      update_attrs[:role_ids] = []
       x = interactor.update_person(1, update_attrs)
-      expected = interactor.validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
-      assert_equal(expected, x)
+      expected = interactor.validation_failed_response(OpenStruct.new(messages: { role_ids: ['must be filled'] }))
+      assert_equal(expected.errors, x.errors)
     end
 
     def test_delete_person
@@ -133,18 +122,6 @@ module MasterfilesApp
       x = interactor.delete_person(1)
       expected = interactor.success_response('Deleted person Title First Name Surname')
       assert_equal(expected, x)
-    end
-
-    def test_assign_person_roles
-      x = interactor.assign_person_roles(1, [])
-      assert_equal(false, x.success)
-      assert_equal('Validation error', x.message)
-      assert_equal(['You did not choose a role'], x.errors[:roles])
-
-      PartyRepo.any_instance.stubs(:assign_roles).returns(true)
-      x = interactor.assign_person_roles(1, [1, 2, 3])
-      assert x.success
-      assert_equal('Roles assigned successfully', x.message)
     end
 
     private

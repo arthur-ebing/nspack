@@ -12,6 +12,11 @@ module MasterfilesApp
 
   class InspectorFlat < Dry::Struct
     attribute :id, Types::Integer
+    attribute :surname, Types::String
+    attribute :first_name, Types::String
+    attribute :title, Types::String
+    attribute :vat_number, Types::String
+    attribute :role_ids, Types::Array
     attribute :inspector_party_role_id, Types::Integer
     attribute :inspector, Types::String
     attribute :tablet_ip_address, Types::String

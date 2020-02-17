@@ -9,59 +9,39 @@ module MasterfilesApp
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      response = nil
+      id = nil
       repo.transaction do
-        response = repo.create_organization(res)
+        id = repo.create_organization(res)
       end
-      if response[:id]
-        id = response[:id]
-        instance = organization(id)
-        success_response("Created organization #{instance.party_name}", instance)
-      else
-        validation_failed_response(OpenStruct.new(messages: response[:error]))
-      end
+      instance = organization(id)
+      success_response("Created organization #{instance.party_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { short_description: ['This organization already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def update_organization(id, params)
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      attrs = res.to_h
-      role_ids = attrs.delete(:role_ids)
-      roles_response = assign_organization_roles(id, role_ids)
-      if roles_response.success
-        repo.transaction do
-          repo.update_organization(id, attrs)
-        end
-        instance = organization(id)
-        success_response("Updated organization #{instance.party_name}, #{roles_response.message}", instance)
-      else
-        validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] }))
+      repo.transaction do
+        repo.update_organization(id, res)
       end
+      instance = organization(id)
+      success_response("Updated organization #{instance.party_name}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def delete_organization(id)
-      name = organization(id).party_name
-      response = nil
+      instance = organization(id)
       repo.transaction do
-        response = repo.delete_organization(id)
+        repo.delete_organization(id)
       end
-      if response[:success]
-        success_response("Deleted organization #{name}")
-      else
-        validation_failed_response(OpenStruct.new(messages: response[:error]))
-      end
-    end
-
-    def assign_organization_roles(id, role_ids)
-      return validation_failed_response(OpenStruct.new(messages: { roles: ['You did not choose a role'] })) if role_ids.empty?
-
-      repo.transaction do
-        repo.assign_roles(id, role_ids, 'O')
-      end
-      success_response('Roles assigned successfully')
+      success_response("Deleted organization #{instance.party_name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private

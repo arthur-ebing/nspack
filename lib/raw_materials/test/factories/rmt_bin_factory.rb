@@ -1,18 +1,11 @@
 # frozen_string_literal: true
 
-# ========================================================= #
-# NB. Scaffolds for test factories should be combined       #
-#     - Otherwise you'll have methods for the same table in #
-#       several factories.                                  #
-#     - Rather create a factory for several related tables  #
-# ========================================================= #
-
 module RawMaterialsApp
   module RmtBinFactory
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class
-      rmt_material_owner_party_role_id = create_party_role('O')[:id]
+      rmt_material_owner_party_role_id = create_party_role('O', AppConst::ROLE_IMPLEMENTATION_OWNER)
       season_id = create_season
       farm_id = create_farm
       puc_id = create_puc
@@ -75,7 +68,7 @@ module RawMaterialsApp
 
     # def create_rmt_container_material_owner(opts = {})
     #   rmt_container_material_type_id = create_rmt_container_material_type
-    #   rmt_material_owner_party_role_id = create_party_role[:id]
+    #   rmt_material_owner_party_role_id = create_party_role
     #
     #   default = {
     #     rmt_container_material_type_id: rmt_container_material_type_id,

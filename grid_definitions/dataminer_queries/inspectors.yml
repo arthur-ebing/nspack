@@ -3,8 +3,7 @@
 :sql: "SELECT\r\n    fn_party_role_name(inspectors.inspector_party_role_id) AS inspector,\r\n
   \   inspectors.inspector_code,\r\n    inspectors.tablet_ip_address,\r\n    inspectors.tablet_port_number,\r\n
   \   inspectors.id,\r\n    inspectors.inspector_party_role_id,\r\n    inspectors.active,\r\n
-  \   inspectors.created_at,\r\n    inspectors.updated_at,\r\n    fn_current_status('inspectors',
-  inspectors.id) AS status \r\nFROM inspectors"
+  \   inspectors.created_at,\r\n    inspectors.updated_at\r\nFROM inspectors"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -146,22 +145,6 @@
     :width: 
     :format: 
     :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 10
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 

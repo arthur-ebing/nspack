@@ -69,7 +69,7 @@ module MasterfilesApp
     private
 
     def farm_group_attrs
-      party_role_id = create_party_role('O')[:id]
+      party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
 
       {
         id: 1,

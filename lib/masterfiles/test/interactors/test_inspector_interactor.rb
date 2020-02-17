@@ -15,7 +15,7 @@ module MasterfilesApp
     def test_inspector
       MasterfilesApp::InspectorRepo.any_instance.stubs(:find_inspector_flat).returns(fake_inspector)
       entity = interactor.send(:inspector, 1)
-      assert entity.is_a?(Inspector)
+      assert entity.is_a?(InspectorFlat)
     end
 
     def test_create_inspector
@@ -35,7 +35,7 @@ module MasterfilesApp
 
     def test_update_inspector
       id = create_inspector
-      attrs = interactor.send(:repo).find_hash(:inspectors, id).reject { |k, _| k == :id }
+      attrs = interactor.send(:repo).find_inspector_flat(id).to_h.reject { |k, _| k == :id }
       value = attrs[:tablet_ip_address]
       attrs[:tablet_ip_address] = 'a_change'
       res = interactor.update_inspector(id, attrs)
@@ -64,11 +64,17 @@ module MasterfilesApp
     private
 
     def inspector_attrs
-      party_role_id = create_party_role[:id]
-
+      party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
+      role_id = create_role
       {
         id: 1,
+        surname: Faker::Lorem.unique.word,
+        first_name: Faker::Lorem.unique.word,
+        title: Faker::Lorem.unique.word,
+        vat_number: '1234567890',
+        role_ids: [role_id],
         inspector_party_role_id: party_role_id,
+        inspector: Faker::Lorem.unique.word,
         inspector_code: Faker::Lorem.unique.word,
         tablet_ip_address: Faker::Lorem.unique.word,
         tablet_port_number: 1,
@@ -77,7 +83,7 @@ module MasterfilesApp
     end
 
     def fake_inspector(overrides = {})
-      Inspector.new(inspector_attrs.merge(overrides))
+      InspectorFlat.new(inspector_attrs.merge(overrides))
     end
 
     def interactor

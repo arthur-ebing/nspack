@@ -168,10 +168,10 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.update_inspector(id, params[:inspector])
           if res.success
             row_keys = %i[
-              inspector_party_role_id
+              inspector
+              inspector_code
               tablet_ip_address
               tablet_port_number
-              inspector_code
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -203,10 +203,10 @@ class Nspack < Roda # rubocop:disable ClassLength
           row_keys = %i[
             id
             inspector
+            inspector_code
             tablet_ip_address
             tablet_port_number
             active
-            inspector_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
