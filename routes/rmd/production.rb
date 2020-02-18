@@ -346,37 +346,37 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
 
-      r.on 'add_sequence_to_pallet_scan_carton' do
+      r.on 'add_sequence_to_pallet_scan_carton', Integer do |id|
         form_state = {}
         if (current_state = retrieve_from_local_store(:current_form_state))
           form_state = current_state
         end
         error = retrieve_from_local_store(:errors)
-        form_state.merge!(error_message: error, errors: { pallet_number: [''], carton_number: [''] }) unless error.nil?
+        form_state.merge!(error_message: error, errors: { carton_number: [''] }) unless error.nil?
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
                                        notes: nil,
                                        caption: 'Add New Sequence To Pallet: Scan Carton',
-                                       action: '/rmd/production/palletizing/add_sequence_to_pallet_submit',
+                                       action: "/rmd/production/palletizing/add_sequence_to_pallet_submit/#{id}",
                                        button_caption: 'Submit')
-        form.add_field(:carton_number, 'Carton Number<br>(For New Sequence)', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: true, required: true, prompt: false)
+        form.add_field(:carton_number, 'Carton Number<br>(For New Sequence)', data_type: :number, scan: 'key248_all', scan_type: :carton_label_id, submit_form: false, required: true, prompt: false)
         form.add_field(:carton_quantity, 'Carton Qty', required: true, prompt: true, data_type: :number)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
 
-      r.on 'add_sequence_to_pallet_submit' do
+      r.on 'add_sequence_to_pallet_submit', Integer do |id|
         carton_number = params[:pallet][:carton_number]
-        pallet_number = retrieve_from_local_store(:add_sequence_pallet_number)
+        pallet_number = MesscadaApp::MesscadaRepo.new.find_pallet(id).pallet_number
         unless AppConst::CARTON_VERIFICATION_REQUIRED
           carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
           unless carton_number
             res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
             unless res.success
-              store_locally(:current_form_state, pallet_number: pallet_number, carton_number: params[:pallet][:carton_number], carton_quantity: params[:pallet][:carton_quantity])
+              store_locally(:current_form_state, carton_quantity: params[:pallet][:carton_quantity])
               store_locally(:errors, unwrap_failed_response(res))
-              r.redirect('/rmd/production/palletizing/add_sequence_to_pallet_scan_carton')
+              r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{id}")
             end
             carton_number = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])[:id]
           end
@@ -387,9 +387,9 @@ class Nspack < Roda # rubocop:disable ClassLength
           pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_pallet_sequences_by_pallet_number(pallet_number)
           r.redirect("/rmd/production/palletizing/print_pallet_view/#{pallet_sequences.all.last[:id]}")
         else
-          store_locally(:current_form_state, pallet_number: pallet_number, carton_number: params[:pallet][:carton_number], carton_quantity: params[:pallet][:carton_quantity])
+          store_locally(:current_form_state, carton_quantity: params[:pallet][:carton_quantity])
           store_locally(:errors, unwrap_failed_response(res))
-          r.redirect('/rmd/production/palletizing/add_sequence_to_pallet_scan_carton')
+          r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{id}")
         end
       end
 
@@ -414,9 +414,10 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.post do
-          if MesscadaApp::MesscadaRepo.new.pallet_exists?(params[:pallet][:pallet_number])
-            store_locally(:add_sequence_pallet_number, params[:pallet][:pallet_number])
-            r.redirect('/rmd/production/palletizing/add_sequence_to_pallet_scan_carton')
+          pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(params[:pallet][:pallet_number])
+          if !pallet.nil_or_empty?
+            # store_locally(:add_sequence_pallet_number, params[:pallet][:pallet_number])
+            r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{pallet[:id]}")
           else
             store_locally(:errors, "Scanned Pallet:#{params[:pallet][:pallet_number]} doesn't exist")
             r.redirect('/rmd/production/palletizing/add_sequence_to_pallet')
