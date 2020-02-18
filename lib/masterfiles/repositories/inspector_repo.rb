@@ -44,7 +44,7 @@ module MasterfilesApp
       if person_id.nil?
         person_id = party_repo.create_person(person_params)
       else
-        party_repo.append_role_to_person(person_id, role_id)
+        party_repo.append_role(person_id, role_id, 'P')
       end
 
       params[:inspector_party_role_id] = get_with_args(:party_roles, :id, person_id: person_id, role_id: role_id)

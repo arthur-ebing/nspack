@@ -17,6 +17,7 @@ module Masterfiles
               form.action "/masterfiles/quality/inspectors/#{id}"
               form.remote!
               form.method :update
+              form.add_field :inspector
               form.add_field :inspector_party_role_id
               form.add_field :inspector_code
               form.add_field :tablet_ip_address

@@ -309,8 +309,6 @@ module MasterfilesApp
       end
     end
 
-    # add append_role_to_org
-
     def append_role(id, role_id, type = 'O')
       organization_id = nil
       person_id = nil
