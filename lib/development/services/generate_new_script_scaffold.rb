@@ -87,7 +87,7 @@ module DevelopmentApp
     end
 
     def indent(text, spaces)
-      text.split("\n").join(UtilityFunctions.newline_and_spaces(spaces))
+      text.split("\n").map(&:chomp).join(UtilityFunctions.newline_and_spaces(spaces))
     end
 
     def comment_indent(text)
