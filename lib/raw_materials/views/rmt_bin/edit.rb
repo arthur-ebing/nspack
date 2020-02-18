@@ -18,7 +18,6 @@ module RawMaterials
               form.remote!
               form.method :update
               form.add_field :bin_asset_number if rules[:scan_rmt_bin_asset_numbers]
-              form.add_field :cultivar_id
               form.add_field :rmt_container_type_id
               form.add_field :qty_bins
               form.add_field :qty_inner_bins

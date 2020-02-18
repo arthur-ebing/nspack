@@ -42,6 +42,7 @@ module RawMaterialsApp
       rmt_inner_container_type_id = repo.rmt_container_type_rmt_inner_container_type(container_type_id) unless container_type_id.nil_or_empty?
       { rmt_delivery_id: delivery.id,
         orchard_id: delivery.orchard_id,
+        cultivar_id: delivery.cultivar_id,
         season_id: delivery.season_id,
         bin_received_date_time: Time.now.to_s,
         farm_id: delivery.farm_id,

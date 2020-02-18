@@ -40,7 +40,6 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
         form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
         form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
-        form.add_select(:cultivar_id, 'Cultivar', items: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(bin_delivery[:orchard_id]), required: true, prompt: true)
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)
@@ -121,6 +120,15 @@ class Nspack < Roda # rubocop:disable ClassLength
           json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', container_material_owners)
         else
           json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', [])
+        end
+      end
+
+      # --------------------------------------------------------------------------
+      # BIN RECEPTION SCANNING
+      # --------------------------------------------------------------------------
+      r.on 'bin_reception_scanning' do
+        r.get do
+          p
         end
       end
     end

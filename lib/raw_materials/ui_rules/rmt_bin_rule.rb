@@ -89,7 +89,6 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       {
         bin_asset_number: { renderer: :label },
-        cultivar_id: { renderer: :select, options: RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(@form_object.orchard_id), caption: 'Cultivar', required: true, prompt: 'Select Cultivar' },
         qty_bins: { required: true },
         bin_fullness: { renderer: :select, options: ['Quarter', 'Half', 'Three Quarters', 'Full'], caption: 'Bin Fullness', required: true, prompt: true },
         nett_weight: {},
