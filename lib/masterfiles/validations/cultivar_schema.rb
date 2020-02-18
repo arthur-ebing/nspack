@@ -9,5 +9,6 @@ module MasterfilesApp
     required(:cultivar_group_id, :integer).maybe(:int?)
     required(:cultivar_name, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
+    required(:registered_code, Types::StrippedString).maybe(:str?)
   end
 end

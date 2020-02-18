@@ -1,11 +1,11 @@
 ---
 :caption: Cultivars
-:sql: SELECT "cultivars"."id", "cultivars"."commodity_id", "cultivars"."cultivar_group_id",
-  "cultivars"."cultivar_name", "cultivars"."description", "cultivars"."created_at",
-  "cultivars"."updated_at", "commodities"."code", "cultivar_groups"."cultivar_group_code",
-  "cultivars"."active" FROM "cultivars" JOIN "commodities" ON "commodities"."id" =
-  "cultivars"."commodity_id" LEFT JOIN "cultivar_groups" ON "cultivar_groups"."id"
-  = "cultivars"."cultivar_group_id"
+:sql: "SELECT\r\n    cultivars.id,\r\n    cultivars.commodity_id,\r\n    cultivars.cultivar_group_id,\r\n
+  \   cultivars.cultivar_name,\r\n    cultivars.description,\r\n    cultivars.created_at,\r\n
+  \   cultivars.updated_at,\r\n    commodities.code,\r\n    cultivar_groups.cultivar_group_code,\r\n
+  \   cultivars.registered_code,\r\n    cultivars.active\r\nFROM cultivars\r\nJOIN
+  commodities ON commodities.id = cultivars.commodity_id\r\nLEFT JOIN cultivar_groups
+  ON cultivar_groups.id = cultivars.cultivar_group_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -154,9 +154,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  registered_code:
+    :name: registered_code
+    :sequence_no: 10
+    :caption: Registered code
+    :namespaced_name: cultivars.registered_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: cultivars.active
     :data_type: :boolean
