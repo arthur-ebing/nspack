@@ -160,12 +160,12 @@
     :caption: Cultivar code
     :namespaced_name: cultivars.cultivar_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
