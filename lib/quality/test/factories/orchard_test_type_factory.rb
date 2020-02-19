@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MasterfilesApp
+module QualityApp
   module OrchardTestTypeFactory
     def create_orchard_test_type(opts = {})
       default = {

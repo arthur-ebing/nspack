@@ -4,12 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module QualityApp
   class TestOrchardTestTypeInteractor < MiniTestWithHooks
-    include OrchardTestFactory
-    include MasterfilesApp::TargetMarketFactory
-    include MasterfilesApp::CultivarFactory
-    include MasterfilesApp::CommodityFactory
-    include MasterfilesApp::FarmsFactory
-    include MasterfilesApp::PartyFactory
+    include OrchardTestTypeFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -75,11 +70,12 @@ module QualityApp
         applies_to_all_markets: false,
         applies_to_all_cultivars: false,
         applies_to_orchard: false,
+        applies_to_orchard_set: false,
         allow_result_capturing: false,
         pallet_level_result: false,
         api_name: 'ABC',
         result_type: 'ABC',
-        result_attribute: 'ABC',
+        result_attributes: 'ABC',
         applicable_tm_group_ids: [1, 2, 3],
         applicable_cultivar_ids: [1, 2, 3],
         applicable_commodity_group_ids: [1, 2, 3],

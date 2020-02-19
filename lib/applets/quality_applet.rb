@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 root_dir = File.expand_path('..', __dir__)
-
 Dir["#{root_dir}/quality/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/quality/interactors/*.rb"].each { |f| require f }
 # Dir["#{root_dir}/quality/jobs/*.rb"].each { |f| require f }
