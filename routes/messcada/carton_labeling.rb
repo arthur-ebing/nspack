@@ -14,10 +14,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do
           res = interactor.carton_labeling(params)
           if res.success
-            <<~HTML
-              #{res.instance}
-            HTML
+            res.instance
           else
+            # feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                           status: false,
+            #                                           msg: unwrap_failed_response(res),
+            #                                           line1: 'Label printing failed',
+            #                                           line6: 'Label printing failed')
+            # Crossbeams::RobotResponder.new(feedback).render
             <<~HTML
               <label><status>false</status>
               <lcd1>Label printing failed</lcd1>
@@ -47,6 +51,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           # r.is do
           r.get do
             res = interactor.carton_verification_and_weighing_and_labeling(params, request.ip)
+            # feedback = if res.success
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: true,
+            #                                             line1: res.message)
+            #            else
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: false,
+            #                                             line1: unwrap_failed_response(res))
+            #            end
+            # Crossbeams::RobotResponder.new(feedback).render
             if res.success
               <<~HTML
                 <carton_verification>
@@ -95,6 +109,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         #   r.is do
         r.get do
           res = interactor.carton_verification_and_weighing(params)
+          # feedback = if res.success
+          #              MesscadaApp::RobotFeedback.new(device: params[:device],
+          #                                             status: true,
+          #                                             line1: res.message)
+          #            else
+          #              MesscadaApp::RobotFeedback.new(device: params[:device],
+          #                                             status: false,
+          #                                             line1: unwrap_failed_response(res))
+          #            end
+          # Crossbeams::RobotResponder.new(feedback).render
           if res.success
             <<~HTML
               <carton_verification>
@@ -143,6 +167,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.is do
           r.get do
             res = interactor.carton_verification(params)
+            # feedback = if res.success
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: true,
+            #                                             line1: res.message)
+            #            else
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: false,
+            #                                             line1: unwrap_failed_response(res))
+            #            end
+            # Crossbeams::RobotResponder.new(feedback).render
             if res.success
               <<~HTML
                 <carton_verification>

@@ -13,6 +13,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.is do
         r.get do       # WEIGH BIN
           res = interactor.update_rmt_bin_weights(params)
+          # feedback = if res.success
+          #              MesscadaApp::RobotFeedback.new(device: params[:device],
+          #                                             status: true,
+          #                                             line1: res.message)
+          #            else
+          #              MesscadaApp::RobotFeedback.new(device: params[:device],
+          #                                             status: false,
+          #                                             line1: unwrap_failed_response(res))
+          #            end
+          # Crossbeams::RobotResponder.new(feedback).render
           if res.success
             <<~HTML
               <bin_tipping>
@@ -61,6 +71,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do       # TIP BIN
           res = interactor.tip_rmt_bin(params)
           bin_tipping_response(res)
+          # feedback = bin_tipping_response(res)
+          # Crossbeams::RobotResponder.new(feedback).render
         end
       end
 
@@ -70,6 +82,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'weighing' do       # WEIGH/TIP BIN
         res = interactor.update_rmt_bin_weights(params)
+        # feedback = if res.success
+        #              res = interactor.tip_rmt_bin(params) # if this fails, should interactor.update_rmt_bin_weights be allowed to commit?
+        #              bin_tipping_response(res)
+        #            else
+        #              MesscadaApp::RobotFeedback.new(device: params[:device],
+        #                                             status: false,
+        #                                             line1: unwrap_failed_response(res))
+        #            end
+        # Crossbeams::RobotResponder.new(feedback).render
+
         if res.success
           res = interactor.tip_rmt_bin(params) # if this fails, should interactor.update_rmt_bin_weights be allowed to commit?
           bin_tipping_response(res)
@@ -95,6 +117,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   end
 
   def bin_tipping_response(res) # rubocop:disable Metrics/AbcSize
+    # if res.success
+    #   MesscadaApp::RobotFeedback.new(device: params[:device],
+    #                                  status: true,
+    #                                  line1: "#{res.message} - run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
+    #                                  line2: "farm:#{res.instance[:farm_code]}",
+    #                                  line3: "puc:#{res.instance[:puc_code]}",
+    #                                  line4: "orch:#{res.instance[:orchard_code]}",
+    #                                  line5: "cult group: #{res.instance[:cultivar_group_code]}",
+    #                                  line6: "cult:#{res.instance[:cultivar_name]}")
+    # else
+    #   MesscadaApp::RobotFeedback.new(device: params[:device],
+    #                                  status: false,
+    #                                  line1: unwrap_failed_response(res))
+    # end
     if res.success
       <<~HTML
         <bin_tipping>
