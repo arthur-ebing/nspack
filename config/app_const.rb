@@ -57,18 +57,12 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DELIVERY_CAPTURE_EMPTY_BINS = make_boolean('CAPTURE_EMPTY_BINS')
   DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION = make_boolean('CAPTURE_TRUCK_AT_FRUIT_RECEPTION')
   USE_PERMANENT_RMT_BIN_BARCODES = make_boolean('USE_PERMANENT_RMT_BIN_BARCODES')
-  ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION = make_boolean('ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION')
-  DEFAULT_DELIVERY_LOCATION = ENV['DEFAULT_DELIVERY_LOCATION']
-  # Regular expression(s) to validate bin asset numbers when present (in case they are typed in incorrectly)
-  # If more than one format is required, separate with commas (no spaces).
-  BIN_ASSET_REGEX = ENV.fetch('BIN_ASSET_REGEX', '.+')
+  # Regular expression to validate bin asset numbers when present (in case they are typed in incorrectly)
+  BIN_ASSET_REGEX = Regexp.new(ENV.fetch('BIN_ASSET_REGEX', '.+'))
 
   # Resources
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')
   GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
-
-  # Constants for pallet movements:
-  CALCULATE_PALLET_DECK_POSITIONS = make_boolean('CALCULATE_PALLET_DECK_POSITIONS')
 
   # Constants for pallet statuses:
   PALLETIZED_NEW_PALLET = 'PALLETIZED_NEW_PALLET'
@@ -79,10 +73,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLETIZED_SEQUENCE_UPDATED = 'PALLETIZED_SEQUENCE_UPDATED'
   PALLET_WEIGHED = 'PALLET WEIGHED'
   PALLET_MOVED = 'PALLET_MOVED'
-
-  # Constants for stock types:
-  PALLET_STOCK_TYPE = 'PALLET'
-  BIN_STOCK_TYPE = 'BIN'
 
   # Constants for rmt bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
@@ -101,7 +91,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Constants for pallets exit_ref
   PALLET_EXIT_REF_SCRAPPED = 'SCRAPPED'
   PALLET_EXIT_REF_REMOVED = 'REMOVED'
-  PALLET_EXIT_REF_REPACKED = 'REPACKED'
 
   # Constants for rmt_bins exit_ref
   BIN_EXIT_REF_UNSCRAPPED = 'BIN UNSCRAPPED'
@@ -170,10 +159,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_ACTION_SET_GROSS_WEIGHT = 'SET GROSS WEIGHT'
   REWORKS_ACTION_UPDATE_PALLET_DETAILS = 'UPDATE PALLET DETAILS'
   REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE = 'BULK PRODUCTION RUN UPDATE'
-
-  REWORKS_REPACK_PALLET_STATUS = 'REPACK SCRAP'
-  REWORKS_REPACK_PALLET_NEW_STATUS = 'REPACKED'
-  REWORKS_REPACK_SCRAP_REASON = 'REPACKED'
 
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
@@ -293,7 +278,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
-  LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
@@ -358,6 +342,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
 
+  # Titan: Govt Inspections
+  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
+  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
+  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
+
   # Addendum: place of issue for export certificate
   ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
   raise Crossbeams::FrameworkError, "#{ADDENDUM_PLACE_OF_ISSUE} is not a valid code" unless ADDENDUM_PLACE_OF_ISSUE.match?(/cpt|dbn|plz|mpm|oth/i)
@@ -368,7 +357,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
-  PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
 
   MF_VARIANT_TABLES = %i[
     standard_pack_codes
@@ -386,23 +374,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   RPT_INDUSTRY = ENV['RPT_INDUSTRY']
 
-  # Titan: Govt Inspections
-  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
-  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
-  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
-
-  # QUALITY APP result types
+  # OTMC result types
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'
-  QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
-  PHYT_CLEAN = 'PhytClean'
-  QUALITY_API_NAMES = [PHYT_CLEAN].freeze
-
-  # PhytClean
-  PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
-  PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
-  PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
-
-  PHYT_CLEAN_PASSED = %w[TRUE true t approved].freeze
-  PHYT_CLEAN_ATTRIBUTES = %i[cbs applied eu bd verified fms b phytoData].freeze
+  OMTC_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
 end

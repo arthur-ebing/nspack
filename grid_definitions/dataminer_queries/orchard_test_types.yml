@@ -1,10 +1,11 @@
 ---
 :caption: Orchard Test Types
 :sql: "SELECT\r\n    orchard_test_types.id,\r\n    orchard_test_types.test_type_code,\r\n
-  \   orchard_test_types.description,\r\n    orchard_test_types.result_type,\r\n    orchard_test_types.applies_to_all_markets,\r\n
+  \   orchard_test_types.description,\r\n    orchard_test_types.applies_to_all_markets,\r\n
   \   orchard_test_types.applies_to_all_cultivars,\r\n    orchard_test_types.applies_to_orchard,\r\n
-  \   orchard_test_types.allow_result_capturing,\r\n    orchard_test_types.pallet_level_result,\r\n
-  \   orchard_test_types.api_name,\r\n    orchard_test_types.result_attribute,\r\n
+  \   orchard_test_types.applies_to_orchard_set,\r\n    orchard_test_types.allow_result_capturing,\r\n
+  \   orchard_test_types.pallet_level_result,\r\n    orchard_test_types.api_name,\r\n
+  \   orchard_test_types.result_type,\r\n    orchard_test_types.result_attributes,\r\n
   \   orchard_test_types.applicable_tm_group_ids,\r\n    orchard_test_types.applicable_cultivar_ids,\r\n
   \   orchard_test_types.applicable_commodity_group_ids,\r\n    orchard_test_types.active,\r\n
   \   orchard_test_types.created_at,\r\n    orchard_test_types.updated_at,\r\n    fn_current_status
@@ -69,25 +70,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  result_type:
-    :name: result_type
-    :sequence_no: 4
-    :caption: Result type
-    :namespaced_name: orchard_test_types.result_type
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   applies_to_all_markets:
     :name: applies_to_all_markets
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Applies to all markets
     :namespaced_name: orchard_test_types.applies_to_all_markets
     :data_type: :boolean
@@ -103,7 +88,7 @@
     :group_max: false
   applies_to_all_cultivars:
     :name: applies_to_all_cultivars
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Applies to all cultivars
     :namespaced_name: orchard_test_types.applies_to_all_cultivars
     :data_type: :boolean
@@ -119,9 +104,25 @@
     :group_max: false
   applies_to_orchard:
     :name: applies_to_orchard
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Applies to orchard
     :namespaced_name: orchard_test_types.applies_to_orchard
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_orchard_set:
+    :name: applies_to_orchard_set
+    :sequence_no: 7
+    :caption: Applies to orchard set
+    :namespaced_name: orchard_test_types.applies_to_orchard_set
     :data_type: :boolean
     :width: 
     :format: 
@@ -181,11 +182,27 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  result_attribute:
-    :name: result_attribute
+  result_type:
+    :name: result_type
     :sequence_no: 11
-    :caption: Result attribute
-    :namespaced_name: orchard_test_types.result_attribute
+    :caption: Result type
+    :namespaced_name: orchard_test_types.result_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  result_attributes:
+    :name: result_attributes
+    :sequence_no: 12
+    :caption: Result attributes
+    :namespaced_name: orchard_test_types.result_attributes
     :data_type: :string_array
     :width: 
     :format: 
@@ -199,7 +216,7 @@
     :group_max: false
   applicable_tm_group_ids:
     :name: applicable_tm_group_ids
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Applicable tm group ids
     :namespaced_name: orchard_test_types.applicable_tm_group_ids
     :data_type: :integer_array
@@ -215,7 +232,7 @@
     :group_max: false
   applicable_cultivar_ids:
     :name: applicable_cultivar_ids
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Applicable cultivar ids
     :namespaced_name: orchard_test_types.applicable_cultivar_ids
     :data_type: :integer_array
@@ -231,7 +248,7 @@
     :group_max: false
   applicable_commodity_group_ids:
     :name: applicable_commodity_group_ids
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Applicable commodity group ids
     :namespaced_name: orchard_test_types.applicable_commodity_group_ids
     :data_type: :integer_array
@@ -247,7 +264,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Active
     :namespaced_name: orchard_test_types.active
     :data_type: :boolean
@@ -263,7 +280,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Created at
     :namespaced_name: orchard_test_types.created_at
     :data_type: :datetime
@@ -279,7 +296,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Updated at
     :namespaced_name: orchard_test_types.updated_at
     :data_type: :datetime
@@ -295,7 +312,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -311,7 +328,7 @@
     :group_max: false
   applicable_tm_groups:
     :name: applicable_tm_groups
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Applicable tm groups
     :namespaced_name: 
     :data_type: :string
@@ -327,7 +344,7 @@
     :group_max: false
   applicable_cultivars:
     :name: applicable_cultivars
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Applicable cultivars
     :namespaced_name: 
     :data_type: :string
@@ -343,7 +360,7 @@
     :group_max: false
   applicable_commodity_groups:
     :name: applicable_commodity_groups
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Applicable commodity groups
     :namespaced_name: 
     :data_type: :string

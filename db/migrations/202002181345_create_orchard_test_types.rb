@@ -10,12 +10,13 @@ Sequel.migration do
       TrueClass :applies_to_all_markets, default: true
       TrueClass :applies_to_all_cultivars, default: true
       TrueClass :applies_to_orchard, default: true
+      TrueClass :applies_to_orchard_set, default: true
       TrueClass :allow_result_capturing, default: true
       TrueClass :pallet_level_result, default: true
 
       String :api_name
       String :result_type, null: false
-      String :result_attribute
+      String :result_attributes
 
       column :applicable_tm_group_ids, 'integer[]'
       column :applicable_cultivar_ids, 'integer[]'
