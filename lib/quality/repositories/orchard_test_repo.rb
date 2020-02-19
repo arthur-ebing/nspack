@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MasterfilesApp
+module QualityApp
   class OrchardTestRepo < BaseRepo
     build_for_select :orchard_test_types,
                      label: :test_type_code,

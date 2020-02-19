@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MasterfilesApp
+module QualityApp
   class OrchardTestType < Dry::Struct
     attribute :id, Types::Integer
     attribute :test_type_code, Types::String

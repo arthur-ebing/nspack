@@ -2,17 +2,17 @@
 
 require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
-module MasterfilesApp
+module QualityApp
   class TestOrchardTestTypeInteractor < MiniTestWithHooks
     include OrchardTestTypeFactory
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::OrchardTestRepo)
+      assert repo.is_a?(QualityApp::OrchardTestRepo)
     end
 
     def test_orchard_test_type
-      MasterfilesApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_type).returns(fake_orchard_test_type)
+      QualityApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_type_flat).returns(fake_orchard_test_type)
       entity = interactor.send(:orchard_test_type, 1)
       assert entity.is_a?(OrchardTestType)
     end
@@ -21,7 +21,7 @@ module MasterfilesApp
       attrs = fake_orchard_test_type.to_h.reject { |k, _| k == :id }
       res = interactor.create_orchard_test_type(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestType, res.instance)
+      assert_instance_of(OrchardTestTypeFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -39,7 +39,7 @@ module MasterfilesApp
       attrs[:test_type_code] = 'a_change'
       res = interactor.update_orchard_test_type(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestType, res.instance)
+      assert_instance_of(OrchardTestTypeFlat, res.instance)
       assert_equal 'a_change', res.instance.test_type_code
       refute_equal value, res.instance.test_type_code
     end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MasterfilesApp
+module QualityApp
   module TaskPermissionCheck
     class OrchardTestType < BaseService
       attr_reader :task, :entity

@@ -3,7 +3,7 @@
 module UiRules
   class OrchardTestTypeRule < Base
     def generate_rules
-      @repo = MasterfilesApp::OrchardTestRepo.new
+      @repo = QualityApp::OrchardTestRepo.new
       make_form_object
       apply_form_values
 

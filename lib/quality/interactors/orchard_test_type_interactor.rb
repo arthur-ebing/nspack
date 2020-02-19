@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module MasterfilesApp
+module QualityApp
   class OrchardTestTypeInteractor < BaseInteractor
     def create_orchard_test_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_orchard_test_type_params(params)
@@ -58,7 +58,7 @@ module MasterfilesApp
     end
 
     def orchard_test_type(id)
-      repo.find_orchard_test_type(id)
+      repo.find_orchard_test_type_flat(id)
     end
 
     def validate_orchard_test_type_params(params)

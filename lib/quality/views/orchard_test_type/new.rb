@@ -1,19 +1,22 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-module Masterfiles
-  module Quality
+module Quality
+  module Config
     module OrchardTestType
-      class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:orchard_test_type, :show, id: id)
+      class New
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:orchard_test_type, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
+            page.form_values form_values
+            page.form_errors form_errors
             page.form do |form|
-              form.caption 'Orchard Test'
-              form.view_only!
+              form.caption 'New Orchard Test Type'
+              form.action '/quality/config/orchard_test_types'
+              form.remote! if remote
               form.row do |row|
                 row.column do |col|
                   col.add_field :test_type_code
@@ -32,7 +35,6 @@ module Masterfiles
                   col.add_field :applies_to_orchard_set
                   col.add_field :allow_result_capturing
                   col.add_field :pallet_level_result
-                  col.add_field :active
                 end
               end
             end
