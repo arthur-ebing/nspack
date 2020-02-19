@@ -327,6 +327,13 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 p4: 'device',
                 dp3: 'kg',
               },
+              {
+                url: '/messcada/hr/register_id?',
+                p1: 'card_reader',
+                p2: 'value',
+                p3: 'device',
+                p4: null,
+              },
             ];
 
             document.addEventListener('DOMContentLoaded', () => {
