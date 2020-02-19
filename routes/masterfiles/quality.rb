@@ -367,6 +367,70 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
     end
+
+    # ORCHARD TEST TYPES
+    # --------------------------------------------------------------------------
+    r.on 'orchard_test_types', Integer do |id|
+      interactor = MasterfilesApp::OrchardTestTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:orchard_test_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial_or_page(r) { Masterfiles::Quality::OrchardTestType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial_or_page(r) { Masterfiles::Quality::OrchardTestType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_orchard_test_type(id, params[:orchard_test_type])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::OrchardTestType::Edit.call(id, form_values: params[:orchard_test_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_orchard_test_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'orchard_test_types' do
+      interactor = MasterfilesApp::OrchardTestTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::OrchardTestType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_orchard_test_type(params[:orchard_test_type])
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/orchard_test_types/new') do
+            Masterfiles::Quality::OrchardTestType::New.call(form_values: params[:orchard_test_type],
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable BlockLength

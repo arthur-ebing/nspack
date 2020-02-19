@@ -390,4 +390,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
 
   RPT_INDUSTRY = ENV['RPT_INDUSTRY']
+
+  # OTMC result types
+  PASS_FAIL = 'Pass/Fail'
+  CLASSIFICATION = 'Classification'
+  OMTC_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
 end
