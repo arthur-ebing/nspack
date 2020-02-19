@@ -13,6 +13,17 @@ class Nspack < Roda
         r.is do
           r.get do
             res = interactor.fg_pallet_weighing(params)
+            # feedback = if res.success
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: true,
+            #                                             line2: "Pallet: #{res.instance[:pallet_number]}",
+            #                                             line3: "Weight: #{res.instance[:gross_weight]}")
+            #            else
+            #              MesscadaApp::RobotFeedback.new(device: params[:device],
+            #                                             status: false,
+            #                                             msg: unwrap_failed_response(res))
+            #            end
+            # Crossbeams::RobotResponder.new(feedback).render
             htmls = if res.success
                       <<~HTML
                         <bin_tipping>
