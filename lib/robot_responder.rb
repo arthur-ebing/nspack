@@ -4,7 +4,9 @@ module Crossbeams
   class RobotResponder
     def initialize(robot_feedback)
       @robot_feedback = robot_feedback
+      # raise if msg && any lines...
       # get device capabilities from MesscadaRepo to decide if display is 4 or 6...
+      # AppConst can override if all robots at installation are the same.
       @display_lines = 6
     end
 
@@ -24,8 +26,7 @@ module Crossbeams
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
           <orange>false</orange>
-          <msg>#{@robot_feedback.msg}</msg>
-          <lcd1>#{line1}</lcd1>
+          <lcd1>#{@robot_feedback.msg || line1}</lcd1>
           <lcd2>#{line2}</lcd2>
           <lcd3>#{line3}</lcd3>
           <lcd4>#{line4}</lcd4>

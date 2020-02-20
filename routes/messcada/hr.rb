@@ -8,11 +8,16 @@ class Nspack < Roda
       interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       res = interactor.register_identifier(params)
 
-      if res.success
-        "Successfully registered #{params[:value]}"
-      else
-        "Unable to add #{params[:value]}. Please try again (#{res.message}"
-      end
+      feedback = if res.success
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: true,
+                                                  msg: "Successfully registered #{params[:value]}")
+                 else
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: false,
+                                                  msg: "Unable to add #{params[:value]}. Please try again (#{res.message}")
+                 end
+      Crossbeams::RobotResponder.new(feedback).render
     end
     # Login/out
     # personnel_login_events (includes group id when applicable)

@@ -6,6 +6,7 @@ Sequel.migration do
       primary_key :id
       String :hardware_type, null: false
       String :identifier, null: false
+      TrueClass :in_use, default: false
       Date :available_from, default: Sequel.lit('CURRENT_DATE')
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
