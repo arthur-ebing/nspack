@@ -348,6 +348,16 @@ class Nspack < Roda
             re_show_form(r, res) { Masterfiles::Fruit::MarketingVariety::Edit.call(id, params[:marketing_variety], res.errors) }
           end
         end
+
+        r.delete do    # DELETE
+          check_auth!('fruit', 'delete')
+          res = interactor.delete_marketing_variety(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
       end
     end
 

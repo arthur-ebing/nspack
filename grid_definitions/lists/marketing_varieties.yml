@@ -11,3 +11,8 @@
   :icon: edit
   :title: Edit
   :popup: true
+- :url: "/masterfiles/fruit/marketing_varieties/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true

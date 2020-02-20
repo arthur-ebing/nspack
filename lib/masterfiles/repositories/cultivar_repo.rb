@@ -106,5 +106,10 @@ module MasterfilesApp
     def cultivar_marketing_variety_ids(cultivar_id)
       DB[:marketing_varieties_for_cultivars].where(cultivar_id: cultivar_id).select_map(:marketing_variety_id).sort
     end
+
+    def delete_marketing_variety(id)
+      DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: id).delete
+      DB[:marketing_varieties].where(id: id).delete
+    end
   end
 end
