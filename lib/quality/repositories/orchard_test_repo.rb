@@ -49,5 +49,11 @@ module QualityApp
 
       DB[:orchard_test_types].where(id: id).update(attrs)
     end
+
+    def for_select_cultivars(args = nil)
+      ds = DB[:cultivars].join(:commodities, id: :commodity_id)
+      ds = ds.where(args) unless args.nil?
+      ds.select_map([:cultivar_name, Sequel[:cultivars][:id]])
+    end
   end
 end
