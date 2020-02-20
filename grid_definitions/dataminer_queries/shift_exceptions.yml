@@ -1,0 +1,147 @@
+---
+:caption: Shift Exceptions
+:sql: "SELECT \"shift_exceptions\".\"id\", \"shift_exceptions\".\"shift_id\", \"shift_exceptions\".\"contract_worker_id\",
+  \"shift_exceptions\".\"running_hours\", fn_contract_worker_name(\"shift_exceptions\".\"contract_worker_id\")
+  AS contract_worker_name, \"shift_exceptions\".\"remarks\", \r\n\"shift_exceptions\".\"created_at\",
+  \"shift_exceptions\".\"updated_at\" FROM \"shift_exceptions\""
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: shift_exceptions.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shift_id:
+    :name: shift_id
+    :sequence_no: 2
+    :caption: Shift
+    :namespaced_name: shift_exceptions.shift_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contract_worker_id:
+    :name: contract_worker_id
+    :sequence_no: 3
+    :caption: Contract worker
+    :namespaced_name: shift_exceptions.contract_worker_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  running_hours:
+    :name: running_hours
+    :sequence_no: 4
+    :caption: Running hours
+    :namespaced_name: shift_exceptions.running_hours
+    :data_type: :number
+    :width: 180
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contract_worker_name:
+    :name: contract_worker_name
+    :sequence_no: 5
+    :caption: Contract worker name
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 6
+    :caption: Remarks
+    :namespaced_name: shift_exceptions.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 7
+    :caption: Created at
+    :namespaced_name: shift_exceptions.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 8
+    :caption: Updated at
+    :namespaced_name: shift_exceptions.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: shift_exceptions.shift_id
+  :caption: Shift
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT id, id FROM shifts ORDER BY id
