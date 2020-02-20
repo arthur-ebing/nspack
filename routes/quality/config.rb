@@ -47,6 +47,19 @@ class Nspack < Roda
     end
 
     r.on 'orchard_test_types' do
+      r.on 'commodity_group_changed' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          p params[:changed_value]
+          actions = []
+          # TODO: behaviour passes changed value instead of selected list values
+          cultivar_list = QualityApp::OrchardTestRepo.new.for_select_cultivars(commodity_group_id: params[:changed_value])
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'applicable_cultivar_ids', options_array: cultivar_list)
+          json_actions(actions)
+        end
+      end
+
       interactor = QualityApp::OrchardTestTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('config', 'new')

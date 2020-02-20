@@ -8,7 +8,7 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
-
+      add_behaviours
       set_show_fields if %i[show reopen].include? @mode
 
       form_name 'orchard_test_type'
@@ -57,14 +57,14 @@ module UiRules
                                    options: MasterfilesApp::TargetMarketRepo.new.for_select_tm_groups,
                                    selected: @form_object.applicable_tm_group_ids,
                                    caption: 'Target Market Groups' },
-        applicable_cultivar_ids: { renderer: :multi,
-                                   options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
-                                   selected: @form_object.applicable_cultivar_ids,
-                                   caption: 'Cultivars' },
         applicable_commodity_group_ids: { renderer: :multi,
                                           options: MasterfilesApp::CommodityRepo.new.for_select_commodity_groups,
                                           selected: @form_object.applicable_commodity_group_ids,
-                                          caption: 'Commodity Groups' }
+                                          caption: 'Commodity Groups' },
+        applicable_cultivar_ids: { renderer: :multi,
+                                   options: @repo.for_select_cultivars,
+                                   selected: @form_object.applicable_cultivar_ids,
+                                   caption: 'Cultivars' }
       }
     end
 
@@ -92,6 +92,14 @@ module UiRules
                                     applicable_tm_group_ids: [],
                                     applicable_cultivar_ids: [],
                                     applicable_commodity_group_ids: [])
+    end
+
+    private
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/quality/config/orchard_test_types/commodity_group_changed' }] if @mode == :new
+      end
     end
   end
 end
