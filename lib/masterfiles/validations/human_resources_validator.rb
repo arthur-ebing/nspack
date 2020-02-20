@@ -12,7 +12,7 @@ module MasterfilesApp
         res = ShiftTypeSchema.call(params)
         return validation_failed_response(res) unless res.messages.empty?
 
-        @repo.validate_shift_type(res.to_h)
+        validate_shift_type(res.to_h)
       end
 
       def validate_shift_type(attrs) # rubocop:disable Metrics/AbcSize

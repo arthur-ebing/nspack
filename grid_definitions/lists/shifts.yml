@@ -1,0 +1,23 @@
+---
+:dataminer_definition: shifts
+:actions:
+- :url: "/production/shifts/shifts/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+- :url: "/production/shifts/shifts/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/development/statuses/list/shifts/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/shifts/shifts/new"
+  :text: New Shift
+  :style: :button
+  :behaviour: :popup

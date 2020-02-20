@@ -1,0 +1,34 @@
+---
+:dataminer_definition: shift_exceptions
+:actions:
+- :url: "/production/shifts/shift_exceptions/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/shifts/shift_exceptions/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/shifts/shift_exceptions/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/development/statuses/list/shift_exceptions/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/shifts/$:shift_id$/shift_exceptions/preselect"
+  :text: New Shift Exception
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: shift_exceptions.shift_id
+      :op: =
+      :val: $:shift_id$

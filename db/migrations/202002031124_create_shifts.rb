@@ -55,6 +55,8 @@ Sequel.migration do
     # start time
     # worker
 
+    # One of the 3 params need to differ from the shift's params
+
     # Parent Child relationship to shifts on grid (Standard edit view)
     create_table(:shift_exceptions, ignore_index_errors: true) do
       primary_key :id
@@ -67,13 +69,13 @@ Sequel.migration do
       # TrueClass :other_bool, default: false
       # TrueClass :active, default: true
 
-      DateTime :start_date_time
-      DateTime :end_date_time
+      # DateTime :start_date_time
+      # DateTime :end_date_time
 
       DateTime :created_at, null: false
       DateTime :updated_at, null: false
 
-      index [:contract_worker_id], name: :shift_exceptions_unique_contract_workers, unique: true
+      index [:contract_worker_id, :shift_id], name: :shift_exceptions_unique_shift_contract_workers, unique: true
       index [:shift_id], name: :fki_shift_exceptions_shifts, unique: true
     end
 
