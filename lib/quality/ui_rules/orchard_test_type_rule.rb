@@ -98,7 +98,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/quality/config/orchard_test_types/commodity_group_changed' }] if @mode == :new
+        behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/quality/config/orchard_test_types/commodity_group_changed' }] if %i[new edit].include? @mode
       end
     end
   end

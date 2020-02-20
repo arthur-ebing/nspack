@@ -54,8 +54,8 @@ class Nspack < Roda
           p params[:changed_value]
           actions = []
           # TODO: behaviour passes changed value instead of selected list values
-          cultivar_list = QualityApp::OrchardTestRepo.new.for_select_cultivars(commodity_group_id: params[:changed_value])
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'applicable_cultivar_ids', options_array: cultivar_list)
+          cultivar_list = QualityApp::OrchardTestRepo.new.for_select_cultivars(commodity_group_id: params[:changed_value].split(','))
+          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_type_applicable_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
       end
