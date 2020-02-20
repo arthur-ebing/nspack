@@ -361,6 +361,33 @@ class Nspack < Roda
         end
       end
     end
+
+    # LINK PERSONNEL IDENTIFIERS
+    # --------------------------------------------------------------------------
+    r.on 'personnel_identifiers', Integer do |id|
+      interactor = MasterfilesApp::ContractWorkerInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'link_contract_worker' do
+        r.get do
+          check_auth!('hr', 'edit')
+          # interactor.assert_permission!(:edit, id)
+          show_partial { Masterfiles::HumanResources::PersonnelIdentifier::LinkWorker.call(id) }
+        end
+
+        r.patch do
+          res = interactor.link_to_personnel_identifier(id, params[:personnel_identifier])
+          if res.success
+            row_keys = %i[
+              contract_worker
+              in_use
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::HumanResources::PersonnelIdentifier::LinkWorker.call(id, form_values: params[:personnel_identifier], form_errors: res.errors) }
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

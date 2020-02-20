@@ -1,0 +1,21 @@
+---
+:dataminer_definition: mes_modules
+:actions:
+- :url: "/labels/mes_modules/mes_modules/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :separator: true
+- :url: "/messcada/hr/modules/$:id$/start_bulk_registration"
+  :text: Start bulk registration mode
+  :icon: toggle-on
+  :title: Start bulk registration mode
+  :popup: true
+  :hide_if_true: bulk_registration_mode
+- :url: "/messcada/hr/modules/$:id$/stop_bulk_registration"
+  :text: Stop bulk registration mode
+  :icon: toggle-off
+  :title: Stop bulk registration mode
+  :popup: true
+  :hide_if_false: bulk_registration_mode

@@ -1,9 +1,10 @@
 ---
 :caption: Modules
-:sql: SELECT "mes_modules"."id", "mes_modules"."module_code", "mes_modules"."module_type",
-  "mes_modules"."server_ip", "mes_modules"."ip_address", "mes_modules"."port", "mes_modules"."alias", "mes_modules"."active",
-  "mes_modules"."created_at", "mes_modules"."updated_at", fn_current_status('mes_modules',
-  "mes_modules"."id") AS status FROM "mes_modules"
+:sql: "SELECT\r\n  \"mes_modules\".\"id\",\r\n  \"mes_modules\".\"module_code\",\r\n
+  \ \"mes_modules\".\"module_type\",\r\n  \"mes_modules\".\"server_ip\",\r\n  \"mes_modules\".\"ip_address\",\r\n
+  \ \"mes_modules\".\"port\",\r\n  \"mes_modules\".\"alias\",\r\n  \"mes_modules\".\"active\",\r\n
+  \ \"mes_modules\".\"created_at\",\r\n  \"mes_modules\".\"updated_at\",\r\n  \"mes_modules\".\"bulk_registration_mode\"\r\nFROM\r\n
+  \ \"mes_modules\""
 :limit: 
 :offset: 
 :external_settings:
@@ -169,12 +170,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status:
-    :name: status
+  bulk_registration_mode:
+    :name: bulk_registration_mode
     :sequence_no: 11
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
+    :caption: Bulk registration mode
+    :namespaced_name: mes_modules.bulk_registration_mode
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false

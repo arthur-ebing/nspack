@@ -85,7 +85,7 @@ module UiRules
       cultivar_id = product_setup_template&.cultivar_id
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
-      p default_mkting_org_id
+
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
 
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?

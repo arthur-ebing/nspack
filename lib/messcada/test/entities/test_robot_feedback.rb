@@ -35,7 +35,7 @@ module MesscadaApp
                                 line4: act[3],
                                 line5: act[4],
                                 line6: act[5])
-        assert_equal exp, ent.four_line
+        assert_equal exp, ent.four_lines
       end
     end
     # rubocop:enable Style/WordArray

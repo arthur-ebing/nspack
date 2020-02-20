@@ -27,6 +27,7 @@ class TestRobotResponder < Minitest::Test
                                          line5: '5',
                                          line6: '6')
     responder = Crossbeams::RobotResponder.new(ent)
+    responder.display_lines = 6
     assert_equal exp, responder.render
   end
 end

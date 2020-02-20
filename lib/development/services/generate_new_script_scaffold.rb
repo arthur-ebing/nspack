@@ -91,7 +91,6 @@ module DevelopmentApp
     end
 
     def comment_indent(text)
-      p text.split("\n")
       text.split("\n").map(&:chomp).join("\n# ")
     end
   end

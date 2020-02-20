@@ -1,0 +1,8 @@
+---
+:dataminer_definition: personnel_identifiers
+:actions:
+- :url: "/masterfiles/human_resources/personnel_identifiers/$:id$/link_contract_worker"
+  :text: Link contract worker
+  :icon: link
+  :title: Link contract worker
+  :popup: true

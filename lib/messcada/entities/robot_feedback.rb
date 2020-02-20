@@ -21,7 +21,7 @@ module MesscadaApp
     end
 
     # Re-work lines to fit a device only capable of 4 lines of text display.
-    def four_line # rubocop:disable Metrics/AbcSize
+    def four_lines # rubocop:disable Metrics/AbcSize
       return [line1, line2, line3, line4] if line5.nil_or_empty? && line6.nil_or_empty?
 
       ar = [line1, line2, line3, line4, line5, line6].compact

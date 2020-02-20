@@ -261,7 +261,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 }
 
                 txt = xmlDoc.getElementsByTagName('msg')[0];
-                if (txt.childNodes.length > 0) {
+                if (txt && txt.childNodes.length > 0) {
                   lcd1.textContent = txt.childNodes[0].nodeValue;
                 } else {
                   txt = xmlDoc.getElementsByTagName('lcd1')[0];
@@ -331,6 +331,20 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 url: '/messcada/hr/register_id?',
                 p1: 'card_reader',
                 p2: 'value',
+                p3: 'device',
+                p4: null,
+              },
+              {
+                url: '/messcada/hr/logon?',
+                p1: 'card_reader',
+                p2: 'identifier',
+                p3: 'device',
+                p4: null,
+              },
+              {
+                url: '/messcada/hr/logoff?',
+                p1: 'card_reader',
+                p2: 'identifier',
                 p3: 'device',
                 p4: null,
               },
