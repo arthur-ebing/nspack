@@ -4,7 +4,7 @@ Sequel.migration do
     extension :pg_triggers
     create_table(:orchard_test_results, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer
+      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer, null: false
       foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
       foreign_key :orchard_id, :orchards, type: :integer
       foreign_key :puc_id, :pucs, type: :integer
@@ -45,11 +45,11 @@ Sequel.migration do
 
     create_table(:orchard_test_logs, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :orchard_test_result_id, :orchard_test_results, type: :integer
-      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer
-      foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
-      foreign_key :orchard_id, :orchards, type: :integer
-      foreign_key :puc_id, :pucs, type: :integer
+      Integer :orchard_test_result_id
+      Integer :orchard_test_type_id
+      Integer :orchard_set_result_id
+      Integer :orchard_id
+      Integer :puc_id
       String :description
       String :status_description
 

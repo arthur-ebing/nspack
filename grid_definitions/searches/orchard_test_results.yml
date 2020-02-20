@@ -1,0 +1,24 @@
+---
+:dataminer_definition: orchard_test_results
+:actions:
+- :url: "/quality/test_results/orchard_test_results/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/quality/test_results/orchard_test_results/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/quality/test_results/orchard_test_results/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/new"
+  :text: New Orchard Test Result
+  :style: :button
+  :behaviour: :popup

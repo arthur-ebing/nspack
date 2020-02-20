@@ -1,0 +1,421 @@
+---
+:caption: Orchard Test Results
+:sql: SELECT "orchard_test_results"."id", "orchard_test_results"."orchard_test_type_id",
+  "orchard_test_results"."orchard_set_result_id", "orchard_test_results"."orchard_id",
+  "orchard_test_results"."puc_id", "orchard_test_results"."description", "orchard_test_results"."status_description",
+  "orchard_test_results"."passed", "orchard_test_results"."classification_only", "orchard_test_results"."freeze_result",
+  "orchard_test_results"."api_result", "orchard_test_results"."classifications", "orchard_test_results"."cultivar_ids",
+  "orchard_test_results"."applicable_from", "orchard_test_results"."applicable_to",
+  "orchard_test_results"."active", "orchard_test_results"."created_at", "orchard_test_results"."updated_at",
+  "orchards"."orchard_code", "orchard_set_results"."description" AS orchard_set_results_description,
+  "orchard_test_types"."test_type_code", "pucs"."puc_code", fn_current_status('orchard_test_results',
+  "orchard_test_results"."id") AS status FROM "orchard_test_results" LEFT JOIN "orchards"
+  ON "orchards"."id" = "orchard_test_results"."orchard_id" LEFT JOIN "orchard_set_results"
+  ON "orchard_set_results"."id" = "orchard_test_results"."orchard_set_result_id" LEFT
+  JOIN "orchard_test_types" ON "orchard_test_types"."id" = "orchard_test_results"."orchard_test_type_id"
+  LEFT JOIN "pucs" ON "pucs"."id" = "orchard_test_results"."puc_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: orchard_test_results.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_test_type_id:
+    :name: orchard_test_type_id
+    :sequence_no: 2
+    :caption: Orchard test type
+    :namespaced_name: orchard_test_results.orchard_test_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_set_result_id:
+    :name: orchard_set_result_id
+    :sequence_no: 3
+    :caption: Orchard set result
+    :namespaced_name: orchard_test_results.orchard_set_result_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_id:
+    :name: orchard_id
+    :sequence_no: 4
+    :caption: Orchard
+    :namespaced_name: orchard_test_results.orchard_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_id:
+    :name: puc_id
+    :sequence_no: 5
+    :caption: Puc
+    :namespaced_name: orchard_test_results.puc_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 6
+    :caption: Description
+    :namespaced_name: orchard_test_results.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status_description:
+    :name: status_description
+    :sequence_no: 7
+    :caption: Status description
+    :namespaced_name: orchard_test_results.status_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 8
+    :caption: Passed
+    :namespaced_name: orchard_test_results.passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification_only:
+    :name: classification_only
+    :sequence_no: 9
+    :caption: Classification only
+    :namespaced_name: orchard_test_results.classification_only
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  freeze_result:
+    :name: freeze_result
+    :sequence_no: 10
+    :caption: Freeze result
+    :namespaced_name: orchard_test_results.freeze_result
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  api_result:
+    :name: api_result
+    :sequence_no: 11
+    :caption: Api result
+    :namespaced_name: orchard_test_results.api_result
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classifications:
+    :name: classifications
+    :sequence_no: 12
+    :caption: Classifications
+    :namespaced_name: orchard_test_results.classifications
+    :data_type: :hstore
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_ids:
+    :name: cultivar_ids
+    :sequence_no: 13
+    :caption: Cultivar ids
+    :namespaced_name: orchard_test_results.cultivar_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_from:
+    :name: applicable_from
+    :sequence_no: 14
+    :caption: Applicable from
+    :namespaced_name: orchard_test_results.applicable_from
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_to:
+    :name: applicable_to
+    :sequence_no: 15
+    :caption: Applicable to
+    :namespaced_name: orchard_test_results.applicable_to
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 16
+    :caption: Active
+    :namespaced_name: orchard_test_results.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 17
+    :caption: Created at
+    :namespaced_name: orchard_test_results.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 18
+    :caption: Updated at
+    :namespaced_name: orchard_test_results.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 19
+    :caption: Orchard code
+    :namespaced_name: orchards.orchard_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_set_results_description:
+    :name: orchard_set_results_description
+    :sequence_no: 20
+    :caption: Orchard set results description
+    :namespaced_name: orchard_set_results.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  test_type_code:
+    :name: test_type_code
+    :sequence_no: 21
+    :caption: Test type code
+    :namespaced_name: orchard_test_types.test_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 22
+    :caption: Puc code
+    :namespaced_name: pucs.puc_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 23
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: orchard_test_results.orchard_test_type_id
+  :caption: Orchard test type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT test_type_code, id FROM orchard_test_types ORDER BY test_type_code
+- :column: orchard_test_results.orchard_set_result_id
+  :caption: Orchard set result
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT description, id FROM orchard_set_results ORDER BY description
+- :column: orchard_test_results.orchard_id
+  :caption: Orchard
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
+- :column: orchard_test_results.puc_id
+  :caption: Puc
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code

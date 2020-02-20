@@ -13,6 +13,28 @@ module QualityApp
 
     crud_calls_for :orchard_test_types, name: :orchard_test_type, wrapper: OrchardTestType
 
+    build_for_select :orchard_test_results,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :orchard_test_results,
+                          label: :description,
+                          value: :id,
+                          order_by: :description
+
+    crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
+
+    build_for_select :orchard_set_results,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :orchard_set_results,
+                          label: :description,
+                          value: :id,
+                          order_by: :description
+
+    crud_calls_for :orchard_set_results, name: :orchard_set_result, wrapper: OrchardSetResult
+
     def find_orchard_test_type_flat(id)
       query = <<~SQL
         SELECT
@@ -30,6 +52,28 @@ module QualityApp
             orchard_test_types.id
       SQL
       OrchardTestTypeFlat.new(DB[query].first)
+    end
+
+    def find_orchard_test_result_flat(id)
+      query = <<~SQL
+        SELECT
+            orchard_test_results.*,
+            orchard_test_types.test_type_code,
+            orchards.orchard_code,
+            pucs.puc_code,
+            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS cultivars
+        FROM
+            orchard_test_results
+            JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id
+            LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_results.cultivar_ids)
+            LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id
+            LEFT JOIN puc ON puc.id = orchard_test_results.puc_id
+
+        WHERE orchard_test_results.id = #{id}
+        GROUP BY
+            orchard_test_results.id
+      SQL
+      OrchardTestResultFlat.new(DB[query].first)
     end
 
     def create_orchard_test_type(params)
@@ -50,10 +94,29 @@ module QualityApp
       DB[:orchard_test_types].where(id: id).update(attrs)
     end
 
-    def for_select_cultivars(args = nil)
+    def for_select_cultivars(args = {}, active = true)
       ds = DB[:cultivars].join(:commodities, id: :commodity_id)
-      ds = ds.where(args) unless args.nil?
+      ds = ds.where(args)
+      ds = ds.where(Sequel[:cultivars][:active] => active)
       ds.select_map([:cultivar_name, Sequel[:cultivars][:id]])
+    end
+
+    def for_select_inactive_cultivars(args)
+      for_select_cultivars(args, false)
+    end
+
+    def create_orchard_test_result(params)
+      attrs = params.to_h
+      attrs[:cultivar_ids] = array_for_db_col(attrs[:cultivar_ids]) if attrs.key?(:cultivar_ids)
+
+      DB[:orchard_test_results].insert(attrs)
+    end
+
+    def update_orchard_test_result(id, params)
+      attrs = params.to_h
+      attrs[:cultivar_ids] = array_for_db_col(attrs[:cultivar_ids]) if attrs.key?(:cultivar_ids)
+
+      DB[:orchard_test_results].where(id: id).update(attrs)
     end
   end
 end
