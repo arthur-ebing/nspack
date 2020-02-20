@@ -4,30 +4,30 @@ Sequel.migration do
     extension :pg_triggers
     create_table(:orchard_test_results, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer, null: false
-      foreign_key :puc_id, :pucs, type: :integer
+      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer
+      foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
       foreign_key :orchard_id, :orchards, type: :integer
-      foreign_key :cultivar_id, :cultivars, type: :integer
-
+      foreign_key :puc_id, :pucs, type: :integer
       String :description
+      String :status_description
 
-      TrueClass :passed, default: false
-      String :classification
-
-      TrueClass :classification_only, default: false
-      TrueClass :freeze_result, default: false
+      TrueClass :passed, default: true
+      TrueClass :classification_only, default: true
+      TrueClass :freeze_result, default: true
       
       Jsonb :api_result
 
-      DateTime :applicable_from
-      DateTime :applicable_to
+      column :classifications, 'hstore'
+      column :cultivar_ids, 'integer[]'
+
+      DateTime :applicable_from, null: false
+      DateTime :applicable_to, null: false
 
       TrueClass :active, default: true
       DateTime :created_at
       DateTime :updated_at
 
       index [:orchard_test_type_id], name: :orchard_test_type_id
-      index [:orchard_test_type_id, :orchard_id], name: :orchard_test_type_orchard_unique_code, unique: true
     end
 
     pgt_created_at(:orchard_test_results,
@@ -45,26 +45,27 @@ Sequel.migration do
 
     create_table(:orchard_test_logs, ignore_index_errors: true) do
       primary_key :id
-      Integer :orchard_test_result_id
-      Integer :orchard_test_type_id
-      Integer :puc_id
-      Integer :orchard_id
-      Integer :cultivar_id
-
+      foreign_key :orchard_test_result_id, :orchard_test_results, type: :integer
+      foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer
+      foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
+      foreign_key :orchard_id, :orchards, type: :integer
+      foreign_key :puc_id, :pucs, type: :integer
       String :description
+      String :status_description
 
-      TrueClass :passed
-      String :classification
-
-      TrueClass :classification_only
-      TrueClass :freeze_result
+      TrueClass :passed, default: true
+      TrueClass :classification_only, default: true
+      TrueClass :freeze_result, default: true
 
       Jsonb :api_result
 
-      DateTime :applicable_from
-      DateTime :applicable_to
+      column :classifications, 'hstore'
+      column :cultivar_ids, 'integer[]'
 
-      TrueClass :active
+      DateTime :applicable_from, null: false
+      DateTime :applicable_to, null: false
+
+      TrueClass :active, default: true
       DateTime :created_at
       DateTime :updated_at
       DateTime :logged_at, null: false
@@ -86,15 +87,17 @@ Sequel.migration do
           INSERT INTO orchard_test_logs
            (orchard_test_result_id,
             orchard_test_type_id,
-            puc_id,
+            orchard_set_result_id,
             orchard_id,
-            cultivar_id,
+            puc_id,
             description,
+            status_description,
             passed,
             classification_only,
             freeze_result,
             api_result,
-            classification,
+            classifications,
+            cultivar_ids,
             applicable_from,
             applicable_to,
             active,
@@ -103,15 +106,17 @@ Sequel.migration do
           VALUES 
            (NEW.id,
             NEW.orchard_test_type_id,
-            NEW.puc_id,
+            NEW.orchard_set_result_id,
             NEW.orchard_id,
-            NEW.cultivar_id,
+            NEW.puc_id,
             NEW.description,
+            NEW.status_description,
             NEW.passed,
             NEW.classification_only,
             NEW.freeze_result,
             NEW.api_result,
-            NEW.classification,
+            NEW.classifications,
+            NEW.cultivar_ids,
             NEW.applicable_from,
             NEW.applicable_to,
             NEW.active,
@@ -123,7 +128,7 @@ Sequel.migration do
         LANGUAGE plpgsql;
 
       CREATE TRIGGER log_orchard_test_result
-      AFTER UPDATE
+      AFTER INSERT
       ON public.orchard_test_results
       FOR EACH ROW
       EXECUTE PROCEDURE public.fn_log_orchard_test_result();
