@@ -2,21 +2,8 @@
 
 module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
-    def phyt_clean_request
-      service_res = nil
-      repo.transaction do
-        service_res = QualityApp::PhytCleanRequests.call
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
-        log_transaction
-      end
-      service_res
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
     def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
-      res = OrchardTestCreateSchema.call(params)
+      res = validate_orchard_test_result_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -26,44 +13,29 @@ module QualityApp
         log_transaction
       end
       instance = orchard_test_result(id)
-      success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
+      success_response("Created orchard test result #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize
-      res = OrchardTestUpdateSchema.call(params)
+    def update_orchard_test_result(id, params)
+      res = validate_orchard_test_result_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        service_res = QualityApp::UpdateOrchardTestResult.call(id, res)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
+        repo.update_orchard_test_result(id, res)
         log_transaction
       end
-      instance = repo.find_orchard_test_result_flat(id)
-      success_response("Updated orchard test result #{instance.orchard_test_type_code}", instance)
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
-    def copy_orchard_test_result(id)
-      instance = orchard_test_result(id).to_h
-      res = create_orchard_test_result(orchard_test_type_id: instance[:orchard_test_type_id])
-      return res unless res.success
-
-      instance[:id] = res.instance.id
-      success_response("Copied orchard test result #{instance[:orchard_test_type_code]}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
+      instance = orchard_test_result(id)
+      success_response("Updated orchard test result #{instance.description}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_orchard_test_result(id)
-      name = orchard_test_result(id).orchard_test_type_code
+      name = orchard_test_result(id).description
       repo.transaction do
         repo.delete_orchard_test_result(id)
         log_status(:orchard_test_results, id, 'DELETED')
@@ -86,7 +58,11 @@ module QualityApp
     end
 
     def orchard_test_result(id)
-      repo.find_orchard_test_result_flat(id)
+      repo.find_orchard_test_result(id)
+    end
+
+    def validate_orchard_test_result_params(params)
+      OrchardTestResultSchema.call(params)
     end
   end
 end

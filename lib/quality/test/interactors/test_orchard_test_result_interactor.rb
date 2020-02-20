@@ -17,7 +17,7 @@ module QualityApp
     end
 
     def test_orchard_test_result
-      QualityApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_result_flat).returns(fake_orchard_test_result)
+      QualityApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_result).returns(fake_orchard_test_result)
       entity = interactor.send(:orchard_test_result, 1)
       assert entity.is_a?(OrchardTestResult)
     end
@@ -26,7 +26,7 @@ module QualityApp
       attrs = fake_orchard_test_result.to_h.reject { |k, _| k == :id }
       res = interactor.create_orchard_test_result(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestResultFlat, res.instance)
+      assert_instance_of(OrchardTestResult, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -44,7 +44,7 @@ module QualityApp
       attrs[:description] = 'a_change'
       res = interactor.update_orchard_test_result(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestResultFlat, res.instance)
+      assert_instance_of(OrchardTestResult, res.instance)
       assert_equal 'a_change', res.instance.description
       refute_equal value, res.instance.description
     end
@@ -69,21 +69,24 @@ module QualityApp
 
     def orchard_test_result_attrs
       orchard_test_type_id = create_orchard_test_type
-      puc_id = create_puc
+      orchard_set_result_id = create_orchard_set_result
       orchard_id = create_orchard
-      cultivar_id = create_cultivar
+      puc_id = create_puc
+      cultivar_ids = [create_cultivar, create_cultivar, create_cultivar]
       {
         id: 1,
         orchard_test_type_id: orchard_test_type_id,
-        puc_id: puc_id,
+        orchard_set_result_id: orchard_set_result_id,
         orchard_id: orchard_id,
-        cultivar_id: cultivar_id,
+        puc_id: puc_id,
         description: Faker::Lorem.unique.word,
+        status_description: 'ABC',
         passed: false,
         classification_only: false,
         freeze_result: false,
         api_result: nil,
-        classification: nil,
+        classifications: nil,
+        cultivar_ids: cultivar_ids,
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true

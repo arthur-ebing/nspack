@@ -44,7 +44,7 @@ class TestOrchardTestResultRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_orchard_test_result).returns(ok_response(instance: row_vals))
     patch_as_fetch 'quality/test_results/orchard_test_results/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect
+    expect_json_update_grid
   end
 
   def test_update_fail
@@ -92,9 +92,10 @@ class TestOrchardTestResultRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    INTERACTOR.any_instance.stubs(:create_orchard_test_result).returns(ok_response(instance: { id: 1 }))
-    post_as_fetch 'quality/test_results/orchard_test_results', { id: 1 }, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_flash_notice
+    row_vals = Hash.new(1)
+    INTERACTOR.any_instance.stubs(:create_orchard_test_result).returns(ok_response(instance: row_vals))
+    post_as_fetch 'quality/test_results/orchard_test_results', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_json_add_to_grid(has_notice: true)
   end
 
   def test_create_remotely_fail

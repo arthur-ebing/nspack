@@ -4,7 +4,12 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module QualityApp
   class TestOrchardTestTypeInteractor < MiniTestWithHooks
-    include OrchardTestTypeFactory
+    include OrchardTestFactory
+    include MasterfilesApp::TargetMarketFactory
+    include MasterfilesApp::CultivarFactory
+    include MasterfilesApp::CommodityFactory
+    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::PartyFactory
 
     def test_repo
       repo = interactor.send(:repo)
