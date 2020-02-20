@@ -10,5 +10,6 @@ module MasterfilesApp
     attribute :day_night_or_custom, Types::Integer
     attribute :shift_type_code, Types::String
     attribute :employment_type_code, Types::String
+    attribute :plant_resource_code, Types::String
   end
 end

@@ -8,7 +8,7 @@ module MasterfilesApp
 
       id = nil
       repo.transaction do
-        id = repo.create_shift_type(res)
+        id = repo.create_shift_type(res.instance)
         log_status(:shift_types, id, 'CREATED')
         log_transaction
       end

@@ -3,7 +3,8 @@
 module UiRules
   class ShiftRule < Base
     def generate_rules
-      @repo = MasterfilesApp::HumanResourcesRepo.new
+      @repo = ProductionApp::HumanResourcesRepo.new
+      @mf_hr_repo = MasterfilesApp::HumanResourcesRepo.new
       make_form_object
       apply_form_values
 
@@ -35,7 +36,7 @@ module UiRules
 
     def new_fields
       {
-        shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, caption: 'Shift Type', required: true },
+        shift_type_id: { renderer: :select, options: @mf_hr_repo.for_select_shift_types_with_codes, caption: 'Shift Type', required: true },
         date: { renderer: :input, subtype: :date, caption: 'Please select', required: true }
       }
     end

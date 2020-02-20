@@ -6,7 +6,7 @@ module ProductionApp
       attr_reader :task, :entity
       def initialize(task, shift_id = nil)
         @task = task
-        @repo = MasterfilesApp::HumanResourcesRepo.new
+        @repo = ProductionApp::HumanResourcesRepo.new
         @id = shift_id
         @entity = @id ? @repo.find_shift(@id) : nil
       end
@@ -15,9 +15,6 @@ module ProductionApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
       }.freeze
 
       def call
@@ -46,14 +43,6 @@ module ProductionApp
 
         all_ok
       end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
     end
   end
 end

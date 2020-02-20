@@ -3,7 +3,8 @@
 module UiRules
   class ShiftExceptionRule < Base
     def generate_rules
-      @repo = MasterfilesApp::HumanResourcesRepo.new
+      @repo = ProductionApp::HumanResourcesRepo.new
+      @mf_hr_repo = MasterfilesApp::HumanResourcesRepo.new
       make_form_object
       apply_form_values
 
@@ -80,7 +81,7 @@ module UiRules
     end
 
     def contract_worker_name
-      @repo.find_contract_worker(@options[:contract_worker_id])&.contract_worker_name
+      @mf_hr_repo.find_contract_worker(@options[:contract_worker_id])&.contract_worker_name
     end
 
     def shift_type_code

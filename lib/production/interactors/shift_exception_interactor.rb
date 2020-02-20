@@ -88,7 +88,7 @@ module ProductionApp
     private
 
     def repo
-      @repo ||= MasterfilesApp::HumanResourcesRepo.new
+      @repo ||= ProductionApp::HumanResourcesRepo.new
     end
 
     def shift_exception(id)

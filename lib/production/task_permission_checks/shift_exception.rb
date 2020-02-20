@@ -6,7 +6,7 @@ module ProductionApp
       attr_reader :task, :entity
       def initialize(task, shift_exception_id = nil)
         @task = task
-        @repo = MasterfilesApp::HumanResourcesRepo.new
+        @repo = ProductionApp::HumanResourcesRepo.new
         @id = shift_exception_id
         @entity = @id ? @repo.find_shift_exception(@id) : nil
       end

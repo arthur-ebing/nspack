@@ -1,6 +1,7 @@
 ---
 :caption: Contract Types
-:sql: SELECT "contract_types"."id", "contract_types"."code" FROM "contract_types"
+:sql: SELECT "contract_types"."id", "contract_types"."code", "contract_types"."description"
+  FROM "contract_types"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -32,6 +33,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: contract_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
