@@ -13,7 +13,7 @@ class Nspack < Roda
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: true,
                                                   line1: params[:value],
-                                                  line4: 'Registered')
+                                                  line4: res.message)
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,

@@ -6,13 +6,15 @@ module MesscadaApp
       res = validate_identifier_for_registration(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      return success_response('Already registered.') if repo.exists?(:personnel_identifiers, identifier: res[:value])
+
       id = nil
       repo.transaction do
         id = repo.create_personnel_identifier(res)
         log_status(:personnel_identifiers, id, 'CREATED')
         log_transaction
       end
-      success_response("Created personnel identifier #{res[:value]}")
+      success_response('Registered')
     rescue Crossbeams::InfoError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('register_identifier'))
       puts e.message
@@ -42,14 +44,14 @@ module MesscadaApp
 
     def logon(params)
       name = repo.contract_worker_name(params[:identifier])
-      return failed_response("No one linked to #{params[:identifier]}") if name.nil_or_empty?
+      return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?
 
       success_response('Logged on', contract_worker: name)
     end
 
     def logoff(params)
       name = repo.contract_worker_name(params[:identifier])
-      return failed_response("No one linked to #{params[:identifier]}") if name.nil_or_empty?
+      return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?
 
       success_response('Logged off', contract_worker: name)
     end

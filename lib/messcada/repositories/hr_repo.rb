@@ -4,9 +4,9 @@ module MesscadaApp
   class HrRepo < BaseRepo
     def create_personnel_identifier(res)
       hw_type = if res[:card_reader]
-                  'card'
+                  'rfid-rdr'
                 else
-                  'rfid'
+                  'rfid-usb'
                 end
       DB[:personnel_identifiers].insert_conflict
                                 .insert(identifier: res[:value],
