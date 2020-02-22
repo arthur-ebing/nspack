@@ -1,14 +1,14 @@
 ---
 :caption: Contract Workers
 :sql: "SELECT\r\n  contract_workers.id,\r\n  contract_workers.employment_type_id,\r\n
-  \ contract_workers.contract_type_id,\r\n  contract_workers.wage_level_id,\r\n  contract_workers.full_names,\r\n
-  \ contract_workers.surname,\r\n  contract_workers.title,\r\n  personnel_identifiers.identifier,\r\n
-  \ contract_workers.email,\r\n  contract_workers.contact_number,\r\n  contract_workers.personnel_number,\r\n
-  \ contract_workers.start_date,\r\n  contract_workers.end_date,\r\n  contract_workers.created_at,\r\n
-  \ contract_workers.updated_at,\r\n  contract_workers.active,\r\n  contract_workers.personnel_identifier_id,\r\n
-  \ contract_types.code AS contract_type_code,\r\n  employment_types.code AS employment_type_code,\r\n
-  \ wage_levels.description,\r\n  wage_levels.wage_level\r\nFROM\r\n  contract_workers\r\n
-  \ JOIN contract_types ON contract_types.id = contract_workers.contract_type_id\r\n
+  \ contract_workers.contract_type_id,\r\n  contract_workers.wage_level_id,\r\n  contract_workers.first_name,\r\n
+  \ contract_workers.surname,\r\n  contract_workers.title,\r\n  contract_workers.personnel_number,\r\n
+  \ wage_levels.wage_level,\r\n  personnel_identifiers.identifier,\r\n  contract_workers.start_date,\r\n
+  \ contract_workers.end_date,\r\n  contract_workers.email,\r\n  contract_workers.contact_number,\r\n
+  \ contract_workers.created_at,\r\n  contract_workers.updated_at,\r\n  contract_workers.active,\r\n
+  \ contract_workers.personnel_identifier_id,\r\n  contract_types.contract_type_code,\r\n
+  \ employment_types.employment_type_code,\r\n  wage_levels.description\r\nFROM\r\n
+  \ contract_workers\r\n  JOIN contract_types ON contract_types.id = contract_workers.contract_type_id\r\n
   \ JOIN employment_types ON employment_types.id = contract_workers.employment_type_id\r\n
   \ JOIN wage_levels ON wage_levels.id = contract_workers.wage_level_id\r\n  LEFT
   OUTER JOIN personnel_identifiers ON personnel_identifiers.id = contract_workers.personnel_identifier_id"
@@ -80,17 +80,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  full_names:
-    :name: full_names
+  first_name:
+    :name: first_name
     :sequence_no: 5
-    :caption: Full names
-    :namespaced_name: contract_workers.full_names
+    :caption: First name
+    :namespaced_name: contract_workers.first_name
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -128,57 +128,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  identifier:
-    :name: identifier
-    :sequence_no: 8
-    :caption: Identifier
-    :namespaced_name: personnel_identifiers.identifier
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  email:
-    :name: email
-    :sequence_no: 9
-    :caption: Email
-    :namespaced_name: contract_workers.email
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  contact_number:
-    :name: contact_number
-    :sequence_no: 10
-    :caption: Contact number
-    :namespaced_name: contract_workers.contact_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   personnel_number:
     :name: personnel_number
-    :sequence_no: 11
+    :sequence_no: 8
     :caption: 'NO'
     :namespaced_name: contract_workers.personnel_number
     :data_type: :string
@@ -192,9 +144,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  wage_level:
+    :name: wage_level
+    :sequence_no: 9
+    :caption: Wage
+    :namespaced_name: wage_levels.wage_level
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  identifier:
+    :name: identifier
+    :sequence_no: 10
+    :caption: Identifier
+    :namespaced_name: personnel_identifiers.identifier
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   start_date:
     :name: start_date
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Start date
     :namespaced_name: contract_workers.start_date
     :data_type: :date
@@ -210,7 +194,7 @@
     :group_max: false
   end_date:
     :name: end_date
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: End date
     :namespaced_name: contract_workers.end_date
     :data_type: :date
@@ -224,9 +208,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  email:
+    :name: email
+    :sequence_no: 13
+    :caption: Email
+    :namespaced_name: contract_workers.email
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contact_number:
+    :name: contact_number
+    :sequence_no: 14
+    :caption: Contact number
+    :namespaced_name: contract_workers.contact_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Created at
     :namespaced_name: contract_workers.created_at
     :data_type: :datetime
@@ -242,7 +258,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: contract_workers.updated_at
     :data_type: :datetime
@@ -258,7 +274,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Active
     :namespaced_name: contract_workers.active
     :data_type: :boolean
@@ -274,7 +290,7 @@
     :group_max: false
   personnel_identifier_id:
     :name: personnel_identifier_id
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Personnel identifier
     :namespaced_name: contract_workers.personnel_identifier_id
     :data_type: :string
@@ -290,9 +306,9 @@
     :group_max: false
   contract_type_code:
     :name: contract_type_code
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Contract type code
-    :namespaced_name: contract_types.code
+    :namespaced_name: contract_types.contract_type_code
     :data_type: :string
     :width: 
     :format: 
@@ -306,9 +322,9 @@
     :group_max: false
   employment_type_code:
     :name: employment_type_code
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Employment type code
-    :namespaced_name: employment_types.code
+    :namespaced_name: employment_types.employment_type_code
     :data_type: :string
     :width: 
     :format: 
@@ -322,7 +338,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Description
     :namespaced_name: wage_levels.description
     :data_type: :string
@@ -336,36 +352,4 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  wage_level:
-    :name: wage_level
-    :sequence_no: 21
-    :caption: Wage
-    :namespaced_name: wage_levels.wage_level
-    :data_type: :string
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-:query_parameter_definitions:
-- :column: contract_types.code
-  :caption: Contract Type Code
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 
-- :column: employment_types.code
-  :caption: Employment Type Code
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 
+:query_parameter_definitions: []

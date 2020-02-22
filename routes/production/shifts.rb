@@ -145,10 +145,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.is do
-        r.get do       # SHOW
-          check_auth!('shifts', 'read')
-          show_partial { Production::Shifts::ShiftException::Show.call(id) }
-        end
         r.patch do     # UPDATE
           res = interactor.update_shift_exception(id, params[:shift_exception])
           if res.success

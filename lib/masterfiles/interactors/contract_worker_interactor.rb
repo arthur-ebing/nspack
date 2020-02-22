@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_worker(id)
-      success_response("Created contract worker #{instance.full_names}", instance)
+      success_response("Created contract worker #{instance.first_name}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { full_names: ['This contract worker already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { first_name: ['This contract worker already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,13 +29,13 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_worker(id)
-      success_response("Updated contract worker #{instance.full_names}", instance)
+      success_response("Updated contract worker #{instance.first_name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_contract_worker(id)
-      name = contract_worker(id).full_names
+      name = contract_worker(id).first_name
       repo.transaction do
         repo.delete_contract_worker(id)
         log_status(:contract_workers, id, 'DELETED')

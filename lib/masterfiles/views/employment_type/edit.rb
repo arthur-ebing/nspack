@@ -17,7 +17,7 @@ module Masterfiles
               form.action "/masterfiles/human_resources/employment_types/#{id}"
               form.remote!
               form.method :update
-              form.add_field :code
+              form.add_field :employment_type_code
             end
           end
 

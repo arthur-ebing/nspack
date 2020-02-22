@@ -1,7 +1,24 @@
 # frozen_string_literal: true
 
 class Nspack < Roda
-  route 'reports', 'production' do |r|
+  route 'reports', 'production' do |r| # rubocop:disable Metrics/BlockLength
+    # SHIFT: PACKER REPORT
+    # ---------------------------------------------------------------------------
+    r.on 'print_packer_report', Integer do |id|
+      res = CreateJasperReport.call(report_name: 'packer_report',
+                                    user: current_user.login_name,
+                                    file: 'packer_report',
+                                    params: {
+                                      shift_id: id,
+                                      keep_file: true
+                                    })
+      if res.success
+        change_window_location_via_json(res.instance, request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     # AGGREGATE PACKOUT REPORT
     # --------------------------------------------------------------------------
     r.on 'aggregate_packout' do

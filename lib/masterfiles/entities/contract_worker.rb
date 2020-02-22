@@ -6,11 +6,11 @@ module MasterfilesApp
     attribute :employment_type_id, Types::Integer
     attribute :contract_type_id, Types::Integer
     attribute :wage_level_id, Types::Integer
-    attribute :employer_type_code, Types::String
+    attribute :employment_type_code, Types::String
     attribute :contract_type_code, Types::String
     attribute :contract_worker_name, Types::String
     attribute :wage_level, Types::Decimal
-    attribute :full_names, Types::String
+    attribute :first_name, Types::String
     attribute :surname, Types::String
     attribute :title, Types::String
     attribute :email, Types::String

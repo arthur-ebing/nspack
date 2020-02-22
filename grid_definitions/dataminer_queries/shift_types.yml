@@ -1,8 +1,8 @@
 ---
 :caption: Shift Types
 :sql: SELECT "shift_types"."id", "shift_types"."plant_resource_id", "shift_types"."employment_type_id",
-  fn_shift_type_code(shift_types.id),  "shift_types"."start_hour", "shift_types"."end_hour",
-  "shift_types"."day_night_or_custom", "employment_types"."code" as employment_type_code,
+  fn_shift_type_code(shift_types.id) AS shift_type_code,  "shift_types"."start_hour",
+  "shift_types"."end_hour", "shift_types"."day_night_or_custom", "employment_types".employment_type_code,
   "plant_resources"."plant_resource_code" FROM "shift_types" JOIN "employment_types"
   ON "employment_types"."id" = "shift_types"."employment_type_id" JOIN "plant_resources"
   ON "plant_resources"."id" = "shift_types"."plant_resource_id"
@@ -58,8 +58,8 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fn_shift_type_code:
-    :name: fn_shift_type_code
+  shift_type_code:
+    :name: shift_type_code
     :sequence_no: 4
     :caption: Shift type code
     :namespaced_name: 
@@ -126,7 +126,7 @@
     :name: employment_type_code
     :sequence_no: 8
     :caption: Employment type code
-    :namespaced_name: employment_types.code
+    :namespaced_name: employment_types.employment_type_code
     :data_type: :string
     :width: 
     :format: 

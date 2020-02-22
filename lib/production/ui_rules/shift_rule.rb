@@ -36,7 +36,7 @@ module UiRules
 
     def new_fields
       {
-        shift_type_id: { renderer: :select, options: @mf_hr_repo.for_select_shift_types_with_codes, caption: 'Shift Type', required: true },
+        shift_type_id: { renderer: :select, options: @mf_hr_repo.for_select_shift_types_with_codes, caption: 'Shift Type', required: true, prompt: true },
         date: { renderer: :input, subtype: :date, caption: 'Please select', required: true }
       }
     end

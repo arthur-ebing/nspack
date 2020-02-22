@@ -28,8 +28,8 @@ module UiRules
         ph_plant_resource_id: { renderer: :select, options: packhouse_plant_resources, caption: 'PH Plant Resource', required: true, prompt: true },
         line_plant_resource_id: { renderer: :select, options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::LINE), caption: 'Line Plant Resource', prompt: true },
         employment_type_id: { renderer: :select, options: @repo.for_select_employment_types, caption: 'Employment Type', required: true },
-        start_hour: { renderer: :select, options: (1..24).step(1).to_a, required: true, sort_items: false },
-        end_hour: { renderer: :select, options: (1..24).step(1).to_a, required: true, sort_items: false },
+        start_hour: { renderer: :select, options: (0..23).step(1).to_a, required: true, sort_items: false },
+        end_hour: { renderer: :select, options: (0..23).step(1).to_a, required: true, sort_items: false },
         day_night_or_custom: { renderer: :select, options: [%w[Day D], %w[Night N], %w[Custom C]], required: true, min_charwidth: 30 }
       }
     end

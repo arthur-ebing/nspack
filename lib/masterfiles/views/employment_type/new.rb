@@ -16,7 +16,7 @@ module Masterfiles
               form.caption 'New Employment Type'
               form.action '/masterfiles/human_resources/employment_types'
               form.remote! if remote
-              form.add_field :code
+              form.add_field :employment_type_code
             end
           end
 

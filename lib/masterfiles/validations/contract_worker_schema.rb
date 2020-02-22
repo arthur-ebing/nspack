@@ -8,7 +8,7 @@ module MasterfilesApp
     required(:employment_type_id, :integer).filled(:int?)
     required(:contract_type_id, :integer).filled(:int?)
     required(:wage_level_id, :integer).filled(:int?)
-    required(:full_names, Types::StrippedString).filled(:str?)
+    required(:first_name, Types::StrippedString).filled(:str?)
     required(:surname, Types::StrippedString).filled(:str?)
     required(:title, Types::StrippedString).maybe(:str?)
     required(:email, Types::StrippedString).maybe(:str?)

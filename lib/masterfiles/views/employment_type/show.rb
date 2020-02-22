@@ -13,7 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Employment Type'
               form.view_only!
-              form.add_field :code
+              form.add_field :employment_type_code
             end
           end
 

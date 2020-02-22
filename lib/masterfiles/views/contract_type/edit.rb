@@ -17,7 +17,7 @@ module Masterfiles
               form.action "/masterfiles/human_resources/contract_types/#{id}"
               form.remote!
               form.method :update
-              form.add_field :code
+              form.add_field :contract_type_code
               form.add_field :description
             end
           end

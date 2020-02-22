@@ -17,7 +17,7 @@ module Masterfiles
               form.add_field :contract_type_id
               form.add_field :wage_level_id
               form.add_field :title
-              form.add_field :full_names
+              form.add_field :first_name
               form.add_field :surname
               form.add_field :email
               form.add_field :contact_number

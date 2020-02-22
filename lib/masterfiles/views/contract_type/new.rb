@@ -16,7 +16,7 @@ module Masterfiles
               form.caption 'New Contract Type'
               form.action '/masterfiles/human_resources/contract_types'
               form.remote! if remote
-              form.add_field :code
+              form.add_field :contract_type_code
               form.add_field :description
             end
           end

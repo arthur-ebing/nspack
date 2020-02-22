@@ -3,7 +3,7 @@
 module MasterfilesApp
   class ContractType < Dry::Struct
     attribute :id, Types::Integer
-    attribute :code, Types::String
+    attribute :contract_type_code, Types::String
     attribute :description, Types::String
   end
 end

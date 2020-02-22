@@ -5,6 +5,6 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:code, Types::StrippedString).filled(:str?)
+    required(:employment_type_code, Types::StrippedString).filled(:str?)
   end
 end

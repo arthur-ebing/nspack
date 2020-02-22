@@ -40,9 +40,15 @@ module Production
             end
 
             page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Print Packer Report',
+                                  url: "/production/reports/print_packer_report/#{id}",
+                                  loading_window: true,
+                                  style: :button)
+            end
+
+            page.section do |section|
               section.show_border!
-              # unless cannot_edit
-              # new_item_url = rules[:on_consignment] ? "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/new_item_on_consignment" : "/pack_material/replenish/mr_deliveries/#{id}/mr_delivery_items/preselect"
               section.add_control(control_type: :link,
                                   text: 'New Item',
                                   url: "/production/shifts/shifts/#{id}/shift_exceptions/preselect",
@@ -54,19 +60,6 @@ module Production
                                "/list/shift_exceptions/grid?key=standard&shift_id=#{id}",
                                height: 16,
                                caption: 'Shift Exceptions')
-              # end
-              # if (rules[:can_add_invoice] || rules[:can_complete_invoice]) && !rules[:invoice_completed] || rules[:over_supply_accepted]
-              #   section.add_grid('del_items',
-              #                    "/list/mr_delivery_items_edit_unit_prices/grid?key=standard&delivery_id=#{id}",
-              #                    height: 16,
-              #                    caption: 'Delivery Line Items')
-              # end
-              # if rules[:invoice_completed]
-              #   section.add_grid('del_items',
-              #                    "/list/mr_delivery_items_show/grid?key=standard&delivery_id=#{id}",
-              #                    height: 16,
-              #                    caption: 'Delivery Line Items')
-              # end
             end
           end
 

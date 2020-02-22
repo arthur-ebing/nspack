@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = employment_type(id)
-      success_response("Created employment type #{instance.code}", instance)
+      success_response("Created employment type #{instance.employment_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { code: ['This employment type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { employment_type_code: ['This employment type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,13 +29,13 @@ module MasterfilesApp
         log_transaction
       end
       instance = employment_type(id)
-      success_response("Updated employment type #{instance.code}", instance)
+      success_response("Updated employment type #{instance.employment_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_employment_type(id)
-      name = employment_type(id).code
+      name = employment_type(id).employment_type_code
       repo.transaction do
         repo.delete_employment_type(id)
         log_status(:employment_types, id, 'DELETED')

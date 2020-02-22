@@ -1,6 +1,7 @@
 ---
 :caption: Employment Types
-:sql: SELECT "employment_types"."id", "employment_types"."code" FROM "employment_types"
+:sql: SELECT "employment_types"."id", "employment_types"."employment_type_code" FROM
+  "employment_types"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -21,25 +22,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  code:
-    :name: code
+  employment_type_code:
+    :name: employment_type_code
     :sequence_no: 2
-    :caption: Code
-    :namespaced_name: employment_types.code
+    :caption: Employment type code
+    :namespaced_name: employment_types.employment_type_code
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
 :query_parameter_definitions:
-- :column: employment_types.code
-  :caption: Code
+- :column: employment_types.employment_type_code
+  :caption: Employment Type Code
   :data_type: :string
   :control_type: :text
   :default_value: 

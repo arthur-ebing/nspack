@@ -16,8 +16,8 @@ module ProductionApp
                             wrapper: Shift,
                             parent_tables: [{
                               parent_table: :employment_types,
-                              columns: [:code],
-                              flatten_columns: { code: :employment_type_code }
+                              columns: [:employment_type_code],
+                              flatten_columns: { employment_type_code: :employment_type_code }
                             }],
                             lookup_functions: [{ function: :fn_shift_type_code,
                                                  args: [:shift_type_id],
@@ -32,23 +32,25 @@ module ProductionApp
                                                  col_name: :contract_worker_name }])
     end
 
-    def for_select_contract_workers_for_shift(shift_id)
+    def for_select_contract_workers_for_shift(shift_id) # rubocop:disable Metrics/AbcSize
       emp_type_id = DB[:shift_types].where(
         id: DB[:shifts].where(
           id: shift_id
         ).get(:shift_type_id)
       ).get(:employment_type_id)
-      if emp_type_id
-        MasterfilesApp::HumanResources.new.for_select_contract_workers(where: { employment_type_id: emp_type_id }).map do |r|
-          [DB['SELECT fn_contract_worker_name(?)', r[1]].single_value, r[1]]
-        end
-      else
-        []
+      cw_ids = DB[:shift_exceptions].where(shift_id: shift_id).select_map(:contract_worker_id)
+      MasterfilesApp::HumanResourcesRepo.new.for_select_contract_workers(where: { employment_type_id: emp_type_id }).map do |r|
+        next if cw_ids.include?(r[1])
+
+        [DB['SELECT fn_contract_worker_name(?)', r[1]].single_value, r[1]]
       end
     end
 
-    def create_shift(attrs)
-      date = attrs[:date].strftime('%Y%m%d')
+    def create_shift(attrs) # rubocop:disable Metrics/AbcSize
+      date = attrs.delete(:date)
+      start_date_times = DB[:shifts].where(shift_type_id: attrs[:shift_type_id]).map { |r| r[:start_date_time].to_date.to_s }
+      return validation_failed_response('Shift for this type and date combination already exists') if start_date_times.include?(date)
+
       shift_type = DB[:shift_types].where(id: attrs[:shift_type_id])
       start_hr = shift_type.get(:start_hour)
       end_hr = shift_type.get(:end_hour)

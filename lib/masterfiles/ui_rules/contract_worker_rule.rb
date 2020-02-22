@@ -15,10 +15,10 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:employment_type_id] = { renderer: :label, with_value: @form_object.employer_type_code, caption: 'Employment Type' }
+      fields[:employment_type_id] = { renderer: :label, with_value: @form_object.employment_type_code, caption: 'Employment Type' }
       fields[:contract_type_id] = { renderer: :label, with_value: @form_object.contract_type_code, caption: 'Contract Type' }
       fields[:wage_level_id] = { renderer: :label, with_value: @form_object.wage_level, caption: 'Wage Level' }
-      fields[:full_names] = { renderer: :label }
+      fields[:first_name] = { renderer: :label }
       fields[:surname] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:email] = { renderer: :label }
@@ -34,7 +34,7 @@ module UiRules
         employment_type_id: { renderer: :select, options: @repo.for_select_employment_types, caption: 'Employment Type', required: true },
         contract_type_id: { renderer: :select, options: @repo.for_select_contract_types, caption: 'Contract Type', required: true },
         wage_level_id: { renderer: :select, options: @repo.for_select_wage_levels, caption: 'Wage Level', required: true },
-        full_names: { required: true },
+        first_name: { required: true },
         surname: { required: true },
         title: { force_uppercase: true },
         email: {},
@@ -63,7 +63,7 @@ module UiRules
       @form_object = OpenStruct.new(employment_type_id: nil,
                                     contract_type_id: nil,
                                     wage_level_id: nil,
-                                    full_names: nil,
+                                    first_name: nil,
                                     surname: nil,
                                     title: nil,
                                     email: nil,

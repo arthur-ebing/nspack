@@ -13,7 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Contract Type'
               form.view_only!
-              form.add_field :code
+              form.add_field :contract_type_code
               form.add_field :description
             end
           end

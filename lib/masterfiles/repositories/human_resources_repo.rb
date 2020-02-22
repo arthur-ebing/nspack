@@ -3,18 +3,18 @@
 module MasterfilesApp
   class HumanResourcesRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :employment_types,
-                     label: :code,
+                     label: :employment_type_code,
                      value: :id,
                      no_active_check: true,
-                     order_by: :code
+                     order_by: :employment_type_code
 
     crud_calls_for :employment_types, name: :employment_type, wrapper: EmploymentType
 
     build_for_select :contract_types,
-                     label: :code,
+                     label: :contract_type_code,
                      value: :id,
                      no_active_check: true,
-                     order_by: :code
+                     order_by: :contract_type_code
 
     crud_calls_for :contract_types, name: :contract_type, wrapper: ContractType
 
@@ -27,13 +27,13 @@ module MasterfilesApp
     crud_calls_for :wage_levels, name: :wage_level, wrapper: WageLevel
 
     build_for_select :contract_workers,
-                     label: :full_names,
+                     label: :first_name,
                      value: :id,
-                     order_by: :full_names
+                     order_by: :first_name
     build_inactive_select :contract_workers,
-                          label: :full_names,
+                          label: :first_name,
                           value: :id,
-                          order_by: :full_names
+                          order_by: :first_name
 
     crud_calls_for :contract_workers, name: :contract_worker, wrapper: ContractWorker
 
@@ -77,11 +77,11 @@ module MasterfilesApp
       find_with_association(:contract_workers, id,
                             wrapper: ContractWorker,
                             parent_tables: [{ parent_table: :employment_types,
-                                              columns: [:code],
-                                              flatten_columns: { code: :employer_type_code } },
+                                              columns: [:employment_type_code],
+                                              flatten_columns: { employment_type_code: :employment_type_code } },
                                             { parent_table: :contract_types,
-                                              columns: [:code],
-                                              flatten_columns: { code: :contract_type_code } },
+                                              columns: [:contract_type_code],
+                                              flatten_columns: { contract_type_code: :contract_type_code } },
                                             { parent_table: :wage_levels,
                                               columns: [:wage_level],
                                               flatten_columns: { wage_level: :wage_level } }],
@@ -108,8 +108,8 @@ module MasterfilesApp
                                                  args: [:id],
                                                  col_name: :shift_type_code }],
                             parent_tables: [{ parent_table: :employment_types,
-                                              columns: [:code],
-                                              flatten_columns: { code: :employment_type_code } },
+                                              columns: [:employment_type_code],
+                                              flatten_columns: { employment_type_code: :employment_type_code } },
                                             { parent_table: :plant_resources,
                                               columns: [:plant_resource_code],
                                               flatten_columns: { plant_resource_code: :plant_resource_code } }])
@@ -155,10 +155,14 @@ module MasterfilesApp
     end
 
     def similar_shift_type_hours(attrs)
+      grouped = %w[D N]
+      inc = grouped.include?(attrs[:day_night_or_custom])
+
+      plant_resource_id = attrs[:line_plant_resource_id] || attrs[:ph_plant_resource_id]
       DB[:shift_types].where(
-        plant_resource_id: attrs[:plant_resource_id],
+        plant_resource_id: plant_resource_id,
         employment_type_id: attrs[:employment_type_id],
-        day_night_or_custom: attrs[:day_night_or_custom]
+        day_night_or_custom: inc ? grouped : 'C'
       ).map { |r| { start_hour: r[:start_hour], end_hour: r[:end_hour] } }
     end
 
@@ -168,32 +172,6 @@ module MasterfilesApp
         options << [find_shift_type(st_id)&.shift_type_code, st_id]
       end
       options
-    end
-
-    # def create_shift(attrs)
-    #   date = attrs[:date].strftime("%Y%m%d")
-    #   shift_type = DB[:shift_types].where(id: attrs[:shift_type_id])
-    #   start_hr = shift_type.get(:start_hour)
-    #   end_hr = shift_type.get(:end_hour)
-    #
-    #   attrs[:start_date_time] = Time.parse(date + )
-    #   attrs[:end_date_time] =
-    #   DB[:shifts].insert(attrs)
-    # end
-
-    def for_select_contract_workers_for_shift(shift_id)
-      emp_type_id = DB[:shift_types].where(
-        id: DB[:shifts].where(
-          id: shift_id
-        ).get(:shift_type_id)
-      ).get(:employment_type_id)
-      if emp_type_id
-        for_select_contract_workers(where: { employment_type_id: emp_type_id }).map do |r|
-          [DB['SELECT fn_contract_worker_name(?)', r[1]].single_value, r[1]]
-        end
-      else
-        []
-      end
     end
 
     def similar_shift_hours(attrs)

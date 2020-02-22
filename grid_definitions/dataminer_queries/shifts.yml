@@ -1,11 +1,12 @@
 ---
 :caption: Shifts
-:sql: "SELECT \"shifts\".\"id\", \"shifts\".\"shift_type_id\", \"shifts\".\"active\",
-  \"shifts\".\"running_hours\", \"shifts\".\"start_date_time\", \"shifts\".\"end_date_time\",
-  \"shifts\".\"created_at\", \"shifts\".\"updated_at\", \r\nemployment_types.code
-  as employment_type_code,\r\nfn_shift_type_code(shifts.shift_type_id), fn_current_status('shifts',
-  \"shifts\".\"id\") AS status\r\nFROM \"shifts\"\r\nJOIN shift_types ON shift_types.id
-  = shifts.shift_type_id\r\nJOIN employment_types ON employment_types.id = shift_types.employment_type_id\r\n\r\n"
+:sql: "SELECT \"shifts\".\"id\",\r\n       \"shifts\".\"shift_type_id\",\r\n       fn_shift_type_code(shifts.shift_type_id)
+  AS shift_type_code,\r\n       employment_types.employment_type_code,\r\n       \"shifts\".\"running_hours\",\r\n
+  \      \"shifts\".\"start_date_time\",\r\n       \"shifts\".\"end_date_time\",\r\n
+  \      fn_current_status('shifts', \"shifts\".\"id\") AS status,\r\n       \"shifts\".\"created_at\",\r\n
+  \      \"shifts\".\"updated_at\",\r\n       \"shifts\".\"active\"\r\nFROM \"shifts\"\r\n
+  \   JOIN shift_types ON shift_types.id = shifts.shift_type_id\r\n    JOIN employment_types
+  ON employment_types.id = shift_types.employment_type_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -42,17 +43,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  shift_type_code:
+    :name: shift_type_code
     :sequence_no: 3
-    :caption: Active
-    :namespaced_name: shifts.active
-    :data_type: :boolean
+    :caption: Shift type code
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  employment_type_code:
+    :name: employment_type_code
+    :sequence_no: 4
+    :caption: Employment type code
+    :namespaced_name: employment_types.employment_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -60,11 +77,11 @@
     :group_max: false
   running_hours:
     :name: running_hours
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Running hours
     :namespaced_name: shifts.running_hours
     :data_type: :number
-    :width: 
+    :width: 120
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -76,7 +93,7 @@
     :group_max: false
   start_date_time:
     :name: start_date_time
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Start date time
     :namespaced_name: shifts.start_date_time
     :data_type: :datetime
@@ -92,7 +109,7 @@
     :group_max: false
   end_date_time:
     :name: end_date_time
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: End date time
     :namespaced_name: shifts.end_date_time
     :data_type: :datetime
@@ -106,9 +123,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  status:
+    :name: status
+    :sequence_no: 8
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: shifts.created_at
     :data_type: :datetime
@@ -124,7 +157,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: shifts.updated_at
     :data_type: :datetime
@@ -138,49 +171,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  employment_type_code:
-    :name: employment_type_code
-    :sequence_no: 9
-    :caption: Employment type code
-    :namespaced_name: employment_types.code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  fn_shift_type_code:
-    :name: fn_shift_type_code
-    :sequence_no: 10
-    :caption: Shift type code
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
+  active:
+    :name: active
     :sequence_no: 11
-    :caption: Status
-    :namespaced_name: 
-    :data_type: :string
+    :caption: Active
+    :namespaced_name: shifts.active
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -203,8 +204,8 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: employment_types.code
-  :caption: Employment Type Code
+- :column: employment_types.employment_type_code
+  :caption: Emp Type Code
   :data_type: :string
   :control_type: :text
   :default_value: 

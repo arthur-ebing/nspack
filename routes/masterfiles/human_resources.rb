@@ -28,7 +28,7 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_employment_type(id, params[:employment_type])
           if res.success
-            update_grid_row(id, changes: { code: res.instance[:code] },
+            update_grid_row(id, changes: { employment_type_code: res.instance[:employment_type_code] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::HumanResources::EmploymentType::Edit.call(id, form_values: params[:employment_type], form_errors: res.errors) }
@@ -57,7 +57,7 @@ class Nspack < Roda
         if res.success
           row_keys = %i[
             id
-            code
+            employment_type_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -94,7 +94,7 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_contract_type(id, params[:contract_type])
           if res.success
-            update_grid_row(id, changes: { code: res.instance[:code], description: res.instance[:description] }, notice: res.message)
+            update_grid_row(id, changes: { contract_type_code: res.instance[:contract_type_code], description: res.instance[:description] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::HumanResources::ContractType::Edit.call(id, form_values: params[:contract_type], form_errors: res.errors) }
           end
@@ -122,7 +122,7 @@ class Nspack < Roda
         if res.success
           row_keys = %i[
             id
-            code
+            contract_type_code
             description
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -232,7 +232,7 @@ class Nspack < Roda
               employment_type_id
               contract_type_id
               wage_level_id
-              full_names
+              first_name
               surname
               title
               email
@@ -272,7 +272,7 @@ class Nspack < Roda
             employment_type_id
             contract_type_id
             wage_level_id
-            full_names
+            first_name
             surname
             title
             email

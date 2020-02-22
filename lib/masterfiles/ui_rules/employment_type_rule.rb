@@ -15,12 +15,12 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:code] = { renderer: :label }
+      fields[:employment_type_code] = { renderer: :label }
     end
 
     def common_fields
       {
-        code: { required: true }
+        employment_type_code: { required: true }
       }
     end
 
@@ -34,7 +34,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(code: nil)
+      @form_object = OpenStruct.new(employment_type_code: nil)
     end
   end
 end

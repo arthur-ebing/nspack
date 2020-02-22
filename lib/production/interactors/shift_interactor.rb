@@ -8,14 +8,14 @@ module ProductionApp
 
       id = nil
       repo.transaction do
-        id = repo.create_shift(res)
+        id = repo.create_shift(res.to_h)
         log_status(:shifts, id, 'CREATED')
         log_transaction
       end
       instance = shift(id)
-      success_response("Created shift #{instance.id}", instance)
+      success_response("Created shift #{instance.shift_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This shift already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { base: ['This shift already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,7 +29,7 @@ module ProductionApp
         log_transaction
       end
       instance = shift(id)
-      success_response("Updated shift #{instance.id}", instance)
+      success_response("Updated shift #{instance.shift_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_type(id)
-      success_response("Created contract type #{instance.code}", instance)
+      success_response("Created contract type #{instance.contract_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { code: ['This contract type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { contract_type_code: ['This contract type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,13 +29,13 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_type(id)
-      success_response("Updated contract type #{instance.code}", instance)
+      success_response("Updated contract type #{instance.contract_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_contract_type(id)
-      name = contract_type(id).code
+      name = contract_type(id).contract_type_code
       repo.transaction do
         repo.delete_contract_type(id)
         log_status(:contract_types, id, 'DELETED')

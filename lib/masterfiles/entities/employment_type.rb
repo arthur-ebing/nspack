@@ -3,6 +3,6 @@
 module MasterfilesApp
   class EmploymentType < Dry::Struct
     attribute :id, Types::Integer
-    attribute :code, Types::String
+    attribute :employment_type_code, Types::String
   end
 end
