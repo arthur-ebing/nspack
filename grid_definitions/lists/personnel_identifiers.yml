@@ -6,3 +6,11 @@
   :icon: link
   :title: Link contract worker
   :popup: true
+  :hide_if_true: :in_use
+- :separator: true
+- :url: "/masterfiles/human_resources/personnel_identifiers/$:id$/de_link_contract_worker"
+  :text: De-link contract worker
+  :icon: close-outline
+  :title: De-link contract worker
+  :popup: true
+  :hide_if_false: :in_use

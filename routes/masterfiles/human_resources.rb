@@ -387,6 +387,23 @@ class Nspack < Roda
           end
         end
       end
+
+      r.on 'de_link_contract_worker' do
+        r.get do
+          check_auth!('hr', 'edit')
+          # interactor.assert_permission!(:edit, id)
+          show_partial { Masterfiles::HumanResources::PersonnelIdentifier::DeLinkWorker.call(id) }
+        end
+
+        r.patch do
+          res = interactor.de_link_personnel_identifier(id)
+          if res.success
+            update_grid_row(id, changes: { contract_worker: nil, in_use: false }, notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::HumanResources::PersonnelIdentifier::DeLinkWorker.call(id, form_values: params[:personnel_identifier], form_errors: res.errors) }
+          end
+        end
+      end
     end
   end
 end

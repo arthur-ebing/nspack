@@ -4,7 +4,7 @@
   \ \"mes_modules\".\"module_type\",\r\n  \"mes_modules\".\"server_ip\",\r\n  \"mes_modules\".\"ip_address\",\r\n
   \ \"mes_modules\".\"port\",\r\n  \"mes_modules\".\"alias\",\r\n  \"mes_modules\".\"active\",\r\n
   \ \"mes_modules\".\"created_at\",\r\n  \"mes_modules\".\"updated_at\",\r\n  \"mes_modules\".\"bulk_registration_mode\"\r\nFROM\r\n
-  \ \"mes_modules\""
+  \ \"mes_modules\"\r\nORDER BY \"mes_modules\".\"module_code\""
 :limit: 
 :offset: 
 :external_settings:

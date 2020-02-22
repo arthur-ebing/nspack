@@ -414,5 +414,13 @@ module MesscadaApp
       SQL
       DB[query, run_id].first[:bins_tipped]
     end
+
+    def display_lines_for(device)
+      server_ip = URI.parse(AppConst::LABEL_SERVER_URI).host
+      mtype = DB[:mes_modules]
+              .where(module_code: device, server_ip: server_ip)
+              .get(:module_type)
+      mtype == 'robot-T200' ? 4 : 6
+    end
   end
 end

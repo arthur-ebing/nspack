@@ -5,6 +5,8 @@ module MesscadaApp
     configure { config.type_specs = true }
 
     required(:device, Types::StrippedString).filled(:str?)
+    optional(:card_reader, Types::StrippedString).maybe(:str?)
+    optional(:identifier, Types::StrippedString).maybe(:str?)
   end
 
   CartonVerificationSchema = Dry::Validation.Params do

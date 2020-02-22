@@ -11,6 +11,7 @@ module UiRules
 
       set_show_fields if @mode == :show
       set_link_fields if @mode == :link
+      set_de_link_fields if @mode == :de_link
 
       form_name 'personnel_identifier'
     end
@@ -18,6 +19,12 @@ module UiRules
     def set_link_fields
       fields[:identifier] = { renderer: :label }
       fields[:contract_worker_id] = { renderer: :select, options: @repo.for_select_unallocated_contract_workers }
+    end
+
+    def set_de_link_fields
+      contract_worker = @repo.find_contract_worker_by_identifier_id(@options[:id])
+      fields[:identifier] = { renderer: :label }
+      fields[:contract_worker_id] = { renderer: :label, with_value: contract_worker[:contract_worker_name] }
     end
 
     def set_show_fields
@@ -43,7 +50,7 @@ module UiRules
       end
 
       @form_object = @repo.find_personnel_identifier(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge(contract_worker_id: nil)) if @mode == :link
+      @form_object = OpenStruct.new(@form_object.to_h.merge(contract_worker_id: nil)) if %i[link de_link].include?(@mode)
     end
 
     def make_new_form_object

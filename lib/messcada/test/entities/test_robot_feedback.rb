@@ -38,6 +38,28 @@ module MesscadaApp
         assert_equal exp, ent.four_lines
       end
     end
+
+    def test_short_4_lines
+      [
+        { actual: ['1', '2', '3', '4', nil, nil, nil, nil], expect: ['1', '2', '3', '4'] },
+        { actual: ['1', '2', '3', '4', '5', nil, nil, nil], expect: ['5', nil, nil, nil] },
+        { actual: [nil, nil, nil, nil, nil, '6', nil, nil], expect: [nil, '6', nil, nil] }
+      ].each do |tst|
+        act = tst[:actual]
+        exp = tst[:expect]
+        ent = RobotFeedback.new(device: 'CLM-01',
+                                status: true,
+                                line1: act[0],
+                                line2: act[1],
+                                line3: act[2],
+                                line4: act[3],
+                                short1: act[4],
+                                short2: act[5],
+                                short3: act[6],
+                                short4: act[7])
+        assert_equal exp, ent.four_lines
+      end
+    end
     # rubocop:enable Style/WordArray
   end
 end

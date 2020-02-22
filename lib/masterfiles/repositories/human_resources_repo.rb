@@ -90,6 +90,17 @@ module MasterfilesApp
                                                  col_name: :contract_worker_name }])
     end
 
+    def find_contract_worker_id_by_identifier_id(personnel_identifier_id)
+      DB[:contract_workers]
+        .where(personnel_identifier_id: personnel_identifier_id)
+        .get(:id)
+    end
+
+    def find_contract_worker_by_identifier_id(personnel_identifier_id)
+      id = find_contract_worker_id_by_identifier_id(personnel_identifier_id)
+      find_contract_worker(id)
+    end
+
     def find_shift_type(id)
       find_with_association(:shift_types, id,
                             wrapper: ShiftType,

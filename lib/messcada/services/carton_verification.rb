@@ -13,16 +13,17 @@ module MesscadaApp
       @repo = MesscadaApp::MesscadaRepo.new
       @carton_quantity = 1
       @carton_is_pallet = AppConst::CARTON_EQUALS_PALLET
+      @container_type = @carton_is_pallet ? 'Bin' : 'Carton'
       res = carton_verification
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      ok_response
+      success_response("#{@container_type} verified")
     end
 
     private
 
     def carton_verification  # rubocop:disable Metrics/AbcSize
-      return failed_response("Carton / Bin:#{carton_label_id} already verified") if carton_label_carton_exists?
+      return failed_response("#{@container_type} #{carton_label_id} already verified") if carton_label_carton_exists?
 
       carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 

@@ -2,10 +2,11 @@
 
 module MesscadaApp
   class CartonLabeling < BaseService
-    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number
+    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number, :identifier
 
     def initialize(params)
       @resource_code = params[:device]
+      @identifier = params[:identifier]
     end
 
     def call
@@ -30,6 +31,11 @@ module MesscadaApp
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref)
+      unless identifier.nil_or_empty?
+        hr_ids = MesscadaApp::HrRepo.new.contract_worker_ids(identifier)
+        attrs = attrs.merge(personnel_identifier_id: hr_ids[:personnel_identifier_id],
+                            contract_worker_id: hr_ids[:contract_worker_id])
+      end
 
       res = validate_carton_label_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?

@@ -5,7 +5,7 @@
   (contract_workers.id) AS contract_worker,\r\n  personnel_identifiers.available_from,\r\n
   \ personnel_identifiers.created_at,\r\n  personnel_identifiers.updated_at\r\nFROM\r\n
   \ personnel_identifiers\r\n  LEFT OUTER JOIN contract_workers ON contract_workers.personnel_identifier_id
-  = personnel_identifiers.id"
+  = personnel_identifiers.id\r\nORDER BY personnel_identifiers.identifier"
 :limit: 
 :offset: 
 :external_settings: {}

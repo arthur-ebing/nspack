@@ -51,6 +51,18 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def de_link_personnel_identifier(id)
+      contract_worker_id = repo.find_contract_worker_id_by_identifier_id(id)
+
+      repo.transaction do
+        repo.update_contract_worker(contract_worker_id, personnel_identifier_id: nil)
+        repo.update(:personnel_identifiers, id, in_use: false)
+        # log status?
+      end
+
+      success_response('Successfully de-linked identifier from worker', in_use: false, contract_worker: nil)
+    end
+
     def link_to_personnel_identifier(id, params)
       repo.transaction do
         repo.update_contract_worker(params[:contract_worker_id], personnel_identifier_id: id)

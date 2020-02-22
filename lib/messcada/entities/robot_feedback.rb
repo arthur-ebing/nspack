@@ -11,6 +11,10 @@ module MesscadaApp
     attribute? :line4, Types::String
     attribute? :line5, Types::String
     attribute? :line6, Types::String
+    attribute? :short1, Types::String
+    attribute? :short2, Types::String
+    attribute? :short3, Types::String
+    attribute? :short4, Types::String
 
     def red
       !status
@@ -22,6 +26,7 @@ module MesscadaApp
 
     # Re-work lines to fit a device only capable of 4 lines of text display.
     def four_lines # rubocop:disable Metrics/AbcSize
+      return [short1, short2, short3, short4] unless [short1, short2, short3, short4].all?(&:nil_or_empty?)
       return [line1, line2, line3, line4] if line5.nil_or_empty? && line6.nil_or_empty?
 
       ar = [line1, line2, line3, line4, line5, line6].compact

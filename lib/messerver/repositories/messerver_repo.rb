@@ -288,7 +288,9 @@ module MesserverApp
     def send_error_email(response, context)
       body = []
       body << "The call to MesServer was:\n#{context}" unless context.nil?
-      body << if response.body.encoding == Encoding::ASCII_8BIT
+      body << if response.body.nil?
+                'Empty response body received'
+              elsif response.body.encoding == Encoding::ASCII_8BIT
                 'An image was probably returned from MesServer'
               else
                 "The response from MesServer was:\n-------------------------------\n#{response.body}"

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'production', 'messcada' do |r|
     # --------------------------------------------------------------------------
     # CARTON/FG BIN LABELING
@@ -16,23 +16,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             res.instance
           else
-            # feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
-            #                                           status: false,
-            #                                           msg: unwrap_failed_response(res),
-            #                                           line1: 'Label printing failed',
-            #                                           line6: 'Label printing failed')
-            # Crossbeams::RobotResponder.new(feedback).render
-            <<~HTML
-              <label><status>false</status>
-              <lcd1>Label printing failed</lcd1>
-              <lcd2></lcd2>
-              <lcd3></lcd3>
-              <lcd4></lcd4>
-              <lcd5></lcd5>
-              <lcd6>Label printing failed.</lcd6>
-              <msg>#{unwrap_failed_response(res)}</msg>
-              </label>
-            HTML
+            feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                      status: false,
+                                                      msg: unwrap_failed_response(res),
+                                                      line1: 'Label printing failed',
+                                                      line6: 'Label printing failed')
+            Crossbeams::RobotResponder.new(feedback).render
           end
         end
       end
@@ -47,173 +36,56 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           # view-source:http://192.168.50.106:9296/messcada/production/carton_verification/weighing/labeling?carton_number=123&gross_weight=600.23&measurement_unit=kg&device=CLM-01-B01
           # --------------------------------------------------------------------------
 
-          # r.on do
-          # r.is do
           r.get do
             res = interactor.carton_verification_and_weighing_and_labeling(params, request.ip)
-            # feedback = if res.success
-            #              MesscadaApp::RobotFeedback.new(device: params[:device],
-            #                                             status: true,
-            #                                             line1: res.message)
-            #            else
-            #              MesscadaApp::RobotFeedback.new(device: params[:device],
-            #                                             status: false,
-            #                                             line1: unwrap_failed_response(res))
-            #            end
-            # Crossbeams::RobotResponder.new(feedback).render
-            if res.success
-              <<~HTML
-                <carton_verification>
-                  <status>true</status>
-                  <red>false</red>
-                  <green>true</green>
-                  <orange>false</orange>
-                  <msg></msg>
-                  <lcd1>#{res.message}</lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </carton_verification>
-              HTML
-              # wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-            else
-              <<~HTML
-                <carton_verification>
-                  <status>false</status>
-                  <red>true</red>
-                  <green>false</green>
-                  <orange>false</orange>
-                  <msg></msg>
-                  <lcd1>#{unwrap_failed_response(res)}</lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </carton_verification>
-              HTML
-              # wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-            end
+            feedback = if res.success
+                         MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                        status: true,
+                                                        line1: res.message)
+                       else
+                         MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                        status: false,
+                                                        line1: unwrap_failed_response(res))
+                       end
+            Crossbeams::RobotResponder.new(feedback).render
           end
-          # end
-          # end
         end
 
         # --------------------------------------------------------------------------
         # CARTON/FG BIN VERIFICATION + WEIGHING
         # view-source:http://192.168.50.106:9296/messcada/production/carton_verification/weighing?carton_number=123&gross_weight=600.23&measurement_unit=kg&device=CLM-01-B01
         # --------------------------------------------------------------------------
-        # r.on do
-        #   r.is do
         r.get do
           res = interactor.carton_verification_and_weighing(params)
-          # feedback = if res.success
-          #              MesscadaApp::RobotFeedback.new(device: params[:device],
-          #                                             status: true,
-          #                                             line1: res.message)
-          #            else
-          #              MesscadaApp::RobotFeedback.new(device: params[:device],
-          #                                             status: false,
-          #                                             line1: unwrap_failed_response(res))
-          #            end
-          # Crossbeams::RobotResponder.new(feedback).render
-          if res.success
-            <<~HTML
-              <carton_verification>
-                <status>true</status>
-                <red>false</red>
-                <green>true</green>
-                <orange>false</orange>
-                <msg></msg>
-                <lcd1>#{res.message}</lcd1>
-                <lcd2></lcd2>
-                <lcd3></lcd3>
-                <lcd4></lcd4>
-                <lcd5></lcd5>
-                <lcd6></lcd6>
-              </carton_verification>
-            HTML
-            # wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-          else
-            <<~HTML
-              <carton_verification>
-                <status>false</status>
-                <red>true</red>
-                <green>false</green>
-                <orange>false</orange>
-                <msg></msg>
-                <lcd1>#{unwrap_failed_response(res)}</lcd1>
-                <lcd2></lcd2>
-                <lcd3></lcd3>
-                <lcd4></lcd4>
-                <lcd5></lcd5>
-                <lcd6></lcd6>
-              </carton_verification>
-            HTML
-            # wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-          end
+          feedback = if res.success
+                       MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                      status: true,
+                                                      line1: res.message)
+                     else
+                       MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                      status: false,
+                                                      line1: unwrap_failed_response(res))
+                     end
+          Crossbeams::RobotResponder.new(feedback).render
         end
-        #   end
-        # end
       end
 
       # --------------------------------------------------------------------------
       # PURE CARTON/FG BIN VERIFICATION
       # view-source:http://192.168.50.106:9296/messcada/production/carton_verification?carton_number=123&device=CLM-01-B01
       # --------------------------------------------------------------------------
-      r.on do
-        r.is do
-          r.get do
-            res = interactor.carton_verification(params)
-            # feedback = if res.success
-            #              MesscadaApp::RobotFeedback.new(device: params[:device],
-            #                                             status: true,
-            #                                             line1: res.message)
-            #            else
-            #              MesscadaApp::RobotFeedback.new(device: params[:device],
-            #                                             status: false,
-            #                                             line1: unwrap_failed_response(res))
-            #            end
-            # Crossbeams::RobotResponder.new(feedback).render
-            if res.success
-              <<~HTML
-                <carton_verification>
-                  <status>true</status>
-                  <red>false</red>
-                  <green>true</green>
-                  <orange>false</orange>
-                  <msg></msg>
-                  <lcd1>#{res.message}</lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </carton_verification>
-              HTML
-              # wrap_content_in_style("<CartonVerification Status='true' Red='false' Green='true' Orange='false' Msg='#{res.message}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-            else
-              <<~HTML
-                <carton_verification>
-                  <status>false</status>
-                  <red>true</red>
-                  <green>false</green>
-                  <orange>false</orange>
-                  <msg></msg>
-                  <lcd1>#{unwrap_failed_response(res)}</lcd1>
-                  <lcd2></lcd2>
-                  <lcd3></lcd3>
-                  <lcd4></lcd4>
-                  <lcd5></lcd5>
-                  <lcd6></lcd6>
-                </carton_verification>
-              HTML
-              # wrap_content_in_style("<CartonVerification Status='false' Red='true' Green='false' Orange='false' Msg='#{unwrap_failed_response(res)}' LCD1='' LCD2='' LCD3='' LCD4='' LCD5='' LCD6='' /> ", nil)
-            end
-          end
-        end
+      r.get do
+        res = interactor.carton_verification(params)
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.message)
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: unwrap_failed_response(res))
+                   end
+        Crossbeams::RobotResponder.new(feedback).render
       end
     end
   end

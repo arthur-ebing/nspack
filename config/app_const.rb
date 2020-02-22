@@ -302,6 +302,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # * target_market_group_name
   CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
 
+  # pi Robots can display 6 lines of text, while T2n robots can only display 4.
+  # If all robots on site are homogenous, set the value here.
+  # Else it will be looked up from the module name.
+  ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
+
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'

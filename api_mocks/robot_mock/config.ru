@@ -140,6 +140,12 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               <tr>
                 <th style="text-align:right">&nbsp;<label id="l_p4"></label></th><td><input type="text" id="p4" hidden /></td>
               </tr>
+              <tr>
+                <th style="text-align:right">&nbsp;<label id="l_p5"></label></th><td><input type="text" id="p5" hidden /></td>
+              </tr>
+              <tr>
+                <th style="text-align:right">&nbsp;<label id="l_p6"></label></th><td><input type="text" id="p6" hidden /></td>
+              </tr>
               </table>
             </div>
           </div>
@@ -168,6 +174,10 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             const p3 = document.getElementById('p3');
             const lP4 = document.getElementById('l_p4');
             const p4 = document.getElementById('p4');
+            const lP5 = document.getElementById('l_p5');
+            const p5 = document.getElementById('p5');
+            const lP6 = document.getElementById('l_p6');
+            const p6 = document.getElementById('p6');
             const xmlResult = document.getElementById('xml_result');
 
             const clearLcd = function clearLcd() {
@@ -205,6 +215,12 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               }
               if (thisSet.p4) {
                 url += `&${thisSet.p4}=${p4.value}`
+              }
+              if (thisSet.p5) {
+                url += `&${thisSet.p5}=${p5.value}`
+              }
+              if (thisSet.p6) {
+                url += `&${thisSet.p6}=${p6.value}`
               }
 
               urlSent.textContent = url;
@@ -281,6 +297,14 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                   if (txt.childNodes.length > 0) {
                     lcd4.textContent = txt.childNodes[0].nodeValue;
                   }
+                  txt = xmlDoc.getElementsByTagName('lcd5')[0];
+                  if (txt.childNodes.length > 0) {
+                    lcd5.textContent = txt.childNodes[0].nodeValue;
+                  }
+                  txt = xmlDoc.getElementsByTagName('lcd6')[0];
+                  if (txt.childNodes.length > 0) {
+                    lcd6.textContent = txt.childNodes[0].nodeValue;
+                  }
                 }
               }).catch((data) => {
                 console.log('CATCH');
@@ -291,62 +315,87 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             const urlSet = [
               {
                 url: '/messcada/rmt/bin_tipping?',
-                p1: 'bin_number',
-                p2: 'device',
+                p1: 'device',
+                p2: 'bin_number',
                 p3: null,
                 p4: null,
+                p5: null,
+                p6: null,
               },
               {
                 url: '/messcada/rmt/bin_tipping/weighing?',
-                p1: 'bin_number',
-                p2: 'gross_weight',
-                p3: 'measurement_unit',
-                p4: 'device',
-                dp3: 'kg',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: null,
+                p6: null,
+                dp4: 'kg',
               },
               {
                 url: '/messcada/production/carton_labeling?',
                 p1: 'device',
-                p2: null,
+                p2: 'card_reader',
+                p3: 'identifier',
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/production/carton_verification?',
+                p1: 'device',
+                p2: 'carton_number',
                 p3: null,
                 p4: null,
+                p5: null,
+                p6: null,
               },
               {
                 url: '/messcada/production/carton_verification/weighing/labeling?',
-                p1: 'carton_number',
-                p2: 'gross_weight',
-                p3: 'measurement_unit',
-                p4: 'device',
-                dp3: 'kg',
+                p1: 'device',
+                p2: 'carton_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: 'card_reader',
+                p6: 'identifier',
+                dp4: 'kg',
               },
               {
                 url: '/messcada/fg/pallet_weighing?',
-                p1: 'bin_number',
-                p2: 'gross_weight',
-                p3: 'measurement_unit',
-                p4: 'device',
-                dp3: 'kg',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: null,
+                p6: null,
+                dp4: 'kg',
               },
               {
                 url: '/messcada/hr/register_id?',
-                p1: 'card_reader',
-                p2: 'value',
-                p3: 'device',
+                p1: 'device',
+                p2: 'card_reader',
+                p3: 'value',
                 p4: null,
+                p5: null,
+                p6: null,
               },
               {
                 url: '/messcada/hr/logon?',
-                p1: 'card_reader',
-                p2: 'identifier',
-                p3: 'device',
+                p1: 'device',
+                p2: 'card_reader',
+                p3: 'identifier',
                 p4: null,
+                p5: null,
+                p6: null,
               },
               {
                 url: '/messcada/hr/logoff?',
-                p1: 'card_reader',
-                p2: 'identifier',
-                p3: 'device',
+                p1: 'device',
+                p2: 'card_reader',
+                p3: 'identifier',
                 p4: null,
+                p5: null,
+                p6: null,
               },
             ];
 
@@ -412,6 +461,28 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                   lP4.textContent = '';
                   p4.value = '';
                   p4.hidden = true;
+                }
+                if (thisSet.p5) {
+                  lP5.textContent = thisSet.p5;
+                  p5.hidden = false;
+                  if (thisSet.dp5) {
+                    p5.value = thisSet.dp5;
+                  }
+                } else {
+                  lP5.textContent = '';
+                  p5.value = '';
+                  p5.hidden = true;
+                }
+                if (thisSet.p6) {
+                  lP6.textContent = thisSet.p6;
+                  p6.hidden = false;
+                  if (thisSet.dp6) {
+                    p6.value = thisSet.dp6;
+                  }
+                } else {
+                  lP6.textContent = '';
+                  p6.value = '';
+                  p6.hidden = true;
                 }
               }, false);
             });
