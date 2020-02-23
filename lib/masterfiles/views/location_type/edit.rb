@@ -4,7 +4,7 @@ module Masterfiles
   module Locations
     module LocationType
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:location_type, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.add_field :location_type_code
               form.add_field :short_code
               form.add_field :can_be_moved
+              form.add_field :hierarchical
             end
           end
 

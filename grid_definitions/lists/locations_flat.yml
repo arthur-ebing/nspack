@@ -1,10 +1,5 @@
 ---
-:dataminer_definition: locations
-:tree:
-  :tree_column: path_array
-  :tree_caption: Location Hierarchy
-  :suppress_node_counts: false
-  :groupDefaultExpanded: -1
+:dataminer_definition: locations_flat
 :actions:
 - :url: "/masterfiles/locations/locations/$:id$"
   :text: view
@@ -22,11 +17,6 @@
   :is_delete: true
   :popup: true
 - :separator: true
-- :url: "/masterfiles/locations/locations/$:id$/add_child"
-  :text: New sub-location
-  :icon: add-solid
-  :title: New sub-location
-  :popup: true
 - :url: "/list/location_location_assignments/multi?key=locations&id=$:id$"
   :text: Assignments
   :icon: list
@@ -43,8 +33,12 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/locations/locations/new"
+  :url: "/masterfiles/locations/locations/new_flat?location_type=$:location_type$"
   :text: New Location
   :style: :button
   :behaviour: :popup  
-  :hide_if_sql_returns_true: SELECT EXISTS(SELECT locations.id FROM locations JOIN location_types ON location_types.id = locations.location_type_id WHERE location_types.hierarchical)
+:conditions:
+  :location_type:
+    - :col: location_types.location_type_code
+      :op: =
+      :val: $:location_type$

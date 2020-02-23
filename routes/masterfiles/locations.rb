@@ -31,6 +31,7 @@ class Nspack < Roda
               location_type_code
               short_code
               can_be_moved
+              hierarchical
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -221,6 +222,33 @@ class Nspack < Roda
     end
     r.on 'locations' do
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new_flat' do    # NEW, NON-HIERARCHICAL
+        r.get do
+          check_auth!('locations', 'new')
+          show_partial_or_page(r) { Masterfiles::Locations::Location::NewFlat.call(params[:location_type], remote: fetch?(r)) }
+        end
+        r.post do
+          res = interactor.create_root_location(params[:location])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            loc_type = intercactor.location_type_code(params[:location])
+            form_errors = move_validation_errors_to_base(res.errors,
+                                                         %i[location_long_code receiving_bay_type_location],
+                                                         highlights: { location_long_code: %i[location_long_code location_short_code],
+                                                                       receiving_bay_type_location: %i[location_type_id can_store_stock] })
+            re_show_form(r, res, url: '/masterfiles/locations/locations/new_flat') do
+              Masterfiles::Locations::Location::NewFlat.call(loc_type,
+                                                             form_values: params[:location],
+                                                             form_errors: form_errors,
+                                                             remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'new' do    # NEW
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::Location::New.call(remote: fetch?(r)) }

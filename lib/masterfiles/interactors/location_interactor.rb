@@ -74,6 +74,10 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
+    def location_type_code(params)
+      repo.find_location_type(params[:location_type_id])&.location_type_code
+    end
+
     def update_location(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_location_params(params)
       return validation_failed_response(res) unless res.messages.empty?

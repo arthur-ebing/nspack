@@ -212,6 +212,10 @@ module MasterfilesApp
       DB[:location_types].where(can_be_moved: true).select_map(:id)
     end
 
+    def location_type_id_from(location_type_code)
+      DB[:location_types].where(location_type_code: location_type_code).get(:id)
+    end
+
     def descendants_for_ancestor_id(ancestor_id)
       DB[:tree_locations].where(ancestor_location_id: ancestor_id).select_map(:descendant_location_id)
     end

@@ -3,9 +3,9 @@
 module Masterfiles
   module Locations
     module Location
-      class Edit
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:location, :edit, id: id, form_values: form_values)
+      class NewFlat
+        def self.call(location_type_code, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:location, :new_flat, location_type_code: location_type_code, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,9 +13,8 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.action "/masterfiles/locations/locations/#{id}"
-              form.remote!
-              form.method :update
+              form.action "/masterfiles/locations/locations/new_flat?location_type=#{location_type_code}"
+              form.remote! if remote
               form.add_field :location_type_id
               form.add_field :location_type_label
               form.add_field :primary_storage_type_id

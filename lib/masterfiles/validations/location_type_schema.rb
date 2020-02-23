@@ -8,5 +8,6 @@ module MasterfilesApp
     required(:location_type_code, Types::StrippedString).filled(:str?)
     required(:short_code, Types::StrippedString).filled(:str?)
     required(:can_be_moved, :bool).filled(:bool?)
+    required(:hierarchical, :bool).maybe(:bool?)
   end
 end

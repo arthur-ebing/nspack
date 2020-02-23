@@ -18,6 +18,7 @@ module Masterfiles
               form.add_field :location_type_code
               form.add_field :short_code
               form.add_field :can_be_moved
+              form.add_field :hierarchical
             end
           end
 
