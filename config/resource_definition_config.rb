@@ -47,8 +47,8 @@ module Crossbeams
         #02B3CA
         #03B1D6
         #22ADE1
-        #62A2F2
         #47A7EB
+        #62A2F2
         #779CF6
         #8A94F9
         #9B90F8
@@ -170,10 +170,18 @@ module Crossbeams
       CLM_ROBOT = 'CLM_ROBOT'
       QC_ROBOT = 'QC_ROBOT'
       SCALE_ROBOT = 'SCALE_ROBOT'
-      FORKLIFT_ROBOT = 'FORKLIFT_ROBOT'
+      BIN_SCALE_ROBOT = 'BIN_SCALE_ROBOT'
+      CARTON_SCALE_ROBOT = 'CARTON_SCALE_ROBOT'
+      PALLET_SCALE_ROBOT = 'PALLET_SCALE_ROBOT'
+      BIN_FORKLIFT_ROBOT = 'BIN_FORKLIFT_ROBOT'
+      PALLET_FORKLIFT_ROBOT = 'PALLET_FORKLIFT_ROBOT'
+      CARTON_VERIFICATION_ROBOT = 'CARTON_VERIFICATION_ROBOT'
       PALLETIZING_ROBOT = 'PALLETIZING_ROBOT'
       BIN_TIPPING_ROBOT = 'BINTIPPING_ROBOT'
-      FORKLIFT = 'FORKLIFT'
+      BIN_FORKLIFT = 'BIN_FORKLIFT'
+      PALLET_FORKLIFT = 'PALLET_FORKLIFT'
+      CARTON_VERIFICATION_STATION = 'CARTON_VERIFICATION_STATION'
+      CARTON_VERIFICATION_ROBOT = 'CARTON_VERIFICATION_ROBOT'
       PALLETIZING_BAY = 'PALLETIZING_BAY'
       BIN_TIPPING_STATION = 'BIN_TIPPING_STATION'
       BIN_VERIFICATION_STATION = 'BIN_VERIFICATION_STATION'
@@ -193,13 +201,32 @@ module Crossbeams
       MODULE_BUTTON = 'MODULE_BUTTON'
       PERIPHERAL = 'PERIPHERAL'
 
-      ROOT_PLANT_RESOURCE_TYPES = [SITE, FORKLIFT, ROOM].freeze
+      ROOT_PLANT_RESOURCE_TYPES = [SITE, BIN_FORKLIFT, PALLET_FORKLIFT, ROOM].freeze
 
       SYSTEM_RESOURCE_RULES = {
-        SERVER => { description: 'Server', attributes: { ip_address: :string } },
-        MODULE => { description: 'Module', computing_device: true, attributes: { ip_address: :string, sub_types: [CLM_ROBOT, QC_ROBOT, SCALE_ROBOT, FORKLIFT_ROBOT, PALLETIZING_ROBOT, BIN_TIPPING_ROBOT] } },
-        MODULE_BUTTON => { description: 'Module button', computing_device: true, attributes: { ip_address: :string, sub_types: [ROBOT_BUTTON] } },
-        PERIPHERAL => { description: 'Peripheral', peripheral: true, attributes: { ip_address: :string } }
+        SERVER => { description: 'Server',
+                    attributes: { ip_address: :string } },
+        MODULE => { description: 'Module',
+                    computing_device: true,
+                    attributes: { ip_address: :string,
+                                  sub_types: [CLM_ROBOT,
+                                              QC_ROBOT,
+                                              BIN_SCALE_ROBOT,
+                                              CARTON_SCALE_ROBOT,
+                                              PALLET_SCALE_ROBOT,
+                                              CARTON_VERIFICATION_ROBOT,
+                                              BIN_VERIFICATION_ROBOT,
+                                              BIN_FORKLIFT_ROBOT,
+                                              PALLET_FORKLIFT_ROBOT,
+                                              PALLETIZING_ROBOT,
+                                              BIN_TIPPING_ROBOT] } },
+        MODULE_BUTTON => { description: 'Module button',
+                           computing_device: true,
+                           attributes: { ip_address: :string,
+                                         sub_types: [ROBOT_BUTTON] } },
+        PERIPHERAL => { description: 'Peripheral',
+                        peripheral: true,
+                        attributes: { ip_address: :string } }
       }.freeze
 
       PLANT_RESOURCE_RULES = {
@@ -207,22 +234,34 @@ module Crossbeams
                   allowed_children: [PACKHOUSE, ROOM],
                   icon: { file: 'globe', colour: CLR_H } },
         PACKHOUSE => { description: 'Packhouse',
-                       allowed_children: [ROOM, LINE, CLM_ROBOT, SCALE_ROBOT, QC_ROBOT, PALLETIZING_BAY, SCALE, PRINTER, BIN_VERIFICATION_STATION, WEIGHING_STATION],
+                       allowed_children: [ROOM,
+                                          LINE,
+                                          CLM_ROBOT,
+                                          BIN_SCALE_ROBOT,
+                                          CARTON_SCALE_ROBOT,
+                                          PALLET_SCALE_ROBOT,
+                                          QC_ROBOT,
+                                          PALLETIZING_BAY,
+                                          SCALE,
+                                          PRINTER,
+                                          CARTON_VERIFICATION_STATION,
+                                          BIN_VERIFICATION_STATION,
+                                          WEIGHING_STATION],
                        icon: { file: 'factory', colour: CLR_N } },
         ROOM => { description: 'Room',
-                  allowed_children: [QC_ROBOT, SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
+                  allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
                   allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
                   icon: { file: 'packline', colour: CLR_S } },
         DROP => { description: 'Drop',
-                  allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
+                  allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                   icon: { file: 'packing', colour: CLR_D } },
         DROP_STATION => { description: 'Drop station',
-                          allowed_children: [DROP, CLM_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
+                          allowed_children: [DROP, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                           icon: { file: 'station', colour: CLR_R } },
         DROP_TABLE => { description: 'Drop table',
-                        allowed_children: [CLM_ROBOT, SCALE_ROBOT, SCALE, PRINTER],
+                        allowed_children: [CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                         icon: { file: 'packing', colour: CLR_N } },
         ROBOT_BUTTON => { description: 'Robot button',
                           allowed_children: [],
@@ -240,16 +279,37 @@ module Crossbeams
                       icon: { file: 'server3', colour: CLR_L },
                       create_with_system_resource: 'MODULE',
                       code_prefix: 'QCM-' },
+        # TODO: deprecate SCALE_ROBOT :: Need to modify existing data at sites first...
         SCALE_ROBOT => { description: 'Scale Robot',
                          allowed_children: [],
                          icon: { file: 'server3', colour: CLR_P },
                          create_with_system_resource: 'MODULE',
                          code_prefix: 'SCM-' },
-        FORKLIFT_ROBOT => { description: 'Forklift Robot',
-                            allowed_children: [],
-                            icon: { file: 'server3', colour: CLR_F },
-                            create_with_system_resource: 'MODULE',
-                            code_prefix: 'FKM-' },
+        BIN_SCALE_ROBOT => { description: 'Bin Scale Robot',
+                             allowed_children: [],
+                             icon: { file: 'server3', colour: CLR_P },
+                             create_with_system_resource: 'MODULE',
+                             code_prefix: 'BWM-' },
+        CARTON_SCALE_ROBOT => { description: 'Carton Scale Robot',
+                                allowed_children: [],
+                                icon: { file: 'server3', colour: CLR_W },
+                                create_with_system_resource: 'MODULE',
+                                code_prefix: 'CWM-' },
+        PALLET_SCALE_ROBOT => { description: 'Pallet Scale Robot',
+                                allowed_children: [],
+                                icon: { file: 'server3', colour: CLR_H },
+                                create_with_system_resource: 'MODULE',
+                                code_prefix: 'PWM-' },
+        BIN_FORKLIFT_ROBOT => { description: 'Bin Forklift Robot',
+                                allowed_children: [],
+                                icon: { file: 'server3', colour: CLR_F },
+                                create_with_system_resource: 'MODULE',
+                                code_prefix: 'BMM-' },
+        PALLET_FORKLIFT_ROBOT => { description: 'Pallet Forklift Robot',
+                                   allowed_children: [],
+                                   icon: { file: 'server3', colour: CLR_J },
+                                   create_with_system_resource: 'MODULE',
+                                   code_prefix: 'PMM-' },
         PALLETIZING_ROBOT => { description: 'Palletizing Robot',
                                allowed_children: [],
                                icon: { file: 'server3', colour: CLR_T },
@@ -260,9 +320,12 @@ module Crossbeams
                                icon: { file: 'server3', colour: CLR_Q },
                                create_with_system_resource: 'MODULE',
                                code_prefix: 'BTM-' },
-        FORKLIFT => { description: 'Forklift',
-                      allowed_children: [FORKLIFT_ROBOT],
-                      icon: { file: 'forkishlift', colour: CLR_M } },
+        BIN_FORKLIFT => { description: 'Bin Forklift',
+                          allowed_children: [BIN_FORKLIFT_ROBOT],
+                          icon: { file: 'forkishlift', colour: CLR_M } },
+        PALLET_FORKLIFT => { description: 'Pallet Forklift',
+                             allowed_children: [PALLET_FORKLIFT_ROBOT],
+                             icon: { file: 'forkishlift', colour: CLR_M } },
         PALLETIZING_BAY => { description: 'Palletizing Bay',
                              allowed_children: [PALLETIZING_ROBOT, SCALE, PRINTER],
                              icon: { file: 'cube', colour: CLR_G } },
@@ -278,6 +341,14 @@ module Crossbeams
                      icon: { file: 'printer', colour: CLR_A },
                      non_editable_code: true,
                      code_prefix: 'PRN-' },
+        CARTON_VERIFICATION_STATION => { description: 'Carton-verification station',
+                                         allowed_children: [CARTON_VERIFICATION_ROBOT, PRINTER],
+                                         icon: { file: 'tag', colour: CLR_B } },
+        CARTON_VERIFICATION_ROBOT => { description: 'Carton verification Robot',
+                                       allowed_children: [ROBOT_BUTTON],
+                                       icon: { file: 'server3', colour: CLR_L },
+                                       create_with_system_resource: 'MODULE',
+                                       code_prefix: 'CVM-' },
         BIN_TIPPING_STATION => { description: 'Bin-tipping station',
                                  allowed_children: [BIN_TIPPING_ROBOT, SCALE],
                                  icon: { file: 'cog', colour: CLR_U } },
@@ -290,7 +361,7 @@ module Crossbeams
                                     create_with_system_resource: 'MODULE',
                                     code_prefix: 'BVM-' },
         WEIGHING_STATION => { description: 'Weighing station',
-                              allowed_children: [SCALE_ROBOT, SCALE, PRINTER],
+                              allowed_children: [BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                               icon: { file: 'square', colour: CLR_W } },
         PRINT_STATION => { description: 'Print station',
                            allowed_children: [PRINT_STATION_ROBOT, PRINTER],
