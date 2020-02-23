@@ -7,9 +7,13 @@ Sequel.migration do
       CREATE OR REPLACE FUNCTION public.fn_shift_type_code(in_id integer)
           RETURNS text AS
       $BODY$
-        SELECT concat_ws('_', (CASE WHEN prt.id IS NOT NULL THEN parent_pr.plant_resource_code ELSE NULL END),
-          pr.plant_resource_code, emp.employment_type_code, st.day_night_or_custom,
-          st.start_hour, st.end_hour) AS shift_type_code
+        SELECT concat(
+          (CASE WHEN prt.id IS NOT NULL THEN (parent_pr.plant_resource_code || '_') ELSE NULL END),
+          (pr.plant_resource_code || '_' ||
+            emp.code || '_' ||
+            st.day_night_or_custom || '_' ||
+            st.start_hour || '_' ||
+            st.end_hour)) AS shift_type_code
         FROM shift_types st
         LEFT OUTER JOIN plant_resources pr ON st.plant_resource_id = pr.id
         LEFT OUTER JOIN plant_resource_types prt ON pr.plant_resource_type_id = prt.id AND prt.plant_resource_type_code = 'LINE'
@@ -23,6 +27,7 @@ Sequel.migration do
           COST 100;
       ALTER FUNCTION public.fn_shift_type_code(integer)
           OWNER TO postgres;
+      -- resource_code (ph)+ resource_code (line)+ employment_type_code + D_N_C + start_hour + end_hour (FUNCTION)SQL
     SQL
   end
 
@@ -32,7 +37,3 @@ Sequel.migration do
     SQL
   end
 end
-
-
-
-

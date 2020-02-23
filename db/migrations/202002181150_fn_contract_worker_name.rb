@@ -7,9 +7,12 @@ Sequel.migration do
       CREATE OR REPLACE FUNCTION public.fn_contract_worker_name(in_id integer)
           RETURNS text AS
       $BODY$
-        SELECT concat_ws(' ', cw.title, cw.first_name, cw.surname) AS contract_worker_name
-        FROM contract_workers cw
-        WHERE cw.id = in_id;
+        SELECT concat(
+          (CASE WHEN contract_workers.title IS NOT NULL THEN (contract_workers.title || ' ') ELSE NULL END),
+          (contract_workers.full_names || ' ' ||
+            contract_workers.surname)) AS contract_worker_name
+        FROM contract_workers
+        WHERE contract_workers.id = in_id;
       $BODY$
           LANGUAGE sql VOLATILE
           COST 100;
@@ -24,7 +27,3 @@ Sequel.migration do
     SQL
   end
 end
-
-
-
-
