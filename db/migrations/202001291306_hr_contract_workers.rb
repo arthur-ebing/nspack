@@ -29,7 +29,7 @@ Sequel.migration do
       foreign_key :contract_type_id, :contract_types, null: false, key: [:id]
       foreign_key :wage_level_id, :wage_levels, null: false, key: [:id]
 
-      String :first_name, null: false
+      String :full_names, null: false
       String :surname, null: false
       String :title
       String :email
