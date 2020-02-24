@@ -39,6 +39,7 @@ module RawMaterials
                     col.add_field :tipping_complete_date_time
                     col.add_field :active
                     col.add_field :keep_open
+                    col.add_field :quantity_bins_with_fruit
                   end
                 end
               end

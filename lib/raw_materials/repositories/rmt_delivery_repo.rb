@@ -23,6 +23,14 @@ module RawMaterialsApp
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
 
+    def delivery_bin_count(id)
+      DB[:rmt_bins].where(rmt_delivery_id: id).count
+    end
+
+    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
+      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(bin_fullness: bin_fullness)
+    end
+
     def get_bin_delivery(id)
       qry = <<~SQL
         SELECT d.*,f.farm_code,p.puc_code, o.orchard_code
@@ -138,7 +146,27 @@ module RawMaterialsApp
         FROM rmt_container_material_owners
         WHERE rmt_container_material_type_id = ?
       SQL
-      DB[query, container_material_type_id].select_map(%i[party_name id])
+      # DB[query, container_material_type_id].select_map(%i[party_name id])
+      DB[query, container_material_type_id].map { |p| [p[:party_name], p[:id]] }
+    end
+
+    def delivery_confirmation_details(id)
+      query = <<~SQL
+        select d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
+        , d.truck_registration_number, d.date_delivered
+        , count(b.id) as bins_received, (d.quantity_bins_with_fruit - count(b.id)) as qty_bins_remaining
+        from rmt_deliveries d
+        join cultivars c on c.id=d.cultivar_id
+        join cultivar_groups cg on cg.id=c.cultivar_group_id
+        join farms f on f.id=d.farm_id
+        join pucs p on p.id=d.puc_id
+        join orchards o on o.id=d.orchard_id
+        join rmt_bins b on b.rmt_delivery_id=d.id
+        where d.id = ?
+        group by d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
+        , d.truck_registration_number, d.date_delivered
+      SQL
+      DB[query, id].first
     end
 
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
@@ -155,7 +183,7 @@ module RawMaterialsApp
     end
 
     def bin_asset_number_available?(bin_asset_number)
-      DB[:rmt_bins].where(bin_asset_number: bin_asset_number).count.zero?
+      DB[:rmt_bins].where(bin_asset_number: bin_asset_number, exit_ref: nil).count.zero?
     end
 
     def find_bin_by_asset_number(bin_asset_number)

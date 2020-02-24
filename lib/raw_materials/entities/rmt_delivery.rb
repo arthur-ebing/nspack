@@ -19,5 +19,6 @@ module RawMaterialsApp
     attribute? :keep_open, Types::Bool
     attribute? :current, Types::Bool
     attribute? :active, Types::Bool
+    attribute? :quantity_bins_with_fruit, Types::Integer
   end
 end

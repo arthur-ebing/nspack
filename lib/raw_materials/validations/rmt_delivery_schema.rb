@@ -18,5 +18,6 @@ module RawMaterialsApp
     required(:date_delivered, :time).maybe(:time?)
     optional(:current, :bool).filled(:bool?)
     optional(:keep_open, :bool).filled(:bool?)
+    optional(:quantity_bins_with_fruit, :integer)
   end
 end

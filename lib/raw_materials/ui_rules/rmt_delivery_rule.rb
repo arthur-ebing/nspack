@@ -43,6 +43,7 @@ module UiRules
       fields[:date_delivered] = { renderer: :label }
       fields[:tipping_complete_date_time] = { renderer: :label }
       fields[:keep_open] = { renderer: :label, as_boolean: true }
+      fields[:quantity_bins_with_fruit] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -60,7 +61,8 @@ module UiRules
         qty_empty_bins: {},
         date_picked: { renderer: :date },
         date_delivered: { renderer: :date },
-        current: { renderer: :checkbox, caption: 'Set As Current' }
+        current: { renderer: :checkbox, caption: 'Set As Current' },
+        quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' }
       }
 
       fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?

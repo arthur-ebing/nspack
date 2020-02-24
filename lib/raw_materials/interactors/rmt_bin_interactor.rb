@@ -1,7 +1,22 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtBinInteractor < BaseInteractor
+  class RmtBinInteractor < BaseInteractor # rubocop:disable ClassLength
+    def validate_delivery(id)
+      delivery = find_rmt_delivery(id)
+      return failed_response("Delivery: #{id} does not exist") unless delivery
+      return failed_response("Delivery: #{id} has already been tipped") if delivery[:delivery_tipped]
+      return failed_response("quantity_bins_with_fruit has not yet been set for delivery:#{id}") unless delivery[:quantity_bins_with_fruit]
+
+      return failed_response("All #{delivery[:quantity_bins_with_fruit]} bins have already been received(scanned)")  unless delivery[:quantity_bins_with_fruit] > RawMaterialsApp::RmtDeliveryRepo.new.delivery_bin_count(id)
+
+      ok_response
+    end
+
+    def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
+      repo.update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
+    end
+
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
@@ -32,6 +47,67 @@ module RawMaterialsApp
       return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in the correct format'] })) unless AppConst::BIN_ASSET_REGEX.match?(params[:bin_asset_number])
 
       ok_response
+    end
+
+    def validate_bin_asset_numbers_format(params)
+      error = {}
+      params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.each do |k, _v|
+        error.store(k, ['is not in the correct format']) unless AppConst::BIN_ASSET_REGEX.match?(params[k])
+      end
+      error
+    end
+
+    def validate_bin_asset_numbers_duplicate_scans(params)
+      error = {}
+      scans = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |b| b[1] }
+      duplicate_scans = scans.find_all { |v| scans.count(v) > 1 }
+      params.find_all { |_k, v| duplicate_scans.include?(v) }.each do |k, _v|
+        error.store(k, ["Bin #{params[k]} scanned more than once"])
+      end
+      error
+    end
+
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_bin_asset_numbers_duplicate_scans(params)
+      return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
+
+      res = validate_bin_asset_numbers_format(params)
+      return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
+
+      res = validate_bins_in_stock(params)
+      return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
+
+      delivery = find_rmt_delivery(delivery_id)
+      params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
+
+      submitted_bins = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |_k, v| v }
+      params.delete_if { |k, _v| k.to_s.include?('bin_asset_number') }
+
+      res = validate_rmt_bin_params(params)
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
+
+      repo.transaction do
+        submitted_bins.each do |bin_asset_number|
+          bin_params = { bin_asset_number: bin_asset_number }.merge(params)
+          id = repo.create_rmt_bin(bin_params)
+          log_status('rmt_bins', id, 'BIN_RECEIVED')
+        end
+
+        log_status('rmt_deliveries', delivery_id, 'DELIVERY_RECEIVED')
+        log_transaction
+      end
+      success_response('Bins Scanned Successfully',
+                       delivery)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_bins_in_stock(params)
+      error = {}
+      params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.each do |k, _v|
+        error.store(k, ["Bin #{params[k]} already in stock"]) if !params[k].nil_or_empty? && !bin_asset_number_available?(params[k])
+      end
+      error
     end
 
     def bin_asset_number_available?(bin_asset_number)
@@ -84,6 +160,10 @@ module RawMaterialsApp
 
     def find_rmt_delivery(id)
       repo.find(:rmt_deliveries, RawMaterialsApp::RmtDelivery, id)
+    end
+
+    def get_delivery_confirmation_details(id)
+      repo.delivery_confirmation_details(id)
     end
 
     def find_rmt_delivery_by_bin_id(id)
