@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module Quality
   module TestResults
     module OrchardTestResult
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:orchard_test_result, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -17,26 +16,7 @@ module Quality
               form.caption 'New Orchard Test Result'
               form.action '/quality/test_results/orchard_test_results'
               form.remote! if remote
-              form.row do |row|
-                row.column do |col|
-                  col.add_field :orchard_test_type_id
-                  col.add_field :orchard_set_result_id
-                  col.add_field :orchard_id
-                  col.add_field :puc_id
-                  col.add_field :description
-                  col.add_field :status_description
-                  col.add_field :api_result
-                  col.add_field :classifications
-                  col.add_field :cultivar_ids
-                end
-                row.column do |col|
-                  col.add_field :passed
-                  col.add_field :classification_only
-                  col.add_field :freeze_result
-                  col.add_field :applicable_from
-                  col.add_field :applicable_to
-                end
-              end
+              form.add_field :orchard_test_type_id
             end
           end
 
@@ -46,4 +26,3 @@ module Quality
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

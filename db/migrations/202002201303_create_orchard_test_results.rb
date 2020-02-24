@@ -20,8 +20,8 @@ Sequel.migration do
       column :classifications, 'hstore'
       column :cultivar_ids, 'integer[]'
 
-      DateTime :applicable_from, null: false
-      DateTime :applicable_to, null: false
+      DateTime :applicable_from
+      DateTime :applicable_to
 
       TrueClass :active, default: true
       DateTime :created_at
@@ -62,8 +62,8 @@ Sequel.migration do
       column :classifications, 'hstore'
       column :cultivar_ids, 'integer[]'
 
-      DateTime :applicable_from, null: false
-      DateTime :applicable_to, null: false
+      DateTime :applicable_from
+      DateTime :applicable_to
 
       TrueClass :active, default: true
       DateTime :created_at
@@ -128,7 +128,7 @@ Sequel.migration do
         LANGUAGE plpgsql;
 
       CREATE TRIGGER log_orchard_test_result
-      AFTER INSERT
+      AFTER UPDATE
       ON public.orchard_test_results
       FOR EACH ROW
       EXECUTE PROCEDURE public.fn_log_orchard_test_result();

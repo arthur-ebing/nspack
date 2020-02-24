@@ -62,7 +62,7 @@ module UiRules
                                           selected: @form_object.applicable_commodity_group_ids,
                                           caption: 'Commodity Groups' },
         applicable_cultivar_ids: { renderer: :multi,
-                                   options: @repo.for_select_cultivars,
+                                   options: MasterfilesApp::CultivarRepo.new.for_select_cultivars,
                                    selected: @form_object.applicable_cultivar_ids,
                                    caption: 'Cultivars' }
       }
@@ -82,7 +82,7 @@ module UiRules
                                     description: nil,
                                     applies_to_all_markets: false,
                                     applies_to_all_cultivars: false,
-                                    applies_to_orchard: false,
+                                    applies_to_orchard: true,
                                     applies_to_orchard_set: false,
                                     allow_result_capturing: false,
                                     pallet_level_result: false,
