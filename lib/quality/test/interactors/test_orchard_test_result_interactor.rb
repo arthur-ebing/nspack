@@ -17,7 +17,7 @@ module QualityApp
     end
 
     def test_orchard_test_result
-      QualityApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_result).returns(fake_orchard_test_result)
+      QualityApp::OrchardTestRepo.any_instance.stubs(:find_orchard_test_result_flat).returns(fake_orchard_test_result)
       entity = interactor.send(:orchard_test_result, 1)
       assert entity.is_a?(OrchardTestResult)
     end
@@ -26,7 +26,7 @@ module QualityApp
       attrs = fake_orchard_test_result.to_h.reject { |k, _| k == :id }
       res = interactor.create_orchard_test_result(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestResult, res.instance)
+      assert_instance_of(OrchardTestResultFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -44,7 +44,7 @@ module QualityApp
       attrs[:description] = 'a_change'
       res = interactor.update_orchard_test_result(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestResult, res.instance)
+      assert_instance_of(OrchardTestResultFlat, res.instance)
       assert_equal 'a_change', res.instance.description
       refute_equal value, res.instance.description
     end

@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 module UiRules
-  class OrchardTestResultRule < Base
+  class OrchardTestResultRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = QualityApp::OrchardTestRepo.new
+      @cultivar_repo = MasterfilesApp::CultivarRepo.new
+      @farm_repo = MasterfilesApp::FarmRepo.new
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields @mode == :new ? new_fields : common_fields
 
       set_show_fields if %i[show reopen].include? @mode
-
+      add_behaviours if %i[edit].include? @mode
       form_name 'orchard_test_result'
     end
 
@@ -22,12 +24,12 @@ module UiRules
       fields[:orchard_set_result_id] = { renderer: :label,
                                          with_value: orchard_set_result_id_label,
                                          caption: 'Orchard Set Result' }
-      fields[:orchard_id] = { renderer: :label,
-                              with_value: @form_object.orchard_code,
-                              caption: 'Orchard' }
       fields[:puc_id] = { renderer: :label,
                           with_value: @form_object.puc_code,
                           caption: 'Puc' }
+      fields[:orchard_id] = { renderer: :label,
+                              with_value: @form_object.orchard_code,
+                              caption: 'Orchard' }
       fields[:description] = { renderer: :label }
       fields[:status_description] = { renderer: :label }
       fields[:passed] = { renderer: :label, as_boolean: true }
@@ -41,38 +43,63 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def new_fields
       {
         orchard_test_type_id: { renderer: :select,
-                                options: QualityApp::OrchardTestRepo.new.for_select_orchard_test_types,
-                                disabled_options: QualityApp::OrchardTestRepo.new.for_select_inactive_orchard_test_types,
+                                options: @repo.for_select_orchard_test_types,
+                                disabled_options: @repo.for_select_inactive_orchard_test_types,
                                 caption: 'Orchard Test Type',
-                                required: true },
+                                required: true,
+                                prompt: true }
+      }
+    end
+
+    def common_fields # rubocop:disable Metrics/AbcSize
+      cultivar_selector = if @rule_object.applies_to_orchard
+                            orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+                            { renderer: :select,
+                              options: @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) }),
+                              disabled_options: @cultivar_repo.for_select_inactive_cultivars,
+                              caption: 'Cultivar',
+                              required: true }
+                          else
+                            { renderer: :multi,
+                              options: @cultivar_repo.for_select_cultivars,
+                              selected: @form_object.cultivar_ids,
+                              caption: 'Cultivars' }
+                          end
+
+      {
+        orchard_test_type_id: { renderer: :label,
+                                with_value: @form_object.orchard_test_type_code,
+                                caption: 'Orchard Test Type' },
         orchard_set_result_id: { renderer: :select,
-                                 options: QualityApp::OrchardTestRepo.new.for_select_orchard_set_results,
-                                 disabled_options: QualityApp::OrchardTestRepo.new.for_select_inactive_orchard_set_results,
+                                 hide_on_load: true,
+                                 options: @repo.for_select_orchard_set_results,
+                                 disabled_options: @repo.for_select_inactive_orchard_set_results,
                                  caption: 'Orchard Set Result' },
-        orchard_id: { renderer: :select,
-                      options: MasterfilesApp::FarmRepo.new.for_select_orchards,
-                      disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_orchards,
-                      caption: 'Orchard',
-                      required: true },
         puc_id: { renderer: :select,
-                  options: MasterfilesApp::FarmRepo.new.for_select_pucs,
-                  disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_pucs,
+                  options: @farm_repo.for_select_pucs,
+                  disabled_options: @farm_repo.for_select_inactive_pucs,
                   caption: 'Puc',
-                  required: true },
-        description: {},
-        status_description: {},
+                  required: true,
+                  prompt: true },
+        orchard_id: { renderer: :select,
+                      options: @repo.for_select_orchards,
+                      disabled_options: @repo.for_select_orchards,
+                      caption: 'Orchard',
+                      required: @rule_object.applies_to_orchard,
+                      prompt: true },
+        description: { hide_on_load: true },
+        status_description: { hide_on_load: true },
         passed: { renderer: :checkbox },
-        classification_only: { renderer: :checkbox },
-        freeze_result: { renderer: :checkbox },
-        api_result: {},
-        classifications: {},
-        cultivar_ids: { renderer: :multi,
-                        options: @repo.for_select_cultivars,
-                        selected: @form_object.cultivar_ids,
-                        caption: 'Cultivars' },
+        classification_only: { renderer: :checkbox,
+                               hide_on_load: true },
+        freeze_result: { renderer: :checkbox,
+                         hide_on_load: true },
+        api_result: { hide_on_load: true },
+        classifications: { hide_on_load: true },
+        cultivar_ids: cultivar_selector,
         applicable_from: { renderer: :date,
                            required: true },
         applicable_to: { renderer: :date,
@@ -82,28 +109,21 @@ module UiRules
 
     def make_form_object
       if @mode == :new
-        make_new_form_object
+        @form_object = OpenStruct.new(orchard_test_type_id: nil)
         return
       end
 
       @form_object = @repo.find_orchard_test_result_flat(@options[:id])
+      @rule_object = @repo.find_orchard_test_type_flat(@form_object[:orchard_test_type_id])
     end
 
-    def make_new_form_object
-      @form_object = OpenStruct.new(orchard_test_type_id: nil,
-                                    orchard_set_result_id: nil,
-                                    orchard_id: nil,
-                                    puc_id: nil,
-                                    description: nil,
-                                    status_description: nil,
-                                    passed: true,
-                                    classification_only: true,
-                                    freeze_result: true,
-                                    api_result: nil,
-                                    classifications: nil,
-                                    cultivar_ids: nil,
-                                    applicable_from: nil,
-                                    applicable_to: nil)
+    private
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :puc_id, notify: [{ url: '/quality/test_results/orchard_test_results/puc_changed' }]
+        behaviour.dropdown_change :orchard_id, notify: [{ url: '/quality/test_results/orchard_test_results/orchard_changed' }]
+      end
     end
   end
 end

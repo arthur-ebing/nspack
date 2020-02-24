@@ -3,7 +3,7 @@
 module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
     def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
-      res = validate_orchard_test_result_params(params)
+      res = OrchardTestCreateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
@@ -13,7 +13,7 @@ module QualityApp
         log_transaction
       end
       instance = orchard_test_result(id)
-      success_response("Created orchard test result #{instance.description}", instance)
+      success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -21,7 +21,7 @@ module QualityApp
     end
 
     def update_orchard_test_result(id, params)
-      res = validate_orchard_test_result_params(params)
+      res = OrchardTestUpdateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
@@ -29,13 +29,13 @@ module QualityApp
         log_transaction
       end
       instance = orchard_test_result(id)
-      success_response("Updated orchard test result #{instance.description}", instance)
+      success_response("Updated orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_orchard_test_result(id)
-      name = orchard_test_result(id).description
+      name = orchard_test_result(id).orchard_test_type_code
       repo.transaction do
         repo.delete_orchard_test_result(id)
         log_status(:orchard_test_results, id, 'DELETED')
@@ -58,11 +58,7 @@ module QualityApp
     end
 
     def orchard_test_result(id)
-      repo.find_orchard_test_result(id)
-    end
-
-    def validate_orchard_test_result_params(params)
-      OrchardTestResultSchema.call(params)
+      repo.find_orchard_test_result_flat(id)
     end
   end
 end
