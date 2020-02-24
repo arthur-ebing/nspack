@@ -36,7 +36,8 @@ module UiRules
           options: @repo.for_select_contract_workers_for_shift(shift_id),
           caption: 'Contract Worker',
           min_charwidth: 30,
-          required: true
+          required: true,
+          prompt: true
         }
       }
     end

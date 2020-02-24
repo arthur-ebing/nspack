@@ -87,7 +87,10 @@ module MasterfilesApp
                                               flatten_columns: { wage_level: :wage_level } }],
                             lookup_functions: [{ function: :fn_contract_worker_name,
                                                  args: [:id],
-                                                 col_name: :contract_worker_name }])
+                                                 col_name: :contract_worker_name },
+                                               { function: :fn_shift_type_code,
+                                                 args: [:shift_type_id],
+                                                 col_name: :shift_type_code }])
     end
 
     def find_contract_worker_id_by_identifier_id(personnel_identifier_id)
