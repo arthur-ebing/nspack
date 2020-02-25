@@ -24,5 +24,6 @@ module RawMaterialsApp
     optional(:bin_asset_number, Types::StrippedString).maybe(:str?)
     optional(:scrapped, :bool).maybe(:bool?)
     optional(:scrapped_at, %i[nil time]).maybe(:time?)
+    optional(:scrapped_bin_asset_number, Types::StrippedString).maybe(:str?)
   end
 end
