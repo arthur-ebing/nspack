@@ -560,14 +560,19 @@ module ProductionApp
     end
 
     def scrapped_bin_bulk_update(params)
-      DB[:rmt_bins]
-        .where(id: params[:pallets_selected])
-        .update(scrap_remarks: params[:remarks],
-                scrap_reason_id: params[:scrap_reason_id],
-                scrapped_at: Time.now,
-                scrapped: true,
-                exit_ref: 'SCRAPPED',
-                exit_ref_date_time: Time.now)
+      # DB[:rmt_bins]
+      #   .where(id: params[:pallets_selected])
+      #   .update(scrap_remarks: params[:remarks],
+      #           scrap_reason_id: params[:scrap_reason_id],
+      #           scrapped_at: Time.now,
+      #           scrapped: true,
+      #           exit_ref: 'SCRAPPED',
+      #           exit_ref_date_time: Time.now)
+      upd = "UPDATE rmt_bins SET scrap_remarks = '#{params[:remarks]}', scrap_reason_id = #{params[:scrap_reason_id]},
+             scrapped_at = '#{Time.now}', scrapped = true, exit_ref = 'SCRAPPED', exit_ref_date_time = '#{Time.now}',
+             scrapped_bin_asset_number = bin_asset_number, bin_asset_number = null
+             WHERE id IN (#{params[:pallets_selected].join(',')});"
+      DB[upd].update
     end
   end
 end
