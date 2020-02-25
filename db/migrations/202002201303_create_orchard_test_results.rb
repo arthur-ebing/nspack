@@ -28,6 +28,7 @@ Sequel.migration do
       DateTime :updated_at
 
       index [:orchard_test_type_id], name: :orchard_test_type_id
+      index [:orchard_test_type_id, :orchard_id], name: :orchard_test_type_orchard_unique_code, unique: true
     end
 
     pgt_created_at(:orchard_test_results,
