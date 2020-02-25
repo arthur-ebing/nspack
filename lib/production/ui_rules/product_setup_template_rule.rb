@@ -3,7 +3,7 @@
 
 module UiRules
   class ProductSetupTemplateRule < Base # rubocop:disable ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
@@ -16,7 +16,8 @@ module UiRules
       set_show_fields if %i[show reopen].include? @mode
       set_manage_template_setups if @mode == :manage
 
-      add_behaviours if %i[new edit clone].include? @mode
+      add_behaviours if %i[new].include? @mode
+      add_edit_behaviours if %i[edit clone].include? @mode
 
       form_name 'product_setup_template'
     end
@@ -144,6 +145,21 @@ module UiRules
     private
 
     def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :cultivar_group_id,
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_group_changed',
+                                             param_keys: %i[product_setup_template_template_name] }]
+        behaviour.dropdown_change :cultivar_id,
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_changed',
+                                             param_keys: %i[product_setup_template_template_name product_setup_template_cultivar_group_id] }]
+        behaviour.dropdown_change :packhouse_resource_id,
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/packhouse_resource_changed' }]
+        behaviour.dropdown_change :season_group_id,
+                                  notify: [{ url: '/production/product_setups/product_setup_templates/season_group_changed' }]
+      end
+    end
+
+    def add_edit_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :cultivar_group_id,
                                   notify: [{ url: '/production/product_setups/product_setup_templates/cultivar_group_changed',
