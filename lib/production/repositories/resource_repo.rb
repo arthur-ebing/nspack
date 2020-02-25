@@ -93,8 +93,8 @@ module ProductionApp
       id
     end
 
-    def create_child_plant_resource(parent_id, res)
-      sys_id = create_twin_system_resource(parent_id, res)
+    def create_child_plant_resource(parent_id, res, sys_code: nil)
+      sys_id = create_twin_system_resource(parent_id, res, sys_code)
       attrs = if sys_id
                 res.to_h.merge(system_resource_id: sys_id)
               else
@@ -219,14 +219,14 @@ module ProductionApp
 
     private
 
-    def create_twin_system_resource(parent_id, res)
+    def create_twin_system_resource(parent_id, res, sys_code)
       rules = plant_resource_definition(res[:plant_resource_type_id])
       system_resource_type = rules[:create_with_system_resource]
       return unless system_resource_type
 
       system_rules = Crossbeams::Config::ResourceDefinitions::SYSTEM_RESOURCE_RULES[system_resource_type]
       system_resource_type_id = system_resource_type_id_from_code(system_resource_type)
-      code = resolve_system_code(parent_id, rules[:code_prefix], res[:plant_resource_type_id], rules[:sequence_without_zero_padding])
+      code = sys_code || resolve_system_code(parent_id, rules[:code_prefix], res[:plant_resource_type_id], rules[:sequence_without_zero_padding])
       attrs = { system_resource_type_id: system_resource_type_id,
                 plant_resource_type_id: res[:plant_resource_type_id],
                 system_resource_code: code,
