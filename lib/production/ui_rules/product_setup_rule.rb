@@ -112,7 +112,7 @@ module UiRules
                                 searchable: true,
                                 remove_search_for_small_list: false },
         std_fruit_size_count_id: { renderer: :select,
-                                   options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts,
+                                   options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
                                    disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_std_fruit_size_counts,
                                    caption: 'Std Size Count',
                                    prompt: 'Select Size Count',
