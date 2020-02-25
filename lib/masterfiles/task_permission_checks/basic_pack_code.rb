@@ -29,6 +29,8 @@ module MasterfilesApp
       private
 
       def create_check
+        return failed_response 'Basic pack codes must be created via Standard pack codes' if AppConst::BASE_PACK_EQUALS_STD_PACK
+
         all_ok
       end
 

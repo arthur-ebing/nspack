@@ -302,6 +302,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # * target_market_group_name
   CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
 
+  # Does this installation require login when printing a label from a robot?
+  INCENTIVISED_LABELING = make_boolean('INCENTIVISED_LABELING')
+
   # pi Robots can display 6 lines of text, while T2n robots can only display 4.
   # If all robots on site are homogenous, set the value here.
   # Else it will be looked up from the module name.

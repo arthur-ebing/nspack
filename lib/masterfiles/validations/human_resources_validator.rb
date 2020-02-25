@@ -26,18 +26,27 @@ module MasterfilesApp
           ed = set[:end_hour]
           values << st
           values << ed
-          ed -= 1
-          st += 1
 
-          return failed_response('Start hour overlaps current time slot') if (st..ed).include?(start_hr)
-          return failed_response('End hour overlaps current time slot') if (st..ed).include?(end_hr)
+          range = time_range(st + 1, ed - 1)
+          return failed_response('Start hour overlaps current time slot') if range.include?(start_hr)
+          return failed_response('End hour overlaps current time slot') if range.include?(end_hr)
         end
 
+        range = time_range(start_hr + 1, end_hr - 1)
         values.uniq.each do |val|
-          return failed_response('Time slot overlaps current time slot') if (start_hr + 1..end_hr - 1).include?(val)
+          return failed_response('Time slot overlaps current time slot') if range.include?(val)
         end
 
         success_response('Valid shift type', attrs)
+      end
+
+      def time_range(start_hr, end_hr)
+        cycle = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+        start_index = cycle.find_index(start_hr)
+        sub_cycle = cycle[start_index..-1]
+        end_index = sub_cycle.find_index(end_hr)
+        sub_cycle[0..end_index]
       end
     end
   end

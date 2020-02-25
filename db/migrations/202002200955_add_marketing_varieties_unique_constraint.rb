@@ -18,7 +18,7 @@ Sequel.migration do
 
   down do
     alter_table(:marketing_varieties) do
-      drop_index [:marketing_variety_code], name: :marketing_variety_unique_code
+      drop_constraint :marketing_variety_unique_code
     end
   end
 end

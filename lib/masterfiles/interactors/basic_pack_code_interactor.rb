@@ -38,6 +38,11 @@ module MasterfilesApp
       end
     end
 
+    def assert_permission!(task, id = nil)
+      res = TaskPermissionCheck::BasicPackCode.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
     private
 
     def repo

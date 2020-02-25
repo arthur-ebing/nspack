@@ -50,6 +50,10 @@ module MesscadaApp
       exists?(:system_resources, system_resource_code: resource_code)
     end
 
+    def identifier_exists?(identifier)
+      exists?(:personnel_identifiers, identifier: identifier)
+    end
+
     def production_run_exists?(production_run_id)
       exists?(:production_runs, id: production_run_id)
     end

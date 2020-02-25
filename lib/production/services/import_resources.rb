@@ -71,7 +71,7 @@ module ProductionApp
           id = repo.create_child_plant_resource(parent_id, res, sys_code: clm)
           repo.log_status('plant_resources', id, 'CREATED', user_name: 'Import')
           4.times do |btn_no|
-            btn_dat = { plant_resource_type_id: btn_type, plant_resource_code: "#{attrs[:alias]}-#{btn_no}", description: "#{attrs[:alias]}-#{btn_no}" }
+            btn_dat = { plant_resource_type_id: btn_type, plant_resource_code: "#{attrs[:alias]}-#{btn_no + 1}", description: "#{attrs[:alias]}-#{btn_no + 1}" }
             res = PlantResourceSchema.call(btn_dat)
             b_id = repo.create_child_plant_resource(id, res)
             repo.log_status('plant_resources', b_id, 'CREATED', user_name: 'Import')

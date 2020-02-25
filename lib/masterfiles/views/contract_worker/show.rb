@@ -13,18 +13,25 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Contract Worker'
               form.view_only!
-              form.add_field :employment_type_id
-              form.add_field :contract_type_id
-              form.add_field :wage_level_id
-              form.add_field :title
-              form.add_field :first_name
-              form.add_field :surname
-              form.add_field :email
-              form.add_field :contact_number
-              form.add_field :personnel_number
-              form.add_field :start_date
-              form.add_field :end_date
-              form.add_field :active
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :title
+                  col.add_field :first_name
+                  col.add_field :surname
+                  col.add_field :email
+                  col.add_field :contact_number
+                  col.add_field :personnel_number
+                  col.add_field :active
+                end
+                row.column do |col|
+                  col.add_field :employment_type_id
+                  col.add_field :contract_type_id
+                  col.add_field :wage_level_id
+                  col.add_field :shift_type_id
+                  col.add_field :start_date
+                  col.add_field :end_date
+                end
+              end
             end
           end
 

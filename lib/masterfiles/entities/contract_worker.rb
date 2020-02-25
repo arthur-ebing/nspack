@@ -6,6 +6,8 @@ module MasterfilesApp
     attribute :employment_type_id, Types::Integer
     attribute :contract_type_id, Types::Integer
     attribute :wage_level_id, Types::Integer
+    attribute :shift_type_id, Types::Integer
+    attribute :shift_type_code, Types::String
     attribute :employment_type_code, Types::String
     attribute :contract_type_code, Types::String
     attribute :contract_worker_name, Types::String

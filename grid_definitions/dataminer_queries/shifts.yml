@@ -49,7 +49,7 @@
     :caption: Shift type code
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 240
     :format: 
     :hide: false
     :pinned: 
@@ -65,7 +65,7 @@
     :caption: Employment type code
     :namespaced_name: employment_types.employment_type_code
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -81,7 +81,7 @@
     :caption: Running hours
     :namespaced_name: shifts.running_hours
     :data_type: :number
-    :width: 120
+    :width: 150
     :format: :delimited_1000
     :hide: false
     :pinned: 

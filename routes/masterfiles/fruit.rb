@@ -410,6 +410,7 @@ class Nspack < Roda
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
+        interactor.assert_permission!(:create)
         show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
