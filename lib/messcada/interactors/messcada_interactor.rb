@@ -70,6 +70,9 @@ module MesscadaApp
       check_res = validate_device_exists(res[:device])
       return check_res unless check_res.success
 
+      check_res = validate_incentivised_labeling(res[:identifier])
+      return check_res unless check_res.success
+
       cvl_res = nil
       repo.transaction do
         cvl_res = MesscadaApp::CartonLabeling.call(res)
@@ -284,6 +287,10 @@ module MesscadaApp
       repo.resource_code_exists?(resource_code)
     end
 
+    def identifier_exists?(identifier)
+      repo.identifier_exists?(identifier)
+    end
+
     def carton_label_exists?(carton_label_id)
       repo.carton_label_exists?(carton_label_id)
     end
@@ -304,6 +311,12 @@ module MesscadaApp
 
     def validate_device_exists(resource_code)
       return failed_response("Resource Code:#{resource_code} could not be found") unless resource_code_exists?(resource_code)
+
+      ok_response
+    end
+
+    def validate_incentivised_labeling(identifier)
+      return failed_response('Not logged in') unless identifier_exists?(identifier)
 
       ok_response
     end
