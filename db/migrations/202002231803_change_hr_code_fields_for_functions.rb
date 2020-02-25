@@ -54,7 +54,7 @@ Sequel.migration do
         SELECT concat(
           (CASE WHEN prt.id IS NOT NULL THEN (parent_pr.plant_resource_code || '_') ELSE NULL END),
           (pr.plant_resource_code || '_' ||
-            emp.code || '_' ||
+            emp.employment_type_code || '_' ||
             st.day_night_or_custom || '_' ||
             st.start_hour || '_' ||
             st.end_hour)) AS shift_type_code
@@ -83,7 +83,7 @@ Sequel.migration do
       $BODY$
         SELECT concat(
           (CASE WHEN contract_workers.title IS NOT NULL THEN (contract_workers.title || ' ') ELSE NULL END),
-          (contract_workers.full_names || ' ' ||
+          (contract_workers.first_name || ' ' ||
             contract_workers.surname)) AS contract_worker_name
         FROM contract_workers
         WHERE contract_workers.id = in_id;

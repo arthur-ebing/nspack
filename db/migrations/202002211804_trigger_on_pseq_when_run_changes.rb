@@ -31,7 +31,7 @@ Sequel.migration do
 
   down do
     run <<~SQL
-      DROP TRIGGER pallet_sequences_prod_run_changed_stats_queue;
+      DROP TRIGGER pallet_sequences_prod_run_changed_stats_queue ON public.pallet_sequences;
       DROP FUNCTION public.fn_add_changed_runs_to_stats_queue();
     SQL
   end
