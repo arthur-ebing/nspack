@@ -12,6 +12,16 @@ namespace :app do
       end
     end
 
+    desc 'Import resources'
+    task :import_resources, %i[site mod_fn prn_fn] => [:load_app] do |_, args|
+      res = ProductionApp::ImportResources.call(args.site, args.mod_fn, args.prn_fn)
+      if res.success
+        puts "SUCCESS: #{res.message}"
+      else
+        puts "FAILURE: #{res.message}"
+      end
+    end
+
     desc 'SQL Extract of Masterfiles'
     task extract: [:load_app] do
       # Todo - allow list of specific tables
