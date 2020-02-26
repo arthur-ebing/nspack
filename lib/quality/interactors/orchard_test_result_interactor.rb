@@ -24,12 +24,14 @@ module QualityApp
       res = OrchardTestUpdateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      service_res = nil
       repo.transaction do
-        repo.update_orchard_test_result(id, res)
+        service_res = QualityApp::UpdateOrchardTestResult.call(id, res)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
         log_transaction
       end
-      instance = orchard_test_result(id)
-      success_response("Updated orchard test result #{instance.orchard_test_type_code}", instance)
+      service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -47,8 +47,7 @@ module QualityApp
         LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_types.applicable_cultivar_ids)
         LEFT JOIN commodity_groups ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)
         WHERE orchard_test_types.id = #{id}
-        GROUP BY
-            orchard_test_types.id
+        GROUP BY orchard_test_types.id
       SQL
       OrchardTestTypeFlat.new(DB[query].first)
     end
