@@ -7,5 +7,6 @@ module MasterfilesApp
     optional(:id, :integer).filled(:int?)
     required(:target_market_group_type_id, :integer).filled(:int?)
     required(:target_market_group_name, Types::StrippedString).filled(:str?)
+    required(:description, Types::StrippedString).maybe(:str?)
   end
 end

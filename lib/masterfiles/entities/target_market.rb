@@ -6,5 +6,6 @@ module MasterfilesApp
     attribute :target_market_name, Types::String
     attribute :country_ids, Types::Array
     attribute :tm_group_ids, Types::Array
+    attribute :description, Types::String
   end
 end

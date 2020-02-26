@@ -1,10 +1,11 @@
 ---
 :caption: Target Market Groups
-:sql: SELECT "target_market_groups"."id", "target_market_groups"."target_market_group_type_id",
-  "target_market_groups"."target_market_group_name", "target_market_groups"."created_at",
-  "target_market_groups"."updated_at", "target_market_group_types"."target_market_group_type_code"
-  FROM "target_market_groups" JOIN "target_market_group_types" ON "target_market_group_types"."id"
-  = "target_market_groups"."target_market_group_type_id" ORDER BY "target_market_groups"."target_market_group_name"
+:sql: "SELECT\r\n  \"target_market_groups\".\"id\",\r\n  \"target_market_groups\".\"target_market_group_type_id\",\r\n
+  \ \"target_market_groups\".\"target_market_group_name\",\r\n  \"target_market_groups\".\"description\",\r\n
+  \ \"target_market_groups\".\"created_at\",\r\n  \"target_market_groups\".\"updated_at\",\r\n
+  \ \"target_market_group_types\".\"target_market_group_type_code\"\r\nFROM\r\n  \"target_market_groups\"\r\n
+  \ JOIN \"target_market_group_types\" ON \"target_market_group_types\".\"id\" = \"target_market_groups\".\"target_market_group_type_id\"\r\nORDER
+  BY\r\n  \"target_market_groups\".\"target_market_group_name\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -57,9 +58,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  description:
+    :name: description
+    :sequence_no: 4
+    :caption: Description
+    :namespaced_name: target_market_groups.description
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Created at
     :namespaced_name: target_market_groups.created_at
     :data_type: :datetime
@@ -75,7 +92,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Updated at
     :namespaced_name: target_market_groups.updated_at
     :data_type: :datetime
@@ -91,7 +108,7 @@
     :group_max: false
   target_market_group_type_code:
     :name: target_market_group_type_code
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Target market group type code
     :namespaced_name: target_market_group_types.target_market_group_type_code
     :data_type: :string

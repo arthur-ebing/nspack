@@ -1,14 +1,16 @@
 ---
 :caption: Target Markets
-:sql: "SELECT \"target_markets\".\"id\", \"target_markets\".\"target_market_name\",\r\n(SELECT
-  string_agg(country_name, '; ')\r\n FROM (SELECT c.country_name FROM destination_countries
-  c\r\n  JOIN target_markets_for_countries t\r\n    ON t.destination_country_id =
-  c.id\r\n   AND t.target_market_id = target_markets.id\r\n   AND c.active) AS tab)
-  AS countries,\r\n(SELECT string_agg(target_market_group_name, '; ')\r\n FROM (SELECT
-  g.target_market_group_name FROM target_market_groups g\r\n  JOIN target_markets_for_groups
-  t\r\n    ON t.target_market_group_id = g.id\r\n   AND t.target_market_id = target_markets.id\r\n
-  \  AND g.active) AS tab) AS target_market_groups,\r\n\"target_markets\".\"created_at\",
-  \"target_markets\".\"updated_at\"\r\nFROM \"target_markets\""
+:sql: "SELECT\r\n  \"target_markets\".\"id\",\r\n  \"target_markets\".\"target_market_name\",\r\n
+  \ \"target_markets\".\"description\",\r\n  (\r\n    SELECT\r\n      string_agg(country_name,
+  '; ')\r\n    FROM (\r\n      SELECT\r\n        c.country_name\r\n      FROM\r\n
+  \       destination_countries c\r\n        JOIN target_markets_for_countries t ON
+  t.destination_country_id = c.id\r\n          AND t.target_market_id = target_markets.id\r\n
+  \         AND c.active) AS tab) AS countries,\r\n  (\r\n    SELECT\r\n      string_agg(target_market_group_name,
+  '; ')\r\n    FROM (\r\n      SELECT\r\n        g.target_market_group_name\r\n      FROM\r\n
+  \       target_market_groups g\r\n      JOIN target_markets_for_groups t ON t.target_market_group_id
+  = g.id\r\n        AND t.target_market_id = target_markets.id\r\n        AND g.active)
+  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
+  \ \"target_markets\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -45,9 +47,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: target_markets.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   countries:
     :name: countries
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Countries
     :namespaced_name: 
     :data_type: :string
@@ -63,7 +81,7 @@
     :group_max: false
   target_market_groups:
     :name: target_market_groups
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Target market groups
     :namespaced_name: 
     :data_type: :string
@@ -79,7 +97,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: target_markets.created_at
     :data_type: :datetime
@@ -95,7 +113,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: target_markets.updated_at
     :data_type: :datetime

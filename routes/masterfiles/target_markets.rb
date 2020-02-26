@@ -85,7 +85,8 @@ class Nspack < Roda
           if res.success
             update_grid_row(id,
                             changes: { target_market_group_type_id: res.instance[:target_market_group_type_id],
-                                       target_market_group_name: res.instance[:target_market_group_name] },
+                                       target_market_group_name: res.instance[:target_market_group_name],
+                                       description: res.instance[:description] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::TmGroup::Edit.call(id, params[:tm_group], res.errors) }
@@ -165,7 +166,8 @@ class Nspack < Roda
           res = interactor.update_target_market(id, params[:target_market])
           if res.success
             update_grid_row(id,
-                            changes: { target_market_name: res.instance[:target_market_name] },
+                            changes: { target_market_name: res.instance[:target_market_name],
+                                       description: res.instance[:description] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }
