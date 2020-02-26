@@ -90,6 +90,94 @@ class Nspack < Roda # rubocop:disable ClassLength
         container_material_type_combo_changed('rmt_bin')
       end
 
+      r.on 'edit_rmt_bin' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:error_message], errors:  { delivery_number: [''] }) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bin',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/edit_rmt_bin',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin][:bin_number])
+          if res.success
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/render_edit_rmt_bin/#{res.instance[:id]}")
+          else
+            store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/edit_rmt_bin')
+          end
+        end
+      end
+
+      r.on 'render_edit_rmt_bin', Integer do |id| # rubocop:disable Metrics/BlockLength
+        bin = interactor.bin_details(id)
+        form_state = { bin_fullness: bin[:bin_fullness], qty_bins: bin[:qty_bins] }
+        error = retrieve_from_local_store(:errors)
+        form_state.merge!(error_message: error[:error_message], errors:  { delivery_number: [''] }) unless error.nil?
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       notes: nil,
+                                       form_name: :rmt_bin,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Update Bin',
+                                       reset_button: false,
+                                       no_submit: false,
+                                       action: "/rmd/rmt_deliveries/rmt_bins/edit_rmt_bin_submit/#{bin[:id]}",
+                                       button_caption: 'Update')
+
+        capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+        capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+
+        form.behaviours do |behaviour|
+          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_edit_rmt_container_type_combo_changed' }] if capture_container_material
+          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_edit_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
+        end
+
+        form.add_label(:delivery_number, 'Delivery Number', bin[:rmt_delivery_id])
+        form.add_label(:farm_code, 'Farm', bin[:farm_code])
+        form.add_label(:puc_code, 'Puc', bin[:puc_code])
+        form.add_label(:orchard_code, 'Orchard', bin[:orchard_code])
+        form.add_label(:cultivar_name, 'Cultivar', bin[:cultivar_name])
+        form.add_field(:qty_bins, 'Qty Bins', hide_on_load: true)
+        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: bin[:rmt_container_type_id], required: true, prompt: true)
+
+        if capture_container_material
+          form.add_select(:rmt_container_material_type_id, 'Container Material Type',
+                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: bin[:rmt_container_type_id] }),
+                          required: true, prompt: true, value: bin[:rmt_container_material_type_id])
+        end
+
+        if capture_container_material && capture_container_material_owner
+          form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
+                          items: RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(bin[:rmt_container_material_type_id]),
+                          required: true, prompt: true, value: bin[:rmt_material_owner_party_role_id])
+        end
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.on 'edit_rmt_bin_submit', Integer do |id|
+        res = interactor.pdt_update_rmt_bin(id, params[:rmt_bin])
+        if res.success
+          store_locally(:flash_notice, "Bin: #{id} Updated Successfully")
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/edit_rmt_bin')
+        else
+          store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/render_edit_rmt_bin/#{id}")
+        end
+      end
+
       # --------------------------------------------------------------------------
       # BIN RECEPTION SCANNING
       # --------------------------------------------------------------------------
@@ -161,6 +249,14 @@ class Nspack < Roda # rubocop:disable ClassLength
         container_material_type_combo_changed('delivery')
       end
 
+      r.on 'bin_edit_rmt_container_type_combo_changed' do
+        rmt_container_type_combo_changed('rmt_bin')
+      end
+
+      r.on 'bin_edit_container_material_type_combo_changed' do
+        container_material_type_combo_changed('rmt_bin')
+      end
+
       r.on 'receive_rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
         delivery = interactor.get_delivery_confirmation_details(id)
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
@@ -176,7 +272,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                        notes: notice,
                                        form_name: :delivery,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Confirm Delivery',
+                                       caption: 'Receive Bins',
                                        reset_button: false,
                                        no_submit: false,
                                        action: "/rmd/rmt_deliveries/rmt_bins/receive_rmt_bins_submit/#{id}",
@@ -302,8 +398,6 @@ class Nspack < Roda # rubocop:disable ClassLength
           form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
           form.add_label(:truck_registration_number, 'Truck Reg Number', delivery[:truck_registration_number])
           form.add_label(:date_delivered, 'Date Delivered', delivery[:date_delivered])
-          # form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
-          # form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
 

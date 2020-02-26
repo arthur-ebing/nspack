@@ -169,6 +169,21 @@ module RawMaterialsApp
       DB[query, id].first
     end
 
+    def bin_details(id)
+      query = <<~SQL
+        select b.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code, b.rmt_delivery_id, b.bin_fullness
+        , b.rmt_container_type_id, b.rmt_container_material_type_id, b.rmt_material_owner_party_role_id, b.qty_bins
+        from rmt_bins b
+        join cultivars c on c.id=b.cultivar_id
+        join cultivar_groups cg on cg.id=c.cultivar_group_id
+        join farms f on f.id=b.farm_id
+        join pucs p on p.id=b.puc_id
+        join orchards o on o.id=b.orchard_id
+        where b.id = ?
+      SQL
+      DB[query, id].first
+    end
+
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
       DB[:rmt_container_material_owners]
         .where(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id, rmt_container_material_type_id:  rmt_container_material_type_id)
@@ -194,6 +209,10 @@ module RawMaterialsApp
       return rmt_bin unless rmt_bin.nil_or_empty?
 
       DB["SELECT * FROM rmt_bins WHERE (tipped_asset_number = '#{bin_asset_number}')"].first
+    end
+
+    def find_rmt_bin_stock(bin_number)
+      DB[:rmt_bins].where(id: bin_number, exit_ref: nil)
     end
 
     def find_bin_label_data(bin_id)

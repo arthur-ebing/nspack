@@ -126,6 +126,12 @@ module RawMaterialsApp
         rmt_inner_container_type_id: rmt_inner_container_type_id }
     end
 
+    def pdt_update_rmt_bin(id, params)
+      res = update_rmt_bin(id, params)
+      log_status('rmt_bins', res.instance[:id], 'BIN_PDT_EDIT') if res.success
+      res
+    end
+
     def update_rmt_bin(id, params) # rubocop:disable Metrics/AbcSize
       delivery = find_rmt_delivery_by_bin_id(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
@@ -154,6 +160,22 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def validate_bin(bin_number)
+      bin = find_rmt_bin_by_id_or_asset_number(bin_number)
+      return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
+
+      success_response('Valid Bin Scanned',
+                       bin)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def find_rmt_bin_by_id_or_asset_number(bin_number)
+      return repo.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      repo.find_rmt_bin_stock(bin_number)
+    end
+
     def find_container_material_owners_by_container_material_type(container_material_type_id)
       repo.find_container_material_owners_by_container_material_type(container_material_type_id)
     end
@@ -164,6 +186,10 @@ module RawMaterialsApp
 
     def get_delivery_confirmation_details(id)
       repo.delivery_confirmation_details(id)
+    end
+
+    def bin_details(id)
+      repo.bin_details(id)
     end
 
     def find_rmt_delivery_by_bin_id(id)
