@@ -91,6 +91,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLET_EXIT_REF_SCRAPPED = 'SCRAPPED'
   PALLET_EXIT_REF_REMOVED = 'REMOVED'
 
+  # Constants for rmt_bins exit_ref
+  BIN_EXIT_REF_UNSCRAPPED = 'BIN UNSCRAPPED'
+
   # Constants for dispatch:
   DEFAULT_CARGO_TEMP_ON_ARRIVAL = ENV['DEFAULT_CARGO_TEMP_ON_ARRIVAL']
 

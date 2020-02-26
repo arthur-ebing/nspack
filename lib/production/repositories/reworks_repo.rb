@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 module ProductionApp
   class ReworksRepo < BaseRepo # rubocop:disable ClassLength
@@ -574,5 +574,42 @@ module ProductionApp
              WHERE id IN (#{params[:pallets_selected].join(',')});"
       DB[upd].update
     end
+
+    def unscrapped_bin_bulk_update(params)
+      DB[:rmt_bins]
+        .where(id: params[:pallets_selected])
+        .update(scrapped: false,
+                scrapped_at: nil,
+                unscrapped_at: Time.now,
+                exit_ref: nil,
+                exit_ref_date_time: nil,
+                scrap_remarks: nil,
+                scrap_reason_id: nil)
+
+      upd = ''
+      params[:pallets_selected].each { |bin_id| upd << update_bin_asset_number(bin_id.to_i) }
+      DB[upd].update
+    end
+
+    def update_bin_asset_number(bin_id)
+      str = "UPDATE rmt_bins SET scrapped_bin_asset_number = null WHERE id = #{bin_id};"
+      scrapped_bin_asset_number = DB[:rmt_bins].where(id: bin_id).get(:scrapped_bin_asset_number)
+      str = "UPDATE rmt_bins SET bin_asset_number = '#{scrapped_bin_asset_number}', scrapped_bin_asset_number = null WHERE id = #{bin_id};" unless bin_asset_number_not_available(scrapped_bin_asset_number)
+      str
+    end
+
+    def bin_asset_number_not_available(scrapped_bin_asset_number)
+      return false if scrapped_bin_asset_number.nil_or_empty?
+
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT id
+          FROM rmt_bins
+          WHERE exit_ref is null
+            AND	bin_asset_number = '#{scrapped_bin_asset_number}')
+      SQL
+      DB[query].single_value
+    end
   end
 end
+# frozen_string_literal: true

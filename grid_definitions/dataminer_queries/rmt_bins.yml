@@ -984,3 +984,13 @@
   :list_def:
   - true
   - false
+- :column: scrapped
+  :caption: Scrapped?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 8
+  :list_def:
+    - true
+    - false

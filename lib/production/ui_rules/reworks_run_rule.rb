@@ -24,10 +24,12 @@ module UiRules
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
+      @rules[:scrap_bin] = AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type_id_label
+      @rules[:unscrap_bin] = AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type_id_label
       @rules[:array_of_changes_made] = !@form_object.changes_made_array.nil_or_empty? && !@form_object.changes_made_array.respond_to?(:to_hash)
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
 
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallet Numbers'
 
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,

@@ -182,7 +182,8 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_TIP_BINS,
            AppConst::RUN_TYPE_WEIGH_RMT_BINS,
-           AppConst::RUN_TYPE_SCRAP_BIN
+           AppConst::RUN_TYPE_SCRAP_BIN,
+          AppConst::RUN_TYPE_UNSCRAP_BIN
         validate_rmt_bins(reworks_run_type, pallets_selected)
       else
         validate_pallet_numbers(reworks_run_type, pallets_selected)
@@ -193,7 +194,8 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_WEIGH_RMT_BINS
         'edit_rmt_bin_gross_weight'
-      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT
+      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT # ,
+        # AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         'edit_pallet'
       end
     end
@@ -203,6 +205,7 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       return create_scrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
+      return create_unscrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_UNSCRAP_BIN
 
       rw_res = ProductionApp::CreateReworksRun.call(res, reworks_action, changes)
       return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
@@ -227,6 +230,21 @@ module ProductionApp
         log_status(:rmt_bins, bin, 'SCRAPPED')
       end
       success_response('Bins Scrapped successfully', reworks_run_id: id)
+    end
+
+    def create_unscrap_bin_reworks_run(params) # rubocop:disable Metrics/AbcSize
+      repo.unscrapped_bin_bulk_update(params)
+      id = repo.create_reworks_run(user: params[:user],
+                                   reworks_run_type_id: params[:reworks_run_type_id],
+                                   pallets_selected: "{ #{params[:pallets_selected].join(',')} }",
+                                   pallets_affected: "{ #{params[:pallets_selected].join(',')} }",
+                                   changes_made: nil,
+                                   bins_unscrapped: "{ #{params[:pallets_selected].join(',')} }",
+                                   pallets_unscrapped: nil)
+      params[:pallets_selected].each do |bin|
+        log_status(:rmt_bins, bin, AppConst::BIN_EXIT_REF_UNSCRAPPED)
+      end
+      success_response('Bins Unscrapped successfully', reworks_run_id: id)
     end
 
     def print_reworks_pallet_label(pallet_number, params)  # rubocop:disable Metrics/AbcSize
@@ -721,6 +739,14 @@ module ProductionApp
       cultivar_and_farm ? repo.find_to_farm_orchards(cultivar_and_farm) : []
     end
 
+    # def edit_representative_pallet_sequence(res)
+    #   attrs = res.to_h
+    #
+    #   success_response('ok', attrs)
+    # rescue Crossbeams::InfoError => e
+    #   failed_response(e.message)
+    # end
+
     private
 
     def repo
@@ -833,6 +859,7 @@ module ProductionApp
       when AppConst::RUN_TYPE_SCRAP_PALLET,
            AppConst::RUN_TYPE_SCRAP_BIN,
            AppConst::RUN_TYPE_UNSCRAP_PALLET,
+          AppConst::RUN_TYPE_UNSCRAP_BIN,
            AppConst::RUN_TYPE_REPACK,
            AppConst::RUN_TYPE_TIP_BINS,
            AppConst::RUN_TYPE_RECALC_NETT_WEIGHT
@@ -865,7 +892,7 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
-    def validate_rmt_bins(reworks_run_type, rmt_bins) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def validate_rmt_bins(reworks_run_type, rmt_bins) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
@@ -887,6 +914,12 @@ module ProductionApp
       if AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type
         scrapped_bins = repo.scrapped_bins?(rmt_bins)
         return OpenStruct.new(success: false, messages: { pallets_selected: ['already scrapped'] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
+      end
+
+      if AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type
+        scrapped_bins = repo.scrapped_bins?(rmt_bins)
+        unscrapped_bins = (rmt_bins - scrapped_bins.map(&:to_s))
+        return OpenStruct.new(success: false, messages: { pallets_selected: ['not scrapped'] }, pallets_selected: rmt_bins) unless unscrapped_bins.nil_or_empty?
       end
 
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
