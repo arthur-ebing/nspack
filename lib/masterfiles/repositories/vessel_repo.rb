@@ -36,7 +36,7 @@ module MasterfilesApp
       ds.select_map([Sequel[:vessels][:vessel_code], Sequel[:vessels][:id]])
     end
 
-    def for_select_inactive_vessels(args = nil)
+    def for_select_inactive_vessels(args = {})
       for_select_vessels(args, false)
     end
   end
