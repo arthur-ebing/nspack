@@ -6,7 +6,6 @@ module MasterfilesApp
     attribute :city_id, Types::Integer
     attribute :depot_code, Types::String
     attribute :description, Types::String
-    attribute :edi_hub_address, Types::String
     attribute? :active, Types::Bool
   end
 
@@ -15,7 +14,6 @@ module MasterfilesApp
     attribute :city_id, Types::Integer
     attribute :depot_code, Types::String
     attribute :description, Types::String
-    attribute :edi_hub_address, Types::String
     attribute :city_name, Types::String
     attribute? :active, Types::Bool
   end

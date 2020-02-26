@@ -31,7 +31,6 @@ class Nspack < Roda
                                            medium_description: res.instance[:medium_description],
                                            long_description: res.instance[:long_description],
                                            vat_number: res.instance[:vat_number],
-                                           edi_hub_address: res.instance[:edi_hub_address],
                                            variants: res.instance[:variants] },
                                 notice: res.message)
           else

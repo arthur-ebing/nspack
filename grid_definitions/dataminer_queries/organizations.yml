@@ -3,9 +3,8 @@
 :sql: "SELECT\r\n  \"organizations\".\"id\",\r\n  \"organizations\".\"party_id\",\r\n
   \ \"organizations\".\"parent_id\",\r\n  \"organizations\".\"short_description\",\r\n
   \ \"organizations\".\"medium_description\",\r\n  \"organizations\".\"long_description\",\r\n
-  \ \"organizations\".\"vat_number\",\r\n  \"organizations\".\"edi_hub_address\",\r\n
-  \ \"organizations\".\"variants\",\r\n  \"organizations\".\"active\",\r\n  \"organizations\".\"created_at\",\r\n
-  \ \"organizations\".\"updated_at\",\r\n  \"organizations\".\"short_description\"
+  \ \"organizations\".\"vat_number\",\r\n  \"organizations\".\"variants\",\r\n  \"organizations\".\"active\",\r\n
+  \ \"organizations\".\"created_at\",\r\n  \"organizations\".\"updated_at\",\r\n  \"organizations\".\"short_description\"
   AS organizations_short_description,\r\n  \"parties\".\"party_type\",\r\n  \"parent\".\"short_description\"
   AS parent\r\nFROM\r\n  \"organizations\"\r\n  LEFT JOIN \"organizations\" \"parent\"
   ON \"parent\".\"id\" = \"organizations\".\"parent_id\"\r\n  JOIN \"parties\" ON
@@ -126,25 +125,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  edi_hub_address:
-    :name: edi_hub_address
-    :sequence_no: 8
-    :caption: EDI hub address
-    :namespaced_name: organizations.edi_hub_address
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   variants:
     :name: variants
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Variants
     :namespaced_name: organizations.variants
     :data_type: :string_array
@@ -160,7 +143,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 9
     :caption: Active
     :namespaced_name: organizations.active
     :data_type: :boolean
@@ -176,7 +159,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Created at
     :namespaced_name: organizations.created_at
     :data_type: :datetime
@@ -192,7 +175,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Updated at
     :namespaced_name: organizations.updated_at
     :data_type: :datetime
@@ -208,7 +191,7 @@
     :group_max: false
   organizations_short_description:
     :name: organizations_short_description
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Organizations short description
     :namespaced_name: organizations.short_description
     :data_type: :string
@@ -224,7 +207,7 @@
     :group_max: false
   party_type:
     :name: party_type
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Party type
     :namespaced_name: parties.party_type
     :data_type: :string
@@ -240,7 +223,7 @@
     :group_max: false
   parent:
     :name: parent
-    :sequence_no: 15
+    :sequence_no: 14
     :caption: Parent
     :namespaced_name: parent.short_description
     :data_type: :string

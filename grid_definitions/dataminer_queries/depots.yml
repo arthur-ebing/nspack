@@ -1,9 +1,10 @@
 ---
 :caption: Depots
-:sql: SELECT "depots"."id", "depots"."city_id", "depots"."depot_code", "depots"."description",
-  "depots"."edi_hub_address", "depots"."active", "depots"."created_at", "depots"."updated_at",
-  "destination_cities"."city_name" AS city_name FROM "depots" LEFT JOIN "destination_cities"
-  ON "destination_cities"."id" = "depots"."city_id"
+:sql: "SELECT\r\n  \"depots\".\"id\",\r\n  \"depots\".\"city_id\",\r\n  \"depots\".\"depot_code\",\r\n
+  \ \"depots\".\"description\",\r\n  \"depots\".\"active\",\r\n  \"depots\".\"created_at\",\r\n
+  \ \"depots\".\"updated_at\",\r\n  \"destination_cities\".\"city_name\" AS city_name\r\nFROM\r\n
+  \ \"depots\"\r\n  LEFT JOIN \"destination_cities\" ON \"destination_cities\".\"id\"
+  = \"depots\".\"city_id\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -72,25 +73,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  edi_hub_address:
-    :name: edi_hub_address
-    :sequence_no: 5
-    :caption: EDI Hub Address
-    :namespaced_name: depots.edi_hub_address
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: depots.active
     :data_type: :boolean
@@ -106,7 +91,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: depots.created_at
     :data_type: :datetime
@@ -122,7 +107,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: depots.updated_at
     :data_type: :datetime
@@ -138,7 +123,7 @@
     :group_max: false
   city_name:
     :name: city_name
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: City name
     :namespaced_name: destination_cities.city_name
     :data_type: :string

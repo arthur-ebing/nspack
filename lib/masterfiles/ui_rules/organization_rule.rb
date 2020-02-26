@@ -22,7 +22,6 @@ module UiRules
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
-      fields[:edi_hub_address] = { renderer: :label }
       # fields[:variants] = { renderer: :label }
       # fields[:active] = { renderer: :label, as_boolean: true }
     end
@@ -34,8 +33,7 @@ module UiRules
         medium_description: { required: true },
         long_description: {},
         vat_number: {},
-        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  },
-        edi_hub_address: {}
+        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
         # variants: {}
       }
     end
@@ -53,8 +51,7 @@ module UiRules
                                     vat_number: nil,
                                     # variants: nil,
                                     # active: true,
-                                    role_ids: [],
-                                    edi_hub_address: nil)
+                                    role_ids: [])
     end
   end
 end
