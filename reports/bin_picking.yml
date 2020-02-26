@@ -126,7 +126,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -142,7 +142,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -158,7 +158,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -174,7 +174,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -190,7 +190,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -206,7 +206,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -222,7 +222,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -238,7 +238,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
