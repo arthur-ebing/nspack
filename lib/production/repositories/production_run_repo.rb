@@ -269,11 +269,12 @@ module ProductionApp
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
     end
 
-    def tipping_run_for_line(production_line_id)
+    def tipping_run_for_line(production_run_id, production_line_id)
       DB[:production_runs]
         .where(production_line_id: production_line_id)
         .where(running: true)
         .where(tipping: true)
+        .exclude(id: production_run_id)
         .get(:id)
     end
 

@@ -8,7 +8,7 @@ module ProductionApp
       @repo = ProductionRunRepo.new
       @production_run = repo.find_production_run(id)
       @user_name = user_name
-      @tipping_run_id = repo.tipping_run_for_line(production_run.production_line_id)
+      @tipping_run_id = repo.tipping_run_for_line(production_run.id, production_run.production_line_id)
     end
 
     def call # rubocop:disable Metrics/AbcSize
