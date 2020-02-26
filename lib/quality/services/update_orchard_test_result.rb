@@ -8,12 +8,13 @@ module QualityApp
     def initialize(id, params)
       @id = id
       @params = params.to_h
-      @rule_object = repo.find_orchard_test_type_flat(@params[:orchard_test_type_id])
+
+      @form_object = repo.find_orchard_test_result_flat(id)
+      @rule_object = repo.find_orchard_test_type_flat(@form_object.orchard_test_type_id)
     end
 
     def call
-      res = apply_orchard_test_rules
-      return res unless res.success
+      apply_orchard_test_rules
 
       update_orchard_test_result
     end
@@ -29,9 +30,20 @@ module QualityApp
     end
 
     def apply_orchard_test_rules
-      params[:passed] = true if rule_object.result_type == AppConst::CLASSIFICATION
+      if rule_object.result_type == AppConst::CLASSIFICATION
+        classification_rules
+      else
+        pass_fail_rules
+      end
+    end
 
-      success_response('Rules applied.')
+    def classification_rules
+      params[:passed] = true
+      params[:classification_only] = true
+    end
+
+    def pass_fail_rules
+      params[:classification_only] = nil
     end
 
     def update_orchard_test_result

@@ -16,7 +16,6 @@ module Quality
             page.form do |form|
               form.caption 'Edit Orchard Test Result'
               form.action "/quality/test_results/orchard_test_results/#{id}"
-              form.remote!
               form.method :update
               form.row do |row|
                 row.column do |col|
@@ -24,11 +23,11 @@ module Quality
                   col.add_field :orchard_set_result_id
                   col.add_field :puc_id
                   col.add_field :orchard_id
+                  col.add_field :cultivar_ids
                   col.add_field :description
                   col.add_field :status_description
                   col.add_field :api_result
                   col.add_field :classifications
-                  col.add_field :cultivar_ids
                 end
                 row.column do |col|
                   col.add_field :passed

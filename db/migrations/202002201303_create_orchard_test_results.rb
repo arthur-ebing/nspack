@@ -11,9 +11,9 @@ Sequel.migration do
       String :description
       String :status_description
 
-      TrueClass :passed, default: true
-      TrueClass :classification_only, default: true
-      TrueClass :freeze_result, default: true
+      TrueClass :passed
+      TrueClass :classification_only
+      TrueClass :freeze_result
       
       Jsonb :api_result
 

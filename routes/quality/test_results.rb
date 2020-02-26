@@ -24,14 +24,12 @@ class Nspack < Roda
           show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Show.call(id) }
         end
         r.patch do     # UPDATE
-          attrs = params[:orchard_test_result]
-          attrs[:cultivar_ids] = Array(attrs[:cultivar_ids]) unless attrs.nil?
-          res = interactor.update_orchard_test_result(id, attrs)
+          res = interactor.update_orchard_test_result(id, params[:orchard_test_result])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            re_show_form(r, res) do
+            re_show_form(r, res, url: "/quality/test_results/orchard_test_results/#{id}/edit") do
               Quality::TestResults::OrchardTestResult::Edit.call(id,
                                                                  form_values: params[:orchard_test_result],
                                                                  form_errors: res.errors)
@@ -76,8 +74,7 @@ class Nspack < Roda
           actions = []
           orchard = @farm_repo.find_orchard(params[:changed_value])
           cultivar_list = @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
-          # actions << OpenStruct.new(type: :change_select_value, dom_id: 'orchard_test_result_cultivar_ids', value: cultivar_list.first)
+          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
       end
