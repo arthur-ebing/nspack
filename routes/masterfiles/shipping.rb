@@ -479,7 +479,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               city_name
               depot_code
               description
-              edi_hub_address
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -513,7 +512,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             city_id
             depot_code
             description
-            edi_hub_address
             city_name
             active
           ]

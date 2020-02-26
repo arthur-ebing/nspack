@@ -17,6 +17,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :target_market_group_type_id
               form.add_field :target_market_group_name
+              form.add_field :description
             end
           end
 

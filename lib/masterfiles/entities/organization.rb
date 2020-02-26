@@ -15,6 +15,5 @@ module MasterfilesApp
     attribute :role_ids, Types::Array
     attribute :role_names, Types::Array
     attribute :parent_organization, Types::String
-    attribute :edi_hub_address, Types::String
   end
 end

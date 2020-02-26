@@ -1,14 +1,15 @@
 ---
 :caption: Cartons
-:sql: "SELECT carton_labels.id, carton_labels.pallet_number, carton_labels.production_run_id,
-  carton_labels.created_at AS label_created_at, ABS(date_part('epoch', current_timestamp
-  - carton_labels.created_at) / 3600)::int AS label_age_hrs, cartons.created_at AS
-  carton_verified_at, ABS(date_part('epoch', current_timestamp - cartons.created_at)
-  / 3600)::int AS carton_age_hrs, packhouses.plant_resource_code AS packhouse, lines.plant_resource_code
-  AS line, packpoints.plant_resource_code AS packpoint, system_resources.system_resource_code
-  AS print_device, carton_labels.label_name AS label, farms.farm_code AS farm, pucs.puc_code
-  AS puc, orchards.orchard_code AS orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code
-  AS cultivar_group, cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
+:sql: "SELECT carton_labels.id, carton_labels.production_run_id, carton_labels.created_at
+  AS label_created_at, ABS(date_part('epoch', current_timestamp - carton_labels.created_at)
+  / 3600)::int AS label_age_hrs, cartons.created_at AS carton_verified_at, ABS(date_part('epoch',
+  current_timestamp - cartons.created_at) / 3600)::int AS carton_age_hrs, CONCAT(contract_workers.first_name,'_',
+  contract_workers.surname) AS contract_worker, packhouses.plant_resource_code AS
+  packhouse, lines.plant_resource_code AS line, packpoints.plant_resource_code AS
+  packpoint, system_resources.system_resource_code AS print_device, carton_labels.label_name
+  AS label, farms.farm_code AS farm, pucs.puc_code AS puc, orchards.orchard_code AS
+  orchard, commodities.code as commodity, cultivar_groups.cultivar_group_code AS cultivar_group,
+  cultivars.cultivar_name AS cultivar, marketing_varieties.marketing_variety_code
   AS variety, cvv.marketing_variety_code AS cust_variety,std_fruit_size_counts.size_count_value
   AS std_size, fruit_size_references.size_reference AS size_ref, fruit_actual_counts_for_packs.actual_count_for_pack
   AS actual_count, basic_pack_codes.basic_pack_code AS basic_pack, standard_pack_codes.standard_pack_code
@@ -24,12 +25,13 @@
   cartons_per_pallet.cartons_per_pallet, pm_products.product_code,cartons.gross_weight,
   cartons.nett_weight, carton_labels.pick_ref, CASE WHEN EXISTS(SELECT id FROM cartons
   WHERE cartons.carton_label_id= carton_labels.id) THEN 'ok' ELSE NULL END AS colour_rule,
-  cartons.carton_label_id\r\nFROM carton_labels \r\nLEFT JOIN cartons ON carton_labels.id
-  = cartons.carton_label_id \r\nJOIN production_runs ON production_runs.id = carton_labels.production_run_id
-  \r\nLEFT JOIN product_resource_allocations ON product_resource_allocations.id =
-  carton_labels.product_resource_allocation_id \r\nLEFT JOIN product_setups ON product_setups.id
-  = product_resource_allocations.product_setup_id\r\nJOIN product_setup_templates
-  ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
+  cartons.carton_label_id, carton_labels.pallet_number, personnel_identifiers.identifier
+  AS personnel_identifier, contract_workers.personnel_number\r\nFROM carton_labels
+  \r\nLEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id \r\nJOIN production_runs
+  ON production_runs.id = carton_labels.production_run_id \r\nLEFT JOIN product_resource_allocations
+  ON product_resource_allocations.id = carton_labels.product_resource_allocation_id
+  \r\nLEFT JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
+  product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
   plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
   \r\nJOIN plant_resources lines ON lines.id = carton_labels.production_line_id \r\nLEFT
   JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id \r\nLEFT
@@ -55,8 +57,10 @@
   = carton_labels.packed_tm_group_id \r\nJOIN seasons ON seasons.id = carton_labels.season_id\r\nJOIN
   cartons_per_pallet ON cartons_per_pallet.id = carton_labels.cartons_per_pallet_id
   \r\nLEFT JOIN pm_products ON pm_products.id = carton_labels.fruit_sticker_pm_product_id
-  \r\nJOIN pallet_formats ON pallet_formats.id = carton_labels.pallet_format_id \r\nORDER
-  BY carton_labels.created_at DESC"
+  \r\nJOIN pallet_formats ON pallet_formats.id = carton_labels.pallet_format_id\r\nLEFT
+  JOIN contract_workers ON contract_workers.id = carton_labels.contract_worker_id
+  \r\nLEFT JOIN personnel_identifiers ON personnel_identifiers.id = carton_labels.personnel_identifier_id
+  \r\nORDER BY carton_labels.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -69,7 +73,7 @@
     :sequence_no: 1
     :caption: Id
     :namespaced_name: carton_labels.id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: true
@@ -80,25 +84,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pallet_number:
-    :name: pallet_number
-    :sequence_no: 2
-    :caption: Pallet number
-    :namespaced_name: carton_labels.pallet_number
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Production run
     :namespaced_name: carton_labels.production_run_id
     :data_type: :integer
@@ -114,7 +102,7 @@
     :group_max: false
   label_created_at:
     :name: label_created_at
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Label created at
     :namespaced_name: carton_labels.created_at
     :data_type: :datetime
@@ -130,7 +118,7 @@
     :group_max: false
   label_age_hrs:
     :name: label_age_hrs
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Label age hrs
     :namespaced_name: 
     :data_type: :number
@@ -146,7 +134,7 @@
     :group_max: false
   carton_verified_at:
     :name: carton_verified_at
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Carton verified at
     :namespaced_name: cartons.created_at
     :data_type: :datetime
@@ -162,10 +150,26 @@
     :group_max: false
   carton_age_hrs:
     :name: carton_age_hrs
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Carton age hrs
     :namespaced_name: 
     :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contract_worker:
+    :name: contract_worker
+    :sequence_no: 7
+    :caption: Contract worker
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: false
@@ -389,7 +393,7 @@
     :sequence_no: 21
     :caption: Std size
     :namespaced_name: std_fruit_size_counts.size_count_value
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -421,7 +425,7 @@
     :sequence_no: 23
     :caption: Actual count
     :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -517,7 +521,7 @@
     :sequence_no: 29
     :caption: Resource allocation
     :namespaced_name: carton_labels.product_resource_allocation_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -533,7 +537,7 @@
     :sequence_no: 30
     :caption: Product setup
     :namespaced_name: product_resource_allocations.product_setup_id
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -806,6 +810,54 @@
     :caption: Carton label
     :namespaced_name: cartons.carton_label_id
     :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 48
+    :caption: Pallet number
+    :namespaced_name: carton_labels.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  personnel_identifier:
+    :name: personnel_identifier
+    :sequence_no: 49
+    :caption: Personnel identifier
+    :namespaced_name: personnel_identifiers.identifier
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  personnel_number:
+    :name: personnel_number
+    :sequence_no: 50
+    :caption: Personnel number
+    :namespaced_name: contract_workers.personnel_number
+    :data_type: :string
     :width: 
     :format: 
     :hide: false

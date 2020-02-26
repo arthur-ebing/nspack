@@ -510,7 +510,7 @@ const crossbeamsUtils = {
 
     if (select) {
       select.removeActiveItems();
-      select.setChoices(newItems, 'value', 'label', true);
+      select.setChoices(newItems, 'value', 'label', true); // seems to remove sortable...
     } else {
       while (elem.options.length) elem.remove(0);
       newItems.forEach((item) => {

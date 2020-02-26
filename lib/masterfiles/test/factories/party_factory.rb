@@ -32,8 +32,7 @@ module MasterfilesApp
         medium_description: Faker::Company.name.to_s,
         long_description: Faker::Company.name.to_s,
         vat_number: Faker::Number.number(10),
-        active: true,
-        edi_hub_address: Faker::Lorem.characters(3)
+        active: true
       }
       organization_id = DB[:organizations].insert(default.merge(opts))
 

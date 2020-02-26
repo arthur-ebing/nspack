@@ -374,7 +374,7 @@ const crossbeamsGridEvents = {
         rIdx = rowNode.rowIndex;
       }
       gridOptions.api.ensureColumnVisible(event.target.dataset.colName);
-      gridOptions.api.setFocusedCell(rIdx, event.target.dataset.colName);
+      gridOptions.api.setFocusedCell(rIdx, event.target.dataset.colName); // ??? no effect
     });
   },
 
@@ -1337,7 +1337,7 @@ const crossbeamsGridStaticLoader = {
     crossbeamsGridEvents.displayRowCounts(gridOptions.context.domGridId, rows, rows);
     // If the grid has no horizontal scrollbar, hide the scroll to column dropdown.
     const grdEl = document.getElementById(gridOptions.context.domGridId);
-    const vport = grdEl.querySelector('.ag-body-viewport');
+    const vport = grdEl.querySelector('.ag-body-horizontal-scroll-viewport');
     crossbeamsGridEvents.makeColumnScrollList(gridOptions.context.domGridId,
       colDefs,
       vport.scrollWidth > vport.offsetWidth);
