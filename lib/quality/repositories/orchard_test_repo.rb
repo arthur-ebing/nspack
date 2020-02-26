@@ -59,7 +59,7 @@ module QualityApp
             orchard_test_types.test_type_code AS orchard_test_type_code,
             orchards.orchard_code,
             pucs.puc_code,
-            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS cultivars
+            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS cultivar_codes
         FROM orchard_test_results
         JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id
         LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_results.cultivar_ids)

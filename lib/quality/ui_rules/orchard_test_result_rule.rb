@@ -30,14 +30,20 @@ module UiRules
       fields[:orchard_id] = { renderer: :label,
                               with_value: @form_object.orchard_code,
                               caption: 'Orchard' }
+      fields[:cultivar_ids] = { renderer: :label,
+                                with_value: @form_object.cultivar_codes,
+                                caption: 'Cultivars' }
+
       fields[:description] = { renderer: :label }
       fields[:status_description] = { renderer: :label }
-      fields[:passed] = { renderer: :label, as_boolean: true }
+      fields[:passed] = { renderer: :label,
+                          with_value: @form_object.passed ? 'Passed' : 'Failed',
+                          caption: 'Result' }
       fields[:classification_only] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
       fields[:api_result] = { renderer: :label }
       fields[:classifications] = { renderer: :label }
-      fields[:cultivar_ids] = { renderer: :label }
+
       fields[:applicable_from] = { renderer: :label }
       fields[:applicable_to] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -54,21 +60,8 @@ module UiRules
       }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
-      cultivar_selector = if @rule_object.applies_to_orchard
-                            orchard = @farm_repo.find_orchard(@form_object.orchard_id)
-                            { renderer: :select,
-                              options: @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) }),
-                              disabled_options: @cultivar_repo.for_select_inactive_cultivars,
-                              caption: 'Cultivar',
-                              required: true }
-                          else
-                            { renderer: :multi,
-                              options: @cultivar_repo.for_select_cultivars,
-                              selected: @form_object.cultivar_ids,
-                              caption: 'Cultivars' }
-                          end
-
+    def common_fields
+      orchard = @farm_repo.find_orchard(@form_object.orchard_id)
       {
         orchard_test_type_id: { renderer: :label,
                                 with_value: @form_object.orchard_test_type_code,
@@ -90,16 +83,24 @@ module UiRules
                       caption: 'Orchard',
                       required: @rule_object.applies_to_orchard,
                       prompt: true },
+        cultivar_ids: { renderer: :multi,
+                        options: @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) }),
+                        selected: @form_object.cultivar_ids,
+                        caption: 'Cultivars',
+                        required: true },
         description: { hide_on_load: true },
         status_description: { hide_on_load: true },
-        passed: { renderer: :checkbox },
+        passed: { renderer: :select,
+                  options: [%w[Passed true], %w[Failed false]],
+                  caption: 'Result',
+                  prompt: true,
+                  required: true },
         classification_only: { renderer: :checkbox,
                                hide_on_load: true },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: true },
         api_result: { hide_on_load: true },
         classifications: { hide_on_load: true },
-        cultivar_ids: cultivar_selector,
         applicable_from: { renderer: :date,
                            required: true },
         applicable_to: { renderer: :date,
