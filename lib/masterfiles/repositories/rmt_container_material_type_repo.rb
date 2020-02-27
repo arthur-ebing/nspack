@@ -16,9 +16,9 @@ module MasterfilesApp
     def for_select_party_roles
       DB[:party_roles]
         .join(:roles, id: :role_id)
-        .select(Sequel[:pm_boms][:id], Sequel.function(:fn_party_role_name_with_role, :id))
+        .select(Sequel[:party_roles][:id], Sequel.function(:fn_party_role_name_with_role, Sequel[:party_roles][:id]))
         .where(name: AppConst::ROLE_RMT_BIN_OWNER)
-        .order(Sequel.function(:fn_party_role_name_with_role, :id))
+        .order(Sequel.function(:fn_party_role_name_with_role, Sequel[:party_roles][:id]))
         .map(%i[fn_party_role_name_with_role id])
     end
 
