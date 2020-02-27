@@ -49,6 +49,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'location_types' do
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -69,6 +70,7 @@ class Nspack < Roda
         end
       end
     end
+
     # LOCATIONS
     # --------------------------------------------------------------------------
     r.on 'locations', Integer do |id|
@@ -223,8 +225,22 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'locations' do
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'print_location_barcodes' do
+        res = CreateJasperReport.call(report_name: 'barcode_report',
+                                      user: current_user.login_name,
+                                      file: 'barcode_report',
+                                      params: { location_ids: multiselect_grid_choices(params),
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
 
       r.on 'new_flat' do    # NEW, NON-HIERARCHICAL
         r.get do
@@ -256,6 +272,7 @@ class Nspack < Roda
         check_auth!('locations', 'new')
         show_partial_or_page(r) { Masterfiles::Locations::Location::New.call(remote: fetch?(r)) }
       end
+
       r.post do        # CREATE
         res = interactor.create_root_location(params[:location])
         if res.success
@@ -274,6 +291,7 @@ class Nspack < Roda
         end
       end
     end
+
     # LOCATION ASSIGNMENTS
     # --------------------------------------------------------------------------
     r.on 'location_assignments', Integer do |id|
@@ -314,6 +332,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'location_assignments' do
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -333,6 +352,7 @@ class Nspack < Roda
         end
       end
     end
+
     # LOCATION STORAGE TYPES
     # --------------------------------------------------------------------------
     r.on 'location_storage_types', Integer do |id|
@@ -374,6 +394,7 @@ class Nspack < Roda
         end
       end
     end
+
     r.on 'location_storage_types' do
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -471,6 +492,5 @@ class Nspack < Roda
     end
   end
 end
-
 # rubocop:enable Metrics/ClassLength
 # rubocop:enable Metrics/BlockLength
