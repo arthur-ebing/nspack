@@ -45,27 +45,6 @@ module MasterfilesApp
 
     crud_calls_for :shift_types, name: :shift_type, wrapper: ShiftType
 
-    build_for_select :shifts,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_inactive_select :shifts,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
-
-    # crud_calls_for :shifts, name: :shift, wrapper: ProductionApp::Shift
-    crud_calls_for :shifts, name: :shift, wrapper: Shift
-
-    build_for_select :shift_exceptions,
-                     label: :remarks,
-                     value: :id,
-                     no_active_check: true,
-                     order_by: :remarks
-
-    # crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ProductionApp::ShiftException
-    crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ShiftException
-
     crud_calls_for :personnel_identifiers, name: :personnel_identifier, wrapper: PersonnelIdentifier
 
     def for_select_unallocated_contract_workers
@@ -118,27 +97,6 @@ module MasterfilesApp
                                             { parent_table: :plant_resources,
                                               columns: [:plant_resource_code],
                                               flatten_columns: { plant_resource_code: :plant_resource_code } }])
-    end
-
-    def find_shift(id)
-      find_with_association(:shifts, id,
-                            wrapper: ProductionApp::Shift,
-                            parent_tables: [{
-                              parent_table: :employment_types,
-                              columns: [:code],
-                              flatten_columns: { code: :employment_type_code }
-                            }],
-                            lookup_functions: [{ function: :fn_shift_type_code,
-                                                 args: [:shift_type_id],
-                                                 col_name: :shift_type_code }])
-    end
-
-    def find_shift_exception(id)
-      find_with_association(:shift_exceptions, id,
-                            wrapper: ProductionApp::ShiftException,
-                            lookup_functions: [{ function: :fn_contract_worker_name,
-                                                 args: [:contract_worker_id],
-                                                 col_name: :contract_worker_name }])
     end
 
     def for_select_plant_resources_for_ph_pr_id(ph_pr_id)
