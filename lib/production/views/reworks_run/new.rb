@@ -42,7 +42,7 @@ module Production
                   col.add_field :remarks
                   col.add_field :pallets_selected
                 end
-                unless rules[:single_edit]
+                unless rules[:single_edit] || rules[:bulk_production_run_update]
                   row.column do |col|
                     col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
                     col.add_control(control_type: :link,
@@ -56,6 +56,12 @@ module Production
               form.row do |row|
                 row.column do |col|
                   col.add_field :production_run_id
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :from_production_run_id
+                  col.add_field :to_production_run_id
                 end
               end
             end

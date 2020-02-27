@@ -66,6 +66,21 @@ module ProductionApp
       DB[:rmt_bins].where(id: rmt_bins).select_map(:id)
     end
 
+    def production_run_exists?(id)
+      DB[:production_runs].where(id: id).select_map(:id)
+    end
+
+    def same_cultivar_group?(old_production_run_id, new_production_run_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT id
+          FROM production_runs
+          WHERE id = #{new_production_run_id}
+            AND	cultivar_group_id = (SELECT cultivar_group_id FROM production_runs WHERE id = #{old_production_run_id}))
+      SQL
+      DB[query].single_value
+    end
+
     def rmt_bin_asset_number_exists?(rmt_bins)
       bin_asset_number = DB[:rmt_bins].where(bin_asset_number: rmt_bins).select_map(:bin_asset_number).compact
       return DB[:rmt_bins].where(tipped_asset_number: rmt_bins).select_map(:tipped_asset_number).compact if bin_asset_number.nil_or_empty?
@@ -115,6 +130,10 @@ module ProductionApp
 
     def selected_scrapped_pallet_numbers(sequence_ids)
       DB[:pallets].where(id: DB[:pallet_sequences].where(id: sequence_ids).select(:scrapped_from_pallet_id)).map { |p| p[:pallet_number] }
+    end
+
+    def selected_pallet_sequences(sequence_ids)
+      DB[:pallet_sequences].where(id: sequence_ids).map { |p| p[:id] }
     end
 
     def selected_rmt_bins(rmt_bin_ids)

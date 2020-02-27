@@ -1325,3 +1325,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: production_run_id
+  :caption: Production run Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 14
+  :list_def:

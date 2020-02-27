@@ -147,6 +147,8 @@ class Nspack < Roda # rubocop:disable ClassLength
             res = interactor.create_reworks_run(id, params[:reworks_run])
             if res.success
               if res.instance[:make_changes]
+                store_locally(:reworks_run_params, res.instance)
+                r.redirect "/production/reworks/reworks_run_types/#{id}/#{res.instance[:display_page]}" if res.instance[:pallets_selected].nil_or_empty?
                 if fetch?(r)
                   redirect_via_json("/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}")
                 else
@@ -200,6 +202,15 @@ class Nspack < Roda # rubocop:disable ClassLength
             end
           end
         end
+
+        r.on 'multiselect_reworks_run_bulk_production_run_update' do
+          attrs = retrieve_from_local_store(:reworks_run_params)
+          res = interactor.bulk_production_run_update(id, multiselect_grid_choices(params), attrs)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
+          end
+        end
       end
 
       r.on 'pallets', String do |pallet_number|
@@ -243,6 +254,27 @@ class Nspack < Roda # rubocop:disable ClassLength
             end
           end
         end
+
+        # r.on 'edit_representative_pallet_sequence' do
+        #   pallet_numbers = pallet_number.split(',')
+        #   store_locally(:pallet_numbers, pallet_numbers)
+        #
+        #   res = interactor.edit_representative_pallet_sequence(params[:reworks_run_pallet])
+        #   r.redirect "/production/reworks/pallet_sequences/#{res.instance[:pallet_sequence_id]}/edit_reworks_pallet_sequence" if res.success
+        # end
+      end
+
+      r.on 'edit_bulk_production_run' do
+        r.get do
+          attrs = retrieve_from_local_store(:reworks_run_params)
+          store_locally(:reworks_run_params, attrs)
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::BulkProductionRunUpdate.call(id, attrs) }
+        end
+      end
+
+      r.on 'reject_bulk_production_run_update' do
+        flash[:notice] = "Changes to #{AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE} has been discarded"
+        r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
       end
 
       r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
@@ -255,12 +287,6 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'pallet_shipping_details' do
         r.get do
           show_partial_or_page(r) { Production::Reworks::ReworksRun::ShowPalletShippingDetails.call(pallet_number) }
-        end
-      end
-
-      r.on 'select_pallet_sequence' do
-        r.get do
-          redirect_via_json "/production/reworks/reworks_run_types/#{id}/pallets/#{pallet_number.join(',')}/edit_pallet"
         end
       end
 
@@ -656,6 +682,17 @@ class Nspack < Roda # rubocop:disable ClassLength
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end
       end
+
+      # r.on 'select_representative_sequence' do
+      #   res = ProductionApp::ReworksRepo.new.where_hash(:pallet_sequences, id: id)
+      #   json_actions([OpenStruct.new(type: :replace_input_value,
+      #                                dom_id: 'reworks_run_pallet_id',
+      #                                value: res[:id]),
+      #                 OpenStruct.new(type: :replace_input_value,
+      #                                dom_id: 'reworks_run_pallet_pallet_sequence_id',
+      #                                value: res[:id])],
+      #                'Selected sequence')
+      # end
     end
   end
 end
