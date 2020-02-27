@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
+# rubocop:disable Metrics/ClassLength
+
 class Nspack < Roda
   route 'raw_materials', 'masterfiles' do |r|
     # RMT DELIVERY DESTINATIONS
@@ -71,6 +73,81 @@ class Nspack < Roda
         end
       end
     end
+    # ASSET TRANSACTION TYPES
+    # --------------------------------------------------------------------------
+    r.on 'asset_transaction_types', Integer do |id|
+      interactor = MasterfilesApp::AssetTransactionTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:asset_transaction_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('raw materials', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::RawMaterials::AssetTransactionType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('raw materials', 'read')
+          show_partial { Masterfiles::RawMaterials::AssetTransactionType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_asset_transaction_type(id, params[:asset_transaction_type])
+          if res.success
+            row_keys = %i[
+              id
+              transaction_type_code
+              description
+              status
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::RawMaterials::AssetTransactionType::Edit.call(id, form_values: params[:asset_transaction_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('raw materials', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_asset_transaction_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'asset_transaction_types' do
+      interactor = MasterfilesApp::AssetTransactionTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('raw materials', 'new')
+        show_partial_or_page(r) { Masterfiles::RawMaterials::AssetTransactionType::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_asset_transaction_type(params[:asset_transaction_type])
+        if res.success
+          row_keys = %i[
+            id
+            transaction_type_code
+            description
+            status
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/raw_materials/asset_transaction_types/new') do
+            Masterfiles::RawMaterials::AssetTransactionType::New.call(form_values: params[:asset_transaction_type],
+                                                                      form_errors: res.errors,
+                                                                      remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/ClassLength

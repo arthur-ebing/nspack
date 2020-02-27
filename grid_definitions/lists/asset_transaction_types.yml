@@ -1,0 +1,19 @@
+---
+:dataminer_definition: asset_transaction_types
+:actions:
+- :url: "/masterfiles/raw_materials/asset_transaction_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/raw_materials/asset_transaction_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/raw_materials/asset_transaction_types/new"
+  :text: New Asset Transaction Type
+  :style: :button
+  :behaviour: :popup
