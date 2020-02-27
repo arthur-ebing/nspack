@@ -132,3 +132,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: SELECT cultivars.cultivar_group_id FROM cultivars
+- :column: cultivars.commodity_id
+  :caption: Commodity Id
+  :data_type: :integer
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def: SELECT cultivars.commodity_id FROM cultivars

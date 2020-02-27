@@ -137,6 +137,14 @@ module MasterfilesApp
         .select_map(:cultivar_group_id)
     end
 
+    def marketing_variety_commodity(variety_as_customer_variety_id)
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .join(:cultivars, id: :cultivar_id)
+        .where(marketing_variety_id: variety_as_customer_variety_id)
+        .get(:commodity_id)
+    end
+
     def packed_tm_groups
       DB[:target_market_groups]
         .join(:target_market_group_types, id: :target_market_group_type_id)

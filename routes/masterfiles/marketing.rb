@@ -94,8 +94,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           customer_variety = repo.find_customer_variety(id)
           handle_not_found(r) unless customer_variety
           check_auth!('marketing', 'edit')
-          cultivar_group_id = repo.marketing_variety_cultivar_group(customer_variety.variety_as_customer_variety_id)
-          r.redirect "/list/link_marketing_varieties/multi?key=customer_variety_varieties&id=#{id}&cultivar_group_id=#{cultivar_group_id}"
+          commodity_id = repo.marketing_variety_commodity(customer_variety.variety_as_customer_variety_id)
+          r.redirect "/list/link_marketing_varieties/multi?key=customer_variety_varieties&id=#{id}&commodity_id=#{commodity_id}"
         end
 
         r.post do
