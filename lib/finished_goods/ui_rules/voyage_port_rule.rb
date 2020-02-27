@@ -108,9 +108,9 @@ module UiRules
       vis = { port_id: true, trans_shipment_vessel_id: true, ata: true, atd: true, eta: true, etd: true }
       case @repo.get(:port_types, @form_object.port_type_id, :port_type_code)
       when 'POL'
-        vis[:port_id] = vis[:ata] = vis[:eta] = false
-      when 'POD'
         vis[:port_id] = vis[:atd] = vis[:etd] = false
+      when 'POD'
+        vis[:port_id] = vis[:ata] = vis[:eta] = false
       when 'TRANSSHIP'
         vis[:port_id] = vis[:trans_shipment_vessel_id] = false
         vis[:ata] = vis[:eta] = vis[:atd] = vis[:etd] = false

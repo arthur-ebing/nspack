@@ -19,10 +19,10 @@ module EdiApp
           loads.customer_order_number AS master_ord,
           EXTRACT(YEAR FROM seasons.end_date)::integer AS season,
           loads.id AS trip_no,
-          COALESCE(pol_voyage_ports.ata, pol_voyage_ports.eta, loads.shipped_at) AS arr_date,
-          COALESCE(pol_voyage_ports.ata, pol_voyage_ports.eta, loads.shipped_at) AS arr_time,
-          COALESCE(pod_voyage_ports.atd, pod_voyage_ports.etd, loads.shipped_at) AS dep_date,
-          COALESCE(pod_voyage_ports.atd, pod_voyage_ports.etd, loads.shipped_at) AS dep_time
+          COALESCE(pod_voyage_ports.ata, pod_voyage_ports.eta, loads.shipped_at) AS arr_date,
+          COALESCE(pod_voyage_ports.ata, pod_voyage_ports.eta, loads.shipped_at) AS arr_time,
+          COALESCE(pol_voyage_ports.atd, pol_voyage_ports.etd, loads.shipped_at) AS dep_date,
+          COALESCE(pol_voyage_ports.atd, pol_voyage_ports.etd, loads.shipped_at) AS dep_time
         FROM loads
         JOIN pallets ON pallets.load_id = loads.id AND NOT scrapped
         JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id AND NOT scrapped
@@ -46,7 +46,7 @@ module EdiApp
           load_containers.container_code AS container,
           loads.shipped_at AS stuff_date,
           cargo_temperatures.set_point_temperature AS temp_set,
-          pol_ports.port_code AS disch_port,
+          pod_ports.port_code AS disch_port,
           voyages.voyage_number AS ship_number,
           pallet_bases.edi_out_pallet_base AS pallet_btype,
           vessels.vessel_code AS ship_name,

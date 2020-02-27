@@ -54,10 +54,10 @@ module UiRules
       fields[:year] = { renderer: :label, with_value: pol&.year, caption: 'Year' }
       fields[:final_destination_id] = { renderer: :label, with_value: final_destination, caption: 'Final Destination' }
       fields[:transfer_load] = { renderer: :label, as_boolean: true }
-      fields[:pol_port_id] = { renderer: :label, with_value: pol&.port_code, caption: 'POL Voyage Port' }
+      fields[:pod_port_id] = { renderer: :label, with_value: pod&.port_code, caption: 'POD Voyage Port' }
       fields[:eta] = { renderer: :label, caption: 'ETA' }
       fields[:ata] = { renderer: :label, caption: 'ATA' }
-      fields[:pod_port_id] = { renderer: :label, with_value: pod&.port_code, caption: 'POD Voyage Port' }
+      fields[:pol_port_id] = { renderer: :label, with_value: pol&.port_code, caption: 'POL Voyage Port' }
       fields[:etd] = { renderer: :label, caption: 'ETD' }
       fields[:atd] = { renderer: :label, caption: 'ATD' }
 

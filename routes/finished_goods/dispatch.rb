@@ -70,10 +70,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           port_type_code = MasterfilesApp::PortTypeRepo.new.find_port_type(params[:changed_value])&.port_type_code
           port_type_code = port_type_code.nil? ? 'stub' : port_type_code
           dom_id_hash = { 'voyage_port_trans_shipment_vessel_id_field_wrapper': %([TRANSSHIP]),
-                          'voyage_port_atd_field_wrapper': %([TRANSSHIP POD]),
-                          'voyage_port_etd_field_wrapper': %([TRANSSHIP POD]),
-                          'voyage_port_ata_field_wrapper': %([TRANSSHIP POL]),
-                          'voyage_port_eta_field_wrapper': %([TRANSSHIP POL]),
+                          'voyage_port_atd_field_wrapper': %([TRANSSHIP POL]),
+                          'voyage_port_etd_field_wrapper': %([TRANSSHIP POL]),
+                          'voyage_port_ata_field_wrapper': %([TRANSSHIP POD]),
+                          'voyage_port_eta_field_wrapper': %([TRANSSHIP POD]),
                           'voyage_port_port_id_field_wrapper': %([TRANSSHIP POL POD]) }
           dom_id_hash.each do |dom_id, port_type|
             actions << OpenStruct.new(type: port_type.include?(port_type_code) ? :show_element : :hide_element, dom_id: dom_id.to_s)
