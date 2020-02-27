@@ -161,7 +161,7 @@ module RawMaterialsApp
         join farms f on f.id=d.farm_id
         join pucs p on p.id=d.puc_id
         join orchards o on o.id=d.orchard_id
-        join rmt_bins b on b.rmt_delivery_id=d.id
+        left outer join rmt_bins b on b.rmt_delivery_id=d.id
         where d.id = ?
         group by d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
         , d.truck_registration_number, d.date_delivered
