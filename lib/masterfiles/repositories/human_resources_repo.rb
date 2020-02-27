@@ -54,7 +54,8 @@ module MasterfilesApp
                           value: :id,
                           order_by: :id
 
-    crud_calls_for :shifts, name: :shift, wrapper: ProductionApp::Shift
+    # crud_calls_for :shifts, name: :shift, wrapper: ProductionApp::Shift
+    crud_calls_for :shifts, name: :shift, wrapper: Shift
 
     build_for_select :shift_exceptions,
                      label: :remarks,
@@ -62,7 +63,8 @@ module MasterfilesApp
                      no_active_check: true,
                      order_by: :remarks
 
-    crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ProductionApp::ShiftException
+    # crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ProductionApp::ShiftException
+    crud_calls_for :shift_exceptions, name: :shift_exception, wrapper: ShiftException
 
     crud_calls_for :personnel_identifiers, name: :personnel_identifier, wrapper: PersonnelIdentifier
 
