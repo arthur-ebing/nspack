@@ -26,6 +26,7 @@ module UiRules
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
       @rules[:scrap_bin] = AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type_id_label
       @rules[:unscrap_bin] = AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
       @rules[:array_of_changes_made] = !@form_object.changes_made_array.nil_or_empty? && !@form_object.changes_made_array.respond_to?(:to_hash)
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
 
@@ -103,6 +104,7 @@ module UiRules
       @rules[:unscrap_pallet] = AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type_id_label
       @rules[:tip_bins] = AppConst::RUN_TYPE_TIP_BINS == reworks_run_type_id_label
       @rules[:weigh_rmt_bins] = AppConst::RUN_TYPE_WEIGH_RMT_BINS == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
       @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins]
 
       text_caption = if @rules[:single_pallet_edit]
@@ -128,17 +130,27 @@ module UiRules
                    caption: 'Scrap Remarks',
                    hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
         pallets_selected: if @rules[:single_edit]
-                            { caption: text_caption }
+                            { caption: text_caption,
+                              hide_on_load: @rules[:bulk_production_run_update] ? true : false }
                           else
                             { renderer: :textarea,
                               rows: 12,
                               placeholder: "Paste #{text_area_caption} here",
-                              caption: text_area_caption }
+                              caption: text_area_caption,
+                              hide_on_load: @rules[:bulk_production_run_update] ? true : false }
                           end,
         production_run_id: { renderer: :integer,
                              required: @rules[:tip_bins],
                              caption: 'Production Run Id',
-                             hide_on_load: @rules[:tip_bins] ? false : true }
+                             hide_on_load: @rules[:tip_bins] ? false : true },
+        from_production_run_id: { renderer: :integer,
+                                  required: @rules[:bulk_production_run_update],
+                                  caption: 'From Production Run',
+                                  hide_on_load: @rules[:bulk_production_run_update] ? false : true },
+        to_production_run_id: { renderer: :integer,
+                                required: @rules[:bulk_production_run_update],
+                                caption: 'To Production Run',
+                                hide_on_load: @rules[:bulk_production_run_update] ? false : true }
       }
     end
 
