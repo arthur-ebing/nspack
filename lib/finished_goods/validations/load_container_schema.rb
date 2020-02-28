@@ -6,7 +6,7 @@ module FinishedGoodsApp
 
     optional(:id, :integer).filled(:int?)
     required(:load_id, :integer).filled(:int?)
-    required(:container_code, Types::StrippedString).filled(:str?, max_size?: 11)
+    required(:container_code, Types::StrippedString).filled(:str?, max_size?: 13)
     required(:container_vents, Types::StrippedString).maybe(:str?)
     required(:container_seal_code, Types::StrippedString).maybe(:str?)
     required(:container_temperature_rhine, Types::StrippedString).maybe(:str?)
