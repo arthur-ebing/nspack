@@ -6,7 +6,7 @@ module MesscadaApp
 
     def initialize(params)
       @resource_code = params[:device]
-      @identifier = params[:identifier]
+      @identifier = params.to_h[:identifier]
     end
 
     def call
