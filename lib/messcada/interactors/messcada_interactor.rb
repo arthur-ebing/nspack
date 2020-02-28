@@ -70,8 +70,10 @@ module MesscadaApp
       check_res = validate_device_exists(res[:device])
       return check_res unless check_res.success
 
-      check_res = validate_incentivised_labeling(res[:identifier])
-      return check_res unless check_res.success
+      if res[:identifier]
+        check_res = validate_incentivised_labeling(res[:identifier])
+        return check_res unless check_res.success
+      end
 
       cvl_res = nil
       repo.transaction do
