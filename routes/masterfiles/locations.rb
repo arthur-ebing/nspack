@@ -233,7 +233,7 @@ class Nspack < Roda
         res = CreateJasperReport.call(report_name: 'location_barcode',
                                       user: current_user.login_name,
                                       file: 'location_barcode',
-                                      params: { param_Id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                      params: { location_ids: "#{multiselect_grid_choices(params).join(',')}|intarray",
                                                 keep_file: false })
         if res.success
           # change_window_location_via_json(res.instance, request.path)
