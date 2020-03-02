@@ -79,6 +79,18 @@ class Nspack < Roda
         end
       end
 
+      r.on 'cultivar_changed' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          actions = []
+          season = @cultivar_repo.find_cultivar_season(params[:changed_value])
+          actions << OpenStruct.new(type: :replace_input_value, dom_id: 'orchard_test_result_applicable_from', value: season&.start_date)
+          actions << OpenStruct.new(type: :replace_input_value, dom_id: 'orchard_test_result_applicable_to', value: season&.end_date)
+          json_actions(actions)
+        end
+      end
+
       r.on 'new' do    # NEW
         check_auth!('test results', 'new')
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::New.call(remote: fetch?(r)) }
