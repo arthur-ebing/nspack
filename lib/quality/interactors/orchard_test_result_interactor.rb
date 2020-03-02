@@ -2,6 +2,19 @@
 
 module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
+    def phyt_clean_request(id)
+      service_res = nil
+      repo.transaction do
+        service_res = QualityApp::PhytCleanRequests.call(id)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
+        log_transaction
+      end
+      service_res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
       res = OrchardTestCreateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?

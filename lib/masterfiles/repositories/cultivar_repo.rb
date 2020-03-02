@@ -116,10 +116,8 @@ module MasterfilesApp
       commodity_id = DB[:cultivars].where(id: cultivar_id).get(:commodity_id)
       return nil if hash.nil?
 
-      season = DB[:seasons].where(commodity_id: commodity_id).max
-      return nil if season.nil?
-
-      MasterfilesApp::CalendarRepo.new.find_season(season[:id])
+      season_id = DB[:seasons].where(commodity_id: commodity_id).reverse(:id).get(:id)
+      MasterfilesApp::CalendarRepo.new.find_season(season_id)
     end
 
     def find_cultivar_marketing_varieties(id)
