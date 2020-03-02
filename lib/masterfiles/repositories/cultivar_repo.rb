@@ -112,6 +112,16 @@ module MasterfilesApp
       DB[:marketing_varieties].where(id: id).delete
     end
 
+    def find_cultivar_season(cultivar_id)
+      commodity_id = DB[:cultivars].where(id: cultivar_id).get(:commodity_id)
+      return nil if hash.nil?
+
+      season = DB[:seasons].where(commodity_id: commodity_id).max
+      return nil if season.nil?
+
+      MasterfilesApp::CalendarRepo.new.find_season(season[:id])
+    end
+
     def find_cultivar_marketing_varieties(id)
       DB[:marketing_varieties]
         .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)

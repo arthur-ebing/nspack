@@ -30,8 +30,8 @@ module UiRules
       fields[:orchard_id] = { renderer: :label,
                               with_value: @form_object.orchard_code,
                               caption: 'Orchard' }
-      fields[:cultivar_ids] = { renderer: :label,
-                                with_value: @form_object.cultivar_codes,
+      fields[:cultivar_id] = { renderer: :label,
+                                with_value: @form_object.cultivar_code,
                                 caption: 'Cultivars' }
 
       fields[:description] = { renderer: :label }
@@ -124,6 +124,7 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :puc_id, notify: [{ url: '/quality/test_results/orchard_test_results/puc_changed' }]
         behaviour.dropdown_change :orchard_id, notify: [{ url: '/quality/test_results/orchard_test_results/orchard_changed' }]
+        behaviour.dropdown_change :cultivar_id, notify: [{ url: '/quality/test_results/orchard_test_results/cultivar_changed' }]
       end
     end
   end
