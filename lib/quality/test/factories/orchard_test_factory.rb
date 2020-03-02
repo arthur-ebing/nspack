@@ -52,18 +52,19 @@ module QualityApp
       DB[:orchard_set_results].insert(default.merge(opts))
     end
 
-    def create_orchard_test_result(opts = {}) # rubocop:disable Metrics/AbcSize
+    def create_orchard_test_result(opts = {})
       orchard_test_type_id = create_orchard_test_type
       orchard_set_result_id = create_orchard_set_result
       orchard_id = create_orchard
       puc_id = create_puc
-      cultivar_ids = [create_cultivar, create_cultivar, create_cultivar]
+      cultivar_id = create_cultivar
 
       default = {
         orchard_test_type_id: orchard_test_type_id,
         orchard_set_result_id: orchard_set_result_id,
-        orchard_id: orchard_id,
         puc_id: puc_id,
+        orchard_id: orchard_id,
+        cultivar_id: cultivar_id,
         description: Faker::Lorem.unique.word,
         status_description: Faker::Lorem.word,
         passed: false,
@@ -71,7 +72,6 @@ module QualityApp
         freeze_result: false,
         api_result: nil,
         classifications: nil,
-        cultivar_ids: BaseRepo.new.array_for_db_col(cultivar_ids),
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true,

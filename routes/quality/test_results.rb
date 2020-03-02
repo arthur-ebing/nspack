@@ -74,7 +74,7 @@ class Nspack < Roda
           actions = []
           orchard = @farm_repo.find_orchard(params[:changed_value])
           cultivar_list = @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) })
-          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_id', options_array: cultivar_list)
           json_actions(actions)
         end
       end

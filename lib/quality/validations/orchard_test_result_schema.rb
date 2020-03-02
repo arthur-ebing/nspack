@@ -23,7 +23,7 @@ module QualityApp
     required(:freeze_result, :bool).maybe(:bool?)
     required(:api_result, :hash).maybe(:hash?)
     required(:classifications, :string).maybe(:str?)
-    required(:cultivar_ids, Types::IntArray).maybe { each(:int?) }
+    required(:cultivar_id, :integer).maybe(:int?)
     required(:applicable_from, :time).filled(:time?)
     required(:applicable_to, :time).filled(:time?)
   end
