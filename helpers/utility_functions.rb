@@ -189,4 +189,12 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   def non_numeric_elements(in_array)
     Array(in_array).reject { |x| x.match(/\A\d+\Z/) }
   end
+
+  # Randomize a URL by adding a queryparam based on current time.
+  #
+  # @param path [string] the URL path
+  # @return [string] the path with "?seq=nnn" appended. (nnn is time in seconds)
+  def cache_bust_url(path)
+    "#{path}?seq=#{Time.now.nsec}"
+  end
 end

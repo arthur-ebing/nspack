@@ -15,7 +15,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -33,7 +33,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -45,13 +45,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       res = CreateJasperReport.call(report_name: 'dispatch_note',
                                     user: current_user.login_name,
                                     file: 'dispatch_note',
+                                    # debug_mode: true,
                                     params: { load_id: id,
                                               pallet_report: 'detail',
                                               for_picklist: 'true|boolean',
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -67,7 +68,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -82,7 +83,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     params: { load_container_id: BaseRepo.new.get_with_args(:load_containers, :id, load_id: id),
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -98,7 +99,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               user_name: current_user.user_name,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -114,7 +115,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               QueryCondition: 'govt_inspection_pallets.passed',
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -130,7 +131,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               QueryCondition: 'NOT govt_inspection_pallets.passed',
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end
@@ -146,7 +147,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     params: { govt_inspection_sheet_id: id,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
       else
         show_error(res.message, fetch?(r))
       end

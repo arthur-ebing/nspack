@@ -6,8 +6,10 @@ module Crossbeams
     include Crossbeams::Responses
     attr_reader :use_ssl
 
-    def initialize(use_ssl = false)
+    def initialize(use_ssl = false, open_timeout: 5, read_timeout: 10)
       @use_ssl = use_ssl
+      @open_timeout = open_timeout
+      @read_timeout = read_timeout
     end
 
     def json_post(url, params, headers = {}) # rubocop:disable Metrics/AbcSize
@@ -134,8 +136,8 @@ module Crossbeams
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
 
-      http.open_timeout = 5
-      http.read_timeout = 10
+      http.open_timeout = @open_timeout
+      http.read_timeout = @read_timeout
 
       [uri, http]
     end
