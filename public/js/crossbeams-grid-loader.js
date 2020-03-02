@@ -149,6 +149,10 @@ const crossbeamsGridEvents = {
         form.submit();
       };
 
+      const saveLoading = () => {
+        crossbeamsUtils.loadingWindow(`${url}?selection[list]=${ids.join(',')}`);
+      };
+
       // Save via a remote fetch call that renders in a dialog.
       const saveToPopup = () => {
         crossbeamsUtils.recordGridIdForPopup(gridId);
@@ -240,6 +244,8 @@ const crossbeamsGridEvents = {
         saveFunc = saveRemote;
       } else if (saveMethod === 'dialog') {
         saveFunc = saveToPopup;
+      } else if (saveMethod === 'loading') {
+        saveFunc = saveLoading;
       }
 
       crossbeamsUtils.confirm({

@@ -236,8 +236,7 @@ class Nspack < Roda
                                       params: { location_ids: "#{multiselect_grid_choices(params).join(',')}|intarray",
                                                 keep_file: false })
         if res.success
-          # change_window_location_via_json(res.instance, request.path)
-          r.redirect "/#{res.instance}"
+          change_window_location_via_json(res.instance, request.path)
         else
           show_error(res.message, fetch?(r))
         end
