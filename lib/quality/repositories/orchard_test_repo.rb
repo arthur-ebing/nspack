@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class OrchardTestRepo < BaseRepo
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,
@@ -59,18 +59,14 @@ module QualityApp
             orchard_test_types.test_type_code AS orchard_test_type_code,
             orchards.orchard_code,
             pucs.puc_code,
-            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS cultivar_codes
+            cultivars.cultivar_name AS cultivar_code
         FROM orchard_test_results
         JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id
-        LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_results.cultivar_ids)
+        LEFT JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id
         LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id
         LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id
         WHERE orchard_test_results.id = #{id}
-        GROUP BY
-            orchard_test_results.id,
-            orchard_test_types.test_type_code,
-            orchards.orchard_code,
-            pucs.puc_code
+
       SQL
       hash = DB[query].first
       return nil if hash.nil?
@@ -104,7 +100,6 @@ module QualityApp
       attrs.delete(:classifications) if attrs[:classifications].nil_or_empty?
       attrs[:api_result] = hash_for_jsonb_col(attrs[:api_result]) if attrs.key?(:api_result)
       attrs[:classifications] = hash_for_jsonb_col(attrs[:classifications]) if attrs.key?(:classifications)
-      attrs[:cultivar_ids] = array_for_db_col(attrs[:cultivar_ids]) if attrs.key?(:cultivar_ids)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
     end

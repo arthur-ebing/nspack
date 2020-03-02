@@ -6,8 +6,10 @@ Sequel.migration do
       primary_key :id
       foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer, null: false
       foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
-      foreign_key :orchard_id, :orchards, type: :integer
       foreign_key :puc_id, :pucs, type: :integer
+      foreign_key :orchard_id, :orchards, type: :integer
+      foreign_key :cultivar_id, :cultivars, type: :integer
+
       String :description
       String :status_description
 
@@ -18,7 +20,6 @@ Sequel.migration do
       Jsonb :api_result
 
       column :classifications, 'hstore'
-      column :cultivar_ids, 'integer[]'
 
       DateTime :applicable_from
       DateTime :applicable_to
@@ -49,8 +50,10 @@ Sequel.migration do
       Integer :orchard_test_result_id
       Integer :orchard_test_type_id
       Integer :orchard_set_result_id
-      Integer :orchard_id
       Integer :puc_id
+      Integer :orchard_id
+      Integer :cultivar_id
+
       String :description
       String :status_description
 
@@ -61,7 +64,6 @@ Sequel.migration do
       Jsonb :api_result
 
       column :classifications, 'hstore'
-      column :cultivar_ids, 'integer[]'
 
       DateTime :applicable_from
       DateTime :applicable_to
@@ -89,8 +91,9 @@ Sequel.migration do
            (orchard_test_result_id,
             orchard_test_type_id,
             orchard_set_result_id,
-            orchard_id,
             puc_id,
+            orchard_id,
+            cultivar_id,
             description,
             status_description,
             passed,
@@ -98,7 +101,6 @@ Sequel.migration do
             freeze_result,
             api_result,
             classifications,
-            cultivar_ids,
             applicable_from,
             applicable_to,
             active,
@@ -108,8 +110,9 @@ Sequel.migration do
            (NEW.id,
             NEW.orchard_test_type_id,
             NEW.orchard_set_result_id,
-            NEW.orchard_id,
             NEW.puc_id,
+            NEW.orchard_id,
+            NEW.cultivar_id,
             NEW.description,
             NEW.status_description,
             NEW.passed,
@@ -117,7 +120,6 @@ Sequel.migration do
             NEW.freeze_result,
             NEW.api_result,
             NEW.classifications,
-            NEW.cultivar_ids,
             NEW.applicable_from,
             NEW.applicable_to,
             NEW.active,

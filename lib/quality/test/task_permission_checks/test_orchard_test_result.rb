@@ -17,8 +17,9 @@ module QualityApp
         id: 1,
         orchard_test_type_id: 1,
         orchard_set_result_id: 1,
-        orchard_id: 1,
         puc_id: 1,
+        orchard_id: 1,
+        cultivar_id: 1,
         description: Faker::Lorem.unique.word,
         status_description: 'ABC',
         passed: false,
@@ -26,7 +27,6 @@ module QualityApp
         freeze_result: false,
         api_result: {},
         classifications: 'ABC',
-        cultivar_ids: [1, 2, 3],
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true

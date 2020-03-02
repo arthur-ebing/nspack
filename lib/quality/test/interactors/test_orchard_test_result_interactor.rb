@@ -70,15 +70,16 @@ module QualityApp
     def orchard_test_result_attrs
       orchard_test_type_id = create_orchard_test_type
       orchard_set_result_id = create_orchard_set_result
-      orchard_id = create_orchard
       puc_id = create_puc
-      cultivar_ids = [create_cultivar, create_cultivar, create_cultivar]
+      orchard_id = create_orchard
+      cultivar_id = create_cultivar
       {
         id: 1,
         orchard_test_type_id: orchard_test_type_id,
         orchard_set_result_id: orchard_set_result_id,
-        orchard_id: orchard_id,
         puc_id: puc_id,
+        orchard_id: orchard_id,
+        cultivar_id: cultivar_id,
         description: Faker::Lorem.unique.word,
         status_description: 'ABC',
         passed: false,
@@ -86,7 +87,7 @@ module QualityApp
         freeze_result: false,
         api_result: nil,
         classifications: nil,
-        cultivar_ids: cultivar_ids,
+
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true
