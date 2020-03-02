@@ -111,6 +111,23 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
+    def request_post(url, fields) # rubocop:disable Metrics/AbcSize
+      uri, http = setup_http(url)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data(fields)
+      log_request(request)
+      response = http.request(request)
+
+      format_response(response, uri)
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      failed_response("There was an error: #{e.message}")
+    end
+
     private
 
     def setup_http(url)
