@@ -12,6 +12,17 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      r.on 'phyt_clean_request' do
+        res = interactor.phyt_clean_request(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect '/list/orchard_test_results'
+        res
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('test results', 'edit')
         interactor.assert_permission!(:edit, id)
