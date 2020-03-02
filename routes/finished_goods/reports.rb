@@ -44,7 +44,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'picklist', Integer do |id|
       res = CreateJasperReport.call(report_name: 'dispatch_note',
                                     user: current_user.login_name,
-                                    file: 'dispatch_note',
+                                    file: 'picklist',
                                     # debug_mode: true,
                                     params: { load_id: id,
                                               pallet_report: 'detail',
