@@ -342,18 +342,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
 
-  # Titan: Govt Inspections
-  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
-  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
-  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
-
-  # PhytClean
-  PHYT_CLEAN_ENVIRONMENT = { UAT: 'https://www.phytclean.co.za',
-                             STAGING: 'https://www.phytclean.co.za',
-                             PRODUCTION: 'https://www.phytclean.co.za' }[ENV['TITAN_ENVIRONMENT'].to_sym]
-  PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
-  PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
-
   # Addendum: place of issue for export certificate
   ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
   raise Crossbeams::FrameworkError, "#{ADDENDUM_PLACE_OF_ISSUE} is not a valid code" unless ADDENDUM_PLACE_OF_ISSUE.match?(/cpt|dbn|plz|mpm|oth/i)
@@ -381,8 +369,25 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   RPT_INDUSTRY = ENV['RPT_INDUSTRY']
 
-  # OTMC result types
+  # Titan: Govt Inspections
+  TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
+  TITAN_API_USER_ID = ENV['TITAN_API_USER_ID']
+  TITAN_API_SECRET = ENV['TITAN_API_SECRET']
+
+  # QUALITY APP result types
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'
-  OMTC_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
+  QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
+  PHYT_CLEAN = 'PhytClean'
+  QUALITY_API_NAMES = [PHYT_CLEAN].freeze
+
+  # PhytClean
+  PHYT_CLEAN_ENVIRONMENT = { UAT: 'https://www.phytclean.co.za',
+                             STAGING: 'https://www.phytclean.co.za',
+                             PRODUCTION: 'https://www.phytclean.co.za' }[ENV['TITAN_ENVIRONMENT'].to_sym]
+  PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
+  PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
+
+  PHYT_CLEAN_PASSED = %w[TRUE true t approved].freeze
+  PHYT_CLEAN_ATTRIBUTES = %i[cbs applied eu bd verified fms b phytoData].freeze
 end
