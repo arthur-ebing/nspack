@@ -60,6 +60,27 @@ class Nspack < Roda
         end
       end
 
+      r.on 'applies_to_all_markets' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          actions = []
+          actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element, dom_id: 'orchard_test_type_applicable_tm_group_ids_field_wrapper')
+          json_actions(actions)
+        end
+      end
+
+      r.on 'applies_to_all_cultivars' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          actions = []
+          actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element, dom_id: 'orchard_test_type_applicable_commodity_group_ids_field_wrapper')
+          actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element, dom_id: 'orchard_test_type_applicable_cultivar_ids_field_wrapper')
+          json_actions(actions)
+        end
+      end
+
       interactor = QualityApp::OrchardTestTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('config', 'new')

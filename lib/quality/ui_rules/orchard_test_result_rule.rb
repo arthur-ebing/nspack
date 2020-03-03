@@ -31,8 +31,8 @@ module UiRules
                               with_value: @form_object.orchard_code,
                               caption: 'Orchard' }
       fields[:cultivar_id] = { renderer: :label,
-                                with_value: @form_object.cultivar_code,
-                                caption: 'Cultivars' }
+                               with_value: @form_object.cultivar_code,
+                               caption: 'Cultivars' }
 
       fields[:description] = { renderer: :label }
       fields[:status_description] = { renderer: :label }
@@ -60,7 +60,7 @@ module UiRules
       }
     end
 
-    def common_fields
+    def common_fields # rubocop:disable Metrics/AbcSize
       orchard = @farm_repo.find_orchard(@form_object.orchard_id)
       {
         orchard_test_type_id: { renderer: :label,
