@@ -76,22 +76,30 @@ module QualityApp
       OrchardTestResultFlat.new(hash)
     end
 
-    def create_orchard_test_type(params)
-      attrs = params.to_h
-      attrs[:applicable_tm_group_ids] = array_for_db_col(attrs[:applicable_tm_group_ids]) if attrs.key?(:applicable_tm_group_ids)
-      attrs[:applicable_cultivar_ids] = array_for_db_col(attrs[:applicable_cultivar_ids]) if attrs.key?(:applicable_cultivar_ids)
-      attrs[:applicable_commodity_group_ids] = array_for_db_col(attrs[:applicable_commodity_group_ids]) if attrs.key?(:applicable_commodity_group_ids)
+    def array_for_db_ids(params)
+      return nil if params.nil?
 
-      DB[:orchard_test_types].insert(attrs)
+      attrs = params.to_h
+      attrs.each do |k, v|
+        attrs[k] = array_for_db_col(v) if k.to_s.end_with?('_ids')
+      end
+      attrs
+    end
+
+    def create_orchard_test_type(params)
+      DB[:orchard_test_types].insert(array_for_db_ids(params))
     end
 
     def update_orchard_test_type(id, params)
       attrs = params.to_h
-      attrs[:applicable_tm_group_ids] = array_for_db_col(attrs[:applicable_tm_group_ids]) if attrs.key?(:applicable_tm_group_ids)
-      attrs[:applicable_cultivar_ids] = array_for_db_col(attrs[:applicable_cultivar_ids]) if attrs.key?(:applicable_cultivar_ids)
-      attrs[:applicable_commodity_group_ids] = array_for_db_col(attrs[:applicable_commodity_group_ids]) if attrs.key?(:applicable_commodity_group_ids)
+      attrs[:applicable_tm_group_ids] = nil if attrs[:applies_to_all_markets]
 
-      DB[:orchard_test_types].where(id: id).update(attrs)
+      if attrs[:applies_to_all_cultivars]
+        attrs[:applicable_cultivar_ids] = nil
+        attrs[:applicable_commodity_group_ids] = nil
+      end
+
+      DB[:orchard_test_types].where(id: id).update(array_for_db_ids(attrs))
     end
 
     def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize

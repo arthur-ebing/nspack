@@ -13,11 +13,11 @@ module QualityApp
     required(:applies_to_orchard_set, :bool).maybe(:bool?)
     required(:allow_result_capturing, :bool).maybe(:bool?)
     required(:pallet_level_result, :bool).maybe(:bool?)
-    required(:api_name, Types::StrippedString).maybe(:str?)
+    optional(:api_name, Types::StrippedString).maybe(:str?)
     required(:result_type, :string).filled(:str?)
-    required(:result_attributes, :string).maybe(:str?)
-    required(:applicable_tm_group_ids, Types::IntArray).maybe { each(:int?) }
-    required(:applicable_cultivar_ids, Types::IntArray).maybe { each(:int?) }
-    required(:applicable_commodity_group_ids, Types::IntArray).maybe { each(:int?) }
+    optional(:result_attributes, :string).maybe(:str?)
+    optional(:applicable_tm_group_ids, Types::IntArray).maybe { each(:int?) }
+    optional(:applicable_cultivar_ids, Types::IntArray).maybe { each(:int?) }
+    optional(:applicable_commodity_group_ids, Types::IntArray).maybe { each(:int?) }
   end
 end

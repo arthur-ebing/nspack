@@ -19,11 +19,11 @@ module Quality
                   col.add_field :test_type_code
                   col.add_field :description
                   col.add_field :result_type
-                  col.add_field :api_name
-                  col.add_field :result_attributes
                   col.add_field :applicable_tm_group_ids
                   col.add_field :applicable_commodity_group_ids
                   col.add_field :applicable_cultivar_ids
+                  col.add_field :api_name
+                  col.add_field :result_attributes
                 end
                 row.column do |col|
                   col.add_field :applies_to_all_markets
