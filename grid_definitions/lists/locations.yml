@@ -4,7 +4,7 @@
   :locations:
     :url: "/masterfiles/locations/locations/print_location_barcodes"
     :section_caption: "Choose locations for barcode printing"
-    :multiselect_save_method: http
+    :multiselect_save_method: loading
     :can_be_cleared: true
 :tree:
   :tree_column: path_array
