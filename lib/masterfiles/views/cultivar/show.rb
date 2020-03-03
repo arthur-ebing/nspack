@@ -15,7 +15,7 @@ module Masterfiles
               form.add_field :commodity_id
               form.add_field :cultivar_group_id
               form.add_field :cultivar_name
-              form.add_field :registered_code
+              form.add_field :cultivar_code
               form.add_field :description
               form.add_field :active
               form.add_field :marketing_varieties

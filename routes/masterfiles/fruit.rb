@@ -285,7 +285,7 @@ class Nspack < Roda
               cultivar_group_code
               cultivar_name
               code
-              registered_code
+              cultivar_code
               description
             ]
             update_grid_row(id, changes: select_attributes(hash, row_keys), notice: res.message)

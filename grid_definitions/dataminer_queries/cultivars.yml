@@ -3,7 +3,7 @@
 :sql: "SELECT\r\n    cultivars.id,\r\n    cultivars.commodity_id,\r\n    cultivars.cultivar_group_id,\r\n
   \   cultivars.cultivar_name,\r\n    cultivars.description,\r\n    cultivars.created_at,\r\n
   \   cultivars.updated_at,\r\n    commodities.code,\r\n    cultivar_groups.cultivar_group_code,\r\n
-  \   cultivars.registered_code,\r\n    cultivars.active\r\nFROM cultivars\r\nJOIN
+  \   cultivars.cultivar_code,\r\n    cultivars.active\r\nFROM cultivars\r\nJOIN
   commodities ON commodities.id = cultivars.commodity_id\r\nLEFT JOIN cultivar_groups
   ON cultivar_groups.id = cultivars.cultivar_group_id"
 :limit: 
@@ -154,11 +154,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  registered_code:
-    :name: registered_code
+  cultivar_code:
+    :name: cultivar_code
     :sequence_no: 10
-    :caption: Registered code
-    :namespaced_name: cultivars.registered_code
+    :caption: Cultivar code
+    :namespaced_name: cultivars.cultivar_code
     :data_type: :string
     :width: 
     :format: 

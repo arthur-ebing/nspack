@@ -21,8 +21,8 @@ module UiRules
       fields[:cultivar_name] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:registered_code] = { renderer: :label }
       fields[:marketing_varieties] = { renderer: :list, items: cultivar_marketing_varieties }
+      fields[:cultivar_code] = { renderer: :label }
     end
 
     def common_fields
@@ -32,7 +32,7 @@ module UiRules
                              options: @repo.for_select_cultivar_groups,
                              disabled_options: @repo.for_select_inactive_cultivar_groups },
         cultivar_name: { required: true },
-        registered_code: {},
+        cultivar_code: {},
         description: {}
       }
     end
@@ -48,7 +48,7 @@ module UiRules
                                     cultivar_group_id: nil,
                                     cultivar_name: nil,
                                     description: nil,
-                                    registered_code: nil)
+                                    cultivar_code: nil)
     end
 
     def cultivar_marketing_varieties
