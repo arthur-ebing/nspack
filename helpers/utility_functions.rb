@@ -73,7 +73,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @param val [string,any] input value
   # @return [string,any]
   def scientific_notation_to_s(val)
-    val.is_a?(String) && val.match?(/-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?/) ? BigDecimal(val).to_s('F') : val
+    val.is_a?(String) && val.match?(/^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)$/) ? BigDecimal(val).to_s('F') : val
   end
 
   # Commas as thousands separators for numbers.
