@@ -13,7 +13,7 @@ class Nspack < Roda
       end
 
       r.on 'phyt_clean_request' do
-        res = interactor.phyt_clean_request(id)
+        res = interactor.phyt_clean_request
         if res.success
           flash[:notice] = res.message
         else

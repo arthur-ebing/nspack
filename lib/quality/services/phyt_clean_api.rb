@@ -30,15 +30,15 @@ module QualityApp
       success_response(instance['message'])
     end
 
-    def request_citrus_eu_orchard_status
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), responder: PhytCleanHttpResponder.new)
+    def request_get_citrus_eu_orchard_status
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), responder: PhytCleanHttpResponder.new, read_timeout: 45)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/citruseuorchardstatus"
 
       res = http.request_get(url, headers)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
-      success_response('ok', instance)
+      success_response('Received citrus eu orchard status', instance)
     end
   end
 end

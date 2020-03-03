@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo
+  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,
@@ -121,6 +121,15 @@ module QualityApp
 
     def for_select_inactive_orchards(args)
       for_select_orchards(args, false)
+    end
+
+    def update_pallet_sequences_phyto_data(params)
+      return nil if params.nil?
+
+      ds = DB[:pallet_sequences]
+      ds = ds.where(puc_id: params[:puc_id], orchard_id: params[:orchard_id], cultivar_id: params[:cultivar_id])
+      ds = ds.exclude(phyto_data: params[:phytoData])
+      ds.update(phyto_data: params[:phytoData])
     end
   end
 end
