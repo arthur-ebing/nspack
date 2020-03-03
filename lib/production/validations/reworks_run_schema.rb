@@ -176,4 +176,14 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
 
     required(:allow_cultivar_mixing, :bool).filled(:bool?)
   end
+
+  ReworksRunBulkProductionRunUpdateSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallets_selected, :array).maybe(:array?) { each(:str?) }
+    required(:from_production_run_id, :integer).filled(:int?)
+    required(:to_production_run_id, :integer).filled(:int?)
+    optional(:make_changes, :bool).maybe(:bool?)
+  end
 end

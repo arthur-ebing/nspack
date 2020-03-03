@@ -73,7 +73,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @param val [string,any] input value
   # @return [string,any]
   def scientific_notation_to_s(val)
-    val.is_a?(String) && val.match?(/-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?/) ? BigDecimal(val).to_s('F') : val
+    val.is_a?(String) && val.match?(/^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)$/) ? BigDecimal(val).to_s('F') : val
   end
 
   # Commas as thousands separators for numbers.
@@ -188,5 +188,13 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @return [array] which might be empty.
   def non_numeric_elements(in_array)
     Array(in_array).reject { |x| x.match(/\A\d+\Z/) }
+  end
+
+  # Randomize a URL by adding a queryparam based on current time.
+  #
+  # @param path [string] the URL path
+  # @return [string] the path with "?seq=nnn" appended. (nnn is time in seconds)
+  def cache_bust_url(path)
+    "#{path}?seq=#{Time.now.nsec}"
   end
 end

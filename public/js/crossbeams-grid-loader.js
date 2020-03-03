@@ -135,6 +135,8 @@ const crossbeamsGridEvents = {
         const form = document.createElement('form');
         const element1 = document.createElement('input');
         const csrf = document.createElement('input');
+        form.style.position = 'absolute';
+        form.style.left = '-1000px';
         form.method = 'POST';
         form.action = url;
         element1.value = ids.join(',');
@@ -145,6 +147,10 @@ const crossbeamsGridEvents = {
         form.appendChild(csrf);
         document.body.appendChild(form);
         form.submit();
+      };
+
+      const saveLoading = () => {
+        crossbeamsUtils.loadingWindow(`${url}?selection[list]=${ids.join(',')}`);
       };
 
       // Save via a remote fetch call that renders in a dialog.
@@ -238,6 +244,8 @@ const crossbeamsGridEvents = {
         saveFunc = saveRemote;
       } else if (saveMethod === 'dialog') {
         saveFunc = saveToPopup;
+      } else if (saveMethod === 'loading') {
+        saveFunc = saveLoading;
       }
 
       crossbeamsUtils.confirm({

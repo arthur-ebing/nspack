@@ -28,7 +28,7 @@ DB.extension :pg_json
 Sequel.extension(:pg_json_ops)
 DB.extension :pg_hstore
 DB.extension :pg_inet
-Sequel.application_timezone = :localtime # Maybe times must be at UTC... timestamp with timezone UTC...
+Sequel.application_timezone = :localtime
 
 Que.connection = DB
 Que.job_middleware.push(
