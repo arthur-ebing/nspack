@@ -16,7 +16,7 @@ Sequel.migration do
 
       String :api_name
       String :result_type, null: false
-      String :result_attributes
+      String :result_attribute
 
       column :applicable_tm_group_ids, 'integer[]'
       column :applicable_cultivar_ids, 'integer[]'
