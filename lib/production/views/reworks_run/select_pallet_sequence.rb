@@ -16,6 +16,7 @@ module Production
               form.add_field :pallet_sequence_id
               form.add_field :reworks_run_type
               form.add_field :pallets_selected
+              form.add_notice 'Select a representative pallet sequence for update', inline_caption: true
               form.add_field :id
             end
           end

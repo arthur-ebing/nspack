@@ -65,7 +65,7 @@ module UiRules
                       param_values: { pallets_selected: @options[:pallets_selected].join(',') },
                       hidden_fields: %i[id],
                       show_field: :id,
-                      caption: 'Select a representative pallet sequence' }
+                      caption: 'Representative sequence' }
     end
 
     def set_pallet_sequence_changes  # rubocop:disable Metrics/AbcSize

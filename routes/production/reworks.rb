@@ -699,7 +699,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'reworks_run_pallet_pallet_sequence_id',
                                      value: res[:id])],
-                     'Selected sequence')
+                     '')
       end
     end
   end
