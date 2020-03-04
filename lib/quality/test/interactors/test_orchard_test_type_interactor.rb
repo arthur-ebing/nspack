@@ -80,7 +80,7 @@ module QualityApp
         pallet_level_result: false,
         api_name: 'ABC',
         result_type: 'ABC',
-        result_attributes: 'ABC',
+        result_attribute: 'ABC',
         applicable_tm_group_ids: [1, 2, 3],
         applicable_cultivar_ids: [1, 2, 3],
         applicable_commodity_group_ids: [1, 2, 3],

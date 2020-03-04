@@ -34,7 +34,7 @@ module UiRules
                                                   caption: 'Commodity Groups' }
       fields[:result_type] = { renderer: :label }
       fields[:api_name] = { renderer: :label }
-      fields[:result_attributes] = { renderer: :label }
+      fields[:result_attribute] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -68,9 +68,9 @@ module UiRules
                                    caption: 'Cultivars' },
         api_name: { renderer: :select,
                     options: AppConst::QUALITY_API_NAMES },
-        result_attributes: { renderer: :select,
-                             options: AppConst::PHYT_CLEAN_ATTRIBUTES,
-                             selected: @form_object.result_attributes }
+        result_attribute: { renderer: :select,
+                            options: AppConst::PHYT_CLEAN_ATTRIBUTES,
+                            selected: @form_object.result_attribute }
       }
     end
 
@@ -94,7 +94,7 @@ module UiRules
                                     pallet_level_result: false,
                                     api_name: nil,
                                     result_type: nil,
-                                    result_attributes: nil,
+                                    result_attribute: nil,
                                     applicable_tm_group_ids: [],
                                     applicable_cultivar_ids: [],
                                     applicable_commodity_group_ids: [])

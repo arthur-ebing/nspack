@@ -15,7 +15,7 @@ module QualityApp
     required(:pallet_level_result, :bool).maybe(:bool?)
     optional(:api_name, Types::StrippedString).maybe(:str?)
     required(:result_type, :string).filled(:str?)
-    optional(:result_attributes, :string).maybe(:str?)
+    optional(:result_attribute, :string).maybe(:str?)
     optional(:applicable_tm_group_ids, Types::IntArray).maybe { each(:int?) }
     optional(:applicable_cultivar_ids, Types::IntArray).maybe { each(:int?) }
     optional(:applicable_commodity_group_ids, Types::IntArray).maybe { each(:int?) }

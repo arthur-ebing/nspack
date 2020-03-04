@@ -13,9 +13,9 @@ Sequel.migration do
       String :description
       String :status_description
 
-      TrueClass :passed
-      TrueClass :classification_only
-      TrueClass :freeze_result
+      TrueClass :passed, default: false
+      TrueClass :classification_only, default: false
+      TrueClass :freeze_result, default: false
       
       Jsonb :api_result
 
@@ -57,9 +57,9 @@ Sequel.migration do
       String :description
       String :status_description
 
-      TrueClass :passed, default: true
-      TrueClass :classification_only, default: true
-      TrueClass :freeze_result, default: true
+      TrueClass :passed
+      TrueClass :classification_only
+      TrueClass :freeze_result
 
       Jsonb :api_result
 
@@ -68,7 +68,7 @@ Sequel.migration do
       DateTime :applicable_from
       DateTime :applicable_to
 
-      TrueClass :active, default: true
+      TrueClass :active
       DateTime :created_at
       DateTime :updated_at
       DateTime :logged_at, null: false

@@ -11,7 +11,7 @@ Sequel.migration do
 
       TrueClass :passed, default: true
       TrueClass :classification_only, default: true
-      TrueClass :freeze_result, default: true
+      TrueClass :freeze_result, default: false
 
       column :classifications, 'hstore'
       column :cultivar_ids, 'integer[]'
