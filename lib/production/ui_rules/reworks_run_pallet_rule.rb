@@ -127,7 +127,7 @@ module UiRules
 
       if @mode == :select_pallet_sequence
         @form_object = OpenStruct.new(reworks_run_type_id: @options[:reworks_run_type_id],
-                                      pallets_selected: @options[:pallets_selected],
+                                      pallets_selected: resolve_selected_pallet_numbers(@options[:pallets_selected]),
                                       pallet_sequence_id: nil)
         return
       end
@@ -166,6 +166,14 @@ module UiRules
         behaviour.dropdown_change :fruit_sticker_pm_product_id,
                                   notify: [{ url: "/production/reworks/pallets/#{@options[:pallet_number]}/fruit_sticker_changed" }]
       end
+    end
+
+    def resolve_selected_pallet_numbers(pallets_selected)
+      return '' if pallets_selected.nil_or_empty?
+
+      pallet_numbers = pallets_selected.join(',').split(/\n|,/).map(&:strip).reject(&:empty?)
+      pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
+      pallet_numbers.join("\n")
     end
   end
 end
