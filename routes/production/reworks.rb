@@ -145,10 +145,11 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
           r.post do
             res = interactor.create_reworks_run(id, params[:reworks_run])
+            bulk_production_run_update = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
             if res.success
               if res.instance[:make_changes]
                 store_locally(:reworks_run_params, res.instance)
-                r.redirect "/production/reworks/reworks_run_types/#{id}/#{res.instance[:display_page]}" if res.instance[:pallets_selected].nil_or_empty?
+                r.redirect "/production/reworks/reworks_run_types/#{id}/#{res.instance[:display_page]}" if bulk_production_run_update
                 if fetch?(r)
                   redirect_via_json("/production/reworks/reworks_run_types/#{id}/pallets/#{res.instance[:pallets_selected].join(',')}/#{res.instance[:display_page]}")
                 else
@@ -169,7 +170,8 @@ class Nspack < Roda # rubocop:disable ClassLength
               re_show_form(r, res, url: url) do
                 Production::Reworks::ReworksRun::New.call(id,
                                                           form_values: params[:reworks_run],
-                                                          form_errors: res.errors)
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
               end
             end
           end
@@ -218,6 +220,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           pallet_numbers = pallet_number.split(',')
           r.get do
             if pallet_numbers.length == 1
+              store_locally(:batch_pallet_numbers, nil)
               show_partial_or_page(r) do
                 Production::Reworks::ReworksRun::EditPallet.call(id,
                                                                  pallet_numbers.first,
@@ -255,13 +258,13 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
 
-        # r.on 'edit_representative_pallet_sequence' do
-        #   pallet_numbers = pallet_number.split(',')
-        #   store_locally(:pallet_numbers, pallet_numbers)
-        #
-        #   res = interactor.edit_representative_pallet_sequence(params[:reworks_run_pallet])
-        #   r.redirect "/production/reworks/pallet_sequences/#{res.instance[:pallet_sequence_id]}/edit_reworks_pallet_sequence" if res.success
-        # end
+        r.on 'edit_representative_pallet_sequence' do
+          pallet_numbers = pallet_number.split(',')
+          store_locally(:batch_pallet_numbers, pallet_numbers)
+
+          res = interactor.edit_representative_pallet_sequence(params[:reworks_run_pallet])
+          r.redirect "/production/reworks/pallet_sequences/#{res.instance[:pallet_sequence_id]}/edit_reworks_pallet_sequence" if res.success
+        end
       end
 
       r.on 'edit_bulk_production_run' do
@@ -398,10 +401,15 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'accept_pallet_sequence_changes' do
         params = retrieve_from_local_store(:reworks_run_sequence_changes)
-        res = interactor.update_pallet_sequence_record(id, reworks_run_type_id, params)
+        batch_pallet_numbers = retrieve_from_local_store(:batch_pallet_numbers)
+        res = interactor.update_pallet_sequence_record(id, reworks_run_type_id, params, batch_pallet_numbers)
         if res.success
           flash[:notice] = res.message
-          r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          if res.instance[:batch_update]
+            r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+          else
+            r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          end
         end
       end
 
@@ -683,16 +691,16 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
       end
 
-      # r.on 'select_representative_sequence' do
-      #   res = ProductionApp::ReworksRepo.new.where_hash(:pallet_sequences, id: id)
-      #   json_actions([OpenStruct.new(type: :replace_input_value,
-      #                                dom_id: 'reworks_run_pallet_id',
-      #                                value: res[:id]),
-      #                 OpenStruct.new(type: :replace_input_value,
-      #                                dom_id: 'reworks_run_pallet_pallet_sequence_id',
-      #                                value: res[:id])],
-      #                'Selected sequence')
-      # end
+      r.on 'select_representative_sequence' do
+        res = ProductionApp::ReworksRepo.new.where_hash(:pallet_sequences, id: id)
+        json_actions([OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_pallet_id',
+                                     value: res[:id]),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_pallet_pallet_sequence_id',
+                                     value: res[:id])],
+                     'Selected sequence')
+      end
     end
   end
 end

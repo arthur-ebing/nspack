@@ -92,6 +92,10 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
+    def production_run_pallets?(pallet_numbers, production_run_id)
+      DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
+    end
+
     def scrapped_bins?(bin_ids)
       DB[:rmt_bins].where(id: bin_ids, scrapped: true).select_map(:id)
     end
@@ -159,6 +163,10 @@ module ProductionApp
 
     def affected_pallet_numbers(sequence_ids, attrs)
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:pallet_number] }
+    end
+
+    def affected_pallet_sequences(sequence_ids, attrs)
+      DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:id] }
     end
 
     def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans)

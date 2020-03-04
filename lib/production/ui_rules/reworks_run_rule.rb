@@ -130,14 +130,12 @@ module UiRules
                    caption: 'Scrap Remarks',
                    hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true },
         pallets_selected: if @rules[:single_edit]
-                            { caption: text_caption,
-                              hide_on_load: @rules[:bulk_production_run_update] ? true : false }
+                            { caption: text_caption }
                           else
                             { renderer: :textarea,
                               rows: 12,
                               placeholder: "Paste #{text_area_caption} here",
-                              caption: text_area_caption,
-                              hide_on_load: @rules[:bulk_production_run_update] ? true : false }
+                              caption: text_area_caption }
                           end,
         production_run_id: { renderer: :integer,
                              required: @rules[:tip_bins],

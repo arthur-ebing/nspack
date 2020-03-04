@@ -195,7 +195,7 @@ module ProductionApp
       return validation_failed_response(res) unless res.messages.empty?
 
       make_changes = make_changes?(reworks_run_type)
-      attrs = res.to_h.merge(user: @user.user_name, make_changes: make_changes, pallets_affected: nil, pallet_sequence_id: nil)
+      attrs = res.to_h.merge(user: @user.user_name, make_changes: make_changes, pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil)
       return success_response('ok', attrs.merge(display_page: display_page(reworks_run_type))) if make_changes
 
       return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
@@ -225,7 +225,7 @@ module ProductionApp
           AppConst::RUN_TYPE_UNSCRAP_BIN
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
-        validate_production_runs(params)
+        validate_production_runs(reworks_run_type, params)
       else
         validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
       end
@@ -235,8 +235,8 @@ module ProductionApp
       case reworks_run_type
       when AppConst::RUN_TYPE_WEIGH_RMT_BINS
         'edit_rmt_bin_gross_weight'
-      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT # ,
-        # AppConst::RUN_TYPE_BATCH_PALLET_EDIT
+      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
+         AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         'edit_pallet'
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
         'edit_bulk_production_run'
@@ -348,6 +348,7 @@ module ProductionApp
         pallets_selected: pallet_sequence_pallet_number(sequence_id),
         pallets_affected: nil,
         pallet_sequence_id: sequence_id,
+        affected_sequences: nil,
         make_changes: true
       }
     end
@@ -435,26 +436,51 @@ module ProductionApp
       standard_pack_code_id
     end
 
-    def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res)  # rubocop:disable Metrics/AbcSize
+    def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      batch_update = batch_pallet_numbers.nil_or_empty? ? false : true
+
       attrs = res.to_h
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
+      before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
       before_descriptions_state = sequence_setup_data(sequence_id)
+      sequences = batch_update ? affected_pallet_sequences(pallet_number_sequences(batch_pallet_numbers), before_attrs) : sequence_id
+      affected_pallets = affected_pallet_numbers(sequences, before_attrs)
+
+      reworks_run_attrs = {
+        user: @user.user_name,
+        reworks_run_type_id: reworks_run_type_id,
+        pallets_selected: batch_update ? batch_pallet_numbers : pallet_sequence_pallet_number(sequences),
+        pallets_affected: affected_pallets,
+        pallet_sequence_id: batch_update ? nil : sequences,
+        affected_sequences: batch_update ? Array(sequences) : nil,
+        make_changes: true
+      }
+      msg = ''
       repo.transaction do
-        reworks_run_attrs = reworks_run_attrs(sequence_id, reworks_run_type_id)
-        reworks_run_attrs[:pallets_affected] = affected_pallet_numbers(sequence_id, attrs)
-        repo.update_pallet_sequence(sequence_id, attrs)
+        batch_update ? repo.existing_records_batch_update(affected_pallets, sequences, attrs) : repo.update_pallet_sequence(sequences, attrs)
         change_descriptions = { before: before_descriptions_state.sort.to_h, after: sequence_setup_data(sequence_id).sort.to_h }
         rw_res = create_reworks_run_record(reworks_run_attrs,
-                                           AppConst::REWORKS_ACTION_SINGLE_EDIT,
-                                           before: sequence_setup_attrs(sequence_id).sort.to_h, after: attrs.sort.to_h, change_descriptions: change_descriptions)
+                                           batch_update ? AppConst::REWORKS_ACTION_BATCH_EDIT : AppConst::REWORKS_ACTION_SINGLE_EDIT,
+                                           before: before_attrs, after: attrs.sort.to_h, change_descriptions: change_descriptions)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        pallet_id = pallet_sequence(sequence_id)[:pallet_id]
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
+        if batch_update
+          msg = 'Batch update was successful'
+          sequences.each do |id|
+            sequence = pallet_sequence(id)
+            log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], sequence[:pallet_id], id, AppConst::REWORKS_ACTION_BATCH_EDIT)
+          end
+        else
+          msg = 'Pallet Sequence updated successfully'
+          pallet_id = pallet_sequence(sequence_id)[:pallet_id]
+          log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
+        end
       end
-      success_response('Pallet Sequence updated successfully', pallet_number: pallet_sequence_pallet_number(sequence_id).first)
+      instance = { pallet_number: pallet_sequence_pallet_number(sequence_id).first,
+                   batch_update: batch_update }
+      success_response("#{msg}.", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -592,7 +618,7 @@ module ProductionApp
       repo.transaction do
         repo.update_pallet_gross_weight(instance[:id], attrs, same_standard_pack)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: Array(pallet_number),
-                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: true }
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: true }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_SET_GROSS_WEIGHT,
                                            before: before_state, after: after_state, change_descriptions: change_descriptions)
@@ -624,7 +650,7 @@ module ProductionApp
       repo.transaction do
         repo.update_pallet(instance[:id], attrs)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: reworks_run_type_id, pallets_selected: Array(pallet_number),
-                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: true }
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: true }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_UPDATE_PALLET_DETAILS,
                                            before: before_attrs, after: attrs, change_descriptions: change_descriptions)
@@ -644,7 +670,7 @@ module ProductionApp
       repo.transaction do
         rw_res = ProductionApp::ManuallyTipBins.call(attrs)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
-                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: false }
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
                                            before: manually_tip_bin_before_state(attrs[:pallets_selected].first).sort.to_h, after: manually_tip_bin_after_state(attrs[:pallets_selected].first, attrs[:production_run_id]).sort.to_h)
@@ -694,7 +720,7 @@ module ProductionApp
 
         repo.update_rmt_bin(rmt_bin_id, weighed_manually: true)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: Array(attrs[:bin_number]),
-                              pallets_affected: nil, pallet_sequence_id: nil, make_changes: false }
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
                                            before: before_state, after: manually_weigh_rmt_bin_state(rmt_bin_id))
@@ -782,13 +808,13 @@ module ProductionApp
       cultivar_and_farm ? repo.find_to_farm_orchards(cultivar_and_farm) : []
     end
 
-    # def edit_representative_pallet_sequence(res)
-    #   attrs = res.to_h
-    #
-    #   success_response('ok', attrs)
-    # rescue Crossbeams::InfoError => e
-    #   failed_response(e.message)
-    # end
+    def edit_representative_pallet_sequence(res)
+      attrs = res.to_h
+
+      success_response('ok', attrs)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
 
     private
 
@@ -862,8 +888,12 @@ module ProductionApp
       repo.sequence_setup_data(id)
     end
 
-    def pallet_number_sequences(pallet_number)
-      repo.find_sequence_ids_from_pallet_number(pallet_number)
+    def pallet_number_sequences(pallet_numbers)
+      repo.find_sequence_ids_from_pallet_number(pallet_numbers)
+    end
+
+    def affected_pallet_sequences(pallet_number, attrs)
+      repo.affected_pallet_sequences(pallet_number, attrs)
     end
 
     # def reworks_run_pallet_print_data(sequence_id)
@@ -924,7 +954,7 @@ module ProductionApp
       end
     end
 
-    def validate_pallet_numbers(reworks_run_type, pallet_numbers)  # rubocop:disable Metrics/AbcSize
+    def validate_pallet_numbers(reworks_run_type, pallet_numbers, production_run_id = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       pallet_numbers = pallet_numbers.split(/\n|,/).map(&:strip).reject(&:empty?)
       pallet_numbers = pallet_numbers.map { |x| x.gsub(/['"]/, '') }
 
@@ -944,6 +974,11 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_pallets.join(', ')} already scrapped"] }, pallets_selected: pallet_numbers) unless scrapped_pallets.nil_or_empty?
       end
 
+      if AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type
+        production_run_pallets = repo.production_run_pallets?(pallet_numbers, production_run_id)
+        extra_pallets = (pallet_numbers - production_run_pallets)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{extra_pallets.join(', ')} are not from production run #{production_run_id}"] }, pallets_selected: pallet_numbers) unless extra_pallets.nil_or_empty?
+      end
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
@@ -980,9 +1015,10 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
     end
 
-    def validate_production_runs(params)  # rubocop:disable Metrics/AbcSize
+    def validate_production_runs(reworks_run_type, params)  # rubocop:disable Metrics/AbcSize
       from_production_run_id = params[:from_production_run_id]
       to_production_run_id = params[:to_production_run_id]
+      pallets_selected = params[:pallets_selected]
 
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{to_production_run_id} should be different"] }, to_production_run_id: to_production_run_id) unless from_production_run_id != to_production_run_id
 
@@ -995,7 +1031,10 @@ module ProductionApp
       same_cultivar_group = repo.same_cultivar_group?(from_production_run_id, to_production_run_id)
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different cultivar groups"] }, to_production_run_id: to_production_run_id) unless same_cultivar_group
 
-      attrs = { from_production_run_id: from_production_run_id, to_production_run_id: to_production_run_id, pallet_numbers: nil }
+      res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected], from_production_run_id)
+      return OpenStruct.new(success: false,  messages: res.messages, pallets_selected: pallets_selected.split(',')) unless res.success
+
+      attrs = { from_production_run_id: from_production_run_id, to_production_run_id: to_production_run_id, pallet_numbers: res.instance[:pallet_numbers] }
       OpenStruct.new(success: true, instance:  attrs)
     end
 

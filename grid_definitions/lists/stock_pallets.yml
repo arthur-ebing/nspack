@@ -140,7 +140,7 @@
     :conditions: pallets_available_to_reworks
   :reworks_bulk_update_pallets:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_bulk_production_run_update"
-    :preselect: "SELECT id FROM vw_pallet_sequence_flat WHERE production_run_id = $:production_run_id$"
+    :preselect: "SELECT id FROM pallet_sequences WHERE production_run_id = $:production_run_id$ AND pallet_id IS NOT NULL AND pallet_number IN $:pallets_selected$"
     :section_caption: "SELECT 'Select pallets for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
     :multiselect_save_method: remote
     :can_be_cleared: false

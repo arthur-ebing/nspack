@@ -48,6 +48,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:pallets_scrapped, :array).maybe(:array?) { each(:str?) }
     optional(:pallets_unscrapped, :array).maybe(:array?) { each(:str?) }
     optional(:pallet_sequence_id, :integer).maybe(:int?)
+    optional(:affected_sequences, :array).maybe(:array?) { each(:int?) }
     optional(:make_changes, :bool).maybe(:bool?)
   end
 
