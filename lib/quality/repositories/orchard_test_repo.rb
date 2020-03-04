@@ -131,5 +131,9 @@ module QualityApp
       ds = ds.exclude(phyto_data: params[:phytoData])
       ds.update(phyto_data: params[:phytoData])
     end
+
+    def update_pallet_sequences(args, attrs)
+      DB[:pallet_sequences].where(args).update(attrs)
+    end
   end
 end

@@ -3,11 +3,11 @@
 module QualityApp
   class PhytCleanRequests < BaseService
     include PhytCleanCalls
-    attr_accessor :responce, :hash, :params
+    attr_accessor :responce, :api_result, :params
 
     def initialize
       @responce = []
-      @hash = {}
+      @api_result = {}
       @params = {}
     end
 
@@ -41,52 +41,45 @@ module QualityApp
     end
 
     def parse_response
-      pucs_list = repo.get_values(:pucs, :puc_code)
+      pucs_list = repo.select_values(:pucs, :puc_code)
       responce.each do |hash|
         next unless pucs_list.include? hash['puc']
 
-        @hash = UtilityFunctions.symbolize_keys(hash)
+        @api_result = UtilityFunctions.symbolize_keys(hash)
         parse_record
       end
     end
 
     def parse_record # rubocop:disable Metrics/AbcSize
-      puc_id = repo.get_id(:pucs, puc_code: hash[:puc])
-      orchard_id = repo.get_id(:orchards, orchard_code: hash[:orch])
-      cultivar_id = repo.get_id(:cultivars, cultivar_code: hash[:cultCode])
-      season = MasterfilesApp::CultivarRepo.new.find_cultivar_season(cultivar_id)
-
+      puc_id = repo.get_with_args(:pucs, :id, puc_code: api_result[:puc])
+      orchard_id = repo.get_with_args(:orchards, :id, orchard_code: api_result[:orch])
+      cultivar_id = repo.get_with_args(:cultivars, :id, cultivar_code: api_result[:cultCode])
       @params = { puc_id: puc_id,
-                  orchard_id: orchard_id,
-                  cultivar_id: cultivar_id,
-                  applicable_from: season&.start_date,
-                  applicable_to: season&.end_date }
+                  orchard_id: orchard_id }
+      return unless params.all? { |_, v| !v.nil? }
 
-      repo.update_pallet_sequences_phyto_data(hash.merge(params))
+      @params[:cultivar_id] = cultivar_id
+      repo.update_pallet_sequences_phyto_data(api_result.merge(params))
       check_orchard_test_types
     end
 
-    def check_orchard_test_types
-      orchard_test_type_ids = repo.get_values(:orchard_test_types, :id,  api_name: AppConst::PHYT_CLEAN)
-      orchard_test_type_ids.each do |id|
-        result_attribute = repo.get(:orchard_test_type, id, :result_attributes).to_sym
+    def check_orchard_test_types # rubocop:disable Metrics/AbcSize
+      orchard_test_types = repo.select_values(:orchard_test_types, :id,  api_name: AppConst::PHYT_CLEAN)
+      orchard_test_types.each do |id|
+        params[:orchard_test_type_id] = id
+        args = params.select { |key, _| %i[orchard_test_type_id puc_id orchard_id cultivar_id].include?(key) }
 
-        args = params.select { |key, _| %i[puc_id orchard_id cultivar_id].include?(key) }
-        args[:orchard_test_type_id] = id
+        orchard_test_result_id = repo.get_with_args(:orchard_test_results, :id, args) || repo.create_orchard_test_result(orchard_test_type_id: id)
+        orchard_test_result = repo.find_orchard_test_result_flat(orchard_test_result_id)
+        next if orchard_test_result.freeze_result
 
-        orchard_test_result_id = repo.get_id(:orchard_test_results, args) || repo.create_orchard_test_result(orchard_test_type_id: id)
-        orchard_test_result = repo.find_orchard_test_result_flat(orchard_test_result_id).to_h
-
-        params[:passed] = AppConst::PHYT_CLEAN_PASSED.include? hash[result_attribute]
-        current = orchard_test_result.select { |key, _| params.keys.include?(key) }
-        next if params == current
-
-        params[:api_result] = hash
-        repo.update_orchard_test_result(orchard_test_result_id, params)
+        params[:api_result] = api_result
+        QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, params)
       end
     end
   end
 end
+
 # {
 #   'puc': 'C2102',
 #   'orch': '61',

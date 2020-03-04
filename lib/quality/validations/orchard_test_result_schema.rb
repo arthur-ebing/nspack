@@ -21,10 +21,9 @@ module QualityApp
     required(:passed, :bool).filled(:bool?)
     required(:classification_only, :bool).maybe(:bool?)
     required(:freeze_result, :bool).maybe(:bool?)
-    required(:api_result, :hash).maybe(:hash?)
     required(:classifications, :string).maybe(:str?)
     required(:cultivar_id, :integer).maybe(:int?)
-    required(:applicable_from, :time).filled(:time?)
-    required(:applicable_to, :time).filled(:time?)
+    optional(:applicable_from, %i[nil time]).maybe(:time?)
+    optional(:applicable_to, %i[nil time]).maybe(:time?)
   end
 end

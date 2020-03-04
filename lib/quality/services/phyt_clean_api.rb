@@ -7,8 +7,6 @@ module QualityApp
     class PhytCleanHttpResponder
       include Crossbeams::Responses
       def format_response(response, _context)
-        p response
-        p response&.body
         if response.code == '200'
           success_response(response.code, response)
         else
