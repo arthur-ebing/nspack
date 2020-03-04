@@ -11,7 +11,7 @@ module Production
           notice = if rules[:no_changes_made]
                      'No changes were made'
                    else
-                     'The changes below were made to pallets affected list:'
+                     'The changes below will be made to affected pallets list:'
                    end
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object

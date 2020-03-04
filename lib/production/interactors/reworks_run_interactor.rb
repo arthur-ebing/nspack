@@ -152,7 +152,7 @@ module ProductionApp
       res = resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
       return validation_failed_response(res) unless res.success
 
-      attrs[:pallets_selected] = Array(res.instance[:pallets_selected])
+      attrs[:pallets_selected] = res.instance[:pallets_selected].split("\n")
       sequence_ids = pallet_number_sequences(attrs[:pallets_selected])
       before_attrs = production_run_attrs(attrs[:from_production_run_id], production_run(attrs[:from_production_run_id]))
       after_attrs = production_run_attrs(attrs[:to_production_run_id], production_run(attrs[:to_production_run_id]))
@@ -173,7 +173,7 @@ module ProductionApp
                                      changes_made: changes_made)
         sequence_ids.each do |sequence_id|
           sequence = pallet_sequence(sequence_id)
-          log_reworks_runs_status_and_transaction(attrs[:reworks_run_type_id], sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE)
+          log_reworks_runs_status_and_transaction(id, sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE)
         end
       end
       success_response('Bulk production run update was successful', reworks_run_id: id)
@@ -438,15 +438,16 @@ module ProductionApp
 
     def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       batch_update = batch_pallet_numbers.nil_or_empty? ? false : true
+      before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
 
       attrs = res.to_h
+      changed_attrs = attrs.reject { |k, v|  before_attrs.key?(k) && before_attrs[k] == v }
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
-      before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
       before_descriptions_state = sequence_setup_data(sequence_id)
-      sequences = batch_update ? affected_pallet_sequences(pallet_number_sequences(batch_pallet_numbers), before_attrs) : sequence_id
-      affected_pallets = affected_pallet_numbers(sequences, before_attrs)
+      sequences = batch_update ? affected_pallet_sequences(pallet_number_sequences(batch_pallet_numbers), changed_attrs) : sequence_id
+      affected_pallets = affected_pallet_numbers(sequences, changed_attrs)
 
       reworks_run_attrs = {
         user: @user.user_name,
@@ -459,7 +460,7 @@ module ProductionApp
       }
       msg = ''
       repo.transaction do
-        batch_update ? repo.existing_records_batch_update(affected_pallets, sequences, attrs) : repo.update_pallet_sequence(sequences, attrs)
+        batch_update ? repo.existing_records_batch_update(affected_pallets, sequences, changed_attrs) : repo.update_pallet_sequence(sequences, changed_attrs)
         change_descriptions = { before: before_descriptions_state.sort.to_h, after: sequence_setup_data(sequence_id).sort.to_h }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            batch_update ? AppConst::REWORKS_ACTION_BATCH_EDIT : AppConst::REWORKS_ACTION_SINGLE_EDIT,
@@ -486,7 +487,7 @@ module ProductionApp
     end
 
     def reject_pallet_sequence_changes(sequence_id)
-      success_response('Changes to Pallet sequence has been discarded', pallet_number: pallet_sequence_pallet_number(sequence_id).first)
+      success_response('Changes to Pallet sequence have been discarded', pallet_number: pallet_sequence_pallet_number(sequence_id).first)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -528,34 +529,34 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def production_run_attrs(production_run_id, sequence)
+    def production_run_attrs(production_run_id, instance)
       { production_run_id: production_run_id,
-        packhouse_resource_id: sequence[:packhouse_resource_id],
-        production_line_id: sequence[:production_line_id] }.merge(farm_details_attrs(sequence))
+        packhouse_resource_id: instance[:packhouse_resource_id],
+        production_line_id: instance[:production_line_id] }.merge(farm_details_attrs(instance))
     end
 
-    def farm_details_attrs(sequence)
-      { farm_id: sequence[:farm_id],
-        puc_id: sequence[:puc_id],
-        orchard_id: sequence[:orchard_id],
-        cultivar_group_id: sequence[:cultivar_group_id],
-        cultivar_id: sequence[:cultivar_id],
-        season_id: sequence[:season_id] }
+    def farm_details_attrs(instance)
+      { farm_id: instance[:farm_id],
+        puc_id: instance[:puc_id],
+        orchard_id: instance[:orchard_id],
+        cultivar_group_id: instance[:cultivar_group_id],
+        cultivar_id: instance[:cultivar_id],
+        season_id: instance[:season_id] }
     end
 
-    def production_run_description_changes(production_run_id, sequence_data)
+    def production_run_description_changes(production_run_id, instance_data)
       { production_run_id: production_run_id,
-        packhouse: sequence_data[:packhouse],
-        line: sequence_data[:line] }.merge(farm_detail_description_changes(sequence_data))
+        packhouse: instance_data[:packhouse],
+        line: instance_data[:line] }.merge(farm_detail_description_changes(instance_data))
     end
 
-    def farm_detail_description_changes(sequence_data)
-      { farm: sequence_data[:farm],
-        puc: sequence_data[:puc],
-        orchard: sequence_data[:orchard],
-        cultivar_group: sequence_data[:cultivar_group],
-        cultivar: sequence_data[:cultivar],
-        season: sequence_data[:season] }
+    def farm_detail_description_changes(instance_data)
+      { farm: instance_data[:farm],
+        puc: instance_data[:puc],
+        orchard: instance_data[:orchard],
+        cultivar_group: instance_data[:cultivar_group],
+        cultivar: instance_data[:cultivar],
+        season: instance_data[:season] }
     end
 
     def update_reworks_farm_details(params)  # rubocop:disable Metrics/AbcSize

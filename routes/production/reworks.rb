@@ -415,8 +415,13 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'reject_pallet_sequence_changes' do
         res = interactor.reject_pallet_sequence_changes(id)
+        batch_update = ProductionApp::ReworksRepo.new.find_reworks_run_type(reworks_run_type_id)[:run_type] == AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         flash[:notice] = 'Changes to Pallet sequence has be discarded'
-        r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+        if batch_update
+          r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{reworks_run_type_id}"
+        else
+          r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+        end
       end
 
       r.on 'edit_reworks_production_run' do # Edit pallet sequence
