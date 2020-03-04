@@ -1,21 +1,17 @@
 ---
 :caption: Orchard Details
-:sql: SELECT orchards.id, orchards.farm_id,orchards.puc_id,orchards.orchard_code,orchards.description,orchards.cultivar_ids,
-      orchards.active,orchards.created_at,orchards.updated_at,
-      farms.farm_code,farms.description AS farm_description,pucs.puc_code,pucs.gap_code,farm_groups.farm_group_code,
-      fn_party_role_name(farms.owner_party_role_id) AS owner_party_role, production_regions.production_region_code AS pdn_region_production_region_code,
-      (SELECT array_agg(orchard_cultivars.cultivar_name) as oc
-      FROM (SELECT c.cultivar_name
-      FROM cultivars c
-      JOIN orchards o ON c.id = ANY (o.cultivar_ids)
-      WHERE o.id = orchards.id
-      ORDER BY c.cultivar_name) AS orchard_cultivars) AS cultivar_names
-      FROM orchards
-      JOIN farms ON farms.id = orchards.farm_id
-      LEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id
-      JOIN production_regions ON production_regions.id = farms.pdn_region_id
-      JOIN pucs ON pucs.id = orchards.puc_id
-      ORDER BY farms.farm_code, orchards.orchard_code
+:sql: "SELECT\r\n    orchards.id,\r\n    orchards.farm_id,\r\n    orchards.puc_id,\r\n
+  \   orchards.orchard_code,\r\n    orchards.description,\r\n    array_agg(cultivars.cultivar_name)
+  AS cultivar_names,\r\n    orchards.cultivar_ids,\r\n    farms.farm_code,\r\n    farms.description
+  AS farm_description,\r\n    pucs.puc_code,\r\n    pucs.gap_code,\r\n    farm_groups.farm_group_code,\r\n
+  \   fn_party_role_name (farms.owner_party_role_id) AS owner_party_role,\r\n    production_regions.production_region_code
+  AS pdn_region_production_region_code,\r\n    array_agg(orchards.otmc_results::varchar)
+  AS otmc_results,\r\n    orchards.active,\r\n    orchards.created_at,\r\n    orchards.updated_at\r\nFROM
+  orchards\r\n    JOIN farms ON farms.id = orchards.farm_id\r\n    JOIN pucs ON pucs.id
+  = orchards.puc_id\r\n    LEFT JOIN cultivars ON cultivars.id = ANY (orchards.cultivar_ids)\r\n
+  \   LEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id\r\n    JOIN production_regions
+  ON production_regions.id = farms.pdn_region_id\r\nGROUP BY\r\n    orchards.id,\r\n
+  \   farms.id,\r\n    pucs.id,\r\n    farm_groups.id,\r\n    production_regions.id\r\n\r\n\r\n\r\n\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -23,7 +19,7 @@
 :columns:
   id:
     :name: id
-    :sequence_no: 6
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: orchards.id
     :data_type: :integer
@@ -39,7 +35,7 @@
     :group_max: false
   farm_id:
     :name: farm_id
-    :sequence_no: 7
+    :sequence_no: 2
     :caption: Farm
     :namespaced_name: orchards.farm_id
     :data_type: :integer
@@ -55,7 +51,7 @@
     :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 8
+    :sequence_no: 3
     :caption: Puc
     :namespaced_name: orchards.puc_id
     :data_type: 
@@ -71,7 +67,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 2
+    :sequence_no: 4
     :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -101,25 +97,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cultivar_ids:
-    :name: cultivar_ids
-    :sequence_no: 9
-    :caption: Cultivars
-    :namespaced_name: orchards.cultivar_ids
-    :data_type: :integer_array
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   cultivar_names:
     :name: cultivar_names
-    :sequence_no: 3
+    :sequence_no: 6
     :caption: Cultivar names
     :namespaced_name: 
     :data_type: :string
@@ -133,44 +113,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 10
-    :caption: Active
-    :namespaced_name: orchards.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 11
-    :caption: Created at
-    :namespaced_name: orchards.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 12
-    :caption: Updated at
-    :namespaced_name: orchards.updated_at
-    :data_type: :datetime
+  cultivar_ids:
+    :name: cultivar_ids
+    :sequence_no: 7
+    :caption: Cultivars
+    :namespaced_name: orchards.cultivar_ids
+    :data_type: :integer_array
     :width: 
     :format: 
     :hide: true
@@ -183,7 +131,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 1
+    :sequence_no: 8
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -199,7 +147,7 @@
     :group_max: false
   farm_description:
     :name: farm_description
-    :sequence_no: 13
+    :sequence_no: 9
     :caption: Farm description
     :namespaced_name: farms.description
     :data_type: :string
@@ -215,7 +163,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 4
+    :sequence_no: 10
     :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -231,7 +179,7 @@
     :group_max: false
   gap_code:
     :name: gap_code
-    :sequence_no: 14
+    :sequence_no: 11
     :caption: Gap code
     :namespaced_name: pucs.gap_code
     :data_type: :string
@@ -247,7 +195,7 @@
     :group_max: false
   farm_group_code:
     :name: farm_group_code
-    :sequence_no: 15
+    :sequence_no: 12
     :caption: Farm group code
     :namespaced_name: farm_groups.farm_group_code
     :data_type: :string
@@ -263,7 +211,7 @@
     :group_max: false
   owner_party_role:
     :name: owner_party_role
-    :sequence_no: 16
+    :sequence_no: 13
     :caption: Farm owner
     :namespaced_name: 
     :data_type: :string
@@ -279,13 +227,77 @@
     :group_max: false
   pdn_region_production_region_code:
     :name: pdn_region_production_region_code
-    :sequence_no: 17
+    :sequence_no: 14
     :caption: Prod region code
     :namespaced_name: production_regions.production_region_code
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  otmc_results:
+    :name: otmc_results
+    :sequence_no: 15
+    :caption: Otmc results
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 16
+    :caption: Active
+    :namespaced_name: orchards.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 17
+    :caption: Created at
+    :namespaced_name: orchards.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 18
+    :caption: Updated at
+    :namespaced_name: orchards.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
