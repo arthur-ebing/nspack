@@ -2,6 +2,19 @@
 
 module LabelPrintingApp
   module LabelContent
+    # Built-in functions - can't be private!
+    def iso_day
+      Date.today.strftime('%j')
+    end
+
+    def iso_week
+      Date.today.strftime('%V')
+    end
+
+    def current_date
+      Date.today.strftime('%Y-%m-%d')
+    end
+
     private
 
     # Take a field and format it for barcode printing.
@@ -50,7 +63,15 @@ module LabelPrintingApp
     end
 
     def make_function(resolver)
-      "Functions not yet implemented - #{resolver}"
+      args = resolver.split(',')
+      func = args.shift
+      raise Crossbeams::FrameworkError, "Label print function '#{func}' is not implemented" unless respond_to?(func.to_sym)
+
+      if args.empty?
+        send(func.to_sym)
+      else
+        send(func.to_sym, *args)
+      end
     end
 
     def make_composite(resolver)

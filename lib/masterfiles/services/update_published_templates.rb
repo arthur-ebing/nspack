@@ -37,9 +37,8 @@ module MasterfilesApp
     end
 
     def add_new_label_template(label_def) # rubocop:disable Metrics/AbcSize
-      # app_names = label_def[:variables].first.values.first[:applications].first
       app_names = label_def[:variables].first&.values
-      app_names = app_names.first[:appplications].first unless app_names.nil?
+      app_names = app_names.first[:applications].first unless app_names.nil?
       id = repo.create_label_template(
         label_template_name: label_def[:label_name],
         description: label_def[:label_name],

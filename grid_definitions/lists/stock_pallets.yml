@@ -27,6 +27,7 @@
       - scrapped
       - failed_inspections
       - failed_verifications
+      - reworks_pallets
 :captions:
   :conditions:
     :active: Active Pallets
@@ -111,10 +112,7 @@
   :pallets_available_to_reworks:
     - :col: in_stock
       :op: =
-      :val: false
-    - :col: govt_inspection_passed
-      :op: =
-      :val: false
+      :val: true
   :pallets_available_for_bulk_update:
     - :col: in_stock
       :op: =

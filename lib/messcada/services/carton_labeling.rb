@@ -20,8 +20,27 @@ module MesscadaApp
 
     private
 
-    def print_command
-      setup_data[:print_command].gsub('$:carton_label_id$', carton_label_id.to_s).gsub('$:pick_ref$', pick_ref.to_s).gsub('$:pallet_number$', pallet_number.to_s)
+    # Built-in functions
+    def iso_day
+      Date.today.strftime('%j')
+    end
+
+    def iso_week
+      Date.today.strftime('%V')
+    end
+
+    def current_date
+      Date.today.strftime('%Y-%m-%d')
+    end
+
+    def print_command # rubocop:disable Metrics/AbcSize
+      setup_data[:print_command]
+        .gsub('$:carton_label_id$', carton_label_id.to_s)
+        .gsub('$:pick_ref$', pick_ref.to_s)
+        .gsub('$:pallet_number$', pallet_number.to_s)
+        .gsub('$:FNC:iso_day$', iso_day)
+        .gsub('$:FNC:iso_week$', iso_week)
+        .gsub('$:FNC:current_date$', current_date)
     end
 
     def carton_labeling  # rubocop:disable Metrics/AbcSize
