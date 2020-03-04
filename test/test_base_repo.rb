@@ -140,10 +140,29 @@ class TestBaseRepo < MiniTestWithHooks
   end
 
   def test_select_values
-    test_query = 'SELECT * FROM users'
-    x = BaseRepo.new.select_values(test_query)
-    y = DB[test_query].select_map
-    assert_equal y, x
+    actual = BaseRepo.new.select_values(:users, :id)
+    expect = DB[:users].select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values(:users, :id, id: [1, 2])
+    expect = DB[:users].where(id: [1, 2]).select_map(:id)
+    assert_equal expect, actual
+  end
+
+  def test_select_values_in_order
+    assert_raises { BaseRepo.new.select_values_in_order(:users, :id) }
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id)
+    expect = DB[:users].order(:id).select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id, where: { id: [1, 2] })
+    expect = DB[:users].where(id: [1, 2]).order(:id).select_map(:id)
+    assert_equal expect, actual
+
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id, where: { id: [1, 2] }, descending: true)
+    expect = DB[:users].where(id: [1, 2]).reverse(:id).select_map(:id)
+    assert_equal expect, actual
   end
 
   def test_hash_for_jsonb_col

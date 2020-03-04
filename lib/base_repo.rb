@@ -242,8 +242,38 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #
   # @param query [String] the SQL query to run.
   # @return [Array] the values from the first column of each row.
-  def select_values(query)
-    DB[query].select_map
+  # def select_values(query)
+  #   DB[query].select_map
+  # end
+
+  # Get an array of ordered values from a dataset.
+  # Optionally filtered by a WHERE clause.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param columns [Symbol,Array] the column (or array of columns) to query.
+  # @param where [Hash] the where-clause conditions. Optional.
+  # @param order [Symbol] the order by clause.
+  # @param descending [Boolean] return in decending order. Default is false.
+  # @return [Array] the values from the column(s) of each row.
+  def select_values_in_order(table_name, columns, where: nil, order:, descending: false)
+    ds = DB[table_name]
+    ds = ds.where(where) if where
+    ds = ds.order(order) if order && !descending
+    ds = ds.reverse(order) if order && descending
+    ds.select_map(columns)
+  end
+
+  # Get an array of values from a dataset.
+  # Optionally filtered by a WHERE clause.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param columns [Symbol,Array] the column (or array of columns) to query.
+  # @param args [Hash] the where-clause conditions. Optional.
+  # @return [Array] the values from the column(s) of each row.
+  def select_values(table_name, columns, args = nil)
+    ds = DB[table_name]
+    ds = ds.where(args) if args
+    ds.select_map(columns)
   end
 
   # Get a list of values from the +master_lists+ table for a particular +list_type+.
