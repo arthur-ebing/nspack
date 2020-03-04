@@ -12,17 +12,6 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
-      r.on 'phyt_clean_request' do
-        res = interactor.phyt_clean_request
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = "#{res.message} #{res.errors}"
-        end
-        r.redirect '/list/orchard_test_results'
-        res
-      end
-
       r.on 'edit' do   # EDIT
         check_auth!('test results', 'edit')
         interactor.assert_permission!(:edit, id)
@@ -66,6 +55,17 @@ class Nspack < Roda
       @repo = QualityApp::OrchardTestRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
+
+      r.on 'phyt_clean_request' do
+        res = interactor.phyt_clean_request
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect '/list/orchard_test_results'
+        res
+      end
 
       r.on 'puc_changed' do
         if params[:changed_value].nil_or_empty?
