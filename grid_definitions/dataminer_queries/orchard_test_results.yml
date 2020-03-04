@@ -7,13 +7,11 @@
   \   orchards.orchard_code,\r\n    cultivars.cultivar_name AS cultivar_code,\r\n
   \   orchard_test_results.description,\r\n    orchard_test_results.status_description,\r\n
   \   orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
-  \   orchard_test_results.freeze_result,\r\n    orchard_test_results.api_result,\r\n
-  \   orchard_test_results.classifications,\r\n    orchard_test_results.applicable_from,\r\n
-  \   orchard_test_results.applicable_to,\r\n    orchard_test_results.active,\r\n
-  \   orchard_test_results.created_at,\r\n    orchard_test_results.updated_at,\r\n
-  \   orchard_set_results.description AS orchard_set_results_description,\r\n    fn_current_status
-  ('orchard_test_results', orchard_test_results.id) AS status\r\nFROM\r\n    orchard_test_results\r\n
-  \       LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
+  \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classifications,\r\n
+  \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
+  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at,\r\n
+  \   orchard_set_results.description AS orchard_set_results_description\r\n\r\nFROM\r\n
+  \   orchard_test_results\r\n        LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
   \       LEFT JOIN orchard_set_results ON orchard_set_results.id = orchard_test_results.orchard_set_result_id\r\n
   \       LEFT JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id\r\n
   \       LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id\r\n        LEFT
@@ -263,25 +261,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  api_result:
-    :name: api_result
-    :sequence_no: 16
-    :caption: Api result
-    :namespaced_name: orchard_test_results.api_result
-    :data_type: :jsonb
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   classifications:
     :name: classifications
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Classifications
     :namespaced_name: orchard_test_results.classifications
     :data_type: :hstore
@@ -297,7 +279,7 @@
     :group_max: false
   applicable_from:
     :name: applicable_from
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Applicable from
     :namespaced_name: orchard_test_results.applicable_from
     :data_type: :datetime
@@ -313,7 +295,7 @@
     :group_max: false
   applicable_to:
     :name: applicable_to
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Applicable to
     :namespaced_name: orchard_test_results.applicable_to
     :data_type: :datetime
@@ -329,7 +311,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Active
     :namespaced_name: orchard_test_results.active
     :data_type: :boolean
@@ -345,7 +327,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Created at
     :namespaced_name: orchard_test_results.created_at
     :data_type: :datetime
@@ -361,26 +343,10 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 22
+    :sequence_no: 21
     :caption: Updated at
     :namespaced_name: orchard_test_results.updated_at
     :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  orchard_set_results_description:
-    :name: orchard_set_results_description
-    :sequence_no: 23
-    :caption: Orchard set results description
-    :namespaced_name: orchard_set_results.description
-    :data_type: :string
     :width: 
     :format: 
     :hide: false
@@ -391,11 +357,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status:
-    :name: status
-    :sequence_no: 24
-    :caption: Status
-    :namespaced_name: 
+  orchard_set_results_description:
+    :name: orchard_set_results_description
+    :sequence_no: 22
+    :caption: Orchard set results description
+    :namespaced_name: orchard_set_results.description
     :data_type: :string
     :width: 
     :format: 

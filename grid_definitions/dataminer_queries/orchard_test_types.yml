@@ -1,22 +1,21 @@
 ---
 :caption: Orchard Test Types
 :sql: "SELECT\r\n    orchard_test_types.id,\r\n    orchard_test_types.test_type_code,\r\n
-  \   orchard_test_types.description,\r\n    orchard_test_types.applies_to_all_markets,\r\n
+  \   orchard_test_types.description,\r\n    orchard_test_types.result_type,\r\n    orchard_test_types.applies_to_all_markets,\r\n
   \   orchard_test_types.applies_to_all_cultivars,\r\n    orchard_test_types.applies_to_orchard,\r\n
   \   orchard_test_types.applies_to_orchard_set,\r\n    orchard_test_types.allow_result_capturing,\r\n
   \   orchard_test_types.pallet_level_result,\r\n    orchard_test_types.api_name,\r\n
-  \   orchard_test_types.result_type,\r\n    orchard_test_types.result_attributes,\r\n
-  \   orchard_test_types.applicable_tm_group_ids,\r\n    orchard_test_types.applicable_cultivar_ids,\r\n
-  \   orchard_test_types.applicable_commodity_group_ids,\r\n    orchard_test_types.active,\r\n
-  \   orchard_test_types.created_at,\r\n    orchard_test_types.updated_at,\r\n    fn_current_status
-  ('orchard_test_types', orchard_test_types.id) AS status,\r\n    string_agg(DISTINCT
-  target_market_groups.target_market_group_name, ', ') AS applicable_tm_groups,\r\n
-  \   string_agg(DISTINCT cultivars.cultivar_name, ', ') AS applicable_cultivars,\r\n
-  \   string_agg(DISTINCT commodity_groups.code, ', ') AS applicable_commodity_groups\r\nFROM\r\n
-  \   orchard_test_types\r\nLEFT JOIN target_market_groups ON target_market_groups.id
-  = ANY (orchard_test_types.applicable_tm_group_ids)\r\nLEFT JOIN cultivars ON cultivars.id
-  = ANY (orchard_test_types.applicable_cultivar_ids)\r\nLEFT JOIN commodity_groups
-  ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)\r\nGROUP
+  \   orchard_test_types.result_attribute,\r\n    orchard_test_types.applicable_tm_group_ids,\r\n
+  \   orchard_test_types.applicable_cultivar_ids,\r\n    orchard_test_types.applicable_commodity_group_ids,\r\n
+  \   orchard_test_types.active,\r\n    orchard_test_types.created_at,\r\n    orchard_test_types.updated_at,\r\n
+  \   fn_current_status ('orchard_test_types', orchard_test_types.id) AS status,\r\n
+  \   string_agg(DISTINCT target_market_groups.target_market_group_name, ', ') AS
+  applicable_tm_groups,\r\n    string_agg(DISTINCT cultivars.cultivar_name, ', ')
+  AS applicable_cultivars,\r\n    string_agg(DISTINCT commodity_groups.code, ', ')
+  AS applicable_commodity_groups\r\nFROM\r\n    orchard_test_types\r\nLEFT JOIN target_market_groups
+  ON target_market_groups.id = ANY (orchard_test_types.applicable_tm_group_ids)\r\nLEFT
+  JOIN cultivars ON cultivars.id = ANY (orchard_test_types.applicable_cultivar_ids)\r\nLEFT
+  JOIN commodity_groups ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)\r\nGROUP
   BY\r\n    orchard_test_types.id"
 :limit: 
 :offset: 
@@ -70,9 +69,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  result_type:
+    :name: result_type
+    :sequence_no: 4
+    :caption: Result type
+    :namespaced_name: orchard_test_types.result_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   applies_to_all_markets:
     :name: applies_to_all_markets
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Applies to all markets
     :namespaced_name: orchard_test_types.applies_to_all_markets
     :data_type: :boolean
@@ -88,7 +103,7 @@
     :group_max: false
   applies_to_all_cultivars:
     :name: applies_to_all_cultivars
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Applies to all cultivars
     :namespaced_name: orchard_test_types.applies_to_all_cultivars
     :data_type: :boolean
@@ -104,7 +119,7 @@
     :group_max: false
   applies_to_orchard:
     :name: applies_to_orchard
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Applies to orchard
     :namespaced_name: orchard_test_types.applies_to_orchard
     :data_type: :boolean
@@ -120,7 +135,7 @@
     :group_max: false
   applies_to_orchard_set:
     :name: applies_to_orchard_set
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Applies to orchard set
     :namespaced_name: orchard_test_types.applies_to_orchard_set
     :data_type: :boolean
@@ -136,7 +151,7 @@
     :group_max: false
   allow_result_capturing:
     :name: allow_result_capturing
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Allow result capturing
     :namespaced_name: orchard_test_types.allow_result_capturing
     :data_type: :boolean
@@ -152,7 +167,7 @@
     :group_max: false
   pallet_level_result:
     :name: pallet_level_result
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Pallet level result
     :namespaced_name: orchard_test_types.pallet_level_result
     :data_type: :boolean
@@ -168,7 +183,7 @@
     :group_max: false
   api_name:
     :name: api_name
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Api name
     :namespaced_name: orchard_test_types.api_name
     :data_type: :string
@@ -182,27 +197,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  result_type:
-    :name: result_type
-    :sequence_no: 11
-    :caption: Result type
-    :namespaced_name: orchard_test_types.result_type
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  result_attributes:
-    :name: result_attributes
+  result_attribute:
+    :name: result_attribute
     :sequence_no: 12
-    :caption: Result attributes
-    :namespaced_name: orchard_test_types.result_attributes
+    :caption: Result attribute
+    :namespaced_name: orchard_test_types.result_attribute
     :data_type: :string_array
     :width: 
     :format: 
