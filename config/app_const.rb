@@ -77,6 +77,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Constants for rmt bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'
+  RMT_BIN_MOVED = 'BIN_MOVED'
 
   # Constants for PM Types
   PM_TYPE_FRUIT_STICKER = 'fruit_sticker'

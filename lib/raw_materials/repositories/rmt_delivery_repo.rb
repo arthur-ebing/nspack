@@ -212,7 +212,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_stock(bin_number)
-      DB[:rmt_bins].where(id: bin_number, exit_ref: nil)
+      DB[:rmt_bins].where(id: bin_number, exit_ref: nil).first
     end
 
     def find_bin_label_data(bin_id)

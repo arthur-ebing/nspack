@@ -1,6 +1,6 @@
 ---
 :caption: Locations
-:sql: "SELECT locations.id, locations.primary_storage_type_id, locations.location_type_id,
+:sql: "SELECT locations.id, locations.primary_storage_type_id, locations.units_in_location, locations.location_type_id,
   locations.primary_assignment_id, \r\nlocations.location_long_code, locations.location_description,
   locations.active, locations.location_short_code, locations.print_code, locations.has_single_container,
   locations.virtual_location, \r\nlocations.can_be_moved,\r\nlocations.can_store_stock,\r\nlocations.consumption_area,
@@ -101,6 +101,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  units_in_location:
+    :name: units_in_location
+    :sequence_no: 5
+    :caption: Units In Location
+    :namespaced_name: locations.units_in_location
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

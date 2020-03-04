@@ -163,9 +163,24 @@ module RawMaterialsApp
     def validate_bin(bin_number)
       bin = find_rmt_bin_by_id_or_asset_number(bin_number)
       return failed_response("Scanned Bin:#{bin_number} is not in stock") unless bin
+      return failed_response("Scanned Bin:#{bin_number} has been tipped") if bin[:bin_tipped]
 
       success_response('Valid Bin Scanned',
                        bin)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def move_bin(bin_number, location_id, is_scanned_location)
+      location_id = FinishedGoodsApp::LoadRepo.new.get_location_id_by_barcode(location_id) unless is_scanned_location
+      return failed_response('Location does not exist') unless !location_id.nil_or_empty? && repo.exists?(:locations, id: location_id)
+
+      bin = repo.find_rmt_bin(bin_number)
+      return failed_response('Bin is already at this location') unless bin[:location_id] != location_id
+
+      repo.transaction do
+        FinishedGoodsApp::MoveStockService.new('BIN', bin_number, location_id, 'MOVE_BIN', nil).call
+      end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

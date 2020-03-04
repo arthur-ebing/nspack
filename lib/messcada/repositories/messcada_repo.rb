@@ -7,6 +7,18 @@ module MesscadaApp
     crud_calls_for :pallets, name: :pallet, wrapper: Pallet
     crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
 
+    def find_stock_item(stock_item_id, stock_type)
+      return find_pallet(stock_item_id) if stock_type.to_s.upcase == 'PALLET'
+
+      DB[:rmt_bins].where(id: stock_item_id).first
+    end
+
+    def update_stock_item(stock_item_id, upd, stock_type)
+      return update_pallet(stock_item_id, upd) if stock_type.to_s.upcase == 'PALLET'
+
+      DB[:rmt_bins].where(id: stock_item_id).update(upd)
+    end
+
     def where_pallets(args) # rubocop:disable Metrics/AbcSize
       has_nett_weight = args.delete(:has_nett_weight)
       has_gross_weight = args.delete(:has_gross_weight)

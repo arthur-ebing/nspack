@@ -22,6 +22,7 @@ module RawMaterialsApp
     attribute :rmt_inner_container_material_id, Types::Integer
     attribute :qty_inner_bins, Types::Integer
     attribute :production_run_rebin_id, Types::Integer
+    attribute :location_id, Types::Integer
     attribute :production_run_tipped_id, Types::Integer
     attribute :bin_tipping_plant_resource_id, Types::Integer
     attribute :bin_fullness, Types::String
@@ -58,6 +59,7 @@ module RawMaterialsApp
     attribute :rmt_inner_container_material_id, Types::Integer
     attribute :qty_inner_bins, Types::Integer
     attribute :production_run_rebin_id, Types::Integer
+    attribute :location_id, Types::Integer
     attribute :production_run_tipped_id, Types::Integer
     attribute :bin_tipping_plant_resource_id, Types::Integer
     attribute :bin_fullness, Types::String

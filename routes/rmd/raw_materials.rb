@@ -90,12 +90,79 @@ class Nspack < Roda # rubocop:disable ClassLength
         container_material_type_combo_changed('rmt_bin')
       end
 
+      # --------------------------------------------------------------------------
+      # MOVE RMT BIN
+      # --------------------------------------------------------------------------
+      r.on 'move_rmt_bin' do
+        r.get do
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:error_message], errors:  { bin_number: [''] }) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bin',
+                                         action: '/rmd/rmt_deliveries/rmt_bins/move_rmt_bin',
+                                         button_caption: 'Submit')
+          form.add_field(:bin_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.validate_bin(params[:bin][:bin_number])
+          if res.success
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/scan_location/#{res.instance[:id]}")
+          else
+            store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            r.redirect('/rmd/rmt_deliveries/rmt_bins/move_rmt_bin')
+          end
+        end
+      end
+
+      r.on 'scan_location', Integer do |id|
+        r.get do
+          bin = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin(id)
+          notice = retrieve_from_local_store(:flash_notice)
+          form_state = {}
+          error = retrieve_from_local_store(:errors)
+          form_state.merge!(error_message: error[:error_message], errors:  { location: [''] }) unless error.nil?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Scan Bin',
+                                         action: "/rmd/rmt_deliveries/rmt_bins/move_rmt_bin_submit/#{id}",
+                                         button_caption: 'Move Bin')
+          form.add_label(:bin_number, 'Bin Number', AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? bin[:bin_asset_number] : bin[:id])
+          form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: false)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+      end
+
+      r.on 'move_rmt_bin_submit', Integer do |id|
+        res = interactor.move_bin(id, params[:bin][:location], !params[:bin][:location_scan_field].nil_or_empty?)
+        if res.success
+          store_locally(:flash_notice, unwrap_failed_response(res))
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/move_rmt_bin')
+        else
+          store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+          r.redirect("/rmd/rmt_deliveries/rmt_bins/scan_location/#{id}")
+        end
+      end
+
+      # --------------------------------------------------------------------------
+      # EDIT RMT BIN
+      # --------------------------------------------------------------------------
       r.on 'edit_rmt_bin' do
         r.get do
           notice = retrieve_from_local_store(:flash_notice)
           form_state = {}
           error = retrieve_from_local_store(:errors)
-          form_state.merge!(error_message: error[:error_message], errors:  { delivery_number: [''] }) unless error.nil?
+          form_state.merge!(error_message: error[:error_message], errors:  { bin_number: [''] }) unless error.nil?
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :bin,
                                          notes: notice,

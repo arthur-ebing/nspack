@@ -18,15 +18,22 @@ module FinishedGoodsApp
 
       location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
       upd = { location_id: location_to_id }
-      upd.store(:first_cold_storage_at, Time.now) if location_to.assignment_code == 'COLD_STORAGE' && !stock_item.first_cold_storage_at
-      repo.update_pallet(stock_item_id, upd)
+      upd.store(:first_cold_storage_at, Time.now) if stock_type.to_s.upcase == 'PALLET' && location_to.assignment_code == 'COLD_STORAGE' && !stock_item.first_cold_storage_at
+
+      repo.update_stock_item(stock_item_id, upd, stock_type)
 
       repo.create_serialized_stock_movement_log(location_from_id: location_from_id, location_to_id: location_to_id, stock_item_id: stock_item_id, stock_item_number: stock_item_number, business_process_id: business_process_id, business_process_object_id: business_process_context_id, serialized_stock_type_id: stock_type_id)
-      repo.log_status('pallets', stock_item.id, AppConst::PALLET_MOVED) if stock_type.to_s.upcase == 'PALLET'
-      success_response('Pallet moved successfully')
+      log_stock_item_status(stock_type)
+      success_response("#{stock_type} moved successfully")
     end
 
     private
+
+    def log_stock_item_status(stock_type)
+      return repo.log_status('pallets', stock_item[:id], AppConst::PALLET_MOVED) if stock_type == 'PALLET'
+
+      repo.log_status('rmt_bins', stock_item[:id], AppConst::RMT_BIN_MOVED)
+    end
 
     def validate
       return validation_failed_response(messages: { location: ['Location does not exist'] }) unless valid_location?
@@ -68,17 +75,18 @@ module FinishedGoodsApp
     end
 
     def validate_stock_item # rubocop:disable Metrics/AbcSize
-      if stock_type.to_s.upcase == 'PALLET'
-        @stock_item = repo.find_pallet(stock_item_id)
+      # if stock_type.to_s.upcase == 'PALLET'
+      @stock_item = repo.find_stock_item(stock_item_id, stock_type.to_s.upcase)
 
-        return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless @stock_item
-        return validation_failed_response(messages: { pallet_number: ['Pallet has been scrapped'] }) if @stock_item.scrapped
-        return validation_failed_response(messages: { pallet_number: ['Pallet has been shipped'] }) if @stock_item.shipped
-        return validation_failed_response(messages: { location: ['Pallet is already in this location'] }) if @stock_item.location_id == location_to_id
+      return failed_response("#{stock_type} does not exist") unless @stock_item
+      return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
+      return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
+      return failed_response("#{stock_type} has been tipped") if @stock_item[:bin_tipped]
+      return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
 
-        @location_from_id = @stock_item.location_id
-        @stock_item_number = @stock_item.pallet_number
-      end
+      @location_from_id = @stock_item[:location_id]
+      @stock_item_number = stock_type.to_s.upcase == 'PALLET' ? @stock_item.pallet_number : @stock_item[:id]
+      # end
       success_response('ok')
     end
 

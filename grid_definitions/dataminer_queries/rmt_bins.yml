@@ -11,7 +11,7 @@
   \   bin_tipped_date,\r\n    bin_tipped_date_time,\r\n    exit_ref_date,\r\n    exit_ref_date_time,\r\n
   \   rebin_created_at,\r\n    scrapped,\r\n    scrapped_at,\r\n    cultivar_group_code,\r\n
   \   cultivar_name,\r\n    cultivar_description,\r\n    farm_code,\r\n    orchard_code,\r\n
-  \   puc_code,\r\n    rmt_class_code,\r\n    container_material_type_code,\r\n    container_type_code,\r\n
+  \   puc_code,\r\n    rmt_class_code,\r\n    location_long_code,\r\n    container_material_type_code,\r\n    container_type_code,\r\n
   \   rmt_delivery_truck_registration_number,\r\n    season_code,\r\n    colour_rule,\r\n
   \   status\r\nFROM vw_bins\r\nWHERE NOT scrapped\r\nORDER BY id DESC"
 :limit: 
@@ -256,6 +256,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 15
+    :caption: Location Code
+    :namespaced_name: location_long_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
