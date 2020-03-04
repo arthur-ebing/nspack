@@ -14,7 +14,7 @@ module UiRules
       form_name 'cultivar'
     end
 
-    def set_show_fields
+    def set_show_fields  # rubocop:disable Metrics/AbcSize
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       cultivar_group_id_label = @repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
@@ -22,6 +22,7 @@ module UiRules
       fields[:cultivar_name] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:marketing_varieties] = { renderer: :list, items: cultivar_marketing_varieties }
     end
 
     def common_fields
@@ -46,6 +47,10 @@ module UiRules
                                     cultivar_group_id: nil,
                                     cultivar_name: nil,
                                     description: nil)
+    end
+
+    def cultivar_marketing_varieties
+      @repo.find_cultivar_marketing_varieties(@options[:id])
     end
   end
 end

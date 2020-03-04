@@ -111,5 +111,13 @@ module MasterfilesApp
       DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: id).delete
       DB[:marketing_varieties].where(id: id).delete
     end
+
+    def find_cultivar_marketing_varieties(id)
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .where(cultivar_id: id)
+        .order(:marketing_variety_code)
+        .select_map(:marketing_variety_code)
+    end
   end
 end
