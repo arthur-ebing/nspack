@@ -12,7 +12,12 @@ module ProductionApp
       @reworks_run_type = @repo.where_hash(:reworks_run_types, id: params[:reworks_run_type_id])
       @pallets_selected = params[:pallets_selected]
       @pallets_affected = params[:pallets_affected].nil_or_empty? ? pallets_selected : params[:pallets_affected]
-      @affected_pallet_sequences = params[:pallet_sequence_id].nil_or_empty? ? repo.find_sequence_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
+      @affected_pallet_sequences = if params[:affected_sequences].nil_or_empty?
+                                     params[:pallet_sequence_id].nil_or_empty? ? repo.find_sequence_ids_from_pallet_number(pallets_affected) : params[:pallet_sequence_id]
+                                   else
+                                     params[:affected_sequences]
+                                   end
+
       @make_changes = params[:make_changes]
       @reworks_action = reworks_action
       @changes = changes
@@ -79,7 +84,7 @@ module ProductionApp
       repo.repacking_reworks_run(pallets_affected, attrs) if reworks_run_booleans[:repack_pallets]
       repo.scrapping_reworks_run(pallets_affected, attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
       repo.update_pallets_pallet_format(pallets_affected.first) if make_changes && reworks_run_booleans[:single_edit]
-      repo.existing_records_batch_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:batch_edit]
+      # repo.existing_records_batch_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:batch_edit]
       repo.update_pallets_recalc_nett_weight(pallets_affected, user_name) if reworks_run_booleans[:recalc_nett_weight]
 
       success_response('ok', reworks_run_id: id)
@@ -119,7 +124,8 @@ module ProductionApp
       sequence_changes = { reworks_action: reworks_action }
       pallets_affected.each  do |pallet_number|
         sequence_changes['pallets'] = {
-          pallet_number: pallet_number
+          pallet_number: pallet_number,
+          pallet_sequence_ids: "{ #{Array(affected_pallet_sequences).join(',')} }"
         }.merge(pallet_sequences_objects(pallet_number))
       end
       sequence_changes.to_json

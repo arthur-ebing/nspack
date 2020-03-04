@@ -49,15 +49,23 @@ module UiRules
     end
 
     def set_select_pallet_sequence_fields
+      reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @options[:reworks_run_type_id])[:run_type]
       fields[:reworks_run_type_id] = { renderer: :hidden }
-      fields[:pallets_selected] = { renderer: :hidden }
+      fields[:pallet_sequence_id] = { renderer: :hidden }
+      fields[:reworks_run_type] = { renderer: :label,
+                                    with_value: reworks_run_type_id_label,
+                                    caption: 'Reworks Run Type' }
+      fields[:pallets_selected] = { renderer: :textarea,
+                                    rows: 10,
+                                    disabled: true,
+                                    caption: 'Selected Pallet Numbers' }
       fields[:id] = { renderer: :lookup,
                       lookup_name: :pallet_sequences_for_reworks,
-                      lookup_key: :pallet_number,
-                      param_values: { pallet_number: @options[:pallets_selected].join(',') },
+                      lookup_key: :standard,
+                      param_values: { pallets_selected: @options[:pallets_selected].join(',') },
                       hidden_fields: %i[id],
-                      show_field: :pallet_number,
-                      caption: 'Select Pallet Sequence' }
+                      show_field: :id,
+                      caption: 'Select a representative pallet sequence' }
     end
 
     def set_pallet_sequence_changes  # rubocop:disable Metrics/AbcSize

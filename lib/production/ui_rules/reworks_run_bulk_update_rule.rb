@@ -19,6 +19,7 @@ module UiRules
       fields[:reworks_run_type] = { renderer: :label,
                                     with_value: reworks_run_type_id_label,
                                     caption: 'Reworks Run Type' }
+      fields[:pallets_selected] = { renderer: :hidden }
       fields[:from_production_run_id] = { renderer: :hidden }
       fields[:to_production_run_id] = { renderer: :hidden }
 
@@ -34,6 +35,7 @@ module UiRules
       @form_object = OpenStruct.new(reworks_run_type_id: @options[:id],
                                     from_production_run_id: @options[:attrs][:from_production_run_id],
                                     to_production_run_id: @options[:attrs][:to_production_run_id],
+                                    pallets_selected: @options[:attrs][:pallets_selected],
                                     params: @options[:attrs])
     end
 

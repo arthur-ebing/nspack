@@ -11,7 +11,7 @@
   :url: "/production/reworks/reworks_run_types/$:reworks_runs.reworks_run_type_id$/reworks_runs/new"
   :text: New Rework Run
   :style: :button
-  :behaviour: :popup
+#  :behaviour: :popup
 :conditions:
   :standard:
     - :col: reworks_runs.reworks_run_type_id

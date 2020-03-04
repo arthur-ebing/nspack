@@ -17,20 +17,32 @@ module Production
                 row.column do |col|
                   col.add_field :reworks_run_type_id
                   col.add_field :reworks_run_type
+                  col.add_field :pallets_selected
                   col.add_field :from_production_run_id
                   col.add_field :to_production_run_id
                 end
               end
             end
             page.section do |section|
-              section.add_notice 'The following production run details has changed'
+              section.add_notice 'The following production run details have changed', inline_caption: true
               section.add_diff :changes_made
             end
-            page.add_notice 'Select pallets for update from the grid below'
+            page.section do |section|
+              section.row do |row|
+                row.column do |col|
+                  col.add_notice 'Select pallets for update from the grid below', inline_caption: true
+                  col.add_control(control_type: :link,
+                                  text: 'Cancel',
+                                  url: "/production/reworks/reworks_run_types/#{id}/reject_bulk_production_run_update",
+                                  style: :button)
+                end
+              end
+            end
             page.section do |section|
               section.fit_height!
               section.add_grid('stock_pallets',
                                '/list/stock_pallets/grid_multi',
+                               height: 10,
                                caption: 'Choose Pallets',
                                is_multiselect: true,
                                can_be_cleared: false,
@@ -38,17 +50,8 @@ module Production
                                multiselect_key: 'reworks_bulk_update_pallets',
                                multiselect_params: { key: 'reworks_bulk_update_pallets',
                                                      id: id,
-                                                     production_run_id: attrs[:from_production_run_id] })
-            end
-            page.section do |section|
-              section.row do |row|
-                row.column do |col|
-                  col.add_control(control_type: :link,
-                                  text: 'Reject Changes',
-                                  url: "/production/reworks/reworks_run_types/#{id}/reject_bulk_production_run_update",
-                                  style: :button)
-                end
-              end
+                                                     production_run_id: attrs[:from_production_run_id],
+                                                     pallets_selected: attrs[:pallets_selected].nil_or_empty? ? '(null)' : "('#{attrs[:pallets_selected].join('\',\'')}')" })
             end
           end
 
