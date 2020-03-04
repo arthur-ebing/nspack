@@ -88,23 +88,21 @@ module UiRules
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        caption: 'Cultivar',
                        required: true },
-        description: { hide_on_load: true },
-        status_description: { hide_on_load: true },
+        description: { hide_on_load: false },
+        status_description: { hide_on_load: false },
         passed: { renderer: :select,
                   options: [%w[Passed t], %w[Failed f]],
                   caption: 'Result',
                   prompt: @form_object.passed.nil?,
                   required: true },
         classification_only: { renderer: :checkbox,
-                               hide_on_load: true },
+                               hide_on_load: false },
         freeze_result: { renderer: :checkbox,
-                         hide_on_load: true },
-        api_result: { hide_on_load: true },
+                         hide_on_load: false },
+        api_result: { hide_on_load: false },
         classifications: { hide_on_load: true },
-        applicable_from: { renderer: :date,
-                           required: true },
-        applicable_to: { renderer: :date,
-                         required: true }
+        applicable_from: { renderer: :date },
+        applicable_to: { renderer: :date }
       }
     end
 

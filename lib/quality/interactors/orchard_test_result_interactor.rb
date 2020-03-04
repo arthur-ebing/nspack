@@ -33,18 +33,18 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def update_orchard_test_result(id, params)
+    def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize
       res = OrchardTestUpdateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      service_res = nil
       repo.transaction do
         service_res = QualityApp::UpdateOrchardTestResult.call(id, res)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
       end
-      service_res
+      instance = repo.find_orchard_test_result_flat(id)
+      success_response("Updated orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

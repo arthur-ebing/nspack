@@ -40,7 +40,8 @@ module UiRules
 
     def common_fields
       {
-        test_type_code: { required: true },
+        test_type_code: { required: true,
+                          force_uppercase: true },
         description: {},
         applies_to_all_markets: { renderer: :checkbox },
         applies_to_all_cultivars: { renderer: :checkbox },
