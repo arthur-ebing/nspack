@@ -37,6 +37,7 @@ module QualityApp
       return failed_response(message) if res.instance.first['notificationMessage'] == message
 
       @responce = res.instance
+      save_to_yaml(@responce)
       success_response(res.message)
     end
 
@@ -77,21 +78,17 @@ module QualityApp
         QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, params)
       end
     end
+
+    def save_to_yaml(array)
+      begin
+        YAML.load_file('log/otmc_store.yml')
+      rescue Errno::ENOENT
+        File.open('log/otmc_store.yml', 'w') { |file| file.write([].to_yaml) }
+      end
+
+      File.open('log/otmc_store.yml', 'w') do |file|
+        file.write(array.to_yaml)
+      end
+    end
   end
 end
-
-# {
-#   'puc': 'C2102',
-#   'orch': '61',
-#   'cultCode': 'NOV',
-#   'cbs': 'true',
-#   'applied': 'true',
-#   'eu': 'TRUE',
-#   'bd': 'NOT REQUIRED',
-#   'verified': 'approved',
-#   'fms': 'A1',
-#   'b': 'false',
-#   'updatedDT': '2019-08-05T12:24:00',
-#   'serverDT': '2020-03-03T13:25:00',
-#   'phytoData': 'EUA1A1FY  '
-# }
