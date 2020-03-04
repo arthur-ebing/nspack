@@ -397,7 +397,7 @@ module ProductionApp
 
     def production_run_details(id)
       query = <<~SQL
-        SELECT production_runs.id, packhouse.plant_resource_code AS packhouse_code, line.plant_resource_code AS line_code,
+        SELECT production_runs.id AS production_run_id, packhouse.plant_resource_code AS packhouse_code, line.plant_resource_code AS line_code,
                farms.farm_code, pucs.puc_code, orchards.orchard_code, cultivar_groups.cultivar_group_code, cultivars.cultivar_name
         FROM production_runs
         LEFT JOIN plant_resources packhouse ON packhouse.id = production_runs.packhouse_resource_id

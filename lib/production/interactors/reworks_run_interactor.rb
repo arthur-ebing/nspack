@@ -176,7 +176,7 @@ module ProductionApp
           log_reworks_runs_status_and_transaction(attrs[:reworks_run_type_id], sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE)
         end
       end
-      success_response('Bulk production run update was successfully', reworks_run_id: id)
+      success_response('Bulk production run update was successful', reworks_run_id: id)
     end
 
     def resolve_changes_made(changes_made)
