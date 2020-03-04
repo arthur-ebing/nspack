@@ -185,6 +185,19 @@ namespace :db do
     puts "Recent migrations:\n#{migrations.join("\n")}"
   end
 
+  desc 'Apply db seeds to masterfiles'
+  task mf_seeds: :dotenv_with_override do
+    require 'sequel'
+    db_name = if ENV.fetch('RACK_ENV') == 'test'
+                ENV.fetch('DATABASE_URL').rpartition('/')[0..1].push(ENV.fetch('DATABASE_NAME')).push('_test').join
+              else
+                ENV.fetch('DATABASE_URL')
+              end
+    db = Sequel.connect(db_name)
+    db.run(File.read('./db/seeds/20_masterfile_data.sql'))
+    puts 'Masterfile seeds applied'
+  end
+
   desc 'Run migrations'
   task :migrate, [:version] => :dotenv_with_override do |_, args|
     require 'sequel'

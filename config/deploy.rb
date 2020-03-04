@@ -66,6 +66,17 @@ task :menu_migrate do
   end
 end
 
+desc 'Runs rake db:mf_seeds'
+task :mf_seeds do
+  on primary :db do
+    within release_path do
+      with rack_env: fetch(:rack_env) do
+        execute :rake, 'db:mf_seeds'
+      end
+    end
+  end
+end
+
 desc 'Runs rake jobs:restart_screen'
 task :restart_que do
   on primary :db do
@@ -139,6 +150,7 @@ namespace :deploy do
   after :updated, :migrate_and_precompile do
     invoke 'migrate'
     invoke 'menu_migrate'
+    invoke 'mf_seeds'
     invoke 'precompile'
     invoke 'restart_que'
   end
