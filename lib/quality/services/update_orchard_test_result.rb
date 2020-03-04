@@ -15,7 +15,11 @@ module QualityApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      apply_orchard_test_rules
+      if orchard_test_type.result_type == AppConst::CLASSIFICATION
+        classification_rules
+      else
+        pass_fail_rules
+      end
       return success_response('No changes') if params == orchard_test_result.to_h.select { |key, _| params.keys.include?(key) }
 
       update_orchard_otmc_results unless result_attribute.nil?
@@ -27,14 +31,6 @@ module QualityApp
 
     def repo
       @repo ||= OrchardTestRepo.new
-    end
-
-    def apply_orchard_test_rules
-      if orchard_test_type.result_type == AppConst::CLASSIFICATION
-        classification_rules
-      else
-        pass_fail_rules
-      end
     end
 
     def classification_rules
