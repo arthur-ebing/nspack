@@ -39,8 +39,8 @@ class FixReworksBulkProductionRunUpdate < BaseScript
         DB.transaction do
           p "Updated pallet_sequences #{pallet_sequence_ids.join(',')} : #{attrs}"
           DB[:pallet_sequences].where(id: pallet_sequence_ids).update(attrs)
-          log_status(:reworks_runs, reworks_run[:id], 'FIXED BULK PRODUCTION RUN UPDATE PALLET SEQUENCE DATA', comment: 'because of problem in the code', user_name: 'System')
-          log_multiple_statuses(:pallet_sequences, pallet_sequence_ids, 'FIXED BULK PRODUCTION RUN UPDATE PALLET SEQUENCE DATA', comment: 'because of problem in the code', user_name: 'System')
+          log_status(:reworks_runs, reworks_run[:id], 'FIXED BULK PRODUCTION RUN UPDATE PALLET SEQUENCE DATA', user_name: 'System')
+          log_multiple_statuses(:pallet_sequences, pallet_sequence_ids, 'FIXED BULK PRODUCTION RUN UPDATE PALLET SEQUENCE DATA', user_name: 'System')
         end
       end
     end
