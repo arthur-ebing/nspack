@@ -127,6 +127,7 @@ module QualityApp
       return nil if params.nil?
 
       ds = DB[:pallet_sequences]
+      ds = ds.where(exit_ref: nil)
       ds = ds.where(puc_id: params[:puc_id], orchard_id: params[:orchard_id], cultivar_id: params[:cultivar_id])
       ds = ds.exclude(phyto_data: params[:phytoData])
       ds.update(phyto_data: params[:phytoData])
