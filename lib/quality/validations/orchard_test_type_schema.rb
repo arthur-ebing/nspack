@@ -10,7 +10,6 @@ module QualityApp
     required(:applies_to_all_markets, :bool).maybe(:bool?)
     required(:applies_to_all_cultivars, :bool).maybe(:bool?)
     required(:applies_to_orchard, :bool).maybe(:bool?)
-    required(:applies_to_orchard_set, :bool).maybe(:bool?)
     required(:allow_result_capturing, :bool).maybe(:bool?)
     required(:pallet_level_result, :bool).maybe(:bool?)
     optional(:api_name, Types::StrippedString).maybe(:str?)

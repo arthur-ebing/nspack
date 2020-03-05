@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module Quality
   module Config
     module OrchardTestType
@@ -29,7 +28,6 @@ module Quality
                   col.add_field :applies_to_all_markets
                   col.add_field :applies_to_all_cultivars
                   col.add_field :applies_to_orchard
-                  col.add_field :applies_to_orchard_set
                   col.add_field :allow_result_capturing
                   col.add_field :pallet_level_result
                   col.add_field :active
@@ -44,4 +42,3 @@ module Quality
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

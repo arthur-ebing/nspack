@@ -13,7 +13,6 @@ module QualityApp
 
     optional(:id, :integer).filled(:int?)
     optional(:orchard_test_type_id, :integer).maybe(:int?)
-    required(:orchard_set_result_id, :integer).maybe(:int?)
     required(:orchard_id, :integer).filled(:int?)
     required(:puc_id, :integer).filled(:int?)
     required(:description, Types::StrippedString).maybe(:str?)

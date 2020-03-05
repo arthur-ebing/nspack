@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 module Quality
   module TestResults
     module OrchardTestResult
@@ -17,7 +16,6 @@ module Quality
               form.row do |row|
                 row.column do |col|
                   col.add_field :orchard_test_type_id
-                  col.add_field :orchard_set_result_id
                   col.add_field :puc_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_id
@@ -44,4 +42,3 @@ module Quality
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

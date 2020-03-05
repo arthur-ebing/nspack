@@ -5,7 +5,6 @@ Sequel.migration do
     create_table(:orchard_test_results, ignore_index_errors: true) do
       primary_key :id
       foreign_key :orchard_test_type_id, :orchard_test_types, type: :integer, null: false
-      foreign_key :orchard_set_result_id, :orchard_set_results, type: :integer
       foreign_key :puc_id, :pucs, type: :integer
       foreign_key :orchard_id, :orchards, type: :integer
       foreign_key :cultivar_id, :cultivars, type: :integer
@@ -49,7 +48,6 @@ Sequel.migration do
       primary_key :id
       Integer :orchard_test_result_id
       Integer :orchard_test_type_id
-      Integer :orchard_set_result_id
       Integer :puc_id
       Integer :orchard_id
       Integer :cultivar_id
@@ -90,7 +88,6 @@ Sequel.migration do
           INSERT INTO orchard_test_logs
            (orchard_test_result_id,
             orchard_test_type_id,
-            orchard_set_result_id,
             puc_id,
             orchard_id,
             cultivar_id,
@@ -109,7 +106,6 @@ Sequel.migration do
           VALUES 
            (NEW.id,
             NEW.orchard_test_type_id,
-            NEW.orchard_set_result_id,
             NEW.puc_id,
             NEW.orchard_id,
             NEW.cultivar_id,

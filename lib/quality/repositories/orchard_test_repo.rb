@@ -24,17 +24,6 @@ module QualityApp
 
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
 
-    build_for_select :orchard_set_results,
-                     label: :description,
-                     value: :id,
-                     order_by: :description
-    build_inactive_select :orchard_set_results,
-                          label: :description,
-                          value: :id,
-                          order_by: :description
-
-    crud_calls_for :orchard_set_results, name: :orchard_set_result, wrapper: OrchardSetResult
-
     def find_orchard_test_type_flat(id)
       query = <<~SQL
         SELECT

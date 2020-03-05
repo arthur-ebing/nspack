@@ -4,7 +4,6 @@ module QualityApp
   class OrchardTestResult < Dry::Struct
     attribute :id, Types::Integer
     attribute :orchard_test_type_id, Types::Integer
-    attribute :orchard_set_result_id, Types::Integer
     attribute :puc_id, Types::Integer
     attribute :orchard_id, Types::Integer
     attribute :cultivar_id, Types::Integer
@@ -24,7 +23,6 @@ module QualityApp
     attribute :id, Types::Integer
     attribute :orchard_test_type_id, Types::Integer
     attribute :orchard_test_type_code, Types::String
-    attribute :orchard_set_result_id, Types::Integer
     attribute :puc_id, Types::Integer
     attribute :puc_code, Types::String
     attribute :orchard_id, Types::Integer

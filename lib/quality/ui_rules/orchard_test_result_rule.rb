@@ -17,13 +17,9 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      orchard_set_result_id_label = @repo.find(:orchard_set_results, QualityApp::OrchardSetResult, @form_object.orchard_set_result_id)&.description
       fields[:orchard_test_type_id] = { renderer: :label,
                                         with_value: @form_object.orchard_test_type_code,
                                         caption: 'Orchard Test Type' }
-      fields[:orchard_set_result_id] = { renderer: :label,
-                                         with_value: orchard_set_result_id_label,
-                                         caption: 'Orchard Set Result' }
       fields[:puc_id] = { renderer: :label,
                           with_value: @form_object.puc_code,
                           caption: 'Puc' }
@@ -60,17 +56,12 @@ module UiRules
       }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields
       orchard = @farm_repo.find_orchard(@form_object.orchard_id)
       {
         orchard_test_type_id: { renderer: :label,
                                 with_value: @form_object.orchard_test_type_code,
                                 caption: 'Orchard Test Type' },
-        orchard_set_result_id: { renderer: :select,
-                                 hide_on_load: true,
-                                 options: @repo.for_select_orchard_set_results,
-                                 disabled_options: @repo.for_select_inactive_orchard_set_results,
-                                 caption: 'Orchard Set Result' },
         puc_id: { renderer: :select,
                   options: @farm_repo.for_select_pucs,
                   disabled_options: @farm_repo.for_select_inactive_pucs,

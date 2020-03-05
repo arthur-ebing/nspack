@@ -1,21 +1,18 @@
 ---
 :caption: Orchard Test Results
 :sql: "SELECT\r\n    orchard_test_results.id,\r\n    orchard_test_results.orchard_test_type_id,\r\n
-  \   orchard_test_results.orchard_set_result_id,\r\n    orchard_test_results.puc_id,\r\n
-  \   orchard_test_results.orchard_id,\r\n    orchard_test_results.cultivar_id,\r\n
+  \   orchard_test_results.puc_id,\r\n    orchard_test_results.orchard_id,\r\n    orchard_test_results.cultivar_id,\r\n
   \   orchard_test_types.test_type_code AS orchard_test_type_code,\r\n    pucs.puc_code,\r\n
   \   orchards.orchard_code,\r\n    cultivars.cultivar_name AS cultivar_code,\r\n
   \   orchard_test_results.description,\r\n    orchard_test_results.status_description,\r\n
   \   orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
   \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classifications,\r\n
   \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
-  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at,\r\n
-  \   orchard_set_results.description AS orchard_set_results_description\r\n\r\nFROM\r\n
-  \   orchard_test_results\r\n        LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
-  \       LEFT JOIN orchard_set_results ON orchard_set_results.id = orchard_test_results.orchard_set_result_id\r\n
-  \       LEFT JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id\r\n
-  \       LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id\r\n        LEFT
-  JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
+  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at\r\n
+  \   \r\nFROM\r\n    orchard_test_results\r\n        LEFT JOIN orchards ON orchards.id
+  = orchard_test_results.orchard_id\r\n        LEFT JOIN orchard_test_types ON orchard_test_types.id
+  = orchard_test_results.orchard_test_type_id\r\n        LEFT JOIN pucs ON pucs.id
+  = orchard_test_results.puc_id\r\n        LEFT JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -53,25 +50,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  orchard_set_result_id:
-    :name: orchard_set_result_id
-    :sequence_no: 3
-    :caption: Orchard set result
-    :namespaced_name: orchard_test_results.orchard_set_result_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   puc_id:
     :name: puc_id
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Puc
     :namespaced_name: orchard_test_results.puc_id
     :data_type: :integer
@@ -87,7 +68,7 @@
     :group_max: false
   orchard_id:
     :name: orchard_id
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Orchard
     :namespaced_name: orchard_test_results.orchard_id
     :data_type: :integer
@@ -103,7 +84,7 @@
     :group_max: false
   cultivar_id:
     :name: cultivar_id
-    :sequence_no: 6
+    :sequence_no: 5
     :caption: Cultivar
     :namespaced_name: orchard_test_results.cultivar_id
     :data_type: :integer
@@ -119,7 +100,7 @@
     :group_max: false
   orchard_test_type_code:
     :name: orchard_test_type_code
-    :sequence_no: 7
+    :sequence_no: 6
     :caption: Orchard test type
     :namespaced_name: orchard_test_types.test_type_code
     :data_type: :string
@@ -135,7 +116,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string
@@ -151,7 +132,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
@@ -167,7 +148,7 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 10
+    :sequence_no: 9
     :caption: Cultivar code
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
@@ -183,7 +164,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Description
     :namespaced_name: orchard_test_results.description
     :data_type: :string
@@ -199,7 +180,7 @@
     :group_max: false
   status_description:
     :name: status_description
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Status description
     :namespaced_name: orchard_test_results.status_description
     :data_type: :string
@@ -215,7 +196,7 @@
     :group_max: false
   passed:
     :name: passed
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Passed
     :namespaced_name: orchard_test_results.passed
     :data_type: :boolean
@@ -231,7 +212,7 @@
     :group_max: false
   classification_only:
     :name: classification_only
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Classification only
     :namespaced_name: orchard_test_results.classification_only
     :data_type: :boolean
@@ -247,7 +228,7 @@
     :group_max: false
   freeze_result:
     :name: freeze_result
-    :sequence_no: 15
+    :sequence_no: 14
     :caption: Freeze result
     :namespaced_name: orchard_test_results.freeze_result
     :data_type: :boolean
@@ -263,7 +244,7 @@
     :group_max: false
   classifications:
     :name: classifications
-    :sequence_no: 16
+    :sequence_no: 15
     :caption: Classifications
     :namespaced_name: orchard_test_results.classifications
     :data_type: :hstore
@@ -279,7 +260,7 @@
     :group_max: false
   applicable_from:
     :name: applicable_from
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Applicable from
     :namespaced_name: orchard_test_results.applicable_from
     :data_type: :datetime
@@ -295,7 +276,7 @@
     :group_max: false
   applicable_to:
     :name: applicable_to
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Applicable to
     :namespaced_name: orchard_test_results.applicable_to
     :data_type: :datetime
@@ -311,7 +292,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Active
     :namespaced_name: orchard_test_results.active
     :data_type: :boolean
@@ -327,7 +308,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Created at
     :namespaced_name: orchard_test_results.created_at
     :data_type: :datetime
@@ -343,26 +324,10 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Updated at
     :namespaced_name: orchard_test_results.updated_at
     :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  orchard_set_results_description:
-    :name: orchard_set_results_description
-    :sequence_no: 22
-    :caption: Orchard set results description
-    :namespaced_name: orchard_set_results.description
-    :data_type: :string
     :width: 
     :format: 
     :hide: false
@@ -382,14 +347,6 @@
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT test_type_code, id FROM orchard_test_types ORDER BY test_type_code
-- :column: orchard_test_results.orchard_set_result_id
-  :caption: Orchard set result
-  :data_type: :integer
-  :control_type: :list
-  :default_value: 
-  :ordered_list: true
-  :ui_priority: 1
-  :list_def: SELECT description, id FROM orchard_set_results ORDER BY description
 - :column: orchard_test_results.orchard_id
   :caption: Orchard
   :data_type: :integer

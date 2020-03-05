@@ -8,7 +8,6 @@ module QualityApp
     attribute :applies_to_all_markets, Types::Bool
     attribute :applies_to_all_cultivars, Types::Bool
     attribute :applies_to_orchard, Types::Bool
-    attribute :applies_to_orchard_set, Types::Bool
     attribute :allow_result_capturing, Types::Bool
     attribute :pallet_level_result, Types::Bool
     attribute :api_name, Types::String
@@ -27,7 +26,6 @@ module QualityApp
     attribute :applies_to_all_markets, Types::Bool
     attribute :applies_to_all_cultivars, Types::Bool
     attribute :applies_to_orchard, Types::Bool
-    attribute :applies_to_orchard_set, Types::Bool
     attribute :allow_result_capturing, Types::Bool
     attribute :pallet_level_result, Types::Bool
     attribute :api_name, Types::String
