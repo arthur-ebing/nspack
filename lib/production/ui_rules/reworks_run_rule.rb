@@ -29,6 +29,7 @@ module UiRules
       @rules[:bulk_production_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
       @rules[:array_of_changes_made] = !@form_object.changes_made_array.nil_or_empty? && !@form_object.changes_made_array.respond_to?(:to_hash)
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
+      @rules[:same_pallet_list] = @form_object.pallets_selected.split("\n") == @form_object.pallets_affected.split("\n")
 
       text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallet Numbers'
 
@@ -48,7 +49,7 @@ module UiRules
                                     rows: 10,
                                     disabled: true,
                                     caption: "Selected #{text_area_caption}",
-                                    hide_on_load: @rules[:single_pallet_selected] ? true : false }
+                                    hide_on_load: @rules[:single_pallet_selected] || @rules[:same_pallet_list] ? true : false }
       fields[:pallets_affected] = if @rules[:single_pallet_selected]
                                     { renderer: :label,
                                       with_value: @form_object.pallets_affected,

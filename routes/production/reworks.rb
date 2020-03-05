@@ -181,7 +181,10 @@ class Nspack < Roda # rubocop:disable ClassLength
           check_auth!('reworks', 'new')
           res = interactor.resolve_pallet_numbers_from_multiselect(id, multiselect_grid_choices(params))
           if res.success
-            show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, form_values: res.instance) }
+            pallet_numbers = res.instance[:pallets_selected]
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'reworks_run_pallets_selected',
+                                         value: pallet_numbers)])
           else
             re_show_form(r, res) do
               Production::Reworks::ReworksRun::New.call(id,
@@ -195,7 +198,10 @@ class Nspack < Roda # rubocop:disable ClassLength
           check_auth!('reworks', 'new')
           res = interactor.resolve_rmt_bins_from_multiselect(id, multiselect_grid_choices(params))
           if res.success
-            show_partial_or_page(r) { Production::Reworks::ReworksRun::New.call(id, form_values: res.instance) }
+            pallet_numbers = res.instance[:pallets_selected]
+            json_actions([OpenStruct.new(type: :replace_input_value,
+                                         dom_id: 'reworks_run_pallets_selected',
+                                         value: pallet_numbers)])
           else
             re_show_form(r, res) do
               Production::Reworks::ReworksRun::New.call(id,
