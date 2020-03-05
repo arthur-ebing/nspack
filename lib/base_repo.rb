@@ -113,6 +113,20 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[table_name].where(args).get(column)
   end
 
+  # Get the id for a record in a table for a given WHERE clause.
+  # Raises an exception if more than one row is returned.
+  # Returns nil if no match is found.
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param args [Hash] the where-clause conditions.
+  # @return [integer] the id value for the matching record or nil.
+  def get_id(table_name, args)
+    ids = DB[table_name].where(args).select_map(:id)
+    raise Crossbeams::FrameworkError, '"get_id" method must return only one record' if ids.length > 1
+
+    ids.first
+  end
+
   # Find the first row in a table matching some condition.
   # Returns nil if it is not found.
   #
@@ -302,6 +316,21 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     return nil if arr.nil?
 
     Sequel.pg_array(arr)
+  end
+
+  # Transform array values in a hash to pg_arrays.
+  # Any values not of type Array are returned unchanged.
+  #
+  # e.g. If input parameters include a collection of ids to be stored
+  # in an array column in the database, passing the params through
+  # this method will prepare the ids correctly for persisting.
+  #
+  # @param args [hash,Dry::Validation] the hash or Dry::Validation result.
+  # @return [hash] the transformed hash.
+  def prepare_array_values_for_db(args)
+    return nil if args.nil?
+
+    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v) : v }
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.
