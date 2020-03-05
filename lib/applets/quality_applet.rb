@@ -2,9 +2,6 @@
 
 root_dir = File.expand_path('..', __dir__)
 
-# Pre-load included module:
-require "#{root_dir}/quality/services/phyt_clean_api.rb"
-
 Dir["#{root_dir}/quality/entities/*.rb"].each { |f| require f }
 Dir["#{root_dir}/quality/interactors/*.rb"].each { |f| require f }
 # Dir["#{root_dir}/quality/jobs/*.rb"].each { |f| require f }
