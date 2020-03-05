@@ -12,7 +12,7 @@ module QualityApp
     attribute :classification_only, Types::Bool
     attribute :freeze_result, Types::Bool
     attribute :api_result, Types::Hash
-    attribute :classifications, Types::String
+    attribute :classification, Types::String
     attribute :applicable_from, Types::DateTime
     attribute :applicable_to, Types::DateTime
     attribute? :active, Types::Bool
@@ -33,7 +33,7 @@ module QualityApp
     attribute :classification_only, Types::Bool
     attribute :freeze_result, Types::Bool
     attribute :api_result, Types::Hash
-    attribute :classifications, Types::String
+    attribute :classification, Types::String
     attribute :applicable_from, Types::DateTime
     attribute :applicable_to, Types::DateTime
     attribute? :active, Types::Bool

@@ -12,12 +12,12 @@ Sequel.migration do
       String :description
 
       TrueClass :passed, default: false
+      String :classification
+
       TrueClass :classification_only, default: false
       TrueClass :freeze_result, default: false
       
       Jsonb :api_result
-
-      column :classifications, 'hstore'
 
       DateTime :applicable_from
       DateTime :applicable_to
@@ -54,12 +54,12 @@ Sequel.migration do
       String :description
 
       TrueClass :passed
+      String :classification
+
       TrueClass :classification_only
       TrueClass :freeze_result
 
       Jsonb :api_result
-
-      column :classifications, 'hstore'
 
       DateTime :applicable_from
       DateTime :applicable_to
@@ -94,7 +94,7 @@ Sequel.migration do
             classification_only,
             freeze_result,
             api_result,
-            classifications,
+            classification,
             applicable_from,
             applicable_to,
             active,
@@ -111,7 +111,7 @@ Sequel.migration do
             NEW.classification_only,
             NEW.freeze_result,
             NEW.api_result,
-            NEW.classifications,
+            NEW.classification,
             NEW.applicable_from,
             NEW.applicable_to,
             NEW.active,
