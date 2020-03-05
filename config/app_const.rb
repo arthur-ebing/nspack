@@ -399,9 +399,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   QUALITY_API_NAMES = [PHYT_CLEAN].freeze
 
   # PhytClean
-  PHYT_CLEAN_ENVIRONMENT = { UAT: 'https://www.phytclean.co.za',
-                             STAGING: 'https://www.phytclean.co.za',
-                             PRODUCTION: 'https://www.phytclean.co.za' }[ENV['TITAN_ENVIRONMENT'].to_sym]
+  PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
   PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
   PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
 

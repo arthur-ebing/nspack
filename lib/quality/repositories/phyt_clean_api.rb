@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  module PhytCleanCalls
+  class PhytCleanApi < BaseRepo
     attr_reader :headers
 
     class PhytCleanHttpResponder
@@ -37,6 +37,17 @@ module QualityApp
 
       instance = JSON.parse(res.instance.body)
       success_response('Received citrus eu orchard status', instance)
+    end
+
+    def filter_phyt_clean_response(array)
+      pucs_list = select_values(:pucs, :puc_code)
+      filtered_response = []
+      array.each do |hash|
+        next unless pucs_list.include? hash['puc']
+
+        filtered_response << UtilityFunctions.symbolize_keys(hash)
+      end
+      filtered_response
     end
   end
 end
