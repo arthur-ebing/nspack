@@ -81,7 +81,7 @@ module FinishedGoodsApp
       return failed_response("#{stock_type} does not exist") unless @stock_item
       return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
       return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
-      return failed_response("#{stock_type} has been tipped") if @stock_item[:bin_tipped]
+      return failed_response("#{stock_type} has been tipped") if stock_type.to_s.upcase == 'BIN' && @stock_item[:bin_tipped]
       return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
 
       @location_from_id = @stock_item[:location_id]
