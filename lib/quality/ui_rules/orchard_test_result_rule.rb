@@ -31,7 +31,6 @@ module UiRules
                                caption: 'Cultivars' }
 
       fields[:description] = { renderer: :label }
-      fields[:status_description] = { renderer: :label }
       fields[:passed] = { renderer: :label,
                           with_value: @form_object.passed ? 'Passed' : 'Failed',
                           caption: 'Result' }
@@ -80,7 +79,6 @@ module UiRules
                        caption: 'Cultivar',
                        required: true },
         description: { hide_on_load: false },
-        status_description: { hide_on_load: false },
         passed: { renderer: :select,
                   options: [%w[Passed t], %w[Failed f]],
                   caption: 'Result',

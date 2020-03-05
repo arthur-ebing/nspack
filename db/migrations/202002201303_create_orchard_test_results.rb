@@ -10,7 +10,6 @@ Sequel.migration do
       foreign_key :cultivar_id, :cultivars, type: :integer
 
       String :description
-      String :status_description
 
       TrueClass :passed, default: false
       TrueClass :classification_only, default: false
@@ -53,7 +52,6 @@ Sequel.migration do
       Integer :cultivar_id
 
       String :description
-      String :status_description
 
       TrueClass :passed
       TrueClass :classification_only
@@ -92,7 +90,6 @@ Sequel.migration do
             orchard_id,
             cultivar_id,
             description,
-            status_description,
             passed,
             classification_only,
             freeze_result,
@@ -110,7 +107,6 @@ Sequel.migration do
             NEW.orchard_id,
             NEW.cultivar_id,
             NEW.description,
-            NEW.status_description,
             NEW.passed,
             NEW.classification_only,
             NEW.freeze_result,

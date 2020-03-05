@@ -40,7 +40,6 @@ module QualityApp
         orchard_id: orchard_id,
         cultivar_id: cultivar_id,
         description: Faker::Lorem.unique.word,
-        status_description: Faker::Lorem.word,
         passed: false,
         classification_only: false,
         freeze_result: false,

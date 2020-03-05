@@ -4,8 +4,7 @@
   \   orchard_test_results.puc_id,\r\n    orchard_test_results.orchard_id,\r\n    orchard_test_results.cultivar_id,\r\n
   \   orchard_test_types.test_type_code AS orchard_test_type_code,\r\n    pucs.puc_code,\r\n
   \   orchards.orchard_code,\r\n    cultivars.cultivar_name AS cultivar_code,\r\n
-  \   orchard_test_results.description,\r\n    orchard_test_results.status_description,\r\n
-  \   orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
+  \   orchard_test_results.description,\r\n    orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
   \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classifications,\r\n
   \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
   \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at\r\n
@@ -178,22 +177,6 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  status_description:
-    :name: status_description
-    :sequence_no: 11
-    :caption: Status description
-    :namespaced_name: orchard_test_results.status_description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   passed:
     :name: passed
     :sequence_no: 12
@@ -314,7 +297,7 @@
     :data_type: :datetime
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
