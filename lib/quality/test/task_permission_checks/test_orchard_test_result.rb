@@ -16,7 +16,6 @@ module QualityApp
       base_attrs = {
         id: 1,
         orchard_test_type_id: 1,
-        orchard_set_result_id: 1,
         puc_id: 1,
         orchard_id: 1,
         cultivar_id: 1,

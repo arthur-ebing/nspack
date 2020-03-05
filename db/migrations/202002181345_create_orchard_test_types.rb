@@ -10,7 +10,6 @@ Sequel.migration do
       TrueClass :applies_to_all_markets, default: true
       TrueClass :applies_to_all_cultivars, default: true
       TrueClass :applies_to_orchard, default: true
-      TrueClass :applies_to_orchard_set, default: true
       TrueClass :allow_result_capturing, default: true
       TrueClass :pallet_level_result, default: true
 

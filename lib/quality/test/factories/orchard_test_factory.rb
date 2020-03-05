@@ -13,7 +13,6 @@ module QualityApp
         applies_to_all_markets: true,
         applies_to_all_cultivars: true,
         applies_to_orchard: false,
-        applies_to_orchard_set: false,
         allow_result_capturing: false,
         pallet_level_result: false,
         api_name: Faker::Lorem.word,
@@ -29,39 +28,14 @@ module QualityApp
       DB[:orchard_test_types].insert(default.merge(opts))
     end
 
-    def create_orchard_set_result(opts = {})
-      orchard_test_type_id = create_orchard_test_type
-      puc_id = create_puc
-
-      default = {
-        orchard_test_type_id: orchard_test_type_id,
-        puc_id: puc_id,
-        description: Faker::Lorem.unique.word,
-        status_description: Faker::Lorem.word,
-        passed: false,
-        classification_only: false,
-        freeze_result: false,
-        classifications: nil,
-        cultivar_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
-        applicable_from: '2010-01-01 12:00',
-        applicable_to: '2010-01-01 12:00',
-        active: true,
-        created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
-      }
-      DB[:orchard_set_results].insert(default.merge(opts))
-    end
-
     def create_orchard_test_result(opts = {})
       orchard_test_type_id = create_orchard_test_type
-      orchard_set_result_id = create_orchard_set_result
       orchard_id = create_orchard
       puc_id = create_puc
       cultivar_id = create_cultivar
 
       default = {
         orchard_test_type_id: orchard_test_type_id,
-        orchard_set_result_id: orchard_set_result_id,
         puc_id: puc_id,
         orchard_id: orchard_id,
         cultivar_id: cultivar_id,

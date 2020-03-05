@@ -20,7 +20,6 @@ module UiRules
       fields[:applies_to_all_markets] = { renderer: :label, as_boolean: true }
       fields[:applies_to_all_cultivars] = { renderer: :label, as_boolean: true }
       fields[:applies_to_orchard] = { renderer: :label, as_boolean: true }
-      fields[:applies_to_orchard_set] = { renderer: :label, as_boolean: true }
       fields[:allow_result_capturing] = { renderer: :label, as_boolean: true }
       fields[:pallet_level_result] = { renderer: :label, as_boolean: true }
       fields[:applicable_tm_group_ids] = { renderer: :label,
@@ -46,7 +45,6 @@ module UiRules
         applies_to_all_markets: { renderer: :checkbox },
         applies_to_all_cultivars: { renderer: :checkbox },
         applies_to_orchard: { renderer: :checkbox },
-        applies_to_orchard_set: { renderer: :checkbox },
         allow_result_capturing: { renderer: :checkbox },
         pallet_level_result: { renderer: :checkbox },
         result_type: { renderer: :select,
@@ -90,7 +88,6 @@ module UiRules
                                     applies_to_all_markets: false,
                                     applies_to_all_cultivars: false,
                                     applies_to_orchard: false,
-                                    applies_to_orchard_set: false,
                                     allow_result_capturing: false,
                                     pallet_level_result: false,
                                     api_name: nil,

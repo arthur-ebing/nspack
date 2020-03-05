@@ -69,14 +69,12 @@ module QualityApp
 
     def orchard_test_result_attrs
       orchard_test_type_id = create_orchard_test_type
-      orchard_set_result_id = create_orchard_set_result
       puc_id = create_puc
       orchard_id = create_orchard
       cultivar_id = create_cultivar
       {
         id: 1,
         orchard_test_type_id: orchard_test_type_id,
-        orchard_set_result_id: orchard_set_result_id,
         puc_id: puc_id,
         orchard_id: orchard_id,
         cultivar_id: cultivar_id,

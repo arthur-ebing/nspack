@@ -20,7 +20,6 @@ module Quality
               form.row do |row|
                 row.column do |col|
                   col.add_field :orchard_test_type_id
-                  col.add_field :orchard_set_result_id
                   col.add_field :puc_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_id

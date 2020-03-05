@@ -20,7 +20,6 @@ module QualityApp
         applies_to_all_markets: false,
         applies_to_all_cultivars: false,
         applies_to_orchard: false,
-        applies_to_orchard_set: false,
         allow_result_capturing: false,
         pallet_level_result: false,
         api_name: 'ABC',
