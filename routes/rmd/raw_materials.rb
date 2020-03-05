@@ -351,6 +351,8 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         form.add_label(:delivery_number, 'Delivery Number', delivery[:id])
+        form.add_label(:cultivar_group_code, 'Cultivar Group', delivery[:cultivar_group_code])
+        form.add_label(:cultivar_name, 'Cultivar', delivery[:cultivar_name])
         form.add_label(:farm_code, 'Farm', delivery[:farm_code])
         form.add_label(:puc_code, 'Puc', delivery[:puc_code])
         form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
@@ -380,12 +382,6 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
 
-        form.add_label(:delivery_number, 'Delivery Number', delivery[:id])
-        form.add_label(:cultivar_group_code, 'Cultivar Group', delivery[:cultivar_group_code])
-        form.add_label(:cultivar_name, 'Cultivar', delivery[:cultivar_name])
-        form.add_label(:farm_code, 'Farm', delivery[:farm_code])
-        form.add_label(:puc_code, 'Puc', delivery[:puc_code])
-        form.add_label(:orchard_code, 'Orchard', delivery[:orchard_code])
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
