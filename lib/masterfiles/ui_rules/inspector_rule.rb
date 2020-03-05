@@ -62,7 +62,7 @@ module UiRules
                                     first_name: nil,
                                     title: nil,
                                     vat_number: nil,
-                                    role_ids: [@repo.get_with_args(:roles, :id, name: AppConst::ROLE_INSPECTOR)],
+                                    role_ids: [@repo.get_id(:roles, name: AppConst::ROLE_INSPECTOR)],
                                     inspector_party_role_id: nil,
                                     inspector_code: nil,
                                     tablet_ip_address: nil,

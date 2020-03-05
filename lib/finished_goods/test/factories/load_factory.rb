@@ -4,8 +4,8 @@ module FinishedGoodsApp
   module LoadFactory
     def create_load(opts = {}) # rubocop:disable Metrics/AbcSize
       repo = BaseRepo.new
-      pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL) || create_port_type(port_type_code: AppConst::PORT_TYPE_POL)
-      pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD) || create_port_type(port_type_code: AppConst::PORT_TYPE_POD)
+      pol_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL) || create_port_type(port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POD) || create_port_type(port_type_code: AppConst::PORT_TYPE_POD)
 
       customer_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
       consignee_party_role_id = create_party_role('O', AppConst::ROLE_CONSIGNEE)

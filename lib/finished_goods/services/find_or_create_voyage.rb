@@ -20,14 +20,14 @@ module FinishedGoodsApp
       params[:voyage_id] = repo.create(:voyages, res)
       repo.log_status(:voyages, params[:voyage_id], 'CREATED', user_name: @user.user_name)
 
-      pol_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
+      pol_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL)
       attrs = { voyage_id: params[:voyage_id], port_id: params[:pol_port_id], port_type_id: pol_port_type_id }
       res = create_voyage_port(attrs)
       return res unless res.success
 
       params[:pol_voyage_port_id] = res.instance
 
-      pod_port_type_id = repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+      pod_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POD)
       attrs = { voyage_id: params[:voyage_id], port_id: params[:pod_port_id], port_type_id: pod_port_type_id }
       res = create_voyage_port(attrs)
       return res unless res.success

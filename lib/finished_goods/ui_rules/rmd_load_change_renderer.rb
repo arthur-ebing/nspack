@@ -24,7 +24,7 @@ module UiRules
       actions[container ? :show_element : :hide_element] = row_ids.map { |a| { dom_id: a } }
 
       # test delete flash warning
-      container_id = BaseRepo.new.get_with_args(:load_containers, :id, load_id: options[:load_id])
+      container_id = BaseRepo.new.get_id(:load_containers, load_id: options[:load_id])
       unless container_id.nil?
         if container
           actions[:hide_element] = [{ dom_id: 'rmd-error' }]

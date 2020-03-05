@@ -3,6 +3,7 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'dispatch', 'rmd' do |r|
+    @repo = BaseRepo.new
     # ALLOCATE PALLETS TO LOAD
     # --------------------------------------------------------------------------
     r.on 'allocate' do
@@ -149,12 +150,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do
           # set defaults
           form_state = {}
-          form_state[:stack_type_id] = BaseRepo.new.get_with_args(:container_stack_types, :id, stack_type_code: 'S')
+          form_state[:stack_type_id] = @repo.get_id(:container_stack_types, stack_type_code: 'S')
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
           form_state[:cargo_temperature_id] = MasterfilesApp::CargoTemperatureRepo.new.cargo_temperature_id_for(AppConst::DEFAULT_CARGO_TEMP_ON_ARRIVAL)
 
           # checks if load_container exists
-          container_id = BaseRepo.new.get_with_args(:load_containers, :id, load_id: load_id)
+          container_id = @repo.get_id(:load_containers, load_id: load_id)
           unless container_id.nil?
             form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(container_id).to_h)
             form_state[:container] = 'true'

@@ -79,8 +79,8 @@ module UiRules
     private
 
     def add_rules
-      pol_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL)
-      pod_port_type_id = @repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD)
+      pol_port_type_id = @repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL)
+      pod_port_type_id = @repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POD)
       has_pod =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pol_port_type_id)
       has_pol =  @repo.exists?(:voyage_ports, voyage_id: @form_object.id, port_type_id: pod_port_type_id)
 

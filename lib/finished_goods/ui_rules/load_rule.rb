@@ -71,7 +71,7 @@ module UiRules
       fields[:memo_pad] = { renderer: :label }
 
       # Load Vehicles
-      load_vehicle_id = @repo.get_with_args(:load_vehicles, :id, load_id: @form_object.id)
+      load_vehicle_id = @repo.get_id(:load_vehicles, load_id: @form_object.id)
       vehicle = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(load_vehicle_id)
       fields[:vehicle_number] = { renderer: :label, with_value: vehicle&.vehicle_number }
       fields[:driver] = { renderer: :label, with_value: vehicle&.driver_name }
@@ -81,7 +81,7 @@ module UiRules
       fields[:vehicle_weight_out] = { renderer: :label, with_value: vehicle&.vehicle_weight_out }
 
       # Load Container
-      load_container_id = @repo.get_with_args(:load_containers, :id, load_id: @form_object.id)
+      load_container_id = @repo.get_id(:load_containers, load_id: @form_object.id)
       container = FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(load_container_id)
       fields[:container_code] = { renderer: :label, with_value: container&.container_code }
       fields[:container_vents] = { renderer: :label, with_value: container&.container_vents }
@@ -226,7 +226,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(depot_id: @repo.get_with_args(:depots, :id, depot_code: AppConst::DEFAULT_DEPOT),
+      @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,

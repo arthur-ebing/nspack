@@ -45,7 +45,7 @@ module FinishedGoodsApp
       res = validate_load_voyage_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: load_id)
+      load_voyage_id = repo.get_id(:load_voyages, load_id: load_id)
       repo.update(:load_voyages, load_voyage_id, res)
       repo.log_status(:load_voyages, load_voyage_id, 'UPDATED', user_name: @user.user_name)
 

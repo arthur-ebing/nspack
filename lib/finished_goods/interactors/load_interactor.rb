@@ -74,7 +74,7 @@ module FinishedGoodsApp
     end
 
     def delete_load(id)
-      load_voyage_id = repo.get_with_args(:load_voyages, :id, load_id: id)
+      load_voyage_id = repo.get_id(:load_voyages, load_id: id)
       repo.transaction do
         # DELETE LOAD_VOYAGE
         LoadVoyageRepo.new.delete_load_voyage(load_voyage_id)
@@ -259,7 +259,7 @@ module FinishedGoodsApp
 
     def update_pallets_temp_tail(params) # rubocop:disable Metrics/AbcSize
       pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
-      id = repo.get_with_args(:pallets, :id, pallet_number: pallet_number)
+      id = repo.get_id(:pallets, pallet_number: pallet_number)
       return failed_response("Pallet: #{pallet_number} doesn't exist.") if id.nil?
 
       repo.transaction do

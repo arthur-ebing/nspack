@@ -47,7 +47,7 @@ module MasterfilesApp
         party_repo.append_role(person_id, role_id, 'P')
       end
 
-      params[:inspector_party_role_id] = get_with_args(:party_roles, :id, person_id: person_id, role_id: role_id)
+      params[:inspector_party_role_id] = get_id(:party_roles, person_id: person_id, role_id: role_id)
       inspector_params = InspectorSchema.call(params)
       raise Crossbeams::InfoError, inspector_params.messages unless inspector_params.messages.empty?
 

@@ -38,8 +38,8 @@ module FinishedGoodsApp
     end
 
     def unship_location
-      location_type_id = repo.get_with_args(:location_types, :id, location_type_code: 'SITE')
-      location_id = repo.get_with_args(:locations, :id, location_type_id: location_type_id)
+      location_type_id = repo.get_id(:location_types, location_type_code: 'SITE')
+      location_id = repo.get_id(:locations, location_type_id: location_type_id)
       return failed_response('Site location not defined, unable to unship pallet') if location_id.nil?
 
       success_response('ok', location_id)

@@ -72,8 +72,8 @@ module FinishedGoodsApp
 
     def load_attrs
       repo = BaseRepo.new
-      create_port_type(port_type_code: AppConst::PORT_TYPE_POL) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POL).nil?
-      create_port_type(port_type_code: AppConst::PORT_TYPE_POD) if repo.get_with_args(:port_types, :id, port_type_code: AppConst::PORT_TYPE_POD).nil?
+      create_port_type(port_type_code: AppConst::PORT_TYPE_POL) if repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL).nil?
+      create_port_type(port_type_code: AppConst::PORT_TYPE_POD) if repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POD).nil?
 
       customer_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
       consignee_party_role_id = create_party_role('O', AppConst::ROLE_CONSIGNEE)
