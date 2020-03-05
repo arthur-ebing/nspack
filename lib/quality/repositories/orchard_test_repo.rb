@@ -61,7 +61,6 @@ module QualityApp
       return nil if hash.nil?
 
       hash[:api_result] = nil if hash[:api_result].nil_or_empty?
-      hash[:classifications] = nil if hash[:classifications].nil_or_empty?
       OrchardTestResultFlat.new(hash)
     end
 
@@ -81,12 +80,10 @@ module QualityApp
       DB[:orchard_test_types].where(id: id).update(prepare_array_values_for_db(attrs))
     end
 
-    def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize
+    def update_orchard_test_result(id, params)
       attrs = params.to_h
       attrs.delete(:api_result) if attrs[:api_result].nil_or_empty?
-      attrs.delete(:classifications) if attrs[:classifications].nil_or_empty?
       attrs[:api_result] = hash_for_jsonb_col(attrs[:api_result]) if attrs.key?(:api_result)
-      attrs[:classifications] = hash_for_jsonb_col(attrs[:classifications]) if attrs.key?(:classifications)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
     end

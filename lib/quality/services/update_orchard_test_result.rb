@@ -39,12 +39,14 @@ module QualityApp
       params[:passed] = true
       params[:classification_only] = true
       @otmc_result = api_result[result_attribute]
+      params[:classification] = otmc_result
     end
 
     def pass_fail_rules
       params[:passed] = AppConst::PHYT_CLEAN_PASSED.include? api_result[result_attribute]
       params[:classification_only] = false
       @otmc_result = params[:passed]
+      params[:classification] = nil
     end
 
     def update_orchard_otmc_results

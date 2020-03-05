@@ -5,7 +5,7 @@
   \   orchard_test_types.test_type_code AS orchard_test_type_code,\r\n    pucs.puc_code,\r\n
   \   orchards.orchard_code,\r\n    cultivars.cultivar_name AS cultivar_code,\r\n
   \   orchard_test_results.description,\r\n    orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
-  \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classifications,\r\n
+  \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classification,\r\n
   \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
   \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at\r\n
   \   \r\nFROM\r\n    orchard_test_results\r\n        LEFT JOIN orchards ON orchards.id
@@ -225,12 +225,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  classifications:
-    :name: classifications
+  classification:
+    :name: classification
     :sequence_no: 15
-    :caption: Classifications
-    :namespaced_name: orchard_test_results.classifications
-    :data_type: :hstore
+    :caption: Classification
+    :namespaced_name: orchard_test_results.classification
+    :data_type: :string
     :width: 
     :format: 
     :hide: false

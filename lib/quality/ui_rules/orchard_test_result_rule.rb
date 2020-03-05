@@ -37,7 +37,7 @@ module UiRules
       fields[:classification_only] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
       fields[:api_result] = { renderer: :label }
-      fields[:classifications] = { renderer: :label }
+      fields[:classification] = { renderer: :label }
 
       fields[:applicable_from] = { renderer: :label }
       fields[:applicable_to] = { renderer: :label }
@@ -89,7 +89,7 @@ module UiRules
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
         api_result: { hide_on_load: false },
-        classifications: { hide_on_load: true },
+        classification: { hide_on_load: true },
         applicable_from: { renderer: :date },
         applicable_to: { renderer: :date }
       }

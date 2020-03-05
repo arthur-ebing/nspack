@@ -21,7 +21,7 @@ module Quality
                   col.add_field :cultivar_id
                   col.add_field :description
                   col.add_field :api_result
-                  col.add_field :classifications
+                  col.add_field :classification
                 end
                 row.column do |col|
                   col.add_field :passed

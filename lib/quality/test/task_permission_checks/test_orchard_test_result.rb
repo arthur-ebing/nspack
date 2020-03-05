@@ -24,7 +24,7 @@ module QualityApp
         classification_only: false,
         freeze_result: false,
         api_result: {},
-        classifications: 'ABC',
+        classification: 'ABC',
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true
