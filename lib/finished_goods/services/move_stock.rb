@@ -74,7 +74,7 @@ module FinishedGoodsApp
       success_response('ok')
     end
 
-    def validate_stock_item # rubocop:disable Metrics/AbcSize
+    def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       # if stock_type.to_s.upcase == 'PALLET'
       @stock_item = repo.find_stock_item(stock_item_id, stock_type.to_s.upcase)
 

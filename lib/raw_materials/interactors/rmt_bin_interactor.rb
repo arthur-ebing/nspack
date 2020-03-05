@@ -171,7 +171,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def move_bin(bin_number, location_id, is_scanned_location)
+    def move_bin(bin_number, location_id, is_scanned_location) # rubocop:disable Metrics/AbcSize
       location_id = FinishedGoodsApp::LoadRepo.new.get_location_id_by_barcode(location_id) unless is_scanned_location
       return failed_response('Location does not exist') unless !location_id.nil_or_empty? && repo.exists?(:locations, id: location_id)
 

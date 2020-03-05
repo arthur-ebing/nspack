@@ -88,6 +88,7 @@ module RawMaterialsApp
       rmt_container_material_type_id = create_rmt_container_material_type
       cultivar_group_id = create_cultivar_group
       puc_id = create_puc
+      location_id = create_location
 
       {
         id: 1,
@@ -101,6 +102,7 @@ module RawMaterialsApp
         rmt_container_type_id: rmt_container_type_id,
         rmt_container_material_type_id: rmt_container_material_type_id,
         cultivar_group_id: cultivar_group_id,
+        location_id: location_id,
         puc_id: puc_id,
         status: Faker::Lorem.unique.word,
         exit_ref: 'ABC',

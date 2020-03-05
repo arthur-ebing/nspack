@@ -31,6 +31,7 @@ module RawMaterialsApp
         qty_inner_bins: 1,
         production_run_rebin_id: 1,
         production_run_tipped_id: 1,
+        location_id: 1,
         bin_tipping_plant_resource_id: 1,
         bin_fullness: 1.0,
         nett_weight: 1.0,
