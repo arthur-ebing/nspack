@@ -86,7 +86,7 @@
     :sequence_no: 4
     :caption: Pallet sequence number
     :namespaced_name: pallet_sequence_number
-    :data_type: :string
+    :data_type: :integer
     :width: 
     :format: 
     :hide: false
@@ -102,14 +102,14 @@
     :sequence_no: 5
     :caption: Carton quantity
     :namespaced_name: carton_quantity
-    :data_type: :number
+    :data_type: :integer
     :width: 
-    :format: :delimited_1000
+    :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -118,14 +118,14 @@
     :sequence_no: 6
     :caption: Pallet carton quantity
     :namespaced_name: pallet_carton_quantity
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -141,7 +141,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -157,7 +157,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -173,7 +173,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -189,7 +189,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -299,7 +299,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -315,7 +315,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -331,7 +331,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -347,7 +347,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -363,7 +363,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -379,7 +379,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -395,7 +395,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -411,7 +411,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -427,7 +427,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -443,7 +443,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -459,7 +459,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -475,7 +475,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -491,7 +491,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -507,7 +507,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -523,7 +523,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -539,7 +539,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -555,7 +555,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -699,7 +699,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -715,7 +715,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -731,9 +731,9 @@
     :format: :delimited_1000
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -749,7 +749,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -765,7 +765,7 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -779,7 +779,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -795,7 +795,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -811,7 +811,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -827,7 +827,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -891,7 +891,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -971,7 +971,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -987,7 +987,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1003,7 +1003,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1035,7 +1035,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1051,7 +1051,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1067,7 +1067,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1083,7 +1083,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1099,7 +1099,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1115,7 +1115,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1131,7 +1131,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1142,7 +1142,7 @@
     :sequence_no: 70
     :caption: Cooled?
     :namespaced_name: cooled
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
@@ -1163,7 +1163,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1179,7 +1179,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1211,7 +1211,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1227,7 +1227,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1243,7 +1243,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1259,7 +1259,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1275,7 +1275,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1291,7 +1291,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1307,7 +1307,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1318,12 +1318,12 @@
     :sequence_no: 81
     :caption: Departure date
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1339,7 +1339,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1355,7 +1355,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1387,7 +1387,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1403,7 +1403,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1419,7 +1419,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1451,7 +1451,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1467,7 +1467,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1483,7 +1483,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1499,7 +1499,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1515,7 +1515,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1531,7 +1531,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1547,7 +1547,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1563,7 +1563,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1595,7 +1595,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1606,7 +1606,7 @@
     :sequence_no: 99
     :caption: Gross weight measured at
     :namespaced_name: gross_weight_measured_at
-    :data_type: :datetime
+    :data_type: :date
     :width: 
     :format: 
     :hide: false
