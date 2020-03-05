@@ -253,7 +253,7 @@ class Nspack < Roda
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           else
-            loc_type = intercactor.location_type_code(params[:location])
+            loc_type = interactor.location_type_code(params[:location])
             form_errors = move_validation_errors_to_base(res.errors,
                                                          %i[location_long_code receiving_bay_type_location],
                                                          highlights: { location_long_code: %i[location_long_code location_short_code],

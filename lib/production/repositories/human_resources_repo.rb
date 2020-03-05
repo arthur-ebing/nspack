@@ -49,7 +49,7 @@ module ProductionApp
     def create_shift(attrs) # rubocop:disable Metrics/AbcSize
       date = attrs.delete(:date)
       start_date_times = DB[:shifts].where(shift_type_id: attrs[:shift_type_id]).map { |r| r[:start_date_time].to_date.to_s }
-      return validation_failed_response('Shift for this type and date combination already exists') if start_date_times.include?(date)
+      return failed_response('Shift for this type and date combination already exists') if start_date_times.include?(date)
 
       shift_type = DB[:shift_types].where(id: attrs[:shift_type_id])
       start_hr = shift_type.get(:start_hour)
