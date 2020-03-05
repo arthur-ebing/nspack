@@ -49,6 +49,19 @@ module QualityApp
       failed_response(e.message)
     end
 
+    def copy_orchard_test_result(id)
+      instance = orchard_test_result(id).to_h
+      res = create_orchard_test_result(orchard_test_type_id: instance[:orchard_test_type_id])
+      return res unless res.success
+
+      instance[:id] = res.instance.id
+      success_response("Copied orchard test result #{instance[:orchard_test_type_code]}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def delete_orchard_test_result(id)
       name = orchard_test_result(id).orchard_test_type_code
       repo.transaction do

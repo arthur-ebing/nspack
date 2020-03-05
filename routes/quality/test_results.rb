@@ -18,6 +18,19 @@ class Nspack < Roda
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(id) }
       end
 
+      r.on 'copy' do   # CLONE
+        check_auth!('test results', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.clone_orchard_test_result(id)
+        if res.success
+          flash[:notice] = res.message
+          show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(res.instance[:id], form_values: res.instance) }
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+          redirect_to_last_grid(r)
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('test results', 'read')
@@ -64,7 +77,6 @@ class Nspack < Roda
           flash[:error] = "#{res.message} #{res.errors}"
         end
         r.redirect '/list/orchard_test_results'
-        res
       end
 
       r.on 'puc_changed' do
