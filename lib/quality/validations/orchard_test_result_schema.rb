@@ -16,7 +16,6 @@ module QualityApp
     required(:orchard_id, :integer).filled(:int?)
     required(:puc_id, :integer).filled(:int?)
     required(:description, Types::StrippedString).maybe(:str?)
-    required(:status_description, Types::StrippedString).maybe(:str?)
     required(:passed, :bool).filled(:bool?)
     required(:classification_only, :bool).maybe(:bool?)
     required(:freeze_result, :bool).maybe(:bool?)

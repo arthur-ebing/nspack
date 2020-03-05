@@ -8,7 +8,6 @@ module QualityApp
     attribute :orchard_id, Types::Integer
     attribute :cultivar_id, Types::Integer
     attribute :description, Types::String
-    attribute :status_description, Types::String
     attribute :passed, Types::Bool
     attribute :classification_only, Types::Bool
     attribute :freeze_result, Types::Bool
@@ -30,7 +29,6 @@ module QualityApp
     attribute :cultivar_id, Types::Integer
     attribute :cultivar_code, Types::String
     attribute :description, Types::String
-    attribute :status_description, Types::String
     attribute :passed, Types::Bool
     attribute :classification_only, Types::Bool
     attribute :freeze_result, Types::Bool

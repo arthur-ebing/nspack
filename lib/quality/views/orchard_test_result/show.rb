@@ -20,7 +20,6 @@ module Quality
                   col.add_field :orchard_id
                   col.add_field :cultivar_id
                   col.add_field :description
-                  col.add_field :status_description
                   col.add_field :api_result
                   col.add_field :classifications
                 end
