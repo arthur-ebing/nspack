@@ -65,18 +65,8 @@ module QualityApp
       OrchardTestResultFlat.new(hash)
     end
 
-    def array_for_db_ids(params)
-      return nil if params.nil?
-
-      attrs = params.to_h
-      attrs.each do |k, v|
-        attrs[k] = array_for_db_col(v) if k.to_s.end_with?('_ids')
-      end
-      attrs
-    end
-
     def create_orchard_test_type(params)
-      DB[:orchard_test_types].insert(array_for_db_ids(params))
+      DB[:orchard_test_types].insert(prepare_array_values_for_db(params))
     end
 
     def update_orchard_test_type(id, params)
@@ -88,7 +78,7 @@ module QualityApp
         attrs[:applicable_commodity_group_ids] = nil
       end
 
-      DB[:orchard_test_types].where(id: id).update(array_for_db_ids(attrs))
+      DB[:orchard_test_types].where(id: id).update(prepare_array_values_for_db(attrs))
     end
 
     def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize
