@@ -114,9 +114,9 @@
       :op: =
       :val: true
   :pallets_available_for_bulk_update:
-    - :col: in_stock
-      :op: =
-      :val: true
+#    - :col: in_stock
+#      :op: =
+#      :val: true
     - :col: production_run_id
       :op: =
       :val: $:production_run_id$
