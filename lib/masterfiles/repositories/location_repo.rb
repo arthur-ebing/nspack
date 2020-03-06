@@ -82,11 +82,28 @@ module MasterfilesApp
     end
 
     def location_id_from_long_code(location_long_code)
-      DB[:locations].where(location_long_code: location_long_code).get(:id)
+      get_id(:locations, location_long_code: location_long_code)
     end
 
     def location_id_from_short_code(location_short_code)
-      DB[:locations].where(location_short_code: location_short_code).get(:id)
+      get_id(:locations, location_short_code: location_short_code)
+    end
+
+    # Given a scanned or entered value and the scan_field
+    # value from a form, return the valid location_id or nil.
+    #
+    # @param value [string,integer] the scanned or entered value
+    # @param scan_field [string] the type of scan (blank if the value was typed in)
+    # @return [intger,nil] the location_id or nil if input was invalid or not found
+    def resolve_location_id_from_scan(value, scan_field)
+      not_found = nil
+      if ['', 'location_short_code'].include?(scan_field)
+        location_id_from_short_code(value)
+      elsif value.is_a?(Numeric) || value =~ /^\d+$/
+        get_id(:locations, id: value)
+      else
+        not_found
+      end
     end
 
     def create_root_location(params)

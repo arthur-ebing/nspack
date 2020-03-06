@@ -4,6 +4,8 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestLocationRepo < MiniTestWithHooks
+    include LocationFactory
+
     def test_for_selects
       assert_respond_to repo, :for_select_locations
       assert_respond_to repo, :for_select_location_assignments
@@ -58,6 +60,26 @@ module MasterfilesApp
       skip 'factories needed'
       # (id)
       # DB[:tree_locations].where(descendant_location_id: id).count == 1
+    end
+
+    def test_resolve_location_id_from_scan
+      loc_short = 'AAAAAAAAAAAAAAAA'
+      loc_id = create_location(location_short_code: loc_short)
+      [
+        [loc_id, 'location_id', loc_id],
+        [loc_id.to_s, 'location_id', loc_id],
+        [loc_short, 'location_id', nil],
+        [loc_short, 'location_short_code', loc_id],
+        [loc_short, '', loc_id],
+        [0, 'location_id', nil]
+      ].each do |val, scan_field, expect|
+        id = repo.resolve_location_id_from_scan(val, scan_field)
+        if expect.nil?
+          assert_nil id
+        else
+          assert_equal expect, id
+        end
+      end
     end
 
     private
