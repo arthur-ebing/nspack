@@ -99,7 +99,7 @@ module MasterfilesApp
       not_found = nil
       if ['', 'location_short_code'].include?(scan_field)
         location_id_from_short_code(value)
-      elsif value.is_a?(Numeric) || value =~ /^\d+$/
+      elsif value.is_a?(Numeric) || value =~ /\A\d+\Z/
         get_id(:locations, id: value)
       else
         not_found
