@@ -87,6 +87,8 @@ module LabelPrintingApp
       label_template = repo.find_label_template_by_name(label_name)
       raise Crossbeams::FrameworkError, "There is no label template named \"#{label_name}\"." if label_template.nil?
 
+      return [] if label_template.variable_rules.nil?
+
       label_template.variable_rules['variables'].map do |var|
         var.values.first['resolver']
       end
