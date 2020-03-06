@@ -391,6 +391,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'receive_rmt_bins_submit', Integer do |id|
         params[:delivery].delete_if { |_k, v| v.nil_or_empty? }
+        params[:delivery].delete_if { |k, _v| k.to_s.include?('scan_field') }
         res = interactor.create_rmt_bins(id, params[:delivery])
         if res.success
           delivery = interactor.get_delivery_confirmation_details(id)
