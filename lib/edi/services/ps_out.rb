@@ -37,6 +37,11 @@ module EdiApp
 
       ps_repo.ps_rows(party_role_id).each do |rec|
         hash = build_hash_from_data(rec, 'PS')
+        if AppConst::PS_APPLY_SUBSTITUTES
+          %i[original_account saftbin1 saftbin2 product_characteristic_code].each do |fld|
+            hash[fld] = rec["substitute_for_#{fld}".to_sym]
+          end
+        end
         add_record('PS', hash)
         @ps_record_count += 1
         @total_cartons += rec[:carton_quantity]

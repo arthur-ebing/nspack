@@ -43,9 +43,23 @@ module EdiApp
           pallets.gross_weight AS pallet_gross_mass,
           pallets.gross_weight_measured_at AS weighing_date,
           pallets.gross_weight_measured_at AS weighing_time,
-          pallets.nett_weight AS mass
+          pallets.nett_weight AS mass,
+          CASE WHEN pallet_sequences.production_run_id IS NULL THEN
+            NULL
+          ELSE
+          'run_id=' || pallet_sequences.production_run_id::text
+          END AS substitute_for_original_account,
+          SUBSTRING(location_types.location_type_code, 1, 16) AS substitute_for_saftbin1,
+          SUBSTRING(locations.location_long_code, 1, 16) AS substitute_for_saftbin2,
+          (SELECT t.treatment_code
+            FROM treatments t
+            JOIN treatment_types y ON y.id = t.treatment_type_id
+            WHERE t.id = ANY (pallet_sequences.treatment_ids)
+            AND y.treatment_type_code = 'CHEMICAL_CONTENT' LIMIT 1) AS substitute_for_product_characteristic_code
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
+        JOIN locations ON locations.id = pallets.location_id
+        JOIN location_types ON location_types.id = locations.location_type_id
         JOIN party_roles mpr ON mpr.id = pallet_sequences.marketing_org_party_role_id
         JOIN organizations marketing_org ON marketing_org.party_id = mpr.party_id
         LEFT OUTER JOIN govt_inspection_pallets ON govt_inspection_pallets.id = pallets.last_govt_inspection_pallet_id

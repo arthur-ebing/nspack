@@ -357,6 +357,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
+  PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
 
   MF_VARIANT_TABLES = %i[
     standard_pack_codes

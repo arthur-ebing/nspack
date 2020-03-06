@@ -48,7 +48,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_CARGO_TEMP_ON_ARRIVAL: 'The cargo temperature_code to default for containers on truck arrival.' },
     { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' },
     { RPT_INDUSTRY: 'Industry specific reporting folder' },
-    { INCENTIVISED_LABELING: 'True if a worker must be logged-in to print a carton label.' }
+    { INCENTIVISED_LABELING: 'True if a worker must be logged-in to print a carton label.' },
+    { PS_APPLY_SUBSTITUTES: 'If true, include extra substitute columns in PS EDI out.' }
   ].freeze
 
   NO_OVERRIDE = [
