@@ -332,7 +332,9 @@ class Nspack < Roda # rubocop:disable ClassLength
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
         notice = retrieve_from_local_store(:flash_notice)
-        form_state = { bin_fullness: :Full, qty_bins: 1 }
+        rmt_container_material_type_id = retrieve_from_local_store(:rmt_container_material_type_id)
+        rmt_material_owner_party_role_id = retrieve_from_local_store(:rmt_material_owner_party_role_id)
+        form_state = { bin_fullness: :Full, qty_bins: 1, rmt_container_material_type_id: rmt_container_material_type_id, rmt_material_owner_party_role_id: rmt_material_owner_party_role_id }
         error = retrieve_from_local_store(:errors)
         form_state.merge!(error_message: error[:message], errors: error[:errors]) unless error.nil?
         form = Crossbeams::RMDForm.new(form_state,
@@ -367,8 +369,9 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         if capture_container_material && capture_container_material_owner
+          rmt_material_owner_party_role_ids = rmt_container_material_type_id ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(rmt_container_material_type_id) : []
           form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
-                          items: [],
+                          items: rmt_material_owner_party_role_ids,
                           required: true, prompt: true)
         end
 
@@ -400,6 +403,8 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         else
           store_locally(:errors, res)
+          store_locally(:rmt_container_material_type_id, params[:delivery][:rmt_container_material_type_id])
+          store_locally(:rmt_material_owner_party_role_id, params[:delivery][:rmt_material_owner_party_role_id])
           r.redirect("/rmd/rmt_deliveries/rmt_bins/receive_rmt_bins/#{id}")
         end
       end
