@@ -1,4 +1,3 @@
-
 // Object to keep track of the grids in a page - so they can be looked up by div id.
 /**
  * In-browser store of grids on the page.
@@ -1371,55 +1370,61 @@ const crossbeamsGridStaticLoader = {
    */
   const loadGrid = function loadGrid(grid, gridOptions) {
     const url = grid.getAttribute('data-gridurl');
-    if (url === '') return; // must be loaded statically
+    if (url === '') return; // this grid must be loaded statically
 
-    const httpRequest = new XMLHttpRequest();
-    httpRequest.open('GET', url);
-
-    httpRequest.onreadystatechange = () => {
-      let httpResult = null;
+    fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'X-Custom-Request-Type': 'Fetch',
+      }),
+    })
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      throw new HttpError(response);
+    })
+    .then((data) => {
       let newColDefs = null;
-
-      if (httpRequest.readyState === 4 && httpRequest.status === 200) {
-        httpResult = JSON.parse(httpRequest.responseText);
-        if (httpResult.exception) {
-          crossbeamsUtils.alert({ prompt: httpResult.flash.error, type: 'error' });
-          if (httpResult.backtrace) {
-            console.groupCollapsed('EXCEPTION:', httpResult.exception, httpResult.flash.error); // eslint-disable-line no-console
-            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
-            console.info(httpResult.backtrace.join('\n')); // eslint-disable-line no-console
-            console.groupEnd(); // eslint-disable-line no-console
-          }
-          return null;
+      if (data.exception) {
+        crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
+        if (data.backtrace) {
+          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+          console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+          console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+          console.groupEnd(); // eslint-disable-line no-console
         }
+        return null;
+      }
 
-        if (httpResult.nestedColumnDefs) {
-          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['1']);
-          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['2']);
-          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.nestedColumnDefs['3']);
-        } else {
-          newColDefs = crossbeamsGridStaticLoader.translateColDefs(httpResult.columnDefs);
-        }
-        gridOptions.api.setColumnDefs(newColDefs);
-        gridOptions.api.setRowData(httpResult.rowDefs);
-        if (!gridOptions.forPrint) {
-          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
-            newColDefs,
-            httpResult.fieldUpdateUrl,
-            httpResult.extraContext);
+      if (data.nestedColumnDefs) {
+        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
+        midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
+        detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
+      } else {
+        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
+      }
+      gridOptions.api.setColumnDefs(newColDefs);
+      gridOptions.api.setRowData(data.rowDefs);
+      if (!gridOptions.forPrint) {
+        crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+          newColDefs,
+          data.fieldUpdateUrl,
+          data.extraContext);
 
-          if (httpResult.multiselect_ids) {
-            gridOptions.api.forEachNode((node) => {
-              if (node.data && httpResult.multiselect_ids.includes(node.data.id)) {
-                node.setSelected(true);
-              }
-            });
-          }
+        if (data.multiselect_ids) {
+          gridOptions.api.forEachNode((node) => {
+            if (node.data && data.multiselect_ids.includes(node.data.id)) {
+              node.setSelected(true);
+            }
+          });
         }
       }
       return null;
-    };
-    httpRequest.send();
+    }).catch((data) => {
+      crossbeamsUtils.fetchErrorHandler(data);
+    });
   };
 
   const listenForGrid = function listenForGrid() {

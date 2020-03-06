@@ -62,14 +62,6 @@
     }, 0); // Disable the button with a delay so the form still submits...
   }
 
-  class HttpError extends Error {
-    constructor(response) {
-      super(`${response.status} for ${response.url}`);
-      this.name = 'HttpError';
-      this.response = response;
-    }
-  }
-
   /**
    * loadDialogContent - fetches the given url and calls setDialogContent
    *                     to replace the dialog's content area.
