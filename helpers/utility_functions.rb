@@ -67,6 +67,27 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     ' ' * ((initial_spaces || 0) + strings.sum(&:length))
   end
 
+  # Wrap text every 120 characters - breaking on a word boundary.
+  #
+  # @param text [string] the long text to be wrapped.
+  # @param width [integer] the number of characters per line. Default 120.
+  # @return [string] the input text with newlines at each wrap position.
+  def wrapped_text(text, width = 120)
+    ar = text.is_a?(Array) ? text : text.split("\n")
+    ar.map { |a| a.scan(/\S.{0,#{width - 2}}\S(?=\s|$)|\S+/).join("\n") }.join("\n")
+  end
+
+  # Wrap SQL every 120 characters - breaking on a word boundary.
+  # Ensure certain SQL keywords start on a new line.
+  #
+  # @param sql [string] the SQL to be wrapped.
+  # @param width [integer] the number of characters per line. Default 120.
+  # @return [string] the input SQL with newlines at each wrap position.
+  def wrapped_sql(sql, width = 120)
+    ar = sql.gsub(/from /i, "\nFROM ").gsub(/where /i, "\nWHERE ").gsub(/values /i, "\nVALUES ").gsub(/(left outer join |left join |inner join |join )/i, "\n\\1").split("\n")
+    wrapped_text(ar, width)
+  end
+
   # If a string contains a number in scientific notation format, return it formatted as a float.
   # e.g. 3.4e2 => 340.0
   # If the value is not a string, returns the value as is.

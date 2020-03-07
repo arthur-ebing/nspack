@@ -96,3 +96,17 @@ json_hash = { "nett_weight" => "0.303e3",
 json_hash.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }
 # =>  { "nett_weight" => "303.0", "gross_weight" => "340.0", "weighed_manually" => true}
 ----
+
+Wrap text/SQL
+
+Default is to wrap at 120 characters, but there is a parameter available to override.
+
+SQL will receiver a newline before every FROM/WHERE/JOIN/VALUES as well.
+[source,ruby]
+----
+UtilityFunctions.wrapped_text(str)
+UtilityFunctions.wrapped_text(str, 80)
+
+UtilityFunctions.wrapped_sql(sql)
+UtilityFunctions.wrapped_sql(sql, 80)
+----
