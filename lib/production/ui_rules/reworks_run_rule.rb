@@ -31,7 +31,7 @@ module UiRules
       @rules[:changes_made_array_count] = @rules[:array_of_changes_made] ? @form_object.changes_made_array.to_a.size : 0
       @rules[:same_pallet_list] = @form_object.pallets_selected.split("\n") == @form_object.pallets_affected.split("\n")
 
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallets'
 
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
@@ -45,9 +45,10 @@ module UiRules
       fields[:reworks_action] = { renderer: :label,
                                   hide_on_load: !@form_object.reworks_action.nil_or_empty? ? false : true }
       fields[:user] = { renderer: :label }
-      fields[:pallets_selected] = { renderer: :textarea,
-                                    rows: 10,
-                                    disabled: true,
+      fields[:pallets_selected] = { renderer: :list,
+                                    items: @form_object.pallets_selected.split("\n"),
+                                    scroll_height: :short,
+                                    filled_background: true,
                                     caption: "Selected #{text_area_caption}",
                                     hide_on_load: @rules[:single_pallet_selected] || @rules[:same_pallet_list] ? true : false }
       fields[:pallets_affected] = if @rules[:single_pallet_selected]
@@ -55,9 +56,10 @@ module UiRules
                                       with_value: @form_object.pallets_affected,
                                       caption: "Affected #{text_area_caption}" }
                                   else
-                                    { renderer: :textarea,
-                                      rows: 10,
-                                      disabled: true,
+                                    { renderer: :list,
+                                      items: @form_object.pallets_affected.split("\n"),
+                                      scroll_height: :short,
+                                      filled_background: true,
                                       caption: "Affected #{text_area_caption}" }
                                   end
       fields[:pallet_number] = { renderer: :label,
@@ -69,6 +71,7 @@ module UiRules
           left_record = change['change_descriptions'].nil_or_empty? ? change['before'] : change['change_descriptions']['before']
           right_record = change['change_descriptions'].nil_or_empty? ? change['after'] : change['change_descriptions']['after']
           fields["changes_made_#{i}".to_sym] = {
+            no_padding: true,
             left_caption: 'Before',
             right_caption: 'After',
             left_record: left_record.sort.to_h,
@@ -88,6 +91,7 @@ module UiRules
                          @form_object.after_descriptions_state.nil_or_empty? ? @form_object.after_state : @form_object.after_descriptions_state
                        end
         fields[:changes_made] = {
+          no_padding: true,
           left_caption: 'Before',
           right_caption: 'After',
           left_record: left_record.transform_values { |v| UtilityFunctions.scientific_notation_to_s(v) }.sort.to_h,
@@ -113,7 +117,7 @@ module UiRules
                      else
                        'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallet Numbers'
+      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallets'
       scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_bins) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_pallets)
       {
         reworks_run_type_id: { renderer: :hidden },

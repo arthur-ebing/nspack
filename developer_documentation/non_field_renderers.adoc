@@ -200,6 +200,16 @@ column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
 |any text
 |None.
 
+|options - :scroll_height
+|Restrict the list to a certain height and show scrollbars if the list is longer.
+|`:short` or `:medium`
+|None.
+
+|options - :filled_background
+|If true, draw a border and set the background to grey.
+|`true` or `false`
+|`false`
+
 |===
 
 === SortableList
@@ -494,6 +504,11 @@ end
 |A file name.
 |`String`.
 |None.
+
+|no_padding
+|Remove surrounding padding in display.
+|Boolean - `true` or `false`.
+|`false`
 
 |===
 

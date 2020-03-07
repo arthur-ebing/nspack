@@ -24,7 +24,7 @@ module Production
               form.add_field :pallet_sequence_number
             end
             if rules[:show_changes_made]
-              page.add_notice 'The changes below were made to pallets affected list:'
+              page.add_notice 'The changes below were made to the affected pallets:', inline_caption: true
               page.section do |section|
                 if rules[:array_of_changes_made]
                   rules[:changes_made_array_count].times do |i|
