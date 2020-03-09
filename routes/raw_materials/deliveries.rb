@@ -155,6 +155,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                 container_type_code
                 container_material_type_code
                 cultivar_group_id
+                location_long_code
                 puc_id
                 exit_ref
                 qty_bins

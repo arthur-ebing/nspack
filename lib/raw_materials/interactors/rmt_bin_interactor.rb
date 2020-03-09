@@ -30,6 +30,7 @@ module RawMaterialsApp
       created_bins = []
       repo.transaction do
         params.delete(:qty_bins_to_create)
+        params[:location_id] = default_location_id unless params[:location_id]
         bin_asset_numbers.map { |a| a[0] }.each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
           bin_id = repo.create_rmt_bin(params)
@@ -42,13 +43,14 @@ module RawMaterialsApp
       success_response('Bins Created Successfully', created_bins)
     end
 
-    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
 
       delivery = find_rmt_delivery(delivery_id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
+      params = params.merge(location_id: default_location_id) unless params[:location_id]
       res = validate_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -98,7 +100,7 @@ module RawMaterialsApp
       error
     end
 
-    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize
+    def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
 
@@ -113,6 +115,7 @@ module RawMaterialsApp
 
       submitted_bins = params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.map { |_k, v| v }
       params.delete_if { |k, _v| k.to_s.include?('bin_asset_number') }
+      params = params.merge(location_id: default_location_id) unless params[:location_id]
 
       res = validate_rmt_bin_params(params)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
@@ -261,6 +264,12 @@ module RawMaterialsApp
     end
 
     private
+
+    def default_location_id
+      return nil unless AppConst::DEFAULT_DELIVERY_LOCATION
+
+      repo.get_id(:locations, location_long_code: AppConst::DEFAULT_DELIVERY_LOCATION)
+    end
 
     def repo
       @repo ||= RmtDeliveryRepo.new

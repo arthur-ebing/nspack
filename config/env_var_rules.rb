@@ -50,7 +50,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { RPT_INDUSTRY: 'Industry specific reporting folder' },
     { INCENTIVISED_LABELING: 'True if a worker must be logged-in to print a carton label.' },
     { PS_APPLY_SUBSTITUTES: 'If true, include extra substitute columns in PS EDI out.' },
-    { BIN_ASSET_REGEX: 'One or more regular expressions (delimited by commas) to validate the format of typed-in bin asset numbers.' }
+    { BIN_ASSET_REGEX: 'One or more regular expressions (delimited by commas) to validate the format of typed-in bin asset numbers.' },
+    { DEFAULT_DELIVERY_LOCATION: 'The long code of the location to serve as the default for all deliveries. If not set, the location id will be blank, but bin moves will not work.' }
   ].freeze
 
   NO_OVERRIDE = [
