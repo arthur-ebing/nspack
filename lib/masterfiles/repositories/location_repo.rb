@@ -66,6 +66,28 @@ module MasterfilesApp
       find_location_by(:id, id)
     end
 
+    def lookup_location(id)
+      query = <<~SQL
+        select distinct l.*, t.location_type_code
+        from locations l
+        join location_types t on t.id=l.location_type_id
+        where l.id = ?
+      SQL
+      DB[query, id].first
+    end
+
+    def find_filled_deck_positions(location_to_id)
+      query = <<~SQL
+        select distinct p.location_short_code
+        from locations d
+        join tree_locations t on t.ancestor_location_id=d.id
+        join locations p on p.id=t.descendant_location_id
+        join pallets s on s.location_id=p.id
+        where d.id = ? and t.ancestor_location_id<>t.descendant_location_id
+      SQL
+      DB[query, location_to_id].select_map(:location_short_code)
+    end
+
     def find_location_by_location_long_code(code)
       find_location_by(:location_long_code, code)
     end

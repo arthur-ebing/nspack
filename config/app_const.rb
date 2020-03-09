@@ -67,6 +67,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')
   GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
 
+  # Constants for pallet movements:
+  CALCULATE_PALLET_DECK_POSITIONS = make_boolean('CALCULATE_PALLET_DECK_POSITIONS')
+
   # Constants for pallet statuses:
   PALLETIZED_NEW_PALLET = 'PALLETIZED_NEW_PALLET'
   RW_PALLET_SINGLE_EDIT = 'RW_PALLET_SINGLE_EDIT'

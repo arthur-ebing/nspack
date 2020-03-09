@@ -12,13 +12,19 @@ module FinishedGoodsApp
       @business_process_context_id = business_process_context_id
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate
       return res unless res.success
 
-      location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
+      location_to = MasterfilesApp::LocationRepo.new.lookup_location(location_to_id)
+
+      if location_to[:location_type_code] == 'COLD_BAY_DECK'
+        res = find_next_available_deck_position(location_to[:location_short_code])
+        return res unless res.success
+      end
+
       upd = { location_id: location_to_id }
-      upd.store(:first_cold_storage_at, Time.now) if stock_type.to_s.upcase == 'PALLET' && location_to.assignment_code == 'COLD_STORAGE' && !stock_item.first_cold_storage_at
+      upd.store(:first_cold_storage_at, Time.now) if stock_type.to_s.upcase == 'PALLET' && location_to[:assignment_code] == 'COLD_STORAGE' && !stock_item.first_cold_storage_at
 
       repo.update_stock_item(stock_item_id, upd, stock_type)
 
@@ -28,6 +34,20 @@ module FinishedGoodsApp
     end
 
     private
+
+    def find_next_available_deck_position(location_code) # rubocop:disable Metrics/AbcSize
+      positions = MasterfilesApp::LocationRepo.new.find_filled_deck_positions(location_to_id)
+
+      return failed_response("Deck:#{location_code} is full") if positions.length == 10
+
+      unless (last_pos = positions.map { |l| l.sub("#{location_code}_P", '').to_i }.min)
+        last_pos = 11
+      end
+      deck_position = MasterfilesApp::LocationRepo.new.find_location_by_location_short_code("#{location_code}_P#{last_pos - 1}")
+      @location_to_id = deck_position.id
+
+      ok_response
+    end
 
     def log_stock_item_status(stock_type)
       return repo.log_status('pallets', stock_item[:id], AppConst::PALLET_MOVED) if stock_type == 'PALLET'
