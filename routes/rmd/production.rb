@@ -246,25 +246,26 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.post do
           carton_number = params[:carton][:carton_number]
-          val_res = interactor.validate_carton_number_for_palletizing(params[:carton][:carton_number])
+          val_res = interactor.validate_carton_number_for_palletizing(carton_number)
           unless val_res.success
             store_locally(:errors, val_res)
             r.redirect('/rmd/production/palletizing/create_new_pallet')
           end
 
+          carton_id = (interactor.find_carton_by_carton_label_id(carton_number) || {})[:id]
           unless AppConst::CARTON_VERIFICATION_REQUIRED
-            carton_number = (interactor.find_carton_by_carton_label_id(params[:carton][:carton_number]) || {})[:id]
-            unless carton_number
-              res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:carton][:carton_number])
+            if carton_id.nil?
+              res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+                                                   .carton_verification(carton_number: carton_number)
               unless res.success
                 store_locally(:errors, res)
                 r.redirect('/rmd/production/palletizing/create_new_pallet')
               end
-              carton_number = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])[:id]
+              carton_id = interactor.find_carton_by_carton_label_id(carton_number)[:id]
             end
           end
 
-          res = interactor.create_pallet_from_carton(carton_number)
+          res = interactor.create_pallet_from_carton(carton_id)
           if res.success
             pallet_sequence = interactor.find_pallet_sequence_attrs(res.instance[:pallet_id], 1)
             r.redirect("/rmd/production/palletizing/print_or_edit_pallet_view/#{pallet_sequence[:id]}")
@@ -369,22 +370,25 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'add_sequence_to_pallet_submit', Integer do |id|
         carton_number = params[:pallet][:carton_number]
         pallet_number = MesscadaApp::MesscadaRepo.new.find_pallet(id).pallet_number
+
+        carton_id = (interactor.find_carton_by_carton_label_id(carton_number) || {})[:id]
         unless AppConst::CARTON_VERIFICATION_REQUIRED
-          carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
-          unless carton_number
-            res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
+          if carton_id.nil?
+            res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+                                                 .carton_verification(carton_number: carton_number)
             unless res.success
               store_locally(:current_form_state, carton_quantity: params[:pallet][:carton_quantity])
               store_locally(:errors, unwrap_failed_response(res))
               r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{id}")
             end
-            carton_number = interactor.find_carton_by_carton_label_id(params[:carton][:carton_number])[:id]
+            carton_id = interactor.find_carton_by_carton_label_id(carton_number)[:id]
           end
         end
 
-        res = interactor.add_sequence_to_pallet(pallet_number, carton_number, params[:pallet][:carton_quantity])
+        res = interactor.add_sequence_to_pallet(pallet_number, carton_id, params[:pallet][:carton_quantity])
         if res.success
-          pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).find_pallet_sequences_by_pallet_number(pallet_number)
+          pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+                                                            .find_pallet_sequences_by_pallet_number(pallet_number)
           r.redirect("/rmd/production/palletizing/print_pallet_view/#{pallet_sequences.all.last[:id]}")
         else
           store_locally(:current_form_state, carton_quantity: params[:pallet][:carton_quantity])
