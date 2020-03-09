@@ -23,10 +23,9 @@ class Nspack < Roda # rubocop:disable ClassLength
       # BIN BARCODES SHEET
       # --------------------------------------------------------------------------
       r.on 'print_bin_barcodes' do
-        res = CreateJasperReport.call(report_name: 'bin_barcodes',
+        res = CreateJasperReport.call(report_name: 'bin_tickets',
                                       user: current_user.login_name,
-                                      file: 'bin_barcodes',
-                                      parent_folder: AppConst::RPT_INDUSTRY,
+                                      file: 'bin_tickets',
                                       params: { delivery_id: id,
                                                 keep_file: false })
         if res.success
@@ -43,7 +42,6 @@ class Nspack < Roda # rubocop:disable ClassLength
         res = CreateJasperReport.call(report_name: 'delivery',
                                       user: current_user.login_name,
                                       file: 'delivery',
-                                      parent_folder: AppConst::RPT_INDUSTRY,
                                       params: { delivery_id: id,
                                                 keep_file: false })
         if res.success
