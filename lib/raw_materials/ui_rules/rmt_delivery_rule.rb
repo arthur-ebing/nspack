@@ -2,7 +2,7 @@
 
 module UiRules
   class RmtDeliveryRule < Base
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object
       apply_form_values
@@ -14,6 +14,9 @@ module UiRules
       @rules[:show_qty_empty_bins] = AppConst::DELIVERY_CAPTURE_EMPTY_BINS
       @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      @rules[:auto_allocate_asset_number] = AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION
+      @rules[:is_auto_allocate_asset_number_delivery] = @form_object.auto_allocate_asset_number
+      @rules[:print_bin_barcodes] = (@mode == :edit && @form_object.auto_allocate_asset_number)
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode
@@ -37,13 +40,14 @@ module UiRules
       fields[:truck_registration_number] = { renderer: :label }
       fields[:qty_damaged_bins] = { renderer: :label }
       fields[:qty_empty_bins] = { renderer: :label }
-      fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:delivery_tipped] = { renderer: :label, as_boolean: true }
       fields[:date_picked] = { renderer: :label }
       fields[:date_delivered] = { renderer: :label }
       fields[:tipping_complete_date_time] = { renderer: :label }
-      fields[:keep_open] = { renderer: :label, as_boolean: true }
       fields[:quantity_bins_with_fruit] = { renderer: :label }
+      fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:delivery_tipped] = { renderer: :label, as_boolean: true }
+      fields[:keep_open] = { renderer: :label, as_boolean: true }
+      fields[:auto_allocate_asset_number] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -62,7 +66,8 @@ module UiRules
         date_picked: { renderer: :date },
         date_delivered: { renderer: :date },
         current: { renderer: :checkbox, caption: 'Set As Current' },
-        quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' }
+        quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' },
+        auto_allocate_asset_number: { renderer: :checkbox }
       }
 
       fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?

@@ -28,18 +28,19 @@ module RawMaterials
                     col.add_field :rmt_delivery_destination_id
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
+                    col.add_field :date_delivered
+                    col.add_field :date_picked
                   end
 
                   row.column do |col|
-                    col.add_field :date_delivered
-                    col.add_field :date_picked
                     col.add_field :truck_registration_number
-                    col.add_field :delivery_tipped
                     col.add_field :season_id
                     col.add_field :tipping_complete_date_time
+                    col.add_field :quantity_bins_with_fruit
+                    col.add_field :delivery_tipped
                     col.add_field :active
                     col.add_field :keep_open
-                    col.add_field :quantity_bins_with_fruit
+                    col.add_field :auto_allocate_asset_number
                   end
                 end
               end

@@ -17,6 +17,7 @@ module RawMaterialsApp
     attribute :date_delivered, Types::DateTime
     attribute :tipping_complete_date_time, Types::DateTime
     attribute? :keep_open, Types::Bool
+    attribute? :auto_allocate_asset_number, Types::Bool
     attribute? :current, Types::Bool
     attribute? :active, Types::Bool
     attribute? :quantity_bins_with_fruit, Types::Integer

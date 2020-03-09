@@ -184,6 +184,17 @@ module RawMaterialsApp
       DB[query, id].first
     end
 
+    def get_available_bin_asset_numbers(count)
+      query = <<~SQL
+        select a.id, a.bin_asset_number
+        from bin_asset_numbers a
+        where a.bin_asset_number NOT IN (select b.bin_asset_number from rmt_bins b where b.bin_asset_number IS NOT NULL)
+        order by last_used_at asc
+        limit ?
+      SQL
+      DB[query, count].all.map { |p| [p[:bin_asset_number], p[:id]] }
+    end
+
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
       DB[:rmt_container_material_owners]
         .where(rmt_material_owner_party_role_id: rmt_material_owner_party_role_id, rmt_container_material_type_id:  rmt_container_material_type_id)

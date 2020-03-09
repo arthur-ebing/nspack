@@ -19,6 +19,40 @@ class Nspack < Roda # rubocop:disable ClassLength
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
       end
 
+      # --------------------------------------------------------------------------
+      # BIN BARCODES SHEET
+      # --------------------------------------------------------------------------
+      r.on 'print_bin_barcodes' do
+        res = CreateJasperReport.call(report_name: 'bin_barcodes',
+                                      user: current_user.login_name,
+                                      file: 'bin_barcodes',
+                                      parent_folder: AppConst::RPT_INDUSTRY,
+                                      params: { delivery_id: id,
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      # --------------------------------------------------------------------------
+      # DELIVERY SHEET
+      # --------------------------------------------------------------------------
+      r.on 'print_delivery' do
+        res = CreateJasperReport.call(report_name: 'delivery',
+                                      user: current_user.login_name,
+                                      file: 'delivery',
+                                      parent_folder: AppConst::RPT_INDUSTRY,
+                                      params: { delivery_id: id,
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
       r.on 'recalc_nett_weight' do
         res = interactor.recalc_rmt_bin_nett_weight(id)
         if res.success
@@ -92,6 +126,70 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.on 'new' do    # NEW
           check_auth!('deliveries', 'new')
           show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::New.call(id, remote: fetch?(r)) }
+        end
+
+        r.on 'create_bin_groups' do # rubocop:disable Metrics/BlockLength
+          r.get do
+            check_auth!('deliveries', 'new')
+            show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::NewBinGroup.call(id, remote: fetch?(r)) }
+          end
+
+          r.post do # rubocop:disable Metrics/BlockLength
+            params[:rmt_bin].merge!(qty_bins: 1)
+            res = interactor.create_bin_groups(id, params[:rmt_bin])
+            if res.success
+              row_keys = %i[
+                id
+                rmt_delivery_id
+                orchard_code
+                farm_code
+                puc_code
+                cultivar_name
+                season_code
+                season_id
+                cultivar_id
+                orchard_id
+                farm_id
+                rmt_class_id
+                rmt_material_owner_party_role_id
+                container_type_code
+                container_material_type_code
+                cultivar_group_id
+                puc_id
+                exit_ref
+                qty_bins
+                bin_asset_number
+                tipped_asset_number
+                rmt_inner_container_type_id
+                rmt_inner_container_material_id
+                qty_inner_bins
+                production_run_rebin_id
+                production_run_tipped_id
+                bin_tipping_plant_resource_id
+                bin_fullness
+                nett_weight
+                gross_weight
+                bin_tipped
+                bin_received_date_time
+                bin_tipped_date_time
+                exit_ref_date_time
+                rebin_created_at
+                scrapped
+                scrapped_at
+              ]
+              actions = []
+              res.instance.each do |instance|
+                actions << OpenStruct.new(type: :add_grid_row, attrs: select_attributes(instance, row_keys))
+              end
+              json_actions(actions, res.message)
+            else
+              re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups") do
+                RawMaterials::Deliveries::RmtBin::NewBinGroup.call(id, form_values: params[:rmt_bin],
+                                                                       form_errors: res.errors,
+                                                                       remote: fetch?(r))
+              end
+            end
+          end
         end
 
         r.on 'direct_create' do

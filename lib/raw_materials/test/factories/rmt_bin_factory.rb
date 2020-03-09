@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  module RmtBinFactory
+  module RmtBinFactory # rubocop:disable ModuleLength
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class
@@ -97,12 +97,12 @@ module RawMaterialsApp
 
     def create_location_storage_definition(opts = {})
       default = {
-          storage_definition_code: Faker::Lorem.word,
-          active: true,
-          created_at: '2010-01-01 12:00',
-          updated_at: '2010-01-01 12:00',
-          storage_definition_format: Faker::Lorem.word,
-          storage_definition_description: Faker::Lorem.word
+        storage_definition_code: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00',
+        storage_definition_format: Faker::Lorem.word,
+        storage_definition_description: Faker::Lorem.word
       }
       DB[:location_storage_definitions].insert(default.merge(opts))
     end

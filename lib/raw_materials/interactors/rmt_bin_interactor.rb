@@ -2,10 +2,11 @@
 
 module RawMaterialsApp
   class RmtBinInteractor < BaseInteractor # rubocop:disable ClassLength
-    def validate_delivery(id)
+    def validate_delivery(id) # rubocop:disable Metrics/AbcSize
       delivery = find_rmt_delivery(id)
       return failed_response("Delivery: #{id} does not exist") unless delivery
       return failed_response("Delivery: #{id} has already been tipped") if delivery[:delivery_tipped]
+      return failed_response("Action not allowed - #{id} is an auto bin allocation delivery") if delivery[:auto_allocate_asset_number]
       return failed_response("quantity_bins_with_fruit has not yet been set for delivery:#{id}") unless delivery[:quantity_bins_with_fruit]
 
       return failed_response("All #{delivery[:quantity_bins_with_fruit]} bins have already been received(scanned)")  unless delivery[:quantity_bins_with_fruit] > RawMaterialsApp::RmtDeliveryRepo.new.delivery_bin_count(id)
@@ -15,6 +16,30 @@ module RawMaterialsApp
 
     def update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
       repo.update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
+    end
+
+    def create_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
+      delivery = find_rmt_delivery(id)
+      params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
+      res = validate_rmt_bin_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
+      return failed_response("Couldn't find #{params[:qty_bins_to_create]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
+
+      created_bins = []
+      repo.transaction do
+        params.delete(:qty_bins_to_create)
+        bin_asset_numbers.map { |a| a[0] }.each do |bin_asset_number|
+          params[:bin_asset_number] = bin_asset_number
+          bin_id = repo.create_rmt_bin(params)
+          log_status('rmt_bins', bin_id, 'BIN_RECEIVED')
+          created_bins << rmt_bin(bin_id)
+        end
+        repo.update(:bin_asset_numbers, bin_asset_numbers.map { |a| a[1] }, last_used_at: Time.now)
+      end
+
+      success_response('Bins Created Successfully', created_bins)
     end
 
     def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize

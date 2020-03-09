@@ -17,6 +17,21 @@ module RawMaterials
                                   text: 'Back',
                                   url: back_url,
                                   style: :back_button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Print Bin Barcodes Sheet',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_bin_barcodes",
+                                  visible: rules[:print_bin_barcodes],
+                                  loading_window: true,
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Print Delivery Sheet',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_delivery",
+                                  visible: rules[:print_bin_barcodes],
+                                  loading_window: true,
+                                  style: :button)
+
               section.form do |form|
                 form.caption 'Edit Rmt Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"
@@ -43,9 +58,17 @@ module RawMaterials
             end
 
             unless is_update
-              page.section do |section|
+              page.section do |section| # rubocop:disable Metrics/BlockLength
                 bin_type = nil
-                if rules[:scan_rmt_bin_asset_numbers]
+                if rules[:is_auto_allocate_asset_number_delivery]
+                  section.add_control(control_type: :link,
+                                      text: 'Create Bin Groups',
+                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: :popup)
+                  bin_type = 'asset_number_'
+                elsif rules[:scan_rmt_bin_asset_numbers]
                   section.add_control(control_type: :link,
                                       text: 'New Rmt Bin',
                                       url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new",

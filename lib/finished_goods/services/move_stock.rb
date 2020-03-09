@@ -74,8 +74,7 @@ module FinishedGoodsApp
       success_response('ok')
     end
 
-    def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      # if stock_type.to_s.upcase == 'PALLET'
+    def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @stock_item = repo.find_stock_item(stock_item_id, stock_type.to_s.upcase)
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
@@ -86,7 +85,7 @@ module FinishedGoodsApp
 
       @location_from_id = @stock_item[:location_id]
       @stock_item_number = stock_type.to_s.upcase == 'PALLET' ? @stock_item.pallet_number : @stock_item[:id]
-      # end
+
       success_response('ok')
     end
 
