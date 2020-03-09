@@ -18,7 +18,7 @@ module FinishedGoodsApp
 
       location_to = MasterfilesApp::LocationRepo.new.lookup_location(location_to_id)
 
-      if location_to[:location_type_code] == 'COLD_BAY_DECK'
+      if stock_type.to_s.upcase == 'PALLET' && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == 'COLD_BAY_DECK'
         res = find_next_available_deck_position(location_to[:location_short_code])
         return res unless res.success
       end
@@ -102,6 +102,7 @@ module FinishedGoodsApp
       return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
       return failed_response("#{stock_type} has been tipped") if stock_type.to_s.upcase == 'BIN' && @stock_item[:bin_tipped]
       return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
+      return failed_response("#{stock_type} current location has not been set") unless @stock_item[:location_id]
 
       @location_from_id = @stock_item[:location_id]
       @stock_item_number = stock_type.to_s.upcase == 'PALLET' ? @stock_item.pallet_number : @stock_item[:id]
