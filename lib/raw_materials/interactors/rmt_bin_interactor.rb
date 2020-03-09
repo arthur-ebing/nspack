@@ -69,7 +69,7 @@ module RawMaterialsApp
 
     def validate_bin_asset_no_format(params)
       return ok_response unless AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in the correct format'] })) unless AppConst::BIN_ASSET_REGEX.match?(params[:bin_asset_number])
+      return validation_failed_response(OpenStruct.new(messages: { bin_asset_number: ['is not in a valid format'] })) unless bin_asset_regex_check_ok?(params[:bin_asset_number])
 
       ok_response
     end
@@ -77,9 +77,15 @@ module RawMaterialsApp
     def validate_bin_asset_numbers_format(params)
       error = {}
       params.find_all { |k, _v| k.to_s.include?('bin_asset_number') }.each do |k, _v|
-        error.store(k, ['is not in the correct format']) unless AppConst::BIN_ASSET_REGEX.match?(params[k])
+        error.store(k, ['is not in a valid format']) unless bin_asset_regex_check_ok?(params[k])
       end
       error
+    end
+
+    def bin_asset_regex_check_ok?(bin_asset_number)
+      Array(AppConst::BIN_ASSET_REGEX.split(',')).any? do |regex|
+        Regexp.new(regex).match?(bin_asset_number)
+      end
     end
 
     def validate_bin_asset_numbers_duplicate_scans(params)

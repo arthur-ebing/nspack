@@ -27,7 +27,9 @@ module RawMaterialsApp
     def test_create_rmt_bin
       delivery_id = create_rmt_delivery
       attrs = fake_rmt_bin.to_h.reject { |k, _| k == :id }
-      res = interactor.create_rmt_bin(delivery_id, attrs)
+      res = AppConst.stub_consts(BIN_ASSET_REGEX: '.+') do
+        interactor.create_rmt_bin(delivery_id, attrs)
+      end
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(RmtBinFlat, res.instance)
       assert res.instance.id.nonzero?
@@ -36,7 +38,9 @@ module RawMaterialsApp
     def test_create_rmt_bin_fail
       rmt_delivery_id = create_rmt_delivery
       attrs = fake_rmt_bin(rmt_container_type_id: nil).to_h.reject { |k, _| k == :id }
-      res = interactor.create_rmt_bin(rmt_delivery_id, attrs)
+      res = AppConst.stub_consts(BIN_ASSET_REGEX: '.+') do
+        interactor.create_rmt_bin(rmt_delivery_id, attrs)
+      end
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:rmt_container_type_id]
     end

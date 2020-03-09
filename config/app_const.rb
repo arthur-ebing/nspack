@@ -58,8 +58,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION = make_boolean('CAPTURE_TRUCK_AT_FRUIT_RECEPTION')
   USE_PERMANENT_RMT_BIN_BARCODES = make_boolean('USE_PERMANENT_RMT_BIN_BARCODES')
   ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION = make_boolean('ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION')
-  # Regular expression to validate bin asset numbers when present (in case they are typed in incorrectly)
-  BIN_ASSET_REGEX = Regexp.new(ENV.fetch('BIN_ASSET_REGEX', '.+'))
+  # Regular expression(s) to validate bin asset numbers when present (in case they are typed in incorrectly)
+  # If more than one format is required, separate with commas (no spaces).
+  BIN_ASSET_REGEX = ENV.fetch('BIN_ASSET_REGEX', '.+')
 
   # Resources
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')

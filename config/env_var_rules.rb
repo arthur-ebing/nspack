@@ -49,7 +49,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { BASE_PACK_EQUALS_STD_PACK: 'If true, creating a std pack will automatically create a basic pack.' },
     { RPT_INDUSTRY: 'Industry specific reporting folder' },
     { INCENTIVISED_LABELING: 'True if a worker must be logged-in to print a carton label.' },
-    { PS_APPLY_SUBSTITUTES: 'If true, include extra substitute columns in PS EDI out.' }
+    { PS_APPLY_SUBSTITUTES: 'If true, include extra substitute columns in PS EDI out.' },
+    { BIN_ASSET_REGEX: 'One or more regular expressions (delimited by commas) to validate the format of typed-in bin asset numbers.' }
   ].freeze
 
   NO_OVERRIDE = [

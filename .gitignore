@@ -53,7 +53,6 @@ prestyle.css
 # Client-specific config.
 config/mail_settings.rb
 config/dataminer_connections.yml
-config/edi_flow_config.yml
 config/edi_out_config.yml
 prepared_reports/*.yml
 pdf_documentation/*.pdf

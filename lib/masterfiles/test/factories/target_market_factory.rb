@@ -4,7 +4,7 @@ module MasterfilesApp
   module TargetMarketFactory
     def create_marketing_variety(opts = {})
       default = {
-        marketing_variety_code: Faker::Lorem.word,
+        marketing_variety_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true
       }
