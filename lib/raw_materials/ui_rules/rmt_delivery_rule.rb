@@ -33,7 +33,7 @@ module UiRules
       puc_id_label = MasterfilesApp::FarmRepo.new.find_puc(@form_object.puc_id)&.puc_code
       fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
-      fields[:rmt_delivery_destination_id] = { renderer: :label, with_value: rmt_delivery_destination_id_label, caption: 'Rmt Delivery Destination' }
+      fields[:rmt_delivery_destination_id] = { renderer: :label, with_value: rmt_delivery_destination_id_label, caption: 'Destination' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
@@ -58,7 +58,7 @@ module UiRules
         orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: true, prompt: true  },
         cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: true, prompt: true },
         rmt_delivery_destination_id: { renderer: :select, options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
-                                       disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations, caption: 'rmt_delivery_destination',
+                                       disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations, caption: 'Destination',
                                        required: true, prompt: true },
         truck_registration_number: {},
         qty_damaged_bins: {},
