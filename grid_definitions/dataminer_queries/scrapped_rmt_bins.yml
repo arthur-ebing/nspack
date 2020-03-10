@@ -8,17 +8,19 @@
   \   qty_inner_bins,\r\n    production_run_rebin_id,\r\n    production_run_tipped_id,\r\n
   \   bin_tipping_plant_resource_id,\r\n    bin_fullness,\r\n    nett_weight,\r\n
   \   gross_weight,\r\n    active,\r\n    bin_tipped,\r\n    created_at,\r\n    updated_at,\r\n
-  \   bin_received_date,\r\n    bin_received_date_time,\r\n    bin_tipped_date,\r\n
+  \   date_picked,\r\n    bin_received_date,\r\n    bin_received_date_time,\r\n    bin_tipped_date,\r\n
   \   bin_tipped_date_time,\r\n    exit_ref_date,\r\n    exit_ref_date_time,\r\n    rebin_created_at,\r\n
   \   scrapped,\r\n    scrapped_at,\r\n    cultivar_group_code,\r\n    cultivar_name,\r\n
-  \   cultivar_description,\r\n    farm_code,\r\n    orchard_code,\r\n    puc_code,\r\n
-  \   rmt_class_code,\r\n    container_material_type_code,\r\n    container_type_code,\r\n
-  \   rmt_delivery_truck_registration_number,\r\n    season_code,\r\n    colour_rule,\r\n
-  \   status\r\nFROM vw_bins\r\nWHERE scrapped\r\nORDER BY id DESC"
+  \   cultivar_description,\r\n    farm_group_code,\r\n    farm_code,\r\n    orchard_code,\r\n
+  \   puc_code,\r\n    rmt_class_code,\r\n    location_long_code,\r\n    container_material_type_code,\r\n
+  \   container_type_code,\r\n    rmt_delivery_truck_registration_number,\r\n    season_code,\r\n
+  \   colour_rule,\r\n    status\r\nFROM vw_bins\r\nWHERE scrapped\r\nORDER BY id
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
-  :colour_key: {}
+  :colour_key:
+    gray: Bin has been tipped
   :render_url: 
 :columns:
   id:
@@ -63,7 +65,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -95,7 +97,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -417,7 +419,7 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -433,7 +435,7 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
-    :group_sum: false
+    :group_sum: true
     :group_avg: false
     :group_min: false
     :group_max: false
@@ -501,17 +503,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  bin_received_date:
-    :name: bin_received_date
+  date_picked:
+    :name: date_picked
     :sequence_no: 31
-    :caption: Bin received date
-    :namespaced_name: bin_received_date
+    :caption: Date picked
+    :namespaced_name: date_picked
     :data_type: :date
-    :width: 
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_received_date:
+    :name: bin_received_date
+    :sequence_no: 32
+    :caption: Bin received
+    :namespaced_name: bin_received_date
+    :data_type: :date
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -519,7 +537,7 @@
     :group_max: false
   bin_received_date_time:
     :name: bin_received_date_time
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Bin received date time
     :namespaced_name: bin_received_date_time
     :data_type: :datetime
@@ -535,7 +553,7 @@
     :group_max: false
   bin_tipped_date:
     :name: bin_tipped_date
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Bin tipped date
     :namespaced_name: bin_tipped_date
     :data_type: :date
@@ -543,7 +561,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -551,7 +569,7 @@
     :group_max: false
   bin_tipped_date_time:
     :name: bin_tipped_date_time
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Bin tipped date time
     :namespaced_name: bin_tipped_date_time
     :data_type: :datetime
@@ -567,7 +585,7 @@
     :group_max: false
   exit_ref_date:
     :name: exit_ref_date
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Exit ref date
     :namespaced_name: exit_ref_date
     :data_type: :date
@@ -575,7 +593,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -583,7 +601,7 @@
     :group_max: false
   exit_ref_date_time:
     :name: exit_ref_date_time
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Exit ref date time
     :namespaced_name: exit_ref_date_time
     :data_type: :datetime
@@ -599,7 +617,7 @@
     :group_max: false
   rebin_created_at:
     :name: rebin_created_at
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: Rebin created at
     :namespaced_name: rebin_created_at
     :data_type: :datetime
@@ -615,7 +633,7 @@
     :group_max: false
   scrapped:
     :name: scrapped
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
@@ -623,7 +641,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -631,7 +649,7 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -647,7 +665,7 @@
     :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Cultivar group code
     :namespaced_name: cultivar_group_code
     :data_type: :string
@@ -663,7 +681,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Cultivar name
     :namespaced_name: cultivar_name
     :data_type: :string
@@ -679,7 +697,7 @@
     :group_max: false
   cultivar_description:
     :name: cultivar_description
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Cultivar description
     :namespaced_name: cultivar_description
     :data_type: :string
@@ -687,7 +705,23 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_group_code:
+    :name: farm_group_code
+    :sequence_no: 44
+    :caption: Farm group
+    :namespaced_name: farm_group_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -695,7 +729,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 43
+    :sequence_no: 45
     :caption: Farm code
     :namespaced_name: farm_code
     :data_type: :string
@@ -711,7 +745,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 44
+    :sequence_no: 46
     :caption: Orchard code
     :namespaced_name: orchard_code
     :data_type: :string
@@ -727,7 +761,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 45
+    :sequence_no: 47
     :caption: Puc code
     :namespaced_name: puc_code
     :data_type: :string
@@ -743,7 +777,7 @@
     :group_max: false
   rmt_class_code:
     :name: rmt_class_code
-    :sequence_no: 46
+    :sequence_no: 48
     :caption: Rmt class code
     :namespaced_name: rmt_class_code
     :data_type: :string
@@ -757,9 +791,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  location_long_code:
+    :name: location_long_code
+    :sequence_no: 49
+    :caption: Location Code
+    :namespaced_name: location_long_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   container_material_type_code:
     :name: container_material_type_code
-    :sequence_no: 47
+    :sequence_no: 50
     :caption: Container material type
     :namespaced_name: container_material_type_code
     :data_type: :string
@@ -775,7 +825,7 @@
     :group_max: false
   container_type_code:
     :name: container_type_code
-    :sequence_no: 48
+    :sequence_no: 51
     :caption: Container type code
     :namespaced_name: container_type_code
     :data_type: :string
@@ -791,7 +841,7 @@
     :group_max: false
   rmt_delivery_truck_registration_number:
     :name: rmt_delivery_truck_registration_number
-    :sequence_no: 49
+    :sequence_no: 52
     :caption: Delivery truck registration
     :namespaced_name: rmt_delivery_truck_registration_number
     :data_type: :string
@@ -799,7 +849,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -807,7 +857,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 50
+    :sequence_no: 53
     :caption: Season code
     :namespaced_name: season_code
     :data_type: :string
@@ -823,7 +873,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 51
+    :sequence_no: 54
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
@@ -839,7 +889,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 52
+    :sequence_no: 55
     :caption: Status
     :namespaced_name: status
     :data_type: :string
@@ -1005,9 +1055,9 @@
   :caption: Scrapped?
   :data_type: :boolean
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 8
   :list_def:
-    - true
-    - false
+  - true
+  - false
