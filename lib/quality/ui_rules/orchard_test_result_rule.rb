@@ -80,16 +80,15 @@ module UiRules
                        required: true },
         description: { hide_on_load: false },
         passed: { renderer: :select,
-                  options: [%w[Passed t], %w[Failed f]],
+                  options: [%w[Failed false], %w[Passed true]],
                   caption: 'Result',
-                  prompt: @form_object.passed.nil?,
-                  required: true },
+                  hide_on_load: !@pass_fail },
+        classification: { hide_on_load: @pass_fail },
         classification_only: { renderer: :checkbox,
-                               hide_on_load: false },
+                               hide_on_load: @pass_fail },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
         api_result: { hide_on_load: false },
-        classification: { hide_on_load: true },
         applicable_from: { renderer: :date },
         applicable_to: { renderer: :date }
       }
@@ -103,6 +102,7 @@ module UiRules
 
       @form_object = @repo.find_orchard_test_result_flat(@options[:id])
       @rule_object = @repo.find_orchard_test_type_flat(@form_object[:orchard_test_type_id])
+      @pass_fail = @rule_object.result_type == AppConst::PASS_FAIL
     end
 
     private

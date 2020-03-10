@@ -20,10 +20,12 @@ module QualityApp
       else
         pass_fail_rules
       end
-      attrs = params
-      attrs.delete(:api_result)
-      return success_response('No changes') if attrs == orchard_test_result.to_h.select { |key, _| attrs.keys.include?(key) }
 
+      unless api_result.empty?
+        attrs = params
+        attrs.delete(:api_result)
+        return success_response('No changes') if attrs == orchard_test_result.to_h.select { |key, _| attrs.keys.include?(key) }
+      end
       update_orchard_otmc_results unless result_attribute.nil?
       repo.update_orchard_test_result(id, params)
       success_response('Updated Orchard Test Result')
@@ -43,7 +45,7 @@ module QualityApp
     end
 
     def pass_fail_rules
-      params[:passed] = AppConst::PHYT_CLEAN_PASSED.include? api_result[result_attribute]
+      params[:passed] = AppConst::PHYT_CLEAN_PASSED.include? api_result[result_attribute] unless api_result.empty?
       params[:classification_only] = false
       @otmc_result = params[:passed]
       params[:classification] = nil
