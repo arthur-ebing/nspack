@@ -10,7 +10,7 @@ module FinishedGoodsApp
       location_id = get_location_id_by_barcode(location) unless is_location_scanned
 
       repo.transaction do
-        FinishedGoodsApp::MoveStockService.new('PALLET', pallet[:id], location_id, 'MOVE_PALLET', nil).call
+        FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet[:id], location_id, 'MOVE_PALLET', nil).call
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)

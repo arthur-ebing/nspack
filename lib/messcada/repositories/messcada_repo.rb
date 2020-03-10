@@ -8,13 +8,13 @@ module MesscadaApp
     crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
 
     def find_stock_item(stock_item_id, stock_type)
-      return find_pallet(stock_item_id) if stock_type.to_s.upcase == 'PALLET'
+      return find_pallet(stock_item_id) if stock_type == AppConst::PALLET_STOCK_TYPE
 
       DB[:rmt_bins].where(id: stock_item_id).first
     end
 
     def update_stock_item(stock_item_id, upd, stock_type)
-      return update_pallet(stock_item_id, upd) if stock_type.to_s.upcase == 'PALLET'
+      return update_pallet(stock_item_id, upd) if stock_type == AppConst::PALLET_STOCK_TYPE
 
       DB[:rmt_bins].where(id: stock_item_id).update(upd)
     end

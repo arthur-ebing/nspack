@@ -80,6 +80,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLET_WEIGHED = 'PALLET WEIGHED'
   PALLET_MOVED = 'PALLET_MOVED'
 
+  # Constants for stock types:
+  PALLET_STOCK_TYPE = 'PALLET'
+  BIN_STOCK_TYPE = 'BIN'
+
   # Constants for rmt bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'

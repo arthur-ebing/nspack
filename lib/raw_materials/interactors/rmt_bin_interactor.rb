@@ -213,7 +213,7 @@ module RawMaterialsApp
       return failed_response('Bin is already at this location') unless bin[:location_id] != location_id
 
       repo.transaction do
-        FinishedGoodsApp::MoveStockService.new('BIN', bin_number, location_id, 'MOVE_BIN', nil).call
+        FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, 'MOVE_BIN', nil).call
       end
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
