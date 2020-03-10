@@ -66,10 +66,12 @@ module UiRules
                                    hide_on_load: @form_object.applies_to_all_cultivars,
                                    caption: 'Cultivars' },
         api_name: { renderer: :select,
-                    options: AppConst::QUALITY_API_NAMES },
+                    options: AppConst::QUALITY_API_NAMES,
+                    prompt: true },
         result_attribute: { renderer: :select,
                             options: AppConst::PHYT_CLEAN_ATTRIBUTES,
-                            selected: @form_object.result_attribute }
+                            selected: @form_object.result_attribute,
+                            prompt: true }
       }
     end
 
