@@ -33,7 +33,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.post do
           pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
-          res = interactor.move_pallet(pallet_number, params[:pallet][:location], !params[:pallet][:location_scan_field].nil_or_empty?)
+          res = interactor.move_pallet(pallet_number, params[:pallet][:location], params[:pallet][:location_scan_field])
 
           if res.success
             store_locally(:flash_notice, res.message)

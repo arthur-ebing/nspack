@@ -2,12 +2,11 @@
 
 module FinishedGoodsApp
   class PalletMovementsInteractor < BaseInteractor
-    def move_pallet(pallet_number, location, is_location_scanned) # rubocop:disable Metrics/AbcSize
+    def move_pallet(pallet_number, location, location_scan_field) # rubocop:disable Metrics/AbcSize
       pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
-      location_id = location
-      location_id = get_location_id_by_barcode(location) unless is_location_scanned
+      location_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(location, location_scan_field)
 
       repo.transaction do
         FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet[:id], location_id, 'MOVE_PALLET', nil).call
