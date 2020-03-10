@@ -32,6 +32,7 @@ module RawMaterials
                   col.add_field :current
                   col.add_field :quantity_bins_with_fruit
                   col.add_field :auto_allocate_asset_number if rules[:auto_allocate_asset_number]
+                  col.add_field :rmt_delivery_destination_id
                 end
               end
             end

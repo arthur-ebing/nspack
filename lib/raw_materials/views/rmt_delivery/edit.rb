@@ -47,11 +47,12 @@ module RawMaterials
                   end
 
                   row.column do |col|
-                    form.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
-                    form.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
+                    col.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
+                    col.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
                     col.add_field :date_picked
                     col.add_field :quantity_bins_with_fruit
-                    form.add_field :truck_registration_number if rules[:show_truck_registration_number]
+                    col.add_field :truck_registration_number if rules[:show_truck_registration_number]
+                    col.add_field :rmt_delivery_destination_id
                   end
                 end
               end
