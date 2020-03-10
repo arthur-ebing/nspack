@@ -105,3 +105,5 @@ INSERT INTO user_email_groups (mail_group) VALUES('label_approvers') ON CONFLICT
 INSERT INTO user_email_groups (mail_group) VALUES('label_publishers') ON CONFLICT DO NOTHING;
 INSERT INTO user_email_groups (mail_group) VALUES('edi_notifiers') ON CONFLICT DO NOTHING;
 
+-- SCRAP_REASONS --
+INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('REPACKED', 'Repacked') ON CONFLICT DO NOTHING;

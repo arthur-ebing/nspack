@@ -29,7 +29,8 @@
   \   internal_inspection_at,\r\n    internal_reinspection_at,\r\n    intake_created_at,\r\n
   \   active,\r\n    temp_tail,\r\n    extended_columns,\r\n    seq_scrapped_at,\r\n
   \   depot_pallet,\r\n    edi_in_file,\r\n    edi_in_consignment_note_number,\r\n
-  \   govt_inspection_sheet_id,\r\n    addendum_manifest,\r\n\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
+  \   govt_inspection_sheet_id,\r\n    addendum_manifest,\r\n    repacked,\r\n    repacked_at,\r\n
+  \   repacked_from_pallet_id,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
   \            THEN 'error' ELSE colour_rule\r\n        END AS colour_rule\r\n\r\nFROM
   vw_pallet_sequence_flat\r\nORDER BY pallet_id, pallet_number DESC"
 :limit: 
@@ -1964,9 +1965,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked:
+    :name: repacked
+    :sequence_no: 121
+    :caption: Repacked
+    :namespaced_name: repacked
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_at:
+    :name: repacked_at
+    :sequence_no: 122
+    :caption: Repacked at
+    :namespaced_name: repacked_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_from_pallet_id:
+    :name: repacked_from_pallet_id
+    :sequence_no: 123
+    :caption: Repacked from pallet
+    :namespaced_name: repacked_from_pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 121
+    :sequence_no: 124
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

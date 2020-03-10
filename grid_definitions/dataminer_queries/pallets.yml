@@ -11,10 +11,10 @@
   scrapped_at, scrapped, partially_palletized, reinspected, verified, verification_passed,
   status, build_status, load_id, vessel, voyage, container, internal_container, temp_code,
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
-  exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
-  AS departure_date, active, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN
-  'error' ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat WHERE NOT
-  scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text
+  exporter, country, region, repacked, repacked_at, repacked_from_pallet_id, COALESCE(ata,
+  eta) AS arrival_date, COALESCE(atd, etd) AS departure_date, active, CASE WHEN fn_pallet_verification_failed(pallet_id)
+  THEN 'error' ELSE colour_rule END AS colour_rule FROM vw_pallet_sequence_flat WHERE
+  NOT scrapped AND UPPER(COALESCE(exit_ref, ''::character varying)::text) <> 'SCRAPPED'::text
   AND pallet_number::text IS NOT NULL ORDER BY pallet_id, pallet_number DESC
 :limit: 
 :offset: 
@@ -1276,9 +1276,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked:
+    :name: repacked
+    :sequence_no: 79
+    :caption: Repacked
+    :namespaced_name: repacked
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_at:
+    :name: repacked_at
+    :sequence_no: 80
+    :caption: Repacked at
+    :namespaced_name: repacked_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_from_pallet_id:
+    :name: repacked_from_pallet_id
+    :sequence_no: 81
+    :caption: Repacked from pallet
+    :namespaced_name: repacked_from_pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   arrival_date:
     :name: arrival_date
-    :sequence_no: 79
+    :sequence_no: 82
     :caption: Arrival date
     :namespaced_name: 
     :data_type: :datetime
@@ -1294,7 +1342,7 @@
     :group_max: false
   departure_date:
     :name: departure_date
-    :sequence_no: 80
+    :sequence_no: 83
     :caption: Departure date
     :namespaced_name: 
     :data_type: :datetime
@@ -1310,7 +1358,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 81
+    :sequence_no: 84
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1326,7 +1374,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 82
+    :sequence_no: 85
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

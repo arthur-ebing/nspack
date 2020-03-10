@@ -16,10 +16,10 @@
   \   verification_result,\r\n    scrapped_at,\r\n    scrapped,\r\n    partially_palletized,\r\n
   \   reinspected,\r\n    verified,\r\n    verification_passed,\r\n    status,\r\n
   \   build_status,\r\n    active,\r\n    zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n
-  \   edi_in_file,\r\n    edi_in_consignment_note_number,\r\n    CASE\r\n        WHEN
-  fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n        ELSE colour_rule\r\n
-  \       END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER BY zero_load_id
-  DESC, pallet_number DESC"
+  \   edi_in_file,\r\n    edi_in_consignment_note_number,\r\n    repacked,\r\n    repacked_at,\r\n
+  \   repacked_from_pallet_id,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
+  THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  BY zero_load_id DESC, pallet_number DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1152,9 +1152,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked:
+    :name: repacked
+    :sequence_no: 71
+    :caption: Repacked
+    :namespaced_name: repacked
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_at:
+    :name: repacked_at
+    :sequence_no: 72
+    :caption: Repacked at
+    :namespaced_name: repacked_at
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_from_pallet_id:
+    :name: repacked_from_pallet_id
+    :sequence_no: 73
+    :caption: Repacked from pallet
+    :namespaced_name: repacked_from_pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 71
+    :sequence_no: 74
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1329,7 +1377,7 @@
   :caption: Production run Id
   :data_type: :integer
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 14
-  :list_def:
+  :list_def: 

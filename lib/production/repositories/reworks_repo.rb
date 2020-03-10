@@ -197,35 +197,51 @@ module ProductionApp
       DB[upd].update unless pallet_format_id.nil_or_empty?
     end
 
-    def repacking_reworks_run(pallet_numbers, attrs)
-      pallet_number_ids = pallet_number_ids(pallet_numbers)
-      return if pallet_number_ids.empty?
-
-      pallet_number_ids.each do |pallet_id|
-        clone_pallet(pallet_id)
-        DB[:pallets].where(id: pallet_id).update(attrs)
-        upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_id = #{pallet_id};"
-        DB[upd].update
+    def repacking_reworks_run(pallet_numbers, _attrs)
+      pallet_numbers.each do |pallet_number|
+        repack_pallet(pallet_number)
       end
+    end
+
+    def repack_pallet(pallet_id)
+      pallet = pallet(pallet_id)
+      sequence_ids = pallet_sequence_ids(pallet_id)
+      return failed_response("Pallet number #{pallet[:pallet_number]} is missing sequences") if sequence_ids.empty?
+
+      new_pallet_id = clone_pallet(pallet, sequence_ids)
+      scrapped_pallet_attrs = { scrapped: true, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_REPACKED }
+      scrapped_pallet_sequence_attrs = { pallet_id: nil, scrapped_from_pallet_id: pallet_id, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_REPACKED }
+
+      update_pallet(pallet_id, scrapped_pallet_attrs)
+      update_pallet_sequence(sequence_ids, scrapped_pallet_sequence_attrs)
+
+      success_response('ok', new_pallet_id: new_pallet_id)
     end
 
     def pallet_number_ids(pallet_numbers)
       DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
     end
 
-    def clone_pallet(id)  # rubocop:disable Metrics/AbcSize
-      sequence_ids = pallet_sequence_ids(id)
-      return if sequence_ids.empty?
+    def pallet_sequence_ids(pallet_id)
+      DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:id)
+    end
 
+    def clone_pallet(pallet, sequence_ids)
       pallet_rejected_fields = %i[id pallet_number build_status]
+      repack_attrs = { repacked: true, repacked_at: Time.now }
+      attrs = pallet.to_h.merge(repack_attrs.to_h).reject { |k, _| pallet_rejected_fields.include?(k) }
+      new_pallet_id = DB[:pallets].insert(attrs)
+      clone_pallet_sequences(pallet[:id], new_pallet_id, sequence_ids)
+      new_pallet_id
+    end
+
+    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids)
+      pallet = pallet(pallet_id)
+      repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id, repacked_at: Time.now }
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number]
-
-      pallet = pallet(id)
-      new_pallet_id = DB[:pallets].insert(pallet.reject { |k, _| pallet_rejected_fields.include?(k) })
-
       sequence_ids.each do |sequence_id|
-        attrs = find_hash(:pallet_sequences, sequence_id).reject { |k, _| ps_rejected_fields.include?(k) }
-        DB[:pallet_sequences].insert(attrs.to_h.merge(pallet_sequence_pallet_params(new_pallet_id)).to_h)
+        attrs = find_hash(:pallet_sequences, sequence_id).to_h.reject { |k, _| ps_rejected_fields.include?(k) }
+        DB[:pallet_sequences].insert(attrs.merge(repack_attrs.to_h))
       end
     end
 
@@ -244,21 +260,17 @@ module ProductionApp
       DB[upd].update
     end
 
-    def pallet_sequence_ids(pallet_id)
-      DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:id)
-    end
-
     def pallet(id)
       find_hash(:pallets, id)
     end
 
-    def pallet_sequence_pallet_params(new_pallet_id)
-      pallet = pallet(new_pallet_id)
-      {
-        pallet_id: pallet[:pallet_id],
-        pallet_number: pallet[:pallet_number]
-      }
-    end
+    # def pallet_sequence_pallet_params(new_pallet_id)
+    #   pallet = pallet(new_pallet_id)
+    #   {
+    #     pallet_id: pallet[:pallet_id],
+    #     pallet_number: pallet[:pallet_number]
+    #   }
+    # end
 
     def reworks_run_pallet_print_data(pallet_number)
       qry = <<~SQL
@@ -636,6 +648,11 @@ module ProductionApp
             AND	bin_asset_number = '#{scrapped_bin_asset_number}')
       SQL
       DB[query].single_value
+    end
+
+    def get_scrap_reason_id(attrs)
+      scrap_reason = attrs.gsub('_', ' ').upcase
+      DB[:scrap_reasons].where(scrap_reason: scrap_reason).get(:id)
     end
   end
 end

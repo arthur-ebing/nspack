@@ -243,6 +243,30 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def repack_pallet(pallet_id) # rubocop:disable Metrics/AbcSize
+      pallet = reworks_repo.pallet(pallet_id)
+      return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
+
+      res = nil
+      repo.transaction do
+        res = FinishedGoodsApp::RepackPallet.call(pallet_id, @user.user_name)
+        repo.log_status('pallets', pallet_id, AppConst::REWORKS_REPACK_PALLET_STATUS)
+        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(pallet_id), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        repo.log_status('pallets', res.instance[:new_pallet_id], AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
+        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(res.instance[:new_pallet_id]), AppConst::REWORKS_REPACK_PALLET_STATUS)
+      end
+      res
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def pallet_sequence_ids(pallet_id)
+      reworks_repo.pallet_sequence_ids(pallet_id)
+    end
+
     private
 
     def pallet_changes_on_verify(params)
@@ -269,6 +293,14 @@ module MesscadaApp
 
     def repo
       @repo ||= MesscadaRepo.new
+    end
+
+    def production_run_repo
+      @production_run_repo ||= ProductionApp::ProductionRunRepo.new
+    end
+
+    def reworks_repo
+      @reworks_repo ||= ProductionApp::ReworksRepo.new
     end
 
     # TODO: split validation if using asset no or not (string asset vs int id)
@@ -337,6 +369,10 @@ module MesscadaApp
       out = res.to_h
       out[:carton_number] = repo.carton_label_id_for_pallet_no(res[:carton_number])
       out
+    end
+
+    def get_pallet_label_data(pallet_id)
+      production_run_repo.get_pallet_label_data(pallet_id)
     end
   end
 end
