@@ -18,7 +18,7 @@ module FinishedGoodsApp
 
       location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
 
-      if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::COLD_BAY_DECK_TYPE
+      if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
         res = find_next_available_deck_position(location_to[:location_long_code])
         return res unless res.success
       end

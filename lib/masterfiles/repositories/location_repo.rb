@@ -91,8 +91,8 @@ module MasterfilesApp
       DB[query, location_to_id].select_map(:pos)
     end
 
-    def find_location_by_location_long_code(barcode)
-      find_location_by(:location_long_code, barcode)
+    def find_location_by_location_long_code(code)
+      find_location_by(:location_long_code, code)
     end
 
     def location_exists(location_long_code, location_short_code)

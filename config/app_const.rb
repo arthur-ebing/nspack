@@ -84,9 +84,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLET_STOCK_TYPE = 'PALLET'
   BIN_STOCK_TYPE = 'BIN'
 
-  # Constants for location types:
-  COLD_BAY_DECK_TYPE = 'DECK'
-
   # Constants for rmt bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'
@@ -296,6 +293,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
+  LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
