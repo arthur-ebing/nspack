@@ -105,7 +105,7 @@
     :namespaced_name: carton_quantity
     :data_type: :integer
     :width: 
-    :format: 
+    :format:
     :hide: false
     :pinned: 
     :groupable: false
@@ -1800,12 +1800,12 @@
     :caption: Seq scrapped at
     :namespaced_name: seq_scrapped_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1816,12 +1816,12 @@
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1832,12 +1832,12 @@
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :date
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1848,7 +1848,7 @@
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
-    :width: 
+    :width:
     :format: 
     :hide: false
     :pinned: 
@@ -1858,9 +1858,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  failed_otmc_results:
+    :name: failed_otmc_results
+    :sequence_no: 112
+    :caption: Failed OTMC results
+    :namespaced_name: failed_otmc_results
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 115
+    :sequence_no: 113
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -2206,9 +2222,9 @@
   :caption: Shipped?
   :data_type: :boolean
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 39
   :list_def:
-  - true
-  - false
+    - true
+    - false

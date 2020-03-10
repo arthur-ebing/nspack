@@ -7,15 +7,19 @@
   \   orchard_test_results.description,\r\n    orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
   \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classification,\r\n
   \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
-  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at\r\n
-  \   \r\nFROM\r\n    orchard_test_results\r\n        LEFT JOIN orchards ON orchards.id
-  = orchard_test_results.orchard_id\r\n        LEFT JOIN orchard_test_types ON orchard_test_types.id
-  = orchard_test_results.orchard_test_type_id\r\n        LEFT JOIN pucs ON pucs.id
-  = orchard_test_results.puc_id\r\n        LEFT JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
+  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at,\r\n
+  \   CASE\r\n       WHEN NOT orchard_test_results.passed THEN 'error'::text\r\n       ELSE
+  NULL::text\r\n    END AS colour_rule\r\n    \r\nFROM\r\n    orchard_test_results\r\n
+  \       LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
+  \       LEFT JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id\r\n
+  \       LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id\r\n        LEFT
+  JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
+  :colour_key:
+    error: Failed OTMC test
 :columns:
   id:
     :name: id
@@ -179,7 +183,7 @@
     :group_max: false
   passed:
     :name: passed
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Passed
     :namespaced_name: orchard_test_results.passed
     :data_type: :boolean
@@ -195,7 +199,7 @@
     :group_max: false
   classification_only:
     :name: classification_only
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Classification only
     :namespaced_name: orchard_test_results.classification_only
     :data_type: :boolean
@@ -211,7 +215,7 @@
     :group_max: false
   freeze_result:
     :name: freeze_result
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Freeze result
     :namespaced_name: orchard_test_results.freeze_result
     :data_type: :boolean
@@ -227,7 +231,7 @@
     :group_max: false
   classification:
     :name: classification
-    :sequence_no: 15
+    :sequence_no: 14
     :caption: Classification
     :namespaced_name: orchard_test_results.classification
     :data_type: :string
@@ -243,7 +247,7 @@
     :group_max: false
   applicable_from:
     :name: applicable_from
-    :sequence_no: 16
+    :sequence_no: 15
     :caption: Applicable from
     :namespaced_name: orchard_test_results.applicable_from
     :data_type: :datetime
@@ -259,7 +263,7 @@
     :group_max: false
   applicable_to:
     :name: applicable_to
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Applicable to
     :namespaced_name: orchard_test_results.applicable_to
     :data_type: :datetime
@@ -275,7 +279,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Active
     :namespaced_name: orchard_test_results.active
     :data_type: :boolean
@@ -291,7 +295,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: orchard_test_results.created_at
     :data_type: :datetime
@@ -307,10 +311,26 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: orchard_test_results.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 20
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: false

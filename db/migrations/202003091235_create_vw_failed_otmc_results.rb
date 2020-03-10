@@ -74,12 +74,10 @@ Sequel.migration do
       $BODY$
       BEGIN
         UPDATE pallet_sequences ps
-        SET failed_otmc_results = sq.failed_otmc_results,
-            pallet_failed_otmc_results = ARRAY(SELECT DISTINCT otmc_results FROM unnest(sq.pallet_failed_otmc_results || sq.failed_otmc_results) AS otmc_results)
+        SET failed_otmc_results = sq.failed_otmc_results
         FROM (SELECT 
                 ps.id,
-                array_agg(DISTINCT v.test_type_id) AS failed_otmc_results,
-                ps.pallet_failed_otmc_results AS pallet_failed_otmc_results
+                array_agg(DISTINCT v.test_type_id) AS failed_otmc_results
               FROM vw_failed_otmc_results v
               JOIN pallet_sequences ps 
                 ON ps.puc_id = v.puc_id

@@ -1158,12 +1158,12 @@
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1174,12 +1174,12 @@
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :date
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1190,12 +1190,12 @@
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1377,7 +1377,7 @@
   :caption: Production run Id
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 14
-  :list_def: 
+  :list_def:
