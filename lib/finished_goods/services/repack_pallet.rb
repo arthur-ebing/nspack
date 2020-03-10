@@ -17,7 +17,7 @@ module FinishedGoodsApp
       res = repack_pallet
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      success_response("Pallet number: #{pallet_number} was successfully repacked.",
+      success_response("Pallet number #{pallet_number} was repacked successfully. Scroll down to print new pallet",
                        new_pallet_id: res.instance[:new_pallet_id])
     end
 

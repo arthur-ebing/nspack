@@ -137,10 +137,12 @@ class Nspack < Roda # rubocop:disable ClassLength
 
           printer_repo = LabelApp::PrinterRepo.new
 
+          notice = retrieve_from_local_store(:flash_notice)
           error = retrieve_from_local_store(:error)
           pallet_sequence.merge!(error_message: error.message) unless error.nil?
 
           form = Crossbeams::RMDForm.new(pallet_sequence,
+                                         notes: notice,
                                          form_name: :pallet,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          caption: "View Pallet #{pallet_sequence[:pallet_number]}",
