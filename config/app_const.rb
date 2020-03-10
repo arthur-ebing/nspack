@@ -84,6 +84,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLET_STOCK_TYPE = 'PALLET'
   BIN_STOCK_TYPE = 'BIN'
 
+  # Constants for location types:
+  COLD_BAY_DECK_TYPE = 'DECK'
+
   # Constants for rmt bin statuses:
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'

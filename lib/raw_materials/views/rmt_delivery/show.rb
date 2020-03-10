@@ -15,6 +15,21 @@ module RawMaterials
                                   text: 'Back',
                                   url: back_url,
                                   style: :back_button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Print Bin Barcodes',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_bin_barcodes",
+                                  visible: rules[:print_bin_barcodes],
+                                  loading_window: true,
+                                  style: :button)
+
+              section.add_control(control_type: :link,
+                                  text: 'Print Delivery',
+                                  url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_delivery",
+                                  visible: rules[:print_bin_barcodes],
+                                  loading_window: true,
+                                  style: :button)
+
               section.form do |form|
                 # form.caption 'Rmt Delivery'
                 form.view_only!

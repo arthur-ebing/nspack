@@ -66,34 +66,33 @@ module MasterfilesApp
       find_location_by(:id, id)
     end
 
-    def lookup_location(id)
+    def find_max_position_for_deck_location(id)
       query = <<~SQL
-        select distinct l.*, t.location_type_code
-        from locations l
-        join location_types t on t.id=l.location_type_id
-        where l.id = ?
+        SELECT COUNT(p.*) as num_positions
+        FROM locations d
+        JOIN tree_locations t on t.ancestor_location_id=d.id
+        join locations p on p.id=t.descendant_location_id
+        where d.id = ?
+        AND t.path_length = 1
       SQL
-      DB[query, id].first
+      DB[query, id].select_map(:num_positions).first
     end
 
     def find_filled_deck_positions(location_to_id)
       query = <<~SQL
-        select distinct p.location_short_code
+        select cast(substring(p.location_long_code from '\\d+$') as int) as pos
         from locations d
         join tree_locations t on t.ancestor_location_id=d.id
         join locations p on p.id=t.descendant_location_id
         join pallets s on s.location_id=p.id
-        where d.id = ? and t.ancestor_location_id<>t.descendant_location_id
+        where d.id = ?
+        AND t.path_length = 1
       SQL
-      DB[query, location_to_id].select_map(:location_short_code)
+      DB[query, location_to_id].select_map(:pos)
     end
 
-    def find_location_by_location_long_code(code)
-      find_location_by(:location_long_code, code)
-    end
-
-    def find_location_by_location_short_code(barcode)
-      find_location_by(:location_short_code, barcode)
+    def find_location_by_location_long_code(barcode)
+      find_location_by(:location_long_code, barcode)
     end
 
     def location_exists(location_long_code, location_short_code)

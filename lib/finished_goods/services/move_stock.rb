@@ -12,14 +12,14 @@ module FinishedGoodsApp
       @business_process_context_id = business_process_context_id
     end
 
-    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = validate
       return res unless res.success
 
-      location_to = MasterfilesApp::LocationRepo.new.lookup_location(location_to_id)
+      location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
 
-      if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == 'COLD_BAY_DECK'
-        res = find_next_available_deck_position(location_to[:location_short_code])
+      if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::COLD_BAY_DECK_TYPE
+        res = find_next_available_deck_position(location_to[:location_long_code])
         return res unless res.success
       end
 
@@ -36,15 +36,16 @@ module FinishedGoodsApp
     private
 
     def find_next_available_deck_position(location_code) # rubocop:disable Metrics/AbcSize
-      positions = MasterfilesApp::LocationRepo.new.find_filled_deck_positions(location_to_id)
+      locn_repo = MasterfilesApp::LocationRepo.new
+      positions = locn_repo.find_filled_deck_positions(location_to_id)
 
-      return failed_response("Deck:#{location_code} is full") if positions.length == 10
+      return failed_response("Deck:#{location_code} is full") if positions.length == locn_repo.find_max_position_for_deck_location(location_to_id)
 
-      unless (last_pos = positions.map { |l| l.sub("#{location_code}_P", '').to_i }.min)
-        last_pos = 11
+      unless (last_pos = positions.min)
+        last_pos = locn_repo.find_max_position_for_deck_location(location_to_id) + 1
       end
-      deck_position = MasterfilesApp::LocationRepo.new.find_location_by_location_short_code("#{location_code}_P#{last_pos - 1}")
-      @location_to_id = deck_position.id
+      next_availaible_position = locn_repo.find_location_by_location_long_code("#{location_code}_P#{last_pos - 1}")
+      @location_to_id = next_availaible_position.id
 
       ok_response
     end

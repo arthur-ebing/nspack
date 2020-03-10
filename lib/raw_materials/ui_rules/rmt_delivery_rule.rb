@@ -16,7 +16,7 @@ module UiRules
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:auto_allocate_asset_number] = AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION
       @rules[:is_auto_allocate_asset_number_delivery] = @form_object.auto_allocate_asset_number
-      @rules[:print_bin_barcodes] = (@mode == :edit && @form_object.auto_allocate_asset_number)
+      @rules[:print_bin_barcodes] = (%i[show edit].include? @mode) && @form_object.auto_allocate_asset_number
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode
