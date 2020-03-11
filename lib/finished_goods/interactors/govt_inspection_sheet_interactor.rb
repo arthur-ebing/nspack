@@ -166,16 +166,24 @@ module FinishedGoodsApp
       GovtInspectionSheetSchema.call(params)
     end
 
-    def validate_govt_inspection_add_pallet_params(params)
+    def validate_govt_inspection_add_pallet_params(params) # rubocop:disable Metrics/AbcSize
       res = GovtInspectionAddPalletSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       attrs = res.to_h
-      res = repo.validate_pallet_number(attrs.delete(:pallet_number))
-      return res unless res.success
+      pallet_number = attrs.delete(:pallet_number)
 
-      attrs[:pallet_id] = res.instance
-      success_response('ok', attrs)
+      pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
+      return failed_response("Pallet: #{pallet_number} doesn't exist.") if id.nil?
+
+      res = repo.exists_on_inspection_sheet(pallet_id)
+      return failed_response("Pallet: #{pallet_number} is already on an inspection sheet.") if res
+
+      res = repo.exists?(:pallet_sequences, pallet_id: pallet_id, failed_otmc_results: nil)
+      return failed_response("Pallet: #{pallet_number} failed a OTMC test.") unless res
+
+      attrs[:pallet_id] = id
+      success_response('Passed Validation', attrs)
     end
   end
 end
