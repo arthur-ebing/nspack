@@ -270,16 +270,10 @@ module RawMaterialsApp
     end
 
     def find_container_material_owners_for_container_material_type(container_material_type_id)
-      query = <<~SQL
-        SELECT rmt_material_owner_party_role_id AS id, o.medium_description AS party_name
-        FROM rmt_container_material_owners ro
-        JOIN party_roles pr on pr.id = ro.rmt_material_owner_party_role_id
-        LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
-        LEFT OUTER JOIN people p ON p.id = pr.person_id
-        JOIN roles r ON r.id = pr.role_id
-        WHERE rmt_container_material_type_id = ?
-      SQL
-      DB[query, container_material_type_id].map { |p| [p[:party_name], p[:id]] }
+      DB[:rmt_container_material_owners]
+        .where(rmt_container_material_type_id: container_material_type_id)
+        .select(:rmt_material_owner_party_role_id, Sequel.function(:fn_party_role_name, :rmt_material_owner_party_role_id))
+        .map { |r| [r[:fn_party_role_name], r[:rmt_material_owner_party_role_id]] }
     end
   end
 end
