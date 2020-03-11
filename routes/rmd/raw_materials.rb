@@ -313,7 +313,14 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'bin_reception_container_material_type_combo_changed' do
-        container_material_type_combo_changed('delivery')
+        # container_material_type_combo_changed('delivery')
+        if !params[:changed_value].to_s.empty?
+          container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_for_container_material_type(params[:changed_value])
+          container_material_owners.unshift(['Select a value', nil])
+          json_replace_select_options('delivery_rmt_material_owner_party_role_id', container_material_owners)
+        else
+          json_replace_select_options('delivery_rmt_material_owner_party_role_id', [['Select a value', nil]])
+        end
       end
 
       r.on 'bin_edit_rmt_container_type_combo_changed' do
@@ -379,6 +386,7 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_field(:qty_bins, 'Qty Bins', hide_on_load: true)
 
         form.add_field(:bin_asset_number1, 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
+        delivery[:qty_bins_remaining] = AppConst::BIN_SCANNING_BATCH_SIZE.to_i unless delivery[:qty_bins_remaining] < AppConst::BIN_SCANNING_BATCH_SIZE.to_i
         if delivery[:qty_bins_remaining] > 1
           (1..(delivery[:qty_bins_remaining] - 1)).each do |c|
             form.add_field("bin_asset_number#{c + 1}".to_sym, "Asset Number#{c + 1}", scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: false)
