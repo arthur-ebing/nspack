@@ -1,14 +1,22 @@
 ---
-:caption: Production Run Dashboard
-:sql: "SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,\r\nproduction_runs.active_run_stage,\r\nproduction_runs.started_at,\r\nproduction_run_stats.bins_tipped,
-  production_run_stats.bins_tipped_weight, production_run_stats.carton_labels_printed,
-  \r\nproduction_run_stats.cartons_verified, production_run_stats.cartons_verified_weight,\r\nproduction_run_stats.pallets_palletized_full,
-  production_run_stats.pallets_palletized_partial,\r\nproduction_run_stats.pallet_weight,\r\nproduction_run_stats.inspected_pallets,
-  production_run_stats.rebins_created, production_run_stats.rebins_weight,\r\nfarms.farm_code,\r\npucs.puc_code,\r\norchards.orchard_code\r\nFROM
-  production_runs\r\nJOIN production_run_stats ON production_run_stats.production_run_id
-  = production_runs.id\r\nJOIN farms ON farms.id = production_runs.farm_id\r\nLEFT
-  JOIN orchards ON orchards.id = production_runs.orchard_id\r\nJOIN pucs ON pucs.id
-  = production_runs.puc_id\r\nWHERE running\r\n"
+:caption: Production Run Dashboard for Today
+:sql: "SELECT\r\n  \"production_runs\".\"id\",\r\n  fn_production_run_code (\"production_runs\".\"id\")
+  AS production_run_code,\r\n  \"production_runs\".\"active_run_stage\",\r\n  \"production_runs\".\"started_at\",\r\n
+  \ \"production_run_stats\".\"bins_tipped\",\r\n  \"production_run_stats\".\"bins_tipped_weight\",\r\n
+  \ \"production_run_stats\".\"carton_labels_printed\",\r\n  \"production_run_stats\".\"cartons_verified\",\r\n
+  \ \"production_run_stats\".\"cartons_verified_weight\",\r\n  \"production_run_stats\".\"pallets_palletized_full\",\r\n
+  \ \"production_run_stats\".\"pallets_palletized_partial\",\r\n  \"production_run_stats\".\"pallet_weight\",\r\n
+  \ \"production_run_stats\".\"inspected_pallets\",\r\n  \"production_run_stats\".\"rebins_created\",\r\n
+  \ \"production_run_stats\".\"rebins_weight\",\r\n  \"farms\".\"farm_code\",\r\n
+  \ \"pucs\".\"puc_code\",\r\n  \"orchards\".\"orchard_code\",\r\n  \"production_runs\".\"completed_at\",\r\n
+  \ \"production_runs\".\"closed_at\"\r\nFROM\r\n  \"production_runs\"\r\n  JOIN \"production_run_stats\"
+  ON \"production_run_stats\".\"production_run_id\" = \"production_runs\".\"id\"\r\n
+  \ JOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\"\r\n  LEFT
+  JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\"\r\n
+  \ JOIN \"pucs\" ON \"pucs\".\"id\" = \"production_runs\".\"puc_id\"\r\nWHERE\r\n
+  \ \"production_runs\".\"started_at\"::date = CURRENT_DATE\r\n  OR \"production_runs\".\"closed_at\"::date
+  = CURRENT_DATE\r\n  OR \"production_runs\".\"completed_at\"::date = CURRENT_DATE\r\n
+  \ OR \"running\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -296,6 +304,38 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 19
+    :caption: Completed at
+    :namespaced_name: production_runs.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  closed_at:
+    :name: closed_at
+    :sequence_no: 20
+    :caption: Closed at
+    :namespaced_name: production_runs.closed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
