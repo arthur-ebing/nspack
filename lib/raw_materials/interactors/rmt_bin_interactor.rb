@@ -31,13 +31,13 @@ module RawMaterialsApp
       repo.transaction do
         params.delete(:qty_bins_to_create)
         params[:location_id] = default_location_id unless params[:location_id]
-        bin_asset_numbers.map { |a| a[0] }.each do |bin_asset_number|
+        bin_asset_numbers.map(&:last).each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
           bin_id = repo.create_rmt_bin(params)
           log_status('rmt_bins', bin_id, 'BIN_RECEIVED')
           created_bins << rmt_bin(bin_id)
         end
-        repo.update(:bin_asset_numbers, bin_asset_numbers.map { |a| a[1] }, last_used_at: Time.now)
+        repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
       end
 
       success_response('Bins Created Successfully', created_bins)
@@ -205,8 +205,8 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def move_bin(bin_number, location_id, is_scanned_location) # rubocop:disable Metrics/AbcSize
-      location_id = FinishedGoodsApp::LoadRepo.new.get_location_id_by_barcode(location_id) unless is_scanned_location
+    def move_bin(bin_number, location_id, location_scan_field) # rubocop:disable Metrics/AbcSize
+      location_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(location_id, location_scan_field)
       return failed_response('Location does not exist') unless !location_id.nil_or_empty? && repo.exists?(:locations, id: location_id)
 
       bin = repo.find_rmt_bin(bin_number)

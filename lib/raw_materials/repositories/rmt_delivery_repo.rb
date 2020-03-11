@@ -189,11 +189,11 @@ module RawMaterialsApp
       query = <<~SQL
         select a.id, a.bin_asset_number
         from bin_asset_numbers a
-        where a.bin_asset_number NOT IN (select b.bin_asset_number from rmt_bins b where b.bin_asset_number IS NOT NULL)
+        WHERE NOT EXISTS(SELECT id FROM rmt_bins WHERE bin_asset_number = a.bin_asset_number)
         order by last_used_at asc
         limit ?
       SQL
-      DB[query, count].all.map { |p| [p[:bin_asset_number], p[:id]] }
+      DB[query, count].select_map(%i[bin_asset_number id])
     end
 
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)

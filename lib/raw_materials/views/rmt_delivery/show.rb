@@ -30,8 +30,7 @@ module RawMaterials
                                   loading_window: true,
                                   style: :button)
 
-              section.form do |form|
-                # form.caption 'Rmt Delivery'
+              section.form do |form| # rubocop:disable Metrics/BlockLength
                 form.view_only!
                 form.no_submit!
                 form.row do |row|

@@ -144,7 +144,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'move_rmt_bin_submit', Integer do |id|
-        res = interactor.move_bin(id, params[:bin][:location], !params[:bin][:location_scan_field].nil_or_empty?)
+        res = interactor.move_bin(id, params[:bin][:location], params[:bin][:location_scan_field])
         if res.success
           store_locally(:flash_notice, unwrap_failed_response(res))
           r.redirect('/rmd/rmt_deliveries/rmt_bins/move_rmt_bin')
