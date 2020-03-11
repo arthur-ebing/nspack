@@ -17,8 +17,9 @@
   \   reinspected,\r\n    verified,\r\n    verification_passed,\r\n    status,\r\n
   \   build_status,\r\n    active,\r\n    zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n
   \   edi_in_file,\r\n    edi_in_consignment_note_number,\r\n    repacked,\r\n    repacked_at,\r\n
-  \   repacked_from_pallet_id,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
-  THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
+  \   CASE\r\n      WHEN fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n
+  \     ELSE colour_rule\r\n    END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
   BY zero_load_id DESC, pallet_number DESC"
 :limit: 
 :offset: 
@@ -1158,12 +1159,12 @@
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1174,12 +1175,12 @@
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :date
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -1190,19 +1191,51 @@
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failed_otmc_results:
+    :name: failed_otmc_results
+    :sequence_no: 74
+    :caption: Failed otmc results
+    :namespaced_name: failed_otmc_results
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failed_otmc:
+    :name: failed_otmc
+    :sequence_no: 75
+    :caption: Failed otmc
+    :namespaced_name: failed_otmc
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 74
+    :sequence_no: 76
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1355,7 +1388,7 @@
   :control_type: :list
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 14
   :list_def: true, false
 - :column: packed_tm_group
   :caption: Packed TM Group
@@ -1363,7 +1396,7 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 15
   :list_def: 
 - :column: depot_pallet
   :caption: Depot Pallet
@@ -1371,13 +1404,29 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 16
   :list_def: 
 - :column: production_run_id
   :caption: Production run Id
   :data_type: :integer
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
-  :ui_priority: 14
-  :list_def:
+  :ui_priority: 17
+  :list_def: 
+- :column: failed_otmc_results
+  :caption: Failed OTMC Results
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 18
+  :list_def: 
+- :column: failed_otmc
+  :caption: Failed OTMC?
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 19
+  :list_def: 

@@ -245,14 +245,14 @@
     :name: otmc_results
     :sequence_no: 15
     :caption: Otmc results
-    :namespaced_name: 
+    :namespaced_name:
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -263,12 +263,12 @@
     :caption: Active
     :namespaced_name: orchards.active
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -279,12 +279,12 @@
     :caption: Created at
     :namespaced_name: orchards.created_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -295,12 +295,12 @@
     :caption: Updated at
     :namespaced_name: orchards.updated_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

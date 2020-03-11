@@ -96,7 +96,7 @@
     :name: cultivar_names
     :sequence_no: 6
     :caption: Cultivar names
-    :namespaced_name: 
+    :namespaced_name:
     :data_type: :string
     :width: 
     :format: 
@@ -130,12 +130,12 @@
     :caption: Cultivars
     :namespaced_name: orchards.cultivar_ids
     :data_type: :integer_array
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
