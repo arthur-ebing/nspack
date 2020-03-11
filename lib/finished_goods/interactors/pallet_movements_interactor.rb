@@ -7,6 +7,7 @@ module FinishedGoodsApp
       return validation_failed_response(messages: { pallet_number: ['Pallet does not exist'] }) unless pallet
 
       location_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(location, location_scan_field)
+      return validation_failed_response(messages: { location: ['Location does not exist'] }) if location_id.nil_or_empty?
 
       repo.transaction do
         FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet[:id], location_id, 'MOVE_PALLET', nil).call
