@@ -59,7 +59,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   USE_PERMANENT_RMT_BIN_BARCODES = make_boolean('USE_PERMANENT_RMT_BIN_BARCODES')
   ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION = make_boolean('ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION')
   DEFAULT_DELIVERY_LOCATION = ENV['DEFAULT_DELIVERY_LOCATION']
-  BIN_SCANNING_BATCH_SIZE = ENV['BIN_SCANNING_BATCH_SIZE']
+  BIN_SCANNING_BATCH_SIZE = ENV.fetch('BIN_SCANNING_BATCH_SIZE', 10)
   # Regular expression(s) to validate bin asset numbers when present (in case they are typed in incorrectly)
   # If more than one format is required, separate with commas (no spaces).
   BIN_ASSET_REGEX = ENV.fetch('BIN_ASSET_REGEX', '.+')
