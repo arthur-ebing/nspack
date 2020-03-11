@@ -370,6 +370,12 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'add_sequence_to_pallet_submit', Integer do |id|
         carton_number = params[:pallet][:carton_number]
         pallet_number = MesscadaApp::MesscadaRepo.new.find_pallet(id).pallet_number
+        val_res = interactor.validate_carton_number_for_palletizing(carton_number)
+        unless val_res.success
+          store_locally(:current_form_state, carton_quantity: params[:pallet][:carton_quantity])
+          store_locally(:errors, unwrap_failed_response(val_res))
+          r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{id}")
+        end
 
         carton_id = (interactor.find_carton_by_carton_label_id(carton_number) || {})[:id]
         unless AppConst::CARTON_VERIFICATION_REQUIRED
@@ -541,6 +547,12 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.post do
           if !params[:pallet][:carton_number].nil_or_empty?
             carton_number = params[:pallet][:carton_number]
+            val_res = interactor.validate_carton_number_for_palletizing(carton_number)
+            unless val_res.success
+              store_locally(:errors, val_res.to_h.merge(error_message: val_res[:message]))
+              r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
+            end
+
             unless AppConst::CARTON_VERIFICATION_REQUIRED
               carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
               unless carton_number
