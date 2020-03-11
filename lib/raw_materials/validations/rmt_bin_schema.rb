@@ -15,7 +15,7 @@ module RawMaterialsApp
     optional(:nett_weight, :decimal).maybe(:decimal?)
     required(:rmt_container_type_id, :integer).filled(:int?)
     optional(:rmt_container_material_type_id, :integer).filled(:int?)
-    optional(:location_id, :integer).filled(:int?)
+    optional(:location_id, :integer).maybe(:int?)
     optional(:rmt_material_owner_party_role_id, :integer).filled(:int?)
     required(:bin_received_date_time, :date_time).maybe(:date_time?)
     optional(:rmt_inner_container_type_id, :integer).maybe(:int?)
