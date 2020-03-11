@@ -63,7 +63,7 @@ module MesscadaApp
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
 
-    def carton_labeling(params) # rubocop:disable Metrics/AbcSize
+    def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = CartonLabelingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -82,7 +82,7 @@ module MesscadaApp
       end
       cvl_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_labeling'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('carton_labeling')) if AppConst::ROBOT_DISPLAY_LINES != 4
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
