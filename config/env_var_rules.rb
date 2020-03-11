@@ -21,6 +21,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CALCULATE_PALLET_DECK_POSITIONS: 'Works out deck position where pallet should go.' },
     { ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION: 'Determines if bins asset_numbers are auto generated or scanned in.' },
     { BIN_SCANNING_BATCH_SIZE: 'Can allow so many bins to be scanned at a time at bin reception' },
+    { EDIT_BIN_RECEIVED_DATE: 'Allow a user to able to edit received_date_time' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
     { CAPTURE_PALLET_WEIGHT_AT_VERIFICATION: 'optional. Fill in the gross weight at pallet verification,' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },

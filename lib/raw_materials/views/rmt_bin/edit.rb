@@ -25,6 +25,7 @@ module RawMaterials
               form.add_field :nett_weight if rules[:show_nett_weight]
               form.add_field :rmt_container_material_type_id if rules[:capture_container_material]
               form.add_field :rmt_material_owner_party_role_id if rules[:capture_container_material] && rules[:capture_container_material_owner]
+              form.add_field :bin_received_date_time if rules[:edit_bin_received_date_time]
             end
           end
 

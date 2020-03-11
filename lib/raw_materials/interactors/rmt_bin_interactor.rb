@@ -168,7 +168,9 @@ module RawMaterialsApp
 
     def update_rmt_bin(id, params) # rubocop:disable Metrics/AbcSize
       delivery = find_rmt_delivery_by_bin_id(id)
+      submitted_bin_received_date_time = params[:bin_received_date_time]
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
+      params[:bin_received_date_time] = submitted_bin_received_date_time if submitted_bin_received_date_time
       res = validate_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
