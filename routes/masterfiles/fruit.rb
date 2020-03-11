@@ -276,17 +276,19 @@ class Nspack < Roda
         end
         r.patch do     # UPDATE
           res = interactor.update_cultivar(id, params[:cultivar]) # Use Interactor - returned instance is "larger" entity (incl. commod code)
-          comm_repo = MasterfilesApp::CommodityRepo.new
           if res.success
-            commodity_code = comm_repo.find_commodity(res.instance[:commodity_id])&.code
-            update_grid_row(id,
-                            changes: { commodity_id: res.instance[:commodity_id],
-                                       cultivar_group_id: res.instance[:cultivar_group_id],
-                                       cultivar_group_code: res.instance[:cultivar_group_code],
-                                       cultivar_name: res.instance[:cultivar_name],
-                                       code: commodity_code,
-                                       description: res.instance[:description] },
-                            notice: res.message)
+            hash = res.instance.to_h
+            hash[:code] = MasterfilesApp::CommodityRepo.new.find_commodity(res.instance[:commodity_id])&.code
+            row_keys = %i[
+              commodity_id
+              cultivar_group_id
+              cultivar_group_code
+              cultivar_name
+              code
+              cultivar_code
+              description
+            ]
+            update_grid_row(id, changes: select_attributes(hash, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::Cultivar::Edit.call(id, params[:cultivar], res.errors) }
           end

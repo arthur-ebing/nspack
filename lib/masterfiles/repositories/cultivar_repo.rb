@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class CultivarRepo < BaseRepo
+  class CultivarRepo < BaseRepo # rubocop:disable ClassLength
     build_for_select :cultivar_groups,
                      label: :cultivar_group_code,
                      value: :id,
@@ -110,6 +110,14 @@ module MasterfilesApp
     def delete_marketing_variety(id)
       DB[:marketing_varieties_for_cultivars].where(marketing_variety_id: id).delete
       DB[:marketing_varieties].where(id: id).delete
+    end
+
+    def find_cultivar_season(cultivar_id)
+      commodity_id = DB[:cultivars].where(id: cultivar_id).get(:commodity_id)
+      return nil if hash.nil?
+
+      season_id = DB[:seasons].where(commodity_id: commodity_id).reverse(:id).get(:id)
+      MasterfilesApp::CalendarRepo.new.find_season(season_id)
     end
 
     def find_cultivar_marketing_varieties(id)

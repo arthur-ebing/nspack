@@ -1,0 +1,27 @@
+---
+:dataminer_definition: orchard_test_types
+:actions:
+- :url: "/quality/config/orchard_test_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/quality/config/orchard_test_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+- :url: "/quality/config/orchard_test_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/orchard_test_types/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/config/orchard_test_types/new"
+  :text: New Orchard Test Type
+  :style: :button

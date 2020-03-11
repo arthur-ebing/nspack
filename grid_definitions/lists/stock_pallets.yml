@@ -109,6 +109,10 @@
     - :col: shipped
       :op: =
       :val: $:shipped$
+  :failed_otmc:
+    - :col: failed_otmc
+      :op: =
+      :val: $:failed_otmc$
   :pallets_available_to_reworks:
     - :col: in_stock
       :op: =

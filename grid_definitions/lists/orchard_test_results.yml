@@ -1,0 +1,35 @@
+---
+:dataminer_definition: orchard_test_results
+:actions:
+- :url: "/quality/test_results/orchard_test_results/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/quality/test_results/orchard_test_results/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+- :url: "/quality/test_results/orchard_test_results/$:id$/copy"
+  :text: copy
+  :icon: copy
+  :title: Copy
+- :url: "/quality/test_results/orchard_test_results/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/orchard_test_results/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/new"
+  :text: New Orchard Test Result
+  :style: :button
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
+  :text: Phyt Clean Request
+  :style: :button

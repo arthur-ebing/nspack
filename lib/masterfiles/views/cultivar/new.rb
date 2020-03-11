@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module Cultivar
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:cultivar, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -18,6 +18,7 @@ module Masterfiles
               form.add_field :commodity_id
               form.add_field :cultivar_group_id
               form.add_field :cultivar_name
+              form.add_field :cultivar_code
               form.add_field :description
             end
           end

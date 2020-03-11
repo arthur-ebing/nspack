@@ -1,0 +1,376 @@
+---
+:caption: Orchard Test Types
+:sql: "SELECT\r\n    orchard_test_types.id,\r\n    orchard_test_types.test_type_code,\r\n
+  \   orchard_test_types.description,\r\n    orchard_test_types.result_type,\r\n    orchard_test_types.applies_to_all_markets,\r\n
+  \   orchard_test_types.applies_to_all_cultivars,\r\n    orchard_test_types.applies_to_orchard,\r\n
+  \   orchard_test_types.allow_result_capturing,\r\n    orchard_test_types.pallet_level_result,\r\n
+  \   orchard_test_types.api_name,\r\n    orchard_test_types.result_attribute,\r\n
+  \   orchard_test_types.applicable_tm_group_ids,\r\n    orchard_test_types.applicable_cultivar_ids,\r\n
+  \   orchard_test_types.applicable_commodity_group_ids,\r\n    orchard_test_types.active,\r\n
+  \   orchard_test_types.created_at,\r\n    orchard_test_types.updated_at,\r\n    fn_current_status
+  ('orchard_test_types', orchard_test_types.id) AS status,\r\n    string_agg(DISTINCT
+  target_market_groups.target_market_group_name, ', ') AS applicable_tm_groups,\r\n
+  \   string_agg(DISTINCT cultivars.cultivar_name, ', ') AS applicable_cultivars,\r\n
+  \   string_agg(DISTINCT commodity_groups.code, ', ') AS applicable_commodity_groups\r\nFROM\r\n
+  \   orchard_test_types\r\nLEFT JOIN target_market_groups ON target_market_groups.id
+  = ANY (orchard_test_types.applicable_tm_group_ids)\r\nLEFT JOIN cultivars ON cultivars.id
+  = ANY (orchard_test_types.applicable_cultivar_ids)\r\nLEFT JOIN commodity_groups
+  ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)\r\nGROUP
+  BY\r\n    orchard_test_types.id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: orchard_test_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  test_type_code:
+    :name: test_type_code
+    :sequence_no: 2
+    :caption: Test type code
+    :namespaced_name: orchard_test_types.test_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: orchard_test_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  result_type:
+    :name: result_type
+    :sequence_no: 4
+    :caption: Result type
+    :namespaced_name: orchard_test_types.result_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_all_markets:
+    :name: applies_to_all_markets
+    :sequence_no: 5
+    :caption: Applies to all markets
+    :namespaced_name: orchard_test_types.applies_to_all_markets
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_all_cultivars:
+    :name: applies_to_all_cultivars
+    :sequence_no: 6
+    :caption: Applies to all cultivars
+    :namespaced_name: orchard_test_types.applies_to_all_cultivars
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applies_to_orchard:
+    :name: applies_to_orchard
+    :sequence_no: 7
+    :caption: Applies to orchard
+    :namespaced_name: orchard_test_types.applies_to_orchard
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allow_result_capturing:
+    :name: allow_result_capturing
+    :sequence_no: 8
+    :caption: Allow result capturing
+    :namespaced_name: orchard_test_types.allow_result_capturing
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_level_result:
+    :name: pallet_level_result
+    :sequence_no: 9
+    :caption: Pallet level result
+    :namespaced_name: orchard_test_types.pallet_level_result
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  api_name:
+    :name: api_name
+    :sequence_no: 10
+    :caption: Api name
+    :namespaced_name: orchard_test_types.api_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  result_attribute:
+    :name: result_attribute
+    :sequence_no: 11
+    :caption: Result attribute
+    :namespaced_name: orchard_test_types.result_attribute
+    :data_type: :string_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_tm_group_ids:
+    :name: applicable_tm_group_ids
+    :sequence_no: 12
+    :caption: Applicable tm group ids
+    :namespaced_name: orchard_test_types.applicable_tm_group_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_cultivar_ids:
+    :name: applicable_cultivar_ids
+    :sequence_no: 13
+    :caption: Applicable cultivar ids
+    :namespaced_name: orchard_test_types.applicable_cultivar_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_commodity_group_ids:
+    :name: applicable_commodity_group_ids
+    :sequence_no: 14
+    :caption: Applicable commodity group ids
+    :namespaced_name: orchard_test_types.applicable_commodity_group_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 15
+    :caption: Active
+    :namespaced_name: orchard_test_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 16
+    :caption: Created at
+    :namespaced_name: orchard_test_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 17
+    :caption: Updated at
+    :namespaced_name: orchard_test_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 18
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_tm_groups:
+    :name: applicable_tm_groups
+    :sequence_no: 19
+    :caption: Applicable tm groups
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_cultivars:
+    :name: applicable_cultivars
+    :sequence_no: 20
+    :caption: Applicable cultivars
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_commodity_groups:
+    :name: applicable_commodity_groups
+    :sequence_no: 21
+    :caption: Applicable commodity groups
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: orchard_test_types.test_type_code
+  :caption: Test type code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: orchard_test_types.result_type
+  :caption: Result type
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
