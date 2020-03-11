@@ -528,7 +528,6 @@ class Nspack < Roda
               commodity_code
               standard_pack_id
               standard_pack_code
-              basic_pack_code
               gross_weight
               nett_weight
             ]

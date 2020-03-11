@@ -29,8 +29,8 @@
     product_setup_code:
       :editor: :select
       :width: 600
-      :value_sql: SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
+      :value_sql: SELECT NULL UNION SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
     label_template_name:
       :editor: :select
       :width: 300
-      :value_sql: SELECT label_template_name, id FROM label_templates WHERE application = 'Carton'
+      :value_sql: SELECT '' AS label_template_name, NULL AS id UNION SELECT label_template_name, id FROM label_templates WHERE application = 'Carton'
