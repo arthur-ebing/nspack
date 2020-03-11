@@ -4,7 +4,7 @@ module MesscadaApp
   module TaskPermissionCheck
     class ValidatePallets < BaseService
       attr_reader :task, :pallet_numbers, :repo, :load_id
-      def initialize(task, pallet_numbers, load_id)
+      def initialize(task, pallet_numbers, load_id = nil)
         @task = task
         @repo = MesscadaRepo.new
         @pallet_numbers = Array(pallet_numbers)
@@ -18,7 +18,9 @@ module MesscadaApp
         in_stock: :in_stock_check,
         has_nett_weight: :nett_weight_check,
         has_gross_weight: :gross_weight_check,
-        not_on_load: :not_on_load_check
+        not_on_load: :not_on_load_check,
+        not_on_inspection_sheet: :not_on_inspection_sheet_check,
+        not_failed_otmc: :not_failed_otmc_check
       }.freeze
 
       def call
@@ -82,6 +84,20 @@ module MesscadaApp
 
         errors = repo.where_pallets(pallet_number: pallet_numbers, on_load: load_id)
         return failed_response "Pallet: #{errors.join(', ')} already allocated to other load." unless errors.empty?
+
+        all_ok
+      end
+
+      def not_failed_otmc_check
+        errors = pallet_numbers - repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil)
+        return failed_response "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
+
+        all_ok
+      end
+
+      def not_on_inspection_sheet_check
+        errors = FinishedGoodsApp::GovtInspectionRepo.new.repo.exists_on_inspection_sheet(pallet_numbers)
+        return failed_response "Pallet: #{errors.join(', ')} is already on an inspection sheet." unless errors.empty?
 
         all_ok
       end

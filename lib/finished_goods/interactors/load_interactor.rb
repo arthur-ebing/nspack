@@ -95,7 +95,8 @@ module FinishedGoodsApp
     end
 
     def ship_load(id) # rubocop:disable Metrics/AbcSize
-      failed_response("Load: #{id} already shipped.") if load_entity(id)&.shipped
+      return failed_response("Load: #{id} already shipped.") if load_entity(id)&.shipped
+
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user.user_name)
@@ -111,11 +112,12 @@ module FinishedGoodsApp
     end
 
     def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
-      failed_response("Load: #{id} not shipped.") unless load_entity(id)&.shipped
+      return failed_response("Load: #{id} not shipped.") unless load_entity(id)&.shipped
 
-      res = ok_response
-      res = validate_pallets(:shipped, pallet_number) unless pallet_number.nil?
-      return res unless res.success
+      unless pallet_number.nil?
+        res = validate_pallets(:shipped, pallet_number)
+        return res unless res.success
+      end
 
       res = nil
       repo.transaction do
@@ -132,7 +134,7 @@ module FinishedGoodsApp
     def allocate_multiselect(load_id, params, initial_params = nil) # rubocop:disable Metrics/AbcSize
       pallet_numbers = repo.find_pallet_numbers_from(params)
       unless pallet_numbers.empty?
-        res = validate_pallets(:not_on_load, pallet_numbers, load_id)
+        res = validate_allocate_list(load_id, pallet_numbers)
         return res unless res.success
       end
 
@@ -154,29 +156,15 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def validate_allocate_list(load_id, pallets_string)
+    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
       res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
-      return res unless res.success
-
-      res = validate_pallets(:not_shipped, pallet_numbers)
-      return res unless res.success
-
-      res = validate_pallets(:in_stock, pallet_numbers)
-      return res unless res.success
-
-      pallet_ids = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
-      success_response('ok', pallet_ids)
-    end
-
-    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
-      res = validate_allocate_list(load_id, pallets_string)
+      res = validate_allocate_list(load_id, pallet_numbers)
       return validation_failed_response(messages: { pallet_list: [res.message] }) unless res.success
 
-      pallet_ids = res.instance
+      pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
       repo.transaction do
         res = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
@@ -217,24 +205,8 @@ module FinishedGoodsApp
       @stepper ||= LoadStep.new(step_key, @user, @context.request_ip)
     end
 
-    def validate_stepper_allocate_pallet(load_id, pallet_numbers)
-      res = validate_pallets(:exists, pallet_numbers)
-      return res unless res.success
-
-      res = validate_pallets(:not_shipped, pallet_numbers)
-      return res unless res.success
-
-      res = validate_pallets(:in_stock, pallet_numbers)
-      return res unless res.success
-
-      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
-      return res unless res.success
-
-      ok_response
-    end
-
     def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = validate_stepper_allocate_pallet(load_id, pallet_number)
+      res = validate_allocate_list(load_id, pallet_number)
       return res unless res.success
 
       message = stepper(step_key).allocate_pallet(pallet_number)
@@ -313,6 +285,22 @@ module FinishedGoodsApp
 
     def validate_load_container_params(params)
       LoadContainerSchema.call(params)
+    end
+
+    def validate_allocate_list(load_id, pallet_numbers)
+      res = validate_pallets(:not_on_load, pallet_numbers, load_id)
+      return res unless res.success
+
+      res = validate_pallets(:not_shipped, pallet_numbers)
+      return res unless res.success
+
+      res = validate_pallets(:in_stock, pallet_numbers)
+      return res unless res.success
+
+      res = validate_pallets(:not_failed_otmc, pallet_numbers)
+      return res unless res.success
+
+      ok_response
     end
   end
 end

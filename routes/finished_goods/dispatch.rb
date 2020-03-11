@@ -289,7 +289,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
         res = interactor.allocate_multiselect(id, pallet_sequence_id: multiselect_grid_choices(params))
-        flash[:notice] = res.message
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
         r.redirect request.referer
       end
 

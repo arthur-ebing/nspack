@@ -69,11 +69,12 @@ module FinishedGoodsApp
                             wrapper: GovtInspectionPalletFlat)
     end
 
-    def exists_on_inspection_sheet(id)
-      DB.select(1).where(DB[:govt_inspection_pallets]
-                             .join(:govt_inspection_sheets, id: :govt_inspection_sheet_id)
-                             .where(cancelled: false, completed: false, pallet_id: id)
-                             .exists).one?
+    def exists_on_inspection_sheet(pallet_numbers)
+      DB[:govt_inspection_pallets]
+        .join(:pallets, id: :pallet_id)
+        .join(:govt_inspection_sheets, id: :govt_inspection_sheet_id)
+        .where(cancelled: false, completed: false, pallet_number: pallet_numbers)
+        .select_map(:pallet_number)
     end
   end
 end
