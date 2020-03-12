@@ -35,7 +35,7 @@ module FinishedGoods
             end
             page.form do |form|
               form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete"
-              form.submit_captions 'Submit'
+              form.submit_captions 'Complete adding pallets'
             end
             page.section do |section|
               section.fit_height!
