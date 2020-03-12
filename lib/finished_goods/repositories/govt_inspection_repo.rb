@@ -70,11 +70,11 @@ module FinishedGoodsApp
     end
 
     def exists_on_inspection_sheet(pallet_numbers)
-      DB[:govt_inspection_pallets]
-        .join(:pallets, id: :pallet_id)
-        .join(:govt_inspection_sheets, id: :govt_inspection_sheet_id)
-        .where(cancelled: false, completed: false, pallet_number: pallet_numbers)
-        .select_map(:pallet_number)
+      ds = DB[:govt_inspection_pallets]
+      ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
+      ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
+      ds = ds.where(cancelled: false, completed: false, pallet_number: pallet_numbers)
+      ds.select_map(:pallet_number)
     end
   end
 end

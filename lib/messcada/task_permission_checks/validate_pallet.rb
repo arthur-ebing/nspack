@@ -96,7 +96,7 @@ module MesscadaApp
       end
 
       def not_on_inspection_sheet_check
-        errors = FinishedGoodsApp::GovtInspectionRepo.new.repo.exists_on_inspection_sheet(pallet_numbers)
+        errors = FinishedGoodsApp::GovtInspectionRepo.new.exists_on_inspection_sheet(pallet_numbers)
         return failed_response "Pallet: #{errors.join(', ')} is already on an inspection sheet." unless errors.empty?
 
         all_ok
