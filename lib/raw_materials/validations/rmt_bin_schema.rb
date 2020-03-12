@@ -17,7 +17,7 @@ module RawMaterialsApp
     optional(:rmt_container_material_type_id, :integer).filled(:int?)
     optional(:location_id, :integer).maybe(:int?)
     optional(:rmt_material_owner_party_role_id, :integer).filled(:int?)
-    required(:bin_received_date_time, :date_time).maybe(:date_time?)
+    required(:bin_received_date_time, :time).maybe(:time?)
     optional(:rmt_inner_container_type_id, :integer).maybe(:int?)
     optional(:rmt_inner_container_material_id, :integer).maybe(:int?)
     optional(:farm_id, :integer).filled(:int?)
