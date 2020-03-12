@@ -290,7 +290,7 @@ module ProductionApp
     def reworks_run_pallet_seq_print_data(id)
       qry = <<~SQL
         SELECT *
-        FROM vw_pallet_label
+        FROM vw_carton_label_pseq
         WHERE id = ?
       SQL
       DB[qry, id].first
