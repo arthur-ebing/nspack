@@ -116,17 +116,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           handle_not_found(r) unless customer_variety
           check_auth!('marketing', 'edit')
           packed_tm_group_ids = repo.available_to_clone_packed_tm_groups(customer_variety.variety_as_customer_variety_id)
+          raise Crossbeams::FrameworkError, 'There are no available packed TM Groups to clone.' if packed_tm_group_ids.nil_or_empty?
+
           r.redirect "/list/clone_customer_varieties/multi?key=customer_variety_varieties&id=#{id}&packed_tm_group_id=#{packed_tm_group_ids}"
         end
 
         r.post do
           res = interactor.clone_customer_variety(id, multiselect_grid_choices(params))
-          if fetch?(r)
-            show_json_notice(res.message)
-          else
+          if res.success
             flash[:notice] = res.message
-            r.redirect '/list/target_market_groups'
+          else
+            flash[:error] = res.message
           end
+          redirect_via_json('/list/customer_varieties')
         end
       end
 
