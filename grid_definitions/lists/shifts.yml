@@ -10,6 +10,16 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :separator: true
+- :url: "/production/shifts/shifts/$:id$/incentive_report"
+  :text: Incentive report
+  :icon: printer
+  :loading_window: true
+- :url: "/production/shifts/shifts/$:id$/incentive_count_report"
+  :text: Incentive count report
+  :icon: printer
+  :loading_window: true
+- :separator: true
 - :url: "/development/statuses/list/shifts/$:id$"
   :text: status
   :icon: information-solid

@@ -95,6 +95,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
       end
+
+      r.on 'incentive_report' do
+        res = CreateJasperReport.call(report_name: 'incentive',
+                                      user: current_user.login_name,
+                                      file: 'incentive',
+                                      params: { shift_id: id })
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+      r.on 'incentive_count_report' do
+        res = CreateJasperReport.call(report_name: 'incentive_count',
+                                      user: current_user.login_name,
+                                      file: 'incentive_count',
+                                      params: { shift_id: id })
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
     end
 
     r.on 'shifts' do
