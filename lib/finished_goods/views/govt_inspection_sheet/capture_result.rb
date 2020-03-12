@@ -19,35 +19,37 @@ module FinishedGoods
                                   style: :back_button)
             end
             page.form do |form|
-              form.caption 'Inspection Sheet'
               form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture"
               form.submit_captions 'Finish Inspection'
-              form.row do |row|
-                row.column do |col|
-                  col.add_field :inspector_id
-                  col.add_field :inspection_billing_party_role_id
-                  col.add_field :exporter_party_role_id
-                  col.add_field :booking_reference
-                end
-                row.column do |col|
-                  col.add_field :inspection_point
-                  col.add_field :destination_country_id
-                  col.add_field :completed
-                  col.add_field :inspected
+              form.fold_up do |fold|
+                fold.caption 'Inspection Sheet'
+                fold.open!
+                fold.row do |row|
+                  row.column do |col|
+                    col.add_field :inspector_id
+                    col.add_field :inspection_billing_party_role_id
+                    col.add_field :exporter_party_role_id
+                    col.add_field :booking_reference
+                  end
+                  row.column do |col|
+                    col.add_field :inspection_point
+                    col.add_field :destination_country_id
+                    col.add_field :completed
+                    col.add_field :inspected
+                  end
                 end
               end
             end
             page.add_notice 'Record inspection results'
             page.section do |section|
-              section.fit_height!
               section.add_grid('govt_inspection_pallets',
                                '/list/govt_inspection_pallets/grid_multi',
                                caption: 'Choose pallets that passed inspection.',
                                is_multiselect: true,
                                multiselect_url: '/finished_goods/inspection/govt_inspection_pallets/capture',
                                multiselect_key: 'standard',
-                               multiselect_params: { key: 'standard',
-                                                     id: id })
+                               multiselect_params: { key: 'standard', id: id },
+                               height: 40)
             end
           end
 

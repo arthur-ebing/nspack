@@ -38,10 +38,10 @@ module FinishedGoods
               form.submit_captions 'Complete adding pallets'
             end
             page.section do |section|
-              section.fit_height!
               section.add_grid('govt_inspection_pallets',
                                "/list/govt_inspection_pallets/grid?key=standard&id=#{id}",
-                               caption: 'Govt Inspection Pallets')
+                               caption: 'Govt Inspection Pallets',
+                               height: 40)
             end
           end
 
