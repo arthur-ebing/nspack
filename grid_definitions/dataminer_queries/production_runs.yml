@@ -670,7 +670,7 @@
     :sequence_no: 40
     :caption: Updated at
     :namespaced_name: production_runs.updated_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false

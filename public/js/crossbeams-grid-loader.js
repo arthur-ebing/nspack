@@ -883,6 +883,14 @@ const crossbeamsGridFormatters = {
     return '<span class="ac_icon_uncheck">&nbsp;</span>';
   },
 
+  // Remove the seconds and time zone portion of a datetime column.
+  dateTimeWithoutSecsOrZoneFormatter: function dateTimeWithoutSecsOrZoneFormatter(params) {
+    if (!params.data) { return null; }
+
+    if (params.value === '' || params.value === null) { return ''; }
+    return params.value.replace(/:\d\d \+\d\d\d\d$/, '');
+  },
+
   // Format a column to display as an icon.
   // The column format is: "icon_name[,colour][,indent level]"
   // - colour defaults to grey
@@ -1253,6 +1261,9 @@ const crossbeamsGridStaticLoader = {
           }
           if (col[attr] === 'crossbeamsGridFormatters.booleanFormatter') {
             newCol[attr] = crossbeamsGridFormatters.booleanFormatter;
+          }
+          if (col[attr] === 'crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter') {
+            newCol[attr] = crossbeamsGridFormatters.dateTimeWithoutSecsOrZoneFormatter;
           }
           if (col[attr] === 'crossbeamsGridFormatters.iconFormatter') {
             newCol[attr] = crossbeamsGridFormatters.iconFormatter;
