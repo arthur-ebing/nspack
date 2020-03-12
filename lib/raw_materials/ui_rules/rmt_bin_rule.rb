@@ -99,7 +99,7 @@ module UiRules
                                           caption: 'Container Material Type', required: true, prompt: true },
         rmt_material_owner_party_role_id: { renderer: :select, options: !@form_object.rmt_container_material_type_id.nil_or_empty? ? @repo.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true },
         qty_inner_bins: { renderer: :integer, hide_on_load: @rules[:capture_inner_bins] ? false : true },
-        bin_received_date_time: { renderer: :date }
+        bin_received_date_time: { renderer: :datetime }
       }
     end
 
