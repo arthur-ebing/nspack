@@ -21,7 +21,7 @@ class Nspack < Roda
       r.on 'copy' do   # CLONE
         check_auth!('test results', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.clone_orchard_test_result(id)
+        res = interactor.copy_orchard_test_result(id)
         if res.success
           flash[:notice] = res.message
           show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(res.instance[:id], form_values: res.instance) }
