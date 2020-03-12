@@ -88,6 +88,11 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.on 'scan_pallet_sequence', Integer do |id|
         r.get do
           pallet_sequence = interactor.find_pallet_sequence_attrs(id)
+          if pallet_sequence.nil_or_empty?
+            store_locally(:error, "Pallet sequence:#{id} doesn't exist")
+            r.redirect('/rmd/finished_goods/repack_pallet/scan_pallet')
+          end
+
           ps_ids = interactor.find_pallet_sequences_from_same_pallet(id)
 
           error = retrieve_from_local_store(:error)
@@ -133,6 +138,11 @@ class Nspack < Roda # rubocop:disable ClassLength
 
         r.get do
           pallet_sequence = interactor.find_pallet_sequence_attrs(id)
+          if pallet_sequence.nil_or_empty?
+            store_locally(:error, "Pallet sequence:#{id} doesn't exist")
+            r.redirect('/rmd/finished_goods/repack_pallet/scan_pallet')
+          end
+
           ps_ids = interactor.find_pallet_sequences_from_same_pallet(id)
 
           printer_repo = LabelApp::PrinterRepo.new
