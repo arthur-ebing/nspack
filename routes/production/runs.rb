@@ -271,6 +271,18 @@ class Nspack < Roda
         end
       end
 
+      r.on 'carton_packout_report' do
+        res = CreateJasperReport.call(report_name: 'carton_packout',
+                                      user: current_user.login_name,
+                                      file: 'carton_packout',
+                                      params: { production_run_id: id })
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
       r.on 'show_stats' do
         check_auth!('runs', 'read')
         show_partial { Production::Runs::ProductionRun::ShowStats.call(id) }
