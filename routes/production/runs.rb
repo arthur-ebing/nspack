@@ -263,6 +263,23 @@ class Nspack < Roda
                                       params: { production_run_id: id,
                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                use_derived_weight: 'false|boolean',
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'packout_report_derived' do
+        res = CreateJasperReport.call(report_name: 'pack_out',
+                                      user: current_user.login_name,
+                                      file: 'pack_out',
+                                      params: { production_run_id: id,
+                                                carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                use_derived_weight: 'true|boolean',
                                                 keep_file: false })
         if res.success
           change_window_location_via_json(res.instance, request.path)

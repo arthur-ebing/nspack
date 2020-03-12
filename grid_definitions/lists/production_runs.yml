@@ -105,6 +105,10 @@
   :text: Packout report
   :icon: printer
   :loading_window: true
+- :url: "/production/runs/production_runs/$:id$/packout_report_derived"
+  :text: Packout report (derived weights)
+  :icon: printer
+  :loading_window: true
 - :url: "/production/runs/production_runs/$:id$/carton_packout_report"
   :text: Carton packout report
   :icon: printer
