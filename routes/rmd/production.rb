@@ -60,6 +60,9 @@ class Nspack < Roda # rubocop:disable ClassLength
         form.add_label(:verification_result, 'Verification Result', pallet_sequence[:verification_result])
         form.add_label(:verification_failure_reason, 'Verification Failure Reason', pallet_sequence[:verification_failure_reason])
         form.add_label(:fruit_sticker, 'Fruit Sticker', pallet_sequence[:fruit_sticker]) if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION
+        form.add_label(:gross_weight, 'Plt Gross', pallet_sequence[:gross_weight])
+        form.add_label(:nett_weight, 'Plt Nett', pallet_sequence[:nett_weight])
+        form.add_label(:sequence_nett_weight, 'Seq Nett', pallet_sequence[:sequence_nett_weight])
         form.add_prev_next_nav('/rmd/production/pallet_inquiry/scan_pallet_sequence/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
       end
