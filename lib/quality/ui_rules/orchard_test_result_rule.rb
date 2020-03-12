@@ -22,14 +22,16 @@ module UiRules
                                         caption: 'Orchard Test Type' }
       fields[:puc_id] = { renderer: :label,
                           with_value: @form_object.puc_code,
-                          caption: 'Puc' }
+                          caption: 'Puc',
+                          required: true }
       fields[:orchard_id] = { renderer: :label,
                               with_value: @form_object.orchard_code,
-                              caption: 'Orchard' }
+                              caption: 'Orchard',
+                              required: true }
       fields[:cultivar_id] = { renderer: :label,
                                with_value: @form_object.cultivar_code,
-                               caption: 'Cultivars' }
-
+                               caption: 'Cultivars',
+                               required: true }
       fields[:description] = { renderer: :label }
       fields[:passed] = { renderer: :label,
                           with_value: @form_object.passed ? 'Passed' : 'Failed',
