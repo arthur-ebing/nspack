@@ -42,13 +42,14 @@ module QualityApp
     def parse_record(api_result) # rubocop:disable Metrics/AbcSize
       @api_result = api_result
       puc_id = repo.get_id(:pucs, puc_code: api_result[:puc])
-      orchard_id = repo.get_id(:orchards, orchard_code: api_result[:orch])
-      cultivar_id = repo.get_id(:cultivars, cultivar_code: api_result[:cultCode])
+      orchard_id = repo.get_id(:orchards, orchard_code: api_result[:orch], puc_id: puc_id)
+      cultivar_id = repo.get_id(:cultivars, cultivar_code: api_result[:cultCode]) || repo.get_id(:cultivars, cultivar_name: api_result[:cultCode])
+
       @params = { puc_id: puc_id,
-                  orchard_id: orchard_id }
+                  orchard_id: orchard_id,
+                  cultivar_id: cultivar_id }
       return unless params.all? { |_, v| !v.nil? }
 
-      @params[:cultivar_id] = cultivar_id
       check_orchard_test_types
     end
 

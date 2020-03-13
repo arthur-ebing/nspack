@@ -21,14 +21,8 @@ module QualityApp
         pass_fail_rules
       end
 
-      unless api_result.empty?
-        attrs = params
-        attrs.delete(:api_result)
-        return success_response('No changes') if attrs == orchard_test_result.to_h.select { |key, _| attrs.keys.include?(key) }
-      end
       update_orchard_otmc_results unless result_attribute.nil?
       repo.update_orchard_test_result(id, params)
-
       update_pallet_sequences_phyto_data if @orchard_test_type.result_attribute == 'phytoData'
 
       success_response('Updated Orchard Test Result')
