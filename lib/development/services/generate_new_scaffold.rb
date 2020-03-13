@@ -1167,6 +1167,8 @@ module DevelopmentApp
             this_col = opts.table_meta.col_lookup[f]
             if this_col[:type] == :boolean
               "fields[:#{f}] = { renderer: :label, as_boolean: true }"
+            elsif this_col[:type] == :datetime
+              "fields[:#{f}] = { renderer: :label, format: :without_timezone_or_seconds }"
             else
               "fields[:#{f}] = { renderer: :label }"
             end

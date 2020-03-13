@@ -20,8 +20,8 @@ module UiRules
       fields[:shift_type_code] = { renderer: :label, with_value: @form_object.shift_type_code, caption: 'Shift Type' }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:running_hours] = { renderer: :label }
-      fields[:start_date_time] = { renderer: :label }
-      fields[:end_date_time] = { renderer: :label }
+      fields[:start_date_time] = { renderer: :label, format: :without_timezone_or_seconds }
+      fields[:end_date_time] = { renderer: :label, format: :without_timezone_or_seconds }
     end
 
     def edit_fields
@@ -29,8 +29,8 @@ module UiRules
         shift_type_id: { renderer: :hidden },
         shift_type_code: { renderer: :label, options: @form_object.shift_type_code, caption: 'Shift Type', required: true },
         running_hours: {},
-        start_date_time: { renderer: :label },
-        end_date_time: { renderer: :label }
+        start_date_time: { renderer: :label, format: :without_timezone_or_seconds },
+        end_date_time: { renderer: :label, format: :without_timezone_or_seconds }
       }
     end
 

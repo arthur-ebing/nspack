@@ -41,7 +41,7 @@ module UiRules
       fields[:qty_damaged_bins] = { renderer: :label }
       fields[:qty_empty_bins] = { renderer: :label }
       fields[:date_picked] = { renderer: :label }
-      fields[:date_delivered] = { renderer: :label }
+      fields[:date_delivered] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:tipping_complete_date_time] = { renderer: :label }
       fields[:quantity_bins_with_fruit] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
