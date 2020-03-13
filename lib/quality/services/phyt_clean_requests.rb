@@ -49,7 +49,6 @@ module QualityApp
       return unless params.all? { |_, v| !v.nil? }
 
       @params[:cultivar_id] = cultivar_id
-      repo.update_pallet_sequences_phyto_data(api_result.merge(params))
       check_orchard_test_types
     end
 

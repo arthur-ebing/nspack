@@ -28,6 +28,9 @@ module QualityApp
       end
       update_orchard_otmc_results unless result_attribute.nil?
       repo.update_orchard_test_result(id, params)
+
+      update_pallet_sequences_phyto_data if @orchard_test_type.result_attribute == 'phytoData'
+
       success_response('Updated Orchard Test Result')
     end
 
@@ -40,7 +43,7 @@ module QualityApp
     def classification_rules
       params[:passed] = true
       params[:classification_only] = true
-      @otmc_result = api_result[result_attribute]
+      @otmc_result = api_result[result_attribute] || params[:classification]
       params[:classification] = otmc_result
     end
 
@@ -55,6 +58,10 @@ module QualityApp
       otmc_results = repo.get(:orchards, params[:orchard_id], :otmc_results) || {}
       otmc_results[orchard_test_type.test_type_code.to_sym] = otmc_result
       repo.update(:orchards, params[:orchard_id], otmc_results: Sequel.hstore(otmc_results))
+    end
+
+    def update_pallet_sequences_phyto_data
+      repo.update_pallet_sequences_phyto_data(params)
     end
   end
 end
