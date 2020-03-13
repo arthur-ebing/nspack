@@ -308,19 +308,19 @@
   :ordered_list: true
   :ui_priority: 2
   :list_def: SELECT user_name FROM users ORDER BY user_name
-- :column: pallet_number
-  :caption: Pallet number
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 3
-  :list_def: 
 - :column: reworks_runs.created_at
   :caption: Created at
   :data_type: :date
   :control_type: :daterange
   :default_value: 
   :ordered_list: false
-  :ui_priority: 4
+  :ui_priority: 3
   :list_def: 
+- :column: reworks_runs.id
+  :caption: Reworks run
+  :data_type: :integer
+  :control_type:
+  :default_value:
+  :ordered_list: true
+  :ui_priority: 4
+  :list_def:

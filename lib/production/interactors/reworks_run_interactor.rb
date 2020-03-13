@@ -138,7 +138,13 @@ module ProductionApp
     def resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
       return failed_response('Bin selection cannot be empty') if multiselect_list.nil_or_empty?
 
-      rmt_bins = selected_rmt_bins(multiselect_list)
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      rmt_bins = case reworks_run_type
+                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+                   selected_bins(multiselect_list)
+                 else
+                   selected_rmt_bins(multiselect_list)
+                 end
       instance = { reworks_run_type_id: reworks_run_type_id,
                    pallets_selected: rmt_bins.join("\n") }
       success_response('', instance)
@@ -149,40 +155,75 @@ module ProductionApp
     def bulk_production_run_update(reworks_run_type_id, multiselect_list, attrs)  # rubocop:disable Metrics/AbcSize
       return failed_response('Pallet sequence selection cannot be empty') if multiselect_list.nil_or_empty?
 
-      res = resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      res = resolve_input_from_multiselect(reworks_run_type, reworks_run_type_id, multiselect_list)
       return validation_failed_response(res) unless res.success
 
       attrs[:pallets_selected] = res.instance[:pallets_selected].split("\n")
-      sequence_ids = pallet_number_sequences(attrs[:pallets_selected])
-      before_attrs = production_run_attrs(attrs[:from_production_run_id], production_run(attrs[:from_production_run_id]))
-      after_attrs = production_run_attrs(attrs[:to_production_run_id], production_run(attrs[:to_production_run_id]))
-      change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
-                              after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
-
-      changes_made = resolve_changes_made(before: before_attrs.sort.to_h,
-                                          after: after_attrs.sort.to_h,
-                                          change_descriptions: change_descriptions)
-
       id = nil
       repo.transaction do
-        repo.update_pallet_sequence(sequence_ids, after_attrs)
+        res = resolve_update_selected_input(reworks_run_type, attrs)
         id = repo.create_reworks_run(user: attrs[:user],
                                      reworks_run_type_id: attrs[:reworks_run_type_id],
                                      pallets_selected: "{ #{attrs[:pallets_selected].join(',')} }",
                                      pallets_affected: "{ #{attrs[:pallets_selected].join(',')} }",
-                                     changes_made: changes_made)
-        sequence_ids.each do |sequence_id|
-          sequence = pallet_sequence(sequence_id)
-          log_reworks_runs_status_and_transaction(id, sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE)
-        end
+                                     changes_made: res[:changes_made])
+        resolve_log_reworks_runs_status_and_transaction(reworks_run_type, id, res[:children])
       end
-      success_response('Bulk production run update was successful', reworks_run_id: id)
+      success_response((res[:message]).to_s, reworks_run_id: id)
+    end
+
+    def resolve_input_from_multiselect(reworks_run_type, reworks_run_type_id, multiselect_list)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+        resolve_pallet_numbers_from_multiselect(reworks_run_type_id, multiselect_list)
+      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+        resolve_rmt_bins_from_multiselect(reworks_run_type_id, multiselect_list)
+      end
+    end
+
+    def resolve_update_selected_input(reworks_run_type, attrs)  # rubocop:disable Metrics/AbcSize
+      change_descriptions = {}
+      case reworks_run_type
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+        message = "#{AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE} was successful"
+        children = pallet_number_sequences(attrs[:pallets_selected])
+        before_attrs = production_run_attrs(attrs[:from_production_run_id], production_run(attrs[:from_production_run_id]))
+        after_attrs = production_run_attrs(attrs[:to_production_run_id], production_run(attrs[:to_production_run_id]))
+        change_descriptions = { before: production_run_details(attrs[:from_production_run_id]).sort.to_h,
+                                after: production_run_details(attrs[:to_production_run_id]).sort.to_h }
+        repo.update_pallet_sequence(children, after_attrs)
+      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+        message = "#{AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE} was successful"
+        children = attrs[:pallets_selected]
+        before_attrs = { production_run_tipped_id: attrs[:from_production_run_id] }
+        after_attrs = { production_run_tipped_id: attrs[:to_production_run_id] }
+        repo.update_rmt_bin(children, after_attrs)
+      end
+      changes_made = resolve_changes_made(before: before_attrs.sort.to_h,
+                                          after: after_attrs.sort.to_h,
+                                          change_descriptions: change_descriptions)
+      { children: children, after_attrs: after_attrs, changes_made: changes_made, message: message }
     end
 
     def resolve_changes_made(changes_made)
       changes = {}
       changes['pallets'] = { pallet_sequences: { changes: changes_made } }
       changes.to_json
+    end
+
+    def resolve_log_reworks_runs_status_and_transaction(reworks_run_type, reworks_run_id, children)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+        children.each do |sequence_id|
+          sequence = pallet_sequence(sequence_id)
+          log_reworks_runs_status_and_transaction(reworks_run_id, sequence[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE)
+        end
+      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+        log_multiple_statuses(:rmt_bins, children, AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE)
+        log_status(:reworks_runs, reworks_run_id, 'CREATED')
+        log_transaction
+      end
     end
 
     def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
@@ -224,7 +265,8 @@ module ProductionApp
            AppConst::RUN_TYPE_SCRAP_BIN,
           AppConst::RUN_TYPE_UNSCRAP_BIN
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
-      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
+          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         validate_production_runs(reworks_run_type, params)
       else
         validate_pallet_numbers(reworks_run_type, params[:pallets_selected])
@@ -238,7 +280,8 @@ module ProductionApp
       when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
          AppConst::RUN_TYPE_BATCH_PALLET_EDIT
         'edit_pallet'
-      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
+          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         'edit_bulk_production_run'
       end
     end
@@ -817,6 +860,26 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def find_reworks_runs_with(pallet_number)
+      # return failed_response("Pallet number : #{pallet_number} doesn't exist") unless repo.pallet_numbers_exists?(pallet_number)
+
+      reworks_runs_ids = repo.find_reworks_runs_with(pallet_number)
+      return validation_failed_response(messages: { pallet_number: ["There are no reworks runs for pallet number : #{pallet_number}"] }) if reworks_runs_ids.nil_or_empty?
+
+      success_response('ok', reworks_runs_ids)
+    end
+
+    def reject_bulk_production_run_update(reworks_run_type_id)
+      reworks_run_type = reworks_run_type(reworks_run_type_id)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+        message = "Changes to #{AppConst::REWORKS_ACTION_BULK_PALLET_RUN_UPDATE} has been discarded"
+      when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+        message = "Changes to #{AppConst::REWORKS_ACTION_BULK_BIN_RUN_UPDATE} has been discarded"
+      end
+      success_response('ok', message)
+    end
+
     private
 
     def repo
@@ -841,6 +904,10 @@ module ProductionApp
 
     def selected_rmt_bins(rmt_bin_ids)
       repo.selected_rmt_bins(rmt_bin_ids)
+    end
+
+    def selected_bins(rmt_bin_ids)
+      repo.selected_bins(rmt_bin_ids)
     end
 
     def selected_pallet_sequences(sequence_ids)
@@ -983,7 +1050,7 @@ module ProductionApp
       OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
     end
 
-    def validate_rmt_bins(reworks_run_type, rmt_bins) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def validate_rmt_bins(reworks_run_type, rmt_bins, production_run_id = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       rmt_bins = rmt_bins.split(/\n|,/).map(&:strip).reject(&:empty?)
       rmt_bins = rmt_bins.map { |x| x.gsub(/['"]/, '') }
 
@@ -1013,10 +1080,16 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ['not scrapped'] }, pallets_selected: rmt_bins) unless unscrapped_bins.nil_or_empty?
       end
 
+      if AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
+        production_run_bins = repo.production_run_bins?(rmt_bins, production_run_id)
+        extra_bins = (rmt_bins - production_run_bins)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{extra_bins.join(', ')} are not from production run #{production_run_id}"] }, pallets_selected: rmt_bins) unless extra_bins.nil_or_empty?
+      end
+
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
     end
 
-    def validate_production_runs(reworks_run_type, params)  # rubocop:disable Metrics/AbcSize
+    def validate_production_runs(reworks_run_type, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       from_production_run_id = params[:from_production_run_id]
       to_production_run_id = params[:to_production_run_id]
       pallets_selected = params[:pallets_selected]
@@ -1032,7 +1105,11 @@ module ProductionApp
       same_cultivar_group = repo.same_cultivar_group?(from_production_run_id, to_production_run_id)
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different cultivar groups"] }, to_production_run_id: to_production_run_id) unless same_cultivar_group
 
-      res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected], from_production_run_id)
+      if AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type
+        res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected], from_production_run_id)
+      elsif AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
+        res = validate_rmt_bins(reworks_run_type, params[:pallets_selected], from_production_run_id)
+      end
       return OpenStruct.new(success: false,  messages: res.messages, pallets_selected: pallets_selected.split(',')) unless res.success
 
       attrs = { from_production_run_id: from_production_run_id, to_production_run_id: to_production_run_id, pallet_numbers: res.instance[:pallet_numbers] }
@@ -1046,7 +1123,8 @@ module ProductionApp
         ReworksRunScrapPalletsSchema.call(params)
       when AppConst::RUN_TYPE_TIP_BINS
         ReworksRunTipBinsSchema.call(params)
-      when  AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+      when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
+          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         ReworksRunBulkProductionRunUpdateSchema.call(params)
       else
         ReworksRunNewSchema.call(params)

@@ -15,6 +15,10 @@ module UiRules
 
     def set_production_run_bulk_update_fields  # rubocop:disable Metrics/AbcSize
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
+      @rules[:bulk_pallet_run_update] = AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type_id_label
+      @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
+      @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:reworks_run_type] = { renderer: :label,
                                     with_value: reworks_run_type_id_label,

@@ -6,3 +6,8 @@
   :icon: view-show
   :title: View
   :popup: true
+:conditions:
+  :search_by_pallet_number:
+    - :col: reworks_runs.id
+      :op: IN
+      :val: $:reworks_runs_ids$

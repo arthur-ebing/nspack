@@ -96,6 +96,10 @@ module ProductionApp
       DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
     end
 
+    def production_run_bins?(bins, production_run_id)
+      DB[:rmt_bins].where(id: bins, production_run_tipped_id: production_run_id).select_map(:id)
+    end
+
     def scrapped_bins?(bin_ids)
       DB[:rmt_bins].where(id: bin_ids, scrapped: true).select_map(:id)
     end
@@ -144,6 +148,10 @@ module ProductionApp
       # return selected_rmt_bin_asset_numbers?(rmt_bin_ids) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
       DB[:rmt_bins].where(id: rmt_bin_ids).where(bin_tipped: false).map { |p| p[:id] }
+    end
+
+    def selected_bins(rmt_bin_ids)
+      DB[:rmt_bins].where(id: rmt_bin_ids).map { |p| p[:id] }
     end
 
     def selected_rmt_bin_asset_numbers?(rmt_bin_ids)
@@ -653,6 +661,13 @@ module ProductionApp
     def get_scrap_reason_id(attrs)
       scrap_reason = attrs.gsub('_', ' ').upcase
       DB[:scrap_reasons].where(scrap_reason: scrap_reason).get(:id)
+    end
+
+    def find_reworks_runs_with(pallet_number)
+      query = <<~SQL
+        SELECT id FROM reworks_runs WHERE pallets_affected @> string_to_array('#{pallet_number}',',');
+      SQL
+      DB[query].all.map { |r| r[:id] }
     end
   end
 end

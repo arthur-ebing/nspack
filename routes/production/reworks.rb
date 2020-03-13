@@ -123,6 +123,25 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
     end
 
+    r.on 'reworks_runs' do
+      r.on 'search_by_pallet_number' do # SEARCH BY PALLET NUMBER
+        r.get do
+          show_partial_or_page(r) { Production::Reworks::ReworksRun::SearchByPalletNumber.call }
+        end
+
+        r.post do
+          res = interactor.find_reworks_runs_with(params[:reworks_run][:pallet_number])
+          if res.success
+            r.redirect "/list/reworks_run_details/with_params?key=search_by_pallet_number&reworks_runs_ids=#{res.instance}"
+          else
+            re_show_form(r, res, url: '/production/reworks/reworks_runs/search_by_pallet_number') do
+              Production::Reworks::ReworksRun::SearchByPalletNumber.call(form_values: params[:reworks_run], form_errors: res.errors)
+            end
+          end
+        end
+      end
+    end
+
     r.on 'reworks_run_types', String do |run_type|
       if run_type.match?(/\A\d+\Z/)
         id = run_type.to_i
@@ -145,7 +164,8 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
           r.post do
             res = interactor.create_reworks_run(id, params[:reworks_run])
-            bulk_production_run_update = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type] == AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+            run_type = ProductionApp::ReworksRepo.new.find_reworks_run_type(id)[:run_type]
+            bulk_production_run_update = (run_type == AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE) || (run_type == AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE)
             if res.success
               if res.instance[:make_changes]
                 store_locally(:reworks_run_params, res.instance)
@@ -282,7 +302,8 @@ class Nspack < Roda # rubocop:disable ClassLength
       end
 
       r.on 'reject_bulk_production_run_update' do
-        flash[:notice] = "Changes to #{AppConst::REWORKS_ACTION_BULK_PRODUCTION_RUN_UPDATE} has been discarded"
+        res = interactor.reject_bulk_production_run_update(id)
+        flash[:notice] = res.instance.to_s
         r.redirect "/list/reworks_runs/with_params?key=standard&reworks_runs.reworks_run_type_id=#{id}"
       end
 
