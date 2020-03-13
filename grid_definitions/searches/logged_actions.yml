@@ -5,7 +5,7 @@
   :text: view
   :icon: view-show
   :title: View
-- :url: "/development/logging/logged_actions/$:event_id$/transaction_sql"
+- :url: "/development/logging/logged_actions/$:id$/transaction_sql"
   :text: transaction SQL
   :icon: code
   :title: View Transaction SQL

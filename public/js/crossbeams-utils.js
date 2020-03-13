@@ -1027,12 +1027,11 @@ const crossbeamsUtils = {
   },
 
   /**
-   * Toggle the visibility of en element in the DOM:
-   * @param {string} id - the id of the DOM element.
+   * Find select elements on the page and add change events.
    * @returns {void}
    */
   applySelectEvents: function applySelectEvents() {
-    const sels = document.querySelectorAll('select:not(.searchable-select)');
+    const sels = document.querySelectorAll('select:not(.searchable-multi):not(.searchable-select)');
     sels.forEach((sel) => {
       // changeValues behaviour - check if another element should be
       // enabled/disabled based on the current selected value.
