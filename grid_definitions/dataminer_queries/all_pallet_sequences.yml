@@ -19,25 +19,32 @@
   \   cooled,\r\n    pol,\r\n    pod,\r\n    final_destination,\r\n    customer,\r\n
   \   consignee,\r\n    final_receiver,\r\n    exporter,\r\n    country,\r\n    region,\r\n
   \   COALESCE(ata, eta) AS arrival_date,\r\n    COALESCE(atd, etd) AS departure_date,\r\n
-  \   pallet_verification_failed,\r\n    verification_failure_reason,\r\n    scanned_carton,\r\n
-  \   cpp,\r\n    bom,\r\n    client_size_ref,\r\n    treatments,\r\n    order_number,\r\n
-  \   pm_type,\r\n    pm_subtype,\r\n    cultivar_group,\r\n    season,\r\n    customer_variety,\r\n
+  \   depot_pallet,\r\n    edi_in_consignment_note_number,\r\n    edi_in_file,\r\n
+  \   inspected_dest_country,\r\n    location,\r\n    temp_tail,\r\n    pallet_verification_failed,\r\n
+  \   verification_failure_reason,\r\n    scanned_carton,\r\n    cpp,\r\n    bom,\r\n
+  \   client_size_ref,\r\n    treatments,\r\n    order_number,\r\n    pm_type,\r\n
+  \   pm_subtype,\r\n    cultivar_group,\r\n    season,\r\n    customer_variety,\r\n
   \   plt_packhouse,\r\n    plt_line,\r\n    exit_ref,\r\n    seq_exit_ref,\r\n    gross_weight_measured_at,\r\n
-  \   partially_palletized_at,\r\n    govt_inspection_passed,\r\n    internal_inspection_passed,\r\n
-  \   inspection_age,\r\n    internal_inspection_at,\r\n    internal_reinspection_at,\r\n
-  \   stock_created_at,\r\n    intake_created_at,\r\n    first_cold_storage_at,\r\n
-  \   active,\r\n    extended_columns,\r\n    seq_scrapped_at,\r\n    packed_at,\r\n
-  \   packed_date,\r\n    repacked,\r\n    repacked_at,\r\n    repacked_date,\r\n
-  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
-  \   CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n
-  \   ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER
-  BY\r\n    pallet_id,\r\n    pallet_number DESC"
+  \   partially_palletized_at,\r\n    govt_inspection_passed,\r\n    inspection_date,\r\n
+  \   govt_inspection_id,\r\n    internal_inspection_passed,\r\n    inspection_age,\r\n
+  \   internal_inspection_at,\r\n    internal_reinspection_at,\r\n    stock_created_at,\r\n
+  \   intake_created_at,\r\n    first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n
+  \   seq_scrapped_at,\r\n    packed_at,\r\n    packed_date,\r\n    repacked,\r\n
+  \   repacked_at,\r\n    repacked_date,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
+  \   failed_otmc,\r\n    CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n
+  \       'error'\r\n    ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n
+  \   vw_pallet_sequence_flat\r\nORDER BY\r\n    pallet_id,\r\n    pallet_number DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
+    ok: In Stock Pallet Sequences
+    ready: Allocated Pallet Sequences
+    inactive: Shipped Pallet Sequences
+    warning: Scrapped Pallet Sequences
     error: Failed inspection and/or failed verifications Pallet Sequences
+    inprogress: Palletized and/or partially palletized Pallet Sequences
 :columns:
   id:
     :name: id
@@ -1351,9 +1358,105 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  depot_pallet:
+    :name: depot_pallet
+    :sequence_no: 83
+    :caption: Depot pallet
+    :namespaced_name: depot_pallet
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_consignment_note_number:
+    :name: edi_in_consignment_note_number
+    :sequence_no: 84
+    :caption: Edi in consignment note number
+    :namespaced_name: edi_in_consignment_note_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  edi_in_file:
+    :name: edi_in_file
+    :sequence_no: 85
+    :caption: Edi in file
+    :namespaced_name: edi_in_file
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected_dest_country:
+    :name: inspected_dest_country
+    :sequence_no: 86
+    :caption: Inspected dest country
+    :namespaced_name: inspected_dest_country
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  location:
+    :name: location
+    :sequence_no: 87
+    :caption: Location
+    :namespaced_name: location
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 88
+    :caption: Temp tail
+    :namespaced_name: temp_tail
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pallet_verification_failed:
     :name: pallet_verification_failed
-    :sequence_no: 83
+    :sequence_no: 89
     :caption: Pallet verification failed
     :namespaced_name: pallet_verification_failed
     :data_type: :boolean
@@ -1369,7 +1472,7 @@
     :group_max: false
   verification_failure_reason:
     :name: verification_failure_reason
-    :sequence_no: 84
+    :sequence_no: 90
     :caption: Verification failure reason
     :namespaced_name: verification_failure_reason
     :data_type: :string
@@ -1385,7 +1488,7 @@
     :group_max: false
   scanned_carton:
     :name: scanned_carton
-    :sequence_no: 85
+    :sequence_no: 91
     :caption: Scanned carton
     :namespaced_name: scanned_carton
     :data_type: :integer
@@ -1401,7 +1504,7 @@
     :group_max: false
   cpp:
     :name: cpp
-    :sequence_no: 86
+    :sequence_no: 92
     :caption: Cpp
     :namespaced_name: cpp
     :data_type: :integer
@@ -1417,7 +1520,7 @@
     :group_max: false
   bom:
     :name: bom
-    :sequence_no: 87
+    :sequence_no: 93
     :caption: Bom
     :namespaced_name: bom
     :data_type: :string
@@ -1433,7 +1536,7 @@
     :group_max: false
   client_size_ref:
     :name: client_size_ref
-    :sequence_no: 88
+    :sequence_no: 94
     :caption: Client size ref
     :namespaced_name: client_size_ref
     :data_type: :string
@@ -1449,7 +1552,7 @@
     :group_max: false
   treatments:
     :name: treatments
-    :sequence_no: 89
+    :sequence_no: 95
     :caption: Treatments
     :namespaced_name: treatments
     :data_type: :string
@@ -1465,7 +1568,7 @@
     :group_max: false
   order_number:
     :name: order_number
-    :sequence_no: 90
+    :sequence_no: 96
     :caption: Order number
     :namespaced_name: order_number
     :data_type: :string
@@ -1481,7 +1584,7 @@
     :group_max: false
   pm_type:
     :name: pm_type
-    :sequence_no: 91
+    :sequence_no: 97
     :caption: Pm type
     :namespaced_name: pm_type
     :data_type: :string
@@ -1497,7 +1600,7 @@
     :group_max: false
   pm_subtype:
     :name: pm_subtype
-    :sequence_no: 92
+    :sequence_no: 98
     :caption: Pm subtype
     :namespaced_name: pm_subtype
     :data_type: :string
@@ -1513,7 +1616,7 @@
     :group_max: false
   cultivar_group:
     :name: cultivar_group
-    :sequence_no: 93
+    :sequence_no: 99
     :caption: Cultivar group
     :namespaced_name: cultivar_group
     :data_type: :string
@@ -1529,7 +1632,7 @@
     :group_max: false
   season:
     :name: season
-    :sequence_no: 94
+    :sequence_no: 100
     :caption: Season
     :namespaced_name: season
     :data_type: :string
@@ -1545,7 +1648,7 @@
     :group_max: false
   customer_variety:
     :name: customer_variety
-    :sequence_no: 95
+    :sequence_no: 101
     :caption: Customer variety
     :namespaced_name: customer_variety
     :data_type: :string
@@ -1561,7 +1664,7 @@
     :group_max: false
   plt_packhouse:
     :name: plt_packhouse
-    :sequence_no: 96
+    :sequence_no: 102
     :caption: Plt packhouse
     :namespaced_name: plt_packhouse
     :data_type: :string
@@ -1577,7 +1680,7 @@
     :group_max: false
   plt_line:
     :name: plt_line
-    :sequence_no: 97
+    :sequence_no: 103
     :caption: Plt line
     :namespaced_name: plt_line
     :data_type: :string
@@ -1593,7 +1696,7 @@
     :group_max: false
   exit_ref:
     :name: exit_ref
-    :sequence_no: 98
+    :sequence_no: 104
     :caption: Exit ref
     :namespaced_name: exit_ref
     :data_type: :string
@@ -1609,7 +1712,7 @@
     :group_max: false
   seq_exit_ref:
     :name: seq_exit_ref
-    :sequence_no: 99
+    :sequence_no: 105
     :caption: Seq exit ref
     :namespaced_name: seq_exit_ref
     :data_type: :string
@@ -1625,7 +1728,7 @@
     :group_max: false
   gross_weight_measured_at:
     :name: gross_weight_measured_at
-    :sequence_no: 100
+    :sequence_no: 106
     :caption: Gross weight measured at
     :namespaced_name: gross_weight_measured_at
     :data_type: :datetime
@@ -1641,7 +1744,7 @@
     :group_max: false
   partially_palletized_at:
     :name: partially_palletized_at
-    :sequence_no: 101
+    :sequence_no: 107
     :caption: Partially palletized at
     :namespaced_name: partially_palletized_at
     :data_type: :datetime
@@ -1657,7 +1760,7 @@
     :group_max: false
   govt_inspection_passed:
     :name: govt_inspection_passed
-    :sequence_no: 102
+    :sequence_no: 108
     :caption: Govt inspection passed
     :namespaced_name: govt_inspection_passed
     :data_type: :boolean
@@ -1671,9 +1774,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_date:
+    :name: inspection_date
+    :sequence_no: 109
+    :caption: Inspection date
+    :namespaced_name: inspection_date
+    :data_type: :date
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  govt_inspection_id:
+    :name: govt_inspection_id
+    :sequence_no: 110
+    :caption: Govt inspection
+    :namespaced_name: govt_inspection_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   internal_inspection_passed:
     :name: internal_inspection_passed
-    :sequence_no: 103
+    :sequence_no: 111
     :caption: Internal inspection passed
     :namespaced_name: internal_inspection_passed
     :data_type: :boolean
@@ -1689,7 +1824,7 @@
     :group_max: false
   inspection_age:
     :name: inspection_age
-    :sequence_no: 104
+    :sequence_no: 112
     :caption: Inspection age
     :namespaced_name: inspection_age
     :data_type: :number
@@ -1705,7 +1840,7 @@
     :group_max: false
   internal_inspection_at:
     :name: internal_inspection_at
-    :sequence_no: 105
+    :sequence_no: 113
     :caption: Internal inspection at
     :namespaced_name: internal_inspection_at
     :data_type: :datetime
@@ -1721,7 +1856,7 @@
     :group_max: false
   internal_reinspection_at:
     :name: internal_reinspection_at
-    :sequence_no: 106
+    :sequence_no: 114
     :caption: Internal reinspection at
     :namespaced_name: internal_reinspection_at
     :data_type: :datetime
@@ -1737,7 +1872,7 @@
     :group_max: false
   stock_created_at:
     :name: stock_created_at
-    :sequence_no: 107
+    :sequence_no: 115
     :caption: Stock created at
     :namespaced_name: stock_created_at
     :data_type: :datetime
@@ -1753,7 +1888,7 @@
     :group_max: false
   intake_created_at:
     :name: intake_created_at
-    :sequence_no: 108
+    :sequence_no: 116
     :caption: Intake created at
     :namespaced_name: intake_created_at
     :data_type: :datetime
@@ -1769,7 +1904,7 @@
     :group_max: false
   first_cold_storage_at:
     :name: first_cold_storage_at
-    :sequence_no: 109
+    :sequence_no: 117
     :caption: First cold storage at
     :namespaced_name: first_cold_storage_at
     :data_type: :datetime
@@ -1785,7 +1920,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 110
+    :sequence_no: 118
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1801,7 +1936,7 @@
     :group_max: false
   extended_columns:
     :name: extended_columns
-    :sequence_no: 111
+    :sequence_no: 119
     :caption: Extended columns
     :namespaced_name: extended_columns
     :data_type: :string
@@ -1817,7 +1952,7 @@
     :group_max: false
   seq_scrapped_at:
     :name: seq_scrapped_at
-    :sequence_no: 112
+    :sequence_no: 120
     :caption: Seq scrapped at
     :namespaced_name: seq_scrapped_at
     :data_type: :datetime
@@ -1833,7 +1968,7 @@
     :group_max: false
   packed_at:
     :name: packed_at
-    :sequence_no: 113
+    :sequence_no: 121
     :caption: Packed at
     :namespaced_name: packed_at
     :data_type: :string
@@ -1849,7 +1984,7 @@
     :group_max: false
   packed_date:
     :name: packed_date
-    :sequence_no: 114
+    :sequence_no: 122
     :caption: Packed date
     :namespaced_name: packed_date
     :data_type: :date
@@ -1865,7 +2000,7 @@
     :group_max: false
   repacked:
     :name: repacked
-    :sequence_no: 115
+    :sequence_no: 123
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
@@ -1881,7 +2016,7 @@
     :group_max: false
   repacked_at:
     :name: repacked_at
-    :sequence_no: 116
+    :sequence_no: 124
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :datetime
@@ -1897,7 +2032,7 @@
     :group_max: false
   repacked_date:
     :name: repacked_date
-    :sequence_no: 117
+    :sequence_no: 125
     :caption: Repacked date
     :namespaced_name: repacked_date
     :data_type: :date
@@ -1913,7 +2048,7 @@
     :group_max: false
   repacked_from_pallet_id:
     :name: repacked_from_pallet_id
-    :sequence_no: 118
+    :sequence_no: 126
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
@@ -1929,7 +2064,7 @@
     :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 119
+    :sequence_no: 127
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
@@ -1945,7 +2080,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 120
+    :sequence_no: 128
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :string
@@ -1961,7 +2096,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 121
+    :sequence_no: 129
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
