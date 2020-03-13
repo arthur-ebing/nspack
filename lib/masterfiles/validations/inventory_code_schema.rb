@@ -7,5 +7,6 @@ module MasterfilesApp
     optional(:id, :integer).filled(:int?)
     required(:inventory_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
+    required(:edi_out_inventory_code, Types::StrippedString).maybe(:str?)
   end
 end

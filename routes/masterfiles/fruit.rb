@@ -1098,7 +1098,9 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_inventory_code(id, params[:inventory_code])
           if res.success
-            update_grid_row(id, changes: { inventory_code: res.instance[:inventory_code], description: res.instance[:description] },
+            update_grid_row(id, changes: { inventory_code: res.instance[:inventory_code],
+                                           description: res.instance[:description],
+                                           edi_out_inventory_code: res.instance[:edi_out_inventory_code] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::InventoryCode::Edit.call(id, form_values: params[:inventory_code], form_errors: res.errors) }
@@ -1130,6 +1132,7 @@ class Nspack < Roda
             id
             inventory_code
             description
+            edi_out_inventory_code
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

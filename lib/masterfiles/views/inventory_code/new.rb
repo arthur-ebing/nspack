@@ -18,6 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :inventory_code
               form.add_field :description
+              form.add_field :edi_out_inventory_code
             end
           end
 

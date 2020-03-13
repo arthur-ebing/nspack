@@ -92,7 +92,7 @@ module EdiApp
           grades.grade_code AS grade,
           COALESCE(fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text) AS size_count,
           marks.mark_code AS mark,
-          inventory_codes.inventory_code AS inv_code,
+          COALESCE(inventory_codes.edi_out_inventory_code, inventory_codes.inventory_code) AS inv_code,
           govt_inspection_sheets.inspection_point AS inspect_pnt,
           inspectors.inspector_code AS inspector,
           pallet_sequences.pick_ref,

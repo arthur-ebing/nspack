@@ -11,6 +11,7 @@ module MasterfilesApp
         id: 1,
         inventory_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        edi_out_inventory_code: 'ABC',
         active: true
       }
       MasterfilesApp::InventoryCode.new(base_attrs.merge(attrs))

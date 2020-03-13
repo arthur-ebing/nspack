@@ -17,13 +17,15 @@ module UiRules
     def set_show_fields
       fields[:inventory_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:edi_out_inventory_code] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         inventory_code: { required: true },
-        description: {}
+        description: {},
+        edi_out_inventory_code: {}
       }
     end
 
@@ -38,7 +40,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inventory_code: nil,
-                                    description: nil)
+                                    description: nil,
+                                    edi_out_inventory_code: nil)
     end
   end
 end

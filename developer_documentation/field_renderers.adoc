@@ -403,6 +403,11 @@ and all words start with initial capital letter.
 |`true` or `false`
 |`false`
 
+|:format
+|Specify a format to be applied to the label text.
+|Symbol: `:without_timezone` or `:without_timezone_or_seconds`. These apply to Time values - stripping "+0200" or ":00 +0200" from the end of the time string.
+|None
+
 |===
 
 === Renderer::List
