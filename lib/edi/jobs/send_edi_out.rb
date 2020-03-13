@@ -3,13 +3,13 @@
 module EdiApp
   module Job
     class SendEdiOut < BaseQueJob
-      attr_reader :repo, :edi_out_rule_id, :hub_address, :flow_type
+      attr_reader :repo, :edi_out_rule_id, :hub_address, :flow_type, :email_notifiers
 
       # No point in retrying
       self.maximum_retry_count = 0
 
       def run(flow_type, party_role_id, user_name, record_id, edi_out_rule_id) # rubocop:disable Metrics/AbcSize
-        # get email group...
+        @email_notifiers = DevelopmentApp::UserRepo.new.email_addresses(user_email_group: AppConst::EMAIL_GROUP_EDI_NOTIFIERS)
         @flow_type = flow_type
         @edi_out_rule_id = edi_out_rule_id
         @repo = EdiOutRepo.new
@@ -42,7 +42,7 @@ module EdiApp
         rescue StandardError => e
           log_err(e.message)
           repo.log_edi_out_error(id, e)
-          ErrorMailer.send_exception_email(e, subject: "EDI out transform failed (#{flow_type} for rule: #{edi_out_rule_id})")
+          ErrorMailer.send_exception_email(e, subject: "EDI out transform failed (#{flow_type} for rule: #{edi_out_rule_id})", append_recipients: email_notifiers)
           transformer.on_fail('an error occurred') if transformer&.respond_to?(:on_fail)
           expire
         end
