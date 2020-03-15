@@ -1971,7 +1971,7 @@
     :sequence_no: 121
     :caption: Packed at
     :namespaced_name: packed_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false

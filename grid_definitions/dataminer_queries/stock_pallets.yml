@@ -1174,7 +1174,7 @@
     :sequence_no: 72
     :caption: Repacked at
     :namespaced_name: repacked_at
-    :data_type: :date
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false

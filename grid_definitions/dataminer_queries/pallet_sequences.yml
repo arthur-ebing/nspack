@@ -1936,7 +1936,7 @@
     :sequence_no: 119
     :caption: Packed at
     :namespaced_name: packed_at
-    :data_type: :string
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
@@ -1984,7 +1984,7 @@
     :sequence_no: 122
     :caption: Repacked at
     :namespaced_name: repacked_at
-    :data_type: :date
+    :data_type: :datetime
     :width: 
     :format: 
     :hide: false
