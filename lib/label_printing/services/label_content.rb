@@ -11,6 +11,10 @@ module LabelPrintingApp
       Date.today.strftime('%V')
     end
 
+    def iso_weekday
+      Date.today.strftime('%u')
+    end
+
     def current_date
       Date.today.strftime('%Y-%m-%d')
     end
