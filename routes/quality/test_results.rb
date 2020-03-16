@@ -18,16 +18,24 @@ class Nspack < Roda
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(id) }
       end
 
-      r.on 'copy' do   # CLONE
-        check_auth!('test results', 'edit')
-        interactor.assert_permission!(:edit, id)
-        res = interactor.copy_orchard_test_result(id)
-        if res.success
-          flash[:notice] = res.message
-          show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Edit.call(res.instance[:id], form_values: res.instance) }
-        else
-          flash[:error] = "#{res.message} #{res.errors}"
-          redirect_to_last_grid(r)
+      r.on 'bulk_edit' do
+        r.get do       # EDIT
+          check_auth!('test results', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::BulkEdit.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_orchard_test_result(id, params[:orchard_test_result])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res, url: "/quality/test_results/orchard_test_results/#{id}/bulk_edit") do
+              Quality::TestResults::OrchardTestResult::BulkEdit.call(id,
+                                                                     form_values: params[:orchard_test_result],
+                                                                     form_errors: res.errors)
+            end
+          end
         end
       end
 
@@ -90,6 +98,17 @@ class Nspack < Roda
         end
       end
 
+      r.on 'pucs_changed' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          actions = []
+          orchard_list = @repo.for_select_orchards(puc_id: params[:changed_value].split(','))
+          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_orchard_ids', options_array: orchard_list)
+          json_actions(actions)
+        end
+      end
+
       r.on 'orchard_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
@@ -102,14 +121,14 @@ class Nspack < Roda
         end
       end
 
-      r.on 'cultivar_changed' do
+      r.on 'orchards_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
         else
           actions = []
-          season = @cultivar_repo.find_cultivar_season(params[:changed_value])
-          actions << OpenStruct.new(type: :replace_input_value, dom_id: 'orchard_test_result_applicable_from', value: season&.start_date)
-          actions << OpenStruct.new(type: :replace_input_value, dom_id: 'orchard_test_result_applicable_to', value: season&.end_date)
+          cultivar_ids = @repo.select_values(:orchards, :cultivar_ids, id: params[:changed_value].split(',')).flatten.uniq
+          cultivar_list = @repo.for_select_cultivars(id: cultivar_ids)
+          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
       end

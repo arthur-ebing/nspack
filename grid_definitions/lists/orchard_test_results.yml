@@ -9,10 +9,10 @@
   :text: edit
   :icon: edit
   :title: Edit
-- :url: "/quality/test_results/orchard_test_results/$:id$/copy"
-  :text: copy
-  :icon: copy
-  :title: Copy
+- :url: "/quality/test_results/orchard_test_results/$:id$/bulk_edit"
+  :text: bulk edit
+  :icon: edit
+  :title: Bulk Edit
 - :url: "/quality/test_results/orchard_test_results/$:id$"
   :text: delete
   :icon: delete

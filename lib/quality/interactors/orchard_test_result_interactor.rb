@@ -28,7 +28,7 @@ module QualityApp
       instance = orchard_test_result(id)
       success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -45,19 +45,6 @@ module QualityApp
       end
       instance = repo.find_orchard_test_result_flat(id)
       success_response("Updated orchard test result #{instance.orchard_test_type_code}", instance)
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
-    def copy_orchard_test_result(id)
-      instance = orchard_test_result(id).to_h
-      res = create_orchard_test_result(orchard_test_type_id: instance[:orchard_test_type_id])
-      return res unless res.success
-
-      instance[:id] = res.instance.id
-      success_response("Copied orchard test result #{instance[:orchard_test_type_code]}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
