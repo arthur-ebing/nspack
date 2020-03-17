@@ -53,6 +53,9 @@ module UiRules
       fields[:govt_inspection_api_result_id] = { renderer: :label,
                                                  with_value: govt_inspection_api_result_id_label,
                                                  caption: 'Govt Inspection Api Result' }
+      fields[:reinspection] = { renderer: :label,
+                                hide_on_load: !@form_object.reinspection,
+                                as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -93,12 +96,15 @@ module UiRules
                                          disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_api_results,
                                          caption: 'Govt Inspection Api Result' },
         pallet_number: { renderer: :input,
-                         subtype: :numeric }
+                         subtype: :numeric },
+        reinspection: { renderer: :checkbox,
+                        hide_on_load: !@form_object.reinspection,
+                        disable: @mode != :reinspection }
       }
     end
 
     def make_form_object
-      make_new_form_object && return if @mode == :new
+      make_new_form_object && return if %i[new reinspection].include? @mode
 
       @form_object = @repo.find_govt_inspection_sheet(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_number: nil))
@@ -119,6 +125,7 @@ module UiRules
                                     awaiting_inspection_results: nil,
                                     destination_country_id: @repo.last_record(:destination_country_id),
                                     govt_inspection_api_result_id: nil,
+                                    reinspection: @mode == :reinspection,
                                     pallet_number: nil)
     end
 

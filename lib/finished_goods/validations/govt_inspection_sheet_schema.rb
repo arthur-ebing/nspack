@@ -19,5 +19,6 @@ module FinishedGoodsApp
     optional(:awaiting_inspection_results, :bool).maybe(:bool?)
     required(:destination_country_id, :integer).filled(:int?)
     optional(:govt_inspection_api_result_id, :integer).maybe(:int?)
+    optional(:reinspection, :bool).maybe(:bool?)
   end
 end

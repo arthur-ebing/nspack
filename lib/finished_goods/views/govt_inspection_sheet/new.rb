@@ -4,8 +4,8 @@ module FinishedGoods
   module Inspection
     module GovtInspectionSheet
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: false) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, :new, form_values: form_values)
+        def self.call(mode: :new, form_values: nil, form_errors: nil, remote: false) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:govt_inspection_sheet, mode, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -26,6 +26,7 @@ module FinishedGoods
                 row.column do |col|
                   col.add_field :inspection_point
                   col.add_field :destination_country_id
+                  col.add_field :reinspection
                 end
               end
             end

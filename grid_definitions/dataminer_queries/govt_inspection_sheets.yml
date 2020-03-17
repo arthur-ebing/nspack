@@ -7,8 +7,8 @@
   AS inspection_billing,\r\n    booking_reference,\r\n    inspection_point,\r\n    destination_countries.country_name
   AS destination_country_country_name,\r\n    results_captured,\r\n    results_captured_at,\r\n
   \   api_results_received,\r\n    completed,\r\n    completed_at,\r\n    govt_inspection_sheets.inspected,\r\n
-  \   awaiting_inspection_results,\r\n    cancelled_id,\r\n    cancelled,\r\n    cancelled_at,\r\n
-  \   govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
+  \   reinspection,\r\n    awaiting_inspection_results,\r\n    cancelled_id,\r\n    cancelled,\r\n
+  \   cancelled_at,\r\n    govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
   \   govt_inspection_sheets.updated_at,\r\n    govt_inspection_api_results.upn_number
   AS upn_number,\r\n    CASE\r\n        WHEN cancelled THEN 'warning'\r\n        WHEN
   govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
@@ -271,9 +271,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  reinspection:
+    :name: reinspection
+    :sequence_no: 16
+    :caption: Reinspection
+    :namespaced_name: reinspection
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   awaiting_inspection_results:
     :name: awaiting_inspection_results
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Awaiting inspection results
     :namespaced_name: awaiting_inspection_results
     :data_type: :boolean
@@ -289,7 +305,7 @@
     :group_max: false
   cancelled_id:
     :name: cancelled_id
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Cancelled Id
     :namespaced_name: cancelled_id
     :data_type: :integer
@@ -305,7 +321,7 @@
     :group_max: false
   cancelled:
     :name: cancelled
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Cancelled
     :namespaced_name: cancelled
     :data_type: :boolean
@@ -321,7 +337,7 @@
     :group_max: false
   cancelled_at:
     :name: cancelled_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Cancelled at
     :namespaced_name: cancelled_at
     :data_type: :datetime
@@ -337,7 +353,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Active
     :namespaced_name: govt_inspection_sheets.active
     :data_type: :boolean
@@ -353,7 +369,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Created at
     :namespaced_name: govt_inspection_sheets.created_at
     :data_type: :datetime
@@ -369,7 +385,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Updated at
     :namespaced_name: govt_inspection_sheets.updated_at
     :data_type: :datetime
@@ -385,7 +401,7 @@
     :group_max: false
   upn_number:
     :name: upn_number
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Upn number
     :namespaced_name: govt_inspection_api_results.upn_number
     :data_type: :string
@@ -401,7 +417,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

@@ -17,6 +17,7 @@ module FinishedGoodsApp
     attribute :awaiting_inspection_results, Types::Bool
     attribute :destination_country_id, Types::Integer
     attribute :govt_inspection_api_result_id, Types::Integer
+    attribute :reinspection, Types::Bool
     attribute? :active, Types::Bool
   end
 end

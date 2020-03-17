@@ -81,10 +81,13 @@ module FinishedGoodsApp
       res = repo.validate_govt_inspection_sheet_inspect_params(id)
       return res unless res.success
 
+      reinspection = repo.get_with_args(:govt_inspection_sheets, :reinspection, id: id)
+      status = reinspection ? 'MANUALLY_REINSPECTED_BY_GOVT' : 'MANUALLY_INSPECTED_BY_GOVT'
       attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
+
       repo.transaction do
         repo.update_govt_inspection_sheet(id, attrs)
-        log_status(:govt_inspection_sheets, id, 'MANUALLY_INSPECTED_BY_GOVT')
+        log_status(:govt_inspection_sheets, id, status)
 
         repo.all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
           pallet = repo.find_hash(:pallets, govt_inspection_pallet[:pallet_id])
@@ -94,7 +97,7 @@ module FinishedGoodsApp
           params[:stock_created_at] = Time.now if govt_inspection_pallet[:passed]
 
           repo.update(:pallets, pallet[:id], params)
-          log_status(:pallets, pallet[:id], 'MANUALLY_INSPECTED_BY_GOVT')
+          log_status(:pallets, pallet[:id], status)
         end
         log_transaction
       end
@@ -170,14 +173,21 @@ module FinishedGoodsApp
       MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
     end
 
-    def validate_govt_inspection_add_pallet_params(params)
+    def validate_govt_inspection_add_pallet_params(params) # rubocop:disable Metrics/AbcSize
       res = GovtInspectionAddPalletSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       attrs = res.to_h
       pallet_number = attrs.delete(:pallet_number)
 
-      res = validate_pallets(:not_on_inspection_sheet, pallet_number)
+      res = validate_pallets(:not_shipped, pallet_number)
+      return res unless res.success
+
+      res = if repo.get_with_args(:govt_inspection_sheets, :reinspection, id: attrs[:govt_inspection_sheet_id])
+              validate_pallets(:not_inspected, pallet_number)
+            else
+              validate_pallets(:not_on_inspection_sheet, pallet_number)
+            end
       return res unless res.success
 
       res = validate_pallets(:not_failed_otmc, pallet_number)
