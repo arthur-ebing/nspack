@@ -125,11 +125,11 @@ module ProductionApp
     end
 
     def find_rmt_bin(rmt_bin_id)
-      DB[:rmt_bins].where(id: rmt_bin_id).get(:id)
+      select_values(:rmt_bins, :id, id: rmt_bin_id)
     end
 
     def get_rmt_bin_asset_number(rmt_bin_id)
-      DB[:rmt_bins].where(id: rmt_bin_id).get(:bin_asset_number)
+      select_values(:rmt_bins, :bin_asset_number, id: rmt_bin_id)
     end
 
     def selected_pallet_numbers(sequence_ids)
@@ -141,17 +141,17 @@ module ProductionApp
     end
 
     def selected_pallet_sequences(sequence_ids)
-      DB[:pallet_sequences].where(id: sequence_ids).map { |p| p[:id] }
+      select_values(:pallet_sequences, :id, id: sequence_ids)
     end
 
     def selected_rmt_bins(rmt_bin_ids)
       # return selected_rmt_bin_asset_numbers?(rmt_bin_ids) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
-      DB[:rmt_bins].where(id: rmt_bin_ids).where(bin_tipped: false).map { |p| p[:id] }
+      select_values(:rmt_bins, :id, id: rmt_bin_ids, bin_tipped: false)
     end
 
     def selected_bins(rmt_bin_ids)
-      DB[:rmt_bins].where(id: rmt_bin_ids).map { |p| p[:id] }
+      select_values(:rmt_bins, :id, id: rmt_bin_ids)
     end
 
     def selected_rmt_bin_asset_numbers?(rmt_bin_ids)
@@ -162,7 +162,7 @@ module ProductionApp
     end
 
     def find_pallet_ids_from_pallet_number(pallet_numbers)
-      DB[:pallets].where(pallet_number: pallet_numbers).select_map(:id)
+      select_values(:pallets, :id, pallet_number: pallet_numbers)
     end
 
     def find_sequence_ids_from_pallet_number(pallet_numbers)
