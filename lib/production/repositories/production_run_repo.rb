@@ -17,13 +17,8 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).get(:id)
     end
 
-    def get_pallet_label_data(pallet_sequence_id)
-      qry = <<~SQL
-        SELECT *
-        FROM vw_pallet_label
-        WHERE id = ?
-      SQL
-      DB[qry, pallet_sequence_id].first
+    def get_pallet_label_data(pallet_id)
+      DB[:vw_pallet_label].where(pallet_id: pallet_id).first
     end
 
     def find_pallet_labels
