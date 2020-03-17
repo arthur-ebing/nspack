@@ -36,6 +36,7 @@ module FinishedGoods
                     col.add_field :destination_country_id
                     col.add_field :completed
                     col.add_field :inspected
+                    col.add_field :reinspection
                   end
                 end
               end

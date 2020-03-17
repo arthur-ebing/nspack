@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class OrchardTestRepo < BaseRepo
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,
@@ -23,6 +23,24 @@ module QualityApp
                           order_by: :description
 
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
+
+    build_for_select :cultivars,
+                     label: :cultivar_code,
+                     value: :id,
+                     order_by: :cultivar_code
+    build_inactive_select :cultivars,
+                          label: :cultivar_code,
+                          value: :id,
+                          order_by: :cultivar_code
+
+    build_for_select :orchards,
+                     label: :orchard_code,
+                     value: :id,
+                     order_by: :orchard_code
+    build_inactive_select :orchards,
+                          label: :orchard_code,
+                          value: :id,
+                          order_by: :orchard_code
 
     def find_orchard_test_type_flat(id)
       query = <<~SQL
@@ -86,30 +104,6 @@ module QualityApp
       attrs[:api_result] = hash_for_jsonb_col(attrs[:api_result]) if attrs.key?(:api_result)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
-    end
-
-    def for_select_orchards(args = {}, active = true)
-      ds = DB[:orchards]
-      ds = ds.where(args) unless args.empty?
-      ds = ds.where(Sequel[:orchards][:active] => active)
-      ds = ds.order(:orchard_code)
-      ds.select_map([:orchard_code, Sequel[:orchards][:id]])
-    end
-
-    def for_select_inactive_orchards(args = {})
-      for_select_orchards(args, false)
-    end
-
-    def for_select_cultivars(args = {}, active = true)
-      ds = DB[:cultivars]
-      ds = ds.where(args) unless args.empty?
-      ds = ds.where(Sequel[:cultivars][:active] => active)
-      ds = ds.order(:cultivar_code)
-      ds.select_map([:cultivar_code, Sequel[:cultivars][:id]])
-    end
-
-    def for_select_inactive_cultivars(args = {})
-      for_select_orchards(args, false)
     end
 
     def update_pallet_sequences_phyto_data(params)

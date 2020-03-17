@@ -50,16 +50,19 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
         form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
         form.add_field(:nett_weight, 'Nett Weight', required: false) if capture_nett_weight
+
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
                           items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
                           required: true, prompt: true)
         end
+
         if capture_container_material && capture_container_material_owner
           form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
                           items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
                           required: true, prompt: true)
         end
+
         form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true)
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
@@ -152,6 +155,185 @@ class Nspack < Roda # rubocop:disable ClassLength
           store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
           r.redirect("/rmd/rmt_deliveries/rmt_bins/scan_location/#{id}")
         end
+      end
+
+      # --------------------------------------------------------------------------
+      # CREATE RMT REBIN
+      # --------------------------------------------------------------------------
+      r.on 'create_rebin' do # rubocop:disable Metrics/BlockLength
+        r.get do # rubocop:disable Metrics/BlockLength
+          form_state = { bin_fullness: :Full }
+          error = retrieve_from_local_store(:errors)
+          notice = retrieve_from_local_store(:flash_notice)
+          if (details = retrieve_from_local_store(:form_state))
+            prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_info(details[:production_run_rebin_id])
+            details[:orchard] = prod_run[:orchard_code]
+            details[:season] = prod_run[:season_code]
+            details[:cultivar] = prod_run[:cultivar_name]
+          end
+          form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
+          form_state.merge!(details) unless details.nil?
+
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+          capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         notes: notice,
+                                         form_name: :rmt_bin,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Create Rebin',
+                                         reset_button: false,
+                                         action: '/rmd/rmt_deliveries/rmt_bins/create_rebin',
+                                         button_caption: 'Submit')
+
+          form.behaviours do |behaviour|
+            behaviour.dropdown_change :production_line_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_line_id_combo_changed' }]
+            behaviour.dropdown_change :production_run_rebin_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_run_rebin_id_combo_changed' }]
+            behaviour.input_change :bin_asset_number, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_asset_number_changed' }]
+            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed', param_keys: %i[rmt_bin_bin_asset_number] }] if capture_container_material && capture_container_material_owner
+          end
+
+          form.add_field(:bin_asset_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
+          form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
+          form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
+          form.add_select(:production_run_rebin_id, 'Production Run', items: form_state[:production_line_id] ? ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(form_state[:production_line_id]) : [], prompt: true, required: true)
+          form.add_label(:farm, 'Farm', form_state[:farm])
+          form.add_label(:puc, 'Puc', form_state[:puc])
+          form.add_label(:orchard, 'Orchard', form_state[:orchard])
+          form.add_label(:cultivar, 'Cultivar', form_state[:cultivar])
+          form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group])
+          form.add_label(:season, 'Season', form_state[:season])
+          form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+
+          if capture_container_material
+            form.add_select(:rmt_container_material_type_id, 'Container Material Type',
+                            items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
+                            required: true, prompt: true)
+          end
+
+          if capture_container_material && capture_container_material_owner
+            form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
+                            items: !details.nil? && !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
+                            required: true, prompt: true)
+          end
+
+          form.add_field(:gross_weight, 'Gross Weight', data_type: 'number')
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.create_rebins(params[:rmt_bin])
+          if res.success
+            store_locally(:flash_notice, "Rebin: #{params[:rmt_bin][:bin_asset_number]} created successfully")
+          else
+            store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
+            params[:rmt_bin][:bin_asset_number] = nil
+            store_locally(:form_state, params[:rmt_bin])
+          end
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/create_rebin')
+        end
+      end
+
+      r.on 'rmt_bin_production_line_id_combo_changed' do
+        actions = [OpenStruct.new(type: :replace_inner_html,
+                                  dom_id: 'rmt_bin_orchard_value',
+                                  value: '&nbsp;'),
+                   OpenStruct.new(type: :replace_inner_html,
+                                  dom_id: 'rmt_bin_season_value',
+                                  value: '&nbsp;'),
+                   OpenStruct.new(type: :replace_inner_html,
+                                  dom_id: 'rmt_bin_cultivar_value',
+                                  value: '&nbsp;')]
+        if !params[:changed_value].to_s.empty?
+          production_runs = ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(params[:changed_value])
+          production_runs.unshift([[]])
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'rmt_bin_production_run_rebin_id',
+                                    options_array: production_runs)
+        else
+          actions << OpenStruct.new(type: :replace_select_options,
+                                    dom_id: 'rmt_bin_production_run_rebin_id',
+                                    options_array: [])
+        end
+        json_actions(actions)
+      end
+
+      r.on 'bin_asset_number_changed' do
+        repo = MasterfilesApp::RmtContainerMaterialTypeRepo.new
+        default_rmt_container_type_id = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)[:id]
+        items = repo.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type_id })
+        items.unshift([[]])
+        container_material_owners = []
+        if (default_rmt_container_material_type = repo.find_bin_rmt_container_material_type(params[:changed_value])) && items.include?([default_rmt_container_material_type[:container_material_type_code], default_rmt_container_material_type[:id]])
+          items.unshift([default_rmt_container_material_type[:container_material_type_code], default_rmt_container_material_type[:id]])
+          container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(default_rmt_container_material_type[:id])
+          container_material_owners.unshift([[]])
+        end
+
+        actions = [OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'rmt_bin_rmt_container_material_type_id',
+                                  options_array: items.uniq),
+                   OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'rmt_bin_rmt_material_owner_party_role_id',
+                                  options_array: container_material_owners)]
+        json_actions(actions)
+      end
+
+      r.on 'rmt_bin_rebin_container_material_type_combo_changed' do
+        if !params[:changed_value].to_s.empty?
+          params[:rmt_bin_bin_asset_number]
+          container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
+          container_material_owners.unshift([[]])
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', container_material_owners)
+        else
+          json_replace_select_options('rmt_bin_rmt_material_owner_party_role_id', [])
+        end
+      end
+
+      r.on 'rmt_bin_production_run_rebin_id_combo_changed' do # rubocop:disable Metrics/BlockLength
+        actions = if !params[:changed_value].to_s.empty?
+                    prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_info(params[:changed_value])
+                    [OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_orchard_value',
+                                    value: prod_run[:orchard_code]),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_season_value',
+                                    value: prod_run[:season_code]),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_farm_value',
+                                    value: prod_run[:farm_code]),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_puc_value',
+                                    value: prod_run[:puc_code]),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_group_value',
+                                    value: prod_run[:cultivar_group_code]),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_value',
+                                    value: prod_run[:cultivar_name])]
+                  else
+                    [OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_orchard_value',
+                                    value: '&nbsp;'),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_season_value',
+                                    value: '&nbsp;'),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_farm_value',
+                                    value: '&nbsp;'),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_puc_value',
+                                    value: '&nbsp;'),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_group_value',
+                                    value: '&nbsp;'),
+                     OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_value',
+                                    value: '&nbsp;')]
+                  end
+        json_actions(actions)
       end
 
       # --------------------------------------------------------------------------
@@ -316,10 +498,10 @@ class Nspack < Roda # rubocop:disable ClassLength
         # container_material_type_combo_changed('delivery')
         if !params[:changed_value].to_s.empty?
           container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_for_container_material_type(params[:changed_value])
-          container_material_owners.unshift(['Select a value', nil])
+          container_material_owners.unshift([[]])
           json_replace_select_options('delivery_rmt_material_owner_party_role_id', container_material_owners)
         else
-          json_replace_select_options('delivery_rmt_material_owner_party_role_id', [['Select a value', nil]])
+          json_replace_select_options('delivery_rmt_material_owner_party_role_id', [])
         end
       end
 
@@ -490,7 +672,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     actions = []
     if !params[:changed_value].to_s.empty?
       rmt_container_material_type_ids = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-      rmt_container_material_type_ids.unshift(['Select a value', nil])
+      rmt_container_material_type_ids.unshift([[]])
       if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         actions << OpenStruct.new(type: :replace_select_options,
                                   dom_id: "#{form_name}_rmt_container_material_type_id",
@@ -504,7 +686,7 @@ class Nspack < Roda # rubocop:disable ClassLength
       if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         actions << OpenStruct.new(type: :replace_select_options,
                                   dom_id: "#{form_name}_rmt_container_material_type_id",
-                                  options_array: [['Select a value', nil]])
+                                  options_array: [])
       end
       if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_INNER_BINS
         actions << OpenStruct.new(type: :hide_element,
@@ -515,7 +697,7 @@ class Nspack < Roda # rubocop:disable ClassLength
     if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
       actions << OpenStruct.new(type: :replace_select_options,
                                 dom_id: "#{form_name}_rmt_material_owner_party_role_id",
-                                options_array: [['Select a value', nil]])
+                                options_array: [])
     end
 
     json_actions(actions)
@@ -524,10 +706,10 @@ class Nspack < Roda # rubocop:disable ClassLength
   def container_material_type_combo_changed(form_name)
     if !params[:changed_value].to_s.empty?
       container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
-      container_material_owners.unshift(['Select a value', nil])
+      container_material_owners.unshift([[]])
       json_replace_select_options("#{form_name}_rmt_material_owner_party_role_id", container_material_owners)
     else
-      json_replace_select_options("#{form_name}_rmt_material_owner_party_role_id", [['Select a value', nil]])
+      json_replace_select_options("#{form_name}_rmt_material_owner_party_role_id", [])
     end
   end
 end

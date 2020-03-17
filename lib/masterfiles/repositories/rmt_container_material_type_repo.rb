@@ -13,6 +13,18 @@ module MasterfilesApp
 
     crud_calls_for :rmt_container_material_types, name: :rmt_container_material_type, wrapper: RmtContainerMaterialType
 
+    def find_bin_rmt_container_material_type(bin_asset_number)
+      qry = <<~SQL
+        select ct.id, cm.container_material_type_code
+        from rmt_bins b
+        join rmt_container_types ct on ct.id=b.rmt_container_type_id
+        join rmt_container_material_types cm on cm.rmt_container_type_id=ct.id
+        where b.bin_asset_number=? or b.tipped_asset_number=?
+        order by b.id desc
+      SQL
+      DB[qry, bin_asset_number, bin_asset_number].first
+    end
+
     def for_select_party_roles
       DB[:party_roles]
         .join(:roles, id: :role_id)

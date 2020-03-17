@@ -52,12 +52,21 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_pallet(id, params)
+    def update_govt_inspection_pallet(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_govt_inspection_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      govt_inspection_sheet_id = repo.get_id(:govt_inspection_pallets, govt_inspection_sheet_id: id)
+      reinspection = repo.get_with_args(:govt_inspection_sheets, :reinspection, id: govt_inspection_sheet_id)
+
+      attrs = res.to_h
+      if reinspection
+        attrs[:reinspected] = true
+        attrs[:reinspected_at] = Time.now
+      end
+
       repo.transaction do
-        repo.update_govt_inspection_pallet(id, res)
+        repo.update_govt_inspection_pallet(id, attrs)
       end
       instance = govt_inspection_pallet(id)
       success_response('Updated govt inspection pallet', instance)

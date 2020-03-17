@@ -7,6 +7,7 @@ module MesscadaApp
       def initialize(task, pallet_numbers, load_id = nil)
         @task = task
         @repo = MesscadaRepo.new
+        @inspection_repo = FinishedGoodsApp::GovtInspectionRepo.new
         @pallet_numbers = Array(pallet_numbers)
         @load_id = load_id
       end
@@ -20,6 +21,7 @@ module MesscadaApp
         has_gross_weight: :gross_weight_check,
         not_on_load: :not_on_load_check,
         not_on_inspection_sheet: :not_on_inspection_sheet_check,
+        not_inspected: :not_inspected_check,
         not_failed_otmc: :not_failed_otmc_check
       }.freeze
 
@@ -96,8 +98,15 @@ module MesscadaApp
       end
 
       def not_on_inspection_sheet_check
-        errors = FinishedGoodsApp::GovtInspectionRepo.new.exists_on_inspection_sheet(pallet_numbers)
+        errors = @inspection_repo.exists_on_inspection_sheet(pallet_numbers)
         return failed_response "Pallet: #{errors.join(', ')} is already on an inspection sheet." unless errors.empty?
+
+        all_ok
+      end
+
+      def not_inspected_check
+        errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: false)
+        return failed_response "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
 
         all_ok
       end

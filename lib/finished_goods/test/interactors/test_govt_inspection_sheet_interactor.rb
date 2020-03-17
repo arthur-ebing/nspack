@@ -86,6 +86,7 @@ module FinishedGoodsApp
         awaiting_inspection_results: false,
         destination_country_id: destination_country_id,
         govt_inspection_api_result_id: nil,
+        reinspection: false,
         active: true
       }
     end

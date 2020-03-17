@@ -15,6 +15,7 @@ module RawMaterialsApp
       rmt_container_material_type_id = create_rmt_container_material_type
       cultivar_group_id = create_cultivar_group
       location_id = create_location
+      production_run_rebin_id = create_production_run
 
       default = {
         rmt_delivery_id: rmt_delivery_id,
@@ -36,7 +37,7 @@ module RawMaterialsApp
         rmt_inner_container_type_id: Faker::Number.number(4),
         rmt_inner_container_material_id: Faker::Number.number(4),
         qty_inner_bins: Faker::Number.number(4),
-        production_run_rebin_id: Faker::Number.number(4),
+        production_run_rebin_id: production_run_rebin_id,
         production_run_tipped_id: Faker::Number.number(4),
         bin_tipping_plant_resource_id: Faker::Number.number(4),
         bin_fullness: Faker::Lorem.word,

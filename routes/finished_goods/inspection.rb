@@ -118,9 +118,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'govt_inspection_sheets' do
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
+        r.on 'reinspection' do    # NEW Reinspection
+          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::New.call(mode: :reinspection) }
+        end
         check_auth!('inspection', 'new')
         show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::New.call }
       end
+
       r.post do        # CREATE
         res = interactor.create_govt_inspection_sheet(params[:govt_inspection_sheet])
         if res.success

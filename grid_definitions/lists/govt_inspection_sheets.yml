@@ -61,3 +61,7 @@
   :url: "/finished_goods/inspection/govt_inspection_sheets/new"
   :text: New Govt Inspection Sheet
   :style: :button
+- :control_type: :link
+  :url: "/finished_goods/inspection/govt_inspection_sheets/new/reinspection"
+  :text: New Govt Reinspection Sheet
+  :style: :button
