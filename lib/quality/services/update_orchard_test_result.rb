@@ -79,15 +79,14 @@ module QualityApp
             end
 
             @orchard_test_result = repo.find_orchard_test_result_flat(id)
-            args.merge!(params)
-            args.reject! { |k, _| %i[puc_ids orchard_ids cultivar_ids].include? k }
+            attrs = args.merge(params.reject { |k, _| %i[puc_ids orchard_ids cultivar_ids].include? k })
 
-            new_args = args
-            new_args.delete(:api_result)
-            next if new_args == orchard_test_result.to_h.select { |key, _| new_args.keys.include?(key) }
+            test_attrs = attrs.dup
+            test_attrs.delete(:api_result)
+            next if test_attrs == orchard_test_result.to_h.select { |key, _| test_attrs.keys.include?(key) }
 
-            repo.update_orchard_test_result(id, args)
-            repo.update_pallet_sequences_phyto_data(args) if @orchard_test_type.result_attribute == 'phytoData'
+            repo.update_orchard_test_result(id, attrs)
+            repo.update_pallet_sequences_phyto_data(attrs) if @orchard_test_type.result_attribute == 'phytoData'
           end
         end
       end
