@@ -11,7 +11,7 @@ module LabelPrintingApp
       Date.today.strftime('%V')
     end
 
-    def iso_weekday
+    def iso_week_day
       Date.today.strftime('%u')
     end
 

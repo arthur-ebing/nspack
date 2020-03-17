@@ -29,7 +29,7 @@ module MesscadaApp
       Date.today.strftime('%V')
     end
 
-    def iso_weekday
+    def iso_week_day
       Date.today.strftime('%u')
     end
 
@@ -44,7 +44,7 @@ module MesscadaApp
         .gsub('$:pallet_number$', pallet_number.to_s)
         .gsub('$:FNC:iso_day$', iso_day)
         .gsub('$:FNC:iso_week$', iso_week)
-        .gsub('$:FNC:iso_weekday$', iso_weekday)
+        .gsub('$:FNC:iso_week_day$', iso_week_day)
         .gsub('$:FNC:current_date$', current_date)
     end
 
