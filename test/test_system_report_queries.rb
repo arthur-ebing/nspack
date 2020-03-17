@@ -2,10 +2,10 @@
 
 require File.join(File.expand_path('./../', __FILE__), 'test_helper')
 
-class TestGridQueries < MiniTestWithHooks
+class TestSystemReportQueries < MiniTestWithHooks
   def test_valid_ddl
     @current = 'No file loaded yet'
-    queries = Dir.glob('grid_definitions/dataminer_queries/*.yml')
+    queries = Dir.glob('reports/*.yml')
     queries.each do |file|
       @current = file
 
@@ -15,11 +15,11 @@ class TestGridQueries < MiniTestWithHooks
       if res.nil?
         assert_nil res
       else
-        assert_instance_of Hash, res, "Grid #{file} did not return a hash"
+        assert_instance_of Hash, res, "Report #{file} did not return a hash"
       end
     end
   rescue StandardError
-    puts "Failure for grid query definition: #{@current}"
+    puts "Failure for DM report query definition: #{@current}"
     raise
   end
 end
