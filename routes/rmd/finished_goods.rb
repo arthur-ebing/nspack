@@ -173,7 +173,10 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.post do
-          res = prod_interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          res = prod_interactor.print_pallet_label_from_sequence(id,
+                                                                 pallet_label_name: params[:pallet][:pallet_label_name],
+                                                                 no_of_prints: params[:pallet][:qty_to_print],
+                                                                 printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, "Labels For Pallet: #{params[:pallet][:pallet_number]} Printed Successfully")
           else

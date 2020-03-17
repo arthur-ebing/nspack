@@ -17,6 +17,10 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_number: pallet_number, pallet_sequence_number: pallet_sequence_number).get(:id)
     end
 
+    def pallet_id_from_pallet_sequence_id(pallet_sequence_id)
+      get_with_args(:pallet_sequences, :pallet_id, id: pallet_sequence_id)
+    end
+
     def get_pallet_label_data(pallet_id)
       DB[:vw_pallet_label].where(pallet_id: pallet_id).first
     end

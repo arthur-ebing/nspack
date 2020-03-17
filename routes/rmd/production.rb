@@ -315,7 +315,10 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'print_pallet_labels', Integer do |id|
         r.post do
-          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          res = interactor.print_pallet_label_from_sequence(id,
+                                                            pallet_label_name: params[:pallet][:pallet_label_name],
+                                                            no_of_prints: params[:pallet][:qty_to_print],
+                                                            printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, "Labels For Pallet: #{params[:pallet][:pallet_number]} Printed Successfully")
             r.redirect('/rmd/production/palletizing/create_new_pallet')
@@ -328,7 +331,10 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'print_pallet_labels_for_edit_pallet_sequence', Integer do |id|
         r.post do
-          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          res = interactor.print_pallet_label_from_sequence(id,
+                                                            pallet_label_name: params[:pallet][:pallet_label_name],
+                                                            no_of_prints: params[:pallet][:qty_to_print],
+                                                            printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, 'Labels Printed Successfully')
           else
@@ -340,7 +346,10 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'print_pallet_labels_for_add_sequence', Integer do |id|
         r.post do
-          res = interactor.print_pallet_label(id, pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          res = interactor.print_pallet_label_from_sequence(id,
+                                                            pallet_label_name: params[:pallet][:pallet_label_name],
+                                                            no_of_prints: params[:pallet][:qty_to_print],
+                                                            printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, 'Labels Printed Successfully')
           else
@@ -652,7 +661,10 @@ class Nspack < Roda # rubocop:disable ClassLength
         if pallet.nil?
           store_locally(:error, error_message: "Pallet #{pallet_number} not found")
         else
-          res = interactor.print_pallet_label(pallet[:id], pallet_label_name: params[:pallet][:pallet_label_name], no_of_prints: params[:pallet][:qty_to_print], printer: params[:pallet][:printer])
+          res = interactor.print_pallet_label(pallet[:id],
+                                              pallet_label_name: params[:pallet][:pallet_label_name],
+                                              no_of_prints: params[:pallet][:qty_to_print],
+                                              printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, 'Labels Printed Successfully')
           else

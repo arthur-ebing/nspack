@@ -131,6 +131,11 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def print_pallet_label_from_sequence(pallet_sequence_id, params)
+      pallet_id = repo.pallet_id_from_pallet_sequence_id(pallet_sequence_id)
+      print_pallet_label(pallet_id, params)
+    end
+
     def print_pallet_label(pallet_id, params)
       instance = get_pallet_label_data(pallet_id)
       LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params)
