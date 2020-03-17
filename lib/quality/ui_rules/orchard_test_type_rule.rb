@@ -61,7 +61,7 @@ module UiRules
                                           hide_on_load: @form_object.applies_to_all_cultivars,
                                           caption: 'Commodity Groups' },
         applicable_cultivar_ids: { renderer: :multi,
-                                   options: @repo.for_select_cultivars,
+                                   options: @repo.for_select_cultivar_codes,
                                    selected: @form_object.applicable_cultivar_ids,
                                    hide_on_load: @form_object.applies_to_all_cultivars,
                                    caption: 'Cultivars' },
