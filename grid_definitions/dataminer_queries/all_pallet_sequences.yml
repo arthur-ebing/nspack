@@ -26,7 +26,7 @@
   \   pm_subtype,\r\n    cultivar_group,\r\n    season,\r\n    customer_variety,\r\n
   \   plt_packhouse,\r\n    plt_line,\r\n    exit_ref,\r\n    seq_exit_ref,\r\n    gross_weight_measured_at,\r\n
   \   partially_palletized_at,\r\n    govt_inspection_passed,\r\n    inspection_date,\r\n
-  \   govt_inspection_id,\r\n    internal_inspection_passed,\r\n    inspection_age,\r\n
+  \   govt_inspection_sheet_id,\r\n    internal_inspection_passed,\r\n    inspection_age,\r\n
   \   internal_inspection_at,\r\n    internal_reinspection_at,\r\n    stock_created_at,\r\n
   \   intake_created_at,\r\n    first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n
   \   seq_scrapped_at,\r\n    packed_at,\r\n    packed_date,\r\n    repacked,\r\n
@@ -1790,11 +1790,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  govt_inspection_id:
-    :name: govt_inspection_id
+  govt_inspection_sheet_id:
+    :name: govt_inspection_sheet_id
     :sequence_no: 110
-    :caption: Govt inspection
-    :namespaced_name: govt_inspection_id
+    :caption: Govt inspection sheet
+    :namespaced_name: govt_inspection_sheet_id
     :data_type: :string
     :width: 
     :format: 
