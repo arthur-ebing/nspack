@@ -92,7 +92,7 @@ class Nspack < Roda
           blank_json_response
         else
           actions = []
-          orchard_list = @repo.for_select_orchards(puc_id: params[:changed_value])
+          orchard_list = @repo.for_select_orchards(where: { puc_id: params[:changed_value] })
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_orchard_id', options_array: orchard_list)
           json_actions(actions)
         end
@@ -103,7 +103,7 @@ class Nspack < Roda
           blank_json_response
         else
           actions = []
-          orchard_list = @repo.for_select_orchards(puc_id: params[:changed_value].split(','))
+          orchard_list = @repo.for_select_orchards(where: { puc_id: params[:changed_value].split(',') })
           actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_orchard_ids', options_array: orchard_list)
           json_actions(actions)
         end
@@ -115,7 +115,7 @@ class Nspack < Roda
         else
           actions = []
           orchard = @farm_repo.find_orchard(params[:changed_value])
-          cultivar_list = @cultivar_repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) })
+          cultivar_list = @repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) })
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_id', options_array: cultivar_list)
           json_actions(actions)
         end
@@ -127,7 +127,7 @@ class Nspack < Roda
         else
           actions = []
           cultivar_ids = @repo.select_values(:orchards, :cultivar_ids, id: params[:changed_value].split(',')).flatten.uniq
-          cultivar_list = @repo.for_select_cultivars(id: cultivar_ids)
+          cultivar_list = @repo.for_select_cultivars(where: { id: cultivar_ids })
           actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
