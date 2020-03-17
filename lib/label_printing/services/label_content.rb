@@ -111,7 +111,7 @@ module LabelPrintingApp
     def format_special_field(field_name)
       if field_name.include?(':')
         parts = field_name.split(':')
-        "#{parts.first}:$:#{parts.last}$"
+        "$:#{parts.first}:#{parts.last}$"
       else
         "$:#{field_name}$"
       end
