@@ -166,10 +166,8 @@ class Nspack < Roda # rubocop:disable ClassLength
           error = retrieve_from_local_store(:errors)
           notice = retrieve_from_local_store(:flash_notice)
           if (details = retrieve_from_local_store(:form_state))
-            prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_info(details[:production_run_rebin_id])
-            details[:orchard] = prod_run[:orchard_code]
-            details[:season] = prod_run[:season_code]
-            details[:cultivar] = prod_run[:cultivar_name]
+            prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_flat(details[:production_run_rebin_id])
+            details.merge!(prod_run.to_h)
           end
           form_state.merge!(error_message: error[:error_message], errors:  {}) unless error.nil?
           form_state.merge!(details) unless details.nil?
@@ -198,12 +196,12 @@ class Nspack < Roda # rubocop:disable ClassLength
           form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
           form.add_select(:production_line_id, 'Production Line', items: ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type('LINE'), prompt: true, required: true)
           form.add_select(:production_run_rebin_id, 'Production Run', items: form_state[:production_line_id] ? ProductionApp::ProductionRunRepo.new.for_select_production_runs_for_line(form_state[:production_line_id]) : [], prompt: true, required: true)
-          form.add_label(:farm, 'Farm', form_state[:farm])
-          form.add_label(:puc, 'Puc', form_state[:puc])
-          form.add_label(:orchard, 'Orchard', form_state[:orchard])
-          form.add_label(:cultivar, 'Cultivar', form_state[:cultivar])
-          form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group])
-          form.add_label(:season, 'Season', form_state[:season])
+          form.add_label(:farm, 'Farm', form_state[:farm_code])
+          form.add_label(:puc, 'Puc', form_state[:puc_code])
+          form.add_label(:orchard, 'Orchard', form_state[:orchard_code])
+          form.add_label(:cultivar, 'Cultivar', form_state[:cultivar_name])
+          form.add_label(:cultivar_group, 'Cultivar Group', form_state[:cultivar_group_code])
+          form.add_label(:season, 'Season', form_state[:season_code])
           form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
 
           if capture_container_material
@@ -294,7 +292,7 @@ class Nspack < Roda # rubocop:disable ClassLength
 
       r.on 'rmt_bin_production_run_rebin_id_combo_changed' do # rubocop:disable Metrics/BlockLength
         actions = if !params[:changed_value].to_s.empty?
-                    prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_info(params[:changed_value])
+                    prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_flat(params[:changed_value])
                     [OpenStruct.new(type: :replace_inner_html,
                                     dom_id: 'rmt_bin_orchard_value',
                                     value: prod_run[:orchard_code]),
