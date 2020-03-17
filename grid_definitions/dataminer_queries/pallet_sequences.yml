@@ -24,7 +24,7 @@
   \   order_number,\r\n    pm_type,\r\n    pm_subtype,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
   \   cultivar_group,\r\n    season,\r\n    customer_variety,\r\n    plt_packhouse,\r\n
   \   plt_line,\r\n    exit_ref,\r\n    seq_exit_ref,\r\n    gross_weight_measured_at,\r\n
-  \   partially_palletized_at,\r\n    govt_inspection_passed,\r\n    inspected_date,\r\n
+  \   partially_palletized_at,\r\n    govt_inspection_passed,\r\n    inspection_date,\r\n
   \   govt_inspection_sheet_id,\r\n    internal_inspection_passed,\r\n    inspection_age,\r\n
   \   internal_inspection_at,\r\n    internal_reinspection_at,\r\n    stock_created_at,\r\n
   \   intake_created_at,\r\n    first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n
@@ -1739,11 +1739,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  inspected_date:
-    :name: inspected_date
+  inspection_date:
+    :name: inspection_date
     :sequence_no: 107
-    :caption: Inspected date
-    :namespaced_name: inspected_date
+    :caption: Inspection date
+    :namespaced_name: inspection_date
     :data_type: :date
     :width: 
     :format: 
