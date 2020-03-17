@@ -100,6 +100,47 @@ module RawMaterialsApp
       error
     end
 
+    def create_rebins(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      vres = validate_bin_asset_no_format(params)
+      return vres unless vres.success
+      return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
+
+      default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+      if default_rmt_container_type
+        params[:rmt_container_type_id] = default_rmt_container_type[:id]
+        params[:rmt_inner_container_type_id] = default_rmt_container_type[:rmt_inner_container_type_id]
+      end
+      params[:gross_weight] = params[:gross_weight].to_i
+      params[:qty_bins] = 1
+      params[:qty_inner_bins] = 1 if AppConst::DELIVERY_CAPTURE_INNER_BINS
+      params[:rebin_created_at] = Time.now
+      params[:is_rebin] = true
+      params[:rmt_delivery_id] = ProductionApp::ProductionRunRepo.new.find_max_delivery_for_run(params[:production_run_rebin_id])
+
+      production_run = repo.find(:production_runs, ProductionApp::ProductionRun, params[:production_run_rebin_id])
+      params = params.merge(get_run_inherited_fields(production_run))
+
+      tare_weight = repo.get_rmt_bin_tare_weight(params)
+      params[:nett_weight] = (params[:gross_weight] - tare_weight) if tare_weight
+
+      res = validate_rmt_rebin_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_rmt_bin(res)
+        log_status('rmt_bins', id, 'REBIN_CREATED')
+        log_transaction
+      end
+      instance = rmt_bin(id)
+      success_response('Created rmt rebin',
+                       instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_rmt_bins(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = validate_bin_asset_numbers_duplicate_scans(params)
       return validation_failed_response(OpenStruct.new(message: 'Validation Error', messages: res)) unless res.empty?
@@ -146,6 +187,14 @@ module RawMaterialsApp
 
     def bin_asset_number_available?(bin_asset_number)
       repo.bin_asset_number_available?(bin_asset_number)
+    end
+
+    def get_run_inherited_fields(run)
+      { orchard_id: run.orchard_id,
+        cultivar_id: run.cultivar_id,
+        season_id: run.season_id,
+        farm_id: run.farm_id,
+        puc_id: run.puc_id }
     end
 
     def get_header_inherited_field(delivery, container_type_id)
@@ -283,6 +332,10 @@ module RawMaterialsApp
 
     def validate_rmt_bin_params(params)
       RmtBinSchema.call(params)
+    end
+
+    def validate_rmt_rebin_params(params)
+      RmtRebinBinSchema.call(params)
     end
   end
 end

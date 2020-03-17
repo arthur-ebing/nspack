@@ -12,6 +12,9 @@ module RawMaterialsApp
     include MasterfilesApp::CalendarFactory
     include MasterfilesApp::RmtContainerMaterialTypeFactory
     include RawMaterialsApp::RmtDeliveryFactory
+    include ProductionApp::ProductionRunFactory
+    include ProductionApp::ResourceFactory
+    include ProductionApp::ProductSetupFactory
 
     def test_repo
       repo = interactor.send(:repo)
