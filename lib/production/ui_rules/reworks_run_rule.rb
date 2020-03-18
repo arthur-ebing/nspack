@@ -35,6 +35,8 @@ module UiRules
 
       text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallets'
 
+      fields[:created_at] = { renderer: :label,
+                              format: :without_timezone_or_seconds }
       fields[:reworks_run_type_id] = { renderer: :label,
                                        with_value: reworks_run_type_id_label,
                                        caption: 'Reworks Run Type' }

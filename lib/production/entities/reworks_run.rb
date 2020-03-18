@@ -34,5 +34,6 @@ module ProductionApp
     attribute :after_descriptions_state, Types::Hash
     attribute :changes_made, Types::Hash
     attribute :changes_made_array, Types::Hash
+    attribute :created_at, Types::DateTime
   end
 end

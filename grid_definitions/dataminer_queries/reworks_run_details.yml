@@ -1,20 +1,20 @@
 ---
 :caption: Pallet Changes Details
-:sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_run_types.run_type,
-  reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason, reworks_runs.remarks,
-  reworks_runs.changes_made ->> 'reworks_action' AS reworks_action, reworks_runs.user,
-  COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected)
-  AS pallets_selected, reworks_runs.pallets_affected, reworks_runs.changes_made ->
-  'pallets' ->> 'pallet_number' AS pallet_number, reworks_runs.changes_made -> 'pallets'
-  -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id, reworks_runs.changes_made ->
-  'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
+:sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_runs.created_at,
+  reworks_run_types.run_type, reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason,
+  reworks_runs.remarks, reworks_runs.changes_made ->> 'reworks_action' AS reworks_action,
+  reworks_runs.user, COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped,
+  reworks_runs.pallets_selected) AS pallets_selected, reworks_runs.pallets_affected,
+  reworks_runs.changes_made -> 'pallets' ->> 'pallet_number' AS pallet_number, reworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id, reworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
   reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before'
   AS before_state, reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->
-  'changes' ->> 'after' AS after_state, reworks_runs.created_at, reworks_runs.updated_at
-  FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
+  'changes' ->> 'after' AS after_state,  reworks_runs.updated_at FROM reworks_runs
+  JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
   LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id ORDER
   BY id DESC
-:limit: 1000
+:limit: 
 :offset: 
 :external_settings:
   :render_url: 
@@ -51,9 +51,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 3
+    :caption: Created at
+    :namespaced_name: reworks_runs.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   run_type:
     :name: run_type
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Run type
     :namespaced_name: reworks_run_types.run_type
     :data_type: :string
@@ -69,7 +85,7 @@
     :group_max: false
   scrap_reason_id:
     :name: scrap_reason_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Scrap reason
     :namespaced_name: reworks_runs.scrap_reason_id
     :data_type: :integer
@@ -85,7 +101,7 @@
     :group_max: false
   scrap_reason:
     :name: scrap_reason
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Scrap reason
     :namespaced_name: scrap_reasons.scrap_reason
     :data_type: :string
@@ -101,7 +117,7 @@
     :group_max: false
   remarks:
     :name: remarks
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Remarks
     :namespaced_name: reworks_runs.remarks
     :data_type: :string
@@ -117,9 +133,9 @@
     :group_max: false
   reworks_action:
     :name: reworks_action
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Reworks action
-    :namespaced_name: reworks_action
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -133,7 +149,7 @@
     :group_max: false
   user:
     :name: user
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: User
     :namespaced_name: reworks_runs.user
     :data_type: :string
@@ -149,9 +165,9 @@
     :group_max: false
   pallets_selected:
     :name: pallets_selected
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Pallets selected
-    :namespaced_name: reworks_runs.pallets_selected
+    :namespaced_name: 
     :data_type: :string_array
     :width: 
     :format: 
@@ -165,7 +181,7 @@
     :group_max: false
   pallets_affected:
     :name: pallets_affected
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Pallets affected
     :namespaced_name: reworks_runs.pallets_affected
     :data_type: :string_array
@@ -181,9 +197,9 @@
     :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Pallet number
-    :namespaced_name: pallet_number
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -197,9 +213,9 @@
     :group_max: false
   pallet_id:
     :name: pallet_id
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Pallet
-    :namespaced_name: pallet_id
+    :namespaced_name: 
     :data_type: :integer
     :width: 
     :format: 
@@ -213,9 +229,9 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Pallet sequence number
-    :namespaced_name: pallet_sequence_number
+    :namespaced_name: 
     :data_type: :integer
     :width: 
     :format: 
@@ -229,9 +245,9 @@
     :group_max: false
   before_state:
     :name: before_state
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Before state
-    :namespaced_name: before_state
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
@@ -245,29 +261,13 @@
     :group_max: false
   after_state:
     :name: after_state
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: After state
-    :namespaced_name: after_state
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
     :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 16
-    :caption: Created at
-    :namespaced_name: reworks_runs.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -319,8 +319,8 @@
 - :column: reworks_runs.id
   :caption: Reworks run
   :data_type: :integer
-  :control_type:
-  :default_value:
-  :ordered_list: true
+  :control_type: 
+  :default_value: 
+  :ordered_list: false
   :ui_priority: 4
-  :list_def:
+  :list_def: 

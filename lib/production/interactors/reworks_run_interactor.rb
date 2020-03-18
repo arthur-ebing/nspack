@@ -1069,15 +1069,13 @@ module ProductionApp
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
       end
 
-      if AppConst::RUN_TYPE_SCRAP_BIN == reworks_run_type
-        scrapped_bins = repo.scrapped_bins?(rmt_bins)
-        return OpenStruct.new(success: false, messages: { pallets_selected: ['already scrapped'] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
-      end
+      res = validate_scrapped_rmt_bins(reworks_run_type, rmt_bins)
+      return OpenStruct.new(success: false,  messages: res.messages, pallets_selected: rmt_bins) unless res.success
 
       if AppConst::RUN_TYPE_UNSCRAP_BIN == reworks_run_type
         scrapped_bins = repo.scrapped_bins?(rmt_bins)
         unscrapped_bins = (rmt_bins - scrapped_bins.map(&:to_s))
-        return OpenStruct.new(success: false, messages: { pallets_selected: ['not scrapped'] }, pallets_selected: rmt_bins) unless unscrapped_bins.nil_or_empty?
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_bins.join(', ')} not scrapped"] }, pallets_selected: rmt_bins) unless unscrapped_bins.nil_or_empty?
       end
 
       if AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
@@ -1087,6 +1085,21 @@ module ProductionApp
       end
 
       OpenStruct.new(success: true, instance: { pallet_numbers: rmt_bins })
+    end
+
+    def validate_scrapped_rmt_bins(reworks_run_type, rmt_bins)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_SCRAP_BIN,
+          AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
+          AppConst::RUN_TYPE_TIP_BINS,
+          AppConst::RUN_TYPE_WEIGH_RMT_BINS
+
+        scrapped_bins = repo.scrapped_bins?(rmt_bins)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_bins.join(', ')} already scrapped"] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
+
+      end
+
+      OpenStruct.new(success: true, instance: { pallets_selected: rmt_bins })
     end
 
     def validate_production_runs(reworks_run_type, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

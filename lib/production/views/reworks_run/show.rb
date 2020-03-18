@@ -8,11 +8,12 @@ module Production
           ui_rule = UiRules::Compiler.new(:reworks_run, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form do |form|
               # form.caption 'Reworks Run'
               form.view_only!
+              form.add_field :created_at
               form.add_field :reworks_run_type_id
               form.add_field :scrap_reason_id
               form.add_field :remarks
