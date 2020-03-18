@@ -24,15 +24,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_shift(id, params[:shift])
           if res.success
-            row_keys = %i[
-              shift_type_id
-              shift_type_code
-              employment_type_code
-              running_hours
-              start_date_time
-              end_date_time
-            ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            flash[:notice] = res.message
+            redirect_via_json "/production/shifts/shifts/#{id}/edit"
           else
             re_show_form(r, res) { Production::Shifts::Shift::Edit.call(id, form_values: params[:shift], form_errors: res.errors, current_user: current_user) }
           end
