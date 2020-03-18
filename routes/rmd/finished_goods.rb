@@ -13,9 +13,15 @@ class Nspack < Roda # rubocop:disable ClassLength
         r.get do
           pallet = {}
           notice = retrieve_from_local_store(:flash_notice)
+          from_state = retrieve_from_local_store(:from_state)
+          pallet.merge!(from_state) unless from_state.nil?
           error = retrieve_from_local_store(:error)
-          pallet.merge!(error_message: error.message) unless error.nil?
-          pallet.merge!(errors: error.errors) if !error.nil? && !error.errors.nil_or_empty?
+          if error.is_a?(String)
+            pallet.merge!(error_message: error)
+          elsif !error.nil?
+            pallet.merge!(error_message: error.message)
+            pallet.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
 
           form = Crossbeams::RMDForm.new(pallet,
                                          form_name: :pallet,
@@ -25,8 +31,10 @@ class Nspack < Roda # rubocop:disable ClassLength
                                          action: '/rmd/finished_goods/pallet_movements/move_pallet',
                                          button_caption: 'Submit')
 
-          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
           form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+          form.add_label(:remaining_num_position, 'Remaining No Position', pallet[:remaining_num_position]) unless pallet[:remaining_num_position].nil_or_empty?
+          form.add_label(:next_position, 'Next Position', pallet[:next_position]) unless pallet[:next_position].nil_or_empty?
+          form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
@@ -36,6 +44,15 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.move_pallet(pallet_number, params[:pallet][:location], params[:pallet][:location_scan_field])
 
           if res.success
+            scanned_locn_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(params[:pallet][:location], params[:pallet][:location_scan_field])
+            scanned_locn = MasterfilesApp::LocationRepo.new.find_location(scanned_locn_id)
+            if AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK
+              positions = MasterfilesApp::LocationRepo.new.find_filled_deck_positions(scanned_locn_id)
+              params[:pallet][:pallet_number] = nil
+              params[:pallet][:remaining_num_position] = positions.min - 1
+              params[:pallet][:next_position] = (positions.min - 1).positive? ? "#{scanned_locn.location_long_code}_P#{positions.min - 1}" : nil
+              store_locally(:from_state, params[:pallet])
+            end
             store_locally(:flash_notice, res.message)
           else
             store_locally(:error, res)
