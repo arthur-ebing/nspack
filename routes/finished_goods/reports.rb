@@ -43,9 +43,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # PICKLIST
     # --------------------------------------------------------------------------
     r.on 'picklist', Integer do |id|
+      report_name = AppConst::USE_EXTENDED_PALLET_PICKLIST ? 'dispatch_picklist' : 'picklist'
       res = CreateJasperReport.call(report_name: 'dispatch_note',
                                     user: current_user.login_name,
-                                    file: 'picklist',
+                                    file: report_name,
                                     params: { load_id: id,
                                               pallet_report: 'detail',
                                               for_picklist: 'true|boolean',

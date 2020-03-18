@@ -389,6 +389,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
 
   RPT_INDUSTRY = ENV['RPT_INDUSTRY']
+  USE_EXTENDED_PALLET_PICKLIST = make_boolean('USE_EXTENDED_PALLET_PICKLIST')
 
   # Titan: Govt Inspections
   TITAN_ENVIRONMENT = { UAT: 'uatapigateway', STAGING: 'stagingapigateway', PRODUCTION: 'apigateway' }[ENV.fetch('TITAN_ENVIRONMENT', 'UAT').to_sym]
