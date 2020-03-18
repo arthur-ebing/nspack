@@ -15,6 +15,7 @@ module FinishedGoodsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
