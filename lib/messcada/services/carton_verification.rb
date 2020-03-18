@@ -23,12 +23,14 @@ module MesscadaApp
     private
 
     def carton_verification  # rubocop:disable Metrics/AbcSize
-      return failed_response("#{@container_type} #{carton_label_id} already verified") if carton_label_carton_exists?
+      # return failed_response("#{@container_type} #{carton_label_id} already verified") if carton_label_carton_exists?
 
-      carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
+      unless carton_label_carton_exists?
+        carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
 
-      id = DB[:cartons].insert(carton_params)
-      MesscadaApp::CreatePalletFromCarton.new(user, id, carton_quantity).call if carton_is_pallet
+        id = DB[:cartons].insert(carton_params)
+        MesscadaApp::CreatePalletFromCarton.new(user, id, carton_quantity).call if carton_is_pallet
+      end
 
       ok_response
     rescue Crossbeams::InfoError => e
