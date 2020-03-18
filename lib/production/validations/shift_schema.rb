@@ -11,4 +11,10 @@ module ProductionApp
     # required(:start_date_time, %i[nil time]).maybe(:time?)
     # required(:end_date_time, %i[nil time]).maybe(:time?)
   end
+
+  UpdateShiftSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:running_hours, %i[nil decimal]).maybe(:decimal?)
+  end
 end

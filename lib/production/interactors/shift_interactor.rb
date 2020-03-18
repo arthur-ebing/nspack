@@ -21,7 +21,7 @@ module ProductionApp
     end
 
     def update_shift(id, params)
-      res = validate_shift_params(params)
+      res = validate_update_shift_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
@@ -63,6 +63,10 @@ module ProductionApp
 
     def validate_shift_params(params)
       ShiftSchema.call(params)
+    end
+
+    def validate_update_shift_params(params)
+      UpdateShiftSchema.call(params)
     end
   end
 end
