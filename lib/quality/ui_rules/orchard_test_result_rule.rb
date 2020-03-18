@@ -48,6 +48,7 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+      puc_ids = @repo.select_values(:orchards, :puc_id).uniq
       edit_orchard_test_type_renderer = { renderer: :select,
                                           options: @repo.for_select_orchard_test_types,
                                           disabled_options: @repo.for_select_inactive_orchard_test_types,
@@ -60,13 +61,13 @@ module UiRules
       {
         orchard_test_type_id: @mode == :new ? edit_orchard_test_type_renderer : show_orchard_test_type_renderer,
         puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs,
+                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
                   disabled_options: @farm_repo.for_select_inactive_pucs,
                   caption: 'Puc',
                   required: true,
                   prompt: true },
         puc_ids: { renderer: :multi,
-                   options: @farm_repo.for_select_pucs,
+                   options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
                    selected: [@form_object.puc_id],
                    caption: 'Pucs',
                    required: true },
@@ -82,12 +83,12 @@ module UiRules
                        caption: 'Orchards',
                        required: true },
         cultivar_id: { renderer: :select,
-                       options: @repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) }),
-                       disabled_options: @repo.for_select_inactive_cultivars,
+                       options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
+                       disabled_options: @repo.for_select_inactive_cultivar_codes,
                        caption: 'Cultivar',
                        required: true },
         cultivar_ids: { renderer: :multi,
-                        options: @repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) }),
+                        options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
                         selected: [@form_object.cultivar_id],
                         caption: 'Cultivars',
                         required: true },

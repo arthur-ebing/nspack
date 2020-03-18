@@ -47,15 +47,14 @@ class Nspack < Roda
     end
 
     r.on 'orchard_test_types' do
+      @repo = QualityApp::OrchardTestRepo.new
       r.on 'commodity_group_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
         else
-          p params[:changed_value]
           actions = []
-          # TODO: behaviour passes changed value instead of selected list values
-          commodity_ids = MasterfilesApp::CultivarRepo.new.select_values(:commodities, :id, commodity_group_id: Array(params[:changed_value].split(',')))
-          cultivar_list = MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { commodity_id: commodity_ids })
+          commodity_ids = @repo.select_values(:commodities, :id, commodity_group_id: Array(params[:changed_value].split(',')))
+          cultivar_list = @repo.for_select_cultivar_codes(where: { commodity_id: commodity_ids })
           actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_type_applicable_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end

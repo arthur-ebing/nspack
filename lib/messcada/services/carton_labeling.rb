@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonLabeling < BaseService
-    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number, :identifier
+    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number, :identifier, :personnel_number
 
     def initialize(params)
       @resource_code = params[:device]
@@ -42,6 +42,7 @@ module MesscadaApp
         .gsub('$:carton_label_id$', carton_label_id.to_s)
         .gsub('$:pick_ref$', pick_ref.to_s)
         .gsub('$:pallet_number$', pallet_number.to_s)
+        .gsub('$:personnel_number$', personnel_number.to_s)
         .gsub('$:FNC:iso_day$', iso_day)
         .gsub('$:FNC:iso_week$', iso_week)
         .gsub('$:FNC:iso_week_day$', iso_week_day)
@@ -55,8 +56,10 @@ module MesscadaApp
       attrs = setup_data[:production_run_data].merge(setup_data[:setup_data]).reject { |k, _| k == :id }
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref)
+      @personnel_number = nil
       unless identifier.nil_or_empty?
         hr_ids = MesscadaApp::HrRepo.new.contract_worker_ids(identifier)
+        @personnel_number = hr_ids[:personnel_number]
         attrs = attrs.merge(personnel_identifier_id: hr_ids[:personnel_identifier_id],
                             contract_worker_id: hr_ids[:contract_worker_id])
       end

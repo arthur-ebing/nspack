@@ -25,10 +25,12 @@ module QualityApp
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
 
     build_for_select :cultivars,
+                     alias: :cultivar_codes,
                      label: :cultivar_code,
                      value: :id,
                      order_by: :cultivar_code
     build_inactive_select :cultivars,
+                          alias: :cultivar_codes,
                           label: :cultivar_code,
                           value: :id,
                           order_by: :cultivar_code

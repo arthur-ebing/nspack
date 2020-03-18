@@ -16,21 +16,6 @@ module ProductionApp
       DB[query, production_line_id].select_map(%i[production_run_code id])
     end
 
-    def find_production_run_info(id)
-      query = <<~SQL
-        SELECT r.id, o.orchard_code, c.cultivar_name, s.season_code, f.farm_code, cg.cultivar_group_code, p.puc_code
-        FROM production_runs r
-        join orchards o on o.id=r.orchard_id
-        join pucs p on p.id=r.puc_id
-        join cultivars c on c.id=r.cultivar_id
-        join cultivar_groups cg on cg.id=c.cultivar_group_id
-        join seasons s on s.id=r.season_id
-        join farms f on f.id=r.farm_id
-        WHERE r.id = ?
-      SQL
-      DB[query, id].first
-    end
-
     def find_max_delivery_for_run(id)
       query = <<~SQL
         select b.rmt_delivery_id, count(b.id) as bin_count

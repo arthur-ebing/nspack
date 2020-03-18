@@ -74,7 +74,6 @@ class Nspack < Roda
     r.on 'orchard_test_results' do
       interactor = QualityApp::OrchardTestResultInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       @repo = QualityApp::OrchardTestRepo.new
-      @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
 
       r.on 'phyt_clean_request' do
@@ -115,7 +114,7 @@ class Nspack < Roda
         else
           actions = []
           orchard = @farm_repo.find_orchard(params[:changed_value])
-          cultivar_list = @repo.for_select_cultivars(where: { id: Array(orchard&.cultivar_ids) })
+          cultivar_list = @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) })
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_id', options_array: cultivar_list)
           json_actions(actions)
         end
@@ -127,7 +126,7 @@ class Nspack < Roda
         else
           actions = []
           cultivar_ids = @repo.select_values(:orchards, :cultivar_ids, id: params[:changed_value].split(',')).flatten.uniq
-          cultivar_list = @repo.for_select_cultivars(where: { id: cultivar_ids })
+          cultivar_list = @repo.for_select_cultivar_codes(where: { id: cultivar_ids })
           actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
