@@ -23,7 +23,7 @@ module MesscadaApp
       DB[:personnel_identifiers]
         .join(:contract_workers, personnel_identifier_id: :id)
         .where(identifier: personnel_identifier)
-        .select(Sequel[:contract_workers][:id].as(:contract_worker_id), :personnel_identifier_id)
+        .select(Sequel[:contract_workers][:id].as(:contract_worker_id), :personnel_identifier_id, :personnel_number)
         .first
     end
   end
