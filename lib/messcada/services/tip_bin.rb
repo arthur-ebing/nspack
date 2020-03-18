@@ -32,6 +32,7 @@ module MesscadaApp
     def validations # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       return "Bin:#{bin_number} could not be found" unless bin_exists?
       return "Bin:#{bin_number} has already been tipped" if bin_tipped?
+      return "Bin:#{bin_number} scrapped" if bin_scrapped?
 
       line = ProductionApp::ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, @device)
       return line.message unless line.success
@@ -77,6 +78,13 @@ module MesscadaApp
     def bin_tipped?
       rmt_bin = find_rmt_bin
       return true if !rmt_bin.nil? && !rmt_bin[:bin_tipped_date_time].nil?
+
+      false
+    end
+
+    def bin_scrapped?
+      rmt_bin = find_rmt_bin
+      return true if rmt_bin[:scrapped]
 
       false
     end

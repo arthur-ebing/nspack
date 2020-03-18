@@ -15,6 +15,7 @@ module MesscadaApp
     def call
       rmt_bin = find_rmt_bin
       return failed_response("Bin:#{bin_number} could not be found") if rmt_bin.nil?
+      return failed_response('Bin Scrapped') if rmt_bin[:scrapped]
 
       updates = { gross_weight: gross_weight }
       tare_weight = repo.get_rmt_bin_tare_weight(rmt_bin)
