@@ -51,6 +51,7 @@ module FinishedGoods
                                can_be_cleared: true,
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
                                multiselect_key: 'allocate',
+                               height: 40,
                                multiselect_params: { key: 'allocate',
                                                      id: id,
                                                      in_stock: true })
