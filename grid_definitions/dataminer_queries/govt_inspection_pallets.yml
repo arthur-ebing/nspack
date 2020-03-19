@@ -1,20 +1,21 @@
 ---
 :caption: Govt Inspection Pallets
-:sql: "SELECT\r\n    fn_current_status('pallets', govt_inspection_pallets.pallet_id)
-  AS status,\r\n    pallets.pallet_number,\r\n    govt_inspection_pallets.id,\r\n
-  \   govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
+:sql: "SELECT\r\n    fn_current_status('pallets', pallets.id) AS status,\r\n    pallets.pallet_number,\r\n
+  \   govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
   \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
   \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
   \   inspection_failure_reasons.failure_reason,\r\n    govt_inspection_pallets.failure_remarks,\r\n
   \   govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
   \   govt_inspection_pallets.updated_at,\r\n    govt_inspection_sheets.completed,\r\n
-  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    CASE\r\n    WHEN
-  govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed THEN 'error'\r\n
-  \   WHEN govt_inspection_pallets.passed THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM
-  govt_inspection_pallets\r\n         JOIN govt_inspection_sheets ON govt_inspection_sheets.id
-  = govt_inspection_pallets.govt_inspection_sheet_id\r\n         LEFT JOIN inspection_failure_reasons
-  ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\n
-  \        JOIN pallets ON pallets.id = govt_inspection_pallets.pallet_id"
+  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    vw.gross_weight,\r\n
+  \   vw.carton_quantity,\r\n    vw.marketing_variety,\r\n    vw.packed_tm_group,\r\n
+  \   vw.pallet_base,\r\n    CASE\r\n        WHEN govt_inspection_pallets.inspected
+  AND NOT govt_inspection_pallets.passed THEN 'error'\r\n        WHEN govt_inspection_pallets.passed
+  THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
+  govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
+  JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nJOIN
+  pallets on pallets.id = govt_inspection_pallets.pallet_id\r\nLEFT JOIN vw_pallet_sequence_flat
+  vw ON vw.pallet_id = pallets.id"
 :limit: 
 :offset: 
 :external_settings:
@@ -278,9 +279,89 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 17
+    :caption: Gross weight
+    :namespaced_name: vw.gross_weight
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 18
+    :caption: Carton quantity
+    :namespaced_name: vw.carton_quantity
+    :data_type: :number
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_variety:
+    :name: marketing_variety
+    :sequence_no: 19
+    :caption: Marketing variety
+    :namespaced_name: vw.marketing_variety
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packed_tm_group:
+    :name: packed_tm_group
+    :sequence_no: 20
+    :caption: Packed tm group
+    :namespaced_name: vw.packed_tm_group
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_base:
+    :name: pallet_base
+    :sequence_no: 21
+    :caption: Pallet base
+    :namespaced_name: vw.pallet_base
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 17
+    :sequence_no: 22
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
