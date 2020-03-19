@@ -45,6 +45,7 @@ require './lib/base_edi_out_service'
 require './lib/base_step'
 require './lib/doc_search'
 require './lib/document_sequence'
+require './lib/export_data'
 require './lib/help_index_builder'
 require './lib/http_calls'
 require './lib/local_store' # Will only work for processes running from one dir.
