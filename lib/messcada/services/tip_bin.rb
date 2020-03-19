@@ -29,7 +29,7 @@ module MesscadaApp
       RawMaterialsApp::RmtDeliveryRepo.new.update_rmt_bin(@rmt_bin_id, updates)
     end
 
-    def validations # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def validations # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return "Bin:#{bin_number} could not be found" unless bin_exists?
       return "Bin:#{bin_number} has already been tipped" if bin_tipped?
       return "Bin:#{bin_number} scrapped" if bin_scrapped?
@@ -64,9 +64,11 @@ module MesscadaApp
     end
 
     def find_rmt_bin
-      return RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-
-      RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin(bin_number)
+      @find_rmt_bin ||= if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+                          RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_number)
+                        else
+                          RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin(bin_number)
+                        end
     end
 
     def bin_exists?
