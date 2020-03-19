@@ -988,7 +988,7 @@ module ProductionApp
     end
 
     def cannot_remove_sequence(pallet_id)
-      repo.unscrapped_sequences_count(pallet_id).> 1
+      repo.unscrapped_sequences_count(pallet_id).<= 1
     end
 
     def standard_pack(standard_pack_code_id)
