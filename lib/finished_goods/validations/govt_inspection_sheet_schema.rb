@@ -20,6 +20,6 @@ module FinishedGoodsApp
     required(:destination_country_id, :integer).filled(:int?)
     optional(:govt_inspection_api_result_id, :integer).maybe(:int?)
     optional(:reinspection, :bool).maybe(:bool?)
-    optional(:created_by, :integer).maybe(:int?)
+    optional(:created_by, Types::StrippedString).maybe(:str?)
   end
 end
