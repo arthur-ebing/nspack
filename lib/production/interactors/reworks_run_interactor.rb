@@ -485,6 +485,10 @@ module ProductionApp
 
       attrs = res.to_h
       changed_attrs = attrs.reject { |k, v|  before_attrs.key?(k) && before_attrs[k] == v }
+      changed_treatment_ids = changed_attrs.delete(:treatment_ids)
+      changed_attrs = changed_attrs.merge(treatment_ids: "{#{changed_treatment_ids.join(',')}}") unless changed_treatment_ids.nil?
+      return failed_response('Changed attributes cannot be empty') if changed_attrs.nil_or_empty?
+
       treatment_ids = attrs.delete(:treatment_ids)
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
