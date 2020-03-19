@@ -30,7 +30,7 @@ module FinishedGoodsApp
 
       repo.create_serialized_stock_movement_log(location_from_id: location_from_id, location_to_id: location_to_id, stock_item_id: stock_item_id, stock_item_number: stock_item_number, business_process_id: business_process_id, business_process_object_id: business_process_context_id, serialized_stock_type_id: stock_type_id)
       log_stock_item_status(stock_type)
-      success_response("#{stock_type} moved successfully")
+      success_response("#{stock_type}: #{stock_item_number} moved successfully")
     end
 
     private
