@@ -180,7 +180,7 @@ module FinishedGoodsApp
       attrs = res.to_h
       pallet_number = attrs.delete(:pallet_number)
 
-      %i[not_shipped not_failed_otmc verification_passed].each do |check|
+      %i[not_shipped not_failed_otmc verification_passed pallet_weight].each do |check|
         res = validate_pallets(check, pallet_number)
         return res unless res.success
       end

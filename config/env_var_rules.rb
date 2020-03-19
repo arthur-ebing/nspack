@@ -24,6 +24,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { EDIT_BIN_RECEIVED_DATE: 'Allow a user to able to edit received_date_time' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
     { CAPTURE_PALLET_WEIGHT_AT_VERIFICATION: 'optional. Fill in the gross weight at pallet verification,' },
+    { PALLET_WEIGHT_REQUIRED_FOR_INSPECTION: 'optional.' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },
