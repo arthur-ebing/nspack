@@ -69,6 +69,7 @@ module FinishedGoodsApp
       inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
       exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
       destination_country_id = create_destination_country
+      user_id = create_user
 
       {
         id: 1,
@@ -87,6 +88,7 @@ module FinishedGoodsApp
         destination_country_id: destination_country_id,
         govt_inspection_api_result_id: nil,
         reinspection: false,
+        created_by: user_id,
         active: true
       }
     end

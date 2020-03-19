@@ -25,6 +25,7 @@ module FinishedGoodsApp
         destination_country_id: 1,
         govt_inspection_api_result_id: 1,
         reinspection: false,
+        created_by: 1,
         active: true
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))

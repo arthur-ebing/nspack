@@ -40,6 +40,7 @@ module FinishedGoods
                   col.add_field :inspection_billing_party_role_id
                   col.add_field :exporter_party_role_id
                   col.add_field :booking_reference
+                  col.add_field :created_by
                 end
                 row.column do |col|
                   col.add_field :inspection_point

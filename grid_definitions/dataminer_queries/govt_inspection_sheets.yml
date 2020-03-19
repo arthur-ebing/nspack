@@ -10,17 +10,19 @@
   \   reinspection,\r\n    awaiting_inspection_results,\r\n    cancelled_id,\r\n    cancelled,\r\n
   \   cancelled_at,\r\n    govt_inspection_sheets.active,\r\n    govt_inspection_sheets.created_at,\r\n
   \   govt_inspection_sheets.updated_at,\r\n    govt_inspection_api_results.upn_number
-  AS upn_number,\r\n    CASE\r\n        WHEN cancelled THEN 'warning'\r\n        WHEN
-  govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
-  THEN 'error'\r\n        WHEN govt_inspection_sheets.inspected AND bool_and(govt_inspection_pallets.passed)
-  THEN 'ok'\r\n        WHEN awaiting_inspection_results THEN 'inprogress'\r\n        WHEN
-  completed THEN 'ready'\r\n        END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\n
-  \        JOIN destination_countries ON destination_countries.id = destination_country_id\r\n
-  \        LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
+  AS upn_number,\r\n    users.user_name AS created_by,\r\n    CASE\r\n        WHEN
+  cancelled THEN 'warning'\r\n        WHEN govt_inspection_sheets.inspected AND NOT
+  bool_and(govt_inspection_pallets.passed) THEN 'error'\r\n        WHEN govt_inspection_sheets.inspected
+  AND bool_and(govt_inspection_pallets.passed) THEN 'ok'\r\n        WHEN awaiting_inspection_results
+  THEN 'inprogress'\r\n        WHEN completed THEN 'ready'\r\n        END AS colour_rule\r\n\r\nFROM
+  govt_inspection_sheets\r\n         JOIN destination_countries ON destination_countries.id
+  = destination_country_id\r\n         LEFT JOIN govt_inspection_api_results ON govt_inspection_api_results.id
   = govt_inspection_api_result_id\r\n         JOIN inspectors ON inspectors.id = inspector_id\r\n
-  \        LEFT JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\n\r\nGROUP
-  BY govt_inspection_sheets.id, inspector_party_role_id, inspector_code, country_name,
-  upn_number\r\nORDER BY govt_inspection_sheets.id DESC"
+  \        LEFT JOIN govt_inspection_pallets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\n
+  \        LEFT JOIN users ON govt_inspection_sheets.created_by = users.id\r\n\r\nGROUP
+  BY \r\n    govt_inspection_sheets.id, \r\n    inspector_party_role_id, \r\n    inspector_code,
+  \r\n    country_name, \r\n    upn_number,\r\n    users.id\r\nORDER BY govt_inspection_sheets.id
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -415,9 +417,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 25
+    :caption: Created by
+    :namespaced_name: users.user_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

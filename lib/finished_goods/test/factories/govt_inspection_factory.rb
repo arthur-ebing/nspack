@@ -2,6 +2,17 @@
 
 module FinishedGoodsApp
   module GovtInspectionFactory
+    def create_user(opts = {})
+      default = {
+        login_name: Faker::Lorem.unique.word,
+        user_name: Faker::Lorem.unique.word,
+        password_hash: '$a$10$wZQEHY77JEp93JgUUyVqgOkwhPb8bYZLswD5NVTWOKwU1ssQTYa.K',
+        email: 'test@example.com',
+        active: true
+      }
+      DB[:users].insert(default.merge(opts))
+    end
+
     def create_inspector(opts = {})
       party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
 

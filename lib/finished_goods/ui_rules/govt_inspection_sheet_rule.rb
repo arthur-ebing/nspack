@@ -56,6 +56,7 @@ module UiRules
       fields[:reinspection] = { renderer: :label,
                                 hide_on_load: !@form_object.reinspection,
                                 as_boolean: true }
+      fields[:created_by] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -99,7 +100,8 @@ module UiRules
                          subtype: :numeric },
         reinspection: { renderer: :checkbox,
                         hide_on_load: !@form_object.reinspection,
-                        disable: @mode != :reinspection }
+                        disable: @mode != :reinspection },
+        created_by: { disabled: true }
       }
     end
 
