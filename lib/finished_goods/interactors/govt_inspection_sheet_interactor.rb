@@ -180,17 +180,16 @@ module FinishedGoodsApp
       attrs = res.to_h
       pallet_number = attrs.delete(:pallet_number)
 
-      res = validate_pallets(:not_shipped, pallet_number)
-      return res unless res.success
+      %i[not_shipped not_failed_otmc verification_passed].each do |check|
+        res = validate_pallets(check, pallet_number)
+        return res unless res.success
+      end
 
       res = if repo.get_with_args(:govt_inspection_sheets, :reinspection, id: attrs[:govt_inspection_sheet_id])
               validate_pallets(:not_inspected, pallet_number)
             else
               validate_pallets(:not_on_inspection_sheet, pallet_number)
             end
-      return res unless res.success
-
-      res = validate_pallets(:not_failed_otmc, pallet_number)
       return res unless res.success
 
       attrs[:pallet_id] = repo.get_id(:pallets, pallet_number: pallet_number)

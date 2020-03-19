@@ -22,7 +22,8 @@ module MesscadaApp
         not_on_load: :not_on_load_check,
         not_on_inspection_sheet: :not_on_inspection_sheet_check,
         not_inspected: :not_inspected_check,
-        not_failed_otmc: :not_failed_otmc_check
+        not_failed_otmc: :not_failed_otmc_check,
+        verification_passed: :verification_passed_check
       }.freeze
 
       def call
@@ -107,6 +108,13 @@ module MesscadaApp
       def not_inspected_check
         errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: false)
         return failed_response "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
+
+        all_ok
+      end
+
+      def verification_passed_check
+        errors = pallet_numbers - @repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, verification_passed: true).uniq
+        return failed_response "Pallet: #{errors.join(', ')}, verification not passed." unless errors.empty?
 
         all_ok
       end
