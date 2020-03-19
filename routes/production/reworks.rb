@@ -437,6 +437,8 @@ class Nspack < Roda # rubocop:disable ClassLength
           else
             r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
           end
+        else
+          r.redirect "/production/reworks/pallet_sequences/#{id}/reject_pallet_sequence_changes"
         end
       end
 
