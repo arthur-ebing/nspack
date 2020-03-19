@@ -379,9 +379,9 @@
     :sequence_no: 23
     :caption: Bin fullness
     :namespaced_name: bin_fullness
-    :data_type: :number
+    :data_type: :string
     :width: 
-    :format: :delimited_1000
+    :format: 
     :hide: false
     :pinned: 
     :groupable: true
