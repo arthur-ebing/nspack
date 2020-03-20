@@ -47,6 +47,20 @@
   :icon: printer
   :title: Print barcode
   :popup: true
+- :separator: true
+- :submenu:
+    :text: View stock
+    :items:
+      - :url: "/masterfiles/locations/locations/$:id$/get_stock/pallets"
+        :text: Pallets
+        :icon: list
+        :title: Location Pallets
+        :popup: true
+      - :url: "/masterfiles/locations/locations/$:id$/get_stock/bins"
+        :text: Bins
+        :icon: list
+        :title: Location Bins
+        :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/locations/locations/new"

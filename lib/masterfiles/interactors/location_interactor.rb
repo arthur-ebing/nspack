@@ -224,6 +224,11 @@ module MasterfilesApp
       LabelPrintingApp::PreviewLabel.call(AppConst::LABEL_LOCATION_BARCODE, instance)
     end
 
+    def find_location_children(location_id)
+      location_children = repo.descendants_for_ancestor_id(location_id)
+      success_response('ok', location_children)
+    end
+
     private
 
     def repo

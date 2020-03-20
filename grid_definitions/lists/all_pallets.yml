@@ -12,3 +12,11 @@
   :icon: information-solid
   :title: Status
   :popup: true
+:captions:
+  :conditions:
+    :location_pallets: Location Pallets
+:conditions:
+  :location_pallets:
+    - :col: location_id
+      :op: IN
+      :val: $:location_ids$

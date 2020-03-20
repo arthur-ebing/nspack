@@ -24,6 +24,9 @@
   :title: Print
   :popup: true
   :hide_if_false: discrete_bin
+:captions:
+  :conditions:
+    :location_bins: Location Bins
 :conditions:
   :standard:
     - :col: rmt_delivery_id
@@ -33,7 +36,10 @@
     - :col: bin_tipped
       :op: =
       :val: $:tipped$
-
+  :location_bins:
+    - :col: location_id
+      :op: IN
+      :val: $:location_ids$
 
 #- :url: "/raw_materials/deliveries/rmt_bins/$:id$/complete"
 #  :text: Complete

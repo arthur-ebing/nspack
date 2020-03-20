@@ -2583,3 +2583,11 @@
   :ordered_list: false
   :ui_priority: 41
   :list_def: 
+- :column: location_id
+  :caption: Location Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 42
+  :list_def:

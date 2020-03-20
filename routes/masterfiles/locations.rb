@@ -183,6 +183,18 @@ class Nspack < Roda
           end
         end
       end
+
+      r.on 'get_stock', String do |type|
+        r.get do
+          res = interactor.find_location_children(id)
+          if type == 'pallets'
+            r.redirect "/list/all_pallets/with_params?key=location_pallets&location_ids=#{res.instance}"
+          elsif type == 'bins'
+            r.redirect "/list/rmt_bins/with_params?key=location_bins&location_ids=#{res.instance}"
+          end
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('locations', 'read')
