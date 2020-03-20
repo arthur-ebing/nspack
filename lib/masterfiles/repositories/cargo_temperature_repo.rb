@@ -14,7 +14,9 @@ module MasterfilesApp
     crud_calls_for :cargo_temperatures, name: :cargo_temperature, wrapper: CargoTemperature
 
     def for_select_cargo_temperatures
-      query = "SELECT temperature_code || ' - ' || set_point_temperature, id FROM cargo_temperatures"
+      query = <<~SQL
+        SELECT temperature_code||' ('||set_point_temperature||')' AS code, id FROM cargo_temperatures
+      SQL
       DB[query].select_map(%i[code id])
     end
 

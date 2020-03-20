@@ -39,7 +39,9 @@ module FinishedGoodsApp
     end
 
     def for_select_container_stack_types
-      query = "SELECT stack_type_code || ' - ' || description, id FROM container_stack_types"
+      query = <<~SQL
+        SELECT stack_type_code||' ('||description||')' AS code, id FROM container_stack_types
+      SQL
       DB[query].select_map(%i[code id])
     end
 

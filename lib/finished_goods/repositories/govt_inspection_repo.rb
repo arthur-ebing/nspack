@@ -52,7 +52,7 @@ module FinishedGoodsApp
 
     def for_select_destination_countries(active = true)
       query = <<~SQL
-        SELECT country_name || ' - (' || destination_region_name || ')',
+        SELECT country_name||' ('||destination_region_name ||')' AS code,
                dc.id
         FROM destination_countries dc
         JOIN destination_regions dr on dc.destination_region_id = dr.id
