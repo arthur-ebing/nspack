@@ -17,27 +17,25 @@ module Crossbeams
 
     def initialize(key)
       @key = key
-      raise ArgumentError, "#{key} is not a valid ExportData key" unless valid_key?
-      raise ArgumentError, 'ExportData must have "out_dir"' unless valid_dir?
-
       @current_column = nil
+      @log_id = nil
     end
 
-    def run # rubocop:disable Metrics/AbcSize
+    def run
+      log('Starting export', start: true)
+
+      validate
       set_defaults
       prepare
       run_report
       write_file
+
       make_zip if config['zip_for_mail']
       send_mail if config['email']
+
+      log('Export completed', complete: true)
     rescue StandardError => e
-      message = if @current_column
-                  "Failure in export of #{key} - column #{@current_column}"
-                else
-                  "Failure in export of #{key}"
-                end
-      ErrorMailer.send_exception_email(e, subject: "ExportData (#{key}) failed: #{e.message}", message: message)
-      puts e.message
+      handle_error(e)
     end
 
     def to_s
@@ -46,6 +44,41 @@ module Crossbeams
 
     private
 
+    def handle_error(err)
+      message = if @current_column
+                  "Failure in export of #{key} - column #{@current_column}"
+                else
+                  "Failure in export of #{key}"
+                end
+      ErrorMailer.send_exception_email(err, subject: "ExportData (#{key}) failed: #{err.message}", message: message)
+      log('Export failed', failed: true, error_message: "#{message} - #{err.message}")
+      puts err.message
+    end
+
+    def repo
+      @repo ||= DevelopmentApp::ExportDataEventLogRepo.new
+    end
+
+    def validate
+      raise ArgumentError, "#{key} is not a valid ExportData key" unless valid_key?
+      raise ArgumentError, 'ExportData must have "out_dir"' unless valid_dir?
+    end
+
+    def log(msg, start: false, complete: false, failed: false, error_message: nil)
+      if start
+        @log_id = repo.create_export_data_event_log(event_log: repo.wrap_log_time(msg), export_key: key, started_at: Time.now)
+      else
+        changeset = { event_log: msg }
+        if complete || failed
+          changeset[:complete] = true
+          changeset[:completed_at] = Time.now
+        end
+        changeset[:failed] = true if failed
+        changeset[:error_message] = error_message if error_message
+        repo.update_export_data_event_log(@log_id, changeset)
+      end
+    end
+
     def set_defaults
       @export_hidden_fields = config['export_hidden_fields'] == true
       @prefix_long_numbers_with_quote = config['prefix_long_numbers_with_quote'].nil? ? true : config['prefix_long_numbers_with_quote']
@@ -53,6 +86,7 @@ module Crossbeams
     end
 
     def send_mail
+      log('Send mail job starting')
       fn = config['zip_for_mail'] ? "#{output_file}.zip" : output_file
       email = config['email']
 
@@ -63,11 +97,13 @@ module Crossbeams
     end
 
     def run_report
+      log('Running query')
       apply_where_conditions
-      @recs = DB[report.runnable_sql].all
+      @recs = repo.run_report(report.runnable_sql)
     end
 
     def write_file # rubocop:disable Metrics/AbcSize
+      log('Writing to file')
       CSV.open(output_file, 'w', headers: ordered_headers, write_headers: true) do |csv|
         recs.each do |rec|
           csv << report.ordered_columns.map do |col|
@@ -91,6 +127,7 @@ module Crossbeams
     end
 
     def make_zip
+      log('Creating zip file')
       `zip -j #{output_file}.zip #{output_file}`
     end
 
