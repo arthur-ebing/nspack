@@ -2,12 +2,13 @@
 
 module FinishedGoodsApp
   class RepackPallet < BaseService
-    attr_reader :repo, :pallet_id, :pallet_number, :user_name
+    attr_reader :repo, :pallet_id, :pallet_number, :user_name, :multiple_pallets
 
-    def initialize(pallet_id, user_name)
+    def initialize(pallet_id, user_name, multiple_pallets = false)
       @pallet_id = pallet_id
       @user_name = user_name
       @repo = ProductionApp::ReworksRepo.new
+      @multiple_pallets = multiple_pallets
     end
 
     def call
@@ -32,8 +33,10 @@ module FinishedGoodsApp
       return res unless res.success
 
       new_pallet_id = res.instance[:new_pallet_id]
-      res = create_reworks_run
-      return res unless res.success
+      unless multiple_pallets
+        res = create_reworks_run
+        return res unless res.success
+      end
 
       success_response('ok',
                        new_pallet_id: new_pallet_id)
