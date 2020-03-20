@@ -33,6 +33,7 @@ module FinishedGoods
                     col.add_field :created_by
                   end
                   row.column do |col|
+                    col.add_field :consignment_note_number
                     col.add_field :inspection_point
                     col.add_field :destination_country_id
                     col.add_field :completed

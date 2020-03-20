@@ -53,7 +53,7 @@ module Crossbeams
     end
 
     def send_mail
-      fn = config['zip_for_mail'] ? output_file : "#{output_file}.zip"
+      fn = config['zip_for_mail'] ? "#{output_file}.zip" : output_file
       email = config['email']
 
       DevelopmentApp::SendMailJob.enqueue(to: email['to'],

@@ -19,6 +19,7 @@ module FinishedGoodsApp
     attribute :govt_inspection_api_result_id, Types::Integer
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String
+    attribute :consignment_note_number, Types::String
     attribute? :active, Types::Bool
   end
 end

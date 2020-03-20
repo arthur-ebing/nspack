@@ -669,6 +669,10 @@ module ProductionApp
       SQL
       DB[query].all.map { |r| r[:id] }
     end
+
+    def find_pallet_numbers(pallet_ids)
+      select_values(:pallets, :pallet_number, id: pallet_ids)
+    end
   end
 end
 # frozen_string_literal: true

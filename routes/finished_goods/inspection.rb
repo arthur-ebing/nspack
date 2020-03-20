@@ -252,6 +252,48 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # REJECT TO REPACK PALLETS
+    # --------------------------------------------------------------------------
+    r.on 'reject_to_repack', Integer do |id|
+      r.on 'print_barcode' do
+        pallet = BaseRepo.new.find_hash(:pallets, id)
+
+        res = CreateJasperReport.call(report_name: 'single_pallet_barcode',
+                                      user: current_user.login_name,
+                                      file: 'single_pallet_barcode',
+                                      params: {
+                                        repack_date: pallet[:repacked_at].strftime('%Y-%m-%d'),
+                                        pallet_number: "#{pallet[:pallet_number]}|string"
+                                      })
+
+        if res.success
+          change_window_location_via_json(res.instance, request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+    end
+
+    r.on 'reject_to_repack' do
+      interactor = FinishedGoodsApp::GovtInspectionPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do
+        check_auth!('inspection', 'new')
+        r.redirect '/list/stock_pallets/multi?key=reject_to_repack'
+      end
+
+      r.on 'multiselect_reject_to_repack' do
+        res = interactor.reject_to_repack(multiselect_grid_choices(params))
+
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

@@ -87,6 +87,7 @@ module FinishedGoodsApp
         govt_inspection_api_result_id: nil,
         reinspection: false,
         created_by: 'ABC',
+        consignment_note_number: '00000001',
         active: true
       }
     end
