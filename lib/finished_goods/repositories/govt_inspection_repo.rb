@@ -101,5 +101,9 @@ module FinishedGoodsApp
       ds = ds.where(cancelled: false, completed: false, pallet_number: pallet_numbers)
       ds.select_map(:pallet_number)
     end
+
+    def selected_pallets(pallet_sequence_ids)
+      select_values(:pallet_sequences, :pallet_id, id: pallet_sequence_ids)
+    end
   end
 end

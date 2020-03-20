@@ -1,0 +1,13 @@
+---
+:dataminer_definition: repacked_pallets
+:actions:
+  - :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+    :text: sequences
+    :title: Pallet sequences for Pallet No $:pallet_number$
+    :icon: list
+    :popup: true
+  - :url: "/finished_goods/inspection/reject_to_repack/$:pallet_id$/print_barcode"
+    :text: print barcode
+    :icon: printer
+    :title: Print Barcode
+    :loading_window: true

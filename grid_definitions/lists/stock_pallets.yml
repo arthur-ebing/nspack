@@ -28,6 +28,8 @@
       - failed_inspections
       - failed_verifications
       - reworks_pallets
+      - failed_and_not_repacked
+      - reject_to_repack
 :captions:
   :conditions:
     :active: Active Pallets
@@ -38,6 +40,7 @@
     :scrapped: Scrapped Pallets
     :failed_inspections: Failed Inspections Pallets
     :failed_verifications: Failed Verifications Pallets
+    :failed_and_not_repacked: Failed and not repacked Pallets
 :conditions:
   :standard:
     - :col: id
@@ -124,6 +127,16 @@
     - :col: production_run_id
       :op: =
       :val: $:production_run_id$
+  :failed_and_not_repacked:
+    - :col: inspected
+      :op: =
+      :val: true
+    - :col: govt_inspection_passed
+      :op: =
+      :val: false
+    - :col: repacked
+      :op: =
+      :val: false
 :multiselect:
   :allocate:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
@@ -144,3 +157,9 @@
     :multiselect_save_method: remote
     :can_be_cleared: false
     :conditions: pallets_available_for_bulk_update
+  :reject_to_repack:
+    :url: "/finished_goods/inspection/reject_to_repack/multiselect_reject_to_repack"
+    :section_caption: 'Select pallets for repack '
+    :multiselect_save_method: remote
+    :can_be_cleared: false
+    :conditions: failed_and_not_repacked
