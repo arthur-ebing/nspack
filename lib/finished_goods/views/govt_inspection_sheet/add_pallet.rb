@@ -23,10 +23,11 @@ module FinishedGoods
                   col.add_field :inspection_billing_party_role_id
                   col.add_field :exporter_party_role_id
                   col.add_field :booking_reference
-                  col.add_field :pallet_number
                   col.add_field :created_by
+                  col.add_field :pallet_number
                 end
                 row.column do |col|
+                  col.add_field :consignment_note_number
                   col.add_field :inspection_point
                   col.add_field :destination_country_id
                   col.add_field :completed

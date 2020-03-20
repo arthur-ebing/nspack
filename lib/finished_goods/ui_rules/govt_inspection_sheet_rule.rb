@@ -4,6 +4,7 @@ module UiRules
   class GovtInspectionSheetRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = FinishedGoodsApp::GovtInspectionRepo.new
+      @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
       apply_form_values
 
@@ -18,10 +19,11 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       inspector_id_label = MasterfilesApp::InspectorRepo.new.find_inspector_flat(@form_object.inspector_id)&.inspector
-      inspection_billing_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.inspection_billing_party_role_id)&.party_name
-      exporter_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.exporter_party_role_id)&.party_name
-      destination_country_id_label = MasterfilesApp::DestinationRepo.new.find_country(@form_object.destination_country_id)&.country_name
-      govt_inspection_api_result_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
+      inspection_billing_party_role_id_label = @party_repo.find_party_role(@form_object.inspection_billing_party_role_id)&.party_name
+      exporter_party_role_id_label = @party_repo.find_party_role(@form_object.exporter_party_role_id)&.party_name
+      destination_country = MasterfilesApp::DestinationRepo.new.find_country(@form_object.destination_country_id)
+      destination_country_id_label = "#{destination_country&.country_name} - (#{destination_country&.region_name})"
+      govt_inspection_api_result_id_label = @repo.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
                                 with_value: inspector_id_label,
                                 caption: 'Inspector' }
@@ -57,9 +59,10 @@ module UiRules
                                 hide_on_load: !@form_object.reinspection,
                                 as_boolean: true }
       fields[:created_by] = { renderer: :label }
+      fields[:consignment_note_number] = { renderer: :label }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields
       {
         inspector_id: { renderer: :select,
                         options: MasterfilesApp::InspectorRepo.new.for_select_inspectors,
@@ -67,13 +70,13 @@ module UiRules
                         caption: 'Inspector',
                         required: true },
         inspection_billing_party_role_id: { renderer: :select,
-                                            options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_INSPECTION_BILLING),
-                                            disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_INSPECTION_BILLING),
+                                            options: @party_repo.for_select_party_roles(AppConst::ROLE_INSPECTION_BILLING),
+                                            disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_INSPECTION_BILLING),
                                             caption: 'Inspection Billing',
                                             required: true },
         exporter_party_role_id: { renderer: :select,
-                                  options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_EXPORTER),
-                                  disabled_options: MasterfilesApp::PartyRepo.new.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
+                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_EXPORTER),
+                                  disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_EXPORTER),
                                   caption: 'Exporter',
                                   required: true },
         booking_reference: { required: true },
@@ -88,20 +91,21 @@ module UiRules
         inspection_point: {},
         awaiting_inspection_results: { renderer: :checkbox },
         destination_country_id: { renderer: :select,
-                                  options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries,
-                                  disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_countries,
+                                  options: @repo.for_select_destination_countries,
+                                  disabled_options: @repo.for_select_inactive_destination_countries,
                                   caption: 'Destination Country',
                                   required: true },
         govt_inspection_api_result_id: { renderer: :select,
-                                         options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_govt_inspection_api_results,
-                                         disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_govt_inspection_api_results,
+                                         options: @repo.for_select_govt_inspection_api_results,
+                                         disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
                                          caption: 'Govt Inspection Api Result' },
         pallet_number: { renderer: :input,
                          subtype: :numeric },
         reinspection: { renderer: :checkbox,
                         hide_on_load: !@form_object.reinspection,
                         disable: @mode != :reinspection },
-        created_by: { disabled: true }
+        created_by: { disabled: true },
+        consignment_note_number: { disabled: true }
       }
     end
 
@@ -114,8 +118,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(inspector_id: nil,
-                                    inspection_billing_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT),
-                                    exporter_party_role_id: MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER),
+                                    inspection_billing_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT),
+                                    exporter_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER),
                                     booking_reference: @repo.last_record(:booking_reference),
                                     results_captured: nil,
                                     results_captured_at: nil,

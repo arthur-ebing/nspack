@@ -41,6 +41,31 @@ module FinishedGoodsApp
     crud_calls_for :govt_inspection_api_results, name: :govt_inspection_api_result, wrapper: GovtInspectionApiResult
     crud_calls_for :govt_inspection_pallet_api_results, name: :govt_inspection_pallet_api_result, wrapper: GovtInspectionPalletApiResult
 
+    def find_govt_inspection_sheet(id)
+      find_with_association(:govt_inspection_sheets,
+                            id,
+                            lookup_functions: [{ function: :fn_consignment_note_number,
+                                                 args: [id],
+                                                 col_name: :consignment_note_number }],
+                            wrapper: GovtInspectionSheet)
+    end
+
+    def for_select_destination_countries(active = true)
+      query = <<~SQL
+        SELECT country_name || ' - (' || destination_region_name || ')',
+               dc.id
+        FROM destination_countries dc
+        JOIN destination_regions dr on dc.destination_region_id = dr.id
+        WHERE dc.active = #{active}
+        ORDER BY country_name
+      SQL
+      DB[query].select_map(%i[code id])
+    end
+
+    def for_select_inactive_destination_countries
+      for_select_destination_countries(false)
+    end
+
     def validate_govt_inspection_sheet_inspect_params(id)
       pallet_ids = DB[:govt_inspection_pallets].where(govt_inspection_sheet_id: id, inspected: false).select_map(:pallet_id)
       pallet_numbers = DB[:pallets].where(id: pallet_ids).select_map(:pallet_number).join(', ')

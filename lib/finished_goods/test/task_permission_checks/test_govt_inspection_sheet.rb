@@ -26,6 +26,7 @@ module FinishedGoodsApp
         govt_inspection_api_result_id: 1,
         reinspection: false,
         created_by: 1,
+        consignment_note_number: '00000001',
         active: true
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))
