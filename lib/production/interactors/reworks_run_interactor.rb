@@ -171,6 +171,8 @@ module ProductionApp
         resolve_log_reworks_runs_status_and_transaction(reworks_run_type, id, res[:children])
       end
       success_response((res[:message]).to_s, reworks_run_id: id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def resolve_input_from_multiselect(reworks_run_type, reworks_run_type_id, multiselect_list)
@@ -198,12 +200,28 @@ module ProductionApp
         children = attrs[:pallets_selected]
         before_attrs = { production_run_tipped_id: attrs[:from_production_run_id] }
         after_attrs = { production_run_tipped_id: attrs[:to_production_run_id] }
+        res = move_bin(attrs[:to_production_run_id], children)
+        return res unless res.success
+
         repo.update_rmt_bin(children, after_attrs)
       end
       changes_made = resolve_changes_made(before: before_attrs.sort.to_h,
                                           after: after_attrs.sort.to_h,
                                           change_descriptions: change_descriptions)
       { children: children, after_attrs: after_attrs, changes_made: changes_made, message: message }
+    end
+
+    def move_bin(production_run_id, children)
+      location_id = repo.find_run_location_id(production_run_id)
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      children.each do |bin_number|
+        res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil).call
+        return res unless res.success
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def resolve_changes_made(changes_made)

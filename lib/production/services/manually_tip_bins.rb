@@ -21,7 +21,7 @@ module ProductionApp
 
     private
 
-    def manually_tip_bins
+    def manually_tip_bins  # rubocop:disable Metrics/AbcSize
       rmt_bin_numbers.each  do |rmt_bin_number|
         @bin_number = rmt_bin_number
         @rmt_bin_id = find_rmt_bin
@@ -30,7 +30,11 @@ module ProductionApp
         errors = rmt_bin_validations
         return failed_response(errors) unless errors.nil?
 
-        update_bin
+        res = move_bin
+        return res unless res.success
+
+        res = update_bin
+        return res unless res.success
       end
 
       ok_response
@@ -67,10 +71,24 @@ module ProductionApp
       return "INVALID CULTIVAR: Run requires: #{run_attrs[:cultivar_name]}. Bin is: #{bin_attrs[:cultivar_name]}" if !run_attrs[:allow_cultivar_mixing] && (bin_attrs[:cultivar_id] != run_attrs[:cultivar_id])
     end
 
+    def move_bin
+      location_id = repo.find_run_location_id(production_run_id)
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, bin_number, location_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil).call
+      return res unless res.success
+
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def update_bin
       RawMaterialsApp::RmtDeliveryRepo.new.update_rmt_bin(rmt_bin_id, rmt_bin_updates)
 
       ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def rmt_bin_updates

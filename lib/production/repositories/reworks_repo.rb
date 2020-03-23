@@ -673,6 +673,19 @@ module ProductionApp
     def find_pallet_numbers(pallet_ids)
       select_values(:pallets, :pallet_number, id: pallet_ids)
     end
+
+    def find_run_location_id(production_run_id)
+      query = <<~SQL
+        SELECT packhouses.location_id FROM production_runs
+        JOIN plant_resources lines ON lines.id = production_runs.production_line_id
+        JOIN tree_plant_resources ON tree_plant_resources.descendant_plant_resource_id = production_runs.production_line_id
+        JOIN plant_resources packhouses ON packhouses.id = tree_plant_resources.ancestor_plant_resource_id
+        JOIN plant_resource_types ON plant_resource_types.id = packhouses.plant_resource_type_id
+        WHERE production_runs.id = #{production_run_id}
+        AND plant_resource_types.plant_resource_type_code = '#{Crossbeams::Config::ResourceDefinitions::PACKHOUSE}'
+      SQL
+      DB[query].single_value
+    end
   end
 end
 # frozen_string_literal: true

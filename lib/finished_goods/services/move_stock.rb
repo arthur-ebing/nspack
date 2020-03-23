@@ -106,9 +106,13 @@ module FinishedGoodsApp
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
       return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
-      return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
-      return failed_response("#{stock_type} has been tipped") if stock_type == AppConst::BIN_STOCK_TYPE && @stock_item[:bin_tipped]
-      return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
+
+      unless business_process == AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS
+        return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
+        return failed_response("#{stock_type} has been tipped") if stock_type == AppConst::BIN_STOCK_TYPE && @stock_item[:bin_tipped]
+        return failed_response("#{stock_type} is already in this location") if @stock_item[:location_id].to_i == location_to_id.to_i
+      end
+
       return failed_response("#{stock_type} current location has not been set") unless @stock_item[:location_id]
 
       @location_from_id = @stock_item[:location_id]

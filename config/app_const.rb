@@ -180,6 +180,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_REPACK_PALLET_NEW_STATUS = 'REPACKED'
   REWORKS_REPACK_SCRAP_REASON = 'REPACKED'
 
+  REWORKS_MOVE_BIN_BUSINESS_PROCESS = 'REWORKS_MOVE_BIN'
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',
