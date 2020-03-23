@@ -66,6 +66,18 @@ module MasterfilesApp
       find_location_by(:id, id)
     end
 
+    def get_parent_location(id)
+      query = <<~SQL
+        select d.id
+        from locations p
+        join tree_locations t on t.descendant_location_id=p.id
+        join locations d on d.id=t.ancestor_location_id
+        where p.id=?
+        AND t.path_length = 1
+      SQL
+      DB[query, id].select_map(:id).first
+    end
+
     def find_max_position_for_deck_location(id)
       query = <<~SQL
         SELECT COUNT(p.*) as num_positions
@@ -89,6 +101,20 @@ module MasterfilesApp
         AND t.path_length = 1
       SQL
       DB[query, location_to_id].select_map(:pos)
+    end
+
+    def get_deck_pallets(id)
+      query = <<~SQL
+        select cast(substring(p.location_long_code from '\\d+$') as int) as pos, s.pallet_number
+        from locations d
+        join tree_locations t on t.ancestor_location_id=d.id
+        join locations p on p.id=t.descendant_location_id
+        left outer join pallets s on s.location_id=p.id
+        where d.id = ?
+        AND t.path_length = 1
+        order by pos desc
+      SQL
+      DB[query, id].all
     end
 
     def find_location_by_location_long_code(code)

@@ -40,19 +40,19 @@ class Nspack < Roda # rubocop:disable ClassLength
         end
 
         r.post do
+          locn_repo = MasterfilesApp::LocationRepo.new
           pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
           res = interactor.move_pallet(pallet_number, params[:pallet][:location], params[:pallet][:location_scan_field])
 
+          scanned_locn_id = locn_repo.resolve_location_id_from_scan(params[:pallet][:location], params[:pallet][:location_scan_field])
+          if (scanned_locn = locn_repo.find_location(scanned_locn_id)) && AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK && (positions = locn_repo.find_filled_deck_positions(scanned_locn_id)).length == locn_repo.find_max_position_for_deck_location(scanned_locn_id)
+            params[:pallet][:pallet_number] = nil
+            params[:pallet][:remaining_num_position] = positions.min - 1
+            params[:pallet][:next_position] = (positions.min - 1).positive? ? "#{scanned_locn.location_long_code}_P#{positions.min - 1}" : nil
+            store_locally(:from_state, params[:pallet])
+          end
+
           if res.success
-            scanned_locn_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(params[:pallet][:location], params[:pallet][:location_scan_field])
-            scanned_locn = MasterfilesApp::LocationRepo.new.find_location(scanned_locn_id)
-            if AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK
-              positions = MasterfilesApp::LocationRepo.new.find_filled_deck_positions(scanned_locn_id)
-              params[:pallet][:pallet_number] = nil
-              params[:pallet][:remaining_num_position] = positions.min - 1
-              params[:pallet][:next_position] = (positions.min - 1).positive? ? "#{scanned_locn.location_long_code}_P#{positions.min - 1}" : nil
-              store_locally(:from_state, params[:pallet])
-            end
             store_locally(:flash_notice, res.message)
           else
             store_locally(:error, res)
@@ -200,6 +200,61 @@ class Nspack < Roda # rubocop:disable ClassLength
             store_locally(:error, res)
           end
           r.redirect("/rmd/finished_goods/repack_pallet/print_pallet_labels/#{id}")
+        end
+      end
+    end
+
+    # --------------------------------------------------------------------------
+    # VIEW DECK PALLETS
+    # --------------------------------------------------------------------------
+    r.on 'view_deck_pallets' do
+      interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        form_state = {}
+        error = retrieve_from_local_store(:error)
+        if error.is_a?(String)
+          form_state.merge!(error_message: error)
+        elsif !error.nil?
+          form_state.merge!(error_message: error.message)
+          form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+        end
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :location,
+                                       notes: nil,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Location',
+                                       action: '/rmd/finished_goods/view_deck_pallets',
+                                       button_caption: 'Submit')
+
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: true, required: true, lookup: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.get_deck_pallets(params[:location][:location], params[:location][:location_scan_field])
+        if res.success
+          if is_empty_deck = res.instance[:pallets].find_all { |p| p[:pallet_number] }.empty?
+            notice = "Deck: #{res.instance[:deck_code]} is empty"
+          end
+          form = Crossbeams::RMDForm.new({},
+                                         form_name: :location,
+                                         notes: notice,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: "Positions for deck:#{res.instance[:deck_code]}",
+                                         no_submit: true,
+                                         action: '/')
+          unless is_empty_deck
+            res.instance[:pallets].each do |e|
+              form.add_label(e[:pos], "Position #{e[:pos]}", e[:pallet_number])
+            end
+          end
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        else
+          store_locally(:error, res)
+          r.redirect('/rmd/finished_goods/view_deck_pallets')
         end
       end
     end

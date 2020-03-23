@@ -18,6 +18,21 @@ module MesscadaApp
       success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     end
 
+    def get_deck_pallets(location, location_scan_field)
+      location_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(location, location_scan_field)
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      location = MasterfilesApp::LocationRepo.new.find_location(location_id)
+      return failed_response("Location:#{location[:location_long_code]} is not a deck") unless location[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
+
+      success_response('ok', pallets: locations_repo.get_deck_pallets(location_id), deck_code: location[:location_long_code])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def find_pallet_sequences_by_pallet_number(scanned_pallet_number)
       pallet_number = pallet_number_from_scan(scanned_pallet_number)
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
@@ -301,6 +316,10 @@ module MesscadaApp
 
     def reworks_repo
       @reworks_repo ||= ProductionApp::ReworksRepo.new
+    end
+
+    def locations_repo
+      @reworks_repo ||= MasterfilesApp::LocationRepo.new
     end
 
     # TODO: split validation if using asset no or not (string asset vs int id)

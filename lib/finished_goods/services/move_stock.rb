@@ -19,6 +19,8 @@ module FinishedGoodsApp
       location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
 
       if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
+        return failed_response("Pallet is already been scanned into deck: #{location_to[:location_long_code]}") if pallet_already_in_deck?
+
         res = find_next_available_deck_position(location_to[:location_long_code])
         return res unless res.success
       end
@@ -34,6 +36,10 @@ module FinishedGoodsApp
     end
 
     private
+
+    def pallet_already_in_deck?
+      (parent = MasterfilesApp::LocationRepo.new.get_parent_location(location_from_id)) && parent == location_to_id ? true : false
+    end
 
     def find_next_available_deck_position(location_code) # rubocop:disable Metrics/AbcSize
       locn_repo = MasterfilesApp::LocationRepo.new
