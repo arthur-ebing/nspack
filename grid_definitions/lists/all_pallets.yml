@@ -17,6 +17,12 @@
     :location_pallets: Location Pallets
 :conditions:
   :location_pallets:
+    - :col: shipped
+      :op: =
+      :val: false
+    - :col: scrapped
+      :op: =
+      :val: false
     - :col: location_id
       :op: IN
       :val: $:location_ids$

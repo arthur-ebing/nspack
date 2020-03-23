@@ -28,12 +28,12 @@
     :caption: Id
     :namespaced_name: id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -44,12 +44,12 @@
     :caption: Delivery
     :namespaced_name: rmt_delivery_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -60,12 +60,12 @@
     :caption: Season
     :namespaced_name: season_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -76,12 +76,12 @@
     :caption: Discrete bin
     :namespaced_name: discrete_bin
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -92,12 +92,12 @@
     :caption: Cultivar
     :namespaced_name: cultivar_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -108,12 +108,12 @@
     :caption: Orchard
     :namespaced_name: orchard_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -124,12 +124,12 @@
     :caption: Farm
     :namespaced_name: farm_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -140,12 +140,12 @@
     :caption: Rmt class
     :namespaced_name: rmt_class_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -156,12 +156,12 @@
     :caption: Rmt container type
     :namespaced_name: rmt_container_type_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -172,12 +172,12 @@
     :caption: Rmt container material type
     :namespaced_name: rmt_container_material_type_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -188,12 +188,12 @@
     :caption: Cultivar group
     :namespaced_name: cultivar_group_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -204,12 +204,12 @@
     :caption: Puc
     :namespaced_name: puc_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -220,12 +220,12 @@
     :caption: Exit ref
     :namespaced_name: exit_ref
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -236,12 +236,12 @@
     :caption: Qty bins
     :namespaced_name: qty_bins
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -252,12 +252,12 @@
     :caption: Bin asset number
     :namespaced_name: bin_asset_number
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -268,12 +268,12 @@
     :caption: Tipped asset number
     :namespaced_name: tipped_asset_number
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -284,12 +284,12 @@
     :caption: Rmt inner container type
     :namespaced_name: rmt_inner_container_type_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -300,12 +300,12 @@
     :caption: Rmt inner container material
     :namespaced_name: rmt_inner_container_material_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -316,12 +316,12 @@
     :caption: Qty inner
     :namespaced_name: qty_inner_bins
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -332,12 +332,12 @@
     :caption: Production run rebin
     :namespaced_name: production_run_rebin_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -348,12 +348,12 @@
     :caption: Tip Run
     :namespaced_name: production_run_tipped_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -364,12 +364,12 @@
     :caption: Bin tipping plant resource
     :namespaced_name: bin_tipping_plant_resource_id
     :data_type: :integer
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -380,12 +380,12 @@
     :caption: Bin fullness
     :namespaced_name: bin_fullness
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -396,12 +396,12 @@
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
-    :width: 
+    :width:
     :format: :delimited_1000
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: true
     :group_avg: false
     :group_min: false
@@ -412,12 +412,12 @@
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
-    :width: 
+    :width:
     :format: :delimited_1000
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: true
     :group_avg: false
     :group_min: false
@@ -428,12 +428,12 @@
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -444,12 +444,12 @@
     :caption: Bin tipped
     :namespaced_name: bin_tipped
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -460,12 +460,12 @@
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -476,12 +476,12 @@
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -493,11 +493,11 @@
     :namespaced_name: date_picked
     :data_type: :date
     :width: 110
-    :format: 
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -509,11 +509,11 @@
     :namespaced_name: bin_received_date
     :data_type: :date
     :width: 120
-    :format: 
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -524,12 +524,12 @@
     :caption: Bin received date time
     :namespaced_name: bin_received_date_time
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -540,12 +540,12 @@
     :caption: Bin tipped date
     :namespaced_name: bin_tipped_date
     :data_type: :date
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -556,12 +556,12 @@
     :caption: Bin tipped date time
     :namespaced_name: bin_tipped_date_time
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -572,12 +572,12 @@
     :caption: Exit ref date
     :namespaced_name: exit_ref_date
     :data_type: :date
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -588,12 +588,12 @@
     :caption: Exit ref date time
     :namespaced_name: exit_ref_date_time
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -604,12 +604,12 @@
     :caption: Rebin created at
     :namespaced_name: rebin_created_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -620,12 +620,12 @@
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -636,12 +636,12 @@
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -652,12 +652,12 @@
     :caption: Cultivar group code
     :namespaced_name: cultivar_group_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -668,12 +668,12 @@
     :caption: Cultivar name
     :namespaced_name: cultivar_name
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -684,12 +684,12 @@
     :caption: Cultivar description
     :namespaced_name: cultivar_description
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -700,12 +700,12 @@
     :caption: Farm group
     :namespaced_name: farm_group_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -716,12 +716,12 @@
     :caption: Farm code
     :namespaced_name: farm_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -732,12 +732,12 @@
     :caption: Orchard code
     :namespaced_name: orchard_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -748,12 +748,12 @@
     :caption: Puc code
     :namespaced_name: puc_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -764,12 +764,12 @@
     :caption: Rmt class code
     :namespaced_name: rmt_class_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -780,12 +780,12 @@
     :caption: Location Code
     :namespaced_name: location_long_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -796,12 +796,12 @@
     :caption: Container material type
     :namespaced_name: container_material_type_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -812,12 +812,12 @@
     :caption: Container type code
     :namespaced_name: container_type_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -828,12 +828,12 @@
     :caption: Delivery truck registration
     :namespaced_name: rmt_delivery_truck_registration_number
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -844,12 +844,12 @@
     :caption: Season code
     :namespaced_name: season_code
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -860,12 +860,12 @@
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -876,12 +876,12 @@
     :caption: Status
     :namespaced_name: status
     :data_type: :string
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -891,7 +891,7 @@
   :caption: Rmt delivery
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT truck_registration_number, id FROM rmt_deliveries ORDER BY truck_registration_number
@@ -899,7 +899,7 @@
   :caption: Season
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT season_code, id FROM seasons ORDER BY season_code
@@ -907,7 +907,7 @@
   :caption: Cultivar
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
@@ -915,7 +915,7 @@
   :caption: Orchard
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code
@@ -923,7 +923,7 @@
   :caption: Farm
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
@@ -931,7 +931,7 @@
   :caption: Rmt class
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT rmt_class_code, id FROM rmt_classes ORDER BY rmt_class_code
@@ -939,7 +939,7 @@
   :caption: Rmt container type
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT container_type_code, id FROM rmt_container_types ORDER BY container_type_code
@@ -947,7 +947,7 @@
   :caption: Rmt container material type
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT container_material_type_code, id FROM rmt_container_material_types
@@ -956,7 +956,7 @@
   :caption: Cultivar group
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT cultivar_group_code, id FROM cultivar_groups ORDER BY cultivar_group_code
@@ -964,7 +964,7 @@
   :caption: Puc
   :data_type: :integer
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: true
   :ui_priority: 1
   :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
@@ -972,63 +972,63 @@
   :caption: Bin asset number
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: rmt_inner_container_type_id
   :caption: Rmt inner container type
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: rmt_inner_container_material_id
   :caption: Rmt inner container material
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: production_run_rebin_id
   :caption: Production run rebin
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: production_run_tipped_id
   :caption: Production run tipped
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: production_run_tipping_id
   :caption: Production run tipping
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: bin_tipping_plant_resource_id
   :caption: Bin tipping plant resource
   :data_type: :integer
   :control_type: :text
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 1
-  :list_def: 
+  :list_def:
 - :column: bin_tipped
   :caption: Tipped?
   :data_type: :boolean
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 7
   :list_def:
@@ -1038,7 +1038,7 @@
   :caption: Scrapped?
   :data_type: :boolean
   :control_type: :list
-  :default_value: 
+  :default_value:
   :ordered_list: false
   :ui_priority: 8
   :list_def:
@@ -1052,3 +1052,13 @@
   :ordered_list: false
   :ui_priority: 9
   :list_def:
+- :column: null_exit_ref
+  :caption: Null exit ref?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 10
+  :list_def:
+    - true
+    - false

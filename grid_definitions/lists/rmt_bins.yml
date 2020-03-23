@@ -37,6 +37,9 @@
       :op: =
       :val: $:tipped$
   :location_bins:
+    - :col: null_exit_ref
+      :op: =
+      :val: true
     - :col: location_id
       :op: IN
       :val: $:location_ids$
