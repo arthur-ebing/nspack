@@ -1,6 +1,14 @@
 Sequel.migration do
   up do
     run <<~SQL
+      DROP TRIGGER update_pallet_sequences_phyto_data ON public.pallet_sequences;
+      DROP TRIGGER update_pallet_sequences_phyto_data ON public.orchards;
+      DROP FUNCTION public.update_pallet_sequences_phyto_data();
+    SQL
+  end
+
+  down do
+    run <<~SQL
       CREATE FUNCTION public.update_pallet_sequences_phyto_data()
       RETURNS trigger AS
       $BODY$
@@ -30,14 +38,6 @@ Sequel.migration do
       ON orchards
       FOR EACH ROW
       EXECUTE PROCEDURE update_pallet_sequences_phyto_data();
-    SQL
-  end
-
-  down do
-    run <<~SQL
-      DROP TRIGGER update_pallet_sequences_phyto_data ON public.pallet_sequences;
-      DROP TRIGGER update_pallet_sequences_phyto_data ON public.orchards;
-      DROP FUNCTION public.update_pallet_sequences_phyto_data();
     SQL
   end
 end
