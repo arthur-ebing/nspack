@@ -59,6 +59,8 @@ module MesscadaApp
       @personnel_number = nil
       unless identifier.nil_or_empty?
         hr_ids = MesscadaApp::HrRepo.new.contract_worker_ids(identifier)
+        raise Crossbeams::InfoError, "Personnel identifier #{identifier} is not registered" if hr_ids.nil?
+
         @personnel_number = hr_ids[:personnel_number]
         attrs = attrs.merge(personnel_identifier_id: hr_ids[:personnel_identifier_id],
                             contract_worker_id: hr_ids[:contract_worker_id])

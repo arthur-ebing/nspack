@@ -42,6 +42,7 @@ module ProductionApp
         running: false,
         labeling: false,
         completed: true,
+        reconfiguring: false,
         completed_at: Time.now,
         active_run_stage: nil
       }
