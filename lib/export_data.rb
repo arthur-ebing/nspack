@@ -92,7 +92,7 @@ module Crossbeams
 
       DevelopmentApp::SendMailJob.enqueue(to: email['to'],
                                           subject: email['subject'],
-                                          body: email['body'],
+                                          body: "Data extracted at #{Time.now.strftime('%Y-%m-%d %H:%M')}.\n#{email['body']}",
                                           attachments: [{ path: fn }])
     end
 
