@@ -58,8 +58,14 @@ module QualityApp
       orchard_test_types.each do |id|
         params[:orchard_test_type_id] = id
         args = params.select { |key, _| %i[orchard_test_type_id puc_id orchard_id cultivar_id].include?(key) }
+        orchard_test_result_id = repo.get_id(:orchard_test_results, args)
 
-        orchard_test_result_id = repo.get_id(:orchard_test_results, args) || repo.create_orchard_test_result(args)
+        if orchard_test_result_id.nil?
+          next unless repo.exists?(:pallet_sequences, params.select { |key, _| %i[puc_id orchard_id cultivar_id].include?(key) })
+
+          orchard_test_result_id = repo.create_orchard_test_result(args)
+        end
+
         orchard_test_result = repo.find_orchard_test_result_flat(orchard_test_result_id)
         next if orchard_test_result.freeze_result
 

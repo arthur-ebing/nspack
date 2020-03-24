@@ -23,8 +23,6 @@ module QualityApp
 
       expand_selection
 
-      update_orchard_otmc_results unless result_attribute.nil?
-
       update_orchard_test_results
 
       success_response('Updated Orchard Test Result')
@@ -86,16 +84,16 @@ module QualityApp
             next if test_attrs == orchard_test_result.to_h.select { |key, _| test_attrs.keys.include?(key) }
 
             repo.update_orchard_test_result(id, attrs)
-            repo.update_pallet_sequences_phyto_data(attrs) if @orchard_test_type.result_attribute == 'phytoData'
+            update_orchard_otmc_results(attrs) unless result_attribute.nil?
           end
         end
       end
     end
 
-    def update_orchard_otmc_results
-      otmc_results = repo.get(:orchards, params[:orchard_id], :otmc_results) || {}
+    def update_orchard_otmc_results(attrs)
+      otmc_results = repo.get(:orchards, attrs[:orchard_id], :otmc_results) || {}
       otmc_results[orchard_test_type.test_type_code.to_sym] = otmc_result
-      repo.update(:orchards, params[:orchard_id], otmc_results: Sequel.hstore(otmc_results))
+      repo.update(:orchards, attrs[:orchard_id], otmc_results: Sequel.hstore(otmc_results))
     end
   end
 end

@@ -18,6 +18,9 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: "/list/orchard_test_results/multi?key=multi_delete"
+  :text: bulk delete
+  :icon: delete
 - :separator: true
 - :url: "/development/statuses/list/orchard_test_results/$:id$"
   :text: status
@@ -33,3 +36,7 @@
   :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
   :text: Phyt Clean Request
   :style: :button
+:multiselect:
+  :multi_delete:
+    :url: "/quality/test_results/orchard_test_results/multi_delete"
+    :section_caption: "Choose results to delete"

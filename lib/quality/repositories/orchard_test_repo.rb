@@ -26,12 +26,12 @@ module QualityApp
 
     build_for_select :cultivars,
                      alias: :cultivar_codes,
-                     label: :cultivar_code,
+                     label: %i[cultivar_name cultivar_code],
                      value: :id,
                      order_by: :cultivar_code
     build_inactive_select :cultivars,
                           alias: :cultivar_codes,
-                          label: :cultivar_code,
+                          label: %i[cultivar_name cultivar_code],
                           value: :id,
                           order_by: :cultivar_code
 
@@ -108,17 +108,16 @@ module QualityApp
       DB[:orchard_test_results].where(id: id).update(attrs)
     end
 
-    def update_pallet_sequences_phyto_data(params)
-      return nil if params.nil?
+    def delete_orchard_test_result(id)
+      instance = find_orchard_test_result_flat(id)
 
-      ds = DB[:pallet_sequences]
-      ds = ds.where(exit_ref: nil)
-      ds = ds.where(puc_id: params[:puc_id], orchard_id: params[:orchard_id], cultivar_id: params[:cultivar_id])
-      ds.update(phyto_data: params[:classification])
-    end
+      # update_orchard_otmc_results
+      otmc_results = get(:orchards, instance.orchard_id, :otmc_results) || {}
+      otmc_results.delete(instance.orchard_test_type_code.to_sym)
+      result = otmc_results.empty? ? nil : Sequel.hstore(otmc_results)
+      update(:orchards, instance.orchard_id, otmc_results: result)
 
-    def update_pallet_sequences(args, attrs)
-      DB[:pallet_sequences].where(args).update(attrs)
+      DB[:orchard_test_results].where(id: id).delete
     end
   end
 end

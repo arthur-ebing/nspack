@@ -132,6 +132,21 @@ class Nspack < Roda
         end
       end
 
+      r.on 'multi_delete' do
+        check_auth!('test results', 'delete')
+        res = nil
+        multiselect_grid_choices(params).each do |id|
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_orchard_test_result(id)
+          unless res.success
+            flash[:error] = res.message
+            r.redirect request.referer
+          end
+        end
+        flash[:notice] = res.message
+        r.redirect request.referer
+      end
+
       r.on 'new' do    # NEW
         check_auth!('test results', 'new')
         show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::New.call(remote: fetch?(r)) }
