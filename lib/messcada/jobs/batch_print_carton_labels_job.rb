@@ -12,6 +12,7 @@ module MesscadaApp
         @printer_id = printer_id
         @request_ip = request_ip
         @packhouse_no = repo.find_resource_packhouse_no(packhouse_resource_id)
+        @supporting_data = {}
 
         find_label(label_template_id)
         @instance = repo.carton_label_printing_instance(carton_label_ids.first)

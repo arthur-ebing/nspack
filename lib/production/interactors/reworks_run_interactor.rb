@@ -373,7 +373,7 @@ module ProductionApp
       instance = reworks_run_carton_print_data(sequence_id)
       label_name = label_template_name(res[:label_template_id])
       repo.transaction do
-        LabelPrintingApp::PrintLabel.call(label_name, instance, quantity: res[:no_of_prints], printer: res[:printer])
+        LabelPrintingApp::PrintLabel.call(label_name, instance, quantity: res[:no_of_prints], printer: res[:printer], supporting_data: { packed_date: instance[:packed_date] })
         log_transaction
       end
       success_response('Carton Label printed successfully')

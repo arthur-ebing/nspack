@@ -4,15 +4,15 @@ module LabelPrintingApp
   module LabelContent
     # Built-in functions - can't be private!
     def iso_day
-      Date.today.strftime('%j')
+      (@supporting_data[:packed_date] || Date.today).strftime('%j')
     end
 
     def iso_week
-      Date.today.strftime('%V')
+      (@supporting_data[:packed_date] || Date.today).strftime('%V')
     end
 
     def iso_week_day
-      Date.today.strftime('%u')
+      (@supporting_data[:packed_date] || Date.today).strftime('%u')
     end
 
     def current_date
