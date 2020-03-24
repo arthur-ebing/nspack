@@ -5,15 +5,12 @@ Sequel.migration do
       RETURNS trigger AS
       $BODY$
       BEGIN
-        UPDATE pallet_sequences ps
-        SET phyto_data = sq.phyto_data
-        FROM (SELECT pallet_sequences.id,
-                orchards.otmc_results -> 'PHYTODATA' AS phyto_data
-              FROM pallet_sequences
-              JOIN orchards ON pallet_sequences.orchard_id = orchards.id
-              WHERE pallet_sequences.exit_ref IS NULL
-              AND orchards.id = NEW.orchard_id) AS sq
-        WHERE ps.id = sq.id;
+        UPDATE pallet_sequences
+        SET phyto_data = (SELECT orchards.otmc_results -> 'PHYTODATA'
+                          FROM orchards
+                          WHERE orchards.id = pallet_sequences.orchard_id)
+        WHERE pallet_sequences.id = NEW.id
+          AND pallet_sequences.exit_ref IS NULL;
         RETURN new; 
       END;
       $BODY$
@@ -32,15 +29,12 @@ Sequel.migration do
       RETURNS trigger AS
       $BODY$
       BEGIN
-        UPDATE pallet_sequences ps
-        SET phyto_data = sq.phyto_data
-        FROM (SELECT pallet_sequences.id,
-                orchards.otmc_results -> 'PHYTODATA' AS phyto_data
-              FROM pallet_sequences
-              JOIN orchards ON pallet_sequences.orchard_id = orchards.id
-              WHERE pallet_sequences.exit_ref IS NULL
-              AND orchards.id = NEW.id) AS sq
-        WHERE ps.id = sq.id;
+        UPDATE pallet_sequences
+        SET phyto_data = (SELECT orchards.otmc_results -> 'PHYTODATA'
+                          FROM orchards
+                          WHERE orchards.id = pallet_sequences.orchard_id)
+        WHERE pallet_sequences.orchard_id = NEW.id
+          AND pallet_sequences.exit_ref IS NULL;
         RETURN new; 
       END;
       $BODY$
@@ -48,7 +42,7 @@ Sequel.migration do
       COST 100;
 
       CREATE TRIGGER update_pallet_sequences_phyto_data
-      AFTER UPDATE OR DELETE
+      AFTER UPDATE OF otmc_results
       ON orchards
       FOR EACH ROW
       EXECUTE PROCEDURE update_pallet_sequences_phyto_data();
