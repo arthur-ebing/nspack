@@ -18,7 +18,7 @@ module MesscadaApp
       success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     end
 
-    def get_deck_pallets(location, location_scan_field)
+    def get_deck_pallets(location, location_scan_field) # rubocop:disable Metrics/AbcSize
       location_id = MasterfilesApp::LocationRepo.new.resolve_location_id_from_scan(location, location_scan_field)
       return failed_response('Location does not exist') if location_id.nil_or_empty?
 
@@ -319,7 +319,7 @@ module MesscadaApp
     end
 
     def locations_repo
-      @reworks_repo ||= MasterfilesApp::LocationRepo.new
+      @locations_repo ||= MasterfilesApp::LocationRepo.new
     end
 
     # TODO: split validation if using asset no or not (string asset vs int id)

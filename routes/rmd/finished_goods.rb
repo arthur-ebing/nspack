@@ -235,9 +235,9 @@ class Nspack < Roda # rubocop:disable ClassLength
       r.post do
         res = interactor.get_deck_pallets(params[:location][:location], params[:location][:location_scan_field])
         if res.success
-          if is_empty_deck = res.instance[:pallets].find_all { |p| p[:pallet_number] }.empty?
-            notice = "Deck: #{res.instance[:deck_code]} is empty"
-          end
+          is_empty_deck = res.instance[:pallets].find_all { |p| p[:pallet_number] }.empty?
+          notice = "Deck: #{res.instance[:deck_code]} is empty" if is_empty_deck
+
           form = Crossbeams::RMDForm.new({},
                                          form_name: :location,
                                          notes: notice,

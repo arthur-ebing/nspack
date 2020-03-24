@@ -70,6 +70,4 @@ class UpdateLocationsUnitsInLocation < BaseScript
       success_response('Out Of Sync Deliveries and Bins Fixed')
     end
   end
-
-  private
 end
