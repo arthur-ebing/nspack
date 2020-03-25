@@ -511,7 +511,10 @@ module ProductionApp
       attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
       before_descriptions_state = sequence_setup_data(sequence_id)
-      sequences = batch_update ? affected_pallet_sequences(pallet_number_sequences(batch_pallet_numbers), changed_attrs) : sequence_id
+      before_changed_attrs = {}
+      changed_attrs.keys.map { |k| before_changed_attrs[k] = before_attrs[k] }
+
+      sequences = batch_update ? affected_pallet_sequences(pallet_number_sequences(batch_pallet_numbers), before_changed_attrs) : sequence_id
       affected_pallets = affected_pallet_numbers(sequences, changed_attrs)
 
       reworks_run_attrs = {
