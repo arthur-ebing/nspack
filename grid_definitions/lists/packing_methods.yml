@@ -1,0 +1,24 @@
+---
+:dataminer_definition: packing_methods
+:actions:
+- :url: "/masterfiles/packaging/packing_methods/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/packaging/packing_methods/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/packaging/packing_methods/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/packaging/packing_methods/new"
+  :text: New Packing Method
+  :style: :button
+  :behaviour: :popup

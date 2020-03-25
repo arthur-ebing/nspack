@@ -43,5 +43,6 @@ module MesscadaApp
     attribute :grade_id, Types::Integer
     attribute :pallet_number, Types::String
     attribute :phc, Types::String
+    attribute :packing_method_id, Types::Integer
   end
 end

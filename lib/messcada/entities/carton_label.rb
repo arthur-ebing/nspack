@@ -43,5 +43,6 @@ module MesscadaApp
     attribute :pallet_number, Types::String
     attribute :carton_equals_pallet, Types::Bool
     attribute :phc, Types::String
+    attribute :packing_method_id, Types::Integer
   end
 end

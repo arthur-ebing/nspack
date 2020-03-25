@@ -185,8 +185,8 @@ module ProductionApp
 
     def prepare_run_allocation_targets(id)
       insert_ds = DB[<<~SQL, id]
-        INSERT INTO product_resource_allocations (production_run_id, plant_resource_id)
-        SELECT r.id, p.id
+        INSERT INTO product_resource_allocations (production_run_id, plant_resource_id, packing_method_id)
+        SELECT r.id, p.id, (SELECT id FROM packing_methods WHERE packing_method_code = '#{AppConst::DEFAULT_PACKING_METHOD}'  )
         FROM production_runs r
         JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id
         JOIN plant_resources p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')
@@ -216,6 +216,13 @@ module ProductionApp
       update(:product_resource_allocations, product_resource_allocation_id, label_template_id: label_template_id)
 
       success_response("Applied #{label_template_name}", label_template_name: label_template_name)
+    end
+
+    def packing_method_for_allocation(product_resource_allocation_id, packing_method_code)
+      packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(packing_method_code)&.id
+      update(:product_resource_allocations, product_resource_allocation_id, packing_method_id: packing_method_id)
+
+      success_response("Applied #{packing_method_code}", packing_method_code: packing_method_code)
     end
 
     def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, label_template_id)
@@ -260,7 +267,7 @@ module ProductionApp
     def allocated_setup_keys(production_run_id)
       query = <<~SQL
         SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
-               a.product_setup_id, a.label_template_id, s.system_resource_code, t.label_template_name
+               a.product_setup_id, a.label_template_id, s.system_resource_code, t.label_template_name, a.packing_method_id
           FROM product_resource_allocations a
           JOIN plant_resources p ON p.id = a.plant_resource_id
           JOIN system_resources s ON s.id = p.system_resource_id

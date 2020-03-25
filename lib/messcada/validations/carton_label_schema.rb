@@ -54,6 +54,7 @@ module MesscadaApp
     optional(:phc, Types::StrippedString).filled(:str?)
     optional(:personnel_identifier_id, :integer).maybe(:int?)
     optional(:contract_worker_id, :integer).maybe(:int?)
+    required(:packing_method_id, :integer).filled(:int?)
 
     validate(fruit_size_reference_or_fruit_actual_count: %i[fruit_size_reference_id fruit_actual_counts_for_pack_id]) do |fruit_size_reference_id, fruit_actual_counts_for_pack_id|
       fruit_size_reference_id || fruit_actual_counts_for_pack_id

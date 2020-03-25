@@ -269,11 +269,19 @@ module ProductionApp
       res
     end
 
+    def packing_method_for_allocation(product_resource_allocation_id, params)
+      res = repo.packing_method_for_allocation(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { packing_method_id: res.instance[:packing_method_id] } }
+      res
+    end
+
     def inline_edit_alloc(product_resource_allocation_id, params)
       if params[:column_name] == 'product_setup_code'
         allocate_product_setup(product_resource_allocation_id, params)
       elsif params[:column_name] == 'label_template_name'
         label_for_allocation(product_resource_allocation_id, params)
+      elsif params[:column_name] == 'packing_method_code'
+        packing_method_for_allocation(product_resource_allocation_id, params)
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
       end

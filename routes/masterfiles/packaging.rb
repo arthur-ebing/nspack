@@ -689,5 +689,76 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # PACKING METHODS
+    # --------------------------------------------------------------------------
+    r.on 'packing_methods', Integer do |id| # rubocop:disable Metrics/BlockLength
+      interactor = MasterfilesApp::PackingMethodInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:packing_methods, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('packaging', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Packaging::PackingMethod::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('packaging', 'read')
+          show_partial { Masterfiles::Packaging::PackingMethod::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_packing_method(id, params[:packing_method])
+          if res.success
+            update_grid_row(id, changes: { packing_method_code: res.instance[:packing_method_code], description: res.instance[:description], actual_count_reduction_factor: res.instance[:actual_count_reduction_factor] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Packaging::PackingMethod::Edit.call(id, form_values: params[:packing_method], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('packaging', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_packing_method(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'packing_methods' do
+      interactor = MasterfilesApp::PackingMethodInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('packaging', 'new')
+        show_partial_or_page(r) { Masterfiles::Packaging::PackingMethod::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_packing_method(params[:packing_method])
+        if res.success
+          row_keys = %i[
+            id
+            packing_method_code
+            description
+            actual_count_reduction_factor
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/packaging/packing_methods/new') do
+            Masterfiles::Packaging::PackingMethod::New.call(form_values: params[:packing_method],
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end

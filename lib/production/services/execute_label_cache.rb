@@ -10,6 +10,7 @@ module ProductionApp
           setup_data: rec[:setup_data],
           production_run_data: cache_run.merge(product_resource_allocation_id: rec[:product_resource_allocation_id],
                                                resource_id: rec[:resource_id],
+                                               packing_method_id: rec[:packing_method_id],
                                                label_name: rec[:label_template_name])
         }
       end

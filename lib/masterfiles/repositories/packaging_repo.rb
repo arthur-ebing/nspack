@@ -38,10 +38,20 @@ module MasterfilesApp
                           value: :id,
                           order_by: :cartons_per_pallet
 
+    build_for_select :packing_methods,
+                     label: :packing_method_code,
+                     value: :id,
+                     order_by: :packing_method_code
+    build_inactive_select :packing_methods,
+                          label: :packing_method_code,
+                          value: :id,
+                          order_by: :packing_method_code
+
     crud_calls_for :pallet_bases, name: :pallet_base, wrapper: PalletBase
     crud_calls_for :pallet_stack_types, name: :pallet_stack_type, wrapper: PalletStackType
     crud_calls_for :pallet_formats, name: :pallet_format, wrapper: PalletFormat
     crud_calls_for :cartons_per_pallet, name: :cartons_per_pallet, wrapper: CartonsPerPallet
+    crud_calls_for :packing_methods, name: :packing_method, wrapper: PackingMethod
 
     def find_pallet_base_pallet_formats(id)
       DB[:pallet_formats]
@@ -122,6 +132,10 @@ module MasterfilesApp
         JOIN pallet_stack_types s on s.id=p.pallet_stack_type_id
       SQL
       DB[qry].all.map { |p| ["#{p[:pallet_base_code]}_#{p[:stack_type_code]}", p[:id]] }
+    end
+
+    def find_packing_method_by_code(packing_method_code)
+      where(:packing_methods, PackingMethod, packing_method_code: packing_method_code)
     end
   end
 end

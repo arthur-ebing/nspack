@@ -109,3 +109,6 @@ INSERT INTO user_email_groups (mail_group) VALUES('edi_notifiers') ON CONFLICT D
 
 -- SCRAP_REASONS --
 INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('REPACKED', 'Repacked') ON CONFLICT DO NOTHING;
+
+-- PACKING_METHODS --
+INSERT INTO packing_methods (packing_method_code, description, actual_count_reduction_factor) VALUES('NORMAL', 'Normal', 1) ON CONFLICT DO NOTHING;

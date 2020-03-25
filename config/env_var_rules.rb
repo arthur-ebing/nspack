@@ -58,7 +58,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { BIN_ASSET_REGEX: 'One or more regular expressions (delimited by commas) to validate the format of typed-in bin asset numbers.' },
     { DEFAULT_DELIVERY_LOCATION: 'The long code of the location to serve as the default for all deliveries. If not set, the location id will be blank, but bin moves will not work.' },
     { LOCATION_TYPES_COLD_BAY_DECK: 'The code for location types that serve as bays in cold storage. Default is "DECK"' },
-    { GOVT_INSPECTION_SIGNEE_CAPTION: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' }
+    { GOVT_INSPECTION_SIGNEE_CAPTION: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
+    { DEFAULT_PACKING_METHOD: 'Default packing method code for product resource allocations' }
   ].freeze
 
   NO_OVERRIDE = [
