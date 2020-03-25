@@ -232,6 +232,7 @@ namespace :db do
                 ENV.fetch('DATABASE_URL')
               end
     db = Sequel.connect(db_name)
+    db.extension :pg_timestamptz
     migrations = if db.tables.include?(:schema_migrations)
                    db[:schema_migrations].reverse(:filename).first(2).map { |r| r[:filename] }
                  else
