@@ -184,9 +184,12 @@ module ProductionApp
     end
 
     def prepare_run_allocation_targets(id)
+      default_packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(AppConst::DEFAULT_PACKING_METHOD)&.id
+      raise Crossbeams::FrameworkError, "Default Packing Method: #{AppConst::DEFAULT_PACKING_METHOD} does not exist." if default_packing_method_id.nil_or_empty?
+
       insert_ds = DB[<<~SQL, id]
         INSERT INTO product_resource_allocations (production_run_id, plant_resource_id, packing_method_id)
-        SELECT r.id, p.id, (SELECT id FROM packing_methods WHERE packing_method_code = '#{AppConst::DEFAULT_PACKING_METHOD}'  )
+        SELECT r.id, p.id, #{default_packing_method_id}
         FROM production_runs r
         JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id
         JOIN plant_resources p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')
@@ -220,6 +223,8 @@ module ProductionApp
 
     def packing_method_for_allocation(product_resource_allocation_id, packing_method_code)
       packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(packing_method_code)&.id
+      raise Crossbeams::FrameworkError, "Packing Method: #{packing_method_code} does not exist." if packing_method_id.nil_or_empty?
+
       update(:product_resource_allocations, product_resource_allocation_id, packing_method_id: packing_method_id)
 
       success_response("Applied #{packing_method_code}", packing_method_code: packing_method_code)
