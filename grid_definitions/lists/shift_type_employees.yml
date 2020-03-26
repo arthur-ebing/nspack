@@ -1,0 +1,9 @@
+---
+:dataminer_definition: contract_workers
+:multiselect:
+  :shift_types:
+    :url: "/masterfiles/human_resources/shift_types/$:id$/link_employees"
+    :preselect: "SELECT contract_worker_id AS id FROM shift_types_contract_workers WHERE shift_type_id = $:id$"
+    :section_caption: "SELECT fn_shift_type_code($:id$)"
+    :can_be_cleared: true
+    :prompt: 'All selected Contract Workers will be unassigned from any other shift types and assigned to this shift type'

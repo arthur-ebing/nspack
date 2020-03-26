@@ -21,7 +21,7 @@ module MasterfilesApp
     end
 
     def delete_shift_type(id)
-      name = shift_type(id).id
+      name = shift_type(id).shift_type_code
       repo.transaction do
         repo.delete_shift_type(id)
         log_status(:shift_types, id, 'DELETED')
@@ -30,6 +30,44 @@ module MasterfilesApp
       success_response("Deleted shift type #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def swop_employees(params) # rubocop:disable Metrics/AbcSize
+      res = HumanResources::Validator.new.validate_shift_type_ids(params)
+      return res unless res.messages.empty?
+
+      from_st = shift_type(params[:from_shift_type_id])
+      to_st = shift_type(params[:to_shift_type_id])
+      repo.transaction do
+        repo.swop_employees(res)
+        log_status(:shift_types, params[:from_shift_type_id], 'SWOP EMPLOYEES')
+        log_status(:shift_types, params[:to_shift_type_id], 'SWOP EMPLOYEES')
+        log_transaction
+      end
+      success_response("Swopped Employees from #{from_st.shift_type_code} with #{to_st.shift_type_code}")
+    end
+
+    def move_employees(params) # rubocop:disable Metrics/AbcSize
+      res = HumanResources::Validator.new.validate_shift_type_ids(params)
+      return res unless res.messages.empty?
+
+      from_st = shift_type(params[:from_shift_type_id])
+      to_st = shift_type(params[:to_shift_type_id])
+      repo.transaction do
+        repo.move_employees(res)
+        log_status(:shift_types, params[:from_shift_type_id], 'MOVED EMPLOYEES')
+        log_status(:shift_types, params[:to_shift_type_id], 'EMPLOYEES MOVED')
+        log_transaction
+      end
+      success_response("Moved Employees from #{from_st.shift_type_code} with #{to_st.shift_type_code}")
+    end
+
+    def link_employees(shift_type_id, contract_worker_ids)
+      code = shift_type(shift_type_id)&.shift_type_code
+      repo.transaction do
+        repo.link_employees(shift_type_id, contract_worker_ids)
+      end
+      success_response("Contract Workers assigned to #{code}")
     end
 
     def assert_permission!(task, id = nil)

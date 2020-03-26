@@ -303,6 +303,17 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      r.on 'link_employees' do
+        r.post do
+          res = interactor.link_employees(id, multiselect_grid_choices(params))
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          redirect_to_last_grid(r)
+        end
+      end
       r.is do
         r.get do       # SHOW
           check_auth!('hr', 'read')
@@ -323,6 +334,34 @@ class Nspack < Roda
     r.on 'shift_types' do
       interactor = MasterfilesApp::ShiftTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+      r.on 'swop_employees' do
+        r.is do
+          r.get do
+            check_auth!('hr', 'new')
+            set_last_grid_url('/list/shift_types', r)
+            show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::Swop.call(remote: fetch?(r)) }
+          end
+          r.post do
+            res = interactor.swop_employees(params[:shift_type])
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        end
+      end
+      r.on 'move_employees' do
+        r.is do
+          r.get do
+            check_auth!('hr', 'new')
+            set_last_grid_url('/list/shift_types', r)
+            show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::Move.call(remote: fetch?(r)) }
+          end
+          r.post do
+            res = interactor.move_employees(params[:shift_type])
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        end
+      end
       r.on 'new' do    # NEW
         check_auth!('hr', 'new')
         set_last_grid_url('/list/shift_types', r)

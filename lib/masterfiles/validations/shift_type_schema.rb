@@ -12,4 +12,11 @@ module MasterfilesApp
     required(:end_hour, :integer).filled(:int?, gt?: 0)
     required(:day_night_or_custom, :string).filled(:str?)
   end
+
+  ShiftTypeIdsSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:from_shift_type_id).filled(:int?)
+    required(:to_shift_type_id).filled(:int?)
+  end
 end

@@ -8,7 +8,14 @@ module UiRules
       make_form_object
       apply_form_values
       add_behaviours
-      common_values_for_fields common_fields
+      common_values_for_fields case @mode
+                               when :swop
+                                 swop_fields
+                               when :move
+                                 swop_fields
+                               else
+                                 common_fields
+                               end
 
       set_show_fields if %i[show reopen].include? @mode
 
@@ -23,6 +30,13 @@ module UiRules
       fields[:shift_type_code] = { renderer: :label, with_value: @form_object.shift_type_code }
     end
 
+    def swop_fields
+      {
+        from_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true },
+        to_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true }
+      }
+    end
+
     def common_fields
       {
         ph_plant_resource_id: { renderer: :select, options: packhouse_plant_resources, caption: 'PH Plant Resource', required: true, prompt: true },
@@ -35,20 +49,29 @@ module UiRules
     end
 
     def make_form_object
-      if @mode == :new
-        make_new_form_object
-        return
-      end
+      @form_object = case @mode
+                     when :new
+                       make_new_form_object
+                     when :swop
+                       make_shift_types_form_object
+                     when :move
+                       make_shift_types_form_object
+                     else
+                       @repo.find_shift_type(@options[:id])
+                     end
+    end
 
-      @form_object = @repo.find_shift_type(@options[:id])
+    def make_shift_types_form_object
+      OpenStruct.new(from_shift_type_id: nil,
+                     to_shift_type_id: nil)
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(plant_resource_id: nil,
-                                    employment_type_id: nil,
-                                    start_hour: nil,
-                                    end_hour: nil,
-                                    day_night_or_custom: nil)
+      OpenStruct.new(plant_resource_id: nil,
+                     employment_type_id: nil,
+                     start_hour: nil,
+                     end_hour: nil,
+                     day_night_or_custom: nil)
     end
 
     private

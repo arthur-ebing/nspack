@@ -1,0 +1,5 @@
+== Shift Types
+
+Contract Workers can only ever belong to one shift type.
+
+Shift types Contract Worker Assignments are used solely for the Planning of shifts, therefore no reports will be derived from this setup. It is strictly temporary.

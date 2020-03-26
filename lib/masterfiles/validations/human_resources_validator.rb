@@ -48,6 +48,11 @@ module MasterfilesApp
         end_index = sub_cycle.find_index(end_hr)
         sub_cycle[0..end_index]
       end
+
+      def validate_shift_type_ids(params)
+        res = ShiftTypeIdsSchema.call(params)
+        res.messages.empty? ? res : validation_failed_response(res)
+      end
     end
   end
 end
