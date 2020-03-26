@@ -38,9 +38,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 1f7a991bbc73fe2b5d78bd4511acf2dd222df63f
+  revision: 90482d76c56c538f60bd25a87a535958357cd637
   specs:
-    roda-data_grid (0.3.0)
+    roda-data_grid (0.3.1)
       axlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -151,7 +151,7 @@ GEM
     parallel (1.17.0)
     parser (2.6.3.0)
       ast (~> 2.4.0)
-    pg (1.1.4)
+    pg (1.2.3)
     pg_query (1.1.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
@@ -181,7 +181,7 @@ GEM
       ffi (~> 1.0)
     rerun (0.13.0)
       listen (~> 3.0)
-    roda (3.29.0)
+    roda (3.30.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -204,9 +204,9 @@ GEM
     sassc (2.0.1)
       ffi (~> 1.9)
       rake
-    sequel (5.21.0)
-    sequel_pg (1.12.2)
-      pg (>= 0.18.0)
+    sequel (5.30.0)
+    sequel_pg (1.12.5)
+      pg (>= 0.18.0, != 1.2.0)
       sequel (>= 4.38.0)
     sequel_postgresql_triggers (1.5.0)
       sequel

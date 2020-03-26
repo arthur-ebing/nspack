@@ -28,7 +28,8 @@ DB.extension :pg_json
 Sequel.extension(:pg_json_ops)
 DB.extension :pg_hstore
 DB.extension :pg_inet
-Sequel.application_timezone = :localtime
+Sequel.application_timezone = :local
+Sequel.database_timezone = :utc
 
 Que.connection = DB
 Que.job_middleware.push(

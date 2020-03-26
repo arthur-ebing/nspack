@@ -1,9 +1,9 @@
 ---
 :caption: Pallet Bases
-:sql: SELECT "pallet_bases"."id", "pallet_bases"."pallet_base_code", "pallet_bases"."description", "pallet_bases"."length",
-  "pallet_bases"."width", "pallet_bases"."edi_in_pallet_base", "pallet_bases"."edi_out_pallet_base",
-  "pallet_bases"."cartons_per_layer", "pallet_bases"."material_mass", "pallet_bases"."active",
-  "pallet_bases"."created_at", "pallet_bases"."updated_at"
+:sql: SELECT "pallet_bases"."id", "pallet_bases"."pallet_base_code", "pallet_bases"."description",
+  "pallet_bases"."length", "pallet_bases"."width", "pallet_bases"."edi_in_pallet_base",
+  "pallet_bases"."edi_out_pallet_base", "pallet_bases"."cartons_per_layer", "pallet_bases"."material_mass",
+  "pallet_bases"."active", "pallet_bases"."created_at", "pallet_bases"."updated_at"
   FROM "pallet_bases"
 :limit: 
 :offset: 
@@ -142,9 +142,9 @@
     :sequence_no: 9
     :caption: Material mass
     :namespaced_name: pallet_bases.material_mass
-    :data_type: :string
+    :data_type: :number
     :width: 
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false

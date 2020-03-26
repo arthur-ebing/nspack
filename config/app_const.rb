@@ -145,7 +145,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
 
   # Default packing method
-  DEFAULT_PACKING_METHOD = ENV['DEFAULT_PACKING_METHOD']
+  DEFAULT_PACKING_METHOD = ENV.fetch('DEFAULT_PACKING_METHOD', 'NORMAL')
 
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'
