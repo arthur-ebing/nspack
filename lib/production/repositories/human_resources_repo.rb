@@ -56,7 +56,8 @@ module ProductionApp
       end_hr = shift_type.get(:end_hour)
 
       attrs[:start_date_time] = Time.parse("#{date} #{start_hr}")
-      attrs[:end_date_time] = Time.parse("#{date} #{end_hr}")
+      end_date = end_hr < start_hr ? date + 1 : date
+      attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr}")
       DB[:shifts].insert(attrs)
     end
   end
