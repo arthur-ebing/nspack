@@ -114,8 +114,8 @@ module ProductionApp
       attrs = find_hash(:production_runs, id).reject { |k, _| ignore_cols.include?(k) }
       new_id = create_production_run(attrs.merge(cloned_from_run_id: id))
       clone_alloc = <<~SQL
-        INSERT INTO product_resource_allocations(production_run_id, plant_resource_id, product_setup_id, label_template_id)
-        SELECT #{new_id}, plant_resource_id, product_setup_id, label_template_id
+        INSERT INTO product_resource_allocations(production_run_id, plant_resource_id, product_setup_id, label_template_id, packing_method_id)
+        SELECT #{new_id}, plant_resource_id, product_setup_id, label_template_id, packing_method_id
         FROM product_resource_allocations
         WHERE production_run_id = ?
       SQL
