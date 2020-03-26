@@ -143,7 +143,7 @@ module MasterfilesApp
       ).map { |r| { start_date_time: r[:start_date_time].strftime('%Y%m%d%H%M').to_i, end_date_time: r[:end_date_time].strftime('%Y%m%d%H%M').to_i } }
     end
 
-    def swop_employees(attrs)
+    def swap_employees(attrs)
       from_worker_ids = contract_worker_ids(attrs[:from_shift_type_id])
       to_worker_ids = contract_worker_ids(attrs[:to_shift_type_id])
 
@@ -156,17 +156,9 @@ module MasterfilesApp
       link_employees(attrs[:to_shift_type_id], from_worker_ids)
     end
 
-    def link_employees(shift_type_id, contract_worker_ids, link_ids = nil)
-      if link_ids
-        DB[:shift_types_contract_workers].where(ids: link_ids).delete
-      else
-        DB[:shift_types_contract_workers].where(contract_worker_id: contract_worker_ids).delete
-      end
+    def link_employees(shift_type_id, contract_worker_ids)
       # Contract workers can always only be assigned to one shift type
-      contract_worker_ids.each do |cw_id|
-        DB[:shift_types_contract_workers].insert(shift_type_id: shift_type_id, contract_worker_id: cw_id)
-        DB[:contract_workers].where(id: cw_id).update(shift_type_id: shift_type_id)
-      end
+      DB[:contract_workers].where(id: contract_worker_ids).update(shift_type_id: shift_type_id)
     end
 
     def contract_worker_ids(shift_type_id)

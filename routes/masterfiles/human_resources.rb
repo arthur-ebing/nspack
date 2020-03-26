@@ -334,15 +334,15 @@ class Nspack < Roda
     r.on 'shift_types' do
       interactor = MasterfilesApp::ShiftTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      r.on 'swop_employees' do
+      r.on 'swap_employees' do
         r.is do
           r.get do
             check_auth!('hr', 'new')
             set_last_grid_url('/list/shift_types', r)
-            show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::Swop.call(remote: fetch?(r)) }
+            show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::Swap.call(remote: fetch?(r)) }
           end
           r.post do
-            res = interactor.swop_employees(params[:shift_type])
+            res = interactor.swap_employees(params[:shift_type])
             flash[:notice] = res.message
             redirect_to_last_grid(r)
           end

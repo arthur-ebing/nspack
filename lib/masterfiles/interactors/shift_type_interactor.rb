@@ -32,19 +32,19 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def swop_employees(params) # rubocop:disable Metrics/AbcSize
+    def swap_employees(params) # rubocop:disable Metrics/AbcSize
       res = HumanResources::Validator.new.validate_shift_type_ids(params)
       return res unless res.messages.empty?
 
       from_st = shift_type(params[:from_shift_type_id])
       to_st = shift_type(params[:to_shift_type_id])
       repo.transaction do
-        repo.swop_employees(res)
-        log_status(:shift_types, params[:from_shift_type_id], 'SWOP EMPLOYEES')
-        log_status(:shift_types, params[:to_shift_type_id], 'SWOP EMPLOYEES')
+        repo.swap_employees(res)
+        log_status(:shift_types, params[:from_shift_type_id], 'SWAP EMPLOYEES')
+        log_status(:shift_types, params[:to_shift_type_id], 'SWAP EMPLOYEES')
         log_transaction
       end
-      success_response("Swopped Employees from #{from_st.shift_type_code} with #{to_st.shift_type_code}")
+      success_response("Swapped Employees from #{from_st.shift_type_code} with #{to_st.shift_type_code}")
     end
 
     def move_employees(params) # rubocop:disable Metrics/AbcSize

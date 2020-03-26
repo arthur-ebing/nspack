@@ -9,10 +9,10 @@ module UiRules
       apply_form_values
       add_behaviours
       common_values_for_fields case @mode
-                               when :swop
-                                 swop_fields
+                               when :swap
+                                 swap_fields
                                when :move
-                                 swop_fields
+                                 swap_fields
                                else
                                  common_fields
                                end
@@ -30,7 +30,7 @@ module UiRules
       fields[:shift_type_code] = { renderer: :label, with_value: @form_object.shift_type_code }
     end
 
-    def swop_fields
+    def swap_fields
       {
         from_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true },
         to_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true }
@@ -52,7 +52,7 @@ module UiRules
       @form_object = case @mode
                      when :new
                        make_new_form_object
-                     when :swop
+                     when :swap
                        make_shift_types_form_object
                      when :move
                        make_shift_types_form_object
