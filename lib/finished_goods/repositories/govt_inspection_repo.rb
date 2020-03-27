@@ -98,7 +98,7 @@ module FinishedGoodsApp
       ds = DB[:govt_inspection_pallets]
       ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
       ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
-      ds = ds.where(cancelled: false, completed: false, pallet_number: pallet_numbers)
+      ds = ds.where(cancelled: false, pallet_number: pallet_numbers)
       ds.select_map(:pallet_number)
     end
 
