@@ -18,6 +18,11 @@
   :is_delete: true
   :popup: true
   :hide_if_true: completed
+- :url: "/list/stock_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+  :text: sequences
+  :title: Pallet sequences for Pallet No $:pallet_number$
+  :icon: list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/inspection/govt_inspection_pallets/new"

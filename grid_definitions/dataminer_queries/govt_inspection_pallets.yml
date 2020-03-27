@@ -1,21 +1,21 @@
 ---
 :caption: Govt Inspection Pallets
-:sql: "SELECT\r\n    fn_current_status('pallets', pallets.id) AS status,\r\n    pallets.pallet_number,\r\n
-  \   govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
-  \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
-  \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
-  \   inspection_failure_reasons.failure_reason,\r\n    govt_inspection_pallets.failure_remarks,\r\n
-  \   govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
-  \   govt_inspection_pallets.updated_at,\r\n    govt_inspection_sheets.completed,\r\n
-  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    vw.gross_weight,\r\n
-  \   vw.carton_quantity,\r\n    vw.marketing_variety,\r\n    vw.packed_tm_group,\r\n
-  \   vw.pallet_base,\r\n    CASE\r\n        WHEN govt_inspection_pallets.inspected
+:sql: "SELECT DISTINCT\r\n    fn_current_status('pallets', pallets.id) AS status,\r\n
+  \   pallets.pallet_number,\r\n    govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n
+  \   govt_inspection_pallets.govt_inspection_sheet_id,\r\n    govt_inspection_pallets.passed,\r\n
+  \   govt_inspection_pallets.inspected,\r\n    govt_inspection_pallets.inspected_at,\r\n
+  \   govt_inspection_pallets.failure_reason_id,\r\n    inspection_failure_reasons.failure_reason,\r\n
+  \   govt_inspection_pallets.failure_remarks,\r\n    govt_inspection_pallets.active,\r\n
+  \   govt_inspection_pallets.created_at,\r\n    govt_inspection_pallets.updated_at,\r\n
+  \   govt_inspection_sheets.completed,\r\n    govt_inspection_sheets.inspected AS
+  sheet_inspected,\r\n    vw.gross_weight,\r\n    vw.pallet_carton_quantity,\r\n    vw.marketing_variety,\r\n
+  \   vw.packed_tm_group,\r\n    vw.pallet_base,\r\n    CASE\r\n        WHEN govt_inspection_pallets.inspected
   AND NOT govt_inspection_pallets.passed THEN 'error'\r\n        WHEN govt_inspection_pallets.passed
-  THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
+  THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
   govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
   JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nJOIN
   pallets on pallets.id = govt_inspection_pallets.pallet_id\r\nLEFT JOIN vw_pallet_sequence_flat
-  vw ON vw.pallet_id = pallets.id"
+  vw ON vw.pallet_id = pallets.id\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -295,11 +295,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  carton_quantity:
-    :name: carton_quantity
+  pallet_carton_quantity:
+    :name: pallet_carton_quantity
     :sequence_no: 18
-    :caption: Carton quantity
-    :namespaced_name: vw.carton_quantity
+    :caption: Pallet carton quantity
+    :namespaced_name: vw.pallet_carton_quantity
     :data_type: :number
     :width: 
     :format: 
