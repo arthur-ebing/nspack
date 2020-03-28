@@ -43,6 +43,7 @@ Pictoral overview of application.
 
 * link:/developer_documentation/grids.adoc[Grids]
 * link:/developer_documentation/grid_actions.adoc[Grid actions]
+* link:/developer_documentation/defining_a_grid_in_code.adoc[Defining a grid in code]
 
 ==== UI: pages
 

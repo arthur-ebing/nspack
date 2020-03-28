@@ -45,3 +45,21 @@ shipped_pallets:
 <7> _Optional_. If present, these settings will be used to email a copy of the output file.
 <8> _Optional_. If present, these conditions will be converted into a where clause for the extract.
 <9> Use `shipped_pallets.yml` **report** definition. _Required_. See point (1).
+
+== Elements
+
+=== Required elements
+
+grid:: The export will make use of this dataminer grid definition (name of the file without `.yml`). System looks in `grid_definitions/dataminer_queries` dir.
+report:: As for `grid`, but the `.yml` file will be loaded from `reports` dir.
+out_dir:: The full path to the directory where the output file is to be written.
+
+=== Optional elements
+
+export_hidden_fields:: Will be set to `false` if not specified. Typically a grid's hidden fields should not be exported. If you do want them as columns, set this to true.
+boolean_as_yn:: Will be set to `true` if not specified. When `true`, the column will show `Y` or `N`. When false the column will contain `true` and `false`.
+prefix_long_numbers_with_quote:: Will be set to `true` if not specified. Required when exporting a column of long digits to csv (e.g. a pallet number) in order to get a spreadsheet to treat the field as text. Outputs `'123456789012345` instead of just `123456789012345`.
+zip_for_mail:: If true, the output file will be zipped.
+email:: When present, these values are used to email the completed extract.
+conditions:: When present, these conditions will be applied to the dataminer report query.
+
