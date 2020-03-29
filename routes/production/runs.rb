@@ -508,6 +508,29 @@ class Nspack < Roda
       end
     end
 
+    r.on 'mix_pallet_rules' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'global' do
+        rule = interactor.find_pallet_mix_rules_by_scope(AppConst::GLOBAL_PALLET_MIX)
+        show_partial_or_page(r) { Production::Runs::PalletMixRule::Edit.call(rule[:id]) }
+      end
+    end
+
+    r.on 'pallet_mix_rules', Integer do |id|
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.patch do
+        res = interactor.update_pallet_mix_rule(id, params[:pallet_mix_rule])
+        if res.success
+          flash[:notice] = res.message
+          redirect_via_json('/production/runs/mix_pallet_rules/global')
+        else
+          re_show_form(r, res) { Production::Runs::PalletMixRule::Edit.call(id, form_values: params[:pallet_mix_rule], form_errors: res.errors) }
+        end
+      end
+    end
+
     r.on 'product_resource_allocations', Integer do |id|
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 

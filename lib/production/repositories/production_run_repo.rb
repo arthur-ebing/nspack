@@ -4,6 +4,7 @@ module ProductionApp
   class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
+    crud_calls_for :pallet_mix_rules, name: :pallet_mix_rule, wrapper: PalletMixRule
 
     def for_select_production_runs_for_line(production_line_id)
       query = <<~SQL
@@ -27,6 +28,10 @@ module ProductionApp
       SQL
       res = DB[query, id].first
       !res.nil? ? res[:rmt_delivery_id] : nil
+    end
+
+    def find_pallet_mix_rules_by_scope(scope)
+      DB[:pallet_mix_rules].where(scope: scope).first
     end
 
     def find_carton_by_carton_label_id(carton_label_id)

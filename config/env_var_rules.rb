@@ -17,6 +17,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_DAMAGED_BINS: 'not applicable to many clients.' },
     { CAPTURE_EMPTY_BINS: 'not applicable to many clients.' },
     { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'optional, not applicable to many clients.' },
+    { PALLET_MIX_RULES_SCOPE: 'a list of scope values for pallet_mix_rules.' },
+    { GLOBAL_PALLET_MIX: 'GLOBAL pallet_mix rule.' },
     { USE_PERMANENT_RMT_BIN_BARCODES: 'Capture deliveries with permanently barcoded bins.' },
     { CALCULATE_PALLET_DECK_POSITIONS: 'Works out deck position where pallet should go.' },
     { ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION: 'Determines if bins asset_numbers are auto generated or scanned in.' },

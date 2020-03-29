@@ -463,6 +463,25 @@ module ProductionApp
       repo.labeling_run_for_line(current_user.profile['packhouse_line_id'])
     end
 
+    def update_pallet_mix_rule(id, params)
+      res = validate_pallet_mix_rule_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_pallet_mix_rule(id, res)
+        log_transaction
+      end
+      instance = pallet_mix_rule(id)
+      success_response("Updated pallet mix rule #{instance.scope} successfully",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def find_pallet_mix_rules_by_scope(scope)
+      repo.find_pallet_mix_rules_by_scope(scope)
+    end
+
     private
 
     def repo
@@ -483,6 +502,14 @@ module ProductionApp
 
     def messcada_repo
       @messcada_repo ||= MesscadaApp::MesscadaRepo.new
+    end
+
+    def pallet_mix_rule(id)
+      repo.find_pallet_mix_rule(id)
+    end
+
+    def validate_pallet_mix_rule_params(params)
+      PalletMixRuleSchema.call(params)
     end
 
     def production_run(id)
