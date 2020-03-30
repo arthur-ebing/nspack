@@ -71,7 +71,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Constants for pallet movements:
   CALCULATE_PALLET_DECK_POSITIONS = make_boolean('CALCULATE_PALLET_DECK_POSITIONS')
-  PALLET_MIX_RULES_SCOPE = ENV['PALLET_MIX_RULES_SCOPE'].split(',')
+  PALLET_MIX_RULES_SCOPE = ENV.fetch('PALLET_MIX_RULES_SCOPE', '').split(',')
   GLOBAL_PALLET_MIX = 'GLOBAL'
 
   # Constants for pallet statuses:
