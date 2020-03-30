@@ -45,7 +45,8 @@ module UiRules
 
     def common_fields
       {
-        scope: { renderer: :label },
+        # scope: { renderer: :label },
+        scope: { readonly: true},
         # production_run_id: {},
         # pallet_id: {},
         allow_tm_mix: { renderer: :checkbox },
