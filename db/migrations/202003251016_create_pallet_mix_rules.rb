@@ -5,15 +5,15 @@ Sequel.migration do
     create_table(:pallet_mix_rules, ignore_index_errors: true) do
       primary_key :id
       String :scope
-      Integer :production_run_id
-      Integer :pallet_id
-      TrueClass :allow_tm_mix
-      TrueClass :allow_grade_mix
-      TrueClass :allow_size_ref_mix
-      TrueClass :allow_pack_mix
-      TrueClass :allow_std_count_mix
-      TrueClass :allow_mark_mix
-      TrueClass :allow_inventory_code_mix
+      foreign_key :production_run_id, :production_runs, type: :integer
+      foreign_key :pallet_id, :pallets, type: :integer
+      TrueClass :allow_tm_mix, default: false
+      TrueClass :allow_grade_mix, default: false
+      TrueClass :allow_size_ref_mix, default: false
+      TrueClass :allow_pack_mix, default: false
+      TrueClass :allow_std_count_mix, default: false
+      TrueClass :allow_mark_mix, default: false
+      TrueClass :allow_inventory_code_mix, default: false
     end
   end
 

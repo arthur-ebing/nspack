@@ -5,7 +5,7 @@ module ProductionApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    optional(:scope, Types::StrippedString).maybe(:str?)
+    required(:scope, Types::StrippedString).filled(:str?)
     optional(:production_run_id, :integer).maybe(:int?)
     optional(:pallet_id, :integer).maybe(:int?)
     optional(:allow_tm_mix, :bool).maybe(:bool?)
