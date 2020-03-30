@@ -45,7 +45,7 @@ module UiRules
 
     def common_fields
       {
-        scope: { readonly: true},
+        scope: { readonly: true },
         allow_tm_mix: { renderer: :checkbox },
         allow_grade_mix: { renderer: :checkbox },
         allow_size_ref_mix: { renderer: :checkbox },
