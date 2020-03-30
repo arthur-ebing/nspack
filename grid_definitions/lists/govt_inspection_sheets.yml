@@ -13,7 +13,7 @@
   :text: edit
   :icon: edit
   :title: Edit
-  :hide_if_true: completed
+  :hide_if_true: inspected
   :popup: true
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
   :text: delete
