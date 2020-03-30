@@ -12,3 +12,27 @@
   :icon: information-solid
   :title: Status
   :popup: true
+:captions:
+  :conditions:
+    :in_stock: In Stock Pallet Coldroom Locations
+    :allocated_stock: Allocated Pallet Coldroom Locations
+    :unallocated_stock: Unallocated Pallet Coldroom Locations
+:conditions:
+  :in_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+  :allocated_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: allocated
+      :op: =
+      :val: $:allocated$
+  :unallocated_stock:
+    - :col: in_stock
+      :op: =
+      :val: $:in_stock$
+    - :col: allocated
+      :op: =
+      :val: $:allocated$
