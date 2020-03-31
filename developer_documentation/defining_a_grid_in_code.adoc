@@ -161,20 +161,92 @@ mk.action_column do |act|
 end
 ----
 
-submenu:: todo..
-separator:: todo..
-link:: todo..
-popup_link:: todo..
-popup_view_link:: todo..
-view_link:: todo..
-popup_new_link:: todo..
-new_link:: todo..
-popup_edit_link:: todo..
-edit_link:: todo..
-popup_delete_link:: todo..
-delete_link:: todo..
+|===
+|Method |description |arguments
+
+|`submenu`
+|Build a submenu - you can use any of these action methods to build the menu within a block
+|text - the submenu caption
+
+|`separator`
+|Renders a separator line between two menu options
+|None
+
+|`link`
+|Present a link to a new page
+a|* text - the href caption
+* url - the URL to call
+* options - see below
+
+|`view_link`
+|Render a link with text `view` and a view icon
+a|* url - the URL to call
+* options - see below
+
+|`new_link`
+|Render a link with text `new` and a new icon
+a|* url - the URL to call
+* options - see below
+
+|`edit_link`
+|Render a link with text `edit` and a edit icon
+a|* url - the URL to call
+* options - see below
+
+|`delete_link`
+|Render a link with text `delete` that will prompt the user and a delete icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_link`
+|Present a link in a popup dialog
+a|* text - the href caption
+* url - the URL to call
+* options - see below
+
+|`popup_view_link`
+|Render a link in a popup dialog with text `view` and a view icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_new_link`
+|Render a link in a popup dialog with text `new` and a new icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_edit_link`
+|Render a link in a popup dialog with text `edit` and a edit icon
+a|* url - the URL to call
+* options - see below
+
+|`popup_delete_link`
+|Make a DELETE fetch request link with text `delete` that will prompt the user and a delete icon
+a|* url - the URL to call
+* options - see below
+
+|===
+
+==== Action method options
+
+* auth
+* has_permission
+* is_delete (set by delete links)
+* icon (set by view, new, edit and delete links)
+* prompt (set by delete links)
+* title
+* title_field
+* popup (set to true by all `popup_` methods)
+* loading_window
+* hide_if_null
+* hide_if_present
+* hide_if_true
+* hide_if_false
+
+See link:/developer_documentation/grid_actions.adoc#_actions[Grid Actions] for an explanation of these options.
 
 == Example
+
+Here is an example showing basic usage.
 
 === Route code
 
@@ -196,7 +268,9 @@ end
 [source,ruby]
 ----
 layout = Crossbeams::Layout::Page.build(rules) do |page|
-  page.add_grid('logged_actions', "/development/logging/logged_actions/#{id}/grid", caption: 'Column details')
+  page.add_grid('logged_actions',
+                "/development/logging/logged_actions/#{id}/grid",
+                caption: 'Column details')
 end
 ----
 
