@@ -26,7 +26,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { EDIT_BIN_RECEIVED_DATE: 'Allow a user to able to edit received_date_time' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
     { CAPTURE_PALLET_WEIGHT_AT_VERIFICATION: 'optional. Fill in the gross weight at pallet verification,' },
-    { PALLET_WEIGHT_REQUIRED_FOR_INSPECTION: 'optional.' },
+    { PALLET_WEIGHT_REQUIRED_FOR_INSPECTION: 'optional. Bool to set if weight is required' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },
@@ -61,7 +61,13 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DEFAULT_DELIVERY_LOCATION: 'The long code of the location to serve as the default for all deliveries. If not set, the location id will be blank, but bin moves will not work.' },
     { LOCATION_TYPES_COLD_BAY_DECK: 'The code for location types that serve as bays in cold storage. Default is "DECK"' },
     { GOVT_INSPECTION_SIGNEE_CAPTION: 'Inspection report - Signee caption - only needs to be set if it should not be "Packhouse manager"' },
-    { DEFAULT_PACKING_METHOD: 'Default packing method code for product resource allocations' }
+    { DEFAULT_PACKING_METHOD: 'Default packing method code for product resource allocations' },
+    { E_CERT_ENVIRONMENT: 'optional. eCert API Environment' },
+    { E_CERT_API_CLIENT_ID: 'optional. eCert API  Client ID' },
+    { E_CERT_API_CLIENT_SECRET: 'optional. eCert API Secret' },
+    { E_CERT_BUSINESS_ID: 'optional. eCert API Business ID' },
+    { E_CERT_BUSINESS_NAME: 'optional. eCert API Business Name' },
+    { E_CERT_INDUSTRY: 'optional. eCert API Industry' }
   ].freeze
 
   NO_OVERRIDE = [

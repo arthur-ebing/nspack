@@ -1,0 +1,296 @@
+---
+:caption: eCert Tracking Units
+:sql: "SELECT \r\n    ecert_tracking_units.id,\r\n    ecert_tracking_units.pallet_id,\r\n
+  \   ecert_tracking_units.ecert_agreement_id,\r\n    ecert_agreements.code AS agreement_code,\r\n
+  \   ecert_agreements.name AS agreement_name,\r\n    pallets.pallet_number,\r\n    ecert_tracking_units.elot_key,\r\n
+  \   ecert_tracking_units.verification_key,\r\n    ecert_tracking_units.passed,\r\n
+  \   ecert_tracking_units.process_result,\r\n    ecert_tracking_units.rejection_reasons,\r\n
+  \   ecert_tracking_units.business_id,\r\n    ecert_tracking_units.industry,\r\n
+  \   ecert_tracking_units.active,\r\n    ecert_tracking_units.created_at,\r\n    ecert_tracking_units.updated_at\r\n\r\nFROM
+  ecert_tracking_units\r\nJOIN ecert_agreements ON ecert_agreements.id = ecert_tracking_units.ecert_agreement_id\r\nJOIN
+  pallets ON pallets.id = ecert_tracking_units.pallet_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: ecert_tracking_units.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 2
+    :caption: Pallet
+    :namespaced_name: ecert_tracking_units.pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ecert_agreement_id:
+    :name: ecert_agreement_id
+    :sequence_no: 3
+    :caption: eCert agreement
+    :namespaced_name: ecert_tracking_units.ecert_agreement_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  agreement_code:
+    :name: agreement_code
+    :sequence_no: 4
+    :caption: Agreement code
+    :namespaced_name: ecert_agreements.code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  agreement_name:
+    :name: agreement_name
+    :sequence_no: 5
+    :caption: Agreement name
+    :namespaced_name: ecert_agreements.name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 6
+    :caption: Pallet number
+    :namespaced_name: pallets.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  elot_key:
+    :name: elot_key
+    :sequence_no: 7
+    :caption: Elot key
+    :namespaced_name: ecert_tracking_units.elot_key
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verification_key:
+    :name: verification_key
+    :sequence_no: 8
+    :caption: Verification key
+    :namespaced_name: ecert_tracking_units.verification_key
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 9
+    :caption: Passed
+    :namespaced_name: ecert_tracking_units.passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  process_result:
+    :name: process_result
+    :sequence_no: 10
+    :caption: Process result
+    :namespaced_name: ecert_tracking_units.process_result
+    :data_type: :string_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rejection_reasons:
+    :name: rejection_reasons
+    :sequence_no: 11
+    :caption: Rejection reasons
+    :namespaced_name: ecert_tracking_units.rejection_reasons
+    :data_type: :string_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  business_id:
+    :name: business_id
+    :sequence_no: 12
+    :caption: Business
+    :namespaced_name: ecert_tracking_units.business_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  industry:
+    :name: industry
+    :sequence_no: 13
+    :caption: Industry
+    :namespaced_name: ecert_tracking_units.industry
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 14
+    :caption: Active
+    :namespaced_name: ecert_tracking_units.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 15
+    :caption: Created at
+    :namespaced_name: ecert_tracking_units.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 16
+    :caption: Updated at
+    :namespaced_name: ecert_tracking_units.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: ecert_tracking_units.pallet_id
+  :caption: Pallet
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pallet_number, id FROM pallets ORDER BY pallet_number
+- :column: ecert_tracking_units.ecert_agreement_id
+  :caption: Ecert agreement
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT code, id FROM ecert_agreements ORDER BY code
+- :column: ecert_tracking_units.business_id
+  :caption: Business
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

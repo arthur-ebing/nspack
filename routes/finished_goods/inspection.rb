@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'inspection', 'finished_goods' do |r|
     # GOVT INSPECTION SHEETS
     # --------------------------------------------------------------------------
@@ -297,3 +298,4 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   end
 end
 # rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/ClassLength

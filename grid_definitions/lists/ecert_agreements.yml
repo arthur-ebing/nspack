@@ -1,0 +1,19 @@
+---
+:dataminer_definition: ecert_agreements
+:actions:
+- :url: "/finished_goods/ecert/ecert_agreements/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/ecert_agreements/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/ecert/ecert_agreements/update_agreements"
+  :text: Update eCert Agreements
+  :style: :button

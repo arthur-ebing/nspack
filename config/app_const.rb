@@ -418,7 +418,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
   PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
   PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
-
   PHYT_CLEAN_PASSED = %w[TRUE true t approved].freeze
   PHYT_CLEAN_ATTRIBUTES = %i[cbs applied eu bd verified fms b phytoData].freeze
+
+  # eCert
+  E_CERT_ENVIRONMENT = { QA: 'http://qa.', PRODUCTION: 'http://app.' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]
+  E_CERT_API_CLIENT_ID = ENV['E_CERT_API_CLIENT_ID']
+  E_CERT_API_CLIENT_SECRET = ENV['E_CERT_API_CLIENT_SECRET']
+  E_CERT_BUSINESS_ID = ENV['E_CERT_BUSINESS_ID']
+  E_CERT_BUSINESS_NAME = ENV['E_CERT_API_CLIENT_SECRET']
+  E_CERT_INDUSTRY = ENV['E_CERT_INDUSTRY']
 end

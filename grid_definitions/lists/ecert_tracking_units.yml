@@ -1,0 +1,19 @@
+---
+:dataminer_definition: ecert_tracking_units
+:actions:
+- :url: "/finished_goods/ecert/ecert_tracking_units/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/ecert_tracking_units/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/ecert/ecert_tracking_units/new"
+  :text: New eCert eLot
+  :style: :button
