@@ -8,7 +8,7 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'govt_inspection_sheets', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
+      repo = BaseRepo.new
       r.on !interactor.exists?(:govt_inspection_sheets, id) do
         handle_not_found(r)
       end
@@ -32,6 +32,13 @@ class Nspack < Roda
             end
           end
         end
+      end
+
+      r.on 'pre_verify' do
+        check_auth!('inspection', 'edit')
+        pallet_ids = repo.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
+        pallet_list = repo.select_values(:pallets, :pallet_number, id: pallet_ids).join("\n")
+        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r), form_values: { pallet_list: pallet_list }) }
       end
 
       r.on 'edit' do   # EDIT

@@ -15,6 +15,11 @@
   :title: Edit
   :hide_if_true: inspected
   :popup: true
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/pre_verify"
+  :text: eCert pre-verify
+  :icon: check-square
+  :hide_if_false: completed
+  :hide_if_true: inspected
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
   :text: delete
   :icon: delete
