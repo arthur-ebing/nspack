@@ -58,15 +58,7 @@ module FinishedGoodsApp
     end
 
     def save_to_yaml(payload)
-      begin
-        YAML.load_file('tmp/eCert_store.yml')
-      rescue Errno::ENOENT
-        File.open('tmp/eCert_store.yml', 'w') { |file| file.write([].to_yaml) }
-      end
-
-      File.open('tmp/eCert_store.yml', 'w') do |file|
-        file.write(payload.to_yaml)
-      end
+      File.open('tmp/eCert_store.yml', 'w') { |f| f << payload.to_yaml }
     end
   end
 end

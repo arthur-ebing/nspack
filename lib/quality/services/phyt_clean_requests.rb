@@ -20,9 +20,10 @@ module QualityApp
       message = 'Data cannot be retrieved as it is out of the valid querying period'
       return failed_response(message) if res.instance.first['notificationMessage'] == message
 
-      save_to_yaml
+      @response = res.instance
+      save_to_yaml(response)
 
-      api.filter_phyt_clean_response(res.instance).each do |api_result|
+      api.filter_phyt_clean_response(response).each do |api_result|
         parse_record(api_result)
       end
 
@@ -74,16 +75,8 @@ module QualityApp
       end
     end
 
-    def save_to_yaml
-      begin
-        YAML.load_file('tmp/otmc_store.yml')
-      rescue Errno::ENOENT
-        File.open('tmp/otmc_store.yml', 'w') { |file| file.write([].to_yaml) }
-      end
-
-      File.open('tmp/otmc_store.yml', 'w') do |file|
-        file.write(response.to_yaml)
-      end
+    def save_to_yaml(payload)
+      File.open('tmp/otmc_store.yml', 'w') { |f| f << payload.to_yaml }
     end
   end
 end
