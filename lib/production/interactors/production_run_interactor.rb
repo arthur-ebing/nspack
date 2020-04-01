@@ -81,6 +81,8 @@ module ProductionApp
       pallet = find_pallet_by_pallet_number(pallet_number)
       return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
       return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
+      return failed_response("Scanned Pallet:#{pallet_number} has been shipped") if pallet[:shipped]
+      return failed_response("Scanned Pallet:#{pallet_number} has been scrapped") if pallet[:scrapped]
 
       ok_response
     rescue Crossbeams::InfoError => e
