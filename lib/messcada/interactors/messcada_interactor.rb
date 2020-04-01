@@ -200,13 +200,14 @@ module MesscadaApp
       repo.find_pallet_sequence_attrs(id)
     end
 
-    def verify_pallet_sequence(pallet_sequence_id, params) # rubocop:disable Metrics/AbcSize
+    def verify_pallet_sequence(pallet_sequence_id, verified_by, params) # rubocop:disable Metrics/AbcSize
       return validation_failed_response(messages: { verification_failure_reason: ['is missing'] }) if params[:verification_result] == 'failed' && params[:verification_failure_reason].nil_or_empty?
 
       pallet_id = get_pallet_sequence_pallet_id(pallet_sequence_id)
       changeset = pallet_changes_on_verify(params)
 
       repo.transaction do
+        params.store(:verified_by, verified_by[:id])
         update_pallet_sequence_verification_result(pallet_sequence_id, params)
 
         repo.update_pallet(pallet_id, changeset) unless changeset.empty?
