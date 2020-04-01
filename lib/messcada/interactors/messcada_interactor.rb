@@ -207,7 +207,7 @@ module MesscadaApp
       changeset = pallet_changes_on_verify(params)
 
       repo.transaction do
-        params.store(:verified_by, verified_by[:id])
+        params.store(:verified_by, verified_by[:user_name])
         update_pallet_sequence_verification_result(pallet_sequence_id, params)
 
         repo.update_pallet(pallet_id, changeset) unless changeset.empty?
