@@ -27,7 +27,7 @@ module MesscadaApp
 
     def validate_pallet_mix_rules(new_sequence) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       oldest_sequence = repo.get_oldest_pallet_sequence(pallet_id)
-      ok_response unless oldest_sequence
+      return ok_response unless oldest_sequence
 
       rule = ProductionApp::ProductionRunRepo.new.find_pallet_mix_rules_by_scope(AppConst::GLOBAL_PALLET_MIX)
       return failed_response("Pallet tm_group:#{oldest_sequence[:target_market_group_name]}. You are adding a sequence with tm_group: #{repo.get(:target_market_groups, new_sequence[:packed_tm_group_id], :target_market_group_name)} . Mixing is not allowed") if !rule[:allow_tm_mix] && (new_sequence[:packed_tm_group_id] != oldest_sequence[:packed_tm_group_id])
