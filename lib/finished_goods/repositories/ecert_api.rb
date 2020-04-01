@@ -28,13 +28,15 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot_preverify(url, body)
+    def elot_preverify(url, params)
       http = Crossbeams::HTTPCalls.new(false, open_timeout: 30, read_timeout: 60)
 
-      res = http.json_post(url, body, headers)
+      res = http.json_post(url, params, headers)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
+      save_to_yaml(url: url, params: params, response: instance)
+
       success_response('Posted Pre-verification', instance)
     end
 
@@ -53,6 +55,18 @@ module FinishedGoodsApp
       end
 
       success_response('Received Agreements', instance)
+    end
+
+    def save_to_yaml(payload)
+      begin
+        YAML.load_file('tmp/eCert_store.yml')
+      rescue Errno::ENOENT
+        File.open('tmp/eCert_store.yml', 'w') { |file| file.write([].to_yaml) }
+      end
+
+      File.open('tmp/eCert_store.yml', 'w') do |file|
+        file.write(payload.to_yaml)
+      end
     end
   end
 end

@@ -132,7 +132,7 @@ module FinishedGoodsApp
                                Reference1: nil,
                                Reference2: nil,
                                ExportDate: nil,
-                               Weight: pallet[:nett_weight],
+                               Weight: pallet[:nett_weight].to_f,
                                WeightUnitCode: 'KG',
                                NumberOfPackageItems: pallet[:carton_quantity],
                                TrackingUnitDetails: compile_preverify_pallet_sequences(pallet_number) }
@@ -140,7 +140,7 @@ module FinishedGoodsApp
       preverify_pallets
     end
 
-    def compile_preverify_pallet_sequences(pallet_number)
+    def compile_preverify_pallet_sequences(pallet_number) # rubocop:disable Metrics/AbcSize
       preverify_pallet_sequences = []
       pallet_sequences = repo.find_pallet_sequences_by_pallet_number(pallet_number)
       pallet_sequences.each do |pallet_sequence|
@@ -153,7 +153,7 @@ module FinishedGoodsApp
                                         ClassCategory: pallet_sequence[:grade],
                                         NumberOfPackagedItems: pallet_sequence[:carton_quantity],
                                         PackageType: 'CT',
-                                        Weight: pallet_sequence[:sequence_nett_weight],
+                                        Weight: pallet_sequence[:sequence_nett_weight].to_f,
                                         WeightUnitCode: 'KG',
                                         TrackingUnitLocation: nil,
                                         TrackingUnitOrigin: pallet_sequence[:production_region] }
