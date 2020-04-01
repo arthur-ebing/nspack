@@ -25,8 +25,8 @@
   \  extended_columns,\r\n   seq_scrapped_at in_stock,\r\n   billing_client,\r\n   depot_pallet,\r\n
   \  edi_in_file,\r\n   edi_in_consignment_note_number,\r\n   packed_at,\r\n   packed_date,\r\n
   \  packed_week,\r\n   repacked,\r\n   repacked_at,\r\n   repacked_from_pallet_id,\r\n
-  \  colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER BY pallet_sequence_number
-  DESC"
+  \   created_by,\r\n    verified_by,\r\n   colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1831,9 +1831,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 113
+    :caption: Created by
+    :namespaced_name: created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_by:
+    :name: verified_by
+    :sequence_no: 114
+    :caption: Verified by
+    :namespaced_name: verified_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 113
+    :sequence_no: 115
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
