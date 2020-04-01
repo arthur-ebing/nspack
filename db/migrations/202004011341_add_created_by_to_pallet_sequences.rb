@@ -1,8 +1,8 @@
 Sequel.migration do
   up do
     alter_table(:pallet_sequences) do
-      add_foreign_key :created_by, :users, type: :integer
-      add_foreign_key :verified_by, :users, type: :integer
+      add_column :created_by, String
+      add_column :verified_by, String
     end
   end
 
