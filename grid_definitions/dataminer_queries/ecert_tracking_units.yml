@@ -6,11 +6,13 @@
   \   ecert_tracking_units.verification_key,\r\n    ecert_tracking_units.passed,\r\n
   \   ecert_tracking_units.process_result,\r\n    ecert_tracking_units.rejection_reasons,\r\n
   \   ecert_tracking_units.business_id,\r\n    ecert_tracking_units.industry,\r\n
-  \   ecert_tracking_units.active,\r\n    ecert_tracking_units.created_at,\r\n    ecert_tracking_units.updated_at,\r\n
+  \   govt_inspection_pallets.govt_inspection_sheet_id AS inspection_sheet,\r\n    ecert_tracking_units.active,\r\n
+  \   ecert_tracking_units.created_at,\r\n    ecert_tracking_units.updated_at,\r\n
   \   CASE\r\n        WHEN ecert_tracking_units.passed THEN NULL\r\n        ELSE  'error'
   \r\n    END AS colour_rule\r\n\r\nFROM ecert_tracking_units\r\nJOIN ecert_agreements
   ON ecert_agreements.id = ecert_tracking_units.ecert_agreement_id\r\nJOIN pallets
-  ON pallets.id = ecert_tracking_units.pallet_id"
+  ON pallets.id = ecert_tracking_units.pallet_id\r\nLEFT JOIN govt_inspection_pallets
+  ON ecert_tracking_units.pallet_id = govt_inspection_pallets.pallet_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -225,9 +227,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  inspection_sheet:
+    :name: inspection_sheet
+    :sequence_no: 14
+    :caption: Inspection sheet
+    :namespaced_name: govt_inspection_pallets.govt_inspection_sheet_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Active
     :namespaced_name: ecert_tracking_units.active
     :data_type: :boolean
@@ -243,7 +261,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: ecert_tracking_units.created_at
     :data_type: :datetime
@@ -259,7 +277,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: ecert_tracking_units.updated_at
     :data_type: :datetime
@@ -275,7 +293,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
