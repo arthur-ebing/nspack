@@ -185,13 +185,15 @@ class Nspack < Roda
       end
 
       r.on 'get_stock', String do |type|
+        r.on 'grid' do
+          interactor.location_view_stock_grid(id, type)
+
+        rescue StandardError => e
+          show_json_exception(e)
+        end
+
         r.get do
-          res = interactor.find_location_children(id)
-          if type == 'pallets'
-            r.redirect "/list/all_pallets/with_params?key=location_pallets&location_ids=#{res.instance}"
-          elsif type == 'bins'
-            r.redirect "/list/rmt_bins/with_params?key=location_bins&location_ids=#{res.instance}"
-          end
+          show_page { Masterfiles::Locations::Location::ViewStock.call(id, type, back_url: back_button_url) }
         end
       end
 

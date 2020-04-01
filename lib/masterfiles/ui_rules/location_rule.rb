@@ -2,7 +2,7 @@
 
 module UiRules
   class LocationRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = MasterfilesApp::LocationRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       make_form_object
@@ -12,6 +12,7 @@ module UiRules
 
       set_show_fields if @mode == :show
       set_print_fields if @mode == :print_barcode
+      make_location_header_table if %i[view_stock].include? @mode
 
       add_behaviours if @options[:id]
       disable_can_be_moved
@@ -184,6 +185,16 @@ module UiRules
 
     def location_type_label
       @repo.find_hash(:location_types, @form_object[:location_type_id])[:location_type_code]
+    end
+
+    def make_location_header_table(columns = nil, display_columns = 2)
+      compact_header(columns: columns || %i[location_long_code location_description location_short_code
+                                            print_code has_single_container virtual_location consumption_area can_store_stock],
+                     display_columns: display_columns,
+                     header_captions: {
+                       primary_storage_type_id: 'Primary Storage Type',
+                       location_type_id: 'Location Type'
+                     })
     end
   end
 end

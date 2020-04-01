@@ -229,6 +229,16 @@ module MasterfilesApp
       success_response('ok', location_children)
     end
 
+    def location_view_stock_grid(location_id, type)
+      col_defs = stock_grid_col_defs(type)
+      row_defs = repo.find_location_stock(location_id, type)
+
+      {
+        columnDefs: col_defs,
+        rowDefs: row_defs
+      }.to_json
+    end
+
     private
 
     def repo
@@ -265,6 +275,83 @@ module MasterfilesApp
 
     def validate_location_storage_type_params(params)
       LocationStorageTypeSchema.call(params)
+    end
+
+    def stock_grid_col_defs(type)  # rubocop:disable Metrics/AbcSize
+      col_names = stock_grid_col_names(type)
+
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          make_actions_for(type).each do |action|
+            act.popup_link action[:text],
+                           action[:url],
+                           col1: action[:col1],
+                           icon: action[:icon],
+                           title: action[:title]
+          end
+        end
+
+        make_columns_for(col_names).each do |col|
+          mk.col col[:field], col[:options][:caption], col[:options]
+        end
+      end
+    end
+
+    def stock_grid_col_names(type)
+      file = if type == 'pallets'
+               'grid_definitions/dataminer_queries/all_pallets.yml'
+             else
+               'grid_definitions/dataminer_queries/rmt_bins.yml'
+             end
+      persistor = Crossbeams::Dataminer::YamlPersistor.new(file)
+      rpt = Crossbeams::Dataminer::Report.load(persistor)
+      rpt.columns
+    end
+
+    def make_actions_for(type)
+      if type == 'pallets'
+        actions_for_pallets_grid
+      else
+        actions_for_rmt_bins_grid
+      end
+    end
+
+    def actions_for_pallets_grid
+      [{
+        text: 'sequences',
+        url: '/list/pallet_sequences/with_params?key=standard&pallet_id=$col1$',
+        col1: 'pallet_id',
+        icon: 'list',
+        title: 'Pallet sequences'
+      }, {
+        text: 'status',
+        url: '/development/statuses/list/pallets/$col1$',
+        col1: 'pallet_id',
+        icon: 'information-solid',
+        title: 'Status'
+      }]
+    end
+
+    def actions_for_rmt_bins_grid
+      [{
+        text: 'view',
+        url: '/raw_materials/deliveries/rmt_bins/$col1$',
+        col1: 'id',
+        icon: 'view-show',
+        title: 'View'
+      }]
+    end
+
+    def make_columns_for(col_names)
+      cols = []
+      col_names.each { |name, column_def| cols << col_with_attrs(name, column_def) }
+      cols
+    end
+
+    def col_with_attrs(name, column_def)
+      col = { field: name }
+      opts = column_def.to_hash
+      col.merge(options: opts)
     end
   end
 end

@@ -357,6 +357,15 @@ module MasterfilesApp
       success_response('ok', code)
     end
 
+    def find_location_stock(location_id, type)
+      query = if type == 'pallets'
+                location_stock_query_for_pallets
+              else
+                location_stock_query_for_bins
+              end
+      DB[query, location_id].all
+    end
+
     private
 
     def sql_for_missing_str_values(values, table, column)
@@ -368,6 +377,55 @@ module MasterfilesApp
         FROM v
           LEFT JOIN #{table} i ON i.#{column} = v.code
         WHERE i.id is null;
+      SQL
+    end
+
+    def location_stock_query_for_pallets
+      <<~SQL
+         SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number, location,
+          carton_quantity, pallet_carton_quantity, pallet_size, pallet_age, stock_age, cold_age, ambient_age,
+          pack_to_inspect_age, inspect_to_cold_age, inspect_to_exit_warm_age, created_at, first_cold_storage_at,
+          stock_created_at, palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at,
+          verified_at, allocated, shipped, in_stock, inspected, inspection_date, palletized, production_run_id,
+          farm, farm_group, puc, orchard, commodity, cultivar, marketing_variety, grade, std_size,
+          actual_count, size_ref, std_pack, std_ctns, packed_tm_group, mark, inventory_code, fruit_sticker,
+          fruit_sticker_2, marketing_org, pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight,
+          basic_pack, packhouse, line, pick_ref, phc, sell_by_code, product_chars, verification_result,
+          scrapped_at, scrapped, partially_palletized, reinspected, verified, verification_passed, status,
+          build_status, load_id, vessel, voyage, container, internal_container, temp_code, vehicle_number,
+          cooled, pol, pod, final_destination, inspected_dest_country, customer, consignee, final_receiver,
+          exporter, country, region, arrival_date, departure_date, pallet_verification_failed,
+          verification_failure_reason, scanned_carton, cpp, bom, client_size_ref, treatments, order_number,
+          pm_type, pm_subtype, cultivar_group, season, customer_variety, plt_packhouse, plt_line, exit_ref,
+          seq_exit_ref, gross_weight_measured_at, partially_palletized_at, govt_inspection_passed,
+          internal_inspection_passed, inspection_age, internal_inspection_at, internal_reinspection_at,
+          intake_created_at, active, temp_tail, extended_columns, seq_scrapped_at, depot_pallet, edi_in_file,
+          edi_in_consignment_note_number, govt_inspection_sheet_id, addendum_manifest, packed_at, packed_date,
+          packed_week, repacked, repacked_at, repacked_date, repacked_from_pallet_id, failed_otmc_results,
+          failed_otmc, CASE WHEN fn_pallet_verification_failed(pallet_id) THEN 'error' ELSE colour_rule END AS colour_rule
+        FROM vw_pallet_sequence_flat
+        JOIN tree_locations ON tree_locations.descendant_location_id = vw_pallet_sequence_flat.location_id
+        WHERE NOT shipped AND NOT scrapped AND tree_locations.ancestor_location_id = ?
+        ORDER BY pallet_id, pallet_number DESC
+      SQL
+    end
+
+    def location_stock_query_for_bins
+      <<~SQL
+        SELECT DISTINCT ON (id) id, rmt_delivery_id, season_id, discrete_bin, cultivar_id, orchard_id, farm_id, rmt_class_id,
+          rmt_container_type_id, rmt_container_material_type_id, cultivar_group_id, puc_id, exit_ref, qty_bins,
+          bin_asset_number, tipped_asset_number, rmt_inner_container_type_id, rmt_inner_container_material_id,
+          qty_inner_bins, production_run_rebin_id, production_run_tipped_id, bin_tipping_plant_resource_id,
+          bin_fullness, nett_weight, gross_weight, active, bin_tipped, created_at, updated_at, date_picked,
+          bin_received_date, bin_received_date_time, bin_tipped_date, bin_tipped_date_time, exit_ref_date,
+          exit_ref_date_time, rebin_created_at, scrapped, scrapped_at, cultivar_group_code, cultivar_name,
+          cultivar_description, farm_group_code, farm_code, orchard_code, puc_code, rmt_class_code,
+          location_long_code, container_material_type_code, container_type_code, rmt_delivery_truck_registration_number,
+          season_code, colour_rule, status
+        FROM vw_bins
+        JOIN tree_locations ON tree_locations.descendant_location_id = vw_bins.location_id
+        WHERE NOT scrapped AND null_exit_ref AND tree_locations.ancestor_location_id = ?
+        ORDER BY id DESC
       SQL
     end
   end
