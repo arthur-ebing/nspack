@@ -95,12 +95,6 @@ module FinishedGoodsApp
       response['Data'].each do |tracking_unit|
         pallet_id = repo.get_id(:pallets, pallet_number: tracking_unit['TrackingUnitID'])
         id = repo.get_id(:ecert_tracking_units, pallet_id: pallet_id)
-
-        # process_result = tracking_unit['ProcessResult'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['ProcessResult'])
-        # rejection_reasons = tracking_unit['RejectionReasons'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['RejectionReasons'])
-        process_result = repo.array_of_text_for_db_col(tracking_unit['ProcessResult'])
-        rejection_reasons = repo.array_of_text_for_db_col(tracking_unit['RejectionReasons'])
-
         attrs = { ecert_agreement_id: agreement_id,
                   business_id: business_id,
                   industry: industry,
@@ -108,8 +102,8 @@ module FinishedGoodsApp
                   elot_key: response['eLotKey'],
                   passed: %w[Passed TRUE].include?(tracking_unit['ProcessStatus']),
                   verification_key: tracking_unit['VerificationKey'],
-                  process_result: process_result,
-                  rejection_reasons: rejection_reasons }
+                  process_result: repo.array_of_text_for_db_col(tracking_unit['ProcessResult']),
+                  rejection_reasons: repo.array_of_text_for_db_col(tracking_unit['RejectionReasons']) }
         id.nil? ? repo.create(:ecert_tracking_units, attrs) : repo.update(:ecert_tracking_units, id, attrs)
       end
       ok_response
