@@ -100,10 +100,12 @@ module MesscadaApp
     def search_cache_files
       cache_files = File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, 'line_*.yml')
       Dir.glob(cache_files).each do |f|
-        if File.file?(f)
-          file_data = YAML.load_file(f)
-          return file_data[resource_code] unless file_data.empty? || file_data[resource_code].nil?
-        end
+        next unless File.file?(f)
+
+        file_data = YAML.load_file(f)
+        next unless file_data
+
+        return file_data[resource_code] unless file_data.empty? || file_data[resource_code].nil?
       end
 
       {}
