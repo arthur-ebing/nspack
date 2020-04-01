@@ -22,7 +22,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+    def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       pallet = find_pallet_by_pallet_number(pallet_number)
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
