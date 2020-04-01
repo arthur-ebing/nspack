@@ -81,7 +81,7 @@ module MesscadaApp
     end
 
     def create_pallet_sequence
-      res = NewPalletSequence.new(carton_id, pallet, carton_quantity).call
+      res = NewPalletSequence.new(user_name, carton_id, pallet, carton_quantity).call
       return res unless res.success
 
       ok_response

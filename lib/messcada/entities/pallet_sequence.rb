@@ -50,5 +50,7 @@ module MesscadaApp
     attribute :pick_ref, Types::String
     attribute? :active, Types::Bool
     attribute :grade_id, Types::Integer
+    attribute :verified_by, Types::String
+    attribute :created_by, Types::String
   end
 end

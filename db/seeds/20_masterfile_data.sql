@@ -95,6 +95,7 @@ INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHO
 INSERT INTO business_processes(process, description) VALUES('MOVE_BIN', 'ADHOC RMT individual Bin movements') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('LOAD_SHIPPED', 'Load truck pallets shipped') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('REWORKS_MOVE_BIN', 'Reworks Bin movements') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('FIRST_INTAKE', 'Inter Warehouse intake') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;

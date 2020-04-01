@@ -2,12 +2,13 @@
 
 module MesscadaApp
   class NewPalletSequenceObject < BaseService
-    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet
+    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet, :user_name
 
-    def initialize(carton_id, carton_quantity)
+    def initialize(user_name, carton_id, carton_quantity)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
       @repo = MesscadaApp::MesscadaRepo.new
+      @user_name = user_name
     end
 
     def call
@@ -21,6 +22,7 @@ module MesscadaApp
 
     def make_pallet_sequence_object  # rubocop:disable Metrics/AbcSize
       attrs = pallet_sequence_carton_params.to_h.merge(pallet_sequence_pallet_params).to_h
+      attrs = attrs.merge(created_by: user_name).to_h
       res = validate_pallet_sequence_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 

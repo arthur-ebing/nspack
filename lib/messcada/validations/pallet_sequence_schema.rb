@@ -61,6 +61,8 @@ module MesscadaApp
     optional(:removed_from_pallet, :bool).maybe(:bool?)
     optional(:removed_from_pallet_at, %i[nil time]).maybe(:time?)
     optional(:removed_from_pallet_id, :integer).maybe(:int?)
+    optional(:verified_by, Types::StrippedString).maybe(:str?)
+    optional(:created_by, Types::StrippedString).maybe(:str?)
 
     validate(fruit_size_reference_or_fruit_actual_count: %i[fruit_size_reference_id fruit_actual_counts_for_pack_id]) do |fruit_size_reference_id, fruit_actual_counts_for_pack_id|
       fruit_size_reference_id || fruit_actual_counts_for_pack_id

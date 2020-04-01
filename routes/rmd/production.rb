@@ -403,7 +403,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           end
         end
 
-        res = interactor.add_sequence_to_pallet(pallet_number, carton_id, params[:pallet][:carton_quantity])
+        res = interactor.add_sequence_to_pallet(current_user&.user_name, pallet_number, carton_id, params[:pallet][:carton_quantity])
         if res.success
           pallet_sequences = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
                                                             .find_pallet_sequences_by_pallet_number(pallet_number)

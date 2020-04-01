@@ -22,7 +22,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def add_sequence_to_pallet(pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+    def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize
       pallet = find_pallet_by_pallet_number(pallet_number)
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
@@ -33,7 +33,7 @@ module ProductionApp
 
       res = nil
       repo.transaction do
-        res = MesscadaApp::AddSequenceToPallet.new(carton_id, pallet[:id], carton_quantity).call
+        res = MesscadaApp::AddSequenceToPallet.new(user_name, carton_id, pallet[:id], carton_quantity).call
         log_transaction
       end
       res
