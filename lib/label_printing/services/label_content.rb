@@ -16,7 +16,7 @@ module LabelPrintingApp
     end
 
     def current_date
-      Date.today.strftime('%Y-%m-%d')
+      (@supporting_data[:packed_date] || Date.today).strftime('%Y-%m-%d')
     end
 
     private
