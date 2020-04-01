@@ -6,8 +6,8 @@ Sequel.migration do
     # -- ecert_tracking_units
     create_table(:ecert_tracking_units, ignore_index_errors: true) do
       primary_key :id
-      foreign_key :pallet_id, :pallets, null: false, key: [:id]
-      foreign_key :ecert_agreement_id, :ecert_agreements, null: false, key: [:id]
+      foreign_key :pallet_id, :pallets, null: false
+      foreign_key :ecert_agreement_id, :ecert_agreements, null: false
       Integer :business_id, null: false
       String :industry, null: false
       String :elot_key

@@ -80,6 +80,8 @@ module FinishedGoodsApp
       return ok_response if update_units.empty?
 
       res = api.elot_preverify(url, compile_preverify_pallets(update_units))
+      return failed_response(res.message) unless res.success
+
       response = res.instance
       if response['IsSuccessful']
         save_response(response)
@@ -93,15 +95,19 @@ module FinishedGoodsApp
       response['Data'].each do |tracking_unit|
         pallet_id = repo.get_id(:pallets, pallet_number: tracking_unit['TrackingUnitID'])
         id = repo.get_id(:ecert_tracking_units, pallet_id: pallet_id)
+
+        process_result = tracking_unit['ProcessResult'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['ProcessResult'])
+        rejection_reasons = tracking_unit['RejectionReasons'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['RejectionReasons'])
+
         attrs = { ecert_agreement_id: agreement_id,
                   business_id: business_id,
                   industry: industry,
                   pallet_id: pallet_id,
                   elot_key: response['eLotKey'],
-                  passed: tracking_unit['ProcessStatus'] == 'Passed',
+                  passed: %w[Passed TRUE].include?(tracking_unit['ProcessStatus']),
                   verification_key: tracking_unit['VerificationKey'],
-                  process_result: tracking_unit['ProcessResult'],
-                  rejection_reasons: tracking_unit['RejectionReasons'] }
+                  process_result: process_result,
+                  rejection_reasons: rejection_reasons }
         id.nil? ? repo.create(:ecert_tracking_units, attrs) : repo.update(:ecert_tracking_units, id, attrs)
       end
       ok_response
@@ -121,14 +127,14 @@ module FinishedGoodsApp
     def compile_preverify_pallets(pallet_numbers)
       preverify_pallets = []
       pallet_numbers.each do |pallet_number|
-        pallet = repo.find_pallet_sequences_by_pallet_number(pallet_number).first || {}
+        pallet = repo.where_hash(:pallets, pallet_number: pallet_number) || {}
         preverify_pallets << { TrackingUnitID: pallet_number,
                                Reference1: nil,
                                Reference2: nil,
                                ExportDate: nil,
                                Weight: pallet[:nett_weight],
                                WeightUnitCode: 'KG',
-                               NumberOfPackageItems: pallet[:pallet_carton_quantity],
+                               NumberOfPackageItems: pallet[:carton_quantity],
                                TrackingUnitDetails: compile_preverify_pallet_sequences(pallet_number) }
       end
       preverify_pallets

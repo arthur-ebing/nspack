@@ -63,7 +63,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(pallet_id: nil,
-                                    ecert_agreement_id: nil,
+                                    ecert_agreement_id: @repo.select_values_in_order(:ecert_tracking_units, :ecert_agreement_id, order: :id).last,
                                     business_id: nil,
                                     industry: nil,
                                     elot_key: nil,

@@ -29,7 +29,7 @@ module FinishedGoodsApp
     end
 
     def elot_preverify(url, body)
-      http = Crossbeams::HTTPCalls.new(false)
+      http = Crossbeams::HTTPCalls.new(false, open_timeout: 30, read_timeout: 60)
 
       res = http.json_post(url, body, headers)
       return failed_response(res.message) unless res.success

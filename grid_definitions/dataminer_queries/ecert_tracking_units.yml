@@ -6,12 +6,16 @@
   \   ecert_tracking_units.verification_key,\r\n    ecert_tracking_units.passed,\r\n
   \   ecert_tracking_units.process_result,\r\n    ecert_tracking_units.rejection_reasons,\r\n
   \   ecert_tracking_units.business_id,\r\n    ecert_tracking_units.industry,\r\n
-  \   ecert_tracking_units.active,\r\n    ecert_tracking_units.created_at,\r\n    ecert_tracking_units.updated_at\r\n\r\nFROM
-  ecert_tracking_units\r\nJOIN ecert_agreements ON ecert_agreements.id = ecert_tracking_units.ecert_agreement_id\r\nJOIN
-  pallets ON pallets.id = ecert_tracking_units.pallet_id"
+  \   ecert_tracking_units.active,\r\n    ecert_tracking_units.created_at,\r\n    ecert_tracking_units.updated_at,\r\n
+  \   CASE\r\n        WHEN ecert_tracking_units.passed THEN NULL\r\n        ELSE  'error'
+  \r\n    END AS colour_rule\r\n\r\nFROM ecert_tracking_units\r\nJOIN ecert_agreements
+  ON ecert_agreements.id = ecert_tracking_units.ecert_agreement_id\r\nJOIN pallets
+  ON pallets.id = ecert_tracking_units.pallet_id"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :colour_key:
+    error: No description
 :columns:
   id:
     :name: id
@@ -71,7 +75,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -87,7 +91,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -119,7 +123,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -199,7 +203,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -229,7 +233,7 @@
     :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -259,6 +263,22 @@
     :caption: Updated at
     :namespaced_name: ecert_tracking_units.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 17
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
