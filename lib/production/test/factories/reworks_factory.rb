@@ -11,11 +11,11 @@ module ProductionApp
         reworks_run_type_id: reworks_run_type_id,
         remarks: Faker::Lorem.word,
         scrap_reason_id: scrap_reason_id,
-        pallets_selected: BaseRepo.new.array_for_db_col(%w[A B C]),
-        pallets_affected: BaseRepo.new.array_for_db_col(%w[A B C]),
+        pallets_selected: BaseRepo.new.array_of_text_for_db_col(%w[A B C]),
+        pallets_affected: BaseRepo.new.array_of_text_for_db_col(%w[A B C]),
         changes_made: {},
-        pallets_scrapped: BaseRepo.new.array_for_db_col(%w[A B C]),
-        pallets_unscrapped: BaseRepo.new.array_for_db_col(%w[A B C])
+        pallets_scrapped: BaseRepo.new.array_of_text_for_db_col(%w[A B C]),
+        pallets_unscrapped: BaseRepo.new.array_of_text_for_db_col(%w[A B C])
       }
       DB[:reworks_runs].insert(default.merge(opts))
     end

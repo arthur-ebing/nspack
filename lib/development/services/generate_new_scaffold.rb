@@ -203,7 +203,7 @@ module DevelopmentApp
         date: "'2010-01-01'",
         decimal: 'Faker::Number.decimal',
         integer_array: 'BaseRepo.new.array_for_db_col([1, 2, 3])',
-        string_array: "BaseRepo.new.array_for_db_col(['A', 'B', 'C'])",
+        string_array: "BaseRepo.new.array_of_text_for_db_col(['A', 'B', 'C'])",
         jsonb: '{}'
       }.freeze
 

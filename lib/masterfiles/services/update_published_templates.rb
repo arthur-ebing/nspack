@@ -65,7 +65,7 @@ module MasterfilesApp
     def variables_list(label_def)
       return nil if label_def[:variables].nil? || label_def[:variables].empty?
 
-      repo.array_for_db_col(label_def[:variables].map { |v| v.keys.first.to_s })
+      repo.array_of_text_for_db_col(label_def[:variables].map { |v| v.keys.first.to_s })
     end
   end
 end

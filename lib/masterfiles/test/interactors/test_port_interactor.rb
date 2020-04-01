@@ -77,8 +77,8 @@ module MasterfilesApp
         city_id: destination_city_id,
         port_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        port_type_ids: BaseRepo.new.array_for_db_col([port_type_id.to_s]),
-        voyage_type_ids: BaseRepo.new.array_for_db_col([voyage_type_id.to_s]),
+        port_type_ids: BaseRepo.new.array_for_db_col([port_type_id]),
+        voyage_type_ids: BaseRepo.new.array_for_db_col([voyage_type_id]),
         active: true
       }
     end

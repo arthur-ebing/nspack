@@ -311,26 +311,39 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # Helper to convert a Ruby Array into a value that postgresql will understand.
   #
   # @param arr [Array] the array to convert.
+  # @param array_type [Symbol] the type of array (:integer / :text). Default is :integer.
   # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
-  def array_for_db_col(arr)
+  def array_for_db_col(arr, array_type: :integer)
     return nil if arr.nil?
 
-    Sequel.pg_array(arr)
+    Sequel.pg_array(arr, array_type)
   end
 
-  # Transform array values in a hash to pg_arrays.
+  # Helper to convert a Ruby Array into a value that postgresql will understand.
+  #
+  # @param arr [Array] the array to convert.
+  # @return [Sequel::Postgres::PGArray] Postgres version of the Array.
+  def array_of_text_for_db_col(arr)
+    array_for_db_col(arr, array_type: :text)
+  end
+
+  # Transform integer array values in a hash to pg_arrays.
   # Any values not of type Array are returned unchanged.
+  #
+  # Note: this will not work unless all arrays are of the same type.
+  # - use :integer or :text.
   #
   # e.g. If input parameters include a collection of ids to be stored
   # in an array column in the database, passing the params through
   # this method will prepare the ids correctly for persisting.
   #
   # @param args [hash,Dry::Validation] the hash or Dry::Validation result.
+  # @param array_type [Symbol] the type of array (:integer / :text). Default is :integer.
   # @return [hash] the transformed hash.
-  def prepare_array_values_for_db(args)
+  def prepare_array_values_for_db(args, array_type: :integer)
     return nil if args.nil?
 
-    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v) : v }
+    args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v, array_type: array_type) : v }
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.

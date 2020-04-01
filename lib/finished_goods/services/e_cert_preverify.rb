@@ -96,8 +96,10 @@ module FinishedGoodsApp
         pallet_id = repo.get_id(:pallets, pallet_number: tracking_unit['TrackingUnitID'])
         id = repo.get_id(:ecert_tracking_units, pallet_id: pallet_id)
 
-        process_result = tracking_unit['ProcessResult'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['ProcessResult'])
-        rejection_reasons = tracking_unit['RejectionReasons'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['RejectionReasons'])
+        # process_result = tracking_unit['ProcessResult'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['ProcessResult'])
+        # rejection_reasons = tracking_unit['RejectionReasons'].nil_or_empty? ? nil : repo.array_for_db_col(tracking_unit['RejectionReasons'])
+        process_result = repo.array_of_text_for_db_col(tracking_unit['ProcessResult'])
+        rejection_reasons = repo.array_of_text_for_db_col(tracking_unit['RejectionReasons'])
 
         attrs = { ecert_agreement_id: agreement_id,
                   business_id: business_id,
