@@ -28,6 +28,8 @@ module ProductionApp
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
       return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
+      return failed_response("Scanned Pallet:#{pallet_number} has been shipped") if pallet[:shipped]
+      return failed_response("Scanned Pallet:#{pallet_number} has been scrapped") if pallet[:scrapped]
 
       res = nil
       repo.transaction do
