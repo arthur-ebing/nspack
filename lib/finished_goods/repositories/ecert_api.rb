@@ -18,8 +18,11 @@ module FinishedGoodsApp
     end
 
     def find_tracking_unit(pallet_number)
+      res = auth_token_call
+      return failed_response(res.message) unless res.success
+
       http = Crossbeams::HTTPCalls.new(false)
-      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnit?trackingUnitId=#{pallet_number}"
+      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
 
       res = http.request_get(url, headers)
       return failed_response(res.message) unless res.success
@@ -28,7 +31,10 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot_preverify(url, params)
+    def elot_preverify(url, params) # rubocop:disable Metrics/AbcSize
+      res = auth_token_call
+      return failed_response(res.message) unless res.success
+
       http = Crossbeams::HTTPCalls.new(false, open_timeout: 30, read_timeout: 60)
 
       res = http.json_post(url, params, headers)

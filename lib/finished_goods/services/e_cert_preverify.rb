@@ -22,10 +22,8 @@ module FinishedGoodsApp
       res = validate_pallets(:has_nett_weight, pallet_numbers)
       return res unless res.success
 
-      res = api.auth_token_call
+      res = find_tracking_unit
       return failed_response(res.message) unless res.success
-
-      find_tracking_unit
 
       res = create_tracking_unit
       return failed_response(res.message) unless res.success
@@ -53,12 +51,15 @@ module FinishedGoodsApp
     def find_tracking_unit
       pallet_numbers.each do |pallet_number|
         res = api.find_tracking_unit(pallet_number)
-        if res.success
-          @update_units << pallet_number
-        else
+        return failed_response(res.message) unless res.success
+
+        if res.instance.empty?
           @create_units << pallet_number
+        else
+          @update_units << pallet_number
         end
       end
+      ok_response
     end
 
     def create_tracking_unit # rubocop:disable Metrics/AbcSize
