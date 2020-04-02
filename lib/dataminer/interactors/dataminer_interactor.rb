@@ -235,7 +235,7 @@ module DataminerApp
         }
         mk.integer 'width', nil, editable: true # , cellEditor: 'numericCellEditor', cellEditorType: 'integer'
         mk.col 'format', nil, editable: true, cellEditor: 'select', cellEditorParams: {
-          values: ['', 'delimited_1000', 'delimited_1000_4'],
+          values: ['', 'delimited_1000', 'delimited_1000_4', 'datetime_with_secs'],
           width: 100
         }
         mk.boolean 'hide', 'Hide?', editable: true, cellEditor: 'select', cellEditorParams: {
