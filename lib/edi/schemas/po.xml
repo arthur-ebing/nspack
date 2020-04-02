@@ -47,7 +47,7 @@
         <field name="master_ord" size="6" required="false"/>
         <field name="location_code" size="7" required="false"/>
         <field name="season" size="4" required="false"/>
-        <field name="client_ref" size="6" required="false"/>
+        <field name="client_ref" size="6" required="false" trim="true" />
         <field name="trip_no" size="8" required="false"/>
         <field name="xmit_flag" size="1" required="false"/>
         <field name="revision" size="5" required="false" format="ZEROES" default="1"/>
@@ -195,7 +195,7 @@
               <field name="full_pallet" size="5" required="false" format="ZEROES"/>
               <field name="inc_pallet" size="5" required="false" format="ZEROES"/>
               <field name="season" size="4"/>
-              <field name="client_ref" size="10" required="false" map_to="client_reference"/>
+              <field name="client_ref" size="10" required="false" map_to="client_reference" trim="true" />
               <field name="allow_code" size="4" required="false"/>
               <field name="allow_del" size="1" required="false"/>
               <field name="liner_bd" size="1" required="false"/>
@@ -206,7 +206,7 @@
               <field name="endorse2" size="2" required="false"/>
               <field name="endorse3" size="2" required="false"/>
               <field name="endorse4" size="2" required="false"/>
-              <field name="order_no" size="6" required="false" map_to="order_number"/>
+              <field name="order_no" size="6" required="false" map_to="order_number" trim="true" />
               <field name="dest_type" size="2" default="DP"/>
               <field name="dest_code" size="7" default="$:INSTALL_LOCATION$" />
               <field name="cnts_on_truck" size="5" format="ZEROES" required="false"/>
@@ -280,7 +280,7 @@
                   <field name="orig_intake" size="8" format="DATE"/>
                   <field name="shift" size="1" required="false"/>
                   <field name="shift_date" size="8" format="DATE" required="false"/>
-                  <field name="order_no" size="6" required="false"/>
+                  <field name="order_no" size="6" required="false" trim="true" />
                   <field name="locn_code" size="7" default="$:INSTALL_LOCATION$" />
                   <field name="store" size="2" required="false"/>
                   <field name="stock_pool" size="2" required="false" default="CE" />
