@@ -59,6 +59,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:production_run_id, :integer).filled(:int?)
     required(:pallets_selected, :array).filled(:array?) { each(:str?) }
     optional(:make_changes, :bool).maybe(:bool?)
+    required(:allow_cultivar_mixing, :bool).maybe(:bool?)
   end
 
   ReworksRunPrintBarcodeSchema = Dry::Validation.Params do

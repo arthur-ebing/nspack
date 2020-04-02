@@ -23,6 +23,7 @@ module Production
               form.add_field :pallets_affected
               form.add_field :pallet_number
               form.add_field :pallet_sequence_number
+              form.add_field :allow_cultivar_mixing
             end
             if rules[:show_changes_made]
               page.add_notice 'The changes below were made to the affected pallets:', inline_caption: true

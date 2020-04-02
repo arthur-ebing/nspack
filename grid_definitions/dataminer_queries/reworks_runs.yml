@@ -1,19 +1,18 @@
 ---
 :caption: Pallet Changes
-:sql: SELECT reworks_runs.id, reworks_runs.reworks_run_type_id, reworks_runs.created_at,
-  reworks_run_types.run_type, reworks_runs.scrap_reason_id, scrap_reasons.scrap_reason,
-  reworks_runs.remarks, reworks_runs.changes_made ->> 'reworks_action' AS reworks_action,
-  reworks_runs.user, COALESCE(reworks_runs.pallets_scrapped, reworks_runs.pallets_unscrapped,
-  reworks_runs.pallets_selected) AS pallets_selected, reworks_runs.pallets_affected,
-  reworks_runs.changes_made -> 'pallets' ->> 'pallet_number' AS pallet_number, reworks_runs.changes_made
-  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id, reworks_runs.changes_made
-  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,
-  reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before'
-  AS before_state, reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' ->
-  'changes' ->> 'after' AS after_state,  reworks_runs.updated_at FROM reworks_runs
-  JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
-  LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id ORDER
-  BY id DESC
+:sql: "SELECT reworks_runs.id,\r\nreworks_runs.reworks_run_type_id,\r\nreworks_runs.created_at,\r\nreworks_run_types.run_type,\r\nreworks_runs.scrap_reason_id,\r\nscrap_reasons.scrap_reason,\r\nreworks_runs.remarks,\r\nreworks_runs.changes_made
+  ->> 'reworks_action' AS reworks_action,\r\nreworks_runs.user,\r\nCOALESCE(reworks_runs.pallets_scrapped,
+  reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,\r\nreworks_runs.pallets_affected,\r\nreworks_runs.changes_made
+  -> 'pallets' ->> 'pallet_number' AS pallet_number,\r\nreworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id,\r\nreworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,\r\nCOALESCE(reworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after' ->> 'allow_cultivar_mixing',
+  'false') AS allow_cultivar_mixing,\r\nreworks_runs.changes_made -> 'pallets'
+  -> 'pallet_sequences' -> 'changes' ->> 'before' AS before_state,\r\nreworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state,\r\nreworks_runs.updated_at\r\nFROM
+  reworks_runs\r\nJOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id\r\nLEFT
+  JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id\r\nORDER BY
+  id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -243,9 +242,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  allow_cultivar_mixing:
+    :name: allow_cultivar_mixing
+    :sequence_no: 15
+    :caption: Allow cultivar mixing?
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   before_state:
     :name: before_state
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Before state
     :namespaced_name: 
     :data_type: :string
@@ -261,7 +276,7 @@
     :group_max: false
   after_state:
     :name: after_state
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: After state
     :namespaced_name: 
     :data_type: :string
@@ -277,7 +292,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Updated at
     :namespaced_name: reworks_runs.updated_at
     :data_type: :datetime

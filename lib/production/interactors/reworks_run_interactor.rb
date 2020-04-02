@@ -737,12 +737,15 @@ module ProductionApp
 
       rw_res = nil
       repo.transaction do
+        repo.update_production_run(attrs[:production_run_id], allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
         rw_res = ProductionApp::ManuallyTipBins.call(attrs)
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
                               pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
-                                           before: manually_tip_bin_before_state(attrs[:pallets_selected].first).sort.to_h, after: manually_tip_bin_after_state(attrs[:pallets_selected].first, attrs[:production_run_id]).sort.to_h)
+                                           before: manually_tip_bin_before_state(attrs).sort.to_h, after: manually_tip_bin_after_state(attrs).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
@@ -750,27 +753,32 @@ module ProductionApp
       success_response('Rmt Bin tipped successfully', pallet_number: attrs[:pallets_selected])
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue StandardError => e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
     end
 
-    def manually_tip_bin_before_state(rmt_bin_id)
+    def manually_tip_bin_before_state(attrs)
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
                    exit_ref_date_time: nil,
                    bin_tipped: false,
                    exit_ref: nil,
                    tipped_manually: false }
-      defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: rmt_bin_id) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge!(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
       defaults
     end
 
-    def manually_tip_bin_after_state(rmt_bin_id, production_run_id)
+    def manually_tip_bin_after_state(attrs)
       defaults = { bin_tipped_date_time: Time.now,
-                   production_run_tipped_id: production_run_id,
+                   production_run_tipped_id: attrs[:production_run_id],
                    exit_ref_date_time: Time.now,
                    bin_tipped: true,
                    exit_ref: 'TIPPED',
                    tipped_manually: true }
-      defaults = defaults.merge!(tipped_asset_number: rmt_bin_id, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge!(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
       defaults
     end
 
@@ -1030,6 +1038,10 @@ module ProductionApp
 
     def pallet_standard_pack_code(pallet_number)
       @repo.where_hash(:pallet_sequences, id: oldest_sequence_id(pallet_number))[:standard_pack_code_id]
+    end
+
+    def production_run_allow_cultivar_mixing(production_run_id)
+      repo.production_run_allow_cultivar_mixing(production_run_id)
     end
 
     def make_changes?(reworks_run_type)

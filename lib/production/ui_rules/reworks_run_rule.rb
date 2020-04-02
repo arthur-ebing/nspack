@@ -70,6 +70,9 @@ module UiRules
                                  hide_on_load: !@form_object.pallet_number.nil_or_empty? ? false : true }
       fields[:pallet_sequence_number] = { renderer: :label,
                                           hide_on_load: !@form_object.pallet_sequence_number.nil_or_empty? ? false : true }
+      fields[:allow_cultivar_mixing] = { renderer: :label,
+                                         as_boolean: true,
+                                         hide_on_load: @rules[:tip_bins] ? false : true }
       if @rules[:array_of_changes_made]
         @form_object.changes_made_array.to_a.each_with_index do |change, i|
           left_record = change['change_descriptions'].nil_or_empty? ? change['before'] : change['change_descriptions']['before']
@@ -152,6 +155,8 @@ module UiRules
                              required: @rules[:tip_bins],
                              caption: 'Production Run Id',
                              hide_on_load: @rules[:tip_bins] ? false : true },
+        allow_cultivar_mixing: { renderer: :checkbox,
+                                 hide_on_load: @rules[:tip_bins] ? false : true },
         from_production_run_id: { renderer: :integer,
                                   required: @rules[:bulk_production_run_update],
                                   caption: 'From Production Run',

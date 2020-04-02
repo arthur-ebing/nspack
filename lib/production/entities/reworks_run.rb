@@ -35,5 +35,6 @@ module ProductionApp
     attribute :changes_made, Types::Hash
     attribute :changes_made_array, Types::Hash
     attribute :created_at, Types::DateTime
+    attribute :allow_cultivar_mixing, Types::Bool
   end
 end

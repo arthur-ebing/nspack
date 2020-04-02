@@ -40,6 +40,7 @@ module ProductionApp
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes', null) AS changes_made_array,
+        COALESCE((reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after' ->> 'allow_cultivar_mixing')::boolean,false) AS allow_cultivar_mixing,
         reworks_runs.created_at, reworks_runs.updated_at
         FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
         LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
@@ -679,6 +680,14 @@ module ProductionApp
         .join(:plant_resources, id: :packhouse_resource_id)
         .where(Sequel[:production_runs][:id] => production_run_id)
         .get(Sequel[:plant_resources][:location_id])
+    end
+
+    def update_production_run(production_run_id, attrs)
+      DB[:production_runs].where(id: production_run_id).update(attrs)
+    end
+
+    def production_run_allow_cultivar_mixing(production_run_id)
+      DB[:production_runs].where(id: production_run_id).get(:allow_cultivar_mixing)
     end
   end
 end

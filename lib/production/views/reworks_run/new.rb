@@ -56,6 +56,7 @@ module Production
               form.row do |row|
                 row.column do |col|
                   col.add_field :production_run_id
+                  col.add_field :allow_cultivar_mixing
                 end
               end
               form.row do |row|
