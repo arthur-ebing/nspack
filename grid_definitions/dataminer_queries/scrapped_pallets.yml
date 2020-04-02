@@ -13,7 +13,7 @@
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
   exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
   AS departure_date, active, exit_ref, created_by, verified_by, colour_rule FROM vw_scrapped_pallet_sequence_flat
-  ORDER BY pallet_id, pallet_number DESC
+  ORDER BY pallet_id DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:

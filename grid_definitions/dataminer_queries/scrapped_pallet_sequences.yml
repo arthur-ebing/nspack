@@ -19,7 +19,7 @@
   inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
   intake_created_at, first_cold_storage_at, active, extended_columns, seq_scrapped_at,
   created_by, verified_by, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER
-  BY pallet_id, pallet_number DESC
+  BY pallet_id DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:
