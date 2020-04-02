@@ -28,7 +28,6 @@ module EdiApp
       private
 
       def send_edi_check
-        # EdiOutRepo.new.flow_has_matching_rule(AppConst::EDI_FLOW_PO, depot_ids: Array(@entity.depot_id), party_role_ids: [@entity.customer_party_role_id, @entity.exporter_party_role_id])
         EdiOutRepo.new.flow_has_matching_rule(AppConst::EDI_FLOW_PO,
                                               depot_ids: Array(@entity.depot_id),
                                               party_role_ids: [@entity.customer_party_role_id,

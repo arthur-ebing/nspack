@@ -20,6 +20,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
     @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
+    @mail_keys = []
 
     load_output_paths
     load_schema
@@ -62,20 +63,53 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     raise Crossbeams::FrameworkError, "There are no directory keys for EDI rule #{edi_out_rule_id}" if dir_keys.nil_or_empty?
 
     config = @repo.load_config
+    build_mail_keys(config, dir_keys)
 
     build_edi_out_paths(config, dir_keys)
+  end
+
+  def build_mail_keys(config, dir_keys)
+    @mail_keys = dir_keys.select { |k| k.start_with?('mail:') }.map { |m| m.delete_prefix('mail:') }.map(&:to_sym)
+    return if @mail_keys.empty?
+
+    unconfig_mails = @mail_keys.select { |k| config[:mail_recipients][k].nil? }
+    raise Crossbeams::FrameworkError, "There is no :mail_recipients config with key(s) #{uconfig_emails.join(', ')}" unless unconfig_mails.nil_or_empty?
   end
 
   def build_edi_out_paths(config, dir_keys)
     @output_paths = []
     dir_keys.each do |key|
-      build_edi_out_path(config[:root], config[:out_dirs][key.to_sym])
+      if key.start_with?('mail:')
+        path = build_edi_mail_out_path(config[:root], config[:email_dir])
+        @output_paths << path unless @output_paths.include?(path)
+      else
+        build_edi_out_path(config[:root], config[:out_dirs][key.to_sym])
+      end
     end
   end
 
   def build_edi_out_path(root, out_dest)
     base_path = root.sub('$HOME', ENV['HOME'])
     @output_paths << File.join(out_dest.sub('$ROOT', base_path), 'transmit')
+  end
+
+  def build_edi_mail_out_path(root, out_dest)
+    raise Crossbeams::FrameworkError, 'The EDI out configuration does not include an entry for "email_dir"' if out_dest.nil?
+
+    base_path = root.sub('$HOME', ENV['HOME'])
+    out_dest.sub('$ROOT', base_path)
+  end
+
+  def send_emails
+    config = @repo.load_config
+    @mail_keys.each do |key|
+      email_settings = config[:mail_recipients][key]
+      email_settings[:subject] = "#{flow_type} file attached" unless email_settings[:subject]
+      email_settings[:body] = "Attached please find #{flow_type} EDI file." unless email_settings[:body]
+      path = build_edi_mail_out_path(config[:root], config[:email_dir])
+      # p "Sending - #{key} from #{File.join(path, @output_filename)} to #{email_settings.inspect}"
+      DevelopmentApp::SendMailJob.enqueue(email_settings.merge(attachments: [{ path: File.join(path, @output_filename) }]))
+    end
   end
 
   # Services can use the field definition:
@@ -275,6 +309,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
       File.open(File.join(path, @output_filename), 'w') { |f| f.puts lines.join("\n") }
     end
+    send_emails
     @output_filename
   end
 
