@@ -49,8 +49,17 @@ end
 res = interactor.create_report
 
 if res.success
-  # show_json_notice('Sent to printer') # For PRINT MODE
-  change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+  # For PRINT MODE:
+  show_json_notice('Sent to printer')
+
+  # For GENERATE MODE:
+  change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+
+  # When generating XLS or RTF files which are downloaded by the browser,
+  # add download: true so the browser window stops showing the spinner.
+  change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance),
+                                  request.path,
+                                  download: true)
 else
   show_error(res.message, fetch?(r))
 end

@@ -137,6 +137,9 @@
         .then((data) => {
           if (data.location) {
             window.location = data.location;
+            if (data.download) {
+              document.getElementById('loading').innerHTML = 'LOADED';
+            }
             if (data.log_url) {
               console.info('URL loaded by this window:', data.log_url);
             }
