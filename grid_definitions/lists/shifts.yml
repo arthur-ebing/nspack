@@ -11,14 +11,28 @@
   :is_delete: true
   :popup: true
 - :separator: true
-- :url: "/production/shifts/shifts/$:id$/incentive_report"
-  :text: Incentive report
-  :icon: printer
-  :loading_window: true
-- :url: "/production/shifts/shifts/$:id$/incentive_count_report"
-  :text: Incentive count report
-  :icon: printer
-  :loading_window: true
+- :submenu:
+    :text: Incentive Report
+    :items:
+      - :url: "/production/shifts/shifts/$:id$/incentive_report"
+        :text: PDF
+        :icon: printer
+        :loading_window: true
+      - :url: "/production/shifts/shifts/$:id$/incentive_report/with_params?key=excel"
+        :text: Excel
+        :icon: excel
+        :loading_window: true
+- :submenu:
+    :text: Incentive Count Report
+    :items:
+      - :url: "/production/shifts/shifts/$:id$/incentive_count_report"
+        :text: PDF
+        :icon: printer
+        :loading_window: true
+      - :url: "/production/shifts/shifts/$:id$/incentive_count_report/with_params?key=excel"
+        :text: Excel
+        :icon: excel
+        :loading_window: true
 - :separator: true
 - :url: "/development/statuses/list/shifts/$:id$"
   :text: status

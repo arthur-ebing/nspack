@@ -29,7 +29,7 @@ The actions are rendered as a context menu that can include submenu groupings.
       - complete
     :hide_if_null: another_field_id,further_field
   - :separator: true
-  - submenu:
+  - :submenu:
      :text: Submenu caption
      :items:
        - :url: /path/to/this/resource

@@ -93,7 +93,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = CreateJasperReport.call(report_name: 'incentive',
                                       user: current_user.login_name,
                                       file: 'incentive',
-                                      params: { shift_id: id })
+                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
         if res.success
           change_window_location_via_json(res.instance, request.path)
         else
@@ -104,7 +104,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = CreateJasperReport.call(report_name: 'incentive_count',
                                       user: current_user.login_name,
                                       file: 'incentive_count',
-                                      params: { shift_id: id })
+                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
         if res.success
           change_window_location_via_json(res.instance, request.path)
         else
