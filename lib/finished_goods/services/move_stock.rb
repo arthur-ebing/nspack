@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class MoveStockService < BaseService
+  class MoveStockService < BaseService # rubocop:disable ClassLength
     attr_reader :stock_type, :stock_item, :stock_item_id, :location_to_id, :business_process, :business_process_context_id, :location_from_id, :stock_item_number, :business_process_id, :stock_type_id
 
     def initialize(stock_type, stock_item_id, location_to_id, business_process = nil, business_process_context_id = nil)
@@ -16,7 +16,10 @@ module FinishedGoodsApp
       res = validate
       return res unless res.success
 
-      location_to = MasterfilesApp::LocationRepo.new.find_location(location_to_id)
+      location_to = locn_repo.find_location(location_to_id)
+
+      res = validate_pallet_infront_if_in_deck?
+      return res unless res.success
 
       if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
         return failed_response("Pallet is already been scanned into deck: #{location_to[:location_long_code]}") if pallet_already_in_deck?
@@ -37,12 +40,24 @@ module FinishedGoodsApp
 
     private
 
+    def validate_pallet_infront_if_in_deck? # rubocop:disable Metrics/AbcSize
+      deck_id = locn_repo.get_parent_location(stock_item.location_id)
+      if deck_id && (location_from = locn_repo.find_location(deck_id)) && location_from[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
+        deck_pallets = locn_repo.get_deck_pallets(deck_id)
+        plt_pos = deck_pallets.find { |p| p[:pallet_number] == stock_item[:pallet_number] }
+        unless (pallets_infront = deck_pallets.find_all { |d| d[:pos] < plt_pos[:pos] && d[:pallet_number] }).empty?
+          return failed_response("There are pallets in front of: #{stock_item[:pallet_number]} in the deck.<br> Please move them out of the deck before you can move this pallet.<br><br> #{pallets_infront.map { |p| " #{p[:pallet_number]}(P#{p[:pos]})" }.join(',')}.")
+        end
+      end
+
+      ok_response
+    end
+
     def pallet_already_in_deck?
-      (parent = MasterfilesApp::LocationRepo.new.get_parent_location(location_from_id)) && parent == location_to_id ? true : false
+      (parent = locn_repo.get_parent_location(location_from_id)) && parent == location_to_id ? true : false
     end
 
     def find_next_available_deck_position(location_code) # rubocop:disable Metrics/AbcSize
-      locn_repo = MasterfilesApp::LocationRepo.new
       positions = locn_repo.find_filled_deck_positions(location_to_id)
 
       return failed_response("Deck:#{location_code} is full") if positions.length == locn_repo.find_max_position_for_deck_location(location_to_id)
@@ -123,6 +138,10 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= MesscadaApp::MesscadaRepo.new
+    end
+
+    def locn_repo
+      MasterfilesApp::LocationRepo.new
     end
   end
 end
