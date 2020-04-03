@@ -95,7 +95,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                       file: 'incentive',
                                       params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
         if res.success
-          change_window_location_via_json(res.instance, request.path)
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
         else
           show_error(res.message, fetch?(r))
         end
@@ -106,7 +106,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                       file: 'incentive_count',
                                       params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
         if res.success
-          change_window_location_via_json(res.instance, request.path)
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
         else
           show_error(res.message, fetch?(r))
         end
