@@ -40,6 +40,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('add_sequence_to_pallet'))
       failed_response(e.message)
     end
 
@@ -72,14 +73,14 @@ module ProductionApp
       end
       res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('fg_pallet_weighing'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('create_pallet_from_carton'))
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('carton_verification'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('create_pallet_from_carton'))
       failed_response(e.message)
     end
 
-    def edit_pallet_validations(pallet_number)
+    def edit_pallet_validations(pallet_number) # rubocop:disable Metrics/AbcSize
       pallet = find_pallet_by_pallet_number(pallet_number)
       return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
       return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
@@ -90,6 +91,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('edit_pallet_validations'))
       failed_response(e.message)
     end
 
@@ -107,6 +109,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('replace_pallet_sequence'))
       failed_response(e.message)
     end
 
@@ -132,6 +135,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('update_pallet_sequence_carton_qty'))
       failed_response(e.message)
     end
 

@@ -206,7 +206,7 @@ module DataminerApp
       end
     end
 
-    def convert_report(params)
+    def convert_report(params) # rubocop:disable Metrics/AbcSize
       yml = params[:yml]
       dbname = params[:database]
       hash = YAML.load(yml) # rubocop:disable Security/YAMLLoad
@@ -214,6 +214,7 @@ module DataminerApp
       rpt = DmConverter.new(repo.admin_report_path(dbname)).convert_hash(hash, params[:filename])
       success_response('Converted to a new report', rpt)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('convert_report'))
       failed_response(e.message)
     end
 
@@ -301,6 +302,7 @@ module DataminerApp
       report.save(yp)
       success_response('Report saved', report)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('save_report'))
       failed_response(e.message)
     end
 
@@ -311,6 +313,7 @@ module DataminerApp
       File.delete(filename)
       success_response('Report has been deleted')
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('delete_report'))
       failed_response(e.message)
     end
 
@@ -353,6 +356,7 @@ module DataminerApp
       report.save(yp)
       success_response('Columns reordered', report)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('save_report_column_order'))
       failed_response(e.message)
     end
 
@@ -453,7 +457,7 @@ module DataminerApp
       ar
     end
 
-    def delete_parameter(id, param_id)
+    def delete_parameter(id, param_id) # rubocop:disable Metrics/AbcSize
       report = repo.lookup_admin_report(id)
       report.query_parameter_definitions.delete_if { |p| p.column == param_id }
       filename = repo.lookup_file_name(id, true)
@@ -461,6 +465,7 @@ module DataminerApp
       report.save(yp)
       success_response('Parameter has been deleted', report)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('delete_parameter'))
       failed_response(e.message)
     end
 
@@ -509,8 +514,6 @@ module DataminerApp
 
         CrosstabApplier.new(repo.db_connection_for(db_conn), rpt, params, crosstab_hash).convert_report if params[:crosstab]
         rpt
-        # rescue StandardError => e
-        #   return "ERROR: #{e.message}"
       end
     end
 

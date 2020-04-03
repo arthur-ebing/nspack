@@ -15,6 +15,7 @@ module FinishedGoodsApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('move_pallet'))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
