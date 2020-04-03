@@ -13,15 +13,16 @@ module FinishedGoodsApp
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
-      @headers = { Authorization: "bearer #{instance['access_token']}" }
-      success_response(instance['message'])
+      header = { Authorization: "Bearer #{instance['access_token']}" }
+      success_response(instance['message'], header)
     end
 
-    def find_tracking_unit(pallet_number)
+    def tracking_unit_status(pallet_number) # rubocop:disable Metrics/AbcSize
       res = auth_token_call
       return failed_response(res.message) unless res.success
 
-      http = Crossbeams::HTTPCalls.new(false)
+      headers = res.instance
+      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'))
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
 
       res = http.request_get(url, headers)
@@ -31,23 +32,25 @@ module FinishedGoodsApp
       success_response('Found Tracking Unit', instance)
     end
 
-    def elot_preverify(url, params) # rubocop:disable Metrics/AbcSize
+    def elot(params, body) # rubocop:disable Metrics/AbcSize
       res = auth_token_call
       return failed_response(res.message) unless res.success
 
-      http = Crossbeams::HTTPCalls.new(false, open_timeout: 30, read_timeout: 60)
+      headers = res.instance
+      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'), open_timeout: 30, read_timeout: 60)
+      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
 
-      res = http.json_post(url, params, headers)
+      res = http.json_post(url, body, headers)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
-      save_to_yaml(url: url, params: params, response: instance)
+      save_to_yaml(url: url, body: body, response: instance)
 
       success_response('Posted Pre-verification', instance)
     end
 
     def update_agreements # rubocop:disable Metrics/AbcSize
-      http = Crossbeams::HTTPCalls.new(false)
+      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'))
       url = "#{AppConst::E_CERT_ENVIRONMENT}ecert.co.za/api/v1/Agreement/Get"
       res = http.request_get(url)
       return failed_response(res.message) unless res.success

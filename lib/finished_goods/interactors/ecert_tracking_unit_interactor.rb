@@ -18,6 +18,18 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def ecert_tracking_unit_status(pallet_number)
+      res = validate_pallets(:exists, pallet_number)
+      return res unless res.success
+
+      res = api.tracking_unit_status(pallet_number)
+      return res unless res.success
+
+      success_response(res.message, res.instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def delete_ecert_tracking_unit(id)
       name = ecert_tracking_unit(id).industry
       repo.transaction do
@@ -41,12 +53,20 @@ module FinishedGoodsApp
       @repo ||= EcertRepo.new
     end
 
+    def api
+      @api ||= ECertApi.new
+    end
+
     def ecert_tracking_unit(id)
       repo.find_ecert_tracking_unit(id)
     end
 
     def validate_ecert_tracking_unit_params(params)
       EcertTrackingUnitSchema.call(params)
+    end
+
+    def validate_pallets(check, pallet_numbers)
+      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
     end
   end
 end

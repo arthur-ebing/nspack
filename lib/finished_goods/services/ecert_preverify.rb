@@ -37,7 +37,7 @@ module FinishedGoodsApp
     private
 
     def repo
-      @repo ||= MesscadaApp::MesscadaRepo.new
+      @repo ||= EcertRepo.new
     end
 
     def api
@@ -50,7 +50,7 @@ module FinishedGoodsApp
 
     def find_tracking_unit
       pallet_numbers.each do |pallet_number|
-        res = api.find_tracking_unit(pallet_number)
+        res = api.tracking_unit_status(pallet_number)
         return failed_response(res.message) unless res.success
 
         if res.instance.empty?
@@ -63,10 +63,9 @@ module FinishedGoodsApp
     end
 
     def create_tracking_unit # rubocop:disable Metrics/AbcSize
-      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{tur_query}"
       return ok_response if create_units.empty?
 
-      res = api.elot_preverify(url, compile_preverify_pallets(create_units))
+      res = api.elot(tur_query, repo.compile_preverify_pallets(create_units))
       response = res.instance
       if response['IsSuccessful']
         save_response(response)
@@ -77,10 +76,9 @@ module FinishedGoodsApp
     end
 
     def update_tracking_unit # rubocop:disable Metrics/AbcSize
-      url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{tur_query(true)}"
       return ok_response if update_units.empty?
 
-      res = api.elot_preverify(url, compile_preverify_pallets(update_units))
+      res = api.elot(tur_query(true), repo.compile_preverify_pallets(update_units))
       return failed_response(res.message) unless res.success
 
       response = res.instance
@@ -93,18 +91,31 @@ module FinishedGoodsApp
     end
 
     def save_response(response) # rubocop:disable Metrics/AbcSize
+      response_units = []
       response['Data'].each do |tracking_unit|
-        pallet_id = repo.get_id(:pallets, pallet_number: tracking_unit['TrackingUnitID'])
+        pallet_number = tracking_unit['TrackingUnitID']
+        next if response_units.include? pallet_number
+
+        response_units << pallet_number
+        pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
         id = repo.get_id(:ecert_tracking_units, pallet_id: pallet_id)
+
+        res = api.tracking_unit_status(pallet_number)
+        return failed_response(res.message) unless res.success
+
+        status = res.instance.first
+        tracking_unit_statuses = status['TrackingUnitStatuses'].first
+
         attrs = { ecert_agreement_id: agreement_id,
                   business_id: business_id,
                   industry: industry,
                   pallet_id: pallet_id,
                   elot_key: response['eLotKey'],
-                  passed: %w[Passed TRUE].include?(tracking_unit['ProcessStatus']),
-                  verification_key: tracking_unit['VerificationKey'],
-                  process_result: repo.array_of_text_for_db_col(tracking_unit['ProcessResult']),
-                  rejection_reasons: repo.array_of_text_for_db_col(tracking_unit['RejectionReasons']) }
+                  passed: %w[Passed].include?(tracking_unit_statuses['ProcessStatus']),
+                  verification_key: nil,
+                  process_result: repo.array_of_text_for_db_col(tracking_unit_statuses['ProcessResult']),
+                  rejection_reasons: repo.array_of_text_for_db_col(tracking_unit_statuses['RejectionReasons']) }
+
         id.nil? ? repo.create(:ecert_tracking_units, attrs) : repo.update(:ecert_tracking_units, id, attrs)
       end
       ok_response
@@ -119,43 +130,6 @@ module FinishedGoodsApp
         AgreementCode: agreement_code
       }
       URI.encode_www_form(hash)
-    end
-
-    def compile_preverify_pallets(pallet_numbers)
-      preverify_pallets = []
-      pallet_numbers.each do |pallet_number|
-        pallet = repo.where_hash(:pallets, pallet_number: pallet_number) || {}
-        preverify_pallets << { TrackingUnitID: pallet_number,
-                               Reference1: nil,
-                               Reference2: nil,
-                               ExportDate: nil,
-                               Weight: pallet[:nett_weight].to_f,
-                               WeightUnitCode: 'KG',
-                               NumberOfPackageItems: pallet[:carton_quantity],
-                               TrackingUnitDetails: compile_preverify_pallet_sequences(pallet_number) }
-      end
-      preverify_pallets
-    end
-
-    def compile_preverify_pallet_sequences(pallet_number) # rubocop:disable Metrics/AbcSize
-      preverify_pallet_sequences = []
-      pallet_sequences = repo.find_pallet_sequences_by_pallet_number(pallet_number)
-      pallet_sequences.each do |pallet_sequence|
-        preverify_pallet_sequences << { OperatorCode: pallet_sequence[:puc],
-                                        OriginLocation: pallet_sequence[:orchard],
-                                        SPSStatus: pallet_sequence[:phyto_data],
-                                        PackOperatorCode: pallet_sequence[:phc],
-                                        CommodityCode: pallet_sequence[:commodity],
-                                        MarketingIndicationCode: pallet_sequence[:marketing_variety],
-                                        ClassCategory: pallet_sequence[:grade],
-                                        NumberOfPackagedItems: pallet_sequence[:carton_quantity],
-                                        PackageType: 'CT',
-                                        Weight: pallet_sequence[:sequence_nett_weight].to_f,
-                                        WeightUnitCode: 'KG',
-                                        TrackingUnitLocation: nil,
-                                        TrackingUnitOrigin: pallet_sequence[:production_region] }
-      end
-      preverify_pallet_sequences
     end
   end
 end

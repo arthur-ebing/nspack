@@ -48,7 +48,8 @@ module UiRules
         pallet_list: { renderer: :textarea, rows: 12,
                        placeholder: 'Paste pallet numbers here',
                        caption: 'Pallet Numbers',
-                       required: true }
+                       required: true },
+        pallet_number: { required: true }
       }
     end
 
@@ -71,7 +72,8 @@ module UiRules
                                     passed: nil,
                                     process_result: nil,
                                     rejection_reasons: nil,
-                                    pallet_list: nil)
+                                    pallet_list: nil,
+                                    pallet_number: nil)
     end
   end
 end

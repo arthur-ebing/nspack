@@ -71,6 +71,26 @@ class Nspack < Roda
 
     r.on 'ecert_tracking_units' do
       interactor = FinishedGoodsApp::EcertTrackingUnitInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'status' do
+        r.get do
+          show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::Status.call(remote: fetch?(r)) }
+        end
+        r.post do # FIND
+          res = interactor.ecert_tracking_unit_status(params[:ecert_tracking_unit_status][:pallet_number])
+          if res.success
+            form_values = params[:ecert_tracking_unit_status]
+            show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::Status.call(res: res.instance.first, form_values: form_values, remote: fetch?(r)) }
+          else
+            re_show_form(r, res, url: '/finished_goods/ecert/ecert_tracking_units/status') do
+              FinishedGoods::Ecert::EcertTrackingUnit::Status.call(form_values: params[:ecert_tracking_unit],
+                                                                   form_errors: res.errors,
+                                                                   remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'new' do    # NEW
         check_auth!('ecert', 'new')
         show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r)) }
