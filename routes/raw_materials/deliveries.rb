@@ -29,7 +29,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                       params: { delivery_id: id,
                                                 keep_file: false })
         if res.success
-          change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
           show_error(res.message, fetch?(r))
         end
@@ -45,7 +45,7 @@ class Nspack < Roda # rubocop:disable ClassLength
                                       params: { delivery_id: id,
                                                 keep_file: false })
         if res.success
-          change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
           show_error(res.message, fetch?(r))
         end

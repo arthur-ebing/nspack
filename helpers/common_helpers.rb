@@ -372,6 +372,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   #
   # @param new_location [string] - the new url.
   # @param log_url [string] - the url to log in the console.
+  # @param download [boolean] - is this report to be downloaded? (set true for XLS, CSV, RTF). Defaults to false.
   # @return [JSON] a JSON response.
   def change_window_location_via_json(new_location, log_url = nil, download: false)
     res = { location: new_location }

@@ -16,7 +16,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -34,7 +34,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -53,7 +53,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               cartons_equals_pallets: "#{AppConst::CARTON_EQUALS_PALLET}|boolean",
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -69,7 +69,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -84,7 +84,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     params: { load_container_id: @repo.get_id(:load_containers, load_id: id),
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -100,7 +100,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               user_name: current_user.user_name,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -117,7 +117,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               signee_caption: AppConst::GOVT_INSPECTION_SIGNEE_CAPTION,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -134,7 +134,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                               signee_caption: AppConst::GOVT_INSPECTION_SIGNEE_CAPTION,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end
@@ -150,7 +150,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     params: { govt_inspection_sheet_id: id,
                                               keep_file: false })
       if res.success
-        change_window_location_via_json(res.instance, UtilityFunctions.cache_bust_url(request.path))
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end

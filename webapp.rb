@@ -133,7 +133,7 @@ class Nspack < Roda
                                               keep_file: true })
       if res.success
         # show_json_notice('Sent to printer')
-        change_window_location_via_json(res.instance, request.path)
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
         show_error(res.message, fetch?(r))
       end

@@ -266,7 +266,7 @@ class Nspack < Roda
                                                 use_derived_weight: 'false|boolean',
                                                 keep_file: false })
         if res.success
-          change_window_location_via_json(res.instance, request.path)
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
           show_error(res.message, fetch?(r))
         end
@@ -282,7 +282,7 @@ class Nspack < Roda
                                                 use_derived_weight: 'true|boolean',
                                                 keep_file: false })
         if res.success
-          change_window_location_via_json(res.instance, request.path)
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
           show_error(res.message, fetch?(r))
         end
@@ -294,7 +294,7 @@ class Nspack < Roda
                                       file: 'carton_packout',
                                       params: { production_run_id: id })
         if res.success
-          change_window_location_via_json(res.instance, request.path)
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
           show_error(res.message, fetch?(r))
         end
