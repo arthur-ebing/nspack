@@ -4,7 +4,7 @@ module FinishedGoods
   module Ecert
     module EcertTrackingUnit
       class Status
-        def self.call(res: nil, form_values: nil, form_errors: nil, remote: true)
+        def self.call(res: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:ecert_tracking_unit_status, :new, res: res, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,7 +19,10 @@ module FinishedGoods
               form.add_field :pallet_number
             end
             page.section do |section|
-              section.add_diff :diff
+              unless res.nil?
+                section.add_diff :header
+                section.add_diff :diff
+              end
             end
           end
 

@@ -19,18 +19,23 @@ module UiRules
 
     def common_fields
       left_body = @repo.flatten_hash(@options[:res])
-      right_header = { Industry: AppConst::E_CERT_INDUSTRY,
-                       BusinessID: AppConst::E_CERT_BUSINESS_ID,
-                       AgreementCode: nil }
-      right_body = @repo.flatten_hash(right_header.merge(@repo.compile_preverify_pallets(@pallet_number).first))
-      right_body = {} if @pallet_number.nil?
+      right_body = @repo.flatten_hash(@repo.compile_preverify_pallets(@pallet_number).first)
 
+      header = {}
+      %i[TrackingUnitID AgreementCode BusinessID ExportProcess Industry ProcessResult ProcessStatus RejectionReasons UpdatedDateTime ExportDate].each do |k|
+        header[k] = left_body.delete(k)
+        right_body.delete(k)
+      end
       {
         pallet_number: { required: true },
+        header: { left_caption: '',
+                  right_caption: '',
+                  left_record: header,
+                  right_record: {} },
         diff: { left_caption: 'eCert',
                 right_caption: 'NSPack',
-                left_record: { TrackingUnitID: @pallet_number }.merge(left_body),
-                right_record: { TrackingUnitID: @pallet_number }.merge(right_body) }
+                left_record: left_body,
+                right_record: right_body }
       }
     end
 
