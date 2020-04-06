@@ -43,6 +43,8 @@ module ErrorMailer
     Que.enqueue mail_opts, job_class: 'DevelopmentApp::SendMailJob', queue: AppConst::QUEUE_NAME
   end
 
+  private
+
   def calculate_recipients(append_recipients, recipients: nil)
     send_to = if recipients
                 recipients.is_a?(Array) ? recipients.map { |t, e| "#{t}<#{e}>" }.join(',') : recipients
