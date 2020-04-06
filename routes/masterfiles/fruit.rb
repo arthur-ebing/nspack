@@ -97,6 +97,7 @@ class Nspack < Roda
               description
               hs_code
               requires_standard_counts
+              use_size_ref_for_edi
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -132,6 +133,7 @@ class Nspack < Roda
             description
             hs_code
             requires_standard_counts
+            use_size_ref_for_edi
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

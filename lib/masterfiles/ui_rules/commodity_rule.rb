@@ -20,6 +20,7 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:hs_code] = { renderer: :label, caption: 'HS code' }
       fields[:requires_standard_counts] = { renderer: :label, as_boolean: true }
+      fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -32,6 +33,7 @@ module UiRules
         description: { required: true },
         hs_code: { required: true, caption: 'HS code' },
         requires_standard_counts: { renderer: :checkbox },
+        use_size_ref_for_edi: { renderer: :checkbox },
         active: { renderer: :checkbox }
       }
     end
@@ -48,6 +50,7 @@ module UiRules
                                     description: nil,
                                     hs_code: nil,
                                     requires_standard_counts: true,
+                                    use_size_ref_for_edi: nil,
                                     active: true)
     end
   end

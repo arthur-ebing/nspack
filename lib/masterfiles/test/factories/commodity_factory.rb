@@ -10,7 +10,8 @@ module MasterfilesApp
         description: Faker::Lorem.word,
         hs_code: Faker::Lorem.word,
         active: true,
-        requires_standard_counts: false
+        requires_standard_counts: false,
+        use_size_ref_for_edi: false
       }
       DB[:commodities].insert(default.merge(opts))
     end
