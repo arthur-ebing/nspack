@@ -65,6 +65,12 @@ module FinishedGoodsApp
       unless (last_pos = positions.min)
         last_pos = locn_repo.find_max_position_for_deck_location(location_to_id) + 1
       end
+
+      if last_pos == 1
+        deck_pallets = locn_repo.get_deck_pallets(location_to_id)
+        empty_pos = deck_pallets.find_all { |d| d[:pallet_number].nil_or_empty? }.last
+        return failed_response("You are trying to move pallet:#{@stock_item_number}<br> into: #{location_code}_P#{empty_pos[:pos]}<br> but there are pallets in front of this position in the deck")
+      end
       next_availaible_position = locn_repo.find_location_by_location_long_code("#{location_code}_P#{last_pos - 1}")
       @location_to_id = next_availaible_position.id
 
