@@ -45,7 +45,7 @@ class Nspack < Roda # rubocop:disable ClassLength
           res = interactor.move_pallet(pallet_number, params[:pallet][:location], params[:pallet][:location_scan_field])
 
           scanned_locn_id = locn_repo.resolve_location_id_from_scan(params[:pallet][:location], params[:pallet][:location_scan_field])
-          if (scanned_locn = locn_repo.find_location(scanned_locn_id)) && AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK && (positions = locn_repo.find_filled_deck_positions(scanned_locn_id)).length < locn_repo.find_max_position_for_deck_location(scanned_locn_id) && positions.min > 1
+          if (scanned_locn = locn_repo.find_location(scanned_locn_id)) && AppConst::CALCULATE_PALLET_DECK_POSITIONS && scanned_locn.location_type_code == AppConst::LOCATION_TYPES_COLD_BAY_DECK && (positions = locn_repo.find_filled_deck_positions(scanned_locn_id)).length < locn_repo.find_max_position_for_deck_location(scanned_locn_id) && !positions.empty?
             params[:pallet][:pallet_number] = nil
             params[:pallet][:remaining_num_position] = positions.min - 1
             params[:pallet][:next_position] = (positions.min - 1).positive? ? "#{scanned_locn.location_long_code}_P#{positions.min - 1}" : nil
