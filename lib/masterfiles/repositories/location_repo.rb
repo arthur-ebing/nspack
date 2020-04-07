@@ -105,7 +105,7 @@ module MasterfilesApp
 
     def get_deck_pallets(id)
       query = <<~SQL
-        select cast(substring(p.location_long_code from '\\d+$') as int) as pos, s.pallet_number
+        select cast(substring(p.location_long_code from '\\d+$') as int) as pos, s.pallet_number, s.id as pallet_id
         from locations d
         join tree_locations t on t.ancestor_location_id=d.id
         join locations p on p.id=t.descendant_location_id
@@ -222,6 +222,17 @@ module MasterfilesApp
     def for_select_location_assignments_for(id)
       dataset = DB[:location_assignments_locations].join(:location_assignments, id: :location_assignment_id).where(Sequel[:location_assignments_locations][:location_id] => id)
       select_two(dataset, :assignment_code, :id)
+    end
+
+    def get_locations_type_code(id)
+      query = <<~SQL
+        select t.location_type_code
+        from locations l
+        join location_types t on t.id=l.location_type_id
+        join location_storage_types s on s.id=l.primary_storage_type_id
+        where l.id = ?
+      SQL
+      DB[query, id].first[:location_type_code]
     end
 
     def link_assignments(id, multiselect_ids)

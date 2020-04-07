@@ -205,6 +205,47 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
 
     # --------------------------------------------------------------------------
+    # MOVE DECK PALLETS
+    # --------------------------------------------------------------------------
+    r.on 'move_deck_pallets' do
+      interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        form_state = {}
+        notice = retrieve_from_local_store(:flash_notice)
+        error = retrieve_from_local_store(:error)
+        if error.is_a?(String)
+          form_state.merge!(error_message: error)
+        elsif !error.nil?
+          form_state.merge!(error_message: error.message)
+          form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+        end
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :location,
+                                       notes: notice,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Location',
+                                       action: '/rmd/finished_goods/move_deck_pallets',
+                                       button_caption: 'Submit')
+
+        form.add_field(:deck, 'Deck', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+        form.add_field(:location_to, 'To Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.move_deck_pallets(params[:location][:deck], params[:location][:deck_scan_field], params[:location][:location_to], params[:location][:location_to_scan_field])
+        if res.success
+          store_locally(:flash_notice, res.message)
+        else
+          store_locally(:error, res)
+        end
+        r.redirect('/rmd/finished_goods/move_deck_pallets')
+      end
+    end
+
+    # --------------------------------------------------------------------------
     # VIEW DECK PALLETS
     # --------------------------------------------------------------------------
     r.on 'view_deck_pallets' do
