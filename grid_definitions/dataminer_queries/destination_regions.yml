@@ -1,12 +1,13 @@
 ---
 :caption: Destination Regions
-:sql: "SELECT \"destination_regions\".\"id\", \"destination_regions\".\"destination_region_name\",
-  \"destination_regions\".\"created_at\", \"destination_regions\".\"updated_at\",\r\n(\r\n
-  \   SELECT\r\n      string_agg(target_market_group_name, '; ')\r\n    FROM (\r\n
-  \     SELECT\r\n        t.target_market_group_name\r\n      FROM\r\n        target_market_groups
-  t\r\n        JOIN destination_regions_tm_groups r ON r.target_market_group_id =
-  t.id\r\n          AND r.destination_region_id = destination_regions.id\r\n          AND
-  t.active) AS tab) AS tm_groups\r\nFROM \"destination_regions\""
+:sql: "SELECT\r\n    destination_regions.id, \r\n    destination_regions.destination_region_name
+  AS region_name,\r\n    destination_regions.description,\r\n    destination_regions.created_at,
+  destination_regions.updated_at,\r\n       (SELECT\r\n           string_agg(target_market_group_name,
+  ', ')\r\n           FROM (SELECT\r\n           t.target_market_group_name\r\n           FROM\r\n
+  \          target_market_groups t\r\n           JOIN destination_regions_tm_groups
+  r ON r.target_market_group_id = t.id\r\n           AND r.destination_region_id =
+  destination_regions.id\r\n           AND t.active) AS tab) AS tm_groups\r\nFROM
+  destination_regions"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -27,17 +28,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_region_name:
-    :name: destination_region_name
+  region_name:
+    :name: region_name
     :sequence_no: 2
-    :caption: Destination region name
+    :caption: Region name
     :namespaced_name: destination_regions.destination_region_name
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: destination_regions.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -45,7 +62,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Created at
     :namespaced_name: destination_regions.created_at
     :data_type: :datetime
@@ -61,7 +78,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Updated at
     :namespaced_name: destination_regions.updated_at
     :data_type: :datetime
@@ -77,7 +94,7 @@
     :group_max: false
   tm_groups:
     :name: tm_groups
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Tm groups
     :namespaced_name: 
     :data_type: :string
@@ -85,7 +102,7 @@
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

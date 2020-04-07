@@ -4,7 +4,7 @@ module Masterfiles
   module TargetMarkets
     module Country
       class New
-        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true)
+        def self.call(parent_id, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:country, :new, form_values: form_values, region_id: parent_id)
           rules   = ui_rule.compile
 
@@ -23,6 +23,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :destination_region_id
               form.add_field :country_name
+              form.add_field :description
               form.add_field :iso_country_code
             end
           end

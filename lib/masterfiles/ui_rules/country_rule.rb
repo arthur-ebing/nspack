@@ -19,6 +19,7 @@ module UiRules
       fields[:destination_region_id] = { renderer: :label, with_value: destination_region_id_label, caption: 'Destination Region' }
       fields[:region_name] = { renderer: :label }
       fields[:country_name] = { renderer: :label }
+      fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:iso_country_code] = { renderer: :label }
     end
@@ -28,6 +29,7 @@ module UiRules
       {
         destination_region_id: { renderer: :select, options: @repo.for_select_destination_regions, caption: 'Region', required: true, invisible: show_region },
         country_name: { required: true },
+        description: {},
         iso_country_code: { renderer: :select, options: AppConst::ISO_COUNTRY_CODES, required: true }
       }
     end
@@ -41,6 +43,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(destination_region_id: nil,
                                     country_name: nil,
+                                    description: nil,
                                     iso_country_code: nil)
     end
   end

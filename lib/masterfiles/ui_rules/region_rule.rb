@@ -16,12 +16,14 @@ module UiRules
 
     def set_show_fields
       fields[:destination_region_name] = { renderer: :label }
+      fields[:description] = { renderer: :label }
       fields[:tm_groups] = { renderer: :list, items: tm_group_names }
     end
 
     def common_fields
       {
-        destination_region_name: { required: true }
+        destination_region_name: { required: true },
+        description: {}
       }
     end
 
@@ -32,7 +34,8 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(destination_region_name: nil)
+      @form_object = OpenStruct.new(destination_region_name: nil,
+                                    description: nil)
     end
 
     def tm_group_names

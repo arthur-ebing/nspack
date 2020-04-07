@@ -6,5 +6,6 @@ module MasterfilesApp
 
     optional(:id, :integer).filled(:int?)
     required(:destination_region_name, Types::StrippedString).filled(:str?)
+    required(:description, Types::StrippedString).maybe(:str?)
   end
 end

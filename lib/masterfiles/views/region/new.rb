@@ -16,6 +16,7 @@ module Masterfiles
               form.action '/masterfiles/target_markets/destination_regions'
               form.remote! if remote
               form.add_field :destination_region_name
+              form.add_field :description
             end
           end
 

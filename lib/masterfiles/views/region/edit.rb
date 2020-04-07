@@ -17,6 +17,7 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :destination_region_name
+              form.add_field :description
             end
           end
 

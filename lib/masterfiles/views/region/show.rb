@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :destination_region_name
+              form.add_field :description
               form.add_field :tm_groups
             end
           end
