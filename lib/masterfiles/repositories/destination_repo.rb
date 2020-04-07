@@ -39,6 +39,7 @@ module MasterfilesApp
 
       DB[:destination_cities].where(destination_country_id: country_ids).delete
       countries.delete
+      DB[:destination_regions_tm_groups].where(destination_region_id: id).delete
       DB[:destination_regions].where(id: id).delete
       { success: true }
     end
@@ -86,6 +87,14 @@ module MasterfilesApp
 
     def create_city(id, attrs)
       DB[:destination_cities].insert(attrs.to_h.merge(destination_country_id: id))
+    end
+
+    def find_region_tm_group_names(id)
+      DB[:target_market_groups]
+        .join(:destination_regions_tm_groups, target_market_group_id: :id)
+        .where(destination_region_id: id)
+        .order(:target_market_group_name)
+        .select_map(:target_market_group_name)
     end
   end
 end

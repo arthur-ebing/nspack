@@ -19,6 +19,7 @@ module UiRules
       fields[:target_market_group_type_id] = { renderer: :label, with_value: tm_group_type_id_label, caption: 'Group Type' }
       fields[:target_market_group_name] = { renderer: :label, caption: 'Group' }
       fields[:description] = { renderer: :label }
+      fields[:regions] = { renderer: :list, items: destination_region_names }
     end
 
     def common_fields
@@ -39,6 +40,10 @@ module UiRules
       @form_object = OpenStruct.new(target_market_group_type_id: nil,
                                     target_market_group_name: nil,
                                     description: nil)
+    end
+
+    def destination_region_names
+      @repo.find_tm_group_regions(@options[:id])
     end
   end
 end

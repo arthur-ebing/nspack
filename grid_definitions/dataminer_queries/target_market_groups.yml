@@ -3,8 +3,13 @@
 :sql: "SELECT\r\n  \"target_market_groups\".\"id\",\r\n  \"target_market_groups\".\"target_market_group_type_id\",\r\n
   \ \"target_market_groups\".\"target_market_group_name\",\r\n  \"target_market_groups\".\"description\",\r\n
   \ \"target_market_groups\".\"created_at\",\r\n  \"target_market_groups\".\"updated_at\",\r\n
-  \ \"target_market_group_types\".\"target_market_group_type_code\"\r\nFROM\r\n  \"target_market_groups\"\r\n
-  \ JOIN \"target_market_group_types\" ON \"target_market_group_types\".\"id\" = \"target_market_groups\".\"target_market_group_type_id\"\r\nORDER
+  \ \"target_market_group_types\".\"target_market_group_type_code\",\r\n(\r\n    SELECT\r\n
+  \     string_agg(destination_region_name, '; ')\r\n    FROM (\r\n      SELECT\r\n
+  \       r.destination_region_name\r\n      FROM\r\n        destination_regions r\r\n
+  \       JOIN destination_regions_tm_groups t ON t.destination_region_id = r.id\r\n
+  \         AND t.target_market_group_id = target_market_groups.id\r\n          AND
+  r.active) AS tab) AS regions\r\nFROM\r\n  \"target_market_groups\"\r\n  JOIN \"target_market_group_types\"
+  ON \"target_market_group_types\".\"id\" = \"target_market_groups\".\"target_market_group_type_id\"\r\nORDER
   BY\r\n  \"target_market_groups\".\"target_market_group_name\""
 :limit: 
 :offset: 
@@ -111,6 +116,22 @@
     :sequence_no: 7
     :caption: Target market group type code
     :namespaced_name: target_market_group_types.target_market_group_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  regions:
+    :name: regions
+    :sequence_no: 8
+    :caption: Regions
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 

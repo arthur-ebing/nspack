@@ -1,0 +1,8 @@
+---
+:dataminer_definition: destination_regions
+:multiselect:
+  :destination_regions:
+    :url: "/masterfiles/target_markets/target_market_groups/$:id$/link_regions"
+    :preselect: "SELECT destination_region_id AS id FROM destination_regions_tm_groups WHERE target_market_group_id = $:id$"
+    :section_caption: "SELECT target_market_group_name FROM target_market_groups WHERE id = $:id$"
+    :multiselect_save_method: remote

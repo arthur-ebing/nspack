@@ -114,6 +114,21 @@ module MasterfilesApp
       success_response("Deleted target market #{name}")
     end
 
+    def link_regions(target_market_group_id, region_ids)
+      return failed_response('You have not selected any regions') unless region_ids
+
+      repo.transaction do
+        repo.link_regions(target_market_group_id, region_ids)
+      end
+
+      existing_ids = repo.target_market_group_region_ids(target_market_group_id)
+      if existing_ids.eql?(region_ids.sort)
+        success_response('Regions linked successfully')
+      else
+        failed_response('Some regions were not linked')
+      end
+    end
+
     def link_countries(target_market_id, country_ids)
       return failed_response('You have not selected any countries') unless country_ids
 

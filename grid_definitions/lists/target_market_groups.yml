@@ -16,6 +16,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :separator: true
+- :url: "/list/target_market_group_regions/multi?key=destination_regions&id=$:id$"
+  :text: regions
+  :icon: list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/target_markets/target_market_groups/new"

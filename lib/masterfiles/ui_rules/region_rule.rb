@@ -16,6 +16,7 @@ module UiRules
 
     def set_show_fields
       fields[:destination_region_name] = { renderer: :label }
+      fields[:tm_groups] = { renderer: :list, items: tm_group_names }
     end
 
     def common_fields
@@ -32,6 +33,10 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(destination_region_name: nil)
+    end
+
+    def tm_group_names
+      @repo.find_region_tm_group_names(@options[:id])
     end
   end
 end

@@ -75,6 +75,20 @@ class Nspack < Roda
         check_auth!('Target Markets', 'edit')
         show_partial { Masterfiles::TargetMarkets::TmGroup::Edit.call(id) }
       end
+
+      r.on 'link_regions' do
+        r.post do
+          res = interactor.link_regions(id, multiselect_grid_choices(params))
+
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          redirect_to_last_grid(r)
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('Target Markets', 'read')
