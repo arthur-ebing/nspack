@@ -15,7 +15,10 @@ module FinishedGoodsApp
     attribute :inspected, Types::Bool
     attribute :inspection_point, Types::String
     attribute :awaiting_inspection_results, Types::Bool
-    attribute :destination_country_id, Types::Integer
+    attribute :packed_tm_group_id, Types::Integer
+    attribute? :packed_tm_group, Types::String
+    attribute :destination_region_id, Types::Integer
+    attribute? :region_name, Types::String
     attribute :govt_inspection_api_result_id, Types::Integer
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String

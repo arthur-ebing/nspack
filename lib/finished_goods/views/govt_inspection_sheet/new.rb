@@ -25,7 +25,8 @@ module FinishedGoods
                 end
                 row.column do |col|
                   col.add_field :inspection_point
-                  col.add_field :destination_country_id
+                  col.add_field :packed_tm_group_id
+                  col.add_field :destination_region_id
                   col.add_field :reinspection
                 end
               end

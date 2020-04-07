@@ -9,7 +9,7 @@ module FinishedGoodsApp
       assert_respond_to repo, :for_select_govt_inspection_pallets
       assert_respond_to repo, :for_select_govt_inspection_pallet_api_results
       assert_respond_to repo, :for_select_govt_inspection_api_results
-      assert_respond_to repo, :for_select_destination_countries
+      assert_respond_to repo, :for_select_destination_regions
     end
 
     def test_crud_calls

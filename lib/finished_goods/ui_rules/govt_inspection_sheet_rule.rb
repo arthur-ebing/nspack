@@ -21,8 +21,6 @@ module UiRules
       inspector_id_label = MasterfilesApp::InspectorRepo.new.find_inspector_flat(@form_object.inspector_id)&.inspector
       inspection_billing_party_role_id_label = @party_repo.find_party_role(@form_object.inspection_billing_party_role_id)&.party_name
       exporter_party_role_id_label = @party_repo.find_party_role(@form_object.exporter_party_role_id)&.party_name
-      destination_country = MasterfilesApp::DestinationRepo.new.find_country(@form_object.destination_country_id)
-      destination_country_id_label = "#{destination_country&.country_name} - (#{destination_country&.region_name})"
       govt_inspection_api_result_id_label = @repo.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
                                 with_value: inspector_id_label,
@@ -47,9 +45,12 @@ module UiRules
       fields[:inspection_point] = { renderer: :label }
       fields[:awaiting_inspection_results] = { renderer: :label,
                                                as_boolean: true }
-      fields[:destination_country_id] = { renderer: :label,
-                                          with_value: destination_country_id_label,
-                                          caption: 'Destination Country' }
+      fields[:packed_tm_group_id] = { renderer: :label,
+                                      with_value: @form_object.packed_tm_group,
+                                      caption: 'Packed TM Group' }
+      fields[:destination_region_id] = { renderer: :label,
+                                         with_value: @form_object.region_name,
+                                         caption: 'Destination Region' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:govt_inspection_api_result_id] = { renderer: :label,
@@ -62,7 +63,8 @@ module UiRules
       fields[:consignment_note_number] = { renderer: :label }
     end
 
-    def common_fields
+    def common_fields # rubocop:disable Metrics/AbcSize
+      valid_tm_group_ids = @repo.select_values(:destination_regions_tm_groups, :target_market_group_id)
       {
         inspector_id: { renderer: :select,
                         options: MasterfilesApp::InspectorRepo.new.for_select_inspectors,
@@ -90,11 +92,16 @@ module UiRules
                      disabled: true },
         inspection_point: {},
         awaiting_inspection_results: { renderer: :checkbox },
-        destination_country_id: { renderer: :select,
-                                  options: @repo.for_select_destination_countries,
-                                  disabled_options: @repo.for_select_inactive_destination_countries,
-                                  caption: 'Destination Country',
-                                  required: true },
+        packed_tm_group_id: { renderer: :select,
+                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups(where: { id: valid_tm_group_ids }),
+                              disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
+                              caption: 'Packed TM Group',
+                              required: true },
+        destination_region_id: { renderer: :select,
+                                 options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: @form_object.packed_tm_group_id }),
+                                 disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_destination_regions(where: { target_market_group_id: @form_object.packed_tm_group_id }),
+                                 caption: 'Destination Region',
+                                 required: true },
         govt_inspection_api_result_id: { renderer: :select,
                                          options: @repo.for_select_govt_inspection_api_results,
                                          disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
@@ -129,7 +136,8 @@ module UiRules
                                     inspected: nil,
                                     inspection_point: @repo.last_record(:inspection_point),
                                     awaiting_inspection_results: nil,
-                                    destination_country_id: @repo.last_record(:destination_country_id),
+                                    packed_tm_group_id: @repo.last_record(:packed_tm_group_id),
+                                    destination_region_id: @repo.last_record(:destination_region_id),
                                     govt_inspection_api_result_id: nil,
                                     reinspection: @mode == :reinspection,
                                     pallet_number: nil)
@@ -140,6 +148,7 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.input_change(:completed, notify: [{ url: "/finished_goods/inspection/govt_inspection_sheets/#{@options[:id]}/add_pallets" }]) if @mode == :add_pallets
+        behaviour.dropdown_change(:packed_tm_group_id, notify: [{ url: '/finished_goods/inspection/govt_inspection_sheets/packed_tm_group_changed' }]) if %i[new edit].include? @mode
       end
     end
 

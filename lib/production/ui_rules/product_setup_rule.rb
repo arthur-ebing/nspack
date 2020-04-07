@@ -170,7 +170,7 @@ module UiRules
                                        searchable: true,
                                        remove_search_for_small_list: false },
         packed_tm_group_id: { renderer: :select,
-                              options: MasterfilesApp::TargetMarketRepo.new.for_select_target_market_groups(AppConst::PACKED_TM_GROUP),
+                              options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_tm_groups,
                               disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_tm_groups,
                               caption: 'Packed TM Group',
                               required: true,

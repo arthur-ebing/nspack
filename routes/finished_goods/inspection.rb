@@ -217,6 +217,15 @@ class Nspack < Roda
     end
 
     r.on 'govt_inspection_sheets' do
+      r.on 'packed_tm_group_changed' do
+        if params[:changed_value].nil_or_empty?
+          blank_json_response
+        else
+          region_list = FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
+          json_replace_select_options('govt_inspection_sheet_destination_region_id', region_list)
+        end
+      end
+
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         r.on 'reinspection' do    # NEW Reinspection

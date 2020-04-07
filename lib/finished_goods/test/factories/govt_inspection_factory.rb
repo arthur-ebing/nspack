@@ -19,7 +19,8 @@ module FinishedGoodsApp
 
     def create_govt_inspection_sheet(opts = {})
       inspector_id = create_inspector
-      destination_country_id = create_destination_country
+      target_market_group_id = create_target_market_group
+      destination_region_id = create_destination_region
       inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
       exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
 
@@ -36,7 +37,8 @@ module FinishedGoodsApp
         inspected: false,
         inspection_point: Faker::Lorem.word,
         awaiting_inspection_results: false,
-        destination_country_id: destination_country_id,
+        packed_tm_group_id: target_market_group_id,
+        destination_region_id: destination_region_id,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00',

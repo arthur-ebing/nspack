@@ -7,6 +7,7 @@ module FinishedGoodsApp
     include GovtInspectionFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::DepotFactory
+    include MasterfilesApp::TargetMarketFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -68,7 +69,8 @@ module FinishedGoodsApp
       inspector_id = create_inspector
       inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
       exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
-      destination_country_id = create_destination_country
+      target_market_group_id = create_target_market_group
+      destination_region_id = create_destination_region
       {
         id: 1,
         inspector_id: inspector_id,
@@ -85,7 +87,8 @@ module FinishedGoodsApp
         inspected: false,
         inspection_point: 'ABC',
         awaiting_inspection_results: false,
-        destination_country_id: destination_country_id,
+        packed_tm_group_id: target_market_group_id,
+        destination_region_id: destination_region_id,
         govt_inspection_api_result_id: nil,
         reinspection: false,
         created_by: 'ABC',

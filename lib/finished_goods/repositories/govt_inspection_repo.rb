@@ -46,26 +46,29 @@ module FinishedGoodsApp
     def find_govt_inspection_sheet(id)
       find_with_association(:govt_inspection_sheets,
                             id,
+                            parent_tables: [{ parent_table: :target_market_groups,
+                                              columns: %i[target_market_group_name],
+                                              foreign_key: :packed_tm_group_id,
+                                              flatten_columns: { target_market_group_name: :packed_tm_group } },
+                                            { parent_table: :destination_regions,
+                                              columns: %i[destination_region_name],
+                                              foreign_key: :destination_region_id,
+                                              flatten_columns: { destination_region_name: :region_name } }],
                             lookup_functions: [{ function: :fn_consignment_note_number,
                                                  args: [id],
                                                  col_name: :consignment_note_number }],
                             wrapper: GovtInspectionSheet)
     end
 
-    def for_select_destination_countries(active = true)
-      query = <<~SQL
-        SELECT country_name||' ('||destination_region_name ||')' AS code,
-               dc.id
-        FROM destination_countries dc
-        JOIN destination_regions dr on dc.destination_region_id = dr.id
-        WHERE dc.active = #{active}
-        ORDER BY country_name
-      SQL
-      DB[query].select_map(%i[code id])
+    def for_select_destination_regions(active = true, where: nil)
+      ds = DB[:destination_regions].join(:destination_regions_tm_groups, destination_region_id: :id).distinct
+      ds = ds.where(active: active)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[destination_region_name id])
     end
 
-    def for_select_inactive_destination_countries
-      for_select_destination_countries(false)
+    def for_select_inactive_destination_regions(where: nil)
+      for_select_destination_regions(false, where: where)
     end
 
     def validate_govt_inspection_sheet_inspect_params(id)
