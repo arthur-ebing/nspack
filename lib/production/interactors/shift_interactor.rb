@@ -8,7 +8,10 @@ module ProductionApp
 
       id = nil
       repo.transaction do
-        id = repo.create_shift(res.to_h)
+        res = repo.create_shift(res.to_h)
+        return res unless res.success
+
+        id = res.instance
         log_status(:shifts, id, 'CREATED')
         log_transaction
       end

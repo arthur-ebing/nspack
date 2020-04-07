@@ -48,7 +48,7 @@ module ProductionApp
 
     def create_shift(attrs) # rubocop:disable Metrics/AbcSize
       date = attrs.delete(:date)
-      start_date_times = DB[:shifts].where(shift_type_id: attrs[:shift_type_id]).map { |r| r[:start_date_time].to_date.to_s }
+      start_date_times = DB[:shifts].where(shift_type_id: attrs[:shift_type_id]).map { |r| r[:start_date_time].to_date }
       return failed_response('Shift for this type and date combination already exists') if start_date_times.include?(date)
 
       shift_type = DB[:shift_types].where(id: attrs[:shift_type_id])
@@ -58,7 +58,8 @@ module ProductionApp
       attrs[:start_date_time] = Time.parse("#{date} #{start_hr}")
       end_date = end_hr < start_hr ? date + 1 : date
       attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr}")
-      DB[:shifts].insert(attrs)
+      id = DB[:shifts].insert(attrs)
+      success_response('ok', id)
     end
   end
 end
