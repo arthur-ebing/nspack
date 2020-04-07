@@ -18,11 +18,11 @@ module FinishedGoodsApp
 
       location_to = locn_repo.find_location(location_to_id)
 
-      res = validate_pallet_infront_if_in_deck?
-      return res unless res.success
-
       if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
         return failed_response("Pallet is already been scanned into deck: #{location_to[:location_long_code]}") if pallet_already_in_deck?
+
+        res = validate_pallet_infront_if_in_deck?
+        return res unless res.success
 
         res = find_next_available_deck_position(location_to[:location_long_code])
         return res unless res.success
