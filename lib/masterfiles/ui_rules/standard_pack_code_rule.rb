@@ -23,6 +23,7 @@ module UiRules
       fields[:plant_resource_button_indicator] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
+      fields[:use_size_ref_for_edi] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -42,7 +43,8 @@ module UiRules
                               options: @this_repo.for_select_basic_pack_codes,
                               disabled_options: @this_repo.for_select_inactive_basic_pack_codes,
                               caption: 'Basic Pack Code',
-                              invisible: AppConst::BASE_PACK_EQUALS_STD_PACK }
+                              invisible: AppConst::BASE_PACK_EQUALS_STD_PACK },
+        use_size_ref_for_edi: { renderer: :checkbox }
       }
     end
 
@@ -58,7 +60,8 @@ module UiRules
                                     std_pack_label_code: nil,
                                     material_mass: nil,
                                     plant_resource_button_indicator: nil,
-                                    basic_pack_code_id: nil)
+                                    basic_pack_code_id: nil,
+                                    use_size_ref_for_edi: nil)
     end
   end
 end

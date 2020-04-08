@@ -63,7 +63,8 @@ module MasterfilesApp
         active: true,
         material_mass: Faker::Number.decimal,
         plant_resource_button_indicator: Faker::Lorem.word,
-        basic_pack_code_id: basic_pack_code_id
+        basic_pack_code_id: basic_pack_code_id,
+        use_size_ref_for_edi: false
       }
       DB[:standard_pack_codes].insert(default.merge(opts))
     end

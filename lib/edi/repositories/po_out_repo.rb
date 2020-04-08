@@ -97,7 +97,9 @@ module EdiApp
           marketing_varieties.marketing_variety_code AS variety,
           standard_pack_codes.standard_pack_code AS pack,
           grades.grade_code AS grade,
-          CASE WHEN commodities.use_size_ref_for_edi THEN
+          CASE WHEN standard_pack_codes.use_size_ref_for_edi THEN
+            COALESCE(fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text)
+          WHEN commodities.use_size_ref_for_edi THEN
             COALESCE(fruit_size_references.edi_out_code, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack::text)
           ELSE
             COALESCE(fruit_actual_counts_for_packs.actual_count_for_pack::text, fruit_size_references.edi_out_code, fruit_size_references.size_reference)

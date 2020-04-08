@@ -1,8 +1,13 @@
 ---
 :caption: Standard Pack Codes
-:sql: "SELECT \"standard_pack_codes\".\"id\",\r\n\"standard_pack_codes\".\"standard_pack_code\",\r\n\"standard_pack_codes\".\"description\",\r\n\"standard_pack_codes\".\"std_pack_label_code\",\r\n\"standard_pack_codes\".\"material_mass\",\r\n\"standard_pack_codes\".\"plant_resource_button_indicator\",\r\n\"basic_pack_codes\".\"basic_pack_code\",\r\n\"standard_pack_codes\".\"created_at\",\r\n\"standard_pack_codes\".\"updated_at\",\r\n\"standard_pack_codes\".\"active\"\r\nFROM
-  \"standard_pack_codes\"\r\nLEFT JOIN \"basic_pack_codes\" ON \"basic_pack_codes\".\"id\"
-  = \"standard_pack_codes\".\"basic_pack_code_id\"\r\nORDER BY \"standard_pack_codes\".\"standard_pack_code\""
+:sql: "SELECT\r\n  \"standard_pack_codes\".\"id\",\r\n  \"standard_pack_codes\".\"standard_pack_code\",\r\n
+  \ \"standard_pack_codes\".\"description\",\r\n  \"standard_pack_codes\".\"std_pack_label_code\",\r\n
+  \ \"standard_pack_codes\".\"material_mass\",\r\n  \"standard_pack_codes\".\"plant_resource_button_indicator\",\r\n
+  \ \"basic_pack_codes\".\"basic_pack_code\",\r\n  \"standard_pack_codes\".\"use_size_ref_for_edi\",\r\n
+  \ \"standard_pack_codes\".\"created_at\",\r\n  \"standard_pack_codes\".\"updated_at\",\r\n
+  \ \"standard_pack_codes\".\"active\"\r\nFROM\r\n  \"standard_pack_codes\"\r\n  LEFT
+  JOIN \"basic_pack_codes\" ON \"basic_pack_codes\".\"id\" = \"standard_pack_codes\".\"basic_pack_code_id\"\r\nORDER
+  BY\r\n  \"standard_pack_codes\".\"standard_pack_code\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -119,9 +124,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  use_size_ref_for_edi:
+    :name: use_size_ref_for_edi
+    :sequence_no: 8
+    :caption: Use size ref for edi
+    :namespaced_name: standard_pack_codes.use_size_ref_for_edi
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: standard_pack_codes.created_at
     :data_type: :datetime
@@ -137,7 +158,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: standard_pack_codes.updated_at
     :data_type: :datetime
@@ -153,7 +174,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: standard_pack_codes.active
     :data_type: :boolean

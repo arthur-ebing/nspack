@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module StandardPackCode
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:standard_pack_code, :show, id: id)
           rules   = ui_rule.compile
 
@@ -18,6 +18,7 @@ module Masterfiles
               form.add_field :std_pack_label_code
               form.add_field :material_mass
               form.add_field :plant_resource_button_indicator
+              form.add_field :use_size_ref_for_edi
               form.add_field :active
             end
           end

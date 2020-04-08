@@ -15,6 +15,7 @@ module MasterfilesApp
         material_mass: 1.0,
         plant_resource_button_indicator: 'ABC',
         basic_pack_code_id: 1,
+        use_size_ref_for_edi: false,
         active: true
       }
       MasterfilesApp::StandardPackCode.new(base_attrs.merge(attrs))
