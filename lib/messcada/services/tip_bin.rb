@@ -14,10 +14,7 @@ module MesscadaApp
       errors = validations
       return failed_response(errors) unless errors.nil?
 
-      pachouse = ProductionApp::ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::PACKHOUSE, @device)
-      return pachouse.message unless pachouse.success
-
-      location_to_id = ProductionApp::ResourceRepo.new.find_plant_resource(pachouse.instance).location_id
+      location_to_id = ProductionApp::ResourceRepo.new.find_plant_resource(@run_attrs[:packhouse_resource_id]).location_id
       res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, @bin_number, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil).call
       return res unless res.success
 
