@@ -577,7 +577,7 @@ class Nspack < Roda # rubocop:disable ClassLength
               end
             end
 
-            res = interactor.replace_pallet_sequence(carton_number, id, params[:pallet][:carton_quantity].nil_or_empty? ? nil : params[:pallet][:carton_quantity])
+            res = interactor.replace_pallet_sequence(current_user&.user_name, carton_number, id, params[:pallet][:carton_quantity].nil_or_empty? ? nil : params[:pallet][:carton_quantity])
             if res.success
               store_locally(:flash_notice, 'Pallets Sequence Updated Successfully')
             else

@@ -95,14 +95,14 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def replace_pallet_sequence(carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+    def replace_pallet_sequence(user_name, carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
       carton = find_carton_with_run_info(carton_number)
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
 
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
       res = nil
       repo.transaction do
-        res = MesscadaApp::ReplacePalletSequence.new(carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
+        res = MesscadaApp::ReplacePalletSequence.new(user_name, carton[:id], pallet_sequence[:pallet_id], pallet_sequence_id, carton_quantity).call
         log_transaction
       end
       res
