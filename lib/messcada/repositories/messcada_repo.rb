@@ -10,7 +10,11 @@ module MesscadaApp
     def find_stock_item(stock_item_id, stock_type)
       return find_pallet(stock_item_id) if stock_type == AppConst::PALLET_STOCK_TYPE
 
-      DB[:rmt_bins].where(id: stock_item_id).first
+      if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+        DB[:rmt_bins].where(bin_asset_number: stock_item_id).first
+      else
+        DB[:rmt_bins].where(id: stock_item_id).first
+      end
     end
 
     def update_stock_item(stock_item_id, upd, stock_type)
