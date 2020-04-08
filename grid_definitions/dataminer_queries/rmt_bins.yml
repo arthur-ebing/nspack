@@ -1,6 +1,6 @@
 ---
 :caption: Rmt Bins
-:sql: "SELECT\r\n    id,\r\n    rmt_delivery_id,\r\n    season_id,\r\n    discrete_bin,\r\n
+:sql: "SELECT\r\n    id,\r\n    rmt_delivery_id,\r\n    season_id,\r\n    discrete_bin,\r\n    delivery_destination_code,\r\n
   \   cultivar_id,\r\n    orchard_id,\r\n    farm_id,\r\n    rmt_class_id,\r\n    rmt_container_type_id,\r\n
   \   rmt_container_material_type_id,\r\n    cultivar_group_id,\r\n    puc_id,\r\n
   \   exit_ref,\r\n    qty_bins,\r\n    bin_asset_number,\r\n    tipped_asset_number,\r\n
@@ -49,6 +49,22 @@
     :hide: false
     :pinned:
     :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_destination_code:
+    :name: delivery_destination_code
+    :sequence_no: 2
+    :caption: Delivery Destination Code
+    :namespaced_name: delivery_destination_code
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
     :group_by_seq:
     :group_sum: false
     :group_avg: false
