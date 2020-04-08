@@ -22,7 +22,7 @@ class Nspack < Roda
 
         r.post do
           pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:govt_inspection_sheet][:pallet_number]).pallet_number
-          res = interactor.update_govt_inspection_add_pallets(govt_inspection_sheet_id: id, pallet_number: pallet_number)
+          res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id: id, pallet_number: pallet_number)
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"

@@ -47,8 +47,8 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_add_pallets(params)
-      res = validate_govt_inspection_add_pallet_params(params)
+    def add_pallets_govt_inspection_sheet(params)
+      res = validate_add_pallet_govt_inspection_params(params)
       return res unless res.success
 
       repo.transaction do
@@ -353,7 +353,7 @@ module FinishedGoodsApp
       MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
     end
 
-    def validate_govt_inspection_add_pallet_params(params) # rubocop:disable Metrics/AbcSize
+    def validate_add_pallet_govt_inspection_params(params) # rubocop:disable Metrics/AbcSize
       res = GovtInspectionAddPalletSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
