@@ -212,6 +212,7 @@ module UiRules
         inspected_pallets
         pallets_palletized_full
         pallets_palletized_partial
+        pallet_weight
         rebins_created
         rebins_weight
       ]
@@ -225,12 +226,14 @@ module UiRules
         inspected_pallets: :right,
         pallets_palletized_full: :right,
         pallets_palletized_partial: :right,
+        pallet_weight: :right,
         rebins_created: :right,
         rebins_weight: :right
       }
       rules[:cell_transformers] = {
         bins_tipped_weight: :decimal,
         cartons_verified_weight: :decimal,
+        pallet_weight: :decimal,
         rebins_weight: :decimal
       }
     end
