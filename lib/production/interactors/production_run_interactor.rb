@@ -109,7 +109,7 @@ module ProductionApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('replace_pallet_sequence'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("replace_pallet_sequence. pallet_sequence_id:#{pallet_sequence_id}, carton_number:#{carton_number} "))
       failed_response(e.message)
     end
 
