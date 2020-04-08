@@ -17,6 +17,10 @@ module Masterfiles
               form.remote! if remote
               form.add_field :parent_id
               form.add_field :short_description
+              form.add_text 'Note: this value should be limited to 2 characters for use in EDIs',
+                            dom_id: 'short_desc_warn',
+                            hide_on_load: rules[:short_too_long],
+                            css_classes: 'orange b'
               form.add_field :medium_description
               form.add_field :long_description
               form.add_field :vat_number

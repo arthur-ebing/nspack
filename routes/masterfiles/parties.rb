@@ -46,6 +46,17 @@ class Nspack < Roda
     end
     r.on 'organizations' do
       interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'changed', String do |field|
+        if field == 'short_desc'
+          if params[:changed_value].length > 2
+            json_show_element('short_desc_warn')
+          else
+            json_hide_element('short_desc_warn')
+          end
+        end
+      end
+
       r.on 'new' do
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Organization::New.call(remote: fetch?(r)) }

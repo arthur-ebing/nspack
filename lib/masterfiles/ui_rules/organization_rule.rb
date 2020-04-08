@@ -11,6 +11,8 @@ module UiRules
 
       set_show_fields if @mode == :show
 
+      rules[:short_too_long] = @form_object[:short_description].to_s.length <= 2
+      add_behaviours if %i[new edit].include?(@mode)
       form_name 'organization'
     end
 
@@ -52,6 +54,15 @@ module UiRules
                                     # variants: nil,
                                     # active: true,
                                     role_ids: [])
+    end
+
+    private
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.keyup :short_description,
+                        notify: [{ url: '/masterfiles/parties/organizations/changed/short_desc' }]
+      end
     end
   end
 end
