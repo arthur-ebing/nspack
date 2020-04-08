@@ -23,9 +23,9 @@ module EdiApp
       @oh_count, @ol_count, @oc_count, @ok_count, @op_count = [0, 0, 0, 0, 0] # rubocop:disable Style/ParallelAssignment
       @total_carton_count, @total_pallet_count = [0, 0] # rubocop:disable Style/ParallelAssignment
       prepare_bh
-      prepare_oh
       return success_response('No data for PO') if @header_rec.nil?
 
+      prepare_oh
       prepare_lf
       prepare_lt
 
@@ -55,13 +55,14 @@ module EdiApp
     private
 
     def prepare_bh
-      add_record('BH')
-    end
-
-    def prepare_oh
       @header_rec = po_repo.po_header_row(record_id)
       return if @header_rec.nil?
 
+      hash = build_hash_from_data(@header_rec, 'BH')
+      add_record('BH', hash)
+    end
+
+    def prepare_oh
       hash = build_hash_from_data(@header_rec, 'OH')
       add_record('OH', hash)
       @oh_count += 1

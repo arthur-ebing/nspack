@@ -12,6 +12,11 @@ module EdiApp
           loads.shipped_at AS start_date,
           loads.shipped_at AS end_date,
           loads.shipped_at AS departure_date,
+          CASE WHEN loads.transfer_load THEN
+            'is_transfer'
+          ELSE
+            'is_final_load_out'
+          END AS extra_chars,
           fn_party_role_org_code(load_vehicles.haulier_party_role_id) AS carrier,
           fn_party_role_org_code(loads.customer_party_role_id) AS customer,
           (SELECT COUNT(*) FROM pallets WHERE load_id = loads.id) AS plt_qty,
