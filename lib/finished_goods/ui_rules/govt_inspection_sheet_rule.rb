@@ -65,6 +65,7 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       valid_tm_group_ids = @repo.select_values(:destination_regions_tm_groups, :target_market_group_id)
+      valid_destination_region_ids = @repo.select_values(:destination_regions_tm_groups, :destination_region_id)
       {
         inspector_id: { renderer: :select,
                         options: MasterfilesApp::InspectorRepo.new.for_select_inspectors,
@@ -98,8 +99,8 @@ module UiRules
                               caption: 'Packed TM Group',
                               required: true },
         destination_region_id: { renderer: :select,
-                                 options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: @form_object.packed_tm_group_id }),
-                                 disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_destination_regions(where: { target_market_group_id: @form_object.packed_tm_group_id }),
+                                 options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { id: valid_destination_region_ids }),
+                                 disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_destination_regions,
                                  caption: 'Destination Region',
                                  required: true },
         govt_inspection_api_result_id: { renderer: :select,
@@ -127,17 +128,17 @@ module UiRules
       @form_object = OpenStruct.new(inspector_id: nil,
                                     inspection_billing_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_INSPECTION_BILLING, AppConst::ROLE_BILLING_CLIENT),
                                     exporter_party_role_id: @party_repo.find_party_role_from_party_name_for_role(AppConst::DEFAULT_EXPORTER, AppConst::ROLE_EXPORTER),
-                                    booking_reference: @repo.last_record(:booking_reference),
+                                    booking_reference: @repo.get_last(:govt_inspection_sheets, :booking_reference),
                                     results_captured: nil,
                                     results_captured_at: nil,
                                     api_results_received: nil,
                                     completed: nil,
                                     completed_at: nil,
                                     inspected: nil,
-                                    inspection_point: @repo.last_record(:inspection_point),
+                                    inspection_point: @repo.get_last(:govt_inspection_sheets, :inspection_point),
                                     awaiting_inspection_results: nil,
-                                    packed_tm_group_id: @repo.last_record(:packed_tm_group_id),
-                                    destination_region_id: @repo.last_record(:destination_region_id),
+                                    packed_tm_group_id: @repo.get_last(:govt_inspection_sheets, :packed_tm_group_id),
+                                    destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
                                     govt_inspection_api_result_id: nil,
                                     reinspection: @mode == :reinspection,
                                     pallet_number: nil)

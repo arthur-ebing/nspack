@@ -79,8 +79,8 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def last_record(column)
-      DB[:govt_inspection_sheets].reverse(:id).limit(1).get(column)
+    def get_last(table_name, column)
+      DB[table_name].reverse(:id).limit(1).get(column)
     end
 
     def find_govt_inspection_pallet_flat(id)

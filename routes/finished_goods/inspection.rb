@@ -222,7 +222,10 @@ class Nspack < Roda
           blank_json_response
         else
           region_list = FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
-          json_replace_select_options('govt_inspection_sheet_destination_region_id', region_list)
+          actions = []
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_region_id', options_array: region_list)
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_region_id', value: region_list.first.last) if region_list.length == 1
+          json_actions(actions)
         end
       end
 
