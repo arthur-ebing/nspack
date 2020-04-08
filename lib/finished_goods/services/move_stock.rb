@@ -124,7 +124,6 @@ module FinishedGoodsApp
 
     def validate_stock_item # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @stock_item = repo.find_stock_item(stock_item_id, stock_type)
-      @stock_item_id = @stock_item[:id] if stock_type == AppConst::BIN_STOCK_TYPE
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
       return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]

@@ -15,7 +15,7 @@ module MesscadaApp
       return failed_response(errors) unless errors.nil?
 
       location_to_id = ProductionApp::ResourceRepo.new.find_plant_resource(@run_attrs[:packhouse_resource_id]).location_id
-      res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, @bin_number, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil).call
+      res = FinishedGoodsApp::MoveStockService.new(AppConst::BIN_STOCK_TYPE, rmt_bin_id, location_to_id, AppConst::BIN_TIP_MOVE_BIN_BUSINESS_PROCESS, nil).call
       return res unless res.success
 
       update_bin
