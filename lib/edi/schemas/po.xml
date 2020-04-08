@@ -93,7 +93,7 @@
         <field name="record_type" size="2" default="OL"/>
         <field name="load_id" size="10" required="false"/>
         <field name="locn_type" size="2" required="false" map_to="location_type" default="DP"/>
-        <field name="locn_code" size="7" required="false" map_to="location_code"/>
+        <field name="locn_code" size="7" required="false" map_to="location_code" trim="true" />
         <field name="seq_no" size="5" type="number" required="false" format="ZEROES" default="1"
           map_to="sequence_number"/>
         <field name="tran_type" size="1" required="false" default="D" map_to="transaction_type"/>
