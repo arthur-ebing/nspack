@@ -12,8 +12,9 @@
   status, build_status, load_id, vessel, voyage, container, internal_container, temp_code,
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
   exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
-  AS departure_date, active, exit_ref, created_by, verified_by, colour_rule FROM vw_scrapped_pallet_sequence_flat
-  ORDER BY pallet_id DESC, pallet_sequence_number ASC
+  AS departure_date, active, exit_ref, created_by, verified_by, edi_size_count, colour_rule
+  FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id DESC, pallet_sequence_number
+  ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1370,9 +1371,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_size_count:
+    :name: edi_size_count
+    :sequence_no: 85
+    :caption: Edi size count
+    :namespaced_name: edi_size_count
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 85
+    :sequence_no: 86
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

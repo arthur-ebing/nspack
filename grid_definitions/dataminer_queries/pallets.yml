@@ -20,9 +20,10 @@
   \   exporter,\r\n    country,\r\n    region,\r\n    packed_at,\r\n    packed_date,\r\n
   \   repacked,\r\n    repacked_at,\r\n    repacked_date,\r\n    repacked_from_pallet_id,\r\n
   \   COALESCE(ata, eta) AS arrival_date,\r\n    COALESCE(atd, etd) AS departure_date,\r\n
-  \   active,\r\n    created_by,\r\n    verified_by,\r\n    CASE WHEN fn_pallet_verification_failed
-  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
-  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER BY pallet_id DESC, pallet_sequence_number ASC"
+  \   active,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    CASE
+  WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n
+  \       colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER
+  BY pallet_id DESC, pallet_sequence_number ASC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1475,9 +1476,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_size_count:
+    :name: edi_size_count
+    :sequence_no: 91
+    :caption: Edi size count
+    :namespaced_name: edi_size_count
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 91
+    :sequence_no: 92
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

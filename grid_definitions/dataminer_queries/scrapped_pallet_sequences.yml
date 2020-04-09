@@ -18,8 +18,8 @@
   gross_weight_measured_at, partially_palletized_at, govt_inspection_passed, internal_inspection_passed,
   inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
   intake_created_at, first_cold_storage_at, active, extended_columns, seq_scrapped_at,
-  created_by, verified_by, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER
-  BY pallet_id DESC, pallet_sequence_number ASC
+  created_by, verified_by, edi_size_count, colour_rule FROM vw_scrapped_pallet_sequence_flat
+  ORDER BY pallet_id DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1808,9 +1808,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_size_count:
+    :name: edi_size_count
+    :sequence_no: 112
+    :caption: Edi size count
+    :namespaced_name: edi_size_count
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 112
+    :sequence_no: 113
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
