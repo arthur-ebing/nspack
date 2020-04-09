@@ -101,16 +101,20 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     DB[table_name].where(id: id).get(column)
   end
 
-  # Get a single value from a record given any WHERE clause
-  # NB: only the first record is returned - even when the WHERE clause
-  #     would return more than one row.
+  # Get a single value (or set of values) from a record given any WHERE clause.
+  # If an array of columns are given, an array of values will be returned.
+  # An exception is raised if the query returns more than one record.
   #
   # @param table_name [Symbol] the db table name.
-  # @param column [Symbol] the column (or array of columns) to query.
+  # @param column [Symbol] the column (or array of columns) to return.
   # @param args [Hash] the where-clause conditions.
   # @return [any] the column value for the matching record or nil.
-  def get_with_args(table_name, column, args)
-    DB[table_name].where(args).get(column)
+  def get_value(table_name, column, args)
+    values = DB[table_name].where(args).select_map(column)
+    raise Crossbeams::FrameworkError, '"get_value" method must return only one record' if values.length > 1
+    return nil if values.empty?
+
+    values.first
   end
 
   # Get the id for a record in a table for a given WHERE clause.

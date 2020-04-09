@@ -250,7 +250,7 @@ module FinishedGoodsApp
       res = validate_pallets(:exists, pallet_number)
       return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
 
-      load_id = repo.get_with_args(:pallets, :load_id, pallet_number: pallet_number)
+      load_id = repo.get_value(:pallets, :load_id, pallet_number: pallet_number)
       return validation_failed_response(messages: { pallet_number: ['Pallet not on a load.'] }) if load_id.nil?
 
       success_response('ok', load_id)

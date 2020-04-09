@@ -42,7 +42,7 @@ module DevelopmentApp
     end
 
     def logged_actions_sql_for_transaction(id)
-      tx_id = get_with_args(Sequel[:audit][:logged_actions], :transaction_id, event_id: id)
+      tx_id = get_value(Sequel[:audit][:logged_actions], :transaction_id, event_id: id)
       # This should change to include affected table and changes
       # (client_query could be an insert/update to tbl1, but a trigger updated tbl2)
       # Query run      : SQL
