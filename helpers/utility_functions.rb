@@ -143,11 +143,17 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
           [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys(v)]
         end
       ]
+    elsif hash.is_a?(Array)
+      hash.map { |a| symbolize_keys(a) }
     else
       hash
     end
   end
 
+  # Change keys in a nested hash into string keys.
+  #
+  # @param hash [hash] the hash with keys to stringify.
+  # @return [hash]
   def stringify_keys(hash)
     if hash.is_a?(Hash)
       Hash[
