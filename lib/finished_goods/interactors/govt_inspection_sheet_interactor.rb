@@ -82,7 +82,7 @@ module FinishedGoodsApp
       res = repo.validate_govt_inspection_sheet_inspect_params(id)
       return res unless res.success
 
-      reinspection = repo.get_with_args(:govt_inspection_sheets, :reinspection, id: id)
+      reinspection = repo.get(:govt_inspection_sheets, id, :reinspection)
       status = reinspection ? 'MANUALLY_REINSPECTED_BY_GOVT' : 'MANUALLY_INSPECTED_BY_GOVT'
       attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
 
@@ -186,7 +186,7 @@ module FinishedGoodsApp
         return res unless res.success
       end
 
-      res = if repo.get_with_args(:govt_inspection_sheets, :reinspection, id: attrs[:govt_inspection_sheet_id])
+      res = if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
               validate_pallets(:not_inspected, pallet_number)
             else
               validate_pallets(:not_on_inspection_sheet, pallet_number)

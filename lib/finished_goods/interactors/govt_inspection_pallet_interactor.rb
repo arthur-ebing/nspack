@@ -22,11 +22,17 @@ module FinishedGoodsApp
       res = validate_govt_inspection_failed_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, id, :govt_inspection_sheet_id)
+      reinspection = repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
       attrs = res.to_h
-      attrs[:inspected] = true
       attrs[:passed] = false
-      attrs[:inspected_at] = Time.now
-
+      attrs[:inspected] = true
+      if reinspection
+        attrs[:reinspected] = true
+        attrs[:reinspected_at] = Time.now
+      else
+        attrs[:inspected_at] = Time.now
+      end
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)
       end
@@ -36,15 +42,21 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def pass_govt_inspection_pallet(ids)
-      attrs = { inspected: true,
-                inspected_at: Time.now,
-                passed: true,
-                failure_reason_id: nil,
-                failure_remarks: nil }
-      repo.transaction do
-        [ids].each do |id|
-          repo.update_govt_inspection_pallet(id, attrs)
+    def pass_govt_inspection_pallet(ids) # rubocop:disable Metrics/AbcSize
+      govt_inspection_sheet_ids = repo.select_values(:govt_inspection_pallets, :govt_inspection_sheet_id, id: ids).uniq
+      govt_inspection_sheet_ids.each do |sheet_id|
+        reinspection = repo.get(:govt_inspection_sheets, sheet_id, :reinspection)
+        attrs = { passed: true, inspected: true, failure_reason_id: nil, failure_remarks: nil }
+        if reinspection
+          attrs[:reinspected] = true
+          attrs[:reinspected_at] = Time.now
+        else
+          attrs[:inspected_at] = Time.now
+        end
+        repo.transaction do
+          [ids].each do |id|
+            repo.update_govt_inspection_pallet(id, attrs)
+          end
         end
       end
       success_response('Govt inspection: pallets passed.')
@@ -52,18 +64,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_pallet(id, params) # rubocop:disable Metrics/AbcSize
+    def update_govt_inspection_pallet(id, params)
       res = validate_govt_inspection_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
-
-      govt_inspection_sheet_id = repo.get_id(:govt_inspection_pallets, govt_inspection_sheet_id: id)
-      reinspection = repo.get_with_args(:govt_inspection_sheets, :reinspection, id: govt_inspection_sheet_id)
-
-      attrs = res.to_h
-      if reinspection
-        attrs[:reinspected] = true
-        attrs[:reinspected_at] = Time.now
-      end
 
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)
@@ -91,8 +94,7 @@ module FinishedGoodsApp
     def reject_to_repack(multiselect_list)  # rubocop:disable Metrics/AbcSize
       return failed_response('Pallet selection cannot be empty') if multiselect_list.nil_or_empty?
 
-      pallet_ids = repo.selected_pallets(multiselect_list)
-      res = nil
+      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: multiselect_list).uniq
       new_pallet_ids = []
       repo.transaction do
         pallet_ids.each do |pallet_id|
@@ -145,6 +147,10 @@ module FinishedGoodsApp
       @repo ||= GovtInspectionRepo.new
     end
 
+    def reworks_repo
+      @reworks_repo ||= ProductionApp::ReworksRepo.new
+    end
+
     def govt_inspection_pallet(id)
       repo.find_govt_inspection_pallet_flat(id)
     end
@@ -155,10 +161,6 @@ module FinishedGoodsApp
 
     def validate_govt_inspection_failed_pallet_params(params)
       GovtInspectionFailedPalletSchema.call(params)
-    end
-
-    def reworks_repo
-      @reworks_repo ||= ProductionApp::ReworksRepo.new
     end
   end
 end

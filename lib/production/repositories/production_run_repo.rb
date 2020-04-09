@@ -47,7 +47,7 @@ module ProductionApp
     end
 
     def pallet_id_from_pallet_sequence_id(pallet_sequence_id)
-      get_with_args(:pallet_sequences, :pallet_id, id: pallet_sequence_id)
+      get(:pallet_sequences, pallet_sequence_id, :pallet_id)
     end
 
     def get_pallet_label_data(pallet_id)
