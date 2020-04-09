@@ -5,7 +5,7 @@ module QualityApp
     def phyt_clean_request
       service_res = nil
       repo.transaction do
-        service_res = QualityApp::PhytCleanRequests.call
+        service_res = QualityApp::PhytCleanCitrusEuOrchardStatus.call
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction

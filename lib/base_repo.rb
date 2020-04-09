@@ -112,7 +112,6 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   def get_value(table_name, column, args)
     values = DB[table_name].where(args).select_map(column)
     raise Crossbeams::FrameworkError, '"get_value" method must return only one record' if values.length > 1
-    return nil if values.empty?
 
     values.first
   end

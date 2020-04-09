@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class PhytCleanRequests < BaseService
+  class PhytCleanCitrusEuOrchardStatus < BaseService
     attr_accessor :response, :api_result, :params
 
     def initialize
@@ -11,9 +11,6 @@ module QualityApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      res = api.auth_token_call
-      return failed_response(res.message) unless res.success
-
       res = api.request_get_citrus_eu_orchard_status
       return failed_response(res.message) unless res.success
 
