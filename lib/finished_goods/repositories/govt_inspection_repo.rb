@@ -101,9 +101,5 @@ module FinishedGoodsApp
       ds = ds.where(cancelled: false, pallet_number: pallet_numbers)
       ds.select_map(:pallet_number)
     end
-
-    def allocated_pallets(inspection_sheet_id)
-      DB[:govt_inspection_pallets].where(govt_inspection_sheet_id: inspection_sheet_id).select_map(:pallet_id)
-    end
   end
 end
