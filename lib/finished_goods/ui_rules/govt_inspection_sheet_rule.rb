@@ -145,7 +145,8 @@ module UiRules
 
     def add_rules
       rules[:inspected] = @form_object.inspected
-      rules[:pallets_allocated] = !@repo.get_value(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:id]).nil?
+      # rules[:pallets_allocated] = !@repo.get_value(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:id]).nil?
+      rules[:pallets_allocated] = @repo.allocated_pallets(@options[:id]).any?
     end
   end
 end
