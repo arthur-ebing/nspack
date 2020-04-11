@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class CartonLabeling < BaseService
+  class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number, :identifier, :personnel_number
 
     def initialize(params)
@@ -102,13 +102,23 @@ module MesscadaApp
       Dir.glob(cache_files).each do |f|
         next unless File.file?(f)
 
-        file_data = YAML.load_file(f)
+        file_data = yaml_data_from_file(f)
         next unless file_data
 
         return file_data[resource_code] unless file_data.empty? || file_data[resource_code].nil?
       end
 
       {}
+    end
+
+    # Read with a shared lock to prevent read while file is being written.
+    def yaml_data_from_file(file)
+      data = nil
+      File.open(file, 'r') do |f|
+        f.flock(File::LOCK_SH)
+        data = YAML.load(f.read) # rubocop:disable Security/YAMLLoad
+      end
+      data
     end
 
     def production_run_exists?
