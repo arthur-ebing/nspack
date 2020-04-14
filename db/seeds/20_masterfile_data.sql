@@ -115,6 +115,8 @@ INSERT INTO scrap_reasons(scrap_reason, description) VALUES ('REPACKED', 'Repack
 -- PACKING_METHODS --
 INSERT INTO packing_methods (packing_method_code, description, actual_count_reduction_factor) VALUES('NORMAL', 'Normal', 1) ON CONFLICT DO NOTHING;
 
--- GLOBAL PALLET_MIX_RULE --
-INSERT INTO public.pallet_mix_rules(scope, production_run_id, pallet_id, allow_tm_mix, allow_grade_mix, allow_size_ref_mix, allow_pack_mix, allow_std_count_mix, allow_mark_mix, allow_inventory_code_mix) VALUES ('GLOBAL', null, null, false, false, false, false, false, false, false) ON CONFLICT DO NOTHING;
+-- GLOBAL PALLET_MIX_RULE (NOTE: no unique key, so insert checks for record existing...) --
+INSERT INTO public.pallet_mix_rules(scope, production_run_id, pallet_id, allow_tm_mix, allow_grade_mix, allow_size_ref_mix, allow_pack_mix, allow_std_count_mix, allow_mark_mix, allow_inventory_code_mix)
+SELECT 'GLOBAL', null, null, false, false, false, false, false, false, false
+ WHERE NOT EXISTS (SELECT id FROM pallet_mix_rules WHERE scope = 'GLOBAL');
 
