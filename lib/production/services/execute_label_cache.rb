@@ -17,7 +17,7 @@ module ProductionApp
       FileUtils.mkpath(AppConst::LABELING_CACHED_DATA_FILEPATH)
 
       # Write the cache file with an exclusive lock to prevent reads before it is fully written.
-      File.open(File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, "line_#{production_run.production_line_id}.yml"), File::WRONLY | File::CREAT) do |f|
+      File.open(File.join(AppConst::LABELING_CACHED_DATA_FILEPATH, "line_#{production_run.production_line_id}.yml"), File::TRUNC | File::WRONLY | File::CREAT) do |f|
         f.flock(File::LOCK_EX)
         f << cache.to_yaml
       end
