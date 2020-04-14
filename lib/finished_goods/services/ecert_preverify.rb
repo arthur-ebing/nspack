@@ -103,8 +103,8 @@ module FinishedGoodsApp
         res = api.tracking_unit_status(pallet_number)
         return failed_response(res.message) unless res.success
 
-        status = res.instance.first
-        tracking_unit_statuses = status['TrackingUnitStatuses'].first
+        status = res.instance.first || {}
+        tracking_unit_statuses = status['TrackingUnitStatuses'].first || {}
 
         attrs = { ecert_agreement_id: agreement_id,
                   business_id: business_id,
