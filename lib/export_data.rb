@@ -21,14 +21,15 @@ module Crossbeams
       @log_id = nil
     end
 
-    def run
+    def run # rubocop:disable Metrics/AbcSize
       log('Starting export', start: true)
 
       validate
       set_defaults
       prepare
       run_report
-      write_file
+      write_csv_file if for_csv?
+      write_xls_file if for_xls?
 
       make_zip if config['zip_for_mail']
       send_mail if config['email']
@@ -43,6 +44,14 @@ module Crossbeams
     end
 
     private
+
+    def for_csv?
+      @output_format == 'csv'
+    end
+
+    def for_xls?
+      @output_format == 'xls'
+    end
 
     def handle_error(err)
       message = if @current_column
@@ -79,10 +88,11 @@ module Crossbeams
       end
     end
 
-    def set_defaults
+    def set_defaults # rubocop:disable Metrics/AbcSize
       @export_hidden_fields = config['export_hidden_fields'] == true
       @prefix_long_numbers_with_quote = config['prefix_long_numbers_with_quote'].nil? ? true : config['prefix_long_numbers_with_quote']
       @boolean_as_yn = config['boolean_as_yn'].nil? ? true : config['boolean_as_yn']
+      @output_format = (config['output_format'] || 'csv').strip
     end
 
     def send_mail
@@ -102,7 +112,7 @@ module Crossbeams
       @recs = repo.run_report(report.runnable_sql)
     end
 
-    def write_file # rubocop:disable Metrics/AbcSize
+    def write_csv_file # rubocop:disable Metrics/AbcSize
       log('Writing to file')
       CSV.open(output_file, 'w', headers: ordered_headers, write_headers: true) do |csv|
         recs.each do |rec|
@@ -113,6 +123,60 @@ module Crossbeams
         end
       end
       @current_column = nil
+    end
+
+    def write_xls_file # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      xls_possible_types = { string: :string, integer: :integer, date: :string,
+                             datetime: :time, time: :time, boolean: :string, number: :float }
+      heads = []
+      fields = []
+      xls_types = []
+      x_styles = []
+      Axlsx::Package.new do |p| # rubocop:disable Metrics/BlockLength
+        p.workbook do |wb| # rubocop:disable Metrics/BlockLength
+          styles = wb.styles
+          styles.fonts.first.sz = 10
+          tbl_header = styles.add_style b: true, font_name: 'arial', alignment: { horizontal: :center }, sz: 10
+          delim4 = styles.add_style(format_code: '#,##0.0000;[Red]-#,##0.0000', sz: 10)
+          delim2 = styles.add_style(format_code: '#,##0.00;[Red]-#,##0.00', sz: 10)
+          bool = styles.add_style alignment: { horizontal: :center }, sz: 10
+          and_styles = { delimited_1000_4: delim4, delimited_1000: delim2, boolean: bool }
+          report.ordered_columns.each do |col|
+            next if col.hide && !@export_hidden_fields
+
+            xls_types << xls_possible_types[col.data_type] || :string
+            heads << col.caption
+            fields << col.name
+            x_styles << if col.format
+                          and_styles[col.format]
+                        else
+                          and_styles[col.data_type]
+                        end
+          end
+
+          wb.add_worksheet do |sheet|
+            sheet.add_row heads, style: tbl_header
+            recs.each do |row|
+              values = fields.map do |f|
+                v = row[f.to_sym]
+                # v.is_a?(BigDecimal) ? v.to_f : v
+                case v
+                when BigDecimal
+                  v.to_f
+                when TrueClass
+                  'Y'
+                when FalseClass
+                  'N'
+                else
+                  v
+                end
+              end
+              sheet.add_row(values, types: xls_types, style: x_styles)
+            end
+          end
+        end
+        p.serialize(output_file)
+      end
     end
 
     def apply_where_conditions
@@ -158,7 +222,7 @@ module Crossbeams
     end
 
     def output_file
-      @output_file ||= File.join(config['out_dir'], "#{key}.csv")
+      @output_file ||= File.join(config['out_dir'], "#{key}.#{@output_format}")
     end
 
     def ordered_headers
