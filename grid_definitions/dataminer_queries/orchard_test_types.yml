@@ -4,7 +4,7 @@
   \   orchard_test_types.description,\r\n    orchard_test_types.result_type,\r\n    orchard_test_types.applies_to_all_markets,\r\n
   \   orchard_test_types.applies_to_all_cultivars,\r\n    orchard_test_types.applies_to_orchard,\r\n
   \   orchard_test_types.allow_result_capturing,\r\n    orchard_test_types.pallet_level_result,\r\n
-  \   orchard_test_types.api_name,\r\n    orchard_test_types.result_attribute,\r\n
+  \   orchard_test_types.api_name,\r\n    orchard_test_types.api_attribute,\r\n
   \   orchard_test_types.applicable_tm_group_ids,\r\n    orchard_test_types.applicable_cultivar_ids,\r\n
   \   orchard_test_types.applicable_commodity_group_ids,\r\n    orchard_test_types.active,\r\n
   \   orchard_test_types.created_at,\r\n    orchard_test_types.updated_at,\r\n    fn_current_status
@@ -181,11 +181,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  result_attribute:
-    :name: result_attribute
+  api_attribute:
+    :name: api_attribute
     :sequence_no: 11
-    :caption: Result attribute
-    :namespaced_name: orchard_test_types.result_attribute
+    :caption: Api attribute
+    :namespaced_name: orchard_test_types.api_attribute
     :data_type: :string_array
     :width: 
     :format: 

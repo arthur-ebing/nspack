@@ -2,17 +2,18 @@
 
 module UiRules
   class OrchardTestResultRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = QualityApp::OrchardTestRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields edit_fields if @mode == :edit
+      common_values_for_fields bulk_edit_fields if @mode == :bulk_edit
 
       set_show_fields if %i[show reopen].include? @mode
-      add_behaviours if %i[new edit].include? @mode
+      add_behaviours if %i[edit bulk_edit].include? @mode
       form_name 'orchard_test_result'
     end
 
@@ -32,77 +33,67 @@ module UiRules
                                with_value: @form_object.cultivar_code,
                                caption: 'Cultivars',
                                required: true }
-      fields[:description] = { renderer: :label }
       fields[:passed] = { renderer: :label,
                           with_value: @form_object.passed ? 'Passed' : 'Failed',
                           caption: 'Result' }
-      fields[:classification_only] = { renderer: :label, as_boolean: true }
+      fields[:classification] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
       fields[:api_result] = { renderer: :label }
-      fields[:classification] = { renderer: :label }
+      fields[:result] = { renderer: :label }
 
       fields[:applicable_from] = { renderer: :label }
       fields[:applicable_to] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
-      orchard = @farm_repo.find_orchard(@form_object.orchard_id)
-      puc_ids = @repo.select_values(:orchards, :puc_id).uniq
-      edit_orchard_test_type_renderer = { renderer: :select,
-                                          options: @repo.for_select_orchard_test_types,
-                                          disabled_options: @repo.for_select_inactive_orchard_test_types,
-                                          caption: 'Orchard Test Type',
-                                          required: true,
-                                          prompt: true }
-      show_orchard_test_type_renderer = { renderer: :label,
-                                          with_value: @form_object.orchard_test_type_code,
-                                          caption: 'Orchard Test Type' }
+    def edit_fields
       {
-        orchard_test_type_id: @mode == :new ? edit_orchard_test_type_renderer : show_orchard_test_type_renderer,
-        puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
-                  disabled_options: @farm_repo.for_select_inactive_pucs,
-                  caption: 'Puc',
-                  required: true,
-                  prompt: true },
-        puc_ids: { renderer: :multi,
-                   options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
-                   selected: [@form_object.puc_id],
-                   caption: 'Pucs',
-                   required: true },
-        orchard_id: { renderer: :select,
-                      options: @repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
-                      disabled_options: @repo.for_select_inactive_orchards,
-                      caption: 'Orchard',
-                      required: true,
-                      prompt: true },
-        orchard_ids: { renderer: :multi,
-                       options: @repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
-                       selected: [@form_object.orchard_id],
-                       caption: 'Orchards',
-                       required: true },
-        cultivar_id: { renderer: :select,
-                       options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
-                       disabled_options: @repo.for_select_inactive_cultivar_codes,
-                       caption: 'Cultivar',
-                       required: true },
-        cultivar_ids: { renderer: :multi,
-                        options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
-                        selected: [@form_object.cultivar_id],
-                        caption: 'Cultivars',
-                        required: true },
-        description: { hide_on_load: false },
-        passed: { renderer: :select,
-                  options: [%w[Failed false], %w[Passed true]],
+        orchard_test_type_id: { renderer: :label,
+                                with_value: @form_object.orchard_test_type_code,
+                                caption: 'Orchard Test Type' },
+        puc_id: { renderer: :label,
+                  with_value: @form_object.puc_code,
+                  caption: 'Puc' },
+        orchard_id: { renderer: :label,
+                      with_value: @form_object.orchard_code,
+                      caption: 'Orchard' },
+        cultivar_id: { renderer: :label,
+                       with_value: @form_object.cultivar_code,
+                       caption: 'Cultivar' },
+        passed: { renderer: :label,
+                  with_value: @form_object.passed ? 'Passed' : 'Failed',
                   caption: 'Result',
-                  hide_on_load: !@pass_fail },
-        classification: { hide_on_load: @pass_fail },
-        classification_only: { renderer: :checkbox,
-                               hide_on_load: @pass_fail },
+                  hide_on_load: @result_type_classification },
+        api_result: { caption: 'Result' },
+        classification: { renderer: :checkbox,
+                          hide_on_load: !@result_type_classification },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
-        api_result: { hide_on_load: false },
+        api_response: { hide_on_load: false },
+        applicable_from: { renderer: :date },
+        applicable_to: { renderer: :date }
+      }
+    end
+
+    def bulk_edit_fields
+      {
+        orchard_test_type_id: { renderer: :label,
+                                with_value: @form_object.orchard_test_type_code,
+                                caption: 'Orchard Test Type' },
+        update_all: { renderer: :checkbox },
+        group_ids: { renderer: :multi,
+                     options: @repo.for_select_orchard_test_results(@form_object.orchard_test_type_id),
+                     caption: 'Puc / Orchard / Cultivar' },
+        passed: { renderer: :label,
+                  with_value: @form_object.passed ? 'Passed' : 'Failed',
+                  caption: 'Result',
+                  hide_on_load: @result_type_classification },
+        api_result: { caption: 'Result' },
+        classification: { renderer: :checkbox,
+                          hide_on_load: !@result_type_classification },
+        freeze_result: { renderer: :checkbox,
+                         hide_on_load: false },
+        api_response: { hide_on_load: false },
         applicable_from: { renderer: :date },
         applicable_to: { renderer: :date }
       }
@@ -115,10 +106,9 @@ module UiRules
       end
 
       @form_object = @repo.find_orchard_test_result_flat(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge(puc_ids: Array(@form_object.puc_id)))
-
       @rule_object = @repo.find_orchard_test_type_flat(@form_object[:orchard_test_type_id])
-      @pass_fail = @rule_object.result_type == AppConst::PASS_FAIL
+      @result_type_classification = @rule_object.result_type == AppConst::CLASSIFICATION
+      @form_object = OpenStruct.new(@form_object.to_h.merge(puc_ids: Array(@form_object.puc_id), classification: @result_type_classification))
     end
 
     private
@@ -129,6 +119,7 @@ module UiRules
         behaviour.dropdown_change :puc_ids, notify: [{ url: '/quality/test_results/orchard_test_results/pucs_changed' }]
         behaviour.dropdown_change :orchard_id, notify: [{ url: '/quality/test_results/orchard_test_results/orchard_changed' }]
         behaviour.dropdown_change :orchard_ids, notify: [{ url: '/quality/test_results/orchard_test_results/orchards_changed' }]
+        behaviour.input_change :update_all, notify: [{ url: '/quality/test_results/orchard_test_results/bulk_edit_all' }]
       end
     end
   end

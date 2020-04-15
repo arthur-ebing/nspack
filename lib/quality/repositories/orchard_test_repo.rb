@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo
+  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,
@@ -12,16 +12,6 @@ module QualityApp
                           order_by: :test_type_code
 
     crud_calls_for :orchard_test_types, name: :orchard_test_type, wrapper: OrchardTestType
-
-    build_for_select :orchard_test_results,
-                     label: :description,
-                     value: :id,
-                     order_by: :description
-    build_inactive_select :orchard_test_results,
-                          label: :description,
-                          value: :id,
-                          order_by: :description
-
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
 
     build_for_select :cultivars,
@@ -43,6 +33,20 @@ module QualityApp
                           label: :orchard_code,
                           value: :id,
                           order_by: :orchard_code
+
+    def for_select_orchard_test_results(orchard_test_type_id)
+      query = <<~SQL
+        SELECT
+            concat(pucs.puc_code, ' - ',orchards.orchard_code, ' - ',cultivars.cultivar_code) as code,
+            orchard_test_results.id
+        FROM orchard_test_results
+        JOIN pucs ON pucs.id = orchard_test_results.puc_id
+        JOIN orchards ON orchards.id = orchard_test_results.orchard_id
+        JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id
+        WHERE orchard_test_type_id = #{orchard_test_type_id}
+      SQL
+      DB[query].select_map(%i[code id])
+    end
 
     def find_orchard_test_type_flat(id)
       query = <<~SQL
@@ -102,8 +106,8 @@ module QualityApp
 
     def update_orchard_test_result(id, params)
       attrs = params.to_h
-      attrs.delete(:api_result) if attrs[:api_result].nil_or_empty?
-      attrs[:api_result] = hash_for_jsonb_col(attrs[:api_result]) if attrs.key?(:api_result)
+      attrs.delete(:api_response) if attrs[:api_response].nil_or_empty?
+      attrs[:api_response] = hash_for_jsonb_col(attrs[:api_response]) if attrs.key?(:api_response)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
     end

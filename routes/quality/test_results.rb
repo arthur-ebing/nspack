@@ -86,49 +86,11 @@ class Nspack < Roda
         r.redirect '/list/orchard_test_results'
       end
 
-      r.on 'puc_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
+      r.on 'bulk_edit_all' do
+        if params[:changed_value] == 't'
+          json_hide_element('orchard_test_result_group_ids_field_wrapper')
         else
-          actions = []
-          orchard_list = @repo.for_select_orchards(where: { puc_id: params[:changed_value] })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_orchard_id', options_array: orchard_list)
-          json_actions(actions)
-        end
-      end
-
-      r.on 'pucs_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          orchard_list = @repo.for_select_orchards(where: { puc_id: params[:changed_value].split(',') })
-          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_orchard_ids', options_array: orchard_list)
-          json_actions(actions)
-        end
-      end
-
-      r.on 'orchard_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          orchard = @farm_repo.find_orchard(params[:changed_value])
-          cultivar_list = @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_id', options_array: cultivar_list)
-          json_actions(actions)
-        end
-      end
-
-      r.on 'orchards_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          cultivar_ids = @repo.select_values(:orchards, :cultivar_ids, id: params[:changed_value].split(',')).flatten.uniq
-          cultivar_list = @repo.for_select_cultivar_codes(where: { id: cultivar_ids })
-          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
-          json_actions(actions)
+          json_show_element('orchard_test_result_group_ids_field_wrapper')
         end
       end
 
@@ -149,20 +111,13 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('test results', 'new')
-        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::New.call(remote: fetch?(r)) }
-      end
-      r.post do        # CREATE
-        res = interactor.create_orchard_test_result(params[:orchard_test_result])
+        res = interactor.create_orchard_test_results
         if res.success
           flash[:notice] = res.message
-          r.redirect("/quality/test_results/orchard_test_results/#{res.instance.id}/edit")
         else
-          re_show_form(r, res, url: '/quality/test_results/orchard_test_results/new') do
-            Quality::TestResults::OrchardTestResult::New.call(form_values: params[:orchard_test_result],
-                                                              form_errors: res.errors,
-                                                              remote: fetch?(r))
-          end
+          flash[:error] = "#{res.message} #{res.errors}"
         end
+        r.redirect '/list/orchard_test_results'
       end
     end
   end

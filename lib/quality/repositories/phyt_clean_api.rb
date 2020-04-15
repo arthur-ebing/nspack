@@ -39,7 +39,7 @@ module QualityApp
       success_response('Received glossary', instance)
     end
 
-    def request_phyt_clean_standard_phyto_data(season_id, puc_id)
+    def request_phyt_clean_standard_data(season_id, puc_id)
       http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'))
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
 

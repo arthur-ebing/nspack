@@ -48,6 +48,14 @@ class Nspack < Roda
 
     r.on 'orchard_test_types' do
       @repo = QualityApp::OrchardTestRepo.new
+      r.on 'api_name_changed' do
+        if params[:changed_value].nil_or_empty?
+          json_hide_element('orchard_test_type_api_attribute_field_wrapper')
+        else
+          json_show_element('orchard_test_type_api_attribute_field_wrapper')
+        end
+      end
+
       r.on 'commodity_group_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response

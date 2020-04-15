@@ -9,6 +9,9 @@ module QualityApp
       id = nil
       repo.transaction do
         id = repo.create_orchard_test_type(res)
+        service_res = CreateOrchardTestResults.call(id)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
         log_status(:orchard_test_types, id, 'CREATED')
         log_transaction
       end

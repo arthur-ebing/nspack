@@ -4,31 +4,31 @@ module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
     def phyt_clean_request
       service_res = nil
-      repo.transaction do
-        service_res = QualityApp::PhytCleanCitrusEuOrchardStatus.call
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
+      repo.select_values(:pucs, :id).each do |puc_id|
+        repo.transaction do
+          service_res = QualityApp::PhytCleanStandardData.call(puc_id)
+          raise Crossbeams::InfoError, service_res.message unless service_res.success
 
-        log_transaction
+          log_transaction
+        end
       end
       service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
-      res = OrchardTestCreateSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+    def create_orchard_test_results
+      ids = repo.select_values(:orchard_test_types, :id)
+      service_res = nil
+      ids.each do |id|
+        repo.transaction do
+          service_res = CreateOrchardTestResults.call(id)
+          raise Crossbeams::InfoError, service_res.message unless service_res.success
 
-      id = nil
-      repo.transaction do
-        id = repo.create_orchard_test_result(res)
-        log_status(:orchard_test_results, id, 'CREATED')
-        log_transaction
+          log_transaction
+        end
       end
-      instance = orchard_test_result(id)
-      success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
+      service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -413,7 +413,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   CLASSIFICATION = 'Classification'
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
   PHYT_CLEAN = 'PhytClean'
-  QUALITY_API_NAMES = [PHYT_CLEAN].freeze
+  PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
+  QUALITY_API_NAMES = [PHYT_CLEAN, PHYT_CLEAN_STANDARD].freeze
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
