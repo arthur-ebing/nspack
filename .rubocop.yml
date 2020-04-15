@@ -65,15 +65,14 @@ Lint/Env:
     - 'app_loader.rb'
     - 'scripts/base_script.rb'
   AllowedEnv:
-    - RACK_ENV
-    - NO_ERR_HANDLE
-    - DEBUG
-    - ROOT
-    - LOGFULLMESSERVERCALLS
-    - VERSION
     - HOME
     - GRID_QUERIES_LOCATION
-    - JASPER_REPORTS_PATH
     - JASPER_REPORTING_ENGINE_PATH
+    - JASPER_REPORTS_PATH
+    - LOGFULLMESSERVERCALLS
+    - NO_ERR_HANDLE
     - NO_RUN_ALLOCATION
+    - RACK_ENV
+    - ROOT
     - RUN_FOR_RMD
+    - VERSION
