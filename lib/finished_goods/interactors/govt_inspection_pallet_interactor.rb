@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable ClassLength
+  class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_govt_inspection_pallet(params)
       res = validate_govt_inspection_pallet_params(params)
       return validation_failed_response(res) unless res.messages.empty?

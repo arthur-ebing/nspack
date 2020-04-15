@@ -54,8 +54,8 @@ require './lib/robot_responder'
 require './lib/ui_rules'
 require './lib/library_versions'
 require './lib/dataminer_connections'
-Dir['./helpers/**/*.rb'].each { |f| require f }
-Dir['./lib/applets/*.rb'].each { |f| require f }
+Dir['./helpers/**/*.rb'].sort.each { |f| require f }
+Dir['./lib/applets/*.rb'].sort.each { |f| require f }
 
 ENV['ROOT'] = File.dirname(__FILE__)
 ENV['VERSION'] = File.read('VERSION')

@@ -1,19 +1,36 @@
+require:
+  - ./lib/rubocop/cops/lint_env
+
 AllCops:
   Exclude:
     - db/**/*
     - test/**/*
     - tmp/**/*
 
-Documentation:
+# New (pending) cops:
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+Style/HashEachMethods:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+
+# END of pending cops
+
+Style/Documentation:
   Enabled: false
 
-LineLength:
+Layout/LineLength:
   Enabled: false
 
-FrozenStringLiteralComment:
+Style/FrozenStringLiteralComment:
   Enabled: false
 
-MethodLength:
+Metrics/MethodLength:
   Enabled: false
 
 Layout/ExtraSpacing:
@@ -36,3 +53,27 @@ Metrics/AbcSize:
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
+
+Lint/Env:
+  Enabled: true
+  Include:
+    - '**/*.rb'
+  Exclude:
+    - '**/config/app_const.rb'
+    - '**/config/environment.rb'
+    - '**/config/puma.rb'
+    - 'app_loader.rb'
+    - 'scripts/base_script.rb'
+  AllowedEnv:
+    - RACK_ENV
+    - NO_ERR_HANDLE
+    - DEBUG
+    - ROOT
+    - LOGFULLMESSERVERCALLS
+    - VERSION
+    - HOME
+    - GRID_QUERIES_LOCATION
+    - JASPER_REPORTS_PATH
+    - JASPER_REPORTING_ENGINE_PATH
+    - NO_RUN_ALLOCATION
+    - RUN_FOR_RMD

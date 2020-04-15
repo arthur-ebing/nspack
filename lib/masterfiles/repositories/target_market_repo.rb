@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class TargetMarketRepo < BaseRepo # rubocop:disable ClassLength
+  class TargetMarketRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :target_market_group_types,
                      alias: 'tm_group_types',
                      label: :target_market_group_type_code,

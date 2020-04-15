@@ -366,7 +366,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #    optgroup_array(recs, :type, :sub, :id)
   #    # => { 'A' => [['B', 1], ['C', 2], ['E', 7]], 'B' => [['D', 4]] }
   def optgroup_array(recs, group_name, label, value = label)
-    Hash[recs.map { |r| [r[group_name], r[label], r[value]] }.group_by(&:first).map { |k, v| [k, v.map { |i| [i[1], i[2]] }] }]
+    Hash[recs.map { |r| [r[group_name], r[label], r[value]] }.group_by(&:first).map { |k, v| [k, v.map { |i| [i[1], i[2]] }] }] # rubocop:disable Style/HashTransformValues
   end
 
   # Log the context of a transaction. Useful for joining to logged_actions table which has no context.

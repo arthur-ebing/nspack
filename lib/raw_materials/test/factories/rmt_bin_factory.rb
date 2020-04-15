@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  module RmtBinFactory # rubocop:disable ModuleLength
+  module RmtBinFactory # rubocop:disable Metrics/ModuleLength
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class

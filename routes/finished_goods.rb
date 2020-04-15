@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Dir['./routes/finished_goods/*.rb'].each { |f| require f }
+Dir['./routes/finished_goods/*.rb'].sort.each { |f| require f }
 
 class Nspack < Roda
   route('finished_goods') do |r|

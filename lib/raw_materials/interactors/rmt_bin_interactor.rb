@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtBinInteractor < BaseInteractor # rubocop:disable ClassLength
+  class RmtBinInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def validate_delivery(id) # rubocop:disable Metrics/AbcSize
       delivery = find_rmt_delivery(id)
       return failed_response("Delivery: #{id} does not exist") unless delivery

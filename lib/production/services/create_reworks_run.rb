@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class CreateReworksRun < BaseService # rubocop:disable ClassLength
+  class CreateReworksRun < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :user_name, :reworks_run_type, :pallets_selected, :pallets_affected,
                 :scrap_reason_id, :scrap_remarks, :make_changes,  :reworks_run_booleans, :reworks_action, :changes,
                 :affected_pallet_sequences

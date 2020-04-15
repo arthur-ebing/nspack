@@ -2154,15 +2154,15 @@ module DevelopmentApp
           # frozen_string_literal: true
 
           root_dir = File.expand_path('..', __dir__)
-          Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].each { |f| require f }
-          #{job_comment}Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].each { |f| require f }
-          #{srv_comment}Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].each { |f| require f }
-          # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].each { |f| require f }
-          Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/entities/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/interactors/*.rb"].sort.each { |f| require f }
+          #{job_comment}Dir["\#{root_dir}/#{opts.applet}/jobs/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/repositories/*.rb"].sort.each { |f| require f }
+          #{srv_comment}Dir["\#{root_dir}/#{opts.applet}/services/*.rb"].sort.each { |f| require f }
+          # Dir["\#{root_dir}/#{opts.applet}/task_permission_checks/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/ui_rules/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/validations/*.rb"].sort.each { |f| require f }
+          Dir["\#{root_dir}/#{opts.applet}/views/**/*.rb"].sort.each { |f| require f }
 
           module #{opts.classnames[:module]}
           end

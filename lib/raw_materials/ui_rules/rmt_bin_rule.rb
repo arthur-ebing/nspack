@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class RmtBinRule < Base # rubocop:disable ClassLength
+  class RmtBinRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       @print_repo = LabelApp::PrinterRepo.new

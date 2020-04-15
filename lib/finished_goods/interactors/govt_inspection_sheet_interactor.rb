@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionSheetInteractor < BaseInteractor # rubocop:disable ClassLength
+  class GovtInspectionSheetInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_govt_inspection_sheet(params) # rubocop:disable Metrics/AbcSize
       params[:created_by] ||= @user.user_name
       res = validate_govt_inspection_sheet_params(params)

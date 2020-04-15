@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ProductSetupTemplateRule < Base # rubocop:disable ClassLength
+  class ProductSetupTemplateRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object

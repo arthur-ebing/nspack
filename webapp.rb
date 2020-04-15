@@ -82,7 +82,7 @@ class Nspack < Roda
       # = if prod and unexpected exception type, just display "something whent wrong" and log
     end
   end
-  Dir['./routes/*.rb'].each { |f| require f }
+  Dir['./routes/*.rb'].sort.each { |f| require f }
 
   route do |r|
     r.assets unless ENV['RACK_ENV'] == 'production'

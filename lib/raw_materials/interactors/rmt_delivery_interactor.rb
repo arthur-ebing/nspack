@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class RmtDeliveryInteractor < BaseInteractor # rubocop:disable ClassLength
+  class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       assert_permission!(:create)
       params[:date_delivered] = Time.now.to_s

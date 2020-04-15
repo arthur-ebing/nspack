@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable ClassLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'production', 'rmd' do |r|
     # --------------------------------------------------------------------------
     # PALLET ENQUIRY
@@ -569,7 +569,7 @@ class Nspack < Roda # rubocop:disable ClassLength
               carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
               unless carton_number
                 res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
-                unless res.success # rubocop:disable BlockNesting
+                unless res.success # rubocop:disable Metrics/BlockNesting
                   store_locally(:errors, error_message: "Error: #{unwrap_failed_response(res)}")
                   r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
                 end

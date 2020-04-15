@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable BlockLength
-class Nspack < Roda # rubocop:disable ClassLength
+# rubocop:disable Metrics/BlockLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'quality', 'masterfiles' do |r| # rubocop:disable Metrics/BlockLength
     # PALLET VERIFICATION FAILURE REASONS
     # --------------------------------------------------------------------------
@@ -369,4 +369,4 @@ class Nspack < Roda # rubocop:disable ClassLength
     end
   end
 end
-# rubocop:enable BlockLength
+# rubocop:enable Metrics/BlockLength

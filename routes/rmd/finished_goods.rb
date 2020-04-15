@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable ClassLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'finished_goods', 'rmd' do |r|
     r.on 'pallet_movements' do
       interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})

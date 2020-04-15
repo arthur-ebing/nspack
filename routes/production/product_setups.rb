@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Nspack < Roda # rubocop:disable ClassLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'product_setups', 'production' do |r| # rubocop:disable Metrics/BlockLength
     # PRODUCT SETUP TEMPLATES
     # --------------------------------------------------------------------------

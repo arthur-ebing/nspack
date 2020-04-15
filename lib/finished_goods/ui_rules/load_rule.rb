@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class LoadRule < Base # rubocop:disable ClassLength
+  class LoadRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = FinishedGoodsApp::LoadRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
@@ -221,6 +221,7 @@ module UiRules
 
     def make_form_object
       make_new_form_object && return if @mode == :new
+
       @form_object = @repo.find_load_flat(@options[:id])
       @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil, load_id: @form_object.id))
     end

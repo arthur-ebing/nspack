@@ -176,7 +176,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   def add_record(record_type, rec = {})
     row = {}
-    record_definitions[record_type].keys.each do |name|
+    record_definitions[record_type].each_key do |name|
       row[name] = value_for(record_type, name, rec[name])
     end
     record_entries[record_type] << row
@@ -332,7 +332,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
 
   def build_hash_from_data(rec, rec_id)
     hs = {}
-    record_definitions[rec_id].keys.each { |key| hs[key] = rec[key] if rec[key] }
+    record_definitions[rec_id].each_key { |key| hs[key] = rec[key] if rec[key] }
     hs
   end
 

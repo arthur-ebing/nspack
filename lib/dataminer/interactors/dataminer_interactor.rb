@@ -338,7 +338,7 @@ module DataminerApp
 
       old_values = report.external_settings[:colour_key] || {}
       css_classes = Hash[col.case_string_values.map { |a| [a, 'No description'] }]
-      css_classes.keys.each do |k|
+      css_classes.each_key do |k|
         str = old_values[k]
         css_classes[k] = str unless str.nil?
       end

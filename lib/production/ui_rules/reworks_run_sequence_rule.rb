@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunSequenceRule < Base # rubocop:disable ClassLength
+  class ReworksRunSequenceRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new

@@ -1,7 +1,7 @@
 # frozen_string_literal: false
 
 module ProductionApp
-  class ReworksRepo < BaseRepo # rubocop:disable ClassLength
+  class ReworksRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :reworks_runs,
                      label: :user,
                      value: :id,

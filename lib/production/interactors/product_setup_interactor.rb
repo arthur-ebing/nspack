@@ -3,7 +3,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductSetupInteractor < BaseInteractor # rubocop:disable ClassLength
+  class ProductSetupInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
       if AppConst::CLIENT_CODE == 'kr'
         if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?

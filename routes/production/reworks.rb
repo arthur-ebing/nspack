@@ -2,7 +2,7 @@
 
 # rubocop:disable Metrics/BlockLength
 
-class Nspack < Roda # rubocop:disable ClassLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'reworks', 'production' do |r|
     # REWORKS RUNS
     # --------------------------------------------------------------------------

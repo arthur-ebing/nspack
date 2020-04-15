@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ReworksRunRule < Base # rubocop:disable ClassLength
+  class ReworksRunRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
       make_form_object

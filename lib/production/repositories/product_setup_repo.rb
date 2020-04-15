@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class ProductSetupRepo < BaseRepo # rubocop:disable ClassLength
+  class ProductSetupRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :product_setup_templates,
                      label: :template_name,
                      value: :id,
