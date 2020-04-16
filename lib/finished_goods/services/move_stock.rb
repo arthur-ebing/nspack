@@ -18,6 +18,11 @@ module FinishedGoodsApp
 
       location_to = locn_repo.find_location(location_to_id)
 
+      if stock_type == AppConst::PALLET_STOCK_TYPE && location_to[:assignment_code] == 'COLD_STORAGE'
+        res = validate_pallet_in_stock
+        return res unless res.success
+      end
+
       if stock_type == AppConst::PALLET_STOCK_TYPE && AppConst::CALCULATE_PALLET_DECK_POSITIONS && location_to[:location_type_code] == AppConst::LOCATION_TYPES_COLD_BAY_DECK
         return failed_response("Pallet is already been scanned into deck: #{location_to[:location_long_code]}") if pallet_already_in_deck?
 
@@ -39,6 +44,12 @@ module FinishedGoodsApp
     end
 
     private
+
+    def validate_pallet_in_stock
+      return failed_response('Pallet cannot be moved into COLD_STORE, it is not in stock') unless stock_item.in_stock
+
+      success_response('ok')
+    end
 
     def validate_pallet_infront_if_in_deck? # rubocop:disable Metrics/AbcSize
       deck_id = locn_repo.get_parent_location(stock_item.location_id)
