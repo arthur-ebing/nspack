@@ -244,12 +244,15 @@ module ProductionApp
       end
     end
 
-    def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
+    def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       res = validate_pallets_selected_input(reworks_run_type, params)
       return validation_failed_response(res) unless res.success
 
       params[:pallets_selected] = res.instance[:pallet_numbers]
+      res = assert_reworks_in_stock_pallets_permissions(reworks_run_type, params[:pallets_selected])
+      return validation_failed_response(res) unless res.success
+
       res = validate_reworks_run_new_params(reworks_run_type, params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -1045,6 +1048,10 @@ module ProductionApp
       repo.production_run_allow_cultivar_mixing(production_run_id)
     end
 
+    def includes_in_stock_pallets?(pallet_numbers)
+      repo.includes_in_stock_pallets?(pallet_numbers)
+    end
+
     def make_changes?(reworks_run_type)
       case reworks_run_type
       when AppConst::RUN_TYPE_SCRAP_PALLET,
@@ -1058,6 +1065,24 @@ module ProductionApp
       else
         true
       end
+    end
+
+    def assert_reworks_in_stock_pallets_permissions(reworks_run_type, pallet_numbers)
+      case reworks_run_type
+      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
+          AppConst::RUN_TYPE_BATCH_PALLET_EDIT,
+          AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+
+        in_stock_pallets = repo.in_stock_pallets?(pallet_numbers)
+        message = "The following pallets #{in_stock_pallets.join(', ')} are in stock and requires user with 'can_change_in_stock_pallets' permission" unless in_stock_pallets.nil_or_empty?
+        return OpenStruct.new(success: false, messages: { pallets_selected: [message] }, pallets_selected: pallet_numbers) unless can_change_reworks_in_stock_pallets(pallet_numbers)
+
+        OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
+      end
+    end
+
+    def can_change_reworks_in_stock_pallets(pallet_numbers)
+      includes_in_stock_pallets?(pallet_numbers) && Crossbeams::Config::UserPermissions.can_user?(@user, :reworks, :can_change_in_stock_pallets)  unless @user&.permission_tree.nil?
     end
 
     def validate_pallet_numbers(reworks_run_type, pallet_numbers, production_run_id = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

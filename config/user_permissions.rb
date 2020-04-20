@@ -21,7 +21,8 @@ module Crossbeams
       BASE = {
         WEBAPP => {
           password: { can_be_changed_by_user: true },
-          load: { can_unship: false, can_ship: false }
+          load: { can_unship: false, can_ship: false },
+          reworks: { can_change_in_stock_pallets: false }
           # stock_adj: { sign_off: false },
           # stock_adj: { sign_off: false, approve: true, take_out_rubbish: true },
           # invoice: { complete: false, approve: { fruit: true, assets: false } }
@@ -31,7 +32,8 @@ module Crossbeams
       DOCUMENTATION = {
         WEBAPP => {
           password: { can_be_changed_by_user: 'Allow this user to change their own password' },
-          load: { can_unship: 'Allow this user to unship loads', can_ship: 'Allow this user to ship loads'  }
+          load: { can_unship: 'Allow this user to unship loads', can_ship: 'Allow this user to ship loads'  },
+          reworks: { can_change_in_stock_pallets: 'Allow this user to change in_stock pallets in reworks'  }
           # stock_adj: { sign_off: 'Sign off on a stock adjustment' }
           # stock_adj: { sign_off: 'Sign off on a stock adjustment', approve: 'dummy appr', take_out_rubbish: 'xx' },
           # invoice: { complete: 'dummy complete', approve: { fruit: 'dummy fruit', assets: 'dummy asset' } }
