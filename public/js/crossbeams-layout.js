@@ -79,7 +79,11 @@
     })
     .then(response => response.json())
     .then((data) => {
-      crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+      if (data.redirect) {
+        window.location = data.redirect;
+      } else {
+        crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+      }
     }).catch((data) => {
       crossbeamsUtils.fetchErrorHandler(data);
     });
