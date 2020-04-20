@@ -689,6 +689,17 @@ module ProductionApp
     def production_run_allow_cultivar_mixing(production_run_id)
       DB[:production_runs].where(id: production_run_id).get(:allow_cultivar_mixing)
     end
+
+    def in_stock_pallets?(pallet_numbers)
+      DB[:pallets].where(pallet_number: pallet_numbers, in_stock: true).select_map(:pallet_number)
+    end
+
+    def includes_in_stock_pallets?(pallet_numbers)
+      return false if pallet_numbers.nil_or_empty?
+
+      query = "SELECT EXISTS( SELECT id FROM pallets WHERE in_stock AND	pallet_number IN ('#{pallet_numbers.join('\',\'')}'))"
+      DB[query].single_value
+    end
   end
 end
 # frozen_string_literal: true
