@@ -160,6 +160,9 @@ module ProductionApp
       return validation_failed_response(res) unless res.success
 
       attrs[:pallets_selected] = res.instance[:pallets_selected].split("\n")
+      res = assert_reworks_in_stock_pallets_permissions(reworks_run_type, attrs[:pallets_selected])
+      return validation_failed_response(res) unless res.success
+
       id = nil
       repo.transaction do
         res = resolve_update_selected_input(reworks_run_type, attrs)
@@ -1068,17 +1071,17 @@ module ProductionApp
     end
 
     def assert_reworks_in_stock_pallets_permissions(reworks_run_type, pallet_numbers)
-      case reworks_run_type
-      when AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
-          AppConst::RUN_TYPE_BATCH_PALLET_EDIT,
-          AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE
+      return ok_response unless [AppConst::RUN_TYPE_SINGLE_PALLET_EDIT,
+                                 AppConst::RUN_TYPE_BATCH_PALLET_EDIT,
+                                 AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE].include?(reworks_run_type)
 
-        in_stock_pallets = repo.in_stock_pallets?(pallet_numbers)
-        message = "The following pallets #{in_stock_pallets.join(', ')} are in stock and requires user with 'can_change_in_stock_pallets' permission" unless in_stock_pallets.nil_or_empty?
+      in_stock_pallets = repo.in_stock_pallets?(pallet_numbers)
+      unless in_stock_pallets.nil_or_empty?
+        message = "The following pallets #{in_stock_pallets.join(', ')} are in stock and requires user with 'can_change_in_stock_pallets' permission"
         return OpenStruct.new(success: false, messages: { pallets_selected: [message] }, pallets_selected: pallet_numbers) unless can_change_reworks_in_stock_pallets(pallet_numbers)
-
-        OpenStruct.new(success: true, instance: { pallet_numbers: pallet_numbers })
       end
+
+      success_response('', { pallet_numbers: pallet_numbers })
     end
 
     def can_change_reworks_in_stock_pallets(pallet_numbers)
