@@ -34,11 +34,11 @@
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: In Stock Pallet Sequences
-    ready: Allocated Pallet Sequences
-    inactive: Shipped Pallet Sequences
-    warning: Scrapped Pallet Sequences
-    inprogress: Palletized and/or partially palletized Pallet Sequences
+    ok: In Stock Pallets
+    ready: Allocated Pallets
+    inactive: Shipped Pallets
+    warning: Scrapped Pallets
+    inprogress: Palletized and/or partially palletized Pallets
     error: Failed inspection and/or failed verifications Pallets
 :columns:
   id:
@@ -65,7 +65,7 @@
     :data_type: :integer
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -79,7 +79,7 @@
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -92,10 +92,10 @@
   pallet_sequence_number:
     :name: pallet_sequence_number
     :sequence_no: 4
-    :caption: Pallet sequence number
+    :caption: Seq
     :namespaced_name: pallet_sequence_number
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -111,7 +111,7 @@
     :caption: Location
     :namespaced_name: location
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -127,7 +127,7 @@
     :caption: Coldroom
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -143,7 +143,7 @@
     :caption: Bay
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -159,7 +159,7 @@
     :caption: Deck
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -175,7 +175,7 @@
     :caption: Deck position
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -188,10 +188,10 @@
   cultivar:
     :name: cultivar
     :sequence_no: 10
-    :caption: Cultivar
+    :caption: Cult
     :namespaced_name: cultivar
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -207,7 +207,7 @@
     :caption: Carton quantity
     :namespaced_name: carton_quantity
     :data_type: :number
-    :width: 
+    :width: 120
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -220,11 +220,11 @@
   pallet_carton_quantity:
     :name: pallet_carton_quantity
     :sequence_no: 12
-    :caption: Pallet carton quantity
+    :caption: Plt Ctn Qty
     :namespaced_name: pallet_carton_quantity
     :data_type: :number
-    :width: 
-    :format: 
+    :width: 120
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -236,11 +236,11 @@
   pallet_size:
     :name: pallet_size
     :sequence_no: 13
-    :caption: Pallet size
+    :caption: Plt size
     :namespaced_name: pallet_size
-    :data_type: :integer
-    :width: 
-    :format: 
+    :data_type: :number
+    :width: 90
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -252,10 +252,10 @@
   pallet_age:
     :name: pallet_age
     :sequence_no: 14
-    :caption: Pallet age
+    :caption: Plt age
     :namespaced_name: pallet_age
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -271,7 +271,7 @@
     :caption: Stock age
     :namespaced_name: stock_age
     :data_type: :integer
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -287,7 +287,7 @@
     :caption: Cold age
     :namespaced_name: cold_age
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -303,7 +303,7 @@
     :caption: Ambient age
     :namespaced_name: ambient_age
     :data_type: :integer
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -367,7 +367,7 @@
     :caption: Created at
     :namespaced_name: vw.created_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: true
     :pinned: 
@@ -383,7 +383,7 @@
     :caption: Palletized at
     :namespaced_name: palletized_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -399,7 +399,7 @@
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -415,7 +415,7 @@
     :caption: Govt inspection passed
     :namespaced_name: govt_inspection_passed
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -431,7 +431,7 @@
     :caption: Inspected dest country
     :namespaced_name: inspected_dest_country
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -447,7 +447,7 @@
     :caption: Shipped at
     :namespaced_name: shipped_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -463,7 +463,7 @@
     :caption: Govt reinspection at
     :namespaced_name: govt_reinspection_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -479,7 +479,7 @@
     :caption: Allocated at
     :namespaced_name: allocated_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -495,7 +495,7 @@
     :caption: Verified at
     :namespaced_name: verified_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -511,7 +511,7 @@
     :caption: Allocated
     :namespaced_name: allocated
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -527,7 +527,7 @@
     :caption: Load
     :namespaced_name: load_id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -543,7 +543,7 @@
     :caption: Shipped
     :namespaced_name: shipped
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -559,7 +559,7 @@
     :caption: In stock
     :namespaced_name: in_stock
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -575,7 +575,7 @@
     :caption: Inspected
     :namespaced_name: inspected
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -591,7 +591,7 @@
     :caption: Palletized
     :namespaced_name: palletized
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -604,10 +604,10 @@
   production_run_id:
     :name: production_run_id
     :sequence_no: 36
-    :caption: Production run
+    :caption: Run
     :namespaced_name: production_run_id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -623,7 +623,7 @@
     :caption: Farm group
     :namespaced_name: farm_group
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -639,7 +639,7 @@
     :caption: Farm
     :namespaced_name: farm
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -655,7 +655,7 @@
     :caption: Puc
     :namespaced_name: puc
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -668,10 +668,10 @@
   orchard:
     :name: orchard
     :sequence_no: 40
-    :caption: Orchard
+    :caption: Orch
     :namespaced_name: orchard
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -684,10 +684,10 @@
   commodity:
     :name: commodity
     :sequence_no: 41
-    :caption: Commodity
+    :caption: Comm
     :namespaced_name: commodity
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -700,10 +700,10 @@
   marketing_variety:
     :name: marketing_variety
     :sequence_no: 42
-    :caption: Marketing variety
+    :caption: Mkt Var
     :namespaced_name: marketing_variety
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -719,7 +719,7 @@
     :caption: Grade
     :namespaced_name: grade
     :data_type: :string
-    :width: 
+    :width: 60
     :format: 
     :hide: false
     :pinned: 
@@ -735,7 +735,7 @@
     :caption: Std size
     :namespaced_name: std_size
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -751,7 +751,7 @@
     :caption: Actual count
     :namespaced_name: actual_count
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -767,7 +767,7 @@
     :caption: Size ref
     :namespaced_name: size_ref
     :data_type: :string
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -783,7 +783,7 @@
     :caption: Std pack
     :namespaced_name: std_pack
     :data_type: :string
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -796,10 +796,10 @@
   packed_tm_group:
     :name: packed_tm_group
     :sequence_no: 48
-    :caption: Packed tm group
+    :caption: Packed Tm
     :namespaced_name: packed_tm_group
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -815,7 +815,7 @@
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -831,7 +831,7 @@
     :caption: Inventory code
     :namespaced_name: inventory_code
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -847,7 +847,7 @@
     :caption: Fruit sticker
     :namespaced_name: fruit_sticker
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -863,7 +863,7 @@
     :caption: Fruit sticker 2
     :namespaced_name: fruit_sticker_2
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -879,7 +879,7 @@
     :caption: Marketing org
     :namespaced_name: marketing_org
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -895,7 +895,7 @@
     :caption: Pallet base
     :namespaced_name: pallet_base
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -908,10 +908,10 @@
   stack_type:
     :name: stack_type
     :sequence_no: 55
-    :caption: Stack type
+    :caption: Stack
     :namespaced_name: stack_type
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -956,7 +956,7 @@
   sequence_nett_weight:
     :name: sequence_nett_weight
     :sequence_no: 58
-    :caption: Sequence nett weight
+    :caption: Seq nett weight
     :namespaced_name: sequence_nett_weight
     :data_type: :number
     :width: 
@@ -975,7 +975,7 @@
     :caption: Basic pack
     :namespaced_name: basic_pack
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -991,7 +991,7 @@
     :caption: Packhouse
     :namespaced_name: packhouse
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1007,7 +1007,7 @@
     :caption: Line
     :namespaced_name: line
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1023,7 +1023,7 @@
     :caption: Pick ref
     :namespaced_name: pick_ref
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1039,7 +1039,7 @@
     :caption: Phc
     :namespaced_name: phc
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1055,7 +1055,7 @@
     :caption: Verification result
     :namespaced_name: verification_result
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1071,9 +1071,9 @@
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -1087,9 +1087,9 @@
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -1103,7 +1103,7 @@
     :caption: Partially palletized
     :namespaced_name: partially_palletized
     :data_type: :boolean
-    :width: 150
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1119,7 +1119,7 @@
     :caption: Reinspected
     :namespaced_name: reinspected
     :data_type: :boolean
-    :width: 150
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1135,7 +1135,7 @@
     :caption: Verified
     :namespaced_name: verified
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1151,7 +1151,7 @@
     :caption: Verification passed
     :namespaced_name: verification_passed
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1167,7 +1167,7 @@
     :caption: Status
     :namespaced_name: status
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1183,7 +1183,7 @@
     :caption: Build status
     :namespaced_name: build_status
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1199,7 +1199,7 @@
     :caption: Active
     :namespaced_name: vw.active
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1215,7 +1215,7 @@
     :caption: Zero load
     :namespaced_name: zero_load_id
     :data_type: :string
-    :width: 
+    :width: 70
     :format: 
     :hide: true
     :pinned: 
@@ -1231,7 +1231,7 @@
     :caption: Temp tail
     :namespaced_name: temp_tail
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1247,7 +1247,7 @@
     :caption: Depot pallet
     :namespaced_name: depot_pallet
     :data_type: :boolean
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1263,7 +1263,7 @@
     :caption: Edi in file
     :namespaced_name: edi_in_file
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1276,10 +1276,10 @@
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
     :sequence_no: 78
-    :caption: Edi in consignment note number
+    :caption: Edi Cons
     :namespaced_name: edi_in_consignment_note_number
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1295,7 +1295,7 @@
     :caption: Packed at
     :namespaced_name: packed_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1311,7 +1311,7 @@
     :caption: Packed date
     :namespaced_name: packed_date
     :data_type: :date
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1327,7 +1327,7 @@
     :caption: Packed week
     :namespaced_name: packed_week
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -1343,7 +1343,7 @@
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1359,7 +1359,7 @@
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1375,7 +1375,7 @@
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1391,7 +1391,7 @@
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -1407,7 +1407,7 @@
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -1423,7 +1423,7 @@
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: true
     :pinned: 
