@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EdiApp
   class PoIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
     attr_reader :org_code, :po_repo, :tot_cartons, :records
