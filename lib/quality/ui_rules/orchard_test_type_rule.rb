@@ -40,12 +40,14 @@ module UiRules
       fields[:api_name] = { renderer: :label }
       fields[:api_attribute] = { renderer: :label,
                                  hide_on_load: @form_object.api_name.nil_or_empty? }
-      fields[:api_result_pass] = { renderer: :label,
+      fields[:api_pass_result] = { renderer: :label,
                                    caption: 'Pass Value' }
+      fields[:api_default_result] = { renderer: :label,
+                                      caption: 'Default Value'  }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields
+    def common_fields # rubocop:disable Metrics/AbcSize
       {
         test_type_code: { required: true,
                           force_uppercase: true },
@@ -79,7 +81,9 @@ module UiRules
                     selected: @form_object.api_name,
                     prompt: true },
         api_attribute: { hide_on_load: @form_object.api_name.nil_or_empty? },
-        api_result_pass: { caption: 'Pass Value' }
+        api_pass_result: { caption: 'Pass Value',
+                           required: @form_object.result_type != AppConst::CLASSIFICATION },
+        api_default_result: { caption: 'Default Value' }
       }
     end
 
@@ -95,15 +99,16 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(test_type_code: nil,
                                     description: nil,
-                                    applies_to_all_markets: false,
-                                    applies_to_all_cultivars: false,
+                                    applies_to_all_markets: true,
+                                    applies_to_all_cultivars: true,
                                     applies_to_orchard: false,
                                     allow_result_capturing: false,
                                     pallet_level_result: false,
                                     api_name: nil,
                                     result_type: nil,
                                     api_attribute: nil,
-                                    api_result_pass: nil,
+                                    api_pass_result: nil,
+                                    api_default_result: nil,
                                     applicable_tm_group_ids: [],
                                     applicable_cultivar_ids: [],
                                     applicable_commodity_group_ids: [])
@@ -115,6 +120,7 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :applicable_commodity_group_ids, notify: [{ url: '/quality/config/orchard_test_types/commodity_group_changed' }]
         behaviour.dropdown_change :api_name, notify: [{ url: '/quality/config/orchard_test_types/api_name_changed' }]
+        behaviour.dropdown_change :result_type, notify: [{ url: '/quality/config/orchard_test_types/result_type_changed' }]
         behaviour.input_change :applies_to_all_markets, notify: [{ url: '/quality/config/orchard_test_types/applies_to_all_markets' }]
         behaviour.input_change :applies_to_all_cultivars, notify: [{ url: '/quality/config/orchard_test_types/applies_to_all_cultivars' }]
       end

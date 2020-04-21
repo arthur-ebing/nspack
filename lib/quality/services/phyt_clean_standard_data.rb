@@ -68,9 +68,10 @@ module QualityApp
       values = YAML.load_file('tmp/PhytCleanStandardGlossary.yml')
 
       params[:orchards].each do |args, attrs|
+        values['orchards'] = [values['orchards'], args].flatten.uniq
         puc_id = repo.get_id(:pucs, puc_code: args[:puc_code])
         orchard_id = repo.get_id(:orchards, orchard_code: args[:orchard_code], puc_id: puc_id)
-        cultivar_id = repo.get_id(:cultivars, cultivar_code: args[:cultivar_code]) || repo.get_id(:cultivars, cultivar_name: args[:cultivar_code])
+        cultivar_id = repo.get_id(:cultivars, cultivar_code: args[:cultivar_code])
         attrs.each do |api_attribute, api_result|
           values[api_attribute.to_s] = [values[api_attribute.to_s], api_result].flatten.uniq
 

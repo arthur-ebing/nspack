@@ -6,16 +6,16 @@ Sequel.migration do
       $BODY$
       BEGIN
         UPDATE pallet_sequences ps
--- Could this query ever return more than one row?
--- - perhaps it should include LIMIT 1...
--- - would then apply to the functions below too.
-        SET phyto_data = (SELECT DISTINCT vw.classification
-                          FROM vw_orchard_test_results_flat vw
-                          WHERE ps.puc_id = ANY(vw.puc_ids)
-                            AND ps.orchard_id = ANY(vw.orchard_ids)
-                            AND ps.cultivar_id = ANY(vw.cultivar_ids)
-                            AND vw.test_type_code = 'PHYTODATA')
+        SET phyto_data = otr.api_result
+
+        FROM orchard_test_results otr
+        JOIN orchard_test_types ott ON otr.orchard_test_type_id = ott.id
+
         WHERE ps.id = NEW.id
+          AND otr.puc_id = NEW.puc_id
+          AND otr.orchard_id = NEW.orchard_id
+          AND otr.cultivar_id = NEW.cultivar_id
+          AND ott.test_type_code = 'PHYTODATA'
           AND ps.exit_ref IS NULL;
         RETURN new;
       END;
@@ -36,15 +36,18 @@ Sequel.migration do
       $BODY$
       BEGIN
         UPDATE pallet_sequences ps
-        SET phyto_data = (SELECT DISTINCT vw.classification
-                          FROM vw_orchard_test_results_flat vw
-                          WHERE NEW.puc_id = ANY(vw.puc_ids)
-                            AND NEW.orchard_id = ANY(vw.orchard_ids)
-                            AND NEW.cultivar_id = ANY(vw.cultivar_ids)
-                            AND vw.test_type_code = 'PHYTODATA')
+        SET phyto_data = otr.api_result
+
+        FROM orchard_test_results otr
+        JOIN orchard_test_types ott ON otr.orchard_test_type_id = ott.id
+
         WHERE ps.puc_id = NEW.puc_id
           AND ps.orchard_id = NEW.orchard_id
           AND ps.cultivar_id = NEW.cultivar_id
+          AND otr.puc_id = NEW.puc_id
+          AND otr.orchard_id = NEW.orchard_id
+          AND otr.cultivar_id = NEW.cultivar_id
+          AND ott.test_type_code = 'PHYTODATA'
           AND ps.exit_ref IS NULL;
         RETURN new;
       END;
@@ -53,7 +56,7 @@ Sequel.migration do
       COST 100;
 
       CREATE TRIGGER update_pallet_sequences_phyto_data
-      AFTER UPDATE OF classification
+      AFTER UPDATE OF api_result
       ON orchard_test_results
       FOR EACH ROW
       EXECUTE PROCEDURE update_pallet_sequences_phyto_data();
@@ -65,15 +68,18 @@ Sequel.migration do
       $BODY$
       BEGIN
         UPDATE pallet_sequences ps
-        SET phyto_data = (SELECT DISTINCT vw.classification
-                          FROM vw_orchard_test_results_flat vw
-                          WHERE NEW.puc_id = ANY(vw.puc_ids)
-                            AND NEW.orchard_id = ANY(vw.orchard_ids)
-                            AND NEW.cultivar_id = ANY(vw.cultivar_ids)
-                            AND vw.test_type_code = 'PHYTODATA')
-        WHERE ps.puc_id = OLD.puc_id
-          AND ps.orchard_id = OLD.orchard_id
-          AND ps.cultivar_id = OLD.cultivar_id
+        SET phyto_data = NULL
+
+        FROM orchard_test_results otr
+        JOIN orchard_test_types ott ON otr.orchard_test_type_id = ott.id
+
+        WHERE ps.puc_id = old.puc_id
+          AND ps.orchard_id = old.orchard_id
+          AND ps.cultivar_id = old.cultivar_id
+          AND otr.puc_id = old.puc_id
+          AND otr.orchard_id = old.orchard_id
+          AND otr.cultivar_id = old.cultivar_id
+          AND ott.test_type_code = 'PHYTODATA'
           AND ps.exit_ref IS NULL;
         RETURN new;
       END;

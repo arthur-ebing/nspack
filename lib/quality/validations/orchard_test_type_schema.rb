@@ -15,7 +15,8 @@ module QualityApp
     optional(:api_name, Types::StrippedString).maybe(:str?)
     required(:result_type, :string).filled(:str?)
     optional(:api_attribute, :string).maybe(:str?)
-    optional(:api_result_pass, :string).maybe(:str?)
+    optional(:api_pass_result, Types::StrippedString).maybe(:str?)
+    optional(:api_default_result, Types::StrippedString).maybe(:str?)
     optional(:applicable_tm_group_ids, Types::IntArray).maybe { each(:int?) }
     optional(:applicable_cultivar_ids, Types::IntArray).maybe { each(:int?) }
     optional(:applicable_commodity_group_ids, Types::IntArray).maybe { each(:int?) }

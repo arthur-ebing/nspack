@@ -2,7 +2,8 @@
 Sequel.migration do
   up do
       rename_column :orchard_test_types, :result_attribute, :api_attribute
-      add_column    :orchard_test_types, :api_result_pass, String
+      add_column    :orchard_test_types, :api_pass_result, String
+      add_column    :orchard_test_types, :api_default_result, String
 
       rename_column  :orchard_test_results, :api_result, :api_response
       rename_column  :orchard_test_results, :classification, :api_result
@@ -22,7 +23,8 @@ Sequel.migration do
       rename_column :orchard_test_results, :api_result, :classification
       rename_column :orchard_test_results, :api_response, :api_result
 
-      drop_column   :orchard_test_types, :api_result_pass
+      drop_column   :orchard_test_types, :api_default_result
+      drop_column   :orchard_test_types, :api_pass_result
       rename_column :orchard_test_types, :api_attribute, :result_attribute
   end
 end

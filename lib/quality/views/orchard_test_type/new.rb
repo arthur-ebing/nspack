@@ -8,7 +8,7 @@ module Quality
           ui_rule = UiRules::Compiler.new(:orchard_test_type, :new, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -23,7 +23,8 @@ module Quality
                   col.add_field :result_type
                   col.add_field :api_name
                   col.add_field :api_attribute
-                  col.add_field :api_result_pass
+                  col.add_field :api_default_result
+                  col.add_field :api_pass_result
                 end
                 row.column do |col|
                   col.add_field :applies_to_all_markets

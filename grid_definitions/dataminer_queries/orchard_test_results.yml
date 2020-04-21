@@ -13,7 +13,8 @@
   \       LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
   \       LEFT JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id\r\n
   \       LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id\r\n        LEFT
-  JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
+  JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\nORDER BY orchard_test_results.updated_at
+  DESC"
 :limit: 
 :offset: 
 :external_settings:

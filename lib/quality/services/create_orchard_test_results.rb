@@ -29,10 +29,11 @@ module QualityApp
           args[:cultivar_id] = cultivar_id
           next if repo.exists?(:orchard_test_results, args)
 
-          args[:passed] = orchard_test_type.api_result_pass.empty?
+          args[:passed] = orchard_test_type.api_pass_result&.upcase == orchard_test_type.api_default_result&.upcase
+          args[:api_result] = orchard_test_type.api_pass_result
+
           if orchard_test_type.result_type == AppConst::CLASSIFICATION
             args[:classification] = true
-            args[:api_result] = orchard_test_type.api_result_pass
             args[:passed] = true
           end
 

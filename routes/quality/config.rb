@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'config', 'quality' do |r|
     # ORCHARD TEST TYPES
     # --------------------------------------------------------------------------
@@ -53,6 +53,14 @@ class Nspack < Roda
           json_hide_element('orchard_test_type_api_attribute_field_wrapper')
         else
           json_show_element('orchard_test_type_api_attribute_field_wrapper')
+        end
+      end
+
+      r.on 'result_type_changed' do
+        if params[:changed_value] == AppConst::CLASSIFICATION
+          json_set_required('orchard_test_type_api_pass_result', false)
+        else
+          json_set_required('orchard_test_type_api_pass_result', true)
         end
       end
 
