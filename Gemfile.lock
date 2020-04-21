@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-layout.git
-  revision: 762ea0afea22602f835f1abe0cb5a6342fd32fa0
+  revision: cc7a7577d26092241f3e0199cb4da10a3b7ffd2a
   specs:
     crossbeams-layout (0.4.2)
       diffy
@@ -193,7 +193,7 @@ GEM
     rodauth (1.20.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.17.0)
+    rouge (3.18.0)
     rubocop (0.81.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
