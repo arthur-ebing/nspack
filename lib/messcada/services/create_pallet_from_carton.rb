@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CreatePalletFromCarton < BaseService
-    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet, :pallet_sequence, :user_name
+    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet_id, :pallet_sequence_id, :user_name
 
     def initialize(user, carton_id, carton_quantity)
       @carton_id = carton_id
@@ -17,7 +17,7 @@ module MesscadaApp
       res = create_pallet_and_sequences
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
-      success_response('ok', pallet_id: pallet)
+      success_response('ok', pallet_id: pallet_id, pallet_sequence_id: pallet_sequence_id)
     end
 
     private
@@ -49,7 +49,7 @@ module MesscadaApp
       res = validate_pallet_params(pallet_params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @pallet = repo.create_pallet(user_name, res.to_h)
+      @pallet_id = repo.create_pallet(user_name, res.to_h)
 
       ok_response
     end
@@ -72,18 +72,15 @@ module MesscadaApp
       repo.find_resource_location_id(carton[:packhouse_resource_id])
     end
 
-    # def resource_phc
-    #   repo.find_resource_phc(carton[:production_line_id]) || repo.find_resource_phc(carton[:packhouse_resource_id])
-    # end
-
     def validate_pallet_params(params)
       PalletSchema.call(params)
     end
 
     def create_pallet_sequence
-      res = NewPalletSequence.new(user_name, carton_id, pallet, carton_quantity).call
+      res = NewPalletSequence.call(user_name, carton_id, pallet_id, carton_quantity)
       return res unless res.success
 
+      @pallet_sequence_id = res.instance[:pallet_sequence_id]
       ok_response
     end
   end

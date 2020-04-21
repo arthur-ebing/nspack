@@ -4,6 +4,7 @@ module MesscadaApp
   class RobotFeedback < Dry::Struct
     attribute :device, Types::String
     attribute :status, Types::Bool
+    attribute? :orange, Types::Bool
     attribute? :msg, Types::String
     attribute? :line1, Types::String
     attribute? :line2, Types::String
@@ -15,6 +16,7 @@ module MesscadaApp
     attribute? :short2, Types::String
     attribute? :short3, Types::String
     attribute? :short4, Types::String
+    attribute? :reader_id, Types::String
 
     def red
       !status

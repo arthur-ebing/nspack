@@ -28,12 +28,13 @@ module Crossbeams
 
     def render_4_lines
       line1, line2, line3, line4 = @robot_feedback.four_lines
+      orange = @robot_feedback.orange || false
       <<~XML
         <robot_feedback>
           <status>#{@robot_feedback.status}</status>
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
-          <orange>false</orange>
+          <orange>#{orange}</orange>
           <lcd1>#{@robot_feedback.msg || line1}</lcd1>
           <lcd2>#{line2}</lcd2>
           <lcd3>#{line3}</lcd3>
@@ -43,12 +44,13 @@ module Crossbeams
     end
 
     def render_6_lines
+      orange = @robot_feedback.orange || false
       <<~XML
         <robot_feedback>
           <status>#{@robot_feedback.status}</status>
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
-          <orange>false</orange>
+          <orange>#{orange}</orange>
           <msg>#{@robot_feedback.msg}</msg>
           <lcd1>#{@robot_feedback.line1}</lcd1>
           <lcd2>#{@robot_feedback.line2}</lcd2>
