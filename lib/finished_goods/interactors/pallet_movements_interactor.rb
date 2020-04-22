@@ -72,6 +72,15 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def set_pallets_target_customer(target_customer_id, multiselect_list)
+      return failed_response('Target customer cannot be empty') if target_customer_id.nil_or_empty?
+
+      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: multiselect_list).uniq
+      repo.set_pallets_target_customer(target_customer_id, pallet_ids)
+
+      success_response("Selected pallets have been successfully allocated to target customer #{get_target_customer_name(target_customer_id)}")
+    end
+
     private
 
     def get_location_id_by_barcode(location_barcode)
@@ -86,12 +95,20 @@ module FinishedGoodsApp
       locn_repo.get_deck_pallets(deck_id).find_all { |d| d[:pallet_number].nil_or_empty? }.length
     end
 
+    def get_target_customer_name(target_customer_id)
+      party_repo.fn_party_role_name(target_customer_id)
+    end
+
     def repo
       @repo ||= FinishedGoodsApp::LoadRepo.new
     end
 
     def locn_repo
       MasterfilesApp::LocationRepo.new
+    end
+
+    def party_repo
+      @party_repo ||= MasterfilesApp::PartyRepo.new
     end
   end
 end

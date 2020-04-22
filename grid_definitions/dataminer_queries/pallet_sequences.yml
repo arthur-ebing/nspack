@@ -30,7 +30,8 @@
   \   intake_created_at,\r\n    first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n
   \   seq_scrapped_at,\r\n    packed_at,\r\n    packed_date,\r\n    repacked,\r\n
   \   repacked_at,\r\n    repacked_date,\r\n    repacked_from_pallet_id,\r\n    created_by,\r\n
-  \   verified_by,\r\n    edi_size_count,\r\n    colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
+  \   verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
+  \   target_customer,\r\n    colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2075,9 +2076,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 128
+    :caption: Target customer party role
+    :namespaced_name: target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 129
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 128
+    :sequence_no: 130
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
@@ -2228,3 +2261,11 @@
   :list_def:
   - true
   - false
+- :column: target_customer_party_role_id
+  :caption: Target Customer Party Role Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 13
+  :list_def:

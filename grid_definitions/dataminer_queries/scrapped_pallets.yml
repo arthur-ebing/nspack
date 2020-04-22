@@ -12,9 +12,9 @@
   status, build_status, load_id, vessel, voyage, container, internal_container, temp_code,
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
   exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
-  AS departure_date, active, exit_ref, created_by, verified_by, edi_size_count, colour_rule
-  FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id DESC, pallet_sequence_number
-  ASC
+  AS departure_date, active, exit_ref, created_by, verified_by, edi_size_count, target_customer_party_role_id,
+  target_customer, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id
+  DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1387,9 +1387,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 86
+    :caption: Target customer party role
+    :namespaced_name: target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 87
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 86
+    :sequence_no: 88
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

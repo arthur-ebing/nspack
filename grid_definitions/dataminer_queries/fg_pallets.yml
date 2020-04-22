@@ -20,7 +20,8 @@
   \   status,\r\n    build_status,\r\n    active,\r\n    temp_tail,\r\n    depot_pallet,\r\n
   \   edi_in_file,\r\n    edi_in_consignment_note_number,\r\n    packed_at,\r\n    packed_date,
   \r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n    repacked_from_pallet_id,\r\n
-  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
+  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
+  \   target_customer,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
   \       THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM
   vw_pallet_sequence_flat\r\nORDER BY pallet_number DESC"
 :limit: 
@@ -1475,9 +1476,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 91
+    :caption: Target customer party role
+    :namespaced_name: target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 92
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 91
+    :sequence_no: 93
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

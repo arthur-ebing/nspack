@@ -30,6 +30,7 @@
       - reworks_pallets
       - failed_and_not_repacked
       - reject_to_repack
+      - target_customer_pallets
 :captions:
   :conditions:
     :active: Active Pallets
@@ -137,6 +138,10 @@
     - :col: repacked
       :op: =
       :val: false
+  :target_customer_pallets:
+    - :col: in_stock
+      :op: =
+      :val: true
 :multiselect:
   :allocate:
     :url: "/finished_goods/dispatch/loads/$:id$/allocate"
@@ -163,3 +168,10 @@
     :multiselect_save_method: remote
     :can_be_cleared: false
     :conditions: failed_and_not_repacked
+  :target_customer_pallets:
+    :url: "/finished_goods/stock/allocate_target_customer/multiselect_target_customer_pallets"
+    :preselect: "SELECT id FROM vw_pallet_sequence_flat WHERE target_customer_party_role_id = $:id$"
+    :section_caption: "SELECT 'Allocate pallets to target customer ' || fn_party_role_name(id) FROM party_roles WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: target_customer_pallets
