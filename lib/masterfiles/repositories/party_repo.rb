@@ -38,6 +38,18 @@ module MasterfilesApp
       Party.new(hash)
     end
 
+    def get_party_role_id(name, role)
+      raise Crossbeams::FrameworkError, '"get_party_role_id" Name not filled.' if name.nil?
+
+      role_id = get_id(:roles, name: role)
+      raise Crossbeams::FrameworkError, '"get_party_role_id" Role does not exist.' if role_id.nil?
+
+      id = DB[:party_roles].join(:organizations, id: :organization_id).where(medium_description: name, role_id: role_id).get(Sequel[:party_roles][:id])
+      return id unless id.nil?
+
+      DB[:party_roles].join(:people, id: :person_id).where(first_name: name.split(' ')[0], surname: name.split(' ')[1], role_id: role_id).get(Sequel[:party_roles][:id])
+    end
+
     def find_party_role(id)
       hash = DB['SELECT party_roles.* , fn_party_role_name(?) AS party_name FROM party_roles WHERE party_roles.id = ?', id, id].first
       return nil if hash.nil?
