@@ -20,20 +20,16 @@
   \    build_status,\r\n     active,\r\n     zero_load_id,\r\n     temp_tail,\r\n
   \    depot_pallet,\r\n     edi_in_file,\r\n     edi_in_consignment_note_number,\r\n
   \    failed_otmc_results,\r\n     failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n
-  \   edi_size_count,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
-  \            THEN 'error' ELSE colour_rule\r\n        END AS colour_rule\r\nFROM
-  vw_repacked_pallet_sequence_flat\r\nORDER BY repacked_at DESC"
+  \   edi_size_count,\r\n    target_customer_party_role_id,\r\n    target_customer,\r\n
+  \   CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n             THEN 'error'
+  ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_repacked_pallet_sequence_flat\r\nORDER
+  BY repacked_at DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: In Stock Pallets
-    ready: Allocated Pallets
-    inactive: Shipped Pallets
-    warning: Scrapped Pallets
     error: Failed inspection and/or failed verifications Pallets
-    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   repacked_from_pallet_id:
     :name: repacked_from_pallet_id
@@ -1315,9 +1311,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 81
+    :caption: Target customer party role
+    :namespaced_name: target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 82
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 81
+    :sequence_no: 83
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

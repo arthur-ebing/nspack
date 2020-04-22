@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class LoadRepo < BaseRepo
+  class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :loads,
                      label: :order_number,
                      value: :id,
@@ -116,6 +116,14 @@ module FinishedGoodsApp
 
     def update_pallets_shipped_at(load_id:, shipped_at:)
       DB[:pallets].where(load_id: load_id).update(shipped_at: shipped_at)
+    end
+
+    def set_pallets_target_customer(target_customer_id, pallet_ids)
+      existing_pallet_ids = select_values(:pallets, :id, target_customer_party_role_id: target_customer_id)
+      removed_pallet_ids = existing_pallet_ids - pallet_ids
+      new_pallet_ids = pallet_ids - existing_pallet_ids
+      DB[:pallets].where(id: removed_pallet_ids).update(target_customer_party_role_id: nil)
+      DB[:pallets].where(id: new_pallet_ids).update(target_customer_party_role_id: target_customer_id)
     end
   end
 end

@@ -32,8 +32,9 @@
   \   seq_scrapped_at,\r\n    packed_date,\r\n    packed_week,\r\n    repacked,\r\n
   \   repacked_at,\r\n    repacked_date,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
   \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
-  \   CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n
-  \   ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
+  \   target_customer_party_role_id,\r\n    target_customer,\r\n    CASE WHEN fn_pallet_verification_failed
+  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
+  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -244,7 +245,7 @@
     :caption: Pack to inspect age
     :namespaced_name: pack_to_inspect_age
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -260,7 +261,7 @@
     :caption: Inspect to cold age
     :namespaced_name: inspect_to_cold_age
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -276,7 +277,7 @@
     :caption: Inspect to exit warm age
     :namespaced_name: inspect_to_exit_warm_age
     :data_type: :integer
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -2222,9 +2223,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_customer_party_role_id:
+    :name: target_customer_party_role_id
+    :sequence_no: 137
+    :caption: Target customer party role
+    :namespaced_name: target_customer_party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 138
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 137
+    :sequence_no: 139
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -2576,3 +2609,12 @@
   :list_def:
   - true
   - false
+- :column: target_customer
+  :caption: Target Customer
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 40
+  :list_def: SELECT fn_party_role_name(id) FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'TARGET CUSTOMER')
