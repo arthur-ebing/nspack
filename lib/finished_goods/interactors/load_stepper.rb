@@ -47,7 +47,7 @@ module FinishedGoodsApp
                      vehicle_number: load_flat.vehicle_number,
                      container_code: load_flat.container_code,
                      allocation_count: initial_count }
-      allocated = LoadRepo.new.find_pallet_numbers_from(load_id: load_id)
+      allocated = LoadRepo.new.select_values(:pallets, :pallet_number, load_id: load_id)
 
       write(form_state: form_state, allocated: allocated, initial_allocated: allocated.clone, scanned: [])
     end

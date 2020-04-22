@@ -288,7 +288,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'allocate_multiselect' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        res = interactor.allocate_multiselect(id, pallet_sequence_id: multiselect_grid_choices(params))
+        pallet_numbers = BaseRepo.new.select_values(:pallet_sequences, :pallet_number, id: multiselect_grid_choices(params)).uniq
+        res = interactor.allocate_multiselect(id, pallet_numbers)
         if res.success
           flash[:notice] = res.message
         else

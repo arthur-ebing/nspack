@@ -2,11 +2,12 @@
 
 module FinishedGoodsApp
   class ShipLoad < BaseService
-    attr_reader :load_id, :pallet_ids, :user_name, :shipped_at
+    attr_reader :repo, :load_id, :pallet_ids, :user_name, :shipped_at
 
     def initialize(load_id, user_name)
+      @repo = LoadRepo.new
       @load_id = load_id
-      @pallet_ids = FinishedGoodsApp::LoadRepo.new.find_pallet_ids_from(load_id: load_id)
+      @pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
       @user_name = user_name
       @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
     end
@@ -50,10 +51,6 @@ module FinishedGoodsApp
         repo.log_status(:pallets, pallet_id, 'SHIPPED', user_name: user_name)
       end
       ok_response
-    end
-
-    def repo
-      @repo ||= LoadRepo.new
     end
   end
 end

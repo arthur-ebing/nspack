@@ -17,7 +17,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      pallet_id_label = FinishedGoodsApp::LoadRepo.new.find_pallet_numbers_from(pallet_id: @form_object.pallet_id).first
+      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
       govt_inspection_sheet_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_sheet(@form_object.govt_inspection_sheet_id)&.booking_reference
       failure_reason_id_label = MasterfilesApp::InspectionFailureReasonRepo.new.find_inspection_failure_reason(@form_object.failure_reason_id)&.failure_reason
       fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
@@ -31,7 +31,7 @@ module UiRules
     end
 
     def set_capture_fields
-      pallet_id_label = FinishedGoodsApp::LoadRepo.new.find_pallet_numbers_from(id: @form_object.pallet_id).first
+      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
       fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
     end
 

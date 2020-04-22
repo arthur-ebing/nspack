@@ -59,25 +59,8 @@ module FinishedGoodsApp
       ds.reverse.limit(1).get(:id)
     end
 
-    def get_location_id_by_barcode(location_barcode)
-      DB[:locations].where(location_short_code: location_barcode).get(:id)
-    end
-
-    def find_pallet_numbers_from(args)
-      ds = DB[:pallets]
-      ds = ds.where(id: DB[:pallet_sequences].where(id: args.delete(:pallet_sequence_id)).select_map(:pallet_id)) if args.key?(:pallet_sequence_id)
-      ds = ds.where(args) unless args.nil_or_empty?
-      ds.select_map(:pallet_number).flatten
-    end
-
-    def find_pallet_ids_from(args)
-      ds = DB[:pallets]
-      ds = ds.where(id: DB[:pallet_sequences].where(id: args.delete(:pallet_sequence_id)).select_map(:pallet_id)) if args.key?(:pallet_sequence_id)
-      ds = ds.where(args) unless args.nil_or_empty?
-      ds.select_map(:id).flatten
-    end
-
-    def allocate_pallets(load_id, pallet_ids, user_name)
+    def allocate_pallets(load_id, pallet_numbers, user_name)
+      pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
       return ok_response if pallet_ids.empty?
 
       DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
@@ -90,10 +73,11 @@ module FinishedGoodsApp
       ok_response
     end
 
-    def unallocate_pallets(load_id, pallet_ids, user_name) # rubocop:disable Metrics/AbcSize
+    def unallocate_pallets(load_id, pallet_numbers, user_name) # rubocop:disable Metrics/AbcSize
+      pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
       return ok_response if pallet_ids.empty?
 
-      DB[:pallets].where(id: pallet_ids, shipped: false).update(load_id: nil, allocated: false, shipped_at: nil)
+      DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
       log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user_name)
 
       # find unallocated loads
@@ -114,7 +98,7 @@ module FinishedGoodsApp
       DB.get(Sequel.function(:fn_party_role_org_code, pr_id))
     end
 
-    def update_pallets_shipped_at(load_id:, shipped_at:)
+    def update_pallets_shipped_at(load_id, shipped_at)
       DB[:pallets].where(load_id: load_id).update(shipped_at: shipped_at)
     end
 

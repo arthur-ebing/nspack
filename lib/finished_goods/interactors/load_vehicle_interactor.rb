@@ -8,7 +8,7 @@ module FinishedGoodsApp
 
       id = nil
       load_id = res.to_h[:load_id]
-      pallet_ids = load_repo.find_pallet_ids_from(load_id: load_id)
+      pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
 
       repo.transaction do
         id = repo.create_load_vehicle(res)

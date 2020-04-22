@@ -2,16 +2,14 @@
 
 module FinishedGoodsApp
   class UnshipLoad < BaseService
-    attr_reader :load_id, :pallet_ids, :user_name, :pallet_number
+    attr_reader :repo, :load_id, :pallet_ids, :user_name, :pallet_number
 
     def initialize(load_id, user_name, pallet_number = nil)
+      @repo = LoadRepo.new
       @load_id = load_id
-      if pallet_number.nil?
-        @pallet_ids = FinishedGoodsApp::LoadRepo.new.find_pallet_ids_from(load_id: load_id)
-      else
-        @pallet_number = pallet_number
-        @pallet_ids = FinishedGoodsApp::LoadRepo.new.find_pallet_ids_from(pallet_number: pallet_number)
-      end
+      @pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
+      @pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_number) unless pallet_number.nil?
+      @pallet_number = pallet_number
       @user_name = user_name
     end
 
@@ -23,7 +21,7 @@ module FinishedGoodsApp
       else
         unship_pallets
         unallocate_pallet
-        success_response("Unshipped and Unallocated Pallet: #{pallet_number}")
+        success_response("Unshipped and unallocated Pallet: #{pallet_number}")
       end
     end
 
@@ -57,11 +55,7 @@ module FinishedGoodsApp
     end
 
     def unallocate_pallet
-      repo.unallocate_pallets(load_id, pallet_ids, user_name)
-    end
-
-    def repo
-      @repo ||= LoadRepo.new
+      repo.unallocate_pallets(load_id, pallet_number, user_name)
     end
   end
 end
