@@ -16,13 +16,13 @@
   \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
   \   load_vehicles.vehicle_number,\r\n    load_vehicles.driver_name,\r\n    load_vehicles.driver_cell_number,\r\n
   \   load_vehicles.id IS NOT NULL AS truck_arrived,\r\n    pallets.pallet_quantity,\r\n
-  \   pallets.pallet_carton_quantity,\r\n    pallets.pallet_numbers,\r\n    cargo_temperatures.temperature_code
-  || ' - ' || cargo_temperatures.set_point_temperature AS cargo_temperature,\r\n    container_stack_types.stack_type_code
-  || ' - ' || COALESCE(container_stack_types.description,'') AS stack_type,\r\n    CASE\r\n
-  \       WHEN loads.shipped THEN 'ready'\r\n        WHEN loads.allocated THEN 'ok'\r\n
-  \       END AS colour_rule\r\n\r\nFROM loads\r\n         JOIN depots ON depots.id
-  = loads.depot_id\r\n         JOIN destination_cities ON destination_cities.id =
-  loads.final_destination_id\r\n         JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
+  \   pallets.pallet_carton_quantity,\r\n    pallets.pallet_numbers,\r\n    pallets.temp_tail,\r\n
+  \   cargo_temperatures.temperature_code || ' - ' || cargo_temperatures.set_point_temperature
+  AS cargo_temperature,\r\n    container_stack_types.stack_type_code || ' - ' || COALESCE(container_stack_types.description,'')
+  AS stack_type,\r\n    CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n        WHEN
+  loads.allocated THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM loads\r\n         JOIN
+  depots ON depots.id = loads.depot_id\r\n         JOIN destination_cities ON destination_cities.id
+  = loads.final_destination_id\r\n         JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
   = loads.pol_voyage_port_id\r\n         JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
   = loads.pod_voyage_port_id\r\n         JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n
   \        JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN
@@ -32,11 +32,11 @@
   = cargo_temperatures.id\r\n         LEFT JOIN container_stack_types ON load_containers.stack_type_id
   = container_stack_types.id\r\n         LEFT JOIN load_voyages ON loads.id = load_voyages.load_id\r\n
   \        LEFT JOIN load_vehicles ON loads.id = load_vehicles.load_id\r\n         LEFT
-  JOIN (\r\n    SELECT\r\n        COUNT(pallets.id) AS pallet_quantity,\r\n        SUM(pallets.carton_quantity::numeric)
-  AS pallet_carton_quantity,\r\n        string_agg(pallets.pallet_number::text, ',
-  '::text) AS pallet_numbers,\r\n        loads.id\r\n    FROM loads\r\n             LEFT
-  JOIN pallets ON loads.id = pallets.load_id\r\n    GROUP BY loads.id) pallets\r\n
-  \                  ON loads.id = pallets.id\r\nORDER BY loads.id DESC"
+  JOIN (\r\n    SELECT\r\n        COUNT(id) AS pallet_quantity,\r\n        SUM(carton_quantity::numeric)
+  AS pallet_carton_quantity,\r\n        string_agg(pallet_number::text, ', '::text)
+  AS pallet_numbers,\r\n        string_agg(temp_tail::text, ', '::text) AS temp_tail,\r\n
+  \       load_id\r\n    FROM pallets\r\n    GROUP BY load_id) pallets\r\n                   ON
+  loads.id = pallets.load_id\r\nORDER BY loads.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -700,9 +700,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  temp_tail:
+    :name: temp_tail
+    :sequence_no: 42
+    :caption: Temp tail
+    :namespaced_name: pallets.temp_tail
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   cargo_temperature:
     :name: cargo_temperature
-    :sequence_no: 42
+    :sequence_no: 43
     :caption: Cargo temperature
     :namespaced_name: 
     :data_type: :string
@@ -718,7 +734,7 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 43
+    :sequence_no: 44
     :caption: Stack type
     :namespaced_name: 
     :data_type: :string
@@ -734,7 +750,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 44
+    :sequence_no: 45
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
