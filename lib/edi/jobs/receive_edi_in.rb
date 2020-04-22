@@ -15,9 +15,12 @@ module EdiApp
         @email_notifiers = DevelopmentApp::UserRepo.new.email_addresses(user_email_group: AppConst::EMAIL_GROUP_EDI_NOTIFIERS)
         @file_name = File.basename(file_path)
         @repo = EdiInRepo.new
+        @edi_result = build_result_object
         id = repo.create_edi_in_transaction(file_name: file_name)
         work_out_flow_type
         repo.update_edi_in_transaction(id, flow_type: flow_type)
+        # Make this the only "active" transaction if there were previous failures
+        repo.mark_incomplete_transactions_as_reprocessed(id, flow_type, file_name)
 
         klass = "#{flow_type.capitalize}In"
 
@@ -25,14 +28,14 @@ module EdiApp
           raise Crossbeams::InfoError, "There is no EDI in processor for flow \"#{flow_type}\"" unless EdiApp.const_defined?(klass)
 
           repo.transaction do
-            res = EdiApp.const_get(klass).send(:call, id, @file_path, logger)
+            res = EdiApp.const_get(klass).send(:call, id, @file_path, logger, @edi_result)
             if res.success
               log "Completed: #{res.message}"
-              repo.log_edi_in_complete(id, res.message)
+              repo.log_edi_in_complete(id, res.message, @edi_result)
               move_to_success_dir
             else
               log "Failed: #{res.message}"
-              repo.log_edi_in_failed(id, res.message, res.instance)
+              repo.log_edi_in_failed(id, res.message, res.instance, @edi_result)
               msg = res.instance.empty? ? res.message : "\n#{res.message}\n#{res.instance}"
               ErrorMailer.send_error_email(subject: "EDI in #{flow_type} transform failed (#{file_name})",
                                            message: msg,
@@ -43,7 +46,7 @@ module EdiApp
           end
         rescue StandardError => e
           log_err(e.message)
-          repo.log_edi_in_error(id, e)
+          repo.log_edi_in_error(id, e, @edi_result)
           move_to_failed_dir
           ErrorMailer.send_exception_email(e, subject: "EDI in transform failed (#{file_name})", append_recipients: email_notifiers)
           expire
@@ -51,6 +54,15 @@ module EdiApp
       end
 
       private
+
+      def build_result_object
+        OpenStruct.new(schema_valid: false,
+                       newer_edi_received: false,
+                       has_missing_master_files: false,
+                       valid: false,
+                       has_discrepancies: false,
+                       notes: nil)
+      end
 
       def move_to_success_dir
         move_to_dir('processed')

@@ -8,5 +8,12 @@ module EdiApp
     attribute :complete, Types::Bool
     attribute :error_message, Types::String
     attribute :backtrace, Types::String
+    attribute :schema_valid, Types::Bool
+    attribute :newer_edi_received, Types::Bool
+    attribute :has_missing_master_files, Types::Bool
+    attribute :valid, Types::Bool
+    attribute :has_discrepancies, Types::Bool
+    attribute :reprocessed, Types::Bool
+    attribute :notes, Types::String
   end
 end

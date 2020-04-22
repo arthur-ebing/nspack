@@ -31,6 +31,19 @@ To achieve this, the `order_items.yml` file would include the following:
 
 This will become a WHERE clause like this: `WHERE order_id = 1`.
 
+NOTE: There are three special values you can use for `:val:` -- `$:START_OF_DAY$`, `$:END_OF_DAY$` and `$:TODAY$`. These return today at 00:00am, today at 23:59:59 and today respectively.
+[source,yaml]
+----
+:conditions:
+  :today:
+    - :col: created_at
+      :op: '>='
+      :val: $:START_OF_DAY$
+    - :col: created_at
+      :op: '<='
+      :val: $:END_OF_DAY$
+----
+
 ==== 2. As a section of a page
 
 In this case you have a page with a form for header data and a grid for item data. As an example, we use order and order items - where `order_items` has an `order_id` column (belongs_to `id` on `orders`). And we use the same `order_items.yml` file as above.

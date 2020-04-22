@@ -28,5 +28,11 @@ module EdiApp
 
       success_response('The file has been enqued to be re-processed.')
     end
+
+    def re_receive_file_from_transaction(id)
+      repo = EdiInRepo .new
+      full_path = repo.file_path_for_edi_in_transaction(id)
+      re_receive_file(full_path)
+    end
   end
 end

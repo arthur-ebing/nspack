@@ -38,9 +38,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: c8e1046ed089011583266623c835654553104283
+  revision: cf3e82f7d0180fa09a49cd71dc7fb99ddacad236
   specs:
-    roda-data_grid (0.4.0)
+    roda-data_grid (0.4.1)
       caxlsx
       crossbeams-dataminer
       crossbeams-layout
@@ -184,7 +184,7 @@ GEM
     rerun (0.13.0)
       listen (~> 3.0)
     rexml (3.2.4)
-    roda (3.30.0)
+    roda (3.31.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
