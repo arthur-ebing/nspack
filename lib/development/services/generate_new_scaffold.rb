@@ -2236,7 +2236,7 @@ module DevelopmentApp
 
       def make_program_menu
         <<~RUBY
-          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program_text}]
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.program_text}.rb]
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
 
           # Then run [bundle exec rake menu:migrate]
@@ -2261,7 +2261,7 @@ module DevelopmentApp
 
       def make_progfunc_menu
         <<~RUBY
-          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}]
+          # Save this as something like [db/menu/#{Time.now.strftime('%Y%m%d%H%M')}_#{opts.singlename}.rb]
           # Or add it to the existing migration for functional area #{make_caption(opts.applet)}.
           # Or add it to the existing migration for program #{make_caption(opts.program_text)}.
 

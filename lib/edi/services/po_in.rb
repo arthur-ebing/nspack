@@ -4,9 +4,9 @@ module EdiApp
   class PoIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
     attr_reader :org_code, :po_repo, :tot_cartons, :records
 
-    def initialize(edi_in_transaction_id, file_path, logger)
+    def initialize(edi_in_transaction_id, file_path, logger, edi_result)
       @po_repo = PoInRepo.new
-      super(edi_in_transaction_id, file_path, logger)
+      super(edi_in_transaction_id, file_path, logger, edi_result)
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -26,10 +26,15 @@ module EdiApp
       create_missing_masterfiles if AppConst::EDI_AUTO_CREATE_MF
 
       mf_res = check_missing_mf
-      return mf_res unless mf_res.success
+      unless mf_res.success
+        missing_masterfiles_detected(mf_res.instance)
+        return mf_res
+      end
+
+      business_validation_passed
 
       create_po_records
-      ok_response
+      success_response('PO processed')
     end
 
     private
@@ -201,34 +206,6 @@ module EdiApp
         temp_tail: seq[:temp_device_id],
         edi_in_inspection_point: seq[:inspect_pnt]
       }
-
-      # Ignore null and default fields:
-      # shipped: false,
-      # partially_palletized: 0,
-      # allocated: 0,
-      # internal_inspection_passed: 0,
-      # plt_packhouse_resource_id: 0,
-      # plt_line_resource_id: 0,
-      # > exit_ref
-      # > scrapped_at
-      # > shipped_at
-      # > internal_inspection_at
-      # > internal_reinspection_at
-      # > first_cold_storage_at
-      # > build_status
-      # > partially_palletized_at
-      # > fruit_sticker_pm_product_id
-      # > active
-      # > updated_at
-      # > allocated_at
-      # > scrapped
-      # > carton_quantity
-      # > nett_weight
-      # > load_id
-      # > fruit_sticker_pm_product_2_id
-      # > last_govt_inspection_pallet_id
-
-      # bp
     end
 
     def build_sequence(pallet_number, seq) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -291,61 +268,11 @@ module EdiApp
       rec[:record] = {
         depot_pallet: true,
         pallet_number: pallet_number,
-        # pallet_id: 0,
-        # farm_id: farm_id,
-        # puc_id: puc_id,
-        # orchard_id: orchard_id,
-        # cultivar_id: cultivar_id,
-        # season_id: season_id,
-        # marketing_variety_id: marketing_variety_id,
-        # fruit_size_reference_id: fruit_size_reference_id,
-        # marketing_org_party_role_id: marketing_org_party_role_id,
-        # packed_tm_group_id: packed_tm_group_id,
-        # mark_id: mark_id,
-        # inventory_code_id: inventory_code_id,
-        # grade_id: grade_id,
-        # basic_pack_code_id: 0, # from parent
-        # standard_pack_code_id: 0, # from parent
-        # pallet_format_id: 0, # from parent
-        # cartons_per_pallet_id: 0, # from parent
         carton_quantity: seq[:ctn_qty].to_i,
-        # nett_weight: 0,                          # ???????????????
         pick_ref: seq[:pick_ref],
         sell_by_code: seq[:sellbycode],
         product_chars: seq[:prod_char]   # ???
       }
-      # pallet_sequence_number: 0,
-      # production_run_id: 0,
-      # cultivar_group_id: 0,
-      # product_resource_allocation_id: 0,
-      # packhouse_resource_id: 0,
-      # production_line_id: 0,
-      # customer_variety_variety_id: 0,
-      # std_fruit_size_count_id: 0,
-      # fruit_actual_counts_for_pack_id: 0,
-      # pm_bom_id: 0,
-      # extended_columns: 0,
-      # client_size_reference: 0,
-      # client_product_code: 0,
-      # treatment_ids: 0,
-      # marketing_order_number: 0,
-      # pm_type_id: 0,
-      # pm_subtype_id: 0,
-      # scanned_from_carton_id: 0,
-      # exit_ref: 0,
-      # scrapped_at: 0,
-      # verification_result: 0,
-      # pallet_verification_failure_reason_id: 0,
-      # verified_at: 0,
-      # active: 0,
-      # created_at: 0,
-      # updated_at: 0,
-      # verified: 0,
-      # verification_passed: 0,
-      # scrapped_from_pallet_id: 0,
-      # removed_from_pallet: 0,
-      # removed_from_pallet_id: 0,
-      # removed_from_pallet_at: 0,
       records[pallet_number][:sub_records] << rec
     end
   end

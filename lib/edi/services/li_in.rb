@@ -4,8 +4,8 @@ module EdiApp
   class LiIn < BaseEdiInService
     attr_reader :org_code, :po_repo, :tot_cartons, :records
 
-    def initialize(edi_in_transaction_id, file_path, logger)
-      super(edi_in_transaction_id, file_path, logger)
+    def initialize(edi_in_transaction_id, file_path, logger, edi_in_result)
+      super(edi_in_transaction_id, file_path, logger, edi_in_result)
     end
 
     def call

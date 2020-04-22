@@ -2,6 +2,8 @@
 
 module EdiApp
   class XmlFileRepo
+    include Crossbeams::Responses
+
     attr_accessor :schema, :record_definitions, :rec_type_lookup, :flow_type, :toc
 
     def initialize(flow_type)
@@ -14,7 +16,12 @@ module EdiApp
 
       xsd = Nokogiri::XML::Schema(File.read(schema_file))
       doc = Nokogiri::XML(File.read(file_path))
-      xsd.validate(doc).each { |error| puts error.message }
+      result = xsd.validate(doc) # .each { |error| puts error.message }
+      if result.empty?
+        ok_response
+      else
+        failed_response('invalid schema', result)
+      end
     end
 
     def records_from_file(file_path)

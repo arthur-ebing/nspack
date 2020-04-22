@@ -1,0 +1,304 @@
+---
+:caption: Edi In Transactions
+:sql: "SELECT\r\n  \"edi_in_transactions\".\"id\",\r\n  \"edi_in_transactions\".\"flow_type\",\r\n
+  \ \"edi_in_transactions\".\"file_name\",\r\n  \"edi_in_transactions\".\"created_at\",\r\n
+  \ \"edi_in_transactions\".\"complete\",\r\n  \"edi_in_transactions\".\"schema_valid\",\r\n
+  \ \"edi_in_transactions\".\"valid\",\r\n  \"edi_in_transactions\".\"reprocessed\",\r\n
+  \ \"edi_in_transactions\".\"newer_edi_received\",\r\n  \"edi_in_transactions\".\"has_missing_master_files\",\r\n
+  \ \"edi_in_transactions\".\"has_discrepancies\",\r\n  \"edi_in_transactions\".\"error_message\",\r\n
+  \ \"edi_in_transactions\".\"notes\",\r\n  \"edi_in_transactions\".\"backtrace\",\r\n
+  \ \"edi_in_transactions\".\"updated_at\"\r\nFROM\r\n  \"edi_in_transactions\"\r\n
+  \ ORDER BY \"edi_in_transactions\".\"id\" DESC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: edi_in_transactions.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  flow_type:
+    :name: flow_type
+    :sequence_no: 2
+    :caption: Flow type
+    :namespaced_name: edi_in_transactions.flow_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  file_name:
+    :name: file_name
+    :sequence_no: 3
+    :caption: File name
+    :namespaced_name: edi_in_transactions.file_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 4
+    :caption: Created at
+    :namespaced_name: edi_in_transactions.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  complete:
+    :name: complete
+    :sequence_no: 5
+    :caption: Complete
+    :namespaced_name: edi_in_transactions.complete
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  schema_valid:
+    :name: schema_valid
+    :sequence_no: 6
+    :caption: Schema valid
+    :namespaced_name: edi_in_transactions.schema_valid
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  valid:
+    :name: valid
+    :sequence_no: 7
+    :caption: Valid
+    :namespaced_name: edi_in_transactions.valid
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  reprocessed:
+    :name: reprocessed
+    :sequence_no: 8
+    :caption: Reprocessed
+    :namespaced_name: edi_in_transactions.reprocessed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  newer_edi_received:
+    :name: newer_edi_received
+    :sequence_no: 9
+    :caption: Newer edi received
+    :namespaced_name: edi_in_transactions.newer_edi_received
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_missing_master_files:
+    :name: has_missing_master_files
+    :sequence_no: 10
+    :caption: Has missing master files
+    :namespaced_name: edi_in_transactions.has_missing_master_files
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_discrepancies:
+    :name: has_discrepancies
+    :sequence_no: 11
+    :caption: Has discrepancies
+    :namespaced_name: edi_in_transactions.has_discrepancies
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  error_message:
+    :name: error_message
+    :sequence_no: 12
+    :caption: Error message
+    :namespaced_name: edi_in_transactions.error_message
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  notes:
+    :name: notes
+    :sequence_no: 13
+    :caption: Notes
+    :namespaced_name: edi_in_transactions.notes
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  backtrace:
+    :name: backtrace
+    :sequence_no: 14
+    :caption: Backtrace
+    :namespaced_name: edi_in_transactions.backtrace
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 15
+    :caption: Updated at
+    :namespaced_name: edi_in_transactions.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: edi_in_transactions.file_name
+  :caption: File name
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: edi_in_transactions.flow_type
+  :caption: Flow type
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT DISTINCT flow_type FROM edi_in_transactions ORDER BY flow_type
+- :column: edi_in_transactions.id
+  :caption: Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: edi_in_transactions.complete
+  :caption: Complete
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: edi_in_transactions.reprocessed
+  :caption: Reprocessed
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: edi_in_transactions.created_at
+  :caption: Date created
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

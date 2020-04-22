@@ -29,5 +29,10 @@ class Nspack < Roda
       flash[:notice] = res.message
       redirect_to_last_grid(r)
     end
+    r.on 're_receive_in_transaction', Integer do |id|
+      res = interactor.re_receive_file_from_transaction(id)
+      flash[:notice] = res.message
+      redirect_to_last_grid(r)
+    end
   end
 end

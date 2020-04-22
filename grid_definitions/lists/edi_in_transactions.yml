@@ -1,0 +1,37 @@
+---
+:dataminer_definition: edi_in_transactions
+:captions:
+  :conditions:
+    :errors: EDI IN errors
+    :today: EDI IN transactions for today
+:actions:
+- :url: "/edi/receipts/edi_in_transactions/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :separator: true
+- :url: "/edi/viewer/display_edi_in_transaction_file/$:id$"
+  :text: view file
+  :icon: document-add
+  :title: View file
+- :url: "/edi/actions/re_receive_in_transaction/$:id$"
+  :text: re-process this file
+  :icon: play
+  :hide_if_true: complete,reprocessed
+  :prompt: Are you sure?
+:conditions:
+  :errors:
+    - :col: edi_in_transactions.complete
+      :op: =
+      :val: false
+    - :col: edi_in_transactions.reprocessed
+      :op: =
+      :val: false
+  :today:
+    - :col: edi_in_transactions.created_at
+      :op: '>='
+      :val: $:START_OF_DAY$
+    - :col: edi_in_transactions.created_at
+      :op: '<='
+      :val: $:END_OF_DAY$

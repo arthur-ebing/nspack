@@ -36,6 +36,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'display_edi_in_transaction_file', Integer do |id|
+      res = interactor.file_path_from_in_transaction(id)
+      if res.success
+        flow_type = res.instance[:flow_type]
+        file_path = res.instance[:file_path]
+        if UtilityFunctions.xml_file?(file_path)
+          show_partial_or_page(r) { Edi::Viewer::File::XML.call(flow_type, file_path) }
+        else
+          @page = interactor.build_grids_for(flow_type, file_path)
+          view('edi/show_in_grids')
+        end
+      else
+        flash[:error] = res.message
+        redirect_to_last_grid(r)
+      end
+    end
+
     # SENT
     # --------------------------------------------------------------------------
     r.on 'sent' do
