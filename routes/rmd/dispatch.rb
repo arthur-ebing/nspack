@@ -8,7 +8,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'allocate' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'complete_allocation' do
@@ -123,7 +122,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'truck_arrival' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'vehicle_type_changed' do
@@ -350,7 +348,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
@@ -389,9 +386,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:load_truck][:pallet_number]).pallet_number
           res = interactor.stepper_load_pallet(:load_truck, load_id, scanned_number)
           if res.instance[:load_complete]
+            form_state = interactor.stepper(:load_truck).form_state || {}
             interactor.stepper(:load_truck).clear
             store_locally(:flash_notice, rmd_success_message(res.message))
-            r.redirect('/rmd/dispatch/load_truck/load')
+            if form_state[:container_code].nil_or_empty?
+              r.redirect('/rmd/dispatch/load_truck/load')
+            else
+              store_locally(:temp_tail, OpenStruct.new(instance: { pallet_number: scanned_number }))
+              r.redirect('/rmd/dispatch/temp_tail')
+            end
           end
           message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
           store_locally(:flash_notice, message)
@@ -456,7 +459,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.get do
         form_state = {}
-        res = retrieve_from_local_store(:res)
+        res = retrieve_from_local_store(:temp_tail)
         unless res.nil?
           form_state = res.instance
           form_state[:error_message] = res.message
@@ -490,10 +493,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.update_pallets_temp_tail(params[:set_temp_tail])
         if res.success
           store_locally(:flash_notice, rmd_success_message(res.message))
+          r.redirect('/rmd/home')
         else
-          store_locally(:res, res)
+          store_locally(:temp_tail, res)
+          r.redirect('/rmd/dispatch/temp_tail')
         end
-        r.redirect('/rmd/dispatch/temp_tail')
       end
     end
   end
