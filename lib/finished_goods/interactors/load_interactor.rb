@@ -131,19 +131,17 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_multiselect(load_id, params, initial_params = nil) # rubocop:disable Metrics/AbcSize
-      pallet_numbers = repo.find_pallet_numbers_from(params)
+    def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
       unless pallet_numbers.empty?
         res = validate_allocate_list(load_id, pallet_numbers)
         return res unless res.success
       end
 
-      new_allocation = repo.find_pallet_ids_from(pallet_number: pallet_numbers)
-      current_allocation = repo.find_pallet_ids_from(load_id: load_id)
+      new_allocation = pallet_numbers
+      current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
 
-      unless initial_params.nil?
-        initial_allocation = repo.find_pallet_ids_from(initial_params)
-        return failed_response('Allocation mismatch') unless current_allocation.sort == initial_allocation.sort
+      unless initial_pallet_numbers.nil?
+        return failed_response('Allocation mismatch') unless current_allocation.sort == initial_pallet_numbers.sort
       end
 
       repo.transaction do
@@ -164,9 +162,8 @@ module FinishedGoodsApp
       res = validate_allocate_list(load_id, pallet_numbers)
       return validation_failed_response(messages: { pallet_list: [res.message] }) unless res.success
 
-      pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
       repo.transaction do
-        res = repo.allocate_pallets(load_id, pallet_ids, @user.user_name)
+        res = repo.allocate_pallets(load_id, pallet_numbers, @user.user_name)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction

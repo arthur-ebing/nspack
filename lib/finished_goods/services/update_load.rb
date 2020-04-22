@@ -53,7 +53,7 @@ module FinishedGoodsApp
     end
 
     def update_pallets_shipped_at
-      repo.update_pallets_shipped_at(load_id: load_id, shipped_at: params[:shipped_at])
+      repo.update_pallets_shipped_at(load_id, params[:shipped_at])
     end
 
     def repo

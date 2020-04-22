@@ -11,8 +11,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'complete_allocation' do
-          allocated = { pallet_number: interactor.stepper(:allocate).allocated }
-          initial_allocated = { pallet_number: interactor.stepper(:allocate).initial_allocated }
+          allocated = interactor.stepper(:allocate).allocated
+          initial_allocated = interactor.stepper(:allocate).initial_allocated
 
           res = interactor.allocate_multiselect(load_id, allocated, initial_allocated)
           if res.success

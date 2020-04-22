@@ -50,8 +50,8 @@ module FinishedGoodsApp
       vehicle_id = vehicle_repo.create_load_vehicle(@vehicle_params)
       repo.log_status(:load_vehicles, vehicle_id, 'CREATED', user_name: @user_name)
       repo.log_status(:loads, @load_id, 'TRUCK_ARRIVED', user_name: @user_name)
-      pallet_id = repo.find_pallet_ids_from(load_id: @load_id)
-      repo.log_multiple_statuses(:pallets, pallet_id, 'TRUCK_ARRIVED', user_name: @user_name)
+      pallet_ids = repo.select_values(:pallets, :id, load_id: @load_id)
+      repo.log_multiple_statuses(:pallets, pallet_ids, 'TRUCK_ARRIVED', user_name: @user_name)
       messages << 'Created load vehicle'
     end
 
