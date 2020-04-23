@@ -14,21 +14,12 @@ module FinishedGoodsApp
       success_response('ok', instance)
     end
 
-    def validate_load_truck(load_id)
+    def validate_load_truck(load_id) # rubocop:disable Metrics/AbcSize
       res = validate_load(load_id)
       return res unless res.success
 
-      return failed_response("Truck Arrival hasn't been done.") if res.instance.vehicle_number.nil?
-
-      res = validate_load_truck_pallets(load_id)
-      return res unless res.success
-
-      success_response('ok')
-    end
-
-    def validate_load_truck_pallets(load_id)
       pallet_numbers = repo.select_values(:pallets, :pallet_number, load_id: load_id)
-      return failed_response 'No pallets allocated' if pallet_numbers.empty?
+      return failed_response("Truck Arrival hasn't been done.") if res.instance.vehicle_number.nil?
 
       res = validate_pallets(:has_nett_weight, pallet_numbers)
       return res unless res.success
