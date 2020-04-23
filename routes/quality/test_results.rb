@@ -76,7 +76,22 @@ class Nspack < Roda
       @repo = QualityApp::OrchardTestRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
 
+      r.on 'orchard_diff' do
+        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::OrchardDiff.call }
+      end
+
       r.on 'phyt_clean_request' do
+        puc_ids = @repo.select_values(:pallet_sequences, :puc_id).uniq
+        res = interactor.phyt_clean_request(puc_ids)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect '/list/orchard_test_results'
+      end
+
+      r.on 'phyt_clean_request_all' do
         res = interactor.phyt_clean_request
         if res.success
           flash[:notice] = res.message

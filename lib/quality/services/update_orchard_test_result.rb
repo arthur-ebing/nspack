@@ -3,11 +3,12 @@
 module QualityApp
   class UpdateOrchardTestResult < BaseService
     attr_reader :id, :orchard_test_type, :orchard_test_result, :api_result, :api_attribute
-    attr_accessor :params, :otmc_result
+    attr_accessor :params, :otmc_result, :attrs
 
     def initialize(id, params)
       @id = id
       @params = params.to_h
+      @attrs = {}
       @api_result = @params[:api_result]
       @orchard_test_result = repo.find_orchard_test_result_flat(id)
       @orchard_test_type = repo.find_orchard_test_type_flat(@orchard_test_result.orchard_test_type_id)
@@ -33,25 +34,23 @@ module QualityApp
     end
 
     def classification_rules
-      params[:passed] = true
-      params[:classification] = true
+      attrs[:passed] = true
+      attrs[:classification] = true
     end
 
     def pass_fail_rules
-      params[:passed] = UtilityFunctions.parse_string_to_array(orchard_test_type.api_pass_result)&.map(&:upcase)&.include? api_result&.upcase
-      params[:classification] = false
+      attrs[:passed] = UtilityFunctions.parse_string_to_array(orchard_test_type.api_pass_result)&.map(&:upcase)&.include? api_result&.upcase
+      attrs[:classification] = false
     end
 
     def update_orchard_test_results # rubocop:disable Metrics/AbcSize
       params[:group_ids] = repo.for_select_orchard_test_results(@orchard_test_result.orchard_test_type_id).map { |row| row[1] } if params[:update_all]
       params[:group_ids] = [id] if params[:group_ids].nil_or_empty?
 
-      attrs = { passed: params[:passed],
-                classification: params[:classification],
-                freeze_result: params[:freeze_result] || false,
-                api_result: params[:api_result],
-                applicable_from: params[:applicable_from],
-                applicable_to: params[:applicable_to] }
+      attrs[:freeze_result] = params[:freeze_result] || false
+      attrs[:api_result] = params[:api_result]
+      attrs[:applicable_from] = params[:applicable_from]
+      attrs[:applicable_to] = params[:applicable_to]
 
       params[:group_ids].each do |id|
         next if repo.exists?(:orchard_test_results, attrs.merge(id: id))

@@ -14,7 +14,18 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[edit bulk_edit].include? @mode
+      set_diff_fields if @mode == :diff
+
       form_name 'orchard_test_result'
+    end
+
+    def set_diff_fields
+      phyto = QualityApp::PhytCleanOrchardDiff.call.instance
+      nspack = @repo.puc_orchard_cultivar
+      fields[:header] = { left_caption: 'Phyto Data',
+                          right_caption: 'NSPack',
+                          left_record: phyto,
+                          right_record: nspack }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -100,7 +111,7 @@ module UiRules
     end
 
     def make_form_object
-      if @mode == :new
+      if %i[new diff].include? @mode
         @form_object = OpenStruct.new(orchard_test_type_id: nil)
         return
       end

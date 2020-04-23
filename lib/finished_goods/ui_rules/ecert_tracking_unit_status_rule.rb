@@ -12,8 +12,6 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
-
       form_name 'ecert_tracking_unit_status'
     end
 

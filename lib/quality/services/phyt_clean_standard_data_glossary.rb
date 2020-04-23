@@ -30,8 +30,8 @@ module QualityApp
 
     def parse_glossary(res)
       res.instance.each do |row|
-        control_param = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
-        glossary[row['cpagxmlAliasname'].downcase] = control_param
+        control_attr = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
+        glossary[row['cpagxmlAliasname'].downcase] = control_attr
       end
       save_to_yaml(glossary, 'PhytCleanStandardGlossary')
     end

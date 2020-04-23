@@ -123,5 +123,18 @@ module QualityApp
 
       DB[:orchard_test_results].where(id: id).delete
     end
+
+    def puc_orchard_cultivar
+      hash = {}
+      select_values(:orchards, %i[puc_id id cultivar_ids]).each do |puc_id, orchard_id, cultivar_ids|
+        puc = get(:pucs, puc_id, :puc_code)
+        orchard = get(:orchards, orchard_id, :orchard_code)
+        cultivar_ids.each do |cultivar_id|
+          cultivar = get(:cultivars, cultivar_id, :cultivar_code)
+          hash["Puc #{puc} - Orchard #{orchard}"] = "Cultivar #{cultivar}   "
+        end
+      end
+      Hash[hash.sort]
+    end
   end
 end

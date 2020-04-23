@@ -2,14 +2,15 @@
 
 module QualityApp
   class PhytCleanStandardData < BaseService
-    attr_reader :repo, :api, :season_id
-    attr_accessor :params, :glossary
+    attr_reader :repo, :api, :season_id, :puc_ids
+    attr_accessor :attrs, :glossary
 
-    def initialize
+    def initialize(puc_ids = nil)
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
-      @params = {}
+      @puc_ids = puc_ids || repo.select_values(:orchards, :puc_id).uniq
+      @attrs = {}
       @glossary = {}
     end
 
@@ -19,7 +20,7 @@ module QualityApp
       res = api.auth_token_call
       return failed_response(res.message) unless res.success
 
-      repo.select_values(:pallet_sequences, :puc_id).uniq.each do |puc_id|
+      puc_ids.each do |puc_id|
         res = api.request_phyt_clean_standard_data(season_id, puc_id)
         return failed_response(res.message) unless res.success
 
@@ -35,10 +36,10 @@ module QualityApp
 
     def parse_standard_data(res) # rubocop:disable Metrics/AbcSize
       head = res.instance['season']
-      params[:season_name] = head['seasonName']
+      attrs[:season_name] = head['seasonName']
       puc = head['fbo'].first
-      params[:puc_code] = puc['code']
-      params[:orchards] = []
+      attrs[:puc_code] = puc['code']
+      attrs[:orchards] = []
       orchards = puc['orchard']
       orchards.each do |orchard|
         orchard_args = {}
@@ -54,39 +55,39 @@ module QualityApp
         control_point_groups.each do |group|
           control_points = group['controlpoints'].first['cp']
           control_points.each do |point|
-            point_params = point['params'].first['p']
-            point_params.each do |point_param|
-              orchard_attrs[point_param['name'].downcase.to_sym] = point_param['value']
+            point_attrs = point['params'].first['p']
+            point_attrs.each do |point_attr|
+              orchard_attrs[point_attr['name'].downcase.to_sym] = point_attr['value']
             end
           end
         end
-        params[:orchards] << [orchard_args, orchard_attrs]
+        attrs[:orchards] << [orchard_args, orchard_attrs]
       end
     end
 
     def update_orchard_tests # rubocop:disable Metrics/AbcSize
-      save_to_yaml(params, "PhytCleanStandardData_#{params[:puc_code]}")
+      save_to_yaml(attrs, "PhytCleanStandardData_#{attrs[:puc_code]}")
       values = YAML.load_file('tmp/PhytCleanStandardGlossary.yml')
 
-      params[:orchards].each do |args, attrs|
-        values['orchards'] = [values['orchards'], args].flatten.uniq
-        puc_id = repo.get_id(:pucs, puc_code: args[:puc_code])
-        orchard_id = repo.get_id(:orchards, orchard_code: args[:orchard_code], puc_id: puc_id)
-        cultivar_id = repo.get_id(:cultivars, cultivar_code: args[:cultivar_code])
-        attrs.each do |api_attribute, api_result|
+      attrs[:orchards].each do |orchard_args, orchard_attrs|
+        values['orchards'] = [values['orchards'], orchard_args].flatten.uniq
+        puc_id = repo.get_id(:pucs, puc_code: orchard_args[:puc_code])
+        orchard_id = repo.get_id(:orchards, orchard_code: orchard_args[:orchard_code], puc_id: puc_id)
+        cultivar_id = repo.get_id(:cultivars, cultivar_code: orchard_args[:cultivar_code])
+        orchard_attrs.each do |api_attribute, api_result|
           values[api_attribute.to_s] = [values[api_attribute.to_s], api_result].flatten.uniq
 
           orchard_test_type_id = repo.get_id(:orchard_test_types, api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute.to_s)
           next if orchard_test_type_id.nil?
 
-          update_params = { puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id, orchard_test_type_id: orchard_test_type_id }
-          orchard_test_result_id = repo.get_id(:orchard_test_results, update_params)
+          update_attrs = { puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id, orchard_test_type_id: orchard_test_type_id }
+          orchard_test_result_id = repo.get_id(:orchard_test_results, update_attrs)
           next if orchard_test_result_id.nil?
 
           next if repo.get(:orchard_test_results, orchard_test_result_id, :freeze_result)
 
-          update_params[:api_result] = api_result
-          QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, update_params)
+          update_attrs[:api_result] = api_result
+          QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, update_attrs)
         end
       end
       save_to_yaml(values, 'PhytCleanStandardGlossary')
