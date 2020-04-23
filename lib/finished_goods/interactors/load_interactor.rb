@@ -2,9 +2,8 @@
 
 module FinishedGoodsApp
   class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    include LoadValidator
     def create_load(params, user)
-      res = validate_load_service_params(params)
+      res = LoadServiceSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
@@ -20,7 +19,7 @@ module FinishedGoodsApp
     end
 
     def update_load(params, user)
-      res = validate_load_service_params(params)
+      res = LoadServiceSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
@@ -95,7 +94,7 @@ module FinishedGoodsApp
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
       unless pallet_numbers.empty?
-        res = validate_allocate_list(load_id, pallet_numbers)
+        res = load_validator.validate_allocate_list(load_id, pallet_numbers)
         return res unless res.success
       end
 
@@ -121,7 +120,7 @@ module FinishedGoodsApp
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = validate_allocate_list(load_id, pallet_numbers)
+      res = load_validator.validate_allocate_list(load_id, pallet_numbers)
       return validation_failed_response(messages: { pallet_list: [res.message] }) unless res.success
 
       repo.transaction do
@@ -136,13 +135,13 @@ module FinishedGoodsApp
     end
 
     def truck_arrival(params) # rubocop:disable Metrics/AbcSize
-      vehicle_res = validate_load_vehicle_params(params)
+      vehicle_res = LoadVehicleSchema.call(params)
       return validation_failed_response(vehicle_res) unless vehicle_res.messages.empty?
 
       # load has a container
       container_res = nil
       if params[:container] == 't'
-        container_res = validate_load_container_params(params)
+        container_res = LoadContainerSchema.call(params)
         return validation_failed_response(container_res) unless container_res.messages.nil_or_empty?
       end
 
@@ -165,7 +164,7 @@ module FinishedGoodsApp
     end
 
     def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = validate_allocate_list(load_id, pallet_number)
+      res = load_validator.validate_allocate_list(load_id, pallet_number)
       return res unless res.success
 
       message = stepper(step_key).allocate_pallet(pallet_number)
@@ -224,6 +223,14 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadRepo.new
+    end
+
+    def load_validator
+      LoadValidator.new
+    end
+
+    def validate_pallets(check, pallet_numbers)
+      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
     end
 
     def load_entity(id)

@@ -30,7 +30,7 @@ module FinishedGoodsApp
     private
 
     def create_load
-      res = validate_load_params(params)
+      res = LoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       @load_id = repo.create(:loads, res)
@@ -41,7 +41,7 @@ module FinishedGoodsApp
     end
 
     def create_load_voyage
-      res = validate_load_voyage_params(params)
+      res = LoadVoyageSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_voyage_id = repo.create(:load_voyages, res)
@@ -56,14 +56,6 @@ module FinishedGoodsApp
 
     def load_entity(id)
       repo.find_load_flat(id)
-    end
-
-    def validate_load_params(params)
-      LoadSchema.call(params)
-    end
-
-    def validate_load_voyage_params(params)
-      LoadVoyageSchema.call(params)
     end
   end
 end

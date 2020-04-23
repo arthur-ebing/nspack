@@ -264,7 +264,7 @@ module UiRules
                              Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
         rules[:can_ship] = !@form_object.shipped &&
                            Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
-                           !FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: @form_object.id).nil_or_empty?
+                           !@repo.get_id(:load_vehicles, load_id: @form_object.id).nil_or_empty?
       end
       rules[:shipped] = @form_object.shipped
       rules[:allocated] = @form_object.allocated
