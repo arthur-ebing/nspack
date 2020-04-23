@@ -114,7 +114,13 @@ def call
 end
 ----
 
-Methods available from the `BaseEdiInService`:
+==== Variables available from the `BaseEdiInService`
+
+flow_type:: The flow type of this process (`PO`, `LI` etc.)
+file_name:: The name of the file being processed (does not include the path)
+edi_records:: The file contents presented as a Ruby structure (`Array` for flat files and `Hash` for XML files)
+
+==== Methods available from the `BaseEdiInService`
 
 missing_required_fields(only_rows: nil):: (For flat files) Checks if any required fields are missing. Raises an exception if they are. If this passes, `edi_in_transaction.schema_valid` will be `true`.
 log(msg):: Write `msg` to the log file at the `info` level.
