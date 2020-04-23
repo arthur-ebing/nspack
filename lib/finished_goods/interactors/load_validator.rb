@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  module LoadValidator
+  class LoadValidator
+    include Crossbeams::Responses
     def validate_load(load_id)
       return failed_response("Value #{load_id} is too big to be a load. Perhaps you scanned a pallet number?") if load_id.to_i > AppConst::MAX_DB_INT
 
@@ -22,7 +23,7 @@ module FinishedGoodsApp
       res = validate_load_truck_pallets(load_id)
       return res unless res.success
 
-      ok_response
+      success_response('ok')
     end
 
     def validate_load_truck_pallets(load_id)
@@ -38,7 +39,7 @@ module FinishedGoodsApp
       res = validate_pallets(:not_shipped, pallet_numbers)
       return res unless res.success
 
-      ok_response
+      success_response('ok')
     end
 
     def validate_allocate_list(load_id, pallet_numbers)
@@ -54,23 +55,11 @@ module FinishedGoodsApp
       res = validate_pallets(:not_failed_otmc, pallet_numbers)
       return res unless res.success
 
-      ok_response
+      success_response('ok')
     end
 
     def validate_pallets(check, pallet_numbers, load_id = nil)
       MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers, load_id)
-    end
-
-    def validate_load_service_params(params)
-      LoadServiceSchema.call(params)
-    end
-
-    def validate_load_vehicle_params(params)
-      LoadVehicleSchema.call(params)
-    end
-
-    def validate_load_container_params(params)
-      LoadContainerSchema.call(params)
     end
 
     private

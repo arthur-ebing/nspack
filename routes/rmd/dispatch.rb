@@ -3,11 +3,12 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'dispatch', 'rmd' do |r|
-    @repo = BaseRepo.new
+    repo = BaseRepo.new
+    interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    load_validator = FinishedGoodsApp::LoadValidator.new
     # ALLOCATE PALLETS TO LOAD
     # --------------------------------------------------------------------------
     r.on 'allocate' do
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'complete_allocation' do
@@ -105,7 +106,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           current_load = interactor.stepper(:allocate)
           load_id = params[:allocate][:load_id]
-          res = interactor.validate_load(load_id)
+          res = load_validator.validate_load(load_id)
 
           if res.success
             current_load.setup_load(load_id)
@@ -121,7 +122,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # TRUCK ARRIVAL
     # --------------------------------------------------------------------------
     r.on 'truck_arrival' do
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.on 'vehicle_type_changed' do
@@ -148,19 +148,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do
           # set defaults
           form_state = {}
-          form_state[:stack_type_id] = @repo.get_id(:container_stack_types, stack_type_code: 'S')
+          form_state[:stack_type_id] = repo.get_id(:container_stack_types, stack_type_code: 'S')
           form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
           form_state[:cargo_temperature_id] = MasterfilesApp::CargoTemperatureRepo.new.cargo_temperature_id_for(AppConst::DEFAULT_CARGO_TEMP_ON_ARRIVAL)
 
           # checks if load_container exists
-          container_id = @repo.get_id(:load_containers, load_id: load_id)
+          container_id = repo.get_id(:load_containers, load_id: load_id)
           unless container_id.nil?
             form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(container_id).to_h)
             form_state[:container] = 'true'
           end
 
           # checks if load_vehicle exists
-          vehicle_id = FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_from(load_id: load_id)
+          vehicle_id = repo.get_id(:load_vehicles, load_id: load_id)
           form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(vehicle_id).to_h) unless vehicle_id.nil?
 
           # overrides if redirect from error
@@ -333,7 +333,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           load_id = params[:load][:load_id]
-          res = interactor.validate_load(load_id)
+          res = load_validator.validate_load(load_id)
           if res.success
             r.redirect("/rmd/dispatch/truck_arrival/load/#{load_id}")
           else
@@ -347,7 +347,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # LOAD TRUCK
     # --------------------------------------------------------------------------
     r.on 'load_truck' do
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # --------------------------------------------------------------------------
       r.on 'load', Integer do |load_id|
         r.get do
@@ -439,7 +438,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           current_load = interactor.stepper(:load_truck)
           load_id = params[:load][:load_id]
-          res = interactor.validate_load_truck(load_id)
+          res = load_validator.validate_load_truck(load_id)
 
           if res.success
             current_load.setup_load(load_id)
@@ -455,8 +454,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # SET TEMP TAIL
     # --------------------------------------------------------------------------
     r.on 'temp_tail' do
-      interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       r.get do
         form_state = {}
         res = retrieve_from_local_store(:temp_tail)

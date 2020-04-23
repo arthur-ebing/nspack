@@ -25,9 +25,5 @@ module FinishedGoodsApp
                                                  col_name: :haulier_party_role }],
                             wrapper: LoadVehicleFlat)
     end
-
-    def find_load_vehicle_from(load_id:)
-      DB[:load_vehicles].where(load_id: load_id).get(:id)
-    end
   end
 end
