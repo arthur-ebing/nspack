@@ -2,13 +2,12 @@
 
 module QualityApp
   class PhytCleanStandardData < BaseService
-    attr_reader :repo, :api, :puc_id, :season_id
+    attr_reader :repo, :api, :season_id
     attr_accessor :params, :glossary
 
-    def initialize(puc_id)
+    def initialize
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
-      @puc_id = puc_id
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @params = {}
       @glossary = {}
@@ -20,12 +19,14 @@ module QualityApp
       res = api.auth_token_call
       return failed_response(res.message) unless res.success
 
-      res = api.request_phyt_clean_standard_data(season_id, puc_id)
-      return failed_response(res.message) unless res.success
+      repo.select_values(:pallet_sequences, :puc_id).uniq.each do |puc_id|
+        res = api.request_phyt_clean_standard_data(season_id, puc_id)
+        return failed_response(res.message) unless res.success
 
-      parse_standard_data(res)
+        parse_standard_data(res)
 
-      update_orchard_tests
+        update_orchard_tests
+      end
 
       success_response(res.message)
     end

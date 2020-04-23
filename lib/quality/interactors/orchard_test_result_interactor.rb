@@ -4,13 +4,12 @@ module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
     def phyt_clean_request
       service_res = nil
-      repo.select_values(:pucs, :id).each do |puc_id|
-        repo.transaction do
-          service_res = QualityApp::PhytCleanStandardData.call(puc_id)
-          raise Crossbeams::InfoError, service_res.message unless service_res.success
 
-          log_transaction
-        end
+      repo.transaction do
+        service_res = QualityApp::PhytCleanStandardData.call
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
+        log_transaction
       end
       service_res
     rescue Crossbeams::InfoError => e

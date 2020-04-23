@@ -24,6 +24,8 @@ module QualityApp
       repo.select_values(:orchards, %i[puc_id id cultivar_ids]).each do |puc_id, orchard_id, cultivar_ids|
         args = { puc_id: puc_id, orchard_id: orchard_id, orchard_test_type_id: orchard_test_type.id }
         cultivar_ids.each do |cultivar_id|
+          next unless repo.exists?(:pallet_sequences, puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id)
+
           next unless (Array(orchard_test_type.applicable_cultivar_ids).include? cultivar_id) || orchard_test_type.applies_to_all_cultivars
 
           args[:cultivar_id] = cultivar_id
