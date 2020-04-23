@@ -15,6 +15,10 @@ class BaseEdiInService < BaseService
 
   def missing_required_fields(only_rows: nil)
     @flat_file_repo.missing_required_fields(only_rows: Array(only_rows))
+  rescue Crossbeams::InfoError => e
+    @edi_result.schema_valid = false
+    @edi_result.notes = e.message
+    raise
   end
 
   def log(msg)
