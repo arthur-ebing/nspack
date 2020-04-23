@@ -134,8 +134,8 @@ module FinishedGoodsApp
       end
     end
 
-    def get_party_role_id(name, role)
-      MasterfilesApp::PartyRepo.new.get_party_role_id(name, role)
+    def get_party_role_id(party_role_name, role_name)
+      MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(party_role_name, role_name)
     end
   end
 end
