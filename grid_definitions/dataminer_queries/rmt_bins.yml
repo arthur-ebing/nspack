@@ -1,7 +1,7 @@
 ---
 :caption: Rmt Bins
-:sql: "SELECT\r\n    id,\r\n    rmt_delivery_id,\r\n    season_id,\r\n    discrete_bin,\r\n    delivery_destination_code,\r\n
-  \   cultivar_id,\r\n    orchard_id,\r\n    farm_id,\r\n    rmt_class_id,\r\n    rmt_container_type_id,\r\n
+:sql: "SELECT\r\n    id,\r\n    rmt_delivery_id,\r\n   EXTRACT(WEEK FROM bin_tipped_date_time) as week,\r\n    season_id,\r\n    discrete_bin,\r\n    delivery_destination_code,\r\n
+  \   cultivar_id,\r\n    orchard_id,\r\n    packhouse,\r\n    farm_id,\r\n    rmt_class_id,\r\n    rmt_container_type_id,\r\n
   \   rmt_container_material_type_id,\r\n    cultivar_group_id,\r\n    puc_id,\r\n
   \   exit_ref,\r\n    qty_bins,\r\n    bin_asset_number,\r\n    tipped_asset_number,\r\n
   \   rmt_inner_container_type_id,\r\n    rmt_inner_container_material_id,\r\n    qty_inner_bins,\r\n
@@ -79,6 +79,38 @@
     :width:
     :format:
     :hide: true
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  week:
+    :name: week
+    :sequence_no: 3
+    :caption: Week
+    :namespaced_name: week
+    :data_type: :integer
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse:
+    :name: packhouse
+    :sequence_no: 2
+    :caption: Packhouse
+    :namespaced_name: packhouse
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
     :pinned:
     :groupable: true
     :group_by_seq:
