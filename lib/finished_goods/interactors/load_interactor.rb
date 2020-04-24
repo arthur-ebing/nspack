@@ -198,7 +198,7 @@ module FinishedGoodsApp
       end
       success_response("Updated pallet: #{pallet_number}")
     rescue Crossbeams::InfoError => e
-      failed_response(e)
+      failed_response(e.message)
     end
 
     def find_load_with(pallet_number)
