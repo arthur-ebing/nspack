@@ -22,7 +22,9 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      return failed_response("Scanned Carton:#{carton_id} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_id
+
       pallet = find_pallet_by_pallet_number(pallet_number)
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
@@ -60,6 +62,8 @@ module ProductionApp
     end
 
     def create_pallet_from_carton(carton_id) # rubocop:disable Metrics/AbcSize
+      return failed_response("Scanned Carton:#{carton_id} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_id
+
       carton = find_carton_with_run_info(carton_id)
       return failed_response("Scanned Carton:#{carton_id} doesn't exist") unless carton
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
@@ -96,6 +100,8 @@ module ProductionApp
     end
 
     def replace_pallet_sequence(user_name, carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+      return failed_response("Scanned Carton:#{carton_number} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_number
+
       carton = find_carton_with_run_info(carton_number)
       return failed_response('Scanned Carton Production Run is closed') if carton[:production_run_closed]
 
