@@ -334,7 +334,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.patch do     # UPDATE
-          res = interactor.update_load(params[:load], current_user)
+          res = interactor.update_load(params[:load])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -454,7 +454,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do        # CREATE
-        res = interactor.create_load(params[:load], current_user)
+        res = interactor.create_load(params[:load])
         if res.success
           flash[:notice] = res.message
           redirect_to_last_grid(r)

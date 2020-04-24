@@ -2,13 +2,13 @@
 
 module FinishedGoodsApp
   class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_load(params, user)
+    def create_load(params)
       res = LoadServiceSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::CreateLoad.call(res, user)
+        load_res = FinishedGoodsApp::CreateLoad.call(res, @user)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -18,13 +18,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load(params, user)
+    def update_load(params)
       res = LoadServiceSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::UpdateLoad.call(res, user)
+        load_res = FinishedGoodsApp::UpdateLoad.call(res, @user)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -219,14 +219,14 @@ module FinishedGoodsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def load_validator
+      LoadValidator.new
+    end
+
     private
 
     def repo
       @repo ||= LoadRepo.new
-    end
-
-    def load_validator
-      LoadValidator.new
     end
 
     def validate_pallets(check, pallet_numbers)
