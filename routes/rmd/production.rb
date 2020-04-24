@@ -565,8 +565,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
             end
 
+            carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
             unless AppConst::CARTON_VERIFICATION_REQUIRED
-              carton_number = (carton = interactor.find_carton_by_carton_label_id(params[:pallet][:carton_number])) ? carton[:id] : nil
               unless carton_number
                 res = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).carton_verification(carton_number: params[:pallet][:carton_number])
                 unless res.success # rubocop:disable Metrics/BlockNesting
