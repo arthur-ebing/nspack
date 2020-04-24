@@ -9,7 +9,7 @@ module QualityApp
       id = nil
       repo.transaction do
         id = repo.create_orchard_test_type(res)
-        service_res = CreateOrchardTestResults.call(id)
+        service_res = RefreshOrchardTestResults.call(id)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_status(:orchard_test_types, id, 'CREATED')
@@ -23,12 +23,24 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def update_orchard_test_type(id, params)
+    def update_orchard_test_type(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_orchard_test_type_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_orchard_test_type(id, res)
+
+        service_res = RefreshOrchardTestResults.call(id)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
+        result_ids = repo.select_values(:orchard_test_results, :id, orchard_test_type_id: id)
+        result_ids.each do |result_id|
+          params = repo.find_hash(:orchard_test_results, result_id)
+          params[:api_result] = res.to_h[:api_default_result]
+          QualityApp::UpdateOrchardTestResult.call(result_id, params)
+        end
+
+        # id = service_res.instance.id
         log_transaction
       end
       instance = orchard_test_type(id)
@@ -37,9 +49,18 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def delete_orchard_test_type(id)
+    def delete_orchard_test_type(id) # rubocop:disable Metrics/AbcSize
       name = orchard_test_type(id).test_type_code
       repo.transaction do
+        result_ids = repo.select_values(:orchard_test_results, :id, orchard_test_type_id: id)
+        result_ids.each do |result_id|
+          freeze_result = repo.get(:orchard_test_results, result_id, :freeze_result)
+          raise Crossbeams::InfoError, "Orchard Test Result #{result_id} frozen." if freeze_result
+
+          repo.delete_orchard_test_result(result_id)
+          log_status(:orchard_test_results, result_id, 'DELETED')
+        end
+
         repo.delete_orchard_test_type(id)
         log_status(:orchard_test_types, id, 'DELETED')
         log_transaction

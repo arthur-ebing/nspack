@@ -13,7 +13,7 @@ module QualityApp
     optional(:orchard_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
     optional(:cultivar_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
     optional(:passed, :bool).maybe(:bool?)
-    required(:classification, :bool).maybe(:bool?)
+    optional(:classification, :bool).maybe(:bool?)
     required(:freeze_result, :bool).maybe(:bool?)
     required(:api_result, :string).maybe(:str?)
     optional(:api_response, :string).maybe(:str?)

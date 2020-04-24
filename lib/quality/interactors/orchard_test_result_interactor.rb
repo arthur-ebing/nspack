@@ -20,7 +20,7 @@ module QualityApp
       service_res = nil
       ids.each do |id|
         repo.transaction do
-          service_res = CreateOrchardTestResults.call(id)
+          service_res = RefreshOrchardTestResults.call(id)
           raise Crossbeams::InfoError, service_res.message unless service_res.success
 
           log_transaction

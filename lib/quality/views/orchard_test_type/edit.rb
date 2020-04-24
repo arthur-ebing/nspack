@@ -16,6 +16,7 @@ module Quality
             page.form do |form|
               form.caption 'Edit Orchard Test Type'
               form.action "/quality/config/orchard_test_types/#{id}"
+              form.submit_captions 'Create Test Results'
               form.remote!
               form.method :update
               form.row do |row|
@@ -25,8 +26,9 @@ module Quality
                   col.add_field :result_type
                   col.add_field :api_name
                   col.add_field :api_attribute
-                  col.add_field :api_default_result
                   col.add_field :api_pass_result
+                  col.add_field :api_default_result
+                  col.add_notice "Leaving 'Default Value' blank will result in Test Results being created as failed."
                 end
                 row.column do |col|
                   col.add_field :applies_to_all_markets

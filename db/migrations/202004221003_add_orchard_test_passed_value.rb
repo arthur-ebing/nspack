@@ -1,6 +1,8 @@
 
 Sequel.migration do
   up do
+      drop_column :orchards, :otmc_results
+
       rename_column :orchard_test_types, :result_attribute, :api_attribute
       add_column    :orchard_test_types, :api_pass_result, String
       add_column    :orchard_test_types, :api_default_result, String
@@ -26,5 +28,7 @@ Sequel.migration do
       drop_column   :orchard_test_types, :api_default_result
       drop_column   :orchard_test_types, :api_pass_result
       rename_column :orchard_test_types, :api_attribute, :result_attribute
+
+      add_column :orchards, :otmc_results, 'hstore'
   end
 end

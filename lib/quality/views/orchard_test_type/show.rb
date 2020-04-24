@@ -20,8 +20,8 @@ module Quality
                   col.add_field :result_type
                   col.add_field :api_name
                   col.add_field :api_attribute
-                  col.add_field :api_default_result
                   col.add_field :api_pass_result
+                  col.add_field :api_default_result
                 end
                 row.column do |col|
                   col.add_field :applies_to_all_markets

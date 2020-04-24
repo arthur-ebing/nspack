@@ -20,7 +20,8 @@ module UiRules
     end
 
     def set_diff_fields
-      phyto = QualityApp::PhytCleanOrchardDiff.call.instance
+      res = QualityApp::PhytCleanOrchardDiff.call
+      phyto = res.success ? res.instance : { 'error': res.message }
       nspack = @repo.puc_orchard_cultivar
       fields[:header] = { left_caption: 'Phyto Data',
                           right_caption: 'NSPack',
@@ -74,10 +75,11 @@ module UiRules
         passed: { renderer: :label,
                   with_value: @form_object.passed ? 'Passed' : 'Failed',
                   caption: 'Result',
-                  hide_on_load: @result_type_classification },
+                  hide_on_load: @classification },
         api_result: { caption: 'Result' },
-        classification: { renderer: :checkbox,
-                          hide_on_load: !@result_type_classification },
+        classification: { renderer: :label,
+                          as_boolean: true,
+                          hide_on_load: !@classification },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
         api_response: { hide_on_load: false },
@@ -98,10 +100,10 @@ module UiRules
         passed: { renderer: :label,
                   with_value: @form_object.passed ? 'Passed' : 'Failed',
                   caption: 'Result',
-                  hide_on_load: @result_type_classification },
+                  hide_on_load: @classification },
         api_result: { caption: 'Result' },
         classification: { renderer: :checkbox,
-                          hide_on_load: !@result_type_classification },
+                          hide_on_load: !@classification },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
         api_response: { hide_on_load: false },
@@ -116,10 +118,11 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_orchard_test_result_flat(@options[:id])
-      @rule_object = @repo.find_orchard_test_type_flat(@form_object[:orchard_test_type_id])
-      @result_type_classification = @rule_object.result_type == AppConst::CLASSIFICATION
-      @form_object = OpenStruct.new(@form_object.to_h.merge(puc_ids: Array(@form_object.puc_id), classification: @result_type_classification))
+      form_object = @repo.find_orchard_test_result_flat(@options[:id]).to_h
+      @classification = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :result_type) == AppConst::CLASSIFICATION
+      form_object[:puc_ids] = Array(form_object[:puc_id])
+      form_object[:classification] = @classification
+      @form_object = OpenStruct.new(form_object)
     end
 
     private

@@ -2,16 +2,15 @@
 
 module QualityApp
   class UpdateOrchardTestResult < BaseService
-    attr_reader :id, :orchard_test_type, :orchard_test_result, :api_result, :api_attribute
+    attr_reader :id, :orchard_test_type, :orchard_test_result, :api_attribute
     attr_accessor :params, :otmc_result, :attrs
 
     def initialize(id, params)
       @id = id
-      @params = params.to_h
-      @attrs = {}
-      @api_result = @params[:api_result]
       @orchard_test_result = repo.find_orchard_test_result_flat(id)
       @orchard_test_type = repo.find_orchard_test_type_flat(@orchard_test_result.orchard_test_type_id)
+      @params = params.to_h
+      @attrs = {}
       @api_attribute = @orchard_test_type.api_attribute&.to_sym
     end
 
@@ -34,12 +33,12 @@ module QualityApp
     end
 
     def classification_rules
-      attrs[:passed] = true
+      attrs[:passed] = !params[:api_result].nil_or_empty?
       attrs[:classification] = true
     end
 
     def pass_fail_rules
-      attrs[:passed] = UtilityFunctions.parse_string_to_array(orchard_test_type.api_pass_result)&.map(&:upcase)&.include? api_result&.upcase
+      attrs[:passed] = UtilityFunctions.parse_string_to_array(orchard_test_type.api_pass_result)&.map(&:upcase)&.include? params[:api_result]&.upcase
       attrs[:classification] = false
     end
 

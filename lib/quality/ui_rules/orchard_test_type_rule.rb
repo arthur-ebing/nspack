@@ -41,7 +41,7 @@ module UiRules
       fields[:api_attribute] = { renderer: :label,
                                  hide_on_load: @form_object.api_name.nil_or_empty? }
       fields[:api_pass_result] = { renderer: :label,
-                                   caption: 'Pass Value' }
+                                   caption: 'Api Pass Value' }
       fields[:api_default_result] = { renderer: :label,
                                       caption: 'Default Value'  }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -81,8 +81,9 @@ module UiRules
                     selected: @form_object.api_name,
                     prompt: true },
         api_attribute: { hide_on_load: @form_object.api_name.nil_or_empty? },
-        api_pass_result: { caption: 'Pass Value',
-                           required: @form_object.result_type != AppConst::CLASSIFICATION },
+        api_pass_result: { caption: 'Api Pass Value',
+                           required: @form_object.result_type != AppConst::CLASSIFICATION,
+                           hide_on_load: @form_object.result_type == AppConst::CLASSIFICATION },
         api_default_result: { caption: 'Default Value' }
       }
     end
@@ -105,7 +106,7 @@ module UiRules
                                     allow_result_capturing: false,
                                     pallet_level_result: false,
                                     api_name: nil,
-                                    result_type: nil,
+                                    result_type: AppConst::CLASSIFICATION,
                                     api_attribute: nil,
                                     api_pass_result: nil,
                                     api_default_result: nil,

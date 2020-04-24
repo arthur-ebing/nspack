@@ -57,11 +57,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'result_type_changed' do
+        actions = []
         if params[:changed_value] == AppConst::CLASSIFICATION
-          json_set_required('orchard_test_type_api_pass_result', false)
+          actions << OpenStruct.new(type: :set_required, dom_id: 'orchard_test_type_api_pass_result', required: false)
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_pass_result_field_wrapper')
         else
-          json_set_required('orchard_test_type_api_pass_result', true)
+          actions << OpenStruct.new(type: :set_required, dom_id: 'orchard_test_type_api_pass_result', required: true)
+          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_pass_result_field_wrapper')
         end
+        json_actions(actions)
       end
 
       r.on 'commodity_group_changed' do

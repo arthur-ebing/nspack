@@ -49,20 +49,32 @@ module QualityApp
     end
 
     def find_orchard_test_type_flat(id)
+      hash = find_hash(:orchard_test_types, id)
       query = <<~SQL
         SELECT
-            orchard_test_types.*,
-            string_agg(DISTINCT target_market_groups.target_market_group_name, ', ') AS applicable_tm_groups,
-            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS applicable_cultivars,
+            CASE
+                WHEN ott.applies_to_all_cultivars THEN (SELECT array_agg(c.id) AS array_agg FROM cultivars c)
+                ELSE ott.applicable_cultivar_ids
+            END AS applicable_cultivar_ids,
+            CASE
+                WHEN ott.applies_to_all_cultivars THEN (SELECT string_agg(c.cultivar_name, ', '::text) AS string_agg FROM cultivars c)
+                ELSE (SELECT string_agg(c.cultivar_code, ', '::text) AS string_agg FROM cultivars c WHERE c.id = ANY (ott.applicable_cultivar_ids))
+            END AS applicable_cultivars,
+            CASE
+                WHEN ott.applies_to_all_markets THEN (SELECT array_agg(tmg.id) AS array_agg FROM target_market_groups tmg)
+                ELSE ott.applicable_tm_group_ids
+            END AS applicable_tm_group_ids,
+            CASE
+                WHEN ott.applies_to_all_markets THEN (SELECT string_agg(tmg.target_market_group_name, ', '::text) AS string_agg FROM target_market_groups tmg)
+                ELSE (SELECT string_agg(tmg.target_market_group_name, ', '::text) AS string_agg FROM target_market_groups tmg WHERE tmg.id = ANY (ott.applicable_tm_group_ids))
+            END AS applicable_tm_groups,
             string_agg(DISTINCT commodity_groups.code, ', ') AS applicable_commodity_groups
-        FROM orchard_test_types
-        LEFT JOIN target_market_groups ON target_market_groups.id = ANY (orchard_test_types.applicable_tm_group_ids)
-        LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_types.applicable_cultivar_ids)
-        LEFT JOIN commodity_groups ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)
-        WHERE orchard_test_types.id = #{id}
-        GROUP BY orchard_test_types.id
+        FROM orchard_test_types ott
+        LEFT JOIN commodity_groups ON commodity_groups.id = ANY (ott.applicable_commodity_group_ids)
+        WHERE ott.id = #{id}
+        GROUP BY ott.id
       SQL
-      OrchardTestTypeFlat.new(DB[query].first)
+      OrchardTestTypeFlat.new(hash.merge(DB[query].first))
     end
 
     def find_orchard_test_result_flat(id)
@@ -110,18 +122,6 @@ module QualityApp
       attrs[:api_response] = hash_for_jsonb_col(attrs[:api_response]) if attrs.key?(:api_response)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
-    end
-
-    def delete_orchard_test_result(id)
-      instance = find_orchard_test_result_flat(id)
-
-      # update_orchard_otmc_results
-      otmc_results = get(:orchards, instance.orchard_id, :otmc_results) || {}
-      otmc_results.delete(instance.orchard_test_type_code.to_sym)
-      result = otmc_results.empty? ? nil : Sequel.hstore(otmc_results)
-      update(:orchards, instance.orchard_id, otmc_results: result)
-
-      DB[:orchard_test_results].where(id: id).delete
     end
 
     def puc_orchard_cultivar
