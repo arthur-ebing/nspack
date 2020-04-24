@@ -26,7 +26,7 @@ module FinishedGoodsApp
 
     def test_create_load
       attrs = fake_load.to_h.reject { |k, _| k == :id }
-      res = interactor.create_load(attrs, current_user)
+      res = interactor.create_load(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(LoadFlat, res.instance)
       assert res.instance.id.nonzero?
@@ -34,7 +34,7 @@ module FinishedGoodsApp
 
     def test_create_load_fail
       attrs = fake_load.to_h.reject { |k, _| %i[id depot_id].include?(k) }
-      res = interactor.create_load(attrs, current_user)
+      res = interactor.create_load(attrs)
       refute res.success, 'should fail validation'
       assert_equal ['is missing'], res.errors[:depot_id]
     end
@@ -45,7 +45,7 @@ module FinishedGoodsApp
       attrs[:load_id] = id
       value = attrs[:order_number]
       attrs[:order_number] = 'a_change'
-      res = interactor.update_load(attrs, current_user)
+      res = interactor.update_load(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(LoadFlat, res.instance)
       assert_equal 'a_change', res.instance.order_number
@@ -55,7 +55,7 @@ module FinishedGoodsApp
     def test_update_load_fail
       id = create_load
       attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| %i[id depot_id].include?(k) }
-      res = interactor.update_load(attrs, current_user)
+      res = interactor.update_load(attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:depot_id]
     end
