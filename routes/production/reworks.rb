@@ -721,7 +721,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           flash[:notice] = res.message
           redirect_via_json "/production/reworks/pallets/#{res.instance[:pallet_number]}/edit_carton_quantities"
         else
-          undo_grid_inline_edit(message: res.message, message_type: :warning)
+          undo_grid_inline_edit(message: unwrap_failed_response(res), message_type: :warning)
         end
       end
 
