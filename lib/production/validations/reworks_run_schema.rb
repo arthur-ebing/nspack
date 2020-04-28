@@ -146,7 +146,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
   EditCartonQuantitySchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:column_value, :integer).filled(:int?)
+    required(:column_value, :integer).filled(:int?, gt?: 0)
   end
 
   ManuallyWeighRmtBinSchema = Dry::Validation.Params do
