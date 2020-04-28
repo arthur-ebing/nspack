@@ -90,6 +90,9 @@ def call
   missing_required_fields(only_rows: 'OP')
   # (For XML files, this has already been handled).
 
+  # Set the match_data variable (for matching to older edis): (see note below)
+  match_data_on(data)
+
   if there_are_missing_masterfiles # however this is implemented..
     missing_masterfiles_detected(notes_describing_what_is_missing)
     return failed_response('Missing masterfiles', notes_describing_what_is_missing)
@@ -97,11 +100,6 @@ def call
 
   # Check that the data conforms to business rules and if it does:
   business_validation_passed
-
-  # Optionally: check if a newer version of this EDI's contents have already been processed.
-  # If they have:
-  newer_edi_received('optionally more context here')
-  return failed_response('Newer EDI received')
 
   # Optionally: check if there are discrepancies in the data
   # If there are:
@@ -113,6 +111,17 @@ def call
   success_response('PO processed')
 end
 ----
+
+[NOTE]
+====
+**Match data** -- mark older EDI as _newer_edi_received_
+
+Set this to a value that uniquely identifies the data in the file. This is used to check if there are outstanding edi-in transactions for the same data. If there are matches, those records have their `newer_edi_received` and `reprocessed` flags set to true. (This might need to be set to a hash of a combination of fields)
+
+If there is no unique value (e.g. for a list of pallets), set it to a comma-separated list (e.g. pallet numbers) and the logic will apply if *any* of the elements in the list match.
+
+**NB** if there is only one value, suffix it with a comma (`['a', 'b']` => `'a,b'` -- and: `['a']` => `'a,'`).
+====
 
 ==== Variables available from the `BaseEdiInService`
 

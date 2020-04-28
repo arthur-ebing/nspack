@@ -32,6 +32,7 @@ module Edi
                   col.add_field :error_message
                   col.add_field :notes
                   col.add_field :backtrace
+                  col.add_field :match_data
                 end
               end
             end

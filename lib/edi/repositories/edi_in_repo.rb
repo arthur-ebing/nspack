@@ -42,5 +42,31 @@ module EdiApp
       changeset = edi_result.to_h.merge(error_message: exception.message, backtrace: exception.backtrace.join("\n"))
       update_edi_in_transaction(id, changeset)
     end
+
+    def match_data_on(id, flow_type, match_data)
+      ids = DB[:edi_in_transactions]
+            .where(flow_type: flow_type,
+                   complete: false,
+                   reprocessed: false,
+                   match_data: match_data)
+            .exclude(id: id)
+            .select_map(:id)
+      return if ids.empty?
+
+      DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
+    end
+
+    def match_data_on_list(id, flow_type, match_data)
+      recs = DB[:edi_in_transactions]
+             .where(flow_type: flow_type,
+                    complete: false,
+                    reprocessed: false)
+             .exclude(id: id)
+             .select_map(%i[id match_data])
+      return if recs.empty?
+
+      ids = recs.reject { |r| ((r.last || '').split(',') & match_data).empty? }.map(&:first)
+      DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
+    end
   end
 end

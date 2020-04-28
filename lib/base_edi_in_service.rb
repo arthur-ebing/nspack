@@ -7,8 +7,8 @@ class BaseEdiInService < BaseService
     @logger = logger
     @edi_result = edi_result
     @file_name = File.basename(file_path)
-    repo = EdiApp::EdiInRepo.new
-    @edi_in_transaction = repo.find_edi_in_transaction(id)
+    @_edi_in_repo = EdiApp::EdiInRepo.new
+    @edi_in_transaction = @_edi_in_repo.find_edi_in_transaction(id)
     @flow_type = edi_in_transaction.flow_type
     build_records(file_path)
   end
@@ -29,9 +29,13 @@ class BaseEdiInService < BaseService
     logger.error "#{file_name}: #{msg}"
   end
 
-  def newer_edi_received(notes = nil)
-    @edi_result.newer_edi_received = true
-    @edi_result.notes = notes unless notes.nil?
+  def match_data_on(match_data)
+    @edi_result.match_data = match_data
+    if match_data.include?(',')
+      @_edi_in_repo.match_data_on_list(edi_in_transaction.id, flow_type, match_data.split(','))
+    else
+      @_edi_in_repo.match_data_on(edi_in_transaction.id, flow_type, match_data)
+    end
   end
 
   def missing_masterfiles_detected(notes)
