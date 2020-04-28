@@ -194,7 +194,7 @@ GEM
       roda (>= 2.6.0)
       sequel (>= 4)
     rouge (3.18.0)
-    rubocop (0.81.0)
+    rubocop (0.82.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.7.0.1)
