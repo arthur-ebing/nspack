@@ -23,6 +23,7 @@ module ProductionApp
     end
 
     def add_sequence_to_pallet(user_name, pallet_number, carton_id, carton_quantity) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      return failed_response('Carton Qty cannot be set zero') if carton_quantity.to_i.zero?
       return failed_response("Scanned Carton:#{carton_id} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_id
 
       pallet = find_pallet_by_pallet_number(pallet_number)
@@ -100,6 +101,7 @@ module ProductionApp
     end
 
     def replace_pallet_sequence(user_name, carton_number, pallet_sequence_id, carton_quantity) # rubocop:disable Metrics/AbcSize
+      return failed_response('Carton Qty cannot be set zero') if carton_quantity&.to_i&.zero?
       return failed_response("Scanned Carton:#{carton_number} not found. #{AppConst::CARTON_VERIFICATION_REQUIRED ? ' Needs to be verified' : nil}") unless carton_number
 
       carton = find_carton_with_run_info(carton_number)
@@ -124,6 +126,8 @@ module ProductionApp
     end
 
     def update_pallet_sequence_carton_qty(pallet_sequence_id, carton_quantity, new_pallet_format = nil, new_cartons_per_pallet_id = nil) # rubocop:disable Metrics/AbcSize
+      return failed_response('Carton Qty cannot be set zero') if carton_quantity.to_i.zero?
+
       pallet_sequence = find_pallet_sequence(pallet_sequence_id)
 
       res = nil
