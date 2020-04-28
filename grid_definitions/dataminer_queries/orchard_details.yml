@@ -5,13 +5,13 @@
   AS cultivar_names,\r\n    orchards.cultivar_ids,\r\n    farms.farm_code,\r\n    farms.description
   AS farm_description,\r\n    pucs.puc_code,\r\n    pucs.gap_code,\r\n    farm_groups.farm_group_code,\r\n
   \   fn_party_role_name (farms.owner_party_role_id) AS owner_party_role,\r\n    production_regions.production_region_code
-  AS pdn_region_production_region_code,\r\n    array_agg(orchards.otmc_results::varchar)
-  AS otmc_results,\r\n    orchards.active,\r\n    orchards.created_at,\r\n    orchards.updated_at\r\nFROM
-  orchards\r\n    JOIN farms ON farms.id = orchards.farm_id\r\n    JOIN pucs ON pucs.id
-  = orchards.puc_id\r\n    LEFT JOIN cultivars ON cultivars.id = ANY (orchards.cultivar_ids)\r\n
-  \   LEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id\r\n    JOIN production_regions
-  ON production_regions.id = farms.pdn_region_id\r\nGROUP BY\r\n    orchards.id,\r\n
-  \   farms.id,\r\n    pucs.id,\r\n    farm_groups.id,\r\n    production_regions.id\r\n\r\n\r\n\r\n\r\n\r\n"
+  AS pdn_region_production_region_code,\r\n    orchards.active,\r\n    orchards.created_at,\r\n
+  \   orchards.updated_at\r\nFROM orchards\r\n    JOIN farms ON farms.id = orchards.farm_id\r\n
+  \   JOIN pucs ON pucs.id = orchards.puc_id\r\n    LEFT JOIN cultivars ON cultivars.id
+  = ANY (orchards.cultivar_ids)\r\n    LEFT JOIN farm_groups ON farm_groups.id = farms.farm_group_id\r\n
+  \   JOIN production_regions ON production_regions.id = farms.pdn_region_id\r\nGROUP
+  BY\r\n    orchards.id,\r\n    farms.id,\r\n    pucs.id,\r\n    farm_groups.id,\r\n
+  \   production_regions.id\r\n\r\n\r\n\r\n\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -241,66 +241,50 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  otmc_results:
-    :name: otmc_results
-    :sequence_no: 15
-    :caption: Otmc results
-    :namespaced_name:
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: false
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   active:
     :name: active
-    :sequence_no: 16
+    :sequence_no: 15
     :caption: Active
     :namespaced_name: orchards.active
     :data_type: :boolean
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: true
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: orchards.created_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: orchards.updated_at
     :data_type: :datetime
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

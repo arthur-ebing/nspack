@@ -72,11 +72,10 @@ module QualityApp
       attrs[:orchards].each do |orchard_args, orchard_attrs|
         values['orchards'] = [values['orchards'], orchard_args].flatten.uniq
         puc_id = repo.get_id(:pucs, puc_code: orchard_args[:puc_code])
-        orchard_id = repo.get_id(:orchards, orchard_code: orchard_args[:orchard_code], puc_id: puc_id)
+        orchard_id = repo.get_id(:orchards, orchard_code: orchard_args[:orchard_code].downcase, puc_id: puc_id)
         cultivar_id = repo.get_id(:cultivars, cultivar_code: orchard_args[:cultivar_code])
         orchard_attrs.each do |api_attribute, api_result|
           values[api_attribute.to_s] = [values[api_attribute.to_s], api_result].flatten.uniq
-
           orchard_test_type_id = repo.get_id(:orchard_test_types, api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute.to_s)
           next if orchard_test_type_id.nil?
 
@@ -87,6 +86,7 @@ module QualityApp
           next if repo.get(:orchard_test_results, orchard_test_result_id, :freeze_result)
 
           update_attrs[:api_result] = api_result
+
           QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, update_attrs)
         end
       end

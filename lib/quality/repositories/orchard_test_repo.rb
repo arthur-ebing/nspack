@@ -128,7 +128,7 @@ module QualityApp
       hash = {}
       id_arrays.each do |puc_id, orchard_id, cultivar_ids|
         puc = get(:pucs, puc_id, :puc_code)
-        orchard = get(:orchards, orchard_id, :orchard_code)
+        orchard = get(:orchards, orchard_id, :orchard_code).upcase
         Array(cultivar_ids).each do |cultivar_id|
           cultivar = get(:cultivars, cultivar_id, :cultivar_code)
           hash["Puc #{puc} - Orchard #{orchard}"] = "Cultivar #{cultivar}   "

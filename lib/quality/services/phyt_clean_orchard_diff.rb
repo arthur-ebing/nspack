@@ -33,12 +33,12 @@ module QualityApp
 
     private
 
-    def parse_standard_data(res)
+    def parse_standard_data(res) # rubocop:disable Metrics/AbcSize
       head = res.instance['season']
       puc = head['fbo'].first
       orchards = puc['orchard']
       orchards.each do |orchard|
-        next unless repo.exists?(:orchards, orchard_code: orchard['name'], puc_id: puc_id)
+        next unless repo.exists?(:orchards, orchard_code: orchard['name'].downcase, puc_id: puc_id)
 
         attrs["Puc #{puc['code']} - Orchard #{orchard['name']}"] = "Cultivar #{orchard['cultivarCode']}   "
       end

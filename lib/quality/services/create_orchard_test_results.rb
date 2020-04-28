@@ -32,7 +32,8 @@ module QualityApp
     end
 
     def create_orchard_test_results # rubocop:disable Metrics/AbcSize
-      repo.select_values(:pallet_sequences, %i[puc_id orchard_id cultivar_id]).uniq.each do |puc_id, orchard_id, cultivar_id|
+      groups = repo.select_values(:pallet_sequences, %i[puc_id orchard_id cultivar_id], exit_ref: nil).uniq
+      groups.each do |puc_id, orchard_id, cultivar_id|
         attrs = { puc_id: puc_id, orchard_id: orchard_id, orchard_test_type_id: orchard_test_type.id }
         next unless Array(orchard_test_type.applicable_cultivar_ids).include? cultivar_id
 
