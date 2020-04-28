@@ -98,6 +98,9 @@ INSERT INTO business_processes(process, description) VALUES('LOAD_SHIPPED', 'Loa
 INSERT INTO business_processes(process, description) VALUES('REWORKS_MOVE_BIN', 'Reworks Bin movements') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('BIN_TIP_MOVE_BIN', 'Bin Tipping Bin movements') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('FIRST_INTAKE', 'Inter Warehouse intake') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('RECEIVE_EMPTY_BINS', 'Receive Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('ISSUE_EMPTY_BINS', 'Issue Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('ADHOC_TRANSACTIONS', 'Adhoc Transactions') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;
@@ -121,3 +124,9 @@ INSERT INTO public.pallet_mix_rules(scope, production_run_id, pallet_id, allow_t
 SELECT 'GLOBAL', null, null, false, false, false, false, false, false, false
  WHERE NOT EXISTS (SELECT id FROM pallet_mix_rules WHERE scope = 'GLOBAL');
 
+-- ASSET TRANSACTION TYPES
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_TIP',	'Bins Emptied on tipping');
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN',	'Bins Filled via rebinning');
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_EMPTY_BIN_MOVE', 'Adhoc Empty Bin Moves');
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BOOKOUT_BINS', 'Bookout Bins to Farms');
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('RECEIVE_BINS', 'Receive Bins Empty Bins');

@@ -3,13 +3,13 @@
 module RawMaterialsApp
   class RmtDeliveryRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :rmt_deliveries,
-                     label: :truck_registration_number,
+                     label: :id,
                      value: :id,
-                     order_by: :truck_registration_number
+                     order_by: :id
     build_inactive_select :rmt_deliveries,
-                          label: :truck_registration_number,
+                          label: :id,
                           value: :id,
-                          order_by: :truck_registration_number
+                          order_by: :id
 
     build_for_select :rmt_bins,
                      label: :status,

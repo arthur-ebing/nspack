@@ -1,0 +1,24 @@
+---
+:dataminer_definition: empty_bin_transactions
+:actions:
+- :url: "/raw_materials/empty_bins/empty_bin_transactions/$:id$"
+  :text: view
+  :title: Empty Bin Transaction
+  :icon: view-show
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/empty_bins/empty_bin_transactions/adhoc_transaction/new"
+  :text: Adhoc Transaction
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/raw_materials/empty_bins/empty_bin_transactions/issue_empty_bins/new"
+  :text: Issue Empty Bins
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/raw_materials/empty_bins/empty_bin_transactions/receive_empty_bins/new"
+  :text: Receive Empty Bins
+  :style: :button
+  :behaviour: :popup

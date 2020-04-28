@@ -130,6 +130,18 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     ids.first
   end
 
+  # Get id of existing record or Create a record, returning the id
+  #
+  # @param table_name [Symbol] the db table name.
+  # @param attrs [Hash, OpenStruct] the fields and their values.
+  # @return [Integer] the id of the new record.
+  def get_id_or_create(table_name, attrs)
+    existing_id = get_id(table_name, attrs.to_h)
+    return existing_id if existing_id
+
+    create(table_name, attrs)
+  end
+
   # Find the first row in a table matching some condition.
   # Returns nil if it is not found.
   #

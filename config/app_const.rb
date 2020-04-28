@@ -302,12 +302,16 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Business Processes
   # PROCESS_DELIVERIES = 'DELIVERIES'
   # PROCESS_VEHICLE_JOBS = 'VEHICLE JOBS'
-  # PROCESS_ADHOC_TRANSACTIONS = 'ADHOC TRANSACTIONS'
   # PROCESS_BULK_STOCK_ADJUSTMENTS = 'BULK STOCK ADJUSTMENTS'
+  PROCESS_ADHOC_TRANSACTIONS = 'ADHOC_TRANSACTIONS'
+  PROCESS_RECEIVE_EMPTY_BINS = 'RECEIVE_EMPTY_BINS'
+  PROCESS_ISSUE_EMPTY_BINS = 'ISSUE_EMPTY_BINS'
 
   # Locations: Location Types
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
   LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
+  LOCATION_TYPES_EMPTY_BIN = 'EMPTY_BIN'
+  ONSITE_EMPTY_BIN_LOCATION = ENV.fetch('ONSITE_EMPTY_BIN_LOCATION')
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
@@ -432,4 +436,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   E_CERT_BUSINESS_ID = ENV['E_CERT_BUSINESS_ID']
   E_CERT_BUSINESS_NAME = ENV['E_CERT_API_CLIENT_SECRET']
   E_CERT_INDUSTRY = ENV['E_CERT_INDUSTRY']
+
+  ASSET_TRANSACTION_TYPES = { adhoc: 'ADHOC_EMPTY_BIN_MOVE',
+                              receive: 'RECEIVE_BINS',
+                              issue: 'BOOKOUT_BINS',
+                              bin_tip: 'BIN_TIP',
+                              rebin: 'REBIN' }.freeze
 end
