@@ -19,7 +19,7 @@ module UiRules
       fields[:flow_type] = { renderer: :label }
       fields[:complete] = { renderer: :label, as_boolean: true }
       fields[:error_message] = { renderer: :label, invisible: @form_object.error_message.nil? }
-      fields[:backtrace] = { renderer: :label, invisible: @form_object.backtrace.nil? }
+      fields[:backtrace] = { renderer: :label, invisible: @form_object.backtrace.nil?, format: :preformat }
       fields[:schema_valid] = { renderer: :label, as_boolean: true }
       fields[:newer_edi_received] = { renderer: :label, as_boolean: true }
       fields[:has_missing_master_files] = { renderer: :label, as_boolean: true }
@@ -27,6 +27,7 @@ module UiRules
       fields[:has_discrepancies] = { renderer: :label, as_boolean: true }
       fields[:reprocessed] = { renderer: :label, as_boolean: true }
       fields[:notes] = { renderer: :label, invisible: @form_object.notes.nil? }
+      fields[:match_data] = { renderer: :label }
     end
 
     def common_fields
@@ -42,7 +43,8 @@ module UiRules
         valid: { renderer: :checkbox },
         has_discrepancies: { renderer: :checkbox },
         reprocessed: { renderer: :checkbox },
-        notes: {}
+        notes: {},
+        match_data: {}
       }
     end
 
@@ -67,7 +69,8 @@ module UiRules
                                     valid: nil,
                                     has_discrepancies: nil,
                                     reprocessed: nil,
-                                    notes: nil)
+                                    notes: nil,
+                                    match_data: nil)
     end
   end
 end

@@ -6,9 +6,9 @@
   \ \"edi_in_transactions\".\"valid\",\r\n  \"edi_in_transactions\".\"reprocessed\",\r\n
   \ \"edi_in_transactions\".\"newer_edi_received\",\r\n  \"edi_in_transactions\".\"has_missing_master_files\",\r\n
   \ \"edi_in_transactions\".\"has_discrepancies\",\r\n  \"edi_in_transactions\".\"error_message\",\r\n
-  \ \"edi_in_transactions\".\"notes\",\r\n  \"edi_in_transactions\".\"backtrace\",\r\n
-  \ \"edi_in_transactions\".\"updated_at\"\r\nFROM\r\n  \"edi_in_transactions\"\r\n
-  \ ORDER BY \"edi_in_transactions\".\"id\" DESC"
+  \ \"edi_in_transactions\".\"notes\",\r\n  \"edi_in_transactions\".\"match_data\",\r\n
+  \ \"edi_in_transactions\".\"backtrace\",\r\n  \"edi_in_transactions\".\"updated_at\"\r\nFROM\r\n
+  \ \"edi_in_transactions\"\r\n  ORDER BY \"edi_in_transactions\".\"id\" DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -221,9 +221,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  match_data:
+    :name: match_data
+    :sequence_no: 14
+    :caption: Match data
+    :namespaced_name: edi_in_transactions.match_data
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   backtrace:
     :name: backtrace
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Backtrace
     :namespaced_name: edi_in_transactions.backtrace
     :data_type: :string
@@ -239,7 +255,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Updated at
     :namespaced_name: edi_in_transactions.updated_at
     :data_type: :datetime

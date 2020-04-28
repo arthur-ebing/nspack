@@ -15,5 +15,6 @@ module EdiApp
     attribute :has_discrepancies, Types::Bool
     attribute :reprocessed, Types::Bool
     attribute :notes, Types::String
+    attribute :match_data, Types::String
   end
 end
