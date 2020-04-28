@@ -269,7 +269,7 @@ namespace :db do
             #   TrueClass :active, default: true
             #   DateTime :created_at, null: false
             #   DateTime :updated_at, null: false
-            #
+
             #   index [:some_id], name: :fki_table_name_some_table_name
             #   index [:my_uniq_name], name: :table_name_unique_my_uniq_name, unique: true
             # end
@@ -326,7 +326,7 @@ namespace :db do
               # DateTime :other
               DateTime :created_at, null: false
               DateTime :updated_at, null: false
-              #
+
               # index [:code], name: :#{nm}_unique_code, unique: true
               # index [:some_id], name: :fki_#{nm}_some_table_name
             end
