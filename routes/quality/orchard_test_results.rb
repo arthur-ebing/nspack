@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+# rubocop:disable Metrics/BlockLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'test_results', 'quality' do |r|
     # ORCHARD TEST RESULTS
     # --------------------------------------------------------------------------
@@ -10,6 +11,16 @@ class Nspack < Roda
       # Check for notfound:
       r.on !interactor.exists?(:orchard_test_results, id) do
         handle_not_found(r)
+      end
+
+      r.on 'phyt_clean_request', Integer do |puc_id|
+        res = interactor.phyt_clean_request(puc_id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect "/quality/test_results/orchard_test_results/#{id}/edit"
       end
 
       r.on 'edit' do   # EDIT
@@ -172,3 +183,4 @@ class Nspack < Roda
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

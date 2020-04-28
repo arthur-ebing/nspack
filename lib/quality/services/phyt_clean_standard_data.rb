@@ -9,7 +9,8 @@ module QualityApp
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
-      @puc_ids = puc_ids || repo.select_values(:orchard_test_results, :puc_id).uniq
+      @puc_ids = Array(puc_ids)
+      @puc_ids = repo.select_values(:orchard_test_results, :puc_id).uniq if @puc_ids.empty?
       @attrs = {}
       @glossary = {}
     end
@@ -67,15 +68,15 @@ module QualityApp
 
     def update_orchard_tests # rubocop:disable Metrics/AbcSize
       save_to_yaml(attrs, "PhytCleanStandardData_#{attrs[:puc_code]}")
-      values = YAML.load_file('tmp/PhytCleanStandardGlossary.yml')
+      # values = YAML.load_file('tmp/PhytCleanStandardGlossary.yml')
 
       attrs[:orchards].each do |orchard_args, orchard_attrs|
-        values['orchards'] = [values['orchards'], orchard_args].flatten.uniq
+        # values['orchards'] = [values['orchards'], orchard_args].flatten.uniq
         puc_id = repo.get_id(:pucs, puc_code: orchard_args[:puc_code])
         orchard_id = repo.get_id(:orchards, orchard_code: orchard_args[:orchard_code].downcase, puc_id: puc_id)
         cultivar_id = repo.get_id(:cultivars, cultivar_code: orchard_args[:cultivar_code])
         orchard_attrs.each do |api_attribute, api_result|
-          values[api_attribute.to_s] = [values[api_attribute.to_s], api_result].flatten.uniq
+          # values[api_attribute.to_s] = [values[api_attribute.to_s], api_result].flatten.uniq
           orchard_test_type_id = repo.get_id(:orchard_test_types, api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute.to_s)
           next if orchard_test_type_id.nil?
 
@@ -90,7 +91,7 @@ module QualityApp
           QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, update_attrs)
         end
       end
-      save_to_yaml(values, 'PhytCleanStandardGlossary')
+      # save_to_yaml(values, 'PhytCleanStandardGlossary')
     end
 
     def save_to_yaml(payload, file_name)

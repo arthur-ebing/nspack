@@ -82,6 +82,7 @@ module QualityApp
         SELECT
             orchard_test_results.*,
             orchard_test_types.test_type_code AS orchard_test_type_code,
+            orchard_test_types.api_name AS api_name,
             orchards.orchard_code,
             pucs.puc_code,
             cultivars.cultivar_name AS cultivar_code

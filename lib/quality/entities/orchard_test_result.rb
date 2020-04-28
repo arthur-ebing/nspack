@@ -31,6 +31,7 @@ module QualityApp
     attribute :passed, Types::Bool
     attribute :classification, Types::Bool
     attribute :freeze_result, Types::Bool
+    attribute :api_name, Types::String
     attribute :api_response, Types::Hash
     attribute :api_result, Types::String
     attribute :applicable_from, Types::DateTime

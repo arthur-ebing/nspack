@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module Quality
   module TestResults
     module OrchardTestResult
@@ -22,8 +23,8 @@ module Quality
                   col.add_field :puc_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_id
-                  col.add_field :api_result
                   col.add_field :api_pass_result
+                  col.add_field :api_result
                 end
                 row.column do |col|
                   col.add_field :passed
@@ -31,6 +32,12 @@ module Quality
                   col.add_field :freeze_result
                   col.add_field :applicable_from
                   col.add_field :applicable_to
+                  if ui_rule.form_object.api_name == AppConst::PHYT_CLEAN_STANDARD && !ui_rule.form_object.freeze_result
+                    col.add_control(control_type: :link,
+                                    text: 'API Call',
+                                    url: "/quality/test_results/orchard_test_results/#{id}/phyt_clean_request/#{ui_rule.form_object.puc_id}",
+                                    style: :button)
+                  end
                 end
               end
             end
@@ -42,3 +49,4 @@ module Quality
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
