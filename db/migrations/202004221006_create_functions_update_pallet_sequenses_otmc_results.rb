@@ -16,13 +16,14 @@ Sequel.migration do
                   END AS new_failed_otmc_results
               
               FROM pallet_sequences ps
+              JOIN pallets p ON p.id = ps.pallet_id
               LEFT JOIN (SELECT * FROM vw_orchard_test_results_flat WHERE NOT passed AND NOT classification) vw
               ON (ps.puc_id = ANY(vw.puc_ids)
               AND ps.orchard_id = ANY(vw.orchard_ids)
               AND ps.cultivar_id = ANY(vw.cultivar_ids)
               AND ps.packed_tm_group_id = ANY(vw.tm_group_ids))
               
-              WHERE ps.exit_ref IS NULL
+              WHERE p.exit_ref IS NULL
               GROUP BY ps.id) sq
 
         WHERE pallet_sequences.id = sq.id
@@ -60,13 +61,14 @@ Sequel.migration do
                   END AS new_failed_otmc_results
               
               FROM pallet_sequences ps
+              JOIN pallets p ON p.id = ps.pallet_id
               LEFT JOIN (SELECT * FROM vw_orchard_test_results_flat WHERE NOT passed AND NOT classification) vw
                ON ps.puc_id = ANY(vw.puc_ids)
               AND ps.orchard_id = ANY(vw.orchard_ids)
               AND ps.cultivar_id = ANY(vw.cultivar_ids)
               AND ps.packed_tm_group_id = ANY(vw.tm_group_ids)
               
-              WHERE ps.exit_ref IS NULL 
+              WHERE p.exit_ref IS NULL 
               GROUP BY ps.id) sq
 
         WHERE pallet_sequences.id = sq.id

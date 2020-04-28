@@ -16,15 +16,16 @@ Sequel.migration do
               JOIN pallet_sequences ps ON ps.puc_id = otr.puc_id
                AND ps.orchard_id = otr.orchard_id
                AND ps.cultivar_id = otr.cultivar_id
+              JOIN pallets p ON p.id = ps.pallet_id
               
               WHERE ott.test_type_code = 'PHYTODATA'
+                AND p.exit_ref IS NULL
               GROUP BY
                   ps.id,
                   otr.api_result) sq
 
         WHERE pallet_sequences.id = sq.id
-          AND pallet_sequences.phyto_data IS DISTINCT FROM sq.new_phyto_data
-          AND pallet_sequences.exit_ref IS NULL;
+          AND pallet_sequences.phyto_data IS DISTINCT FROM sq.new_phyto_data;
 
         RETURN new;
       END;
@@ -51,11 +52,13 @@ Sequel.migration do
         IF EXISTS (SELECT 1 FROM orchard_test_types WHERE test_type_code = 'PHYTODATA' AND id = OLD.orchard_test_type_id) THEN
           UPDATE pallet_sequences ps
           SET phyto_data = NULL
+          FROM pallets p 
   
-          WHERE ps.puc_id = old.puc_id
+          WHERE p.id = ps.pallet_id
+            AND ps.puc_id = old.puc_id
             AND ps.orchard_id = old.orchard_id
             AND ps.cultivar_id = old.cultivar_id
-            AND ps.exit_ref IS NULL;
+            AND p.exit_ref IS NULL;
         END IF;
       RETURN NULL;
       END;
