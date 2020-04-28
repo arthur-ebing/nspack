@@ -9,7 +9,7 @@ module QualityApp
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
-      @puc_ids = puc_ids || repo.select_values(:orchards, :puc_id).uniq
+      @puc_ids = puc_ids || repo.select_values(:orchard_test_results, :puc_id).uniq
       @attrs = {}
       @glossary = {}
     end

@@ -9,24 +9,14 @@ module UiRules
       make_form_object
       apply_form_values
 
+      common_values_for_fields new_fields if @mode == :new
       common_values_for_fields edit_fields if @mode == :edit
       common_values_for_fields bulk_edit_fields if @mode == :bulk_edit
 
       set_show_fields if %i[show reopen].include? @mode
-      add_behaviours if %i[edit bulk_edit].include? @mode
-      set_diff_fields if @mode == :diff
+      add_behaviours if %i[new edit bulk_edit].include? @mode
 
       form_name 'orchard_test_result'
-    end
-
-    def set_diff_fields
-      res = QualityApp::PhytCleanOrchardDiff.call
-      phyto = res.success ? res.instance : { 'error': res.message }
-      nspack = @repo.puc_orchard_cultivar
-      fields[:header] = { left_caption: 'Phyto Data',
-                          right_caption: 'NSPack',
-                          left_record: phyto,
-                          right_record: nspack }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -58,6 +48,36 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
+    def new_fields # rubocop:disable Metrics/AbcSize
+      orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+      puc_ids = @repo.select_values(:orchards, :puc_id).uniq
+      {
+        orchard_test_type_id: { renderer: :select,
+                                options: @repo.for_select_orchard_test_types,
+                                disabled_options: @repo.for_select_inactive_orchard_test_types,
+                                caption: 'Orchard Test Type',
+                                required: true,
+                                prompt: true },
+        puc_id: { renderer: :select,
+                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
+                  disabled_options: @farm_repo.for_select_inactive_pucs,
+                  caption: 'Puc',
+                  required: true,
+                  prompt: true },
+        orchard_id: { renderer: :select,
+                      options: @repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
+                      disabled_options: @repo.for_select_inactive_orchards,
+                      caption: 'Orchard',
+                      required: true,
+                      prompt: true },
+        cultivar_id: { renderer: :select,
+                       options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
+                       disabled_options: @repo.for_select_inactive_cultivar_codes,
+                       caption: 'Cultivar',
+                       required: true }
+      }
+    end
+
     def edit_fields
       {
         orchard_test_type_id: { renderer: :label,
@@ -77,6 +97,8 @@ module UiRules
                   caption: 'Result',
                   hide_on_load: @classification },
         api_result: { caption: 'Result' },
+        api_pass_result: { renderer: :label,
+                           caption: 'Pass Result' },
         classification: { renderer: :label,
                           as_boolean: true,
                           hide_on_load: !@classification },
@@ -113,7 +135,7 @@ module UiRules
     end
 
     def make_form_object
-      if %i[new diff].include? @mode
+      if %i[new].include? @mode
         @form_object = OpenStruct.new(orchard_test_type_id: nil)
         return
       end
@@ -122,6 +144,7 @@ module UiRules
       @classification = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :result_type) == AppConst::CLASSIFICATION
       form_object[:puc_ids] = Array(form_object[:puc_id])
       form_object[:classification] = @classification
+      form_object[:api_pass_result] = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :api_pass_result)
       @form_object = OpenStruct.new(form_object)
     end
 

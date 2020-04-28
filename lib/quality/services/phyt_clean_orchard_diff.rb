@@ -2,14 +2,15 @@
 
 module QualityApp
   class PhytCleanOrchardDiff < BaseService
-    attr_reader :repo, :api, :season_id
+    attr_reader :repo, :api, :season_id, :puc_ids
     attr_accessor :attrs, :puc_id
 
-    def initialize
+    def initialize(puc_ids)
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @attrs = {}
+      @puc_ids = Array(puc_ids).uniq
       @puc_id = nil
     end
 
@@ -19,7 +20,7 @@ module QualityApp
       res = api.auth_token_call
       return failed_response(res.message) unless res.success
 
-      repo.select_values(:orchards, :puc_id).uniq.each do |puc_id|
+      puc_ids.each do |puc_id|
         @puc_id = puc_id
         res = api.request_phyt_clean_standard_data(season_id, puc_id)
         return failed_response(res.message) unless res.success

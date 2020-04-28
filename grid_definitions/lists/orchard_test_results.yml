@@ -22,15 +22,19 @@
 :page_controls:
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/new"
+  :text: New Orchard Test Result
+  :style: :button
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/refresh"
   :text: Refresh Orchard Test Results
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
-  :text: Update Active Phyt Clean Results
+  :text: Update Phyt Clean Results
   :style: :button
 - :control_type: :link
-  :url: "/quality/test_results/orchard_test_results/phyt_clean_request_all"
-  :text: Update All Phyt Clean Results
+  :url: "/quality/test_results/orchard_test_results/pallet_diff"
+  :text: Phyt Clean Pallet Diff
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/orchard_diff"

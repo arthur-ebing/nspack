@@ -15,7 +15,25 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def create_orchard_test_results
+    def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
+      res = OrchardTestCreateSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_orchard_test_result(res)
+        log_status(:orchard_test_results, id, 'CREATED')
+        log_transaction
+      end
+      instance = orchard_test_result(id)
+      success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def refresh_orchard_test_results
       ids = repo.select_values(:orchard_test_types, :id)
       service_res = nil
       ids.each do |id|

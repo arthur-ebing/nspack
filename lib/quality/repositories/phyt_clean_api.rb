@@ -5,7 +5,7 @@ module QualityApp
     attr_reader :header
 
     def auth_token_call
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'))
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/oauth2/token"
       params = { username: AppConst::PHYT_CLEAN_API_USERNAME, password: AppConst::PHYT_CLEAN_API_PASSWORD, grant_type: 'password' }
 
@@ -18,7 +18,7 @@ module QualityApp
     end
 
     def request_phyt_clean_seasons
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'))
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/seasons"
 
       res = http.request_get(url, header)
@@ -29,7 +29,7 @@ module QualityApp
     end
 
     def request_phyt_clean_glossary(season_id)
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'))
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/glossary?seasonID=#{season_id}"
 
       res = http.request_get(url, header)
@@ -40,7 +40,7 @@ module QualityApp
     end
 
     def request_phyt_clean_standard_data(season_id, puc_id)
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'))
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
 
       fbo_xml = "<?xml version=\"1.0\"?><Request><Fbo>
