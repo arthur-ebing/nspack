@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_metatag %>
 
-    <title><%= ENV['APP_CAPTION'] %></title>
+    <title><%= AppConst::APP_CAPTION %></title>
 
     <!-- FAVICON start -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -33,7 +33,7 @@
   <header>
     <div class="system-name">
       <a href="/" class="dib f5 f4-ns fw6 mt0 mb2 link mid-gray" title="Home">
-        <%= ENV['APP_CAPTION'] %>
+        <%= AppConst::APP_CAPTION %>
         <div class="dib">
           <small class="nowrap f6 mt2 mt3-ns pr2 black-70 fw2">v<%= ENV['VERSION'] %></small>
         </div>

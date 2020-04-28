@@ -28,7 +28,7 @@ module EdiApp
     end
 
     def file_path_from_in_transaction(id)
-      repo = EdiInRepo .new
+      repo = EdiInRepo.new
       tran = repo.find_edi_in_transaction(id)
       return failed_response('This transaction does not exist') if tran.nil?
 

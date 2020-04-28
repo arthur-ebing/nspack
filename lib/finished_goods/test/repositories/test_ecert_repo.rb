@@ -15,7 +15,7 @@ module FinishedGoodsApp
     private
 
     def repo
-      EcertRepo .new
+      EcertRepo.new
     end
   end
 end
