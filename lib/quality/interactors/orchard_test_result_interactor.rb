@@ -33,12 +33,12 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def refresh_orchard_test_results
+    def create_orchard_test_results
       ids = repo.select_values(:orchard_test_types, :id)
       service_res = nil
       ids.each do |id|
         repo.transaction do
-          service_res = RefreshOrchardTestResults.call(id)
+          service_res = CreateOrchardTestResults.call(id)
           raise Crossbeams::InfoError, service_res.message unless service_res.success
 
           log_transaction

@@ -69,7 +69,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -85,7 +85,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -101,7 +101,7 @@
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -113,10 +113,10 @@
     :caption: Orchard test type
     :namespaced_name: ott.test_type_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -129,7 +129,7 @@
     :caption: Description
     :namespaced_name: ott.description
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -148,7 +148,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -158,10 +158,10 @@
   puc_code:
     :name: puc_code
     :sequence_no: 9
-    :caption: Puc code
+    :caption: Puc Code
     :namespaced_name: pucs.puc_code
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -174,10 +174,10 @@
   orchard_code:
     :name: orchard_code
     :sequence_no: 10
-    :caption: Orchard code
+    :caption: Orchard Code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -190,10 +190,10 @@
   cultivar_code:
     :name: cultivar_code
     :sequence_no: 11
-    :caption: Cultivar code
+    :caption: Cultivar Code
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -212,7 +212,7 @@
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false

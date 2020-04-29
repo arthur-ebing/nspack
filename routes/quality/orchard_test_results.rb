@@ -152,9 +152,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect request.referer
       end
 
-      r.on 'refresh' do    # REFRESH
+      r.on 'create' do    # REFRESH
         check_auth!('test results', 'new')
-        res = interactor.refresh_orchard_test_results
+        res = interactor.create_orchard_test_results
         if res.success
           flash[:notice] = res.message
         else

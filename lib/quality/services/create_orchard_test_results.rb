@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class RefreshOrchardTestResults < BaseService
+  class CreateOrchardTestResults < BaseService
     attr_reader :orchard_test_type
 
     def initialize(id)

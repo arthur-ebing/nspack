@@ -25,8 +25,8 @@
   :text: New Orchard Test Result
   :style: :button
 - :control_type: :link
-  :url: "/quality/test_results/orchard_test_results/refresh"
-  :text: Refresh Orchard Test Results
+  :url: "/quality/test_results/orchard_test_results/create"
+  :text: Create Orchard Test Results
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
