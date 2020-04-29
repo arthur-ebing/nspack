@@ -53,27 +53,5 @@ module QualityApp
       instance = JSON.parse(res.instance.body)
       success_response('Received standard phyto data', instance)
     end
-
-    def request_get_citrus_eu_orchard_status
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), responder: PhytCleanHttpResponder.new, read_timeout: 60)
-      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/citruseuorchardstatus"
-
-      res = http.request_get(url, header)
-      return failed_response(res.message) unless res.success
-
-      instance = JSON.parse(res.instance.body)
-      success_response('Received citrus eu orchard status', instance)
-    end
-
-    def filter_phyt_clean_response(array)
-      pucs_list = select_values(:pucs, :puc_code)
-      filtered_response = []
-      array.each do |hash|
-        next unless pucs_list.include? hash['puc']
-
-        filtered_response << UtilityFunctions.symbolize_keys(hash)
-      end
-      filtered_response
-    end
   end
 end
