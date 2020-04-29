@@ -15,7 +15,7 @@ module Quality
             page.form do |form|
               form.caption 'New Orchard Test Type'
               form.action '/quality/config/orchard_test_types'
-              form.submit_captions 'Create Test Results'
+              form.submit_captions 'Submit Test Type and Create Test Results'
               form.remote! if remote
               form.row do |row|
                 row.column do |col|

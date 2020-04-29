@@ -28,7 +28,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_orchard_test_type(id, params[:orchard_test_type])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json '/list/orchard_test_results'
           else
             re_show_form(r, res) { Quality::Config::OrchardTestType::Edit.call(id, form_values: params[:orchard_test_type], form_errors: res.errors) }
           end
@@ -110,7 +110,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.create_orchard_test_type(params[:orchard_test_type])
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          r.redirect '/list/orchard_test_results'
         else
           re_show_form(r, res, url: '/quality/config/orchard_test_types/new') do
             Quality::Config::OrchardTestType::New.call(form_values: params[:orchard_test_type],

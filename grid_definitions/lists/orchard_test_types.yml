@@ -13,6 +13,7 @@
   :text: delete
   :icon: delete
   :is_delete: true
+  :prompt: 'By deleting this Test Type, you will also be removing its test results. Are you sure you want to delete this Test Type?'
   :popup: true
 - :separator: true
 - :url: "/development/statuses/list/orchard_test_types/$:id$"

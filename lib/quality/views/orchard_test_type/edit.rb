@@ -16,7 +16,7 @@ module Quality
             page.form do |form|
               form.caption 'Edit Orchard Test Type'
               form.action "/quality/config/orchard_test_types/#{id}"
-              form.submit_captions 'Create Test Results'
+              form.submit_captions 'Submit Test Type and Create Test Results'
               form.remote!
               form.method :update
               form.row do |row|
