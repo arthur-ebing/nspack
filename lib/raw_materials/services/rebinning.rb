@@ -1,34 +1,31 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class CreateDeliverySKUS < BaseService
-    def initialize(mr_delivery_id, user_name)
-      @id = mr_delivery_id
-      @repo = MrStockRepo.new
-      @delivery = @repo.find_mr_delivery(@id)
-      @user_name = user_name
+  class Rebinning < BaseService
+    # Only one remove at a time
+    # @param [Integer] rmt_container_material_owner_id
+    # @param [Integer] location_id
+    # @param [Integer] quantity
+    # @param [Hash{
+    #   [String] ref_no
+    #   [String] user_name
+    # }] opts
+    def initialize(rmt_container_material_owner_id, location_id, quantity, opts = {})
+      @repo = EmptyBinsRepo.new
+
+      @owner_id = rmt_container_material_owner_id
+      @location_id = location_id
+      @quantity = quantity
+
+      @ref_no = @opts.fetch(:ref_no)
+      @opts = opts.merge(business_process_id: @repo.get_id(:business_processes, process: 'ADHOC_TRANSACTIONS'),
+                         parent_transaction_id: nil,
+                         asset_type_id: @repo.get_id(:asset_transaction_types, transaction_type_code: 'REBIN'),
+                         is_adhoc: false)
     end
 
     def call
-      return failed_response('Delivery record does not exist') unless @delivery
-
-      sku_ids   = @repo.create_skus_for_delivery(@id)
-      to_loc_id = @delivery.receipt_location_id
-
-      bsa_check = TaskPermissionCheck::MrDelivery.call(:bsa_in_progress_check, @id, opts: { sku_ids: sku_ids, loc_id: to_loc_id })
-      if bsa_check.success
-        @repo.log_status('mr_deliveries', @id, 'SKUS_CREATED')
-        business_process_id = @repo.resolve_business_process_id(delivery_id: @id)
-
-        CreateMrStock.call(sku_ids,
-                           business_process_id: business_process_id,
-                           to_location_id: to_loc_id,
-                           delivery_id: @id,
-                           user_name: @user_name,
-                           ref_no: @delivery.delivery_number)
-      else
-        failed_response(bsa_check.message)
-      end
+      DestroyEmptyBins.call(@owner_id, @location_id, @quantity, @opts)
     end
   end
 end
