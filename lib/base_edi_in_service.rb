@@ -85,6 +85,6 @@ class BaseEdiInService < BaseService
 
   def check_file_type(file_path)
     typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
-    typ == 'application/xml' ? :xml : :text
+    %w[application/xml text/xml].include?(typ) ? :xml : :text
   end
 end
