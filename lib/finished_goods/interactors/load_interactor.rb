@@ -2,13 +2,25 @@
 
 module FinishedGoodsApp
   class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def validate_load(load_id)
+      load_validator.validate_load(load_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def validate_load_truck(load_id)
+      load_validator.validate_load_truck(load_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_load(params)
       res = LoadServiceSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::CreateLoad.call(res, @user)
+        load_res = CreateLoad.call(res, @user)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -24,7 +36,7 @@ module FinishedGoodsApp
 
       load_res = nil
       repo.transaction do
-        load_res = FinishedGoodsApp::UpdateLoad.call(res, @user)
+        load_res = UpdateLoad.call(res, @user)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction
@@ -55,14 +67,10 @@ module FinishedGoodsApp
       EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_PO, load_entity(load_id).customer_party_role_id, @user.user_name, load_id)
     end
 
-    def ship_load(id) # rubocop:disable Metrics/AbcSize
-      return failed_response("Load: #{id} already shipped.") if load_entity(id)&.shipped
-
+    def ship_load(id)
       res = nil
       repo.transaction do
-        res = ShipLoad.call(id, @user.user_name)
-        raise Crossbeams::InfoError, res.message unless res.success
-
+        res = ShipLoad.call(id, @user)
         send_po_edi(id)
 
         log_transaction
@@ -72,18 +80,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def unship_load(id, pallet_number = nil) # rubocop:disable Metrics/AbcSize
-      return failed_response("Load: #{id} not shipped.") unless load_entity(id)&.shipped
-
-      unless pallet_number.nil?
-        res = validate_pallets(:shipped, pallet_number)
-        return res unless res.success
-      end
-
+    def unship_load(id, pallet_number = nil)
       res = nil
       repo.transaction do
-        res = UnshipLoad.call(id, @user.user_name, pallet_number)
-        raise Crossbeams::InfoError, res.message unless res.success
+        res = UnshipLoad.call(id, @user, pallet_number)
 
         log_transaction
       end
@@ -93,10 +93,7 @@ module FinishedGoodsApp
     end
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
-      unless pallet_numbers.empty?
-        res = load_validator.validate_allocate_list(load_id, pallet_numbers)
-        return res unless res.success
-      end
+      load_validator.validate_allocate_list(load_id, pallet_numbers) unless pallet_numbers.empty?
 
       new_allocation = pallet_numbers
       current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
@@ -106,8 +103,9 @@ module FinishedGoodsApp
       end
 
       repo.transaction do
-        repo.allocate_pallets(load_id, new_allocation - current_allocation, @user.user_name)
-        repo.unallocate_pallets(load_id, current_allocation - new_allocation, @user.user_name)
+        AllocatePallets.call(load_id, new_allocation - current_allocation, @user)
+        UnallocatePallets.call(load_id, current_allocation - new_allocation, @user)
+
         log_transaction
       end
       success_response("Allocation applied to load: #{load_id}")
@@ -115,17 +113,15 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
+    def allocate_list(load_id, pallets_string)
       res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = load_validator.validate_allocate_list(load_id, pallet_numbers)
-      return validation_failed_response(messages: { pallet_list: [res.message] }) unless res.success
+      load_validator.validate_allocate_list(load_id, pallet_numbers)
 
       repo.transaction do
-        res = repo.allocate_pallets(load_id, pallet_numbers, @user.user_name)
-        raise Crossbeams::InfoError, res.message unless res.success
+        AllocatePallets.call(load_id, pallet_numbers, @user)
 
         log_transaction
       end
@@ -147,9 +143,7 @@ module FinishedGoodsApp
 
       res = nil
       repo.transaction do
-        res = TruckArrival.call(vehicle_attrs: vehicle_res,
-                                container_attrs: container_res,
-                                user_name: @user.user_name)
+        res = TruckArrival.call(vehicle_res, container_res, @user)
         raise Crossbeams::InfoError, res.message unless res.success
 
         log_transaction
@@ -164,8 +158,7 @@ module FinishedGoodsApp
     end
 
     def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = load_validator.validate_allocate_list(load_id, pallet_number)
-      return res unless res.success
+      load_validator.validate_allocate_list(load_id, pallet_number)
 
       message = stepper(step_key).allocate_pallet(pallet_number)
       failed_response('error') if stepper(step_key).error?
@@ -189,10 +182,10 @@ module FinishedGoodsApp
 
     def update_pallets_temp_tail(params) # rubocop:disable Metrics/AbcSize
       pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
-      id = repo.get_id(:pallets, pallet_number: pallet_number)
-      return failed_response("Pallet: #{pallet_number} doesn't exist.") if id.nil?
+      load_validator.validate_pallets(:exists, pallet_number)
 
       repo.transaction do
+        id = repo.get_id(:pallets, pallet_number: pallet_number)
         repo.update(:pallets, id, temp_tail: params[:temp_tail])
         log_transaction
       end
@@ -203,15 +196,16 @@ module FinishedGoodsApp
 
     def find_load_with(pallet_number)
       res = MesscadaApp::ParseString.call(pallet_number)
-      return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
 
-      res = validate_pallets(:exists, pallet_number)
-      return validation_failed_response(messages: { pallet_number: [res.message] }) unless res.success
+      load_validator.validate_pallets(:exists, pallet_number)
 
       load_id = repo.get_value(:pallets, :load_id, pallet_number: pallet_number)
-      return validation_failed_response(messages: { pallet_number: ['Pallet not on a load.'] }) if load_id.nil?
+      raise Crossbeams::InfoError, 'Pallet not on a load.' if load_id.nil?
 
       success_response('ok', load_id)
+    rescue Crossbeams::InfoError => e
+      validation_failed_response(messages: { pallet_number: [e.message] })
     end
 
     def assert_permission!(task, id = nil)
@@ -227,10 +221,6 @@ module FinishedGoodsApp
 
     def repo
       @repo ||= LoadRepo.new
-    end
-
-    def validate_pallets(check, pallet_numbers)
-      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
     end
 
     def load_entity(id)

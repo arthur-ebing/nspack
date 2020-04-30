@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class TruckArrival < BaseService
     attr_reader :vehicle_params, :container_params, :load_id, :user_name, :messages
 
-    def initialize(vehicle_attrs:, container_attrs: nil, user_name:)
+    def initialize(vehicle_attrs, container_attrs, user)
       @vehicle_params = vehicle_attrs.to_h
       @container_params = container_attrs.to_h
 
@@ -12,7 +12,7 @@ module FinishedGoodsApp
       @vehicle_id = @vehicle_params.delete(:vehicle_id)
       @container_id = @container_params.delete(:container_id)
 
-      @user_name = user_name
+      @user_name = user.user_name
       @messages = []
     end
 

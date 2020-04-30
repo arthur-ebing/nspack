@@ -2,24 +2,21 @@
 
 module FinishedGoodsApp
   class ShipLoad < BaseService
-    attr_reader :repo, :load_id, :pallet_ids, :user_name, :shipped_at
+    attr_reader :load_id, :instance, :user, :shipped_at
 
-    def initialize(load_id, user_name)
-      @repo = LoadRepo.new
+    def initialize(load_id, user)
       @load_id = load_id
-      @pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
-      @user_name = user_name
+      @instance = repo.find_load_flat(load_id)
+      @user = user
       @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
     end
 
     def call
-      repo.transaction do
-        res = ship_pallets
-        return res unless res.success
+      raise Crossbeams::InfoError, "Load: #{load_id} already shipped." if instance.shipped
 
-        res = ship_load
-        return res unless res.success
-      end
+      ship_pallets
+      ship_load
+
       success_response("Shipped Load: #{load_id}")
     end
 
@@ -33,7 +30,7 @@ module FinishedGoodsApp
 
       attrs = { shipped: true, shipped_at: shipped_at }
       repo.update(:loads, load_id, attrs)
-      repo.log_status(:loads, load_id, 'SHIPPED', user_name: user_name)
+      repo.log_status(:loads, load_id, 'SHIPPED', user_name: user.user_name)
 
       ok_response
     end
@@ -42,15 +39,20 @@ module FinishedGoodsApp
       location_to = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::IN_TRANSIT_LOCATION)&.id
       raise Crossbeams::InfoError, "There is no location named #{AppConst::IN_TRANSIT_LOCATION}. Please contact support." if location_to.nil?
 
+      pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
       pallet_ids.each do |pallet_id|
         res = MoveStockService.call('PALLET', pallet_id, location_to, 'LOAD_SHIPPED', @load_id)
-        return res unless res.success
+        raise Crossbeams::InfoError, res.message unless res.success
 
         attrs = { shipped: true, shipped_at: shipped_at, exit_ref: 'SHIPPED', in_stock: false }
         repo.update(:pallets, pallet_id, attrs)
-        repo.log_status(:pallets, pallet_id, 'SHIPPED', user_name: user_name)
+        repo.log_status(:pallets, pallet_id, 'SHIPPED', user_name: user.user_name)
       end
       ok_response
+    end
+
+    def repo
+      @repo ||= LoadRepo.new
     end
   end
 end

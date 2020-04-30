@@ -5,7 +5,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'dispatch', 'rmd' do |r|
     repo = BaseRepo.new
     interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-    validator = interactor.load_validator
     # ALLOCATE PALLETS TO LOAD
     # --------------------------------------------------------------------------
     r.on 'allocate' do
@@ -106,7 +105,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           current_load = interactor.stepper(:allocate)
           load_id = params[:allocate][:load_id]
-          res = validator.validate_load(load_id)
+          res = interactor.validate_load(load_id)
 
           if res.success
             current_load.setup_load(load_id)
@@ -333,7 +332,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           load_id = params[:load][:load_id]
-          res = validator.validate_load(load_id)
+          res = interactor.validate_load(load_id)
           if res.success
             r.redirect("/rmd/dispatch/truck_arrival/load/#{load_id}")
           else
@@ -438,7 +437,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           current_load = interactor.stepper(:load_truck)
           load_id = params[:load][:load_id]
-          res = validator.validate_load_truck(load_id)
+          res = interactor.validate_load_truck(load_id)
 
           if res.success
             current_load.setup_load(load_id)
