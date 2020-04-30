@@ -39,7 +39,7 @@ class BaseEdiInService < BaseService
   end
 
   def missing_masterfiles_detected(notes)
-    @edi_result.has_missing_masterfiles = true
+    @edi_result.has_missing_master_files = true
     @edi_result.notes = notes
   end
 
