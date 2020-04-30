@@ -49,11 +49,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'orchard_test_types' do
       @repo = QualityApp::OrchardTestRepo.new
       r.on 'api_name_changed' do
-        if params[:changed_value].nil_or_empty?
-          json_hide_element('orchard_test_type_api_attribute_field_wrapper')
+        actions = []
+        if params[:changed_value] == AppConst::PHYT_CLEAN_STANDARD
+          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
+          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_attribute_list_field_wrapper')
         else
-          json_show_element('orchard_test_type_api_attribute_field_wrapper')
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_attribute_list_field_wrapper')
         end
+        json_actions(actions)
       end
 
       r.on 'result_type_changed' do

@@ -48,6 +48,9 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
+      api_attribute_list = []
+      @repo.select_values(:orchard_test_api_attributes, %i[api_attribute description]).each { |attr| api_attribute_list << attr.join(' - ') }
+
       {
         test_type_code: { required: true,
                           force_uppercase: true },
@@ -81,6 +84,9 @@ module UiRules
                     selected: @form_object.api_name,
                     prompt: true },
         api_attribute: { hide_on_load: @form_object.api_name.nil_or_empty? },
+        api_attribute_list: { renderer: :list, items: api_attribute_list,
+                              caption: 'Api Attributes',
+                              hide_on_load: @form_object.api_name.nil_or_empty? },
         api_pass_result: { caption: 'Api Pass Value',
                            required: @form_object.result_type != AppConst::CLASSIFICATION,
                            hide_on_load: @form_object.result_type == AppConst::CLASSIFICATION },

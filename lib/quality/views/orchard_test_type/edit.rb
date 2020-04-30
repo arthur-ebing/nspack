@@ -36,6 +36,7 @@ module Quality
                   col.add_field :applies_to_all_cultivars
                   col.add_field :applicable_commodity_group_ids
                   col.add_field :applicable_cultivar_ids
+                  col.add_field :api_attribute_list
                   # col.add_field :applies_to_orchard
                   # col.add_field :allow_result_capturing
                   # col.add_field :pallet_level_result

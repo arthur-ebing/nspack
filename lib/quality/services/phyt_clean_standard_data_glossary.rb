@@ -30,10 +30,24 @@ module QualityApp
 
     def parse_glossary(res)
       res.instance.each do |row|
-        control_attr = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
-        glossary[row['cpagxmlAliasname'].downcase] = control_attr
+        attribute = row['cpagxmlAliasname'].downcase
+        description = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
+        update_orchard_test_api_attributes(attribute, description)
       end
       save_to_yaml(glossary, 'PhytCleanStandardGlossary')
+    end
+
+    def update_orchard_test_api_attributes(api_attribute, description)
+      glossary[attribute] = description
+      attrs = { api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute }
+      id = repo.get_id(:orchard_test_api_attributes, attrs)
+      attrs[:description] = description
+
+      if id.nil?
+        repo.create(:orchard_test_api_attributes, attrs)
+      else
+        repo.update(:orchard_test_api_attributes, id, attrs)
+      end
     end
 
     def save_to_yaml(payload, file_name)
