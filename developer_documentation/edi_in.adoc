@@ -135,7 +135,7 @@ missing_required_fields(only_rows: nil):: (For flat files) Checks if any require
 log(msg):: Write `msg` to the log file at the `info` level.
 log_err(msg):: Write `msg` to the log file at the `error` level.
 newer_edi_received(notes = nil):: Set the `edi_in_transaction.newer_edi_recived` column to `true` and optionally set the `notes` column.
-missing_masterfiles_detected(notes):: Set the `edi_in_transaction.has_missing_masterfiles` column to `true` and set the `notes` column.
+missing_masterfiles_detected(notes):: Set the `edi_in_transaction.has_missing_master_files` column to `true` and set the `notes` column.
 business_validation_passed:: Set the `edi_in_transaction.valid` column to `true`.
 discrepancies_detected(notes):: Set the `edi_in_transaction.discrepancies_detected` column to `true` and set the `notes` column.
 
