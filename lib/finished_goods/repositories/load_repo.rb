@@ -59,40 +59,6 @@ module FinishedGoodsApp
       ds.reverse.limit(1).get(:id)
     end
 
-    def allocate_pallets(load_id, pallet_numbers, user_name)
-      pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
-      return ok_response if pallet_ids.empty?
-
-      DB[:pallets].where(id: pallet_ids).update(load_id: load_id, allocated: true, allocated_at: Time.now)
-      log_multiple_statuses(:pallets, pallet_ids, 'ALLOCATED', user_name: user_name)
-
-      # updates load status allocated
-      DB[:loads].where(id: load_id).update(allocated: true, allocated_at: Time.now)
-      log_status(:loads, load_id, 'ALLOCATED', user_name: user_name)
-
-      ok_response
-    end
-
-    def unallocate_pallets(load_id, pallet_numbers, user_name) # rubocop:disable Metrics/AbcSize
-      pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
-      return ok_response if pallet_ids.empty?
-
-      DB[:pallets].where(id: pallet_ids).update(load_id: nil, allocated: false)
-      log_multiple_statuses(:pallets, pallet_ids, 'UNALLOCATED', user_name: user_name)
-
-      # find unallocated loads
-      allocated_load_ids = DB[:pallets].where(load_id: load_id).distinct.select_map(:load_id)
-      unallocated_load_ids = [load_id] - allocated_load_ids
-
-      # log status for loads where all pallets have been unallocated
-      unless unallocated_load_ids.empty?
-        DB[:loads].where(id: unallocated_load_ids, shipped: false).update(allocated: false)
-        log_multiple_statuses(:loads, unallocated_load_ids, 'UNALLOCATED', user_name: user_name)
-      end
-
-      ok_response
-    end
-
     def org_code_for_po(load_id)
       pr_id = DB[:loads].where(id: load_id).get(:exporter_party_role_id)
       DB.get(Sequel.function(:fn_party_role_org_code, pr_id))

@@ -33,8 +33,7 @@ module MesscadaApp
 
         raise ArgumentError, 'Validation empty.' if pallet_numbers.nil_or_empty?
 
-        res = exists_check
-        return res unless res.success
+        exists_check
 
         send(check)
       end
@@ -43,42 +42,42 @@ module MesscadaApp
 
       def exists_check
         errors = (pallet_numbers - repo.where_pallets(pallet_number: pallet_numbers)).uniq
-        return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
 
         all_ok
       end
 
       def not_shipped_check
         errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: true).uniq
-        return failed_response "Pallet: #{errors.join(', ')} already shipped." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} already shipped." unless errors.empty?
 
         all_ok
       end
 
       def shipped_check
         errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: false).uniq
-        return failed_response "Pallet: #{errors.join(', ')} not shipped." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} not shipped." unless errors.empty?
 
         all_ok
       end
 
       def in_stock_check
         errors = repo.where_pallets(pallet_number: pallet_numbers, in_stock: false).uniq
-        return failed_response "Pallet: #{errors.join(', ')} not in stock." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} not in stock." unless errors.empty?
 
         all_ok
       end
 
       def nett_weight_check
         errors = repo.where_pallets(pallet_number: pallet_numbers, has_nett_weight: true).uniq
-        return failed_response "Pallet: #{errors.join(', ')} does not have nett weight." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} does not have nett weight." unless errors.empty?
 
         all_ok
       end
 
       def gross_weight_check
         errors = repo.where_pallets(pallet_number: pallet_numbers, has_gross_weight: true).uniq
-        return failed_response "Pallet: #{errors.join(', ')} does not have gross weight." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} does not have gross weight." unless errors.empty?
 
         all_ok
       end
@@ -87,35 +86,35 @@ module MesscadaApp
         raise ArgumentError, 'Load Id is nil.' if load_id.nil?
 
         errors = repo.where_pallets(pallet_number: pallet_numbers, on_load: load_id).uniq
-        return failed_response "Pallet: #{errors.join(', ')} already allocated to other load." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} already allocated to other load." unless errors.empty?
 
         all_ok
       end
 
       def not_failed_otmc_check
         errors = pallet_numbers - repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil).uniq
-        return failed_response "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
 
         all_ok
       end
 
       def not_on_inspection_sheet_check
         errors = @inspection_repo.exists_on_inspection_sheet(pallet_numbers)
-        return failed_response "Pallet: #{errors.join(', ')} is already on an inspection sheet." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} is already on an inspection sheet." unless errors.empty?
 
         all_ok
       end
 
       def not_inspected_check
         errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: false).uniq
-        return failed_response "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
 
         all_ok
       end
 
       def verification_passed_check
         errors = pallet_numbers - @repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, verification_passed: true).uniq
-        return failed_response "Pallet: #{errors.join(', ')}, verification not passed." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')}, verification not passed." unless errors.empty?
 
         all_ok
       end
@@ -124,7 +123,7 @@ module MesscadaApp
         return all_ok unless AppConst::PALLET_WEIGHT_REQUIRED_FOR_INSPECTION
 
         errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, gross_weight: nil).uniq
-        return failed_response "Pallet: #{errors.join(', ')}, gross weight not filled." unless errors.empty?
+        raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')}, gross weight not filled." unless errors.empty?
 
         all_ok
       end
