@@ -5,19 +5,19 @@
         <xs:element name="voyage">
           <xs:complexType>
             <xs:sequence>
-              <xs:element type="xs:string" name="shipper"/>
+              <xs:element type="xs:short" name="year"/>
+              <xs:element type="xs:string" name="vessel_code"/>
+              <xs:element type="xs:string" name="shipping_line"/>
               <xs:element type="xs:int" name="booking_reference"/>
               <xs:element type="xs:string" name="voyage_code"/>
-              <xs:element type="xs:short" name="year"/>
+              <xs:element type="xs:string" name="shipper"/>
               <xs:element type="xs:string" name="voyage_number"/>
-              <xs:element type="xs:string" name="shipping_line"/>
-              <xs:element type="xs:string" name="vessel_code"/>
               <xs:element name="pol">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element type="xs:string" name="port_code"/>
-                    <xs:element type="xs:string" name="etd"/>
                     <xs:element type="xs:string" name="atd"/>
+                    <xs:element type="xs:string" name="etd"/>
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
@@ -25,8 +25,8 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element type="xs:string" name="port_code"/>
-                    <xs:element type="xs:string" name="eta"/>
                     <xs:element type="xs:string" name="ata"/>
+                    <xs:element type="xs:string" name="eta"/>
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
@@ -36,19 +36,20 @@
         <xs:element name="load">
           <xs:complexType>
             <xs:sequence>
+              <xs:element type="xs:string" name="exporter"/>
+              <xs:element type="xs:string" name="customer"/>
               <xs:element type="xs:string" name="load_instruction_code"/>
               <xs:element type="xs:string" name="final_destination"/>
-              <xs:element type="xs:string" name="depot_code"/>
-              <xs:element type="xs:string" name="consignee"/>
               <xs:element type="xs:short" name="customer_order_number"/>
-              <xs:element type="xs:string" name="customer"/>
+              <xs:element type="xs:string" name="consignee"/>
+              <xs:element type="xs:string" name="depot_code"/>
               <xs:element type="xs:string" name="final_receiver"/>
               <xs:element name="container" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element type="xs:string" name="temp_code"/>
-                    <xs:element type="xs:string" name="container_code"/>
                     <xs:element type="xs:string" name="container_short_code"/>
+                    <xs:element type="xs:string" name="container_code"/>
+                    <xs:element type="xs:string" name="temp_code"/>
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
