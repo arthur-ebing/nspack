@@ -2,8 +2,7 @@
 :caption: Orchards
 :sql: "SELECT\r\n    orchards.id,\r\n    orchards.farm_id,\r\n    orchards.puc_id,\r\n
   \   orchards.orchard_code,\r\n    orchards.description,\r\n    array_agg(cultivars.cultivar_name)
-  AS cultivar_names,\r\n    array_agg(orchards.otmc_results::varchar) AS otmc_results,\r\n
-  \   orchards.cultivar_ids,\r\n    orchards.active,\r\n    orchards.created_at,\r\n
+  AS cultivar_names,\r\n    orchards.cultivar_ids,\r\n    orchards.active,\r\n    orchards.created_at,\r\n
   \   orchards.updated_at,\r\n    farms.farm_code,\r\n    pucs.puc_code\r\nFROM orchards\r\nJOIN
   farms ON farms.id = orchards.farm_id\r\nJOIN pucs ON pucs.id = orchards.puc_id\r\nLEFT
   JOIN cultivars ON cultivars.id = ANY (orchards.cultivar_ids)\r\nGROUP BY\r\n    orchards.id,\r\n
@@ -96,22 +95,6 @@
     :name: cultivar_names
     :sequence_no: 6
     :caption: Cultivar names
-    :namespaced_name:
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  otmc_results:
-    :name: otmc_results
-    :sequence_no: 7
-    :caption: Otmc results
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -126,23 +109,23 @@
     :group_max: false
   cultivar_ids:
     :name: cultivar_ids
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Cultivars
     :namespaced_name: orchards.cultivar_ids
     :data_type: :integer_array
-    :width:
-    :format:
+    :width: 
+    :format: 
     :hide: true
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
   active:
     :name: active
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: orchards.active
     :data_type: :boolean
@@ -158,7 +141,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 10
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: orchards.created_at
     :data_type: :datetime
@@ -174,7 +157,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: orchards.updated_at
     :data_type: :datetime
@@ -190,7 +173,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Farm code
     :namespaced_name: farms.farm_code
     :data_type: :string
@@ -206,7 +189,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string

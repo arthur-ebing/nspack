@@ -13,14 +13,6 @@
   :text: bulk edit
   :icon: edit
   :title: Bulk Edit
-- :url: "/quality/test_results/orchard_test_results/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-- :url: "/list/orchard_test_results/multi?key=multi_delete"
-  :text: bulk delete
-  :icon: delete
 - :separator: true
 - :url: "/development/statuses/list/orchard_test_results/$:id$"
   :text: status
@@ -33,8 +25,20 @@
   :text: New Orchard Test Result
   :style: :button
 - :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/create"
+  :text: Create Orchard Test Results
+  :style: :button
+- :control_type: :link
   :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
-  :text: Phyt Clean Request
+  :text: Update Phyt Clean Results
+  :style: :button
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/pallet_diff"
+  :text: Phyt Clean Pallet Diff
+  :style: :button
+- :control_type: :link
+  :url: "/quality/test_results/orchard_test_results/orchard_diff"
+  :text: Phyt Clean Orchard Diff
   :style: :button
 :multiselect:
   :multi_delete:

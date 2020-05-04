@@ -12,7 +12,9 @@ module QualityApp
     attribute :pallet_level_result, Types::Bool
     attribute :api_name, Types::String
     attribute :result_type, Types::String
-    attribute :result_attribute, Types::String
+    attribute :api_attribute, Types::String
+    attribute :api_pass_result, Types::String
+    attribute :api_default_result, Types::String
     attribute :applicable_tm_group_ids, Types::Array
     attribute :applicable_cultivar_ids, Types::Array
     attribute :applicable_commodity_group_ids, Types::Array
@@ -30,7 +32,9 @@ module QualityApp
     attribute :pallet_level_result, Types::Bool
     attribute :api_name, Types::String
     attribute :result_type, Types::String
-    attribute :result_attribute, Types::String
+    attribute :api_attribute, Types::String
+    attribute :api_pass_result, Types::String
+    attribute :api_default_result, Types::String
     attribute :applicable_tm_group_ids, Types::Array
     attribute :applicable_tm_groups, Types::String
     attribute :applicable_cultivar_ids, Types::Array

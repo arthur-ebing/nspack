@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'config', 'quality' do |r|
     # ORCHARD TEST TYPES
     # --------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class Nspack < Roda
           res = interactor.update_orchard_test_type(id, params[:orchard_test_type])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json '/list/orchard_test_results'
           else
             re_show_form(r, res) { Quality::Config::OrchardTestType::Edit.call(id, form_values: params[:orchard_test_type], form_errors: res.errors) }
           end
@@ -48,6 +48,31 @@ class Nspack < Roda
 
     r.on 'orchard_test_types' do
       @repo = QualityApp::OrchardTestRepo.new
+      r.on 'api_name_changed' do
+        actions = []
+        if params[:changed_value] == AppConst::PHYT_CLEAN_STANDARD
+          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
+          options_array = @repo.for_select_orchard_test_api_attributes(AppConst::PHYT_CLEAN_STANDARD)
+        else
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
+          options_array = nil
+        end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_type_api_attribute', options_array: options_array)
+        json_actions(actions)
+      end
+
+      r.on 'result_type_changed' do
+        actions = []
+        if params[:changed_value] == AppConst::CLASSIFICATION
+          actions << OpenStruct.new(type: :set_required, dom_id: 'orchard_test_type_api_pass_result', required: false)
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_pass_result_field_wrapper')
+        else
+          actions << OpenStruct.new(type: :set_required, dom_id: 'orchard_test_type_api_pass_result', required: true)
+          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_pass_result_field_wrapper')
+        end
+        json_actions(actions)
+      end
+
       r.on 'commodity_group_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
@@ -90,7 +115,7 @@ class Nspack < Roda
         res = interactor.create_orchard_test_type(params[:orchard_test_type])
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          r.redirect '/list/orchard_test_results'
         else
           re_show_form(r, res, url: '/quality/config/orchard_test_types/new') do
             Quality::Config::OrchardTestType::New.call(form_values: params[:orchard_test_type],

@@ -2,10 +2,10 @@
 
 module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
-    def phyt_clean_request
+    def phyt_clean_request(puc_ids = nil)
       service_res = nil
       repo.transaction do
-        service_res = QualityApp::PhytCleanRequests.call
+        service_res = QualityApp::PhytCleanStandardData.call(puc_ids)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
@@ -29,6 +29,22 @@ module QualityApp
       success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def create_orchard_test_results
+      ids = repo.select_values(:orchard_test_types, :id)
+      service_res = nil
+      ids.each do |id|
+        repo.transaction do
+          service_res = CreateOrchardTestResults.call(id)
+          raise Crossbeams::InfoError, service_res.message unless service_res.success
+
+          log_transaction
+        end
+      end
+      service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

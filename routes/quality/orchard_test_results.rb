@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+# rubocop:disable Metrics/BlockLength
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'test_results', 'quality' do |r|
     # ORCHARD TEST RESULTS
     # --------------------------------------------------------------------------
@@ -10,6 +11,16 @@ class Nspack < Roda
       # Check for notfound:
       r.on !interactor.exists?(:orchard_test_results, id) do
         handle_not_found(r)
+      end
+
+      r.on 'phyt_clean_request', Integer do |puc_id|
+        res = interactor.phyt_clean_request(puc_id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect "/quality/test_results/orchard_test_results/#{id}/edit"
       end
 
       r.on 'edit' do   # EDIT
@@ -76,14 +87,31 @@ class Nspack < Roda
       @repo = QualityApp::OrchardTestRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
 
+      r.on 'pallet_diff' do
+        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::DiffTool.call(:pallet_sequences) }
+      end
+
+      r.on 'orchard_diff' do
+        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::DiffTool.call(:orchards) }
+      end
+
       r.on 'phyt_clean_request' do
-        res = interactor.phyt_clean_request
+        puc_ids = @repo.select_values(:pallet_sequences, :puc_id).uniq
+        res = interactor.phyt_clean_request(puc_ids)
         if res.success
           flash[:notice] = res.message
         else
           flash[:error] = "#{res.message} #{res.errors}"
         end
         r.redirect '/list/orchard_test_results'
+      end
+
+      r.on 'bulk_edit_all' do
+        if params[:changed_value] == 't'
+          json_hide_element('orchard_test_result_group_ids_field_wrapper')
+        else
+          json_show_element('orchard_test_result_group_ids_field_wrapper')
+        end
       end
 
       r.on 'puc_changed' do
@@ -97,17 +125,6 @@ class Nspack < Roda
         end
       end
 
-      r.on 'pucs_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          orchard_list = @repo.for_select_orchards(where: { puc_id: params[:changed_value].split(',') })
-          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_orchard_ids', options_array: orchard_list)
-          json_actions(actions)
-        end
-      end
-
       r.on 'orchard_changed' do
         if params[:changed_value].nil_or_empty?
           blank_json_response
@@ -116,18 +133,6 @@ class Nspack < Roda
           orchard = @farm_repo.find_orchard(params[:changed_value])
           cultivar_list = @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) })
           actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_result_cultivar_id', options_array: cultivar_list)
-          json_actions(actions)
-        end
-      end
-
-      r.on 'orchards_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          cultivar_ids = @repo.select_values(:orchards, :cultivar_ids, id: params[:changed_value].split(',')).flatten.uniq
-          cultivar_list = @repo.for_select_cultivar_codes(where: { id: cultivar_ids })
-          actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_result_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end
       end
@@ -145,6 +150,17 @@ class Nspack < Roda
         end
         flash[:notice] = res.message
         r.redirect request.referer
+      end
+
+      r.on 'create' do    # REFRESH
+        check_auth!('test results', 'new')
+        res = interactor.create_orchard_test_results
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = "#{res.message} #{res.errors}"
+        end
+        r.redirect '/list/orchard_test_results'
       end
 
       r.on 'new' do    # NEW
@@ -167,3 +183,4 @@ class Nspack < Roda
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

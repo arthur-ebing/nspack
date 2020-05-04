@@ -418,15 +418,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PASS_FAIL = 'Pass/Fail'
   CLASSIFICATION = 'Classification'
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
-  PHYT_CLEAN = 'PhytClean'
-  QUALITY_API_NAMES = [PHYT_CLEAN].freeze
+  PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
+  QUALITY_API_NAMES = [PHYT_CLEAN_STANDARD].freeze
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
   PHYT_CLEAN_API_USERNAME = ENV['PHYT_CLEAN_API_USERNAME']
   PHYT_CLEAN_API_PASSWORD = ENV['PHYT_CLEAN_API_PASSWORD']
-  PHYT_CLEAN_PASSED = %w[TRUE true t approved].freeze
-  PHYT_CLEAN_ATTRIBUTES = %i[cbs applied eu bd verified fms b phytoData].freeze
+  PHYT_CLEAN_SEASON_ID = ENV['PHYT_CLEAN_SEASON_ID']
 
   # eCert
   E_CERT_ENVIRONMENT = { QA: 'http://qa.', PRODUCTION: 'http://app.' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]

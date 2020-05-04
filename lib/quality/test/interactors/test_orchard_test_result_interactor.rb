@@ -22,39 +22,24 @@ module QualityApp
       assert entity.is_a?(OrchardTestResult)
     end
 
-    def test_create_orchard_test_result
-      attrs = fake_orchard_test_result.to_h.reject { |k, _| k == :id }
-      res = interactor.create_orchard_test_result(attrs)
-      assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(OrchardTestResultFlat, res.instance)
-      assert res.instance.id.nonzero?
-    end
-
-    def test_create_orchard_test_result_fail
-      attrs = fake_orchard_test_result(orchard_test_type_id: nil).to_h.reject { |k, _| k == :id }
-      res = interactor.create_orchard_test_result(attrs)
-      refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:orchard_test_type_id]
-    end
-
     def test_update_orchard_test_result
       id = create_orchard_test_result
       attrs = interactor.send(:repo).find_hash(:orchard_test_results, id).reject { |k, _| k == :id }
-      value = attrs[:description]
-      attrs[:description] = 'a_change'
+      value = attrs[:api_result]
+      attrs[:api_result] = 'a_change'
       res = interactor.update_orchard_test_result(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(OrchardTestResultFlat, res.instance)
-      assert_equal 'a_change', res.instance.description
-      refute_equal value, res.instance.description
+      assert_equal 'a_change', res.instance.api_result
+      refute_equal value, res.instance.api_result
     end
 
     def test_update_orchard_test_result_fail
       id = create_orchard_test_result
-      attrs = interactor.send(:repo).find_hash(:orchard_test_results, id).reject { |k, _| %i[id description].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:orchard_test_results, id).reject { |k, _| %i[id api_result].include?(k) }
       res = interactor.update_orchard_test_result(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:description]
+      assert_equal ['is missing'], res.errors[:api_result]
     end
 
     def test_delete_orchard_test_result
@@ -80,10 +65,11 @@ module QualityApp
         cultivar_id: cultivar_id,
         description: Faker::Lorem.unique.word,
         passed: false,
-        classification_only: false,
+        classification: false,
         freeze_result: false,
         api_result: nil,
-        classification: nil,
+        api_response: nil,
+        result: nil,
         applicable_from: '2010-01-01 12:00',
         applicable_to: '2010-01-01 12:00',
         active: true

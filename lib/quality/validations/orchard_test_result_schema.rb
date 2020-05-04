@@ -22,12 +22,14 @@ module QualityApp
     optional(:puc_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
     optional(:orchard_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
     optional(:cultivar_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
-    required(:description, Types::StrippedString).maybe(:str?)
-    required(:passed, :bool).filled(:bool?)
-    required(:classification_only, :bool).maybe(:bool?)
+    optional(:passed, :bool).maybe(:bool?)
+    optional(:classification, :bool).maybe(:bool?)
     required(:freeze_result, :bool).maybe(:bool?)
-    required(:classification, :string).maybe(:str?)
+    required(:api_result, :string).maybe(:str?)
+    optional(:api_response, :string).maybe(:str?)
     optional(:applicable_from, %i[nil time]).maybe(:time?)
     optional(:applicable_to, %i[nil time]).maybe(:time?)
+    optional(:update_all, :bool).maybe(:bool?)
+    optional(:group_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
   end
 end

@@ -5,7 +5,7 @@ module Quality
     module OrchardTestResult
       class BulkEdit
         def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:orchard_test_result, :edit, id: id, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:orchard_test_result, :bulk_edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -19,18 +19,16 @@ module Quality
               form.row do |row|
                 row.column do |col|
                   col.add_field :orchard_test_type_id
-                  col.add_field :puc_ids
-                  col.add_field :orchard_ids
-                  col.add_field :cultivar_ids
-                  col.add_field :description
-                  col.add_field :classification
-                end
-                row.column do |col|
                   col.add_field :passed
-                  col.add_field :classification_only
+                  col.add_field :classification
                   col.add_field :freeze_result
+                  col.add_field :api_result
                   col.add_field :applicable_from
                   col.add_field :applicable_to
+                end
+                row.column do |col|
+                  col.add_field :update_all
+                  col.add_field :group_ids
                 end
               end
             end

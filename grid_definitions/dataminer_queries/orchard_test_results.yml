@@ -1,31 +1,37 @@
 ---
 :caption: Orchard Test Results
-:sql: "SELECT\r\n    orchard_test_results.id,\r\n    orchard_test_results.orchard_test_type_id,\r\n
-  \   orchard_test_results.puc_id,\r\n    orchard_test_results.orchard_id,\r\n    orchard_test_results.cultivar_id,\r\n
-  \   orchard_test_types.test_type_code AS orchard_test_type_code,\r\n    pucs.puc_code,\r\n
-  \   orchards.orchard_code,\r\n    cultivars.cultivar_name AS cultivar_code,\r\n
-  \   orchard_test_results.description,\r\n    orchard_test_results.passed,\r\n    orchard_test_results.classification_only,\r\n
-  \   orchard_test_results.freeze_result,\r\n    orchard_test_results.classification,\r\n
-  \   orchard_test_results.applicable_from,\r\n    orchard_test_results.applicable_to,\r\n
-  \   orchard_test_results.active,\r\n    orchard_test_results.created_at,\r\n    orchard_test_results.updated_at,\r\n
-  \   CASE\r\n       WHEN NOT orchard_test_results.passed THEN 'error'::text\r\n       ELSE
-  NULL::text\r\n    END AS colour_rule\r\n    \r\nFROM\r\n    orchard_test_results\r\n
-  \       LEFT JOIN orchards ON orchards.id = orchard_test_results.orchard_id\r\n
-  \       LEFT JOIN orchard_test_types ON orchard_test_types.id = orchard_test_results.orchard_test_type_id\r\n
-  \       LEFT JOIN pucs ON pucs.id = orchard_test_results.puc_id\r\n        LEFT
-  JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id\r\n"
+:sql: "SELECT\r\n    otr.id,\r\n    otr.orchard_test_type_id,\r\n    otr.puc_id,\r\n
+  \   otr.orchard_id,\r\n    otr.cultivar_id,\r\n    ott.test_type_code AS orchard_test_type_code,\r\n
+  \   ott.description,\r\n    EXISTS( SELECT p.id\r\n            FROM pallet_sequences
+  ps\r\n            JOIN pallets p ON ps.pallet_id = p.id\r\n            WHERE ps.puc_id
+  = otr.puc_id\r\n            AND ps.orchard_id = otr.orchard_id\r\n            AND
+  ps.cultivar_id = otr.cultivar_id\r\n            AND p.exit_ref IS NULL) AS in_stock_pallets,\r\n
+  \   pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_name
+  AS cultivar_code,\r\n    otr.passed,\r\n    otr.classification,\r\n    otr.freeze_result,\r\n
+  \   otr.api_result,\r\n    otr.applicable_from,\r\n    otr.applicable_to,\r\n    otr.active,\r\n
+  \   otr.created_at,\r\n    otr.updated_at,\r\n    CASE\r\n        WHEN freeze_result
+  THEN 'ready'\r\n        WHEN NOT passed AND NOT classification THEN 'error'\r\n
+  \       WHEN NOT passed AND classification THEN 'warning'\r\n        WHEN passed
+  AND NOT classification THEN 'ok'\r\n        ELSE NULL::text\r\n    END AS colour_rule\r\n\r\nFROM
+  orchard_test_results otr\r\nLEFT JOIN orchard_test_types ott ON ott.id = otr.orchard_test_type_id\r\nLEFT
+  JOIN pucs ON pucs.id = otr.puc_id\r\nLEFT JOIN orchards ON orchards.id = otr.orchard_id\r\nLEFT
+  JOIN cultivars ON cultivars.id = otr.cultivar_id\r\n\r\nORDER BY otr.updated_at
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    error: Failed OTMC test
+    ready: Result frozen
+    error: Failed Result
+    warning: Empty Classification
+    ok: Passed Result
 :columns:
   id:
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: orchard_test_results.id
+    :namespaced_name: otr.id
     :data_type: :integer
     :width: 
     :format: 
@@ -41,7 +47,7 @@
     :name: orchard_test_type_id
     :sequence_no: 2
     :caption: Orchard test type
-    :namespaced_name: orchard_test_results.orchard_test_type_id
+    :namespaced_name: otr.orchard_test_type_id
     :data_type: :integer
     :width: 
     :format: 
@@ -57,13 +63,13 @@
     :name: puc_id
     :sequence_no: 3
     :caption: Puc
-    :namespaced_name: orchard_test_results.puc_id
+    :namespaced_name: otr.puc_id
     :data_type: :integer
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -73,13 +79,13 @@
     :name: orchard_id
     :sequence_no: 4
     :caption: Orchard
-    :namespaced_name: orchard_test_results.orchard_id
+    :namespaced_name: otr.orchard_id
     :data_type: :integer
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -89,13 +95,13 @@
     :name: cultivar_id
     :sequence_no: 5
     :caption: Cultivar
-    :namespaced_name: orchard_test_results.cultivar_id
+    :namespaced_name: otr.cultivar_id
     :data_type: :integer
     :width: 
     :format: 
     :hide: true
     :pinned: 
-    :groupable: false
+    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -105,9 +111,25 @@
     :name: orchard_test_type_code
     :sequence_no: 6
     :caption: Orchard test type
-    :namespaced_name: orchard_test_types.test_type_code
+    :namespaced_name: ott.test_type_code
     :data_type: :string
-    :width: 
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 7
+    :caption: Description
+    :namespaced_name: ott.description
+    :data_type: :string
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -117,13 +139,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  in_stock_pallets:
+    :name: in_stock_pallets
+    :sequence_no: 8
+    :caption: In stock pallets
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 7
-    :caption: Puc code
+    :sequence_no: 9
+    :caption: Puc Code
     :namespaced_name: pucs.puc_code
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -135,11 +173,11 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 8
-    :caption: Orchard code
+    :sequence_no: 10
+    :caption: Orchard Code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -151,27 +189,11 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 9
-    :caption: Cultivar code
+    :sequence_no: 11
+    :caption: Cultivar Code
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  description:
-    :name: description
-    :sequence_no: 10
-    :caption: Description
-    :namespaced_name: orchard_test_results.description
-    :data_type: :string
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -183,25 +205,25 @@
     :group_max: false
   passed:
     :name: passed
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Passed
-    :namespaced_name: orchard_test_results.passed
+    :namespaced_name: otr.passed
     :data_type: :boolean
     :width: 
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  classification_only:
-    :name: classification_only
-    :sequence_no: 12
-    :caption: Classification only
-    :namespaced_name: orchard_test_results.classification_only
+  classification:
+    :name: classification
+    :sequence_no: 13
+    :caption: Classification
+    :namespaced_name: otr.classification
     :data_type: :boolean
     :width: 
     :format: 
@@ -215,9 +237,9 @@
     :group_max: false
   freeze_result:
     :name: freeze_result
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Freeze result
-    :namespaced_name: orchard_test_results.freeze_result
+    :namespaced_name: otr.freeze_result
     :data_type: :boolean
     :width: 
     :format: 
@@ -229,11 +251,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  classification:
-    :name: classification
-    :sequence_no: 14
-    :caption: Classification
-    :namespaced_name: orchard_test_results.classification
+  api_result:
+    :name: api_result
+    :sequence_no: 15
+    :caption: API Result / Classification
+    :namespaced_name: otr.api_result
     :data_type: :string
     :width: 
     :format: 
@@ -247,9 +269,9 @@
     :group_max: false
   applicable_from:
     :name: applicable_from
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Applicable from
-    :namespaced_name: orchard_test_results.applicable_from
+    :namespaced_name: otr.applicable_from
     :data_type: :datetime
     :width: 
     :format: 
@@ -263,9 +285,9 @@
     :group_max: false
   applicable_to:
     :name: applicable_to
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Applicable to
-    :namespaced_name: orchard_test_results.applicable_to
+    :namespaced_name: otr.applicable_to
     :data_type: :datetime
     :width: 
     :format: 
@@ -279,9 +301,9 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Active
-    :namespaced_name: orchard_test_results.active
+    :namespaced_name: otr.active
     :data_type: :boolean
     :width: 
     :format: 
@@ -295,9 +317,9 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Created at
-    :namespaced_name: orchard_test_results.created_at
+    :namespaced_name: otr.created_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -311,9 +333,9 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Updated at
-    :namespaced_name: orchard_test_results.updated_at
+    :namespaced_name: otr.updated_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -327,7 +349,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

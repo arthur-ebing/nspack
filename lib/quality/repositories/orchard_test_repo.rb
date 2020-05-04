@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class OrchardTestRepo < BaseRepo
+  class OrchardTestRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :orchard_test_types,
                      label: :test_type_code,
                      value: :id,
@@ -12,16 +12,6 @@ module QualityApp
                           order_by: :test_type_code
 
     crud_calls_for :orchard_test_types, name: :orchard_test_type, wrapper: OrchardTestType
-
-    build_for_select :orchard_test_results,
-                     label: :description,
-                     value: :id,
-                     order_by: :description
-    build_inactive_select :orchard_test_results,
-                          label: :description,
-                          value: :id,
-                          order_by: :description
-
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
 
     build_for_select :cultivars,
@@ -44,21 +34,51 @@ module QualityApp
                           value: :id,
                           order_by: :orchard_code
 
-    def find_orchard_test_type_flat(id)
+    def for_select_orchard_test_results(orchard_test_type_id)
       query = <<~SQL
         SELECT
-            orchard_test_types.*,
-            string_agg(DISTINCT target_market_groups.target_market_group_name, ', ') AS applicable_tm_groups,
-            string_agg(DISTINCT cultivars.cultivar_name, ', ') AS applicable_cultivars,
-            string_agg(DISTINCT commodity_groups.code, ', ') AS applicable_commodity_groups
-        FROM orchard_test_types
-        LEFT JOIN target_market_groups ON target_market_groups.id = ANY (orchard_test_types.applicable_tm_group_ids)
-        LEFT JOIN cultivars ON cultivars.id = ANY (orchard_test_types.applicable_cultivar_ids)
-        LEFT JOIN commodity_groups ON commodity_groups.id = ANY (orchard_test_types.applicable_commodity_group_ids)
-        WHERE orchard_test_types.id = #{id}
-        GROUP BY orchard_test_types.id
+            concat(pucs.puc_code, ' - ',orchards.orchard_code, ' - ',cultivars.cultivar_code) as code,
+            orchard_test_results.id
+        FROM orchard_test_results
+        JOIN pucs ON pucs.id = orchard_test_results.puc_id
+        JOIN orchards ON orchards.id = orchard_test_results.orchard_id
+        JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id
+        WHERE orchard_test_type_id = #{orchard_test_type_id}
       SQL
-      OrchardTestTypeFlat.new(DB[query].first)
+      DB[query].select_map(%i[code id])
+    end
+
+    def for_select_orchard_test_api_attributes(api_name)
+      DB[:orchard_test_api_attributes].where(api_name: api_name).select_map(%i[description api_attribute])
+    end
+
+    def find_orchard_test_type_flat(id)
+      hash = find_hash(:orchard_test_types, id)
+      query = <<~SQL
+        SELECT
+            CASE
+                WHEN ott.applies_to_all_cultivars THEN (SELECT array_agg(c.id) AS array_agg FROM cultivars c)
+                ELSE ott.applicable_cultivar_ids
+            END AS applicable_cultivar_ids,
+            CASE
+                WHEN ott.applies_to_all_cultivars THEN (SELECT string_agg(c.cultivar_name, ', '::text) AS string_agg FROM cultivars c)
+                ELSE (SELECT string_agg(c.cultivar_code, ', '::text) AS string_agg FROM cultivars c WHERE c.id = ANY (ott.applicable_cultivar_ids))
+            END AS applicable_cultivars,
+            CASE
+                WHEN ott.applies_to_all_markets THEN (SELECT array_agg(tmg.id) AS array_agg FROM target_market_groups tmg)
+                ELSE ott.applicable_tm_group_ids
+            END AS applicable_tm_group_ids,
+            CASE
+                WHEN ott.applies_to_all_markets THEN (SELECT string_agg(tmg.target_market_group_name, ', '::text) AS string_agg FROM target_market_groups tmg)
+                ELSE (SELECT string_agg(tmg.target_market_group_name, ', '::text) AS string_agg FROM target_market_groups tmg WHERE tmg.id = ANY (ott.applicable_tm_group_ids))
+            END AS applicable_tm_groups,
+            string_agg(DISTINCT commodity_groups.code, ', ') AS applicable_commodity_groups
+        FROM orchard_test_types ott
+        LEFT JOIN commodity_groups ON commodity_groups.id = ANY (ott.applicable_commodity_group_ids)
+        WHERE ott.id = #{id}
+        GROUP BY ott.id
+      SQL
+      OrchardTestTypeFlat.new(hash.merge(DB[query].first))
     end
 
     def find_orchard_test_result_flat(id)
@@ -66,6 +86,7 @@ module QualityApp
         SELECT
             orchard_test_results.*,
             orchard_test_types.test_type_code AS orchard_test_type_code,
+            orchard_test_types.api_name AS api_name,
             orchards.orchard_code,
             pucs.puc_code,
             cultivars.cultivar_name AS cultivar_code
@@ -102,22 +123,23 @@ module QualityApp
 
     def update_orchard_test_result(id, params)
       attrs = params.to_h
-      attrs.delete(:api_result) if attrs[:api_result].nil_or_empty?
-      attrs[:api_result] = hash_for_jsonb_col(attrs[:api_result]) if attrs.key?(:api_result)
+      attrs.delete(:api_response) if attrs[:api_response].nil_or_empty?
+      attrs[:api_response] = hash_for_jsonb_col(attrs[:api_response]) if attrs.key?(:api_response)
 
       DB[:orchard_test_results].where(id: id).update(attrs)
     end
 
-    def delete_orchard_test_result(id)
-      instance = find_orchard_test_result_flat(id)
-
-      # update_orchard_otmc_results
-      otmc_results = get(:orchards, instance.orchard_id, :otmc_results) || {}
-      otmc_results.delete(instance.orchard_test_type_code.to_sym)
-      result = otmc_results.empty? ? nil : Sequel.hstore(otmc_results)
-      update(:orchards, instance.orchard_id, otmc_results: result)
-
-      DB[:orchard_test_results].where(id: id).delete
+    def puc_orchard_cultivar(id_arrays)
+      hash = {}
+      id_arrays.each do |puc_id, orchard_id, cultivar_ids|
+        puc = get(:pucs, puc_id, :puc_code)
+        orchard = get(:orchards, orchard_id, :orchard_code).upcase
+        Array(cultivar_ids).each do |cultivar_id|
+          cultivar = get(:cultivars, cultivar_id, :cultivar_code)
+          hash["Puc #{puc} - Orchard #{orchard}"] = "Cultivar #{cultivar}   "
+        end
+      end
+      Hash[hash.sort]
     end
   end
 end

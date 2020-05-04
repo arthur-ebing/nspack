@@ -67,7 +67,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { E_CERT_API_CLIENT_SECRET: 'optional. eCert API Secret' },
     { E_CERT_BUSINESS_ID: 'optional. eCert API Business ID' },
     { E_CERT_BUSINESS_NAME: 'optional. eCert API Business Name' },
-    { E_CERT_INDUSTRY: 'optional. eCert API Industry' }
+    { E_CERT_INDUSTRY: 'optional. eCert API Industry' },
+    { PHYT_CLEAN_API_USERNAME: 'optional. PhytClean API User Name' },
+    { PHYT_CLEAN_API_PASSWORD: 'optional. PhytClean API Password' },
+    { PHYT_CLEAN_SEASON_ID: 'optional. PhytClean Standard Data season id' }
   ].freeze
 
   NO_OVERRIDE = [

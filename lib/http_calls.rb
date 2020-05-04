@@ -118,10 +118,14 @@ module Crossbeams
       failed_response("There was an error: #{e.message}")
     end
 
-    def request_post(url, fields) # rubocop:disable Metrics/AbcSize
+    def request_post(url, fields, headers = {}) # rubocop:disable Metrics/AbcSize
       uri, http = setup_http(url)
       http.use_ssl = use_ssl if use_ssl
       request = Net::HTTP::Post.new(uri.request_uri)
+      headers.each do |k, v|
+        request.add_field(k.to_s, v.to_s)
+      end
+
       request.set_form_data(fields)
       log_request(request)
       response = http.request(request)
