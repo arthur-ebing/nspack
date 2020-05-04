@@ -497,9 +497,9 @@
     :sequence_no: 29
     :caption: Std ctns
     :namespaced_name: std_ctns
-    :data_type: :string
+    :data_type: :number
     :width: 80
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false
@@ -2265,7 +2265,7 @@
   :caption: Target Customer Party Role Id
   :data_type: :integer
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 13
-  :list_def:
+  :list_def: 
