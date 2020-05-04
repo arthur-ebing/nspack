@@ -38,7 +38,9 @@ module UiRules
                                                   caption: 'Commodity Groups' }
       fields[:result_type] = { renderer: :label }
       fields[:api_name] = { renderer: :label }
+      api_attribute_value = @repo.get_value(:orchard_test_api_attributes, :description, api_attribute: @form_object.api_attribute)
       fields[:api_attribute] = { renderer: :label,
+                                 with_value: api_attribute_value,
                                  hide_on_load: @form_object.api_name.nil_or_empty? }
       fields[:api_pass_result] = { renderer: :label,
                                    caption: 'Api Pass Value' }
@@ -48,9 +50,6 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      api_attribute_list = []
-      @repo.select_values(:orchard_test_api_attributes, %i[api_attribute description]).each { |attr| api_attribute_list << attr.join(' - ') }
-
       {
         test_type_code: { required: true,
                           force_uppercase: true },
@@ -83,10 +82,9 @@ module UiRules
                     options: AppConst::QUALITY_API_NAMES,
                     selected: @form_object.api_name,
                     prompt: true },
-        api_attribute: { hide_on_load: @form_object.api_name.nil_or_empty? },
-        api_attribute_list: { renderer: :list, items: api_attribute_list,
-                              caption: 'Api Attributes',
-                              hide_on_load: @form_object.api_name.nil_or_empty? },
+        api_attribute: { renderer: :select,
+                         options: @repo.for_select_orchard_test_api_attributes(@form_object.api_name),
+                         selected: @form_object.api_name.nil_or_empty? },
         api_pass_result: { caption: 'Api Pass Value',
                            required: @form_object.result_type != AppConst::CLASSIFICATION,
                            hide_on_load: @form_object.result_type == AppConst::CLASSIFICATION },

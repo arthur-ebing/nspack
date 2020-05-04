@@ -38,7 +38,8 @@ module QualityApp
     end
 
     def pass_fail_rules
-      attrs[:passed] = UtilityFunctions.parse_string_to_array(orchard_test_type.api_pass_result)&.map(&:upcase)&.include? params[:api_result]&.upcase
+      pass_result = orchard_test_type.api_pass_result || ''
+      attrs[:passed] = UtilityFunctions.parse_string_to_array(pass_result)&.map(&:upcase)&.include? params[:api_result]&.upcase
       attrs[:classification] = false
     end
 

@@ -98,6 +98,7 @@ module UiRules
                   hide_on_load: @classification },
         api_result: { caption: 'Result' },
         api_pass_result: { renderer: :label,
+                           hide_on_load: @classification,
                            caption: 'Pass Result' },
         classification: { renderer: :label,
                           as_boolean: true,

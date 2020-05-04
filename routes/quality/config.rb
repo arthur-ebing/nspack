@@ -52,11 +52,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         actions = []
         if params[:changed_value] == AppConst::PHYT_CLEAN_STANDARD
           actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
-          actions << OpenStruct.new(type: :show_element, dom_id: 'orchard_test_type_api_attribute_list_field_wrapper')
+          options_array = @repo.for_select_orchard_test_api_attributes(AppConst::PHYT_CLEAN_STANDARD)
         else
           actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_attribute_field_wrapper')
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'orchard_test_type_api_attribute_list_field_wrapper')
+          options_array = nil
         end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'orchard_test_type_api_attribute', options_array: options_array)
         json_actions(actions)
       end
 

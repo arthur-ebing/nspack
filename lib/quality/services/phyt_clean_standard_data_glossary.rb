@@ -28,18 +28,21 @@ module QualityApp
 
     private
 
-    def parse_glossary(res)
+    def parse_glossary(res) # rubocop:disable Metrics/AbcSize
+      update_orchard_test_api_attributes('phytoData', 'PhytoData Classification')
+      update_orchard_test_api_attributes('isCultivarB', 'CultivarB Status')
+
       res.instance.each do |row|
         attribute = row['cpagxmlAliasname'].downcase
         description = "#{row['controlPointGroupName']} #{row['controlPointName']} #{row['controlpointAllowedGroupName']} ".split.uniq.join(' ')
+        glossary[attribute] = description
         update_orchard_test_api_attributes(attribute, description)
       end
       save_to_yaml(glossary, 'PhytCleanStandardGlossary')
     end
 
-    def update_orchard_test_api_attributes(api_attribute, description)
-      glossary[attribute] = description
-      attrs = { api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute }
+    def update_orchard_test_api_attributes(attribute, description)
+      attrs = { api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: attribute }
       id = repo.get_id(:orchard_test_api_attributes, attrs)
       attrs[:description] = description
 

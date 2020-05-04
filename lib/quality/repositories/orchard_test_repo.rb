@@ -48,6 +48,10 @@ module QualityApp
       DB[query].select_map(%i[code id])
     end
 
+    def for_select_orchard_test_api_attributes(api_name)
+      DB[:orchard_test_api_attributes].where(api_name: api_name).select_map(%i[description api_attribute])
+    end
+
     def find_orchard_test_type_flat(id)
       hash = find_hash(:orchard_test_types, id)
       query = <<~SQL
