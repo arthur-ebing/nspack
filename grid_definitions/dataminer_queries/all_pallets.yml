@@ -758,9 +758,9 @@
     :sequence_no: 45
     :caption: Std ctns
     :namespaced_name: std_ctns
-    :data_type: :string
+    :data_type: :number
     :width: 80
-    :format: 
+    :format: :delimited_1000
     :hide: false
     :pinned: 
     :groupable: false

@@ -160,7 +160,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
   end
 
   def format(array)
-    array.map { |var| "#{var.keys.first.to_s.ljust(25)} : #{var.values.first}" }.join("\n")
+    array.map { |var| "#{var.keys.first.to_s.ljust(48)} : #{var.values.first}" }.join("\n")
   end
 
   def validate
