@@ -102,6 +102,12 @@ module UiRules
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
 
+      customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
+                             []
+                           else
+                             MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
+                           end
+
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
                   []
                 else
@@ -207,10 +213,10 @@ module UiRules
                                       remove_search_for_small_list: false,
                                       required: true }
       fields[:customer_variety_variety_id] =  { renderer: :select,
-                                                options: MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties,
+                                                options: customer_varieties,
                                                 disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_variety_varieties,
-                                                caption: 'Customer Variety Variety',
-                                                prompt: 'Select Customer Variety Variety',
+                                                caption: 'Customer Variety',
+                                                prompt: 'Select Customer Variety',
                                                 searchable: true,
                                                 remove_search_for_small_list: false }
       fields[:client_product_code] =  {}
@@ -355,6 +361,9 @@ module UiRules
                                              param_keys: %i[reworks_run_sequence_std_fruit_size_count_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/actual_count_changed" }]
+        behaviour.dropdown_change :marketing_variety_id,
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/marketing_variety_changed",
+                                             param_keys: %i[reworks_run_sequence_packed_tm_group_id] }]
         behaviour.dropdown_change :packed_tm_group_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/packed_tm_group_changed",
                                              param_keys: %i[reworks_run_sequence_marketing_variety_id] }]

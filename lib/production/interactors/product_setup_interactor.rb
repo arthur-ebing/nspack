@@ -121,7 +121,7 @@ module ProductionApp
     end
 
     def for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
-      MasterfilesApp::MarketingRepo.new.for_select_customer_variety_marketing_varieties(packed_tm_group_id, marketing_variety_id)
+      MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
     end
 
     def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
