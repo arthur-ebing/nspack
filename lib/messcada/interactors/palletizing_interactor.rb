@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class PalletizingInteractor < BaseInteractor
+  class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def scan_carton(params)
       state_machine = state_machine(params)
 
@@ -17,7 +17,7 @@ module MesscadaApp
       end
     end
 
-    def qc_out(params)
+    def qc_out(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
       if state_machine.cannot?(:prepare_qc)
         failed_response("Bay is in #{state_machine.current} state - cannot select a QC carton", current_bay_attributes(state_machine))
@@ -32,7 +32,7 @@ module MesscadaApp
       end
     end
 
-    def return_to_bay(params)
+    def return_to_bay(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
       if state_machine.cannot?(:prepare_return)
         failed_response("Bay is in #{state_machine.current} state - cannot return to bay", current_bay_attributes(state_machine))
@@ -47,7 +47,7 @@ module MesscadaApp
       end
     end
 
-    def refresh(params)
+    def refresh(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
       if state_machine.cannot?(:refresh)
         failed_response("Bay is in #{state_machine.current} state - cannot refresh", current_bay_attributes(state_machine))
@@ -62,7 +62,7 @@ module MesscadaApp
       end
     end
 
-    def complete(params)
+    def complete(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
       if state_machine.cannot?(:complete)
         failed_response("Bay is in #{state_machine.current} state - cannot complete", current_bay_attributes(state_machine))
@@ -110,7 +110,7 @@ module MesscadaApp
       repo.current_palletizing_bay_attributes(state_machine.target.id)
     end
 
-    def start_new_pallet(state_machine, params)
+    def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize
       return failed_response("Cannot create pallet in #{state_machine.current_state} state", current_bay_attributes(state_machine)) if state_machine.cannot?(:create_pallet)
 
       carton_id = params[:carton_number]
@@ -160,6 +160,7 @@ module MesscadaApp
 
     def return_pallet_to_bay(state_machine, params)
       carton_id = params[:carton_number]
+      puts carton_id
 
       # VALIDATE that carton is on a pallet
       repo.transaction do
@@ -175,6 +176,7 @@ module MesscadaApp
 
     def mark_carton_for_qc(state_machine, params)
       carton_id = params[:carton_number]
+      puts carton_id
 
       # VALIDATE that carton is on a pallet
       repo.transaction do
