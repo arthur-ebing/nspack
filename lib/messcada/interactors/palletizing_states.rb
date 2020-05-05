@@ -17,6 +17,9 @@ class PalletizingStates < FiniteMachine::Definition
   # These two could replace the return_to_bay and qc_checkout events...
   # event :scan,           qc_out:        :palletizing, if: ->(context, want) { context.state == :qc_out && want == :qc_checkout }
   # event :scan,           return_to_bay: :palletizing, if: ->(context, want) { context.state == :return_to_bay && want == :return_to_bay }
+  #  scan, palletizing: :palletizing
+  #  scan, empty:       :palletizing
+  #  on_enter(:scan) { |e| if e.from == :return... if :palletize (add carton), if :empty (add pallet, seq, ctn)
 
   event :complete,       palletizing:   :empty
 
