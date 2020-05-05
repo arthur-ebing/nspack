@@ -1146,7 +1146,7 @@ module ProductionApp
 
       if AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type
         production_run_bins = repo.production_run_bins?(rmt_bins, production_run_id)
-        extra_bins = (rmt_bins - production_run_bins)
+        extra_bins = (rmt_bins - production_run_bins.map(&:to_s))
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{extra_bins.join(', ')} are not from production run #{production_run_id}"] }, pallets_selected: rmt_bins) unless extra_bins.nil_or_empty?
       end
 
