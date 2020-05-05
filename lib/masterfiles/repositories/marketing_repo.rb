@@ -173,12 +173,12 @@ module MasterfilesApp
         ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
 
-    def for_select_customer_variety_varieties(packed_tm_group_id, variety_as_customer_variety_id)
+    def for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
       DB[:marketing_varieties]
         .join(:customer_varieties, variety_as_customer_variety_id: :id)
         .join(:customer_variety_varieties, customer_variety_id: :id)
         .where(packed_tm_group_id: packed_tm_group_id)
-        .where(variety_as_customer_variety_id: variety_as_customer_variety_id)
+        .where(marketing_variety_id: marketing_variety_id)
         .distinct(Sequel[:marketing_varieties][:id])
         .select(
           Sequel[:customer_varieties][:id],
