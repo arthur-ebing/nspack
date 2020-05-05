@@ -2,7 +2,9 @@
 
 module EdiApp
   class PsOutRepo < BaseRepo
-    def ps_rows(marketing_org_party_role_id)
+    def ps_rows(party_role_id)
+      party_role_condition = party_role_condition_for(party_role_id)
+
       query = <<~SQL
         SELECT
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
@@ -85,9 +87,20 @@ module EdiApp
         LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
         LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
         WHERE pallets.in_stock
-          AND pallet_sequences.marketing_org_party_role_id = ?
+          AND #{party_role_condition} = ?
       SQL
-      DB[query, marketing_org_party_role_id].all
+      DB[query, party_role_id].all
+    end
+
+    def party_role_condition_for(party_role_id)
+      role = DB[:party_roles].join(:roles, id: :role_id).where(Sequel[:party_roles][:id] => party_role_id).get(:name)
+      raise Crossbeams::FrameworkError, "No role for PartyRole #{party_role_id}" if role.nil?
+
+      if role == AppConst::ROLE_MARKETER
+        'pallet_sequences.marketing_org_party_role_id'
+      else
+        'pallets.target_customer_party_role_id'
+      end
     end
   end
 end
