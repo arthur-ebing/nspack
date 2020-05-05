@@ -2,6 +2,15 @@
 
 namespace :app do
   namespace :masterfiles do
+    desc 'Import Phytclean Glossary'
+    task import_phytclean_glossary: [:load_app] do
+      res = QualityApp::PhytCleanStandardDataGlossary.call
+      if res.success
+        puts "SUCCESS: #{res.message}"
+      else
+        puts "FAILURE: #{res.message}"
+      end
+    end
     desc 'Import locations'
     task :import_locations, [:fn] => [:load_app] do |_, args|
       res = MasterfilesApp::ImportLocations.call(args.fn)
