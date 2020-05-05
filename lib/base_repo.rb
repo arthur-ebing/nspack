@@ -111,7 +111,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [any] the column value for the matching record or nil.
   def get_value(table_name, column, args)
     values = DB[table_name].where(args).select_map(column)
-    raise Crossbeams::FrameworkError, "'get_value' method must return only one record for #{table_name}, #{column}, #{args}" if values.length > 1
+    raise Crossbeams::FrameworkError, %("get_value" method must return only one record for #{table_name}, #{column}, #{args}) if values.length > 1
 
     values.first
   end
@@ -125,7 +125,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [integer] the id value for the matching record or nil.
   def get_id(table_name, args)
     ids = DB[table_name].where(args).select_map(:id)
-    raise Crossbeams::FrameworkError, "'get_id' method must return only one record for #{table_name}, #{args}" if ids.length > 1
+    raise Crossbeams::FrameworkError, %("get_id" method must return only one record for #{table_name}, #{args}) if ids.length > 1
 
     ids.first
   end
