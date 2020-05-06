@@ -150,8 +150,11 @@ module UiRules
                         end
       cultivars = if @form_object.cultivar_group_id.nil_or_empty?
                     []
-                  else
+                  elsif @form_object.orchard_id.nil_or_empty?
                     @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id })
+                  else
+                    orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+                    @cultivar_repo.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
                   end
       seasons = if @form_object.cultivar_group_id.nil_or_empty?
                   []
@@ -321,7 +324,8 @@ module UiRules
         behaviour.dropdown_change :orchard_id,
                                   notify: [{ url: '/production/runs/production_runs/changed/orchard' }]
         behaviour.dropdown_change :cultivar_group_id,
-                                  notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+                                  notify: [{ url: '/production/runs/production_runs/changed/cultivar_group',
+                                             param_keys: %i[production_run_orchard_id] }]
       end
     end
 
@@ -329,7 +333,8 @@ module UiRules
       if @form_object.reconfiguring
         behaviours do |behaviour|
           behaviour.dropdown_change :cultivar_group_id,
-                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group',
+                                               param_keys: %i[production_run_orchard_id] }]
         end
       else
         behaviours do |behaviour|
@@ -341,7 +346,8 @@ module UiRules
           behaviour.dropdown_change :orchard_id,
                                     notify: [{ url: '/production/runs/production_runs/changed/orchard' }]
           behaviour.dropdown_change :cultivar_group_id,
-                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group' }]
+                                    notify: [{ url: '/production/runs/production_runs/changed/cultivar_group',
+                                               param_keys: %i[production_run_orchard_id] }]
         end
       end
     end

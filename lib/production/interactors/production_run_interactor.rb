@@ -419,12 +419,17 @@ module ProductionApp
       success_response('ok', instance)
     end
 
-    def change_for_cultivar_group(params)
+    def change_for_cultivar_group(params) # rubocop:disable Metrics/AbcSize
       res = validate_changed_value_as_int(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       instance = { cultivars: [], seasons: [] }
-      instance[:cultivars] = cultivar_repo.for_select_cultivars(where: { cultivar_group_id: res[:changed_value] })
+      if params[:production_run_orchard_id].nil_or_empty?
+        instance[:cultivars] = cultivar_repo.for_select_cultivars(where: { cultivar_group_id: res[:changed_value] })
+      else
+        orchard = farm_repo.find_orchard(params[:production_run_orchard_id])
+        instance[:cultivars] = cultivar_repo.for_select_cultivars(where: { id: orchard.cultivar_ids.to_a })
+      end
       instance[:cultivars].unshift(['', '']) # if mixed_cult
       instance[:seasons] = MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(res[:changed_value])
 
