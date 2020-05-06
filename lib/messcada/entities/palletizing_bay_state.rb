@@ -16,5 +16,10 @@ module MesscadaApp
     def state
       current_state.nil? ? current_state : current_state.to_sym
     end
+
+    # Instance for use as FiniteMachine target.
+    def fsm_target
+      OpenStruct.new(state: state, action: nil)
+    end
   end
 end

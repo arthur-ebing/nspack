@@ -15,7 +15,8 @@ module MesscadaApp
                     PalletizingBayState,
                     palletizing_robot_code: device,
                     scanner_code: scanner)
-      state.nil? ? create_state(device, scanner) : state
+      instance = state.nil? ? create_state(device, scanner) : state
+      OpenStruct.new(instance.to_h.merge(action: nil))
     end
 
     def create_state(device, scanner)

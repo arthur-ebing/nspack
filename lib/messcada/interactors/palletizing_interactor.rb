@@ -193,7 +193,7 @@ module MesscadaApp
 
     def state_machine(params)
       sm = repo.palletizing_bay_state_by_robot_scanner(params[:device], params[:card_reader])
-      PalletizingStates.new(sm, initial: sm.state)
+      CartonPalletizingStates.new(sm.fsm_target, initial: sm.state)
     end
 
     def repo
