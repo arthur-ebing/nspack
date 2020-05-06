@@ -16,7 +16,7 @@ module QualityApp
         create_orchard_test_results
       end
 
-      success_response('Created Orchard Test Results')
+      success_response('Created Tests')
     end
 
     private

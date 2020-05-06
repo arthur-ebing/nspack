@@ -13,7 +13,7 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Orchard Test Result'
+              form.caption 'New Test'
               form.action '/quality/test_results/orchard_test_results'
               form.remote! if remote
               form.add_field :orchard_test_type_id

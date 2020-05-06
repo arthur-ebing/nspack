@@ -11,7 +11,7 @@ module Quality
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              form.caption 'Orchard Test Type'
+              form.caption 'Test Type'
               form.view_only!
               form.row do |row|
                 row.column do |col|

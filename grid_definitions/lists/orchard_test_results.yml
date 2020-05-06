@@ -1,5 +1,7 @@
 ---
 :dataminer_definition: orchard_test_results
+:captions:
+  :grid_caption: Bin and Pallet Tests
 :actions:
 - :url: "/quality/test_results/orchard_test_results/$:id$"
   :text: view
@@ -22,11 +24,11 @@
 :page_controls:
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/new"
-  :text: New Orchard Test Result
+  :text: New Test
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/create"
-  :text: Create Orchard Test Results
+  :text: Create Tests
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
@@ -38,9 +40,9 @@
   :style: :button
 - :control_type: :link
   :url: "/quality/test_results/orchard_test_results/orchard_diff"
-  :text: Phyt Clean Orchard Diff
+  :text: Phyt Clean Diff
   :style: :button
 :multiselect:
   :multi_delete:
     :url: "/quality/test_results/orchard_test_results/multi_delete"
-    :section_caption: "Choose results to delete"
+    :section_caption: "Choose tests to delete"

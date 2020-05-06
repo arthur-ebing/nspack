@@ -23,7 +23,7 @@ module QualityApp
 
       update_orchard_test_results
 
-      success_response('Updated Orchard Test Result')
+      success_response('Updated Tests')
     end
 
     private

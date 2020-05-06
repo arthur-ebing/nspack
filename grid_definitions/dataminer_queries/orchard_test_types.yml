@@ -1,5 +1,5 @@
 ---
-:caption: Orchard Test Types
+:caption: Test Types
 :sql: "SELECT\r\n    orchard_test_types.id,\r\n    orchard_test_types.test_type_code,\r\n
   \   orchard_test_types.description,\r\n    orchard_test_types.result_type,\r\n    orchard_test_types.applies_to_all_markets,\r\n
   \   orchard_test_types.applies_to_all_cultivars,\r\n    orchard_test_types.applies_to_orchard,\r\n
@@ -19,7 +19,8 @@
   BY\r\n    orchard_test_types.id"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id

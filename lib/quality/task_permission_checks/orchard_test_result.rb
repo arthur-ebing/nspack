@@ -18,7 +18,7 @@ module QualityApp
       }.freeze
 
       def call
-        return failed_response 'Orchard Test Result record not found' unless @entity || task == :create
+        return failed_response 'Test not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

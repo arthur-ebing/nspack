@@ -22,7 +22,7 @@ module UiRules
     def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:orchard_test_type_id] = { renderer: :label,
                                         with_value: @form_object.orchard_test_type_code,
-                                        caption: 'Orchard Test Type' }
+                                        caption: 'Test Type' }
       fields[:puc_id] = { renderer: :label,
                           with_value: @form_object.puc_code,
                           caption: 'Puc',
@@ -56,7 +56,7 @@ module UiRules
         orchard_test_type_id: { renderer: :select,
                                 options: @repo.for_select_orchard_test_types,
                                 disabled_options: @repo.for_select_inactive_orchard_test_types,
-                                caption: 'Orchard Test Type',
+                                caption: 'Test Type',
                                 required: true,
                                 prompt: true },
         puc_id: { renderer: :select,
@@ -83,7 +83,7 @@ module UiRules
       {
         orchard_test_type_id: { renderer: :label,
                                 with_value: @form_object.orchard_test_type_code,
-                                caption: 'Orchard Test Type' },
+                                caption: 'Test Type' },
         puc_id: { renderer: :label,
                   with_value: @form_object.puc_code,
                   caption: 'Puc' },
@@ -116,7 +116,7 @@ module UiRules
       {
         orchard_test_type_id: { renderer: :label,
                                 with_value: @form_object.orchard_test_type_code,
-                                caption: 'Orchard Test Type' },
+                                caption: 'Test Type' },
         update_all: { renderer: :checkbox },
         group_ids: { renderer: :multi,
                      options: @repo.for_select_orchard_test_results(@form_object.orchard_test_type_id),

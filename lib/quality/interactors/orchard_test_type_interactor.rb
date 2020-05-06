@@ -55,7 +55,7 @@ module QualityApp
         result_ids = repo.select_values(:orchard_test_results, :id, orchard_test_type_id: id)
         result_ids.each do |result_id|
           freeze_result = repo.get(:orchard_test_results, result_id, :freeze_result)
-          raise Crossbeams::InfoError, "Orchard Test Result #{result_id} frozen." if freeze_result
+          raise Crossbeams::InfoError, "Test #{result_id} frozen." if freeze_result
 
           repo.delete_orchard_test_result(result_id)
           log_status(:orchard_test_results, result_id, 'DELETED')
