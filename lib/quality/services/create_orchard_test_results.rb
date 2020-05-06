@@ -2,16 +2,19 @@
 
 module QualityApp
   class CreateOrchardTestResults < BaseService
-    attr_reader :orchard_test_type
+    attr_reader :orchard_test_type, :ids
 
-    def initialize(id)
-      @orchard_test_type = repo.find_orchard_test_type_flat(id)
+    def initialize(id = nil)
+      @ids = Array(id || repo.select_values(:orchard_test_types, :id))
     end
 
     def call
-      delete_orchard_test_results
+      ids.each do |id|
+        @orchard_test_type = repo.find_orchard_test_type_flat(id)
+        delete_orchard_test_results
 
-      create_orchard_test_results
+        create_orchard_test_results
+      end
 
       success_response('Created Orchard Test Results')
     end

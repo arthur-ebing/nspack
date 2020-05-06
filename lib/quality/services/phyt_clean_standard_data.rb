@@ -18,6 +18,9 @@ module QualityApp
     def call # rubocop:disable Metrics/AbcSize
       raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
 
+      res = QualityApp::CreateOrchardTestResults.call
+      return failed_response(res.message) unless res.success
+
       res = api.auth_token_call
       return failed_response(res.message) unless res.success
 

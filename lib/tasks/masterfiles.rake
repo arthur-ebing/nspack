@@ -2,6 +2,16 @@
 
 namespace :app do
   namespace :masterfiles do
+    desc 'Update Phytclean Standard Data'
+    task update_phytclean_standard_data: [:load_app] do
+      res = QualityApp::PhytCleanStandardData.call
+      if res.success
+        puts "SUCCESS: #{res.message}"
+      else
+        puts "FAILURE: #{res.message}"
+      end
+    end
+
     desc 'Import Phytclean Glossary'
     task import_phytclean_glossary: [:load_app] do
       res = QualityApp::PhytCleanStandardDataGlossary.call
