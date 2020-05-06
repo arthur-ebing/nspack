@@ -43,9 +43,9 @@ module UiRules
                                  with_value: api_attribute_value,
                                  hide_on_load: @form_object.api_name.nil_or_empty? }
       fields[:api_pass_result] = { renderer: :label,
-                                   caption: 'Api Pass Value' }
+                                   caption: 'Pass Value' }
       fields[:api_default_result] = { renderer: :label,
-                                      caption: 'Default Value'  }
+                                      caption: 'Default Value' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -85,7 +85,7 @@ module UiRules
         api_attribute: { renderer: :select,
                          options: @repo.for_select_orchard_test_api_attributes(@form_object.api_name),
                          selected: @form_object.api_name.nil_or_empty? },
-        api_pass_result: { caption: 'Api Pass Value',
+        api_pass_result: { caption: 'Pass Value',
                            required: @form_object.result_type != AppConst::CLASSIFICATION,
                            hide_on_load: @form_object.result_type == AppConst::CLASSIFICATION },
         api_default_result: { caption: 'Default Value' }

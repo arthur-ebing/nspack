@@ -40,7 +40,8 @@ module UiRules
                           caption: 'Result' }
       fields[:classification] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
-      fields[:api_result] = { renderer: :label }
+      fields[:api_result] = { renderer: :label,
+                              caption: @classification ? 'Classification' : 'Result' }
       fields[:result] = { renderer: :label }
 
       fields[:applicable_from] = { renderer: :label }
@@ -94,9 +95,9 @@ module UiRules
                        caption: 'Cultivar' },
         passed: { renderer: :label,
                   with_value: @form_object.passed ? 'Passed' : 'Failed',
-                  caption: 'Result',
+                  caption: 'Test Result',
                   hide_on_load: @classification },
-        api_result: { caption: 'Result' },
+        api_result: { caption: @classification ? 'Classification' : 'Result' },
         api_pass_result: { renderer: :label,
                            hide_on_load: @classification,
                            caption: 'Pass Result' },
