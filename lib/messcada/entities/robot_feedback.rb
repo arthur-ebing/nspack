@@ -17,6 +17,9 @@ module MesscadaApp
     attribute? :short3, Types::String
     attribute? :short4, Types::String
     attribute? :reader_id, Types::String
+    attribute? :confirm_text, Types::String
+    attribute? :confirm_url, Types::String
+    attribute? :cancel_url, Types::String
 
     def red
       !status
@@ -24,6 +27,14 @@ module MesscadaApp
 
     def green
       status
+    end
+
+    def yes_url
+      confirm_url || 'noop'
+    end
+
+    def no_url
+      cancel_url || 'noop'
     end
 
     # Re-work lines to fit a device only capable of 4 lines of text display.
