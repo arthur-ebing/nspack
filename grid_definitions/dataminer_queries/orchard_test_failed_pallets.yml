@@ -1,0 +1,151 @@
+---
+:caption: Failed OTMC Pallets
+:sql: "SELECT\r\n    test_id,\r\n    test_type_code,\r\n    pallet_number,\r\n    string_agg(sequence,
+  ', ' ORDER BY sequence) AS sequences,\r\n    puc_code,\r\n    orchard_code,\r\n
+  \   cultivar_code,\r\n    tm_group\r\nFROM (\r\nSELECT DISTINCT\r\n    otr.id AS
+  test_id,\r\n    ott.test_type_code,\r\n    ps.pallet_number,\r\n    ps.pallet_sequence_number::TEXT
+  AS sequence,\r\n    (select puc_code from pucs where id = ps.puc_id) AS puc_code,\r\n
+  \   (select orchard_code from orchards where id = ps.orchard_id) AS orchard_code,\r\n
+  \   (select cultivar_code from cultivars where id = ps.cultivar_id) AS cultivar_code,\r\n
+  \   (select target_market_group_name\r\n    from target_market_groups\r\n    where
+  id = ps.packed_tm_group_id) AS tm_group\r\n\r\nFROM pallet_sequences ps\r\nJOIN
+  pallets p ON p.id = ps.pallet_id\r\nJOIN orchard_test_results otr\r\nON ps.puc_id
+  = otr.puc_id\r\nAND ps.orchard_id = otr.orchard_id\r\nAND ps.cultivar_id = otr.cultivar_id\r\nJOIN
+  orchard_test_types ott on otr.orchard_test_type_id = ott.id\r\n\r\nWHERE p.exit_ref
+  IS NULL\r\nAND ott.id = ANY (ps.failed_otmc_results)\r\n)sq\r\nGROUP BY test_id,\r\n
+  \        test_type_code,\r\n         pallet_number,\r\n         puc_code,\r\n         orchard_code,\r\n
+  \        cultivar_code,\r\n         tm_group\r\nORDER BY test_type_code,\r\n         puc_code,\r\n
+  \        orchard_code,\r\n         pallet_number"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  test_id:
+    :name: test_id
+    :sequence_no: 1
+    :caption: Test
+    :namespaced_name: test_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  test_type_code:
+    :name: test_type_code
+    :sequence_no: 2
+    :caption: Test type code
+    :namespaced_name: test_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 3
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sequences:
+    :name: sequences
+    :sequence_no: 4
+    :caption: Sequences
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 5
+    :caption: Puc code
+    :namespaced_name: puc_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 6
+    :caption: Orchard code
+    :namespaced_name: orchard_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_code:
+    :name: cultivar_code
+    :sequence_no: 7
+    :caption: Cultivar code
+    :namespaced_name: cultivar_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tm_group:
+    :name: tm_group
+    :sequence_no: 8
+    :caption: Tm group
+    :namespaced_name: tm_group
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

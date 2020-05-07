@@ -18,7 +18,7 @@ module QualityApp
       instance = orchard_test_type(id)
       success_response("Created orchard test type #{instance.test_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { test_type_code: ['This orchard test type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { test_type_code: ['This orchard test type already exists or Api Attribute already used'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -2,25 +2,31 @@
 :caption: Tests
 :sql: "SELECT\r\n    otr.id,\r\n    otr.orchard_test_type_id,\r\n    otr.puc_id,\r\n
   \   otr.orchard_id,\r\n    otr.cultivar_id,\r\n    ott.test_type_code AS orchard_test_type_code,\r\n
-  \   ott.description,\r\n    EXISTS( SELECT p.id\r\n            FROM pallet_sequences
-  ps\r\n            JOIN pallets p ON ps.pallet_id = p.id\r\n            WHERE ps.puc_id
-  = otr.puc_id\r\n            AND ps.orchard_id = otr.orchard_id\r\n            AND
-  ps.cultivar_id = otr.cultivar_id\r\n            AND p.exit_ref IS NULL) AS in_stock_pallets,\r\n
-  \   EXISTS( SELECT id\r\n            FROM rmt_bins\r\n            WHERE puc_id =
+  \   otr.passed,\r\n    otr.api_result IS NOT NULL AS result_captured,\r\n    otr.classification,\r\n
+  \   otr.freeze_result,\r\n    EXISTS (SELECT p.id\r\n            FROM pallet_sequences
+  ps\r\n                     JOIN pallets p ON ps.pallet_id = p.id\r\n            WHERE
+  ps.puc_id = otr.puc_id\r\n              AND ps.orchard_id = otr.orchard_id\r\n              AND
+  ps.cultivar_id = otr.cultivar_id\r\n              AND p.exit_ref IS NULL) AS plt_in_stock,\r\n
+  \   EXISTS (SELECT id\r\n            FROM rmt_bins\r\n            WHERE puc_id =
   otr.puc_id\r\n              AND orchard_id = otr.orchard_id\r\n              AND
-  cultivar_id = otr.cultivar_id\r\n              AND exit_ref IS NULL) AS in_stock_bins,\r\n
-  \   pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_name
-  AS cultivar_code,\r\n    otr.passed,\r\n    otr.classification,\r\n    otr.freeze_result,\r\n
-  \   otr.api_result,\r\n    otr.api_result IS NOT NULL AS result_captured,\r\n    otr.applicable_from,\r\n
-  \   otr.applicable_to,\r\n    otr.active,\r\n    otr.created_at,\r\n    otr.updated_at,\r\n
-  \   CASE\r\n        WHEN freeze_result THEN 'ready'\r\n        WHEN NOT passed AND
-  NOT classification THEN 'error'\r\n        WHEN NOT passed AND classification THEN
-  'warning'\r\n        WHEN passed AND NOT classification THEN 'ok'\r\n        ELSE
-  NULL::text\r\n    END AS colour_rule\r\n\r\nFROM orchard_test_results otr\r\nLEFT
-  JOIN orchard_test_types ott ON ott.id = otr.orchard_test_type_id\r\nLEFT JOIN pucs
-  ON pucs.id = otr.puc_id\r\nLEFT JOIN orchards ON orchards.id = otr.orchard_id\r\nLEFT
-  JOIN cultivars ON cultivars.id = otr.cultivar_id\r\n\r\nORDER BY otr.updated_at
-  DESC"
+  cultivar_id = otr.cultivar_id\r\n              AND exit_ref IS NULL) AS bins_in_stock,\r\n
+  \   otr.api_result,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_name
+  AS cultivar_code,\r\n    votrf.tm_group_codes,\r\n    otr.applicable_from,\r\n    otr.applicable_to,\r\n
+  \   (SELECT string_agg(DISTINCT ps.pallet_number, ', ' ORDER BY ps.pallet_number)\r\n
+  \    FROM pallet_sequences ps\r\n    JOIN pallets p ON ps.pallet_id = p.id\r\n     WHERE
+  p.exit_ref IS NULL\r\n       AND puc_id = otr.puc_id\r\n       AND orchard_id =
+  otr.orchard_id\r\n       AND cultivar_id = otr.cultivar_id\r\n       AND packed_tm_group_id
+  = ANY (votrf.tm_group_ids)) AS pallets_in_stock,\r\n    otr.active,\r\n    otr.created_at,\r\n
+  \   otr.updated_at,\r\n    CASE\r\n        WHEN otr.freeze_result THEN 'ready'\r\n
+  \       WHEN NOT otr.passed AND NOT otr.classification THEN 'error'\r\n        WHEN
+  NOT otr.passed AND otr.classification THEN 'warning'\r\n        WHEN otr.passed
+  AND NOT otr.classification THEN 'ok'\r\n        ELSE NULL::text\r\n        END AS
+  colour_rule\r\nFROM orchard_test_results otr\r\n         LEFT JOIN orchard_test_types
+  ott ON ott.id = otr.orchard_test_type_id\r\n         LEFT JOIN pucs ON pucs.id =
+  otr.puc_id\r\n         LEFT JOIN orchards ON orchards.id = otr.orchard_id\r\n         LEFT
+  JOIN cultivars ON cultivars.id = otr.cultivar_id\r\n         LEFT JOIN vw_orchard_test_results_flat
+  votrf ON ott.id = votrf.test_type_id AND otr.id = ANY (votrf.orchard_test_results_ids)\r\nORDER
+  BY otr.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -127,13 +133,77 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  description:
-    :name: description
+  passed:
+    :name: passed
     :sequence_no: 7
-    :caption: Description
-    :namespaced_name: ott.description
-    :data_type: :string
-    :width: 200
+    :caption: Passed
+    :namespaced_name: otr.passed
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  result_captured:
+    :name: result_captured
+    :sequence_no: 8
+    :caption: Result captured
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  classification:
+    :name: classification
+    :sequence_no: 9
+    :caption: Classification
+    :namespaced_name: otr.classification
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  freeze_result:
+    :name: freeze_result
+    :sequence_no: 10
+    :caption: Freeze result
+    :namespaced_name: otr.freeze_result
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plt_in_stock:
+    :name: plt_in_stock
+    :sequence_no: 11
+    :caption: Plt in stock
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 70
     :format: 
     :hide: false
     :pinned: 
@@ -143,33 +213,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  in_stock_pallets:
-    :name: in_stock_pallets
-    :sequence_no: 8
-    :caption: Plt in stock
+  bins_in_stock:
+    :name: bins_in_stock
+    :sequence_no: 12
+    :caption: Bins in stock
     :namespaced_name: 
     :data_type: :boolean
-    :width: 90
+    :width: 70
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  in_stock_bins:
-    :name: in_stock_bins
-    :sequence_no: 9
-    :caption: Bins in stock
-    :namespaced_name: 
-    :data_type: :boolean
-    :width: 90
+  api_result:
+    :name: api_result
+    :sequence_no: 13
+    :caption: Result / Classification
+    :namespaced_name: otr.api_result
+    :data_type: :string
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -177,8 +247,8 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 10
-    :caption: Puc Code
+    :sequence_no: 14
+    :caption: Puc code
     :namespaced_name: pucs.puc_code
     :data_type: :string
     :width: 70
@@ -193,8 +263,8 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 11
-    :caption: Orchard Code
+    :sequence_no: 15
+    :caption: Orchard code
     :namespaced_name: orchards.orchard_code
     :data_type: :string
     :width: 70
@@ -209,8 +279,8 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 12
-    :caption: Cultivar Code
+    :sequence_no: 16
+    :caption: Cultivar code
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
     :width: 70
@@ -223,80 +293,16 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  passed:
-    :name: passed
-    :sequence_no: 13
-    :caption: Passed
-    :namespaced_name: otr.passed
-    :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: left
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  classification:
-    :name: classification
-    :sequence_no: 14
-    :caption: Classification
-    :namespaced_name: otr.classification
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  freeze_result:
-    :name: freeze_result
-    :sequence_no: 15
-    :caption: Freeze result
-    :namespaced_name: otr.freeze_result
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  api_result:
-    :name: api_result
-    :sequence_no: 16
-    :caption: Result / Classification
-    :namespaced_name: otr.api_result
+  tm_group_codes:
+    :name: tm_group_codes
+    :sequence_no: 17
+    :caption: Target Market Group codes
+    :namespaced_name: votrf.tm_group_codes
     :data_type: :string
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  result_captured:
-    :name: result_captured
-    :sequence_no: 17
-    :caption: Result captured
-    :namespaced_name: 
-    :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -335,9 +341,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallets_in_stock:
+    :name: pallets_in_stock
+    :sequence_no: 20
+    :caption: Pallets in stock
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Active
     :namespaced_name: otr.active
     :data_type: :boolean
@@ -353,7 +375,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Created at
     :namespaced_name: otr.created_at
     :data_type: :datetime
@@ -369,7 +391,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Updated at
     :namespaced_name: otr.updated_at
     :data_type: :datetime
@@ -385,7 +407,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

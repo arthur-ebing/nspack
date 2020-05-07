@@ -1,0 +1,7 @@
+---
+:dataminer_definition: orchard_test_failed_pallets
+:actions:
+- :url: "/quality/test_results/orchard_test_results/$:test_id$/edit"
+  :text: Edit Test
+  :icon: edit
+  :title: Edit Test
