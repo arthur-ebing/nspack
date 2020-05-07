@@ -19,7 +19,7 @@ module MesscadaApp
 
     # Instance for use as FiniteMachine target.
     def fsm_target
-      OpenStruct.new(state: state, action: nil)
+      OpenStruct.new(id: id, state: state, action: nil)
     end
   end
 end

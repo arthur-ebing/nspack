@@ -3,19 +3,19 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestCartonPalletizingStates < Minitest::Test
     def empty_state
-      OpenStruct.new(state: :empty)
+      OpenStruct.new(id: 1, state: :empty, action: nil)
     end
 
     def palletizing_state
-      OpenStruct.new(state: :palletizing)
+      OpenStruct.new(id: 1, state: :palletizing, action: nil)
     end
 
     def qc_checkout_state
-      OpenStruct.new(state: :qc_checkout)
+      OpenStruct.new(id: 1, state: :qc_checkout, action: nil)
     end
 
     def return_to_bay_state
-      OpenStruct.new(state: :return_to_bay)
+      OpenStruct.new(id: 1, state: :return_to_bay, action: nil)
     end
 
     def test_empty_state

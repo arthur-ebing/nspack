@@ -2,91 +2,129 @@
 
 module MesscadaApp
   class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def scan_carton(params)
+    def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       state_machine = state_machine(params)
 
-      case state_machine.current
-      when :empty
+      return failed_response("Bay is in #{state_machine.current} state - cannot scan", current_bay_attributes(state_machine)) if state_machine.cannot?(:scan)
+
+      state_machine.scan
+      case state_machine.target.action
+      when :create_pallet
         start_new_pallet(state_machine, params)
-      when :palletizing
+      when :add_carton
         add_to_pallet(state_machine, params)
       when :return_to_bay
         return_pallet_to_bay(state_machine, params)
-      when :qc_out
+      when :mark_qc_carton
         mark_carton_for_qc(state_machine, params)
+      else
+        raise Crossbeams::FrameworkError, 'No action returned from state machine'
       end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message, current_bay_attributes(state_machine))
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("scan_carton\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
     end
 
     def qc_out(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
-      if state_machine.cannot?(:prepare_qc)
-        failed_response("Bay is in #{state_machine.current} state - cannot select a QC carton", current_bay_attributes(state_machine))
-      else
+      state_machine.qc_checkout
+
+      if state_machine.target.action == :prepare_qc
         repo.transaction do
-          state_machine.prepare_qc
           changeset = { current_state: state_machine.current.to_s }
           repo.update_palletizing_bay_state(state_machine.target.id, changeset)
           log_transaction
         end
         success_response('ok', current_bay_attributes(state_machine))
+      else
+        failed_response("Bay is in #{state_machine.current} state - cannot select a QC carton", current_bay_attributes(state_machine))
       end
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("qc_out\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
     end
 
     def return_to_bay(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
-      if state_machine.cannot?(:prepare_return)
-        failed_response("Bay is in #{state_machine.current} state - cannot return to bay", current_bay_attributes(state_machine))
-      else
-        repo.transaction do
-          state_machine.prepare_return
-          changeset = { current_state: state_machine.current.to_s }
-          repo.update_palletizing_bay_state(state_machine.target.id, changeset)
-          log_transaction
-        end
-        success_response('ok', current_bay_attributes(state_machine))
+      state_machine.qc_checkout
+
+      return failed_response("Bay is in #{state_machine.current} state - cannot return to bay", current_bay_attributes(state_machine)) unless state_machine.target.action == :prepare_return
+
+      repo.transaction do
+        changeset = { current_state: state_machine.current.to_s }
+        repo.update_palletizing_bay_state(state_machine.target.id, changeset)
+        log_transaction
       end
+      success_response('ok', current_bay_attributes(state_machine))
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("return_to_bay\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
     end
 
     def refresh(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
-      if state_machine.cannot?(:refresh)
-        failed_response("Bay is in #{state_machine.current} state - cannot refresh", current_bay_attributes(state_machine))
-      else
-        repo.transaction do
-          state_machine.refresh
-          changeset = { current_state: state_machine.current.to_s }
-          repo.update_palletizing_bay_state(state_machine.target.id, changeset)
-          log_transaction
-        end
-        success_response('ok', current_bay_attributes(state_machine))
+      state_machine.refresh
+
+      return failed_response("Bay is in #{state_machine.current} state - cannot refresh", current_bay_attributes(state_machine)) unless state_machine.target.action == :refresh
+
+      repo.transaction do
+        changeset = { current_state: state_machine.current.to_s }
+        repo.update_palletizing_bay_state(state_machine.target.id, changeset)
+        log_transaction
       end
+      success_response('ok', current_bay_attributes(state_machine))
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("refresh\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
     end
 
     def complete(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
-      if state_machine.cannot?(:complete)
-        failed_response("Bay is in #{state_machine.current} state - cannot complete", current_bay_attributes(state_machine))
-      else
-        repo.transaction do
-          state_machine.complete
-          changeset = { current_state: state_machine.current.to_s }
-          repo.update_palletizing_bay_state(state_machine.target.id, changeset)
-          log_transaction
-        end
-        success_response('ok', current_bay_attributes(state_machine))
+      state_machine.complete
+
+      return failed_response("Bay is in #{state_machine.current} state - cannot complete", current_bay_attributes(state_machine)) unless state_machine.target.action == :complete_pallet
+
+      repo.transaction do
+        changeset = { current_state: state_machine.current.to_s }
+        repo.update_palletizing_bay_state(state_machine.target.id, changeset)
+        log_transaction
       end
+      success_response('ok', current_bay_attributes(state_machine))
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
     end
 
     def palletizing_robot_feedback(device, res) # rubocop:disable Metrics/AbcSize
       current_state = current_state_string(res.instance)
       if res.success
         orange = %w[qc_out return_to_bay].include?(res.instance[:current_state])
-        MesscadaApp::RobotFeedback.new(device: device,
-                                       status: true,
-                                       orange: orange,
-                                       line1: res.instance[:bay_name],
-                                       line2: res.instance[:pallet_number],
-                                       line3: current_state)
+        feedback = {
+          device: device,
+          status: true,
+          orange: orange,
+          line1: res.instance[:bay_name],
+          line2: res.instance[:pallet_number],
+          line3: current_state
+        }
+        if res.instance[:confirm_text]
+          feedback[:confirm_text] = res.instance[:confirm_text]
+          feedback[:confirm_url] = res.instance[:confirm_url]
+          feedback[:cancel_url] = res.instance[:cancel_url]
+        end
+        MesscadaApp::RobotFeedback.new(feedback)
       else
         MesscadaApp::RobotFeedback.new(device: device,
                                        status: false,
@@ -102,12 +140,12 @@ module MesscadaApp
       if instance[:current_state] == 'empty'
         '[EMPTY]'
       else
-        "[#{instance[:current_state].upcase}] #{instance[:carton_quantity]} / #{instance[:cartons_per_pallet]}"
+        "[#{instance[:current_state].to_s.upcase}] #{instance[:carton_quantity]} / #{instance[:cartons_per_pallet]}"
       end
     end
 
-    def current_bay_attributes(state_machine)
-      repo.current_palletizing_bay_attributes(state_machine.target.id)
+    def current_bay_attributes(state_machine, options = {})
+      repo.current_palletizing_bay_attributes(state_machine.target.id, options)
     end
 
     def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize
@@ -138,8 +176,9 @@ module MesscadaApp
       success_response('ok...', current_bay_attributes(state_machine)) # provide lines for robot...
     end
 
-    def add_to_pallet(state_machine, params)
+    def add_to_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize
       carton_id = params[:carton_number]
+      last_carton = true # This should be set if the CPP qty has now been reached for the pallet.
 
       # VALIDATE that carton has no pseq no (scanned already)
       # check if the pseq has changed
@@ -155,7 +194,17 @@ module MesscadaApp
         repo.update_palletizing_bay_state(state_machine.target.id, changeset)
         log_transaction
       end
-      success_response('ok', current_bay_attributes(state_machine))
+      # If last carton, send a confirm request...
+      confirm = if last_carton
+                  {
+                    confirm_text: 'Pallet size reached. Complete pallet?',
+                    confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+                    cancel_url: 'noop'
+                  }
+                else
+                  {}
+                end
+      success_response('ok', current_bay_attributes(state_machine, confirm))
     end
 
     def return_pallet_to_bay(state_machine, params)
@@ -192,8 +241,8 @@ module MesscadaApp
     end
 
     def state_machine(params)
-      sm = repo.palletizing_bay_state_by_robot_scanner(params[:device], params[:card_reader])
-      CartonPalletizingStates.new(sm.fsm_target, initial: sm.state)
+      fsm = repo.palletizing_bay_state_by_robot_scanner(params[:device], params[:reader_id])
+      CartonPalletizingStates.new(fsm.fsm_target, initial: fsm.state)
     end
 
     def repo

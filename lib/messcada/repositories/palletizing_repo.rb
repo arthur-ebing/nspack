@@ -12,11 +12,10 @@ module MesscadaApp
 
     def palletizing_bay_state_by_robot_scanner(device, scanner)
       state = where(:palletizing_bay_states,
-                    PalletizingBayState,
+                    MesscadaApp::PalletizingBayState,
                     palletizing_robot_code: device,
                     scanner_code: scanner)
-      instance = state.nil? ? create_state(device, scanner) : state
-      OpenStruct.new(instance.to_h.merge(action: nil))
+      state.nil? ? create_state(device, scanner) : state
     end
 
     def create_state(device, scanner)
@@ -30,7 +29,7 @@ module MesscadaApp
       find_palletizing_bay_state(id)
     end
 
-    def current_palletizing_bay_attributes(palletizing_bay_state_id)
+    def current_palletizing_bay_attributes(palletizing_bay_state_id, external_attributes = {})
       query = <<~SQL
         SELECT COALESCE(plant_resources.plant_resource_code, palletizing_robot_code || ': ' || scanner_code) AS bay_name,
         current_state,
@@ -44,7 +43,7 @@ module MesscadaApp
         LEFT JOIN cartons_per_pallet ON cartons_per_pallet.id = cartons.cartons_per_pallet_id
         WHERE palletizing_bay_states.id = ?
       SQL
-      DB[query, palletizing_bay_state_id].first
+      DB[query, palletizing_bay_state_id].first.merge(external_attributes)
     end
   end
 end
