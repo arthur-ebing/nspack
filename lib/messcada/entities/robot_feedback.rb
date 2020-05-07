@@ -4,6 +4,7 @@ module MesscadaApp
   class RobotFeedback < Dry::Struct
     attribute :device, Types::String
     attribute :status, Types::Bool
+    attribute? :orange, Types::Bool
     attribute? :msg, Types::String
     attribute? :line1, Types::String
     attribute? :line2, Types::String
@@ -15,6 +16,10 @@ module MesscadaApp
     attribute? :short2, Types::String
     attribute? :short3, Types::String
     attribute? :short4, Types::String
+    attribute? :reader_id, Types::String
+    attribute? :confirm_text, Types::String
+    attribute? :confirm_url, Types::String
+    attribute? :cancel_url, Types::String
 
     def red
       !status
@@ -22,6 +27,14 @@ module MesscadaApp
 
     def green
       status
+    end
+
+    def yes_url
+      confirm_url || 'noop'
+    end
+
+    def no_url
+      cancel_url || 'noop'
     end
 
     # Re-work lines to fit a device only capable of 4 lines of text display.

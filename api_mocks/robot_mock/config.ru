@@ -192,41 +192,46 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               xmlResult.value = '';
             };
 
-            const fetchResponse = function fetchResponse() {
-              const urlBase = selUrls.value;
-              const thisSet = urlSet.find((item) => {
-                return item.url === urlBase;
-              });
-              if (!thisSet) {
-                urlSent.textContent = 'Not a valid URL...';
-                lcd1.textContent = 'Select a URL below to test...';
-                return;
-              }
-
-              let url = `http://${urlHost.value}:${urlPort.value}${urlBase}`;
-              if (thisSet.p1) {
-                url += `${thisSet.p1}=${p1.value}`
-              }
-              if (thisSet.p2) {
-                url += `&${thisSet.p2}=${p2.value}`
-              }
-              if (thisSet.p3) {
-                url += `&${thisSet.p3}=${p3.value}`
-              }
-              if (thisSet.p4) {
-                url += `&${thisSet.p4}=${p4.value}`
-              }
-              if (thisSet.p5) {
-                url += `&${thisSet.p5}=${p5.value}`
-              }
-              if (thisSet.p6) {
-                url += `&${thisSet.p6}=${p6.value}`
-              }
-
-              urlSent.textContent = url;
-
+            const fetchResponse = function fetchResponse(url) {
               let form = new FormData();
-              form.append('url', url);
+              if (url) {
+                urlSent.textContent = url;
+                form.append('url', url);
+              } else {
+                const urlBase = selUrls.value;
+                const thisSet = urlSet.find((item) => {
+                  return item.url === urlBase;
+                });
+                if (!thisSet) {
+                  urlSent.textContent = 'Not a valid URL...';
+                  lcd1.textContent = 'Select a URL below to test...';
+                  return;
+                }
+
+                let url = `http://${urlHost.value}:${urlPort.value}${urlBase}`;
+                if (thisSet.p1) {
+                  url += `${thisSet.p1}=${p1.value}`
+                }
+                if (thisSet.p2) {
+                  url += `&${thisSet.p2}=${p2.value}`
+                }
+                if (thisSet.p3) {
+                  url += `&${thisSet.p3}=${p3.value}`
+                }
+                if (thisSet.p4) {
+                  url += `&${thisSet.p4}=${p4.value}`
+                }
+                if (thisSet.p5) {
+                  url += `&${thisSet.p5}=${p5.value}`
+                }
+                if (thisSet.p6) {
+                  url += `&${thisSet.p6}=${p6.value}`
+                }
+
+                urlSent.textContent = url;
+
+                form.append('url', url);
+              }
 
               fetch('/make_call', {
                 method: 'POST',
@@ -304,6 +309,28 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                   txt = xmlDoc.getElementsByTagName('lcd6')[0];
                   if (txt.childNodes.length > 0) {
                     lcd6.textContent = txt.childNodes[0].nodeValue;
+                  }
+                }
+
+                txt = xmlDoc.getElementsByTagName('confirm')[0];
+                if (txt && txt.childNodes.length > 0) {
+                  const confTxt = xmlDoc.getElementsByTagName('text')[0].childNodes[0].nodeValue;
+                  const yesUrl = xmlDoc.getElementsByTagName('yes_url')[0].childNodes[0].nodeValue;
+                  const noUrl = xmlDoc.getElementsByTagName('no_url')[0].childNodes[0].nodeValue;
+                  if (window.confirm(confTxt)) {
+                    if (yesUrl === 'noop') {
+                      console.log('Nothing to do...');
+                    } else {
+                      console.log('Should call ' + decodeURIComponent(yesUrl));
+                      fetchResponse(decodeURIComponent(yesUrl));
+                    }
+                  } else {
+                    if (noUrl === 'noop') {
+                      console.log('Nothing to do...');
+                    } else {
+                      console.log('Should call ' + decodeURIComponent(noUrl));
+                      fetchResponse(decodeURIComponent(noUrl));
+                    }
                   }
                 }
               }).catch((data) => {
@@ -392,6 +419,51 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 url: '/messcada/hr/logoff?',
                 p1: 'device',
                 p2: 'card_reader',
+                p3: 'identifier',
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/carton_palletizing/scan_carton?',
+                p1: 'device',
+                p2: 'reader_id',
+                p3: 'identifier',
+                p4: 'carton_number',
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/carton_palletizing/qc_out?',
+                p1: 'device',
+                p2: 'reader_id',
+                p3: 'identifier',
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/carton_palletizing/return_to_bay?',
+                p1: 'device',
+                p2: 'reader_id',
+                p3: 'identifier',
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/carton_palletizing/refresh?',
+                p1: 'device',
+                p2: 'reader_id',
+                p3: 'identifier',
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
+                url: '/messcada/carton_palletizing/complete?',
+                p1: 'device',
+                p2: 'reader_id',
                 p3: 'identifier',
                 p4: null,
                 p5: null,

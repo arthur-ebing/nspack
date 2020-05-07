@@ -174,6 +174,8 @@ module Crossbeams
       CARTON_SCALE_ROBOT = 'CARTON_SCALE_ROBOT'
       PALLET_SCALE_ROBOT = 'PALLET_SCALE_ROBOT'
       BIN_FORKLIFT_ROBOT = 'BIN_FORKLIFT_ROBOT'
+      PALLETIZING_STATION = 'PALLETIZING_STATION'
+      PALLETIZING_BAY = 'PALLETIZING_BAY'
       PALLET_FORKLIFT_ROBOT = 'PALLET_FORKLIFT_ROBOT'
       PALLETIZING_ROBOT = 'PALLETIZING_ROBOT'
       BIN_TIPPING_ROBOT = 'BINTIPPING_ROBOT'
@@ -181,7 +183,6 @@ module Crossbeams
       PALLET_FORKLIFT = 'PALLET_FORKLIFT'
       CARTON_VERIFICATION_STATION = 'CARTON_VERIFICATION_STATION'
       CARTON_VERIFICATION_ROBOT = 'CARTON_VERIFICATION_ROBOT'
-      PALLETIZING_BAY = 'PALLETIZING_BAY'
       BIN_TIPPING_STATION = 'BIN_TIPPING_STATION'
       BIN_VERIFICATION_STATION = 'BIN_VERIFICATION_STATION'
       BIN_VERIFICATION_ROBOT = 'BIN_VERIFICATION_ROBOT'
@@ -192,6 +193,7 @@ module Crossbeams
       # Peripherals
       SCALE = 'SCALE'
       PRINTER = 'PRINTER'
+      SCANNER = 'SCANNER'
       # SCN- : SCANNER (not required as a plant resource)
 
       # System resource types
@@ -240,6 +242,7 @@ module Crossbeams
                                           CARTON_SCALE_ROBOT,
                                           PALLET_SCALE_ROBOT,
                                           QC_ROBOT,
+                                          PALLETIZING_STATION,
                                           PALLETIZING_BAY,
                                           SCALE,
                                           PRINTER,
@@ -251,7 +254,7 @@ module Crossbeams
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
-                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
+                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
                   icon: { file: 'packline', colour: CLR_S } },
         DROP => { description: 'Drop',
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
@@ -310,7 +313,7 @@ module Crossbeams
                                    create_with_system_resource: 'MODULE',
                                    code_prefix: 'PMM-' },
         PALLETIZING_ROBOT => { description: 'Palletizing Robot',
-                               allowed_children: [],
+                               allowed_children: [PALLETIZING_BAY],
                                icon: { file: 'server3', colour: CLR_T },
                                create_with_system_resource: 'MODULE',
                                code_prefix: 'PTM-' },
@@ -325,6 +328,9 @@ module Crossbeams
         PALLET_FORKLIFT => { description: 'Pallet Forklift',
                              allowed_children: [PALLET_FORKLIFT_ROBOT],
                              icon: { file: 'forkishlift', colour: CLR_M } },
+        PALLETIZING_STATION => { description: 'Palletizing Station',
+                                 allowed_children: [PALLETIZING_BAY, PALLETIZING_ROBOT],
+                                 icon: { file: 'cubes', colour: CLR_W } },
         PALLETIZING_BAY => { description: 'Palletizing Bay',
                              allowed_children: [PALLETIZING_ROBOT, SCALE, PRINTER],
                              icon: { file: 'cube', colour: CLR_G } },
@@ -334,6 +340,12 @@ module Crossbeams
                    icon: { file: 'balance-scale', colour: CLR_I },
                    non_editable_code: true,
                    code_prefix: 'SCL-' },
+        SCANNER => { description: 'Scanner',
+                     allowed_children: [],
+                     create_with_system_resource: PERIPHERAL,
+                     icon: { file: 'target', colour: CLR_I },
+                     non_editable_code: true,
+                     code_prefix: 'SCN-' },
         PRINTER => { description: 'Printer',
                      allowed_children: [],
                      create_with_system_resource: PERIPHERAL,

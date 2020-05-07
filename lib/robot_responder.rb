@@ -28,35 +28,49 @@ module Crossbeams
 
     def render_4_lines
       line1, line2, line3, line4 = @robot_feedback.four_lines
+      orange = @robot_feedback.orange || false
       <<~XML
         <robot_feedback>
           <status>#{@robot_feedback.status}</status>
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
-          <orange>false</orange>
+          <orange>#{orange}</orange>
           <lcd1>#{@robot_feedback.msg || line1}</lcd1>
           <lcd2>#{line2}</lcd2>
           <lcd3>#{line3}</lcd3>
-          <lcd4>#{line4}</lcd4>
+          <lcd4>#{line4}</lcd4>#{confirmation}
         </robot_feedback>
       XML
     end
 
     def render_6_lines
+      orange = @robot_feedback.orange || false
       <<~XML
         <robot_feedback>
           <status>#{@robot_feedback.status}</status>
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
-          <orange>false</orange>
+          <orange>#{orange}</orange>
           <msg>#{@robot_feedback.msg}</msg>
           <lcd1>#{@robot_feedback.line1}</lcd1>
           <lcd2>#{@robot_feedback.line2}</lcd2>
           <lcd3>#{@robot_feedback.line3}</lcd3>
           <lcd4>#{@robot_feedback.line4}</lcd4>
           <lcd5>#{@robot_feedback.line5}</lcd5>
-          <lcd6>#{@robot_feedback.line6}</lcd6>
+          <lcd6>#{@robot_feedback.line6}</lcd6>#{confirmation}
         </robot_feedback>
+      XML
+    end
+
+    def confirmation
+      return '' unless @robot_feedback.confirm_text
+
+      <<~XML
+        \n  <confirm>
+            <text>#{@robot_feedback.confirm_text}</text>
+            <yes_url>#{@robot_feedback.yes_url}</yes_url>
+            <no_url>#{@robot_feedback.no_url}</no_url>
+          </confirm>
       XML
     end
   end

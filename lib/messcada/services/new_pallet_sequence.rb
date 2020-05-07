@@ -19,9 +19,9 @@ module MesscadaApp
       validations = validate_pallet_mix_rules(res.instance)
       return validations unless validations.success
 
-      repo.create_sequences(res.instance, pallet_id)
+      id = repo.create_sequences(res.instance, pallet_id)
 
-      ok_response
+      success_response('ok', pallet_sequence_id: id)
     end
 
     private

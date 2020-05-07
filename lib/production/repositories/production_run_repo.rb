@@ -50,6 +50,10 @@ module ProductionApp
       get(:pallet_sequences, pallet_sequence_id, :pallet_id)
     end
 
+    def first_sequence_id_from_pallet(pallet_id)
+      get(:pallet_sequences, pallet_id, :id)
+    end
+
     def get_pallet_label_data(pallet_id)
       DB[:vw_pallet_label].where(pallet_id: pallet_id).first
     end
@@ -94,6 +98,10 @@ module ProductionApp
       DB[qry, carton_id].first
     end
 
+    def cartons_per_pallet(cpp_id)
+      DB[:cartons_per_pallet].where(id: cpp_id).get(:cartons_per_pallet)
+    end
+
     def find_carton_with_run_info(carton_id)
       qry = <<~SQL
         select c.*, r.closed as production_run_closed
@@ -102,6 +110,15 @@ module ProductionApp
         where c.id = ?
       SQL
       DB[qry, carton_id].first
+    end
+
+    def increment_sequence(pallet_sequence_id)
+      query = <<~SQL
+        UPDATE pallet_sequences
+        SET carton_quantity = carton_quantity + 1
+        WHERE id = #{pallet_sequence_id}
+      SQL
+      DB.execute(query)
     end
 
     def create_production_run(params)

@@ -118,6 +118,8 @@ GEM
     faker (1.9.3)
       i18n (>= 0.7)
     ffi (1.11.1)
+    finite_machine (0.12.1)
+      concurrent-ruby (~> 1.0)
     htmlentities (4.3.4)
     i18n (1.6.0)
       concurrent-ruby (~> 1.0)
@@ -247,6 +249,7 @@ DEPENDENCIES
   dry-types (= 0.14.0)
   dry-validation (= 0.13.0)
   faker
+  finite_machine
   mail
   message_bus
   minitest (~> 5.11)
