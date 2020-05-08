@@ -10,6 +10,7 @@ The following renderers that do not bind to fields in a form are available:
 * <<Link>>
 * <<HelpLink>>
 * <<Text>>
+* <<List>>
 * <<SortableList>>
 * <<Address>>
 * <<ContactMethod>>
@@ -207,7 +208,7 @@ column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
 
 |items
 |The list of items to display. If a two-dimensional array is provided, just the first element is displayed.
-|a one-dimensional or two-diemnsional array.
+|a one-dimensional or two-dimensional array. If `remove_item_url` is provided, this **must** be a 2D array with the 2nd element an `id` value.
 |None. Required.
 
 |options - :caption
@@ -224,6 +225,11 @@ column.add_list([['FP', 1], ['MGP', 2], ['CONS', 3]])
 |If true, draw a border and set the background to grey.
 |`true` or `false`
 |`false`
+
+|options - :remove_item_url
+|A URL to call when the user clicks the remove icon next to an item.
+|String. **Must** include `$:id$` token (where the clicked item's id value will be placed).
+|None.
 
 |===
 

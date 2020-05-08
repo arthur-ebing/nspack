@@ -725,11 +725,33 @@ const crossbeamsUtils = {
       return;
     }
     elem.innerHTML = '';
-    action.replace_list_items.items.forEach((item) => {
-      const li = document.createElement('li');
-      li.append(document.createTextNode(item));
-      elem.appendChild(li);
-    });
+    if (elem.dataset && elem.dataset.removeItemUrl) {
+      action.replace_list_items.items.forEach((item) => {
+        if (item.constructor !== Array) {
+          this.alert({
+            prompt: `The list of items for replacing element ${action.replace_list_items.id} must be a 2D array : [text, id]`,
+            title: 'List items-change: invalid items list',
+            type: 'error',
+          });
+          return;
+        }
+        const li = document.createElement('li');
+        li.id = item[1];
+        const id = document.createAttribute('data-item-id');
+        id.value = item[1];
+        li.setAttributeNode(id);
+        const iconStr = `<svg class="cbl-icon red pointer" data-remove-item="${item[1]}" title="remove item" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1600 736v192q0 40-28 68t-68 28h-1216q-40 0-68-28t-28-68v-192q0-40 28-68t68-28h1216q40 0 68 28t28 68z"></path></svg>`;
+        li.append(document.createTextNode(item[0]));
+        li.innerHTML = `${iconStr} ${item[0]}`;
+        elem.appendChild(li);
+      });
+    } else {
+      action.replace_list_items.items.forEach((item) => {
+        const li = document.createElement('li');
+        li.append(document.createTextNode(item));
+        elem.appendChild(li);
+      });
+    }
   },
   /**
    * Clear all validation error messages and styling for a form.
