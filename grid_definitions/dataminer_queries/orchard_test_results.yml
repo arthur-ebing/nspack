@@ -10,13 +10,13 @@
   \   EXISTS (SELECT id\r\n            FROM rmt_bins\r\n            WHERE puc_id =
   otr.puc_id\r\n              AND orchard_id = otr.orchard_id\r\n              AND
   cultivar_id = otr.cultivar_id\r\n              AND exit_ref IS NULL) AS bins_in_stock,\r\n
-  \   otr.api_result,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_name
-  AS cultivar_code,\r\n    votrf.tm_group_codes,\r\n    (SELECT string_agg(DISTINCT
-  ps.pallet_number, ', ' ORDER BY ps.pallet_number)\r\n     FROM pallet_sequences
-  ps\r\n    JOIN pallets p ON ps.pallet_id = p.id\r\n     WHERE p.exit_ref IS NULL\r\n
-  \      AND puc_id = otr.puc_id\r\n       AND orchard_id = otr.orchard_id\r\n       AND
-  cultivar_id = otr.cultivar_id\r\n       AND packed_tm_group_id = ANY (votrf.tm_group_ids))
-  AS pallets_in_stock,\r\n    otr.active,\r\n    otr.created_at,\r\n    otr.updated_at,\r\n
+  \   otr.api_result,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_code,\r\n
+  \   votrf.tm_group_codes,\r\n    (SELECT string_agg(DISTINCT ps.pallet_number, ',
+  ' ORDER BY ps.pallet_number)\r\n     FROM pallet_sequences ps\r\n    JOIN pallets
+  p ON ps.pallet_id = p.id\r\n     WHERE p.exit_ref IS NULL\r\n       AND puc_id =
+  otr.puc_id\r\n       AND orchard_id = otr.orchard_id\r\n       AND cultivar_id =
+  otr.cultivar_id\r\n       AND packed_tm_group_id = ANY (votrf.tm_group_ids)) AS
+  pallets_in_stock,\r\n    otr.active,\r\n    otr.created_at,\r\n    otr.updated_at,\r\n
   \   CASE\r\n        WHEN otr.freeze_result THEN 'ready'\r\n        WHEN NOT otr.passed
   AND NOT otr.classification THEN 'error'\r\n        WHEN NOT otr.passed AND otr.classification
   THEN 'warning'\r\n        WHEN otr.passed AND NOT otr.classification THEN 'ok'\r\n
@@ -280,7 +280,7 @@
     :name: cultivar_code
     :sequence_no: 16
     :caption: Cultivar code
-    :namespaced_name: cultivars.cultivar_name
+    :namespaced_name: cultivars.cultivar_code
     :data_type: :string
     :width: 70
     :format: 
