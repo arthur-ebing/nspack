@@ -7,14 +7,17 @@
   :text: view
   :icon: view-show
   :title: View
+  :popup: true
 - :url: "/quality/test_results/orchard_test_results/$:id$/edit"
   :text: edit
   :icon: edit
   :title: Edit
+  :popup: true
 - :url: "/quality/test_results/orchard_test_results/$:id$/bulk_edit"
   :text: bulk edit
   :icon: edit
   :title: Bulk Edit
+  :popup: true
 - :separator: true
 - :url: "/development/statuses/list/orchard_test_results/$:id$"
   :text: status

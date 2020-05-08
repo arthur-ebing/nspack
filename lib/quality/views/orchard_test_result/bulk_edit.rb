@@ -13,7 +13,6 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Update Test'
               form.action "/quality/test_results/orchard_test_results/#{id}/bulk_edit"
               form.method :update
               form.row do |row|

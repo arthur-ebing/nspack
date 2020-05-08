@@ -35,15 +35,15 @@ module UiRules
                                with_value: @form_object.cultivar_code,
                                caption: 'Cultivars',
                                required: true }
+      fields[:api_result] = { renderer: :label,
+                              caption: @classification ? 'Classification' : 'Result' }
+      fields[:api_pass_result] = { renderer: :label }
+
       fields[:passed] = { renderer: :label,
                           with_value: @form_object.passed ? 'Passed' : 'Failed',
                           caption: 'Result' }
       fields[:classification] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
-      fields[:api_result] = { renderer: :label,
-                              caption: @classification ? 'Classification' : 'Result' }
-      fields[:result] = { renderer: :label }
-
       fields[:applicable_from] = { renderer: :label }
       fields[:applicable_to] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }

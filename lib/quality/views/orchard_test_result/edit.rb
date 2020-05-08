@@ -14,7 +14,6 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Test'
               form.action "/quality/test_results/orchard_test_results/#{id}"
               form.method :update
               form.row do |row|
@@ -23,8 +22,8 @@ module Quality
                   col.add_field :puc_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_id
-                  col.add_field :api_pass_result
                   col.add_field :api_result
+                  col.add_field :api_pass_result
                 end
                 row.column do |col|
                   col.add_field :passed
