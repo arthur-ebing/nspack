@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module Quality
   module TestResults
     module OrchardTestResult
@@ -12,19 +13,28 @@ module Quality
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: '/list/orchard_test_results',
+                                  style: :back_button)
+            end
             page.form do |form|
               form.action "/quality/test_results/orchard_test_results/#{id}/bulk_edit"
               form.method :update
               form.row do |row|
                 row.column do |col|
                   col.add_field :orchard_test_type_id
+                  col.add_field :api_result
+                  col.add_field :api_pass_result
+                end
+                row.column do |col|
                   col.add_field :passed
                   col.add_field :classification
                   col.add_field :freeze_result
-                  col.add_field :api_result
-                  col.add_field :applicable_from
-                  col.add_field :applicable_to
                 end
+              end
+              form.row do |row|
                 row.column do |col|
                   col.add_field :update_all
                   col.add_field :group_ids
@@ -39,3 +49,4 @@ module Quality
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -11,22 +11,21 @@
   otr.puc_id\r\n              AND orchard_id = otr.orchard_id\r\n              AND
   cultivar_id = otr.cultivar_id\r\n              AND exit_ref IS NULL) AS bins_in_stock,\r\n
   \   otr.api_result,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_name
-  AS cultivar_code,\r\n    votrf.tm_group_codes,\r\n    otr.applicable_from,\r\n    otr.applicable_to,\r\n
-  \   (SELECT string_agg(DISTINCT ps.pallet_number, ', ' ORDER BY ps.pallet_number)\r\n
-  \    FROM pallet_sequences ps\r\n    JOIN pallets p ON ps.pallet_id = p.id\r\n     WHERE
-  p.exit_ref IS NULL\r\n       AND puc_id = otr.puc_id\r\n       AND orchard_id =
-  otr.orchard_id\r\n       AND cultivar_id = otr.cultivar_id\r\n       AND packed_tm_group_id
-  = ANY (votrf.tm_group_ids)) AS pallets_in_stock,\r\n    otr.active,\r\n    otr.created_at,\r\n
-  \   otr.updated_at,\r\n    CASE\r\n        WHEN otr.freeze_result THEN 'ready'\r\n
-  \       WHEN NOT otr.passed AND NOT otr.classification THEN 'error'\r\n        WHEN
-  NOT otr.passed AND otr.classification THEN 'warning'\r\n        WHEN otr.passed
-  AND NOT otr.classification THEN 'ok'\r\n        ELSE NULL::text\r\n        END AS
-  colour_rule\r\nFROM orchard_test_results otr\r\n         LEFT JOIN orchard_test_types
-  ott ON ott.id = otr.orchard_test_type_id\r\n         LEFT JOIN pucs ON pucs.id =
-  otr.puc_id\r\n         LEFT JOIN orchards ON orchards.id = otr.orchard_id\r\n         LEFT
-  JOIN cultivars ON cultivars.id = otr.cultivar_id\r\n         LEFT JOIN vw_orchard_test_results_flat
-  votrf ON ott.id = votrf.test_type_id AND otr.id = ANY (votrf.orchard_test_results_ids)\r\nORDER
-  BY otr.updated_at DESC"
+  AS cultivar_code,\r\n    votrf.tm_group_codes,\r\n    (SELECT string_agg(DISTINCT
+  ps.pallet_number, ', ' ORDER BY ps.pallet_number)\r\n     FROM pallet_sequences
+  ps\r\n    JOIN pallets p ON ps.pallet_id = p.id\r\n     WHERE p.exit_ref IS NULL\r\n
+  \      AND puc_id = otr.puc_id\r\n       AND orchard_id = otr.orchard_id\r\n       AND
+  cultivar_id = otr.cultivar_id\r\n       AND packed_tm_group_id = ANY (votrf.tm_group_ids))
+  AS pallets_in_stock,\r\n    otr.active,\r\n    otr.created_at,\r\n    otr.updated_at,\r\n
+  \   CASE\r\n        WHEN otr.freeze_result THEN 'ready'\r\n        WHEN NOT otr.passed
+  AND NOT otr.classification THEN 'error'\r\n        WHEN NOT otr.passed AND otr.classification
+  THEN 'warning'\r\n        WHEN otr.passed AND NOT otr.classification THEN 'ok'\r\n
+  \       ELSE NULL::text\r\n        END AS colour_rule\r\nFROM orchard_test_results
+  otr\r\n         LEFT JOIN orchard_test_types ott ON ott.id = otr.orchard_test_type_id\r\n
+  \        LEFT JOIN pucs ON pucs.id = otr.puc_id\r\n         LEFT JOIN orchards ON
+  orchards.id = otr.orchard_id\r\n         LEFT JOIN cultivars ON cultivars.id = otr.cultivar_id\r\n
+  \        LEFT JOIN vw_orchard_test_results_flat votrf ON ott.id = votrf.test_type_id
+  AND otr.id = ANY (votrf.orchard_test_results_ids)\r\nORDER BY otr.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -309,41 +308,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  applicable_from:
-    :name: applicable_from
-    :sequence_no: 18
-    :caption: Applicable from
-    :namespaced_name: otr.applicable_from
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  applicable_to:
-    :name: applicable_to
-    :sequence_no: 19
-    :caption: Applicable to
-    :namespaced_name: otr.applicable_to
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   pallets_in_stock:
     :name: pallets_in_stock
-    :sequence_no: 20
+    :sequence_no: 18
     :caption: Pallets in stock
     :namespaced_name: 
     :data_type: :string
@@ -359,7 +326,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 21
+    :sequence_no: 19
     :caption: Active
     :namespaced_name: otr.active
     :data_type: :boolean
@@ -375,7 +342,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 22
+    :sequence_no: 20
     :caption: Created at
     :namespaced_name: otr.created_at
     :data_type: :datetime
@@ -391,7 +358,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 23
+    :sequence_no: 21
     :caption: Updated at
     :namespaced_name: otr.updated_at
     :data_type: :datetime
@@ -407,7 +374,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 24
+    :sequence_no: 22
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

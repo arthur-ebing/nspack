@@ -4,7 +4,7 @@ module Quality
   module TestResults
     module OrchardTestResult
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:orchard_test_result, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -13,13 +13,11 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Test'
+              form.caption 'New Tests'
               form.action '/quality/test_results/orchard_test_results'
               form.remote! if remote
               form.add_field :orchard_test_type_id
               form.add_field :puc_id
-              form.add_field :orchard_id
-              form.add_field :cultivar_id
             end
           end
 

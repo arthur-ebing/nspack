@@ -44,13 +44,10 @@ module UiRules
                           caption: 'Result' }
       fields[:classification] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
-      fields[:applicable_from] = { renderer: :label }
-      fields[:applicable_to] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def new_fields # rubocop:disable Metrics/AbcSize
-      orchard = @farm_repo.find_orchard(@form_object.orchard_id)
+    def new_fields
       puc_ids = @repo.select_values(:orchards, :puc_id).uniq
       {
         orchard_test_type_id: { renderer: :select,
@@ -64,18 +61,7 @@ module UiRules
                   disabled_options: @farm_repo.for_select_inactive_pucs,
                   caption: 'Puc',
                   required: true,
-                  prompt: true },
-        orchard_id: { renderer: :select,
-                      options: @repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
-                      disabled_options: @repo.for_select_inactive_orchards,
-                      caption: 'Orchard',
-                      required: true,
-                      prompt: true },
-        cultivar_id: { renderer: :select,
-                       options: @repo.for_select_cultivar_codes(where: { id: Array(orchard&.cultivar_ids) }),
-                       disabled_options: @repo.for_select_inactive_cultivar_codes,
-                       caption: 'Cultivar',
-                       required: true }
+                  prompt: true }
       }
     end
 
@@ -106,9 +92,7 @@ module UiRules
                           hide_on_load: !@classification },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
-        api_response: { hide_on_load: false },
-        applicable_from: { renderer: :date },
-        applicable_to: { renderer: :date }
+        api_response: { hide_on_load: false }
       }
     end
 
@@ -126,14 +110,15 @@ module UiRules
                   caption: 'Result',
                   hide_on_load: @classification },
         api_result: { caption: 'Result' },
+        api_pass_result: { renderer: :label,
+                           hide_on_load: @classification,
+                           caption: 'Pass Result' },
         classification: { renderer: :label,
                           as_boolean: true,
                           hide_on_load: !@classification },
         freeze_result: { renderer: :checkbox,
                          hide_on_load: false },
-        api_response: { hide_on_load: false },
-        applicable_from: { renderer: :date },
-        applicable_to: { renderer: :date }
+        api_response: { hide_on_load: false }
       }
     end
 
@@ -155,10 +140,6 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :puc_id, notify: [{ url: '/quality/test_results/orchard_test_results/puc_changed' }]
-        behaviour.dropdown_change :puc_ids, notify: [{ url: '/quality/test_results/orchard_test_results/pucs_changed' }]
-        behaviour.dropdown_change :orchard_id, notify: [{ url: '/quality/test_results/orchard_test_results/orchard_changed' }]
-        behaviour.dropdown_change :orchard_ids, notify: [{ url: '/quality/test_results/orchard_test_results/orchards_changed' }]
         behaviour.input_change :update_all, notify: [{ url: '/quality/test_results/orchard_test_results/bulk_edit_all' }]
       end
     end

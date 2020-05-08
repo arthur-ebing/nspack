@@ -44,6 +44,7 @@ module QualityApp
         JOIN orchards ON orchards.id = orchard_test_results.orchard_id
         JOIN cultivars ON cultivars.id = orchard_test_results.cultivar_id
         WHERE orchard_test_type_id = #{orchard_test_type_id}
+        ORDER BY puc_code, orchard_code, cultivar_code
       SQL
       DB[query].select_map(%i[code id])
     end

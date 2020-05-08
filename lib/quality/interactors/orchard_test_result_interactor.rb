@@ -19,14 +19,13 @@ module QualityApp
       res = OrchardTestCreateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      id = nil
       repo.transaction do
-        id = repo.create_orchard_test_result(res)
-        log_status(:orchard_test_results, id, 'CREATED')
+        service_res = CreateOrchardTestResults.call(res)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
+
         log_transaction
+        service_res
       end
-      instance = orchard_test_result(id)
-      success_response("Created orchard test result #{instance.orchard_test_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -38,7 +37,7 @@ module QualityApp
       service_res = nil
       ids.each do |id|
         repo.transaction do
-          service_res = CreateOrchardTestResults.call(id)
+          service_res = CreateOrchardTestResults.call(orchard_test_type_id: id)
           raise Crossbeams::InfoError, service_res.message unless service_res.success
 
           log_transaction

@@ -7,8 +7,6 @@ module QualityApp
     optional(:id, :integer).filled(:int?)
     required(:orchard_test_type_id, :integer).filled(:int?)
     required(:puc_id, :integer).filled(:int?)
-    required(:orchard_id, :integer).filled(:int?)
-    required(:cultivar_id, :integer).filled(:int?)
   end
 
   OrchardTestUpdateSchema = Dry::Validation.Params do
@@ -27,8 +25,6 @@ module QualityApp
     required(:freeze_result, :bool).maybe(:bool?)
     required(:api_result, :string).maybe(:str?)
     optional(:api_response, :string).maybe(:str?)
-    optional(:applicable_from, %i[nil time]).maybe(:time?)
-    optional(:applicable_to, %i[nil time]).maybe(:time?)
     optional(:update_all, :bool).maybe(:bool?)
     optional(:group_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
   end

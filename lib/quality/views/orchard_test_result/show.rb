@@ -25,8 +25,6 @@ module Quality
                   col.add_field :passed
                   col.add_field :classification
                   col.add_field :freeze_result
-                  col.add_field :applicable_from
-                  col.add_field :applicable_to
                   col.add_field :active
                 end
               end
