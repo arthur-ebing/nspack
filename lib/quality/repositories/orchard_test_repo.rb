@@ -106,6 +106,35 @@ module QualityApp
       OrchardTestResultFlat.new(hash)
     end
 
+    def failed_otmc_tests(orchard_id:, cultivar_id:, tm_group_id:)
+      query = <<~SQL
+        SELECT test_type_code
+        FROM vw_orchard_test_results_flat
+        WHERE NOT passed
+        AND NOT classification
+        AND ARRAY[#{orchard_id}] && orchard_ids
+        AND ARRAY[#{cultivar_id}] && cultivar_ids
+        AND ARRAY[#{tm_group_id}] && tm_group_ids
+      SQL
+      DB[query].select_map
+    end
+
+    # def failed_otmc_tests2(orchard_id:, cultivar_id:, tm_group_id:)
+    #   failed_test_types = []
+    #   args = { orchard_id: orchard_id, cultivar_id: cultivar_id, passed: false, classification: false }
+    #   test_type_ids = DB[:orchard_test_results].where(args).select_map(:orchard_test_type_id)
+    #   test_type_ids.each do |test_type_id|
+    #     test_type = get(:orchard_test_types, test_type_id, :test_type_code)
+    #     applies_to_all_markets = DB[:orchard_test_types].where(id: test_type_id).get(:applies_to_all_markets)
+    #     next failed_test_types << test_type if applies_to_all_markets
+    #
+    #     query = "id = #{test_type_id} AND ARRAY[#{tm_group_id}] && applicable_tm_group_ids"
+    #     applies_to_specific_market = exists?(:orchard_test_types, Sequel.lit(query))
+    #     failed_test_types << test_type if applies_to_specific_market
+    #   end
+    #   failed_test_types
+    # end
+
     def create_orchard_test_type(params)
       DB[:orchard_test_types].insert(prepare_array_values_for_db(params))
     end
