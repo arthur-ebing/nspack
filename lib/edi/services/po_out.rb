@@ -89,7 +89,7 @@ module EdiApp
       hash = build_hash_from_data(@current_row, 'OK')
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
-      hash[:ship_line] = @current_row[:ship_line][0, 1] # Just the 1st char
+      hash[:ship_line] = (@current_row[:ship_line] || '')[0, 1] # Just the 1st char
       add_record('OK', hash)
       @ok_count += 1
     end
