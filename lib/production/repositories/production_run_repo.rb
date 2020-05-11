@@ -205,6 +205,15 @@ module ProductionApp
       DB[:production_runs].select(Sequel.lit("fn_production_run_code(#{id}) AS production_run_code")).where(id: id).first[:production_run_code]
     end
 
+    def target_market_ids_for_run(id)
+      DB[:product_resource_allocations]
+        .join(:product_setups, id: :product_setup_id)
+        .where(production_run_id: id)
+        .exclude(label_template_id: nil)
+        .distinct
+        .select_map(:packed_tm_group_id)
+    end
+
     def prepare_run_allocation_targets(id)
       default_packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(AppConst::DEFAULT_PACKING_METHOD)&.id
       raise Crossbeams::FrameworkError, "Default Packing Method: #{AppConst::DEFAULT_PACKING_METHOD} does not exist." if default_packing_method_id.nil_or_empty?

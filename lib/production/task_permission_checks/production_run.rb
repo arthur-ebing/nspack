@@ -75,11 +75,17 @@ module ProductionApp
         return failed_response 'Setup is not yet complete' unless entity.setup_complete # || entity.reconfiguring
         return failed_response 'There is a tipping run already active on this line' if line_has_active_tipping_run?
 
+        res = check_orchard_tests_for_run
+        return res unless res.success
+
         all_ok
       end
 
       def re_execute_check
         return failed_response 'Run is not in a re-configure state' unless entity.reconfiguring
+
+        res = check_orchard_tests_for_run
+        return res unless res.success
 
         all_ok
       end
@@ -121,6 +127,14 @@ module ProductionApp
 
       def line_has_active_tipping_run?
         repo.line_has_active_tipping_run?(entity.production_line_id)
+      end
+
+      def check_orchard_tests_for_run
+        # If no orchard/cultivar chosen (i.e. mixed run) we do not check orchard tests
+        return ok_response if @entity.orchard_id.nil? || @entity.cultivar_id.nil?
+
+        tm_ids = @repo.target_market_ids_for_run(@id)
+        QualityApp::CanPackOrchardForTms.call(@entity.orchard_id, @entity.cultivar_id, tm_ids)
       end
     end
   end
