@@ -10,7 +10,7 @@ module FinishedGoods
 
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
-            page.section do |section|
+            page.section do |section| # rubocop:disable Metrics/BlockLength
               section.add_control(control_type: :link,
                                   text: 'Print Passed Inspection Report',
                                   url: "/finished_goods/reports/passed_inspection_report/#{id}",
@@ -27,6 +27,43 @@ module FinishedGoods
                                   text: 'Print Finding Sheet',
                                   url: "/finished_goods/reports/finding_sheet/#{id}",
                                   visible: rules[:pallets_allocated],
+                                  loading_window: true,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Create Intake Tripsheet',
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/create_intake_tripsheet",
+                                  visible: rules[:create_intake_tripsheet],
+                                  behaviour: :popup,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Load Vehicle',
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/load_vehicle",
+                                  visible: rules[:load_vehicle],
+                                  style: :button)
+
+              if rules[:vehicle_loaded]
+                action = 'vehicle_loaded_cancel_confirm'
+                popup = :popup
+              else
+                popup = false
+                action = 'cancel_tripsheet'
+              end
+
+              section.add_control(control_type: :link,
+                                  text: 'Cancel Tripsheet',
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/#{action}",
+                                  visible: rules[:cancel_tripsheet],
+                                  behaviour: popup,
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Refresh Tripsheet',
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/refresh_tripsheet",
+                                  visible: rules[:refresh_tripsheet],
+                                  style: :button)
+              section.add_control(control_type: :link,
+                                  text: 'Print Tripsheet',
+                                  url: "/finished_goods/reports/print_tripsheet/#{id}",
+                                  visible: rules[:print_tripsheet],
                                   loading_window: true,
                                   style: :button)
             end

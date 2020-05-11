@@ -41,6 +41,87 @@ class Nspack < Roda
         show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r), form_values: { pallet_list: pallet_list }) }
       end
 
+      r.on 'create_intake_tripsheet' do
+        r.get do
+          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::NewIntakeTripsheet.call(id) }
+        end
+
+        r.post do
+          res = interactor.create_intake_tripsheet(id, planned_location_to_id: params[:intake_tripsheet][:location_to_id], business_process_id: MesscadaApp::MesscadaRepo.new.find_business_process('FIRST_INTAKE')[:id],
+                                                       stock_type_id: MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id], govt_inspection_sheet_id: id)
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+        end
+      end
+
+      r.on 'load_vehicle' do
+        r.get do
+          res = interactor.load_vehicle(id)
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+        end
+      end
+
+      r.on 'vehicle_loaded_cancel_confirm' do
+        show_partial do
+          FinishedGoods::Tripsheet::Confirm.call(id,
+                                                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/vehicle_offloading_cancel_confirm",
+                                                 notice: 'Vehicle has already been loaded. Are you sure want to cancel tripsheet?',
+                                                 button_captions: %w[Ok Canceling])
+        end
+      end
+
+      r.on 'vehicle_offloading_cancel_confirm' do
+        res = interactor.offloading_started?(id)
+        if res.instance[:offloaded_pallets].zero?
+          redirect_via_json("/finished_goods/inspection/govt_inspection_sheets/#{id}/cancel_tripsheet")
+        else
+          show_partial do
+            FinishedGoods::Tripsheet::Confirm.call(id,
+                                                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/cancel_tripsheet",
+                                                   notice: "#{res.instance[:offloaded_pallets]} pallet#{res.instance[:offloaded_pallets] > 1 ? 's' : nil} have already been offloaded. Are you sure want to cancel tripsheet?",
+                                                   button_captions: %w[Ok Canceling])
+          end
+        end
+      end
+
+      r.on 'cancel_tripsheet' do
+        res = interactor.cancel_tripsheet(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+
+        r.get do
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+        end
+
+        r.post do
+          redirect_via_json("/finished_goods/inspection/govt_inspection_sheets/#{id}")
+        end
+      end
+
+      r.on 'refresh_tripsheet' do
+        r.get do
+          res = interactor.refresh_tripsheet(id)
+          if res.success
+            flash[:notice] = res.message
+          else
+            flash[:error] = res.message
+          end
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:edit, id)

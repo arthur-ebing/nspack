@@ -3,6 +3,109 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'finished_goods', 'rmd' do |r|
+    # OFFLOAD VEHICLE
+    # --------------------------------------------------------------------------
+    r.on 'offload_vehicle' do
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        notice = retrieve_from_local_store(:flash_notice)
+        form_state = { location: MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::DEFAULT_FIRST_INTAKE_LOCATION).location_short_code }
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error[:message]) unless error.nil?
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :vehicle,
+                                       notes: notice,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Pallet And Location',
+                                       action: '/rmd/finished_goods/offload_vehicle',
+                                       button_caption: 'Submit')
+
+        form.add_field(:vehicle_job, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+        form.add_field(:location, 'Location', scan: 'key248_all', scan_type: :location, submit_form: false, required: true, lookup: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.validate_offload_vehicle(params[:vehicle][:vehicle_job], params[:vehicle][:location], params[:vehicle][:location_scan_field])
+
+        if res.success
+          store_locally(:flash_notice, res.message)
+          r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{params[:vehicle][:vehicle_job]}")
+        else
+          store_locally(:error, res)
+          r.redirect('/rmd/finished_goods/offload_vehicle')
+        end
+      end
+    end
+
+    r.on 'scan_offload_vehicle_pallet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        notice = retrieve_from_local_store(:flash_notice)
+        form_state = {}
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error[:message]) unless error.nil?
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :pallet,
+                                       notes: notice,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Offload Pallet',
+                                       action: "/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}",
+                                       button_caption: 'Submit')
+
+        tripsheet_pallets = FinishedGoodsApp::GovtInspectionRepo.new.get_vehicle_job_units(id)
+
+        form.add_label(:location, 'Location', FinishedGoodsApp::GovtInspectionRepo.new.get_vehicle_job_location(tripsheet_pallets.first[:vehicle_job_id]))
+        form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: true)
+
+        unless (loaded_p = tripsheet_pallets.find_all { |p| !p[:offloaded_at] }).empty?
+          form.add_section_header('Pallets Still On Load')
+          loaded_p.each do |l|
+            form.add_label(:loaded_pallet, '', l[:pallet_number])
+          end
+        end
+
+        unless (offloaded_p = tripsheet_pallets.find_all { |p| p[:offloaded_at] }).empty?
+          form.add_section_header('Pallets Already Offloaded')
+          offloaded_p.each do |o|
+            form.add_label(:offloaded_pallet, '', o[:pallet_number])
+          end
+        end
+
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
+        if res.success
+          store_locally(:flash_notice, res.message)
+        else
+          store_locally(:error, res)
+        end
+
+        if !res.instance[:vehicle_job_offloaded]
+          r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
+        else
+          form = Crossbeams::RMDForm.new({},
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Offload Pallet',
+                                         action: '/',
+                                         reset_button: false,
+                                         no_submit: true,
+                                         button_caption: '')
+
+          form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+      end
+    end
+
     r.on 'pallet_movements' do
       interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 

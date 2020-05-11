@@ -80,6 +80,8 @@ module FinishedGoodsApp
         api_results_received: false,
         completed: false,
         completed_at: '2010-01-01 12:00',
+        tripsheet_created_at: '2010-01-01 12:00',
+        tripsheet_loaded_at: '2010-01-01 12:00',
         inspected: false,
         inspection_point: 'ABC',
         awaiting_inspection_results: false,

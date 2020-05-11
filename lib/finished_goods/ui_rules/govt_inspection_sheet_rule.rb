@@ -143,10 +143,16 @@ module UiRules
       end
     end
 
-    def add_rules
+    def add_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       rules[:inspected] = @form_object.inspected
       # rules[:pallets_allocated] = !@repo.get_value(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:id]).nil?
       rules[:pallets_allocated] = @repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: @options[:id])
+      rules[:create_intake_tripsheet] = @form_object.inspected && !@form_object.tripsheet_created
+      rules[:load_vehicle] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
+      rules[:vehicle_loaded] = @form_object.tripsheet_loaded
+      rules[:cancel_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded
+      rules[:refresh_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded && @repo.refresh_tripsheet?(@form_object.id)
+      rules[:print_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded
     end
   end
 end

@@ -20,6 +20,11 @@ module FinishedGoodsApp
     required(:destination_country_id, :integer).filled(:int?)
     optional(:govt_inspection_api_result_id, :integer).maybe(:int?)
     optional(:reinspection, :bool).maybe(:bool?)
+    optional(:tripsheet_created, :bool).maybe(:bool?)
+    optional(:tripsheet_created_at, %i[nil time]).maybe(:time?)
+    optional(:tripsheet_loaded, :bool).maybe(:bool?)
+    optional(:tripsheet_loaded_at, %i[nil time]).maybe(:time?)
+    optional(:tripsheet_offloaded, :bool).maybe(:bool?)
     optional(:created_by, Types::StrippedString).maybe(:str?)
   end
 end

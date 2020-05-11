@@ -151,6 +151,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Default packing method
   DEFAULT_PACKING_METHOD = ENV.fetch('DEFAULT_PACKING_METHOD', 'NORMAL')
 
+  # First Intake
+  DEFAULT_FIRST_INTAKE_LOCATION = ENV['DEFAULT_FIRST_INTAKE_LOCATION']
+  CREATE_STOCK_AT_FIRST_INTAKE = make_boolean('CREATE_STOCK_AT_FIRST_INTAKE')
+
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'
 
@@ -265,7 +269,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
     { regex: '^(\\d+)', type: 'carton_label_id', field: 'id' },
     # { regex: '^SK(\\d+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
     { regex: '^([A-Z0-9]+)', type: 'bin_asset', field: 'bin_asset_number' }, # asset no should change to string and this should not require SK.
-    { regex: '^(\\d+)', type: 'load', field: 'id' }
+    { regex: '^(\\d+)', type: 'load', field: 'id' },
+    { regex: '^(\\d+)', type: 'vehicle_job', field: 'id' }
   ].freeze
 
   # Per scan type, per field, set attributes for displaying a lookup value below a scan field.
@@ -308,7 +313,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PROCESS_RECEIVE_EMPTY_BINS = 'RECEIVE_EMPTY_BINS'
   PROCESS_ISSUE_EMPTY_BINS = 'ISSUE_EMPTY_BINS'
 
+  # Storage Types
+  STORAGE_TYPE_PALLETS = 'PALLETS'
+
   # Locations: Location Types
+  LOCATION_TYPES_WAREHOUSE = 'WAREHOUSE'
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
   LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   LOCATION_TYPES_EMPTY_BIN = 'EMPTY_BIN'
@@ -391,6 +400,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PO = 'PO'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
   PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
+  EDI_OUT_RULES_FLOW_TYPES = ENV.fetch('EDI_OUT_RULES_FLOW_TYPES').split(',')
 
   MF_VARIANT_TABLES = %i[
     standard_pack_codes

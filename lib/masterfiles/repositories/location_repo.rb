@@ -235,6 +235,17 @@ module MasterfilesApp
       DB[query, id].first[:location_type_code]
     end
 
+    def find_warehouse_pallets_locations
+      query = <<~SQL
+        select l.id, l.location_long_code
+        from locations l
+        join location_types t on t.id=l.location_type_id
+        join location_storage_types s on s.id=l.primary_storage_type_id
+        where s.storage_type_code = ? and t.location_type_code = ?
+      SQL
+      DB[query, AppConst::STORAGE_TYPE_PALLETS, AppConst::LOCATION_TYPES_WAREHOUSE].all.map { |r| [r[:location_long_code], r[:id]] }
+    end
+
     def link_assignments(id, multiselect_ids)
       return failed_response('Choose at least one assignment') if multiselect_ids.empty?
 

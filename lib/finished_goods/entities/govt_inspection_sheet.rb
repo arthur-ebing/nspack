@@ -21,5 +21,10 @@ module FinishedGoodsApp
     attribute :created_by, Types::String
     attribute :consignment_note_number, Types::String
     attribute? :active, Types::Bool
+    attribute? :tripsheet_created, Types::Bool
+    attribute :tripsheet_created_at, Types::DateTime
+    attribute? :tripsheet_loaded, Types::Bool
+    attribute :tripsheet_loaded_at, Types::DateTime
+    attribute? :tripsheet_offloaded, Types::Bool
   end
 end

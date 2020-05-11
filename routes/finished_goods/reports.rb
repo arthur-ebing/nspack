@@ -155,6 +155,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_error(res.message, fetch?(r))
       end
     end
+
+    # TRIPSHEET SHEET
+    # --------------------------------------------------------------------------
+    r.on 'print_tripsheet', Integer do |id|
+      vehicle_job_id = FinishedGoodsApp::GovtInspectionRepo.new.get_id(:vehicle_jobs, govt_inspection_sheet_id: id)
+      res = CreateJasperReport.call(report_name: 'interwarehouse',
+                                    user: current_user.login_name,
+                                    file: 'interwarehouse',
+                                    params: { vehicle_job_id: vehicle_job_id,
+                                              keep_file: false })
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
