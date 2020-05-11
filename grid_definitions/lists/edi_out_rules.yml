@@ -1,2 +1,13 @@
 ---
 :dataminer_definition: edi_out_rules
+:actions:
+  - :url: "/edi/config/edi_out_rules/$:id$/edit"
+    :text: edit
+    :icon: edit
+    :title: Edit
+    :popup: false
+  - :url: "/edi/config/edi_out_rules/$:id$"
+    :text: delete
+    :icon: delete
+    :is_delete: true
+    :popup: true

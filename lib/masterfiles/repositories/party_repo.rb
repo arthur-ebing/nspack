@@ -354,6 +354,22 @@ module MasterfilesApp
       ).map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
+    def for_select_party_roles_org_code(role, active: true)
+      DB[:party_roles].where(
+        role_id: DB[:roles].where(name: role).select(:id), active: active
+      ).select(
+        :id,
+        Sequel.function(:fn_party_role_org_code, :id)
+      ).map { |r| [r[:fn_party_role_org_code], r[:id]] }
+    end
+
+    def find_role_by_party_role(party_role_id)
+      DB[:roles]
+        .join(:party_roles, role_id: :id)
+        .select(Sequel[:roles].*)
+        .where(Sequel[:party_roles][:id] => party_role_id).first
+    end
+
     def parties_except_for_role(role)
       query = <<~SQL
         SELECT fn_party_name(p.id), p.id

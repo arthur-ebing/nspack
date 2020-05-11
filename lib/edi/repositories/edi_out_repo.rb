@@ -3,6 +3,7 @@
 module EdiApp
   class EdiOutRepo < BaseRepo
     crud_calls_for :edi_out_transactions, name: :edi_out_transaction, wrapper: EdiOutTransaction
+    crud_calls_for :edi_out_rules, name: :edi_out_rule, wrapper: EdiOutRule
 
     def load_config
       @load_config ||= begin
@@ -69,6 +70,11 @@ module EdiApp
 
     def new_sequence_for_flow(flow_type)
       next_document_sequence_number("edi_out_#{flow_type.downcase}")
+    end
+
+    def for_select_directory_keys
+      config = load_config
+      config[:out_dirs].keys + config[:mail_recipients].keys.map { |m| "mail:#{m}" }
     end
   end
 end
