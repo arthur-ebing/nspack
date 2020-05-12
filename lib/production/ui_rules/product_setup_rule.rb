@@ -24,7 +24,7 @@ module UiRules
     def set_show_fields  # rubocop:disable Metrics/AbcSize
       product_setup_template_id_label = @repo.find_hash(:product_setup_templates, @form_object.product_setup_template_id)[:template_name]
       marketing_variety_id_label = @repo.find_hash(:marketing_varieties, @form_object.marketing_variety_id)[:marketing_variety_code]
-      customer_variety_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety_variety(@form_object.customer_variety_variety_id)&.marketing_variety_code
+      customer_variety_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_variety_id)&.variety_as_customer_variety
       std_fruit_size_count_id_label = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
       basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
       standard_pack_code_id_label = @repo.find_hash(:standard_pack_codes, @form_object.standard_pack_code_id)[:standard_pack_code]

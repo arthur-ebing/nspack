@@ -164,11 +164,11 @@ module MasterfilesApp
 
     def for_select_inactive_customer_variety_varieties
       DB[:marketing_varieties]
-        .join(:customer_variety_varieties, marketing_variety_id: :id)
-        .join(:customer_varieties, id: :customer_variety_id)
-        .where(Sequel[:customer_variety_varieties][:active] => false)
+        .join(:customer_varieties, variety_as_customer_variety_id: :id)
+        .where(Sequel[:customer_varieties][:active] => false)
+        .distinct(Sequel[:marketing_varieties][:id])
         .select(
-          Sequel[:customer_variety_varieties][:id],
+          Sequel[:customer_varieties][:id],
           :marketing_variety_code
         ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
