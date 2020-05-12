@@ -134,7 +134,7 @@ module ProductionApp
         return ok_response if @entity.orchard_id.nil? || @entity.cultivar_id.nil?
 
         tm_ids = @repo.target_market_ids_for_run(@id)
-        QualityApp::CanPackOrchardForTms.call(@entity.orchard_id, @entity.cultivar_id, tm_ids)
+        QualityApp::CanPackOrchardForTms.call(orchard_id: @entity.orchard_id, cultivar_id: @entity.cultivar_id, tm_group_ids: tm_ids)
       end
     end
   end
