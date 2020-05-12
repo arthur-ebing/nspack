@@ -358,9 +358,8 @@ module ProductionApp
 
     def customer_variety_variety(customer_variety_variety_id)
       DB[:marketing_varieties]
-        .join(:customer_variety_varieties, marketing_variety_id: :id)
-        .join(:customer_varieties, id: :customer_variety_id)
-        .where(Sequel[:customer_variety_varieties][:id] => customer_variety_variety_id)
+        .join(:customer_varieties, variety_as_customer_variety_id: :id)
+        .where(Sequel[:customer_varieties][:id] => customer_variety_variety_id)
         .get(:marketing_variety_code)
     end
 
