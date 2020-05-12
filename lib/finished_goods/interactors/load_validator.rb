@@ -16,7 +16,10 @@ module FinishedGoodsApp
 
     def validate_load_truck(load_id)
       validate_load(load_id)
-      raise Crossbeams::InfoError, "Truck Arrival hasn't been done." if repo.find_load_flat(load_id)&.vehicle_number.nil?
+      instance = repo.find_load_flat(load_id)
+      raise Crossbeams::InfoError, "Load: #{load_id}, No Pallets Allocated." unless instance.allocated
+
+      raise Crossbeams::InfoError, "Load: #{load_id}, Truck Arrival hasn't been done." if instance.vehicle_number.nil?
 
       pallet_numbers = repo.select_values(:pallets, :pallet_number, load_id: load_id)
       validate_pallets(:has_nett_weight, pallet_numbers)

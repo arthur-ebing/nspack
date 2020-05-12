@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  class GovtInspectionRepo < BaseRepo # rubocop:disable ClassLength, Migration/DepartmentName
+  class GovtInspectionRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :govt_inspection_sheets,
                      label: :id,
                      value: :id,
