@@ -341,17 +341,15 @@ module MasterfilesApp
       details
     end
 
-    def for_select_inactive_party_roles(role = 'TRANSPORTER')
+    def for_select_inactive_party_roles(role)
       for_select_party_roles(role, active: false)
     end
 
-    def for_select_party_roles(role = 'TRANSPORTER', active: true)
-      DB[:party_roles].where(
-        role_id: DB[:roles].where(name: role).select(:id), active: active
-      ).select(
-        :id,
-        Sequel.function(:fn_party_role_name, :id)
-      ).map { |r| [r[:fn_party_role_name], r[:id]] }
+    def for_select_party_roles(role, where: nil, active: true)
+      ds = DB[:party_roles].where(role_id: DB[:roles].where(name: role).select(:id), active: active)
+      ds = ds.where(where) unless where.nil?
+      ds = ds.select( :id, Sequel.function(:fn_party_role_name, :id))
+      ds.map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
     def for_select_party_roles_org_code(role, active: true)
