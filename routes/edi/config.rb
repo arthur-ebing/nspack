@@ -11,14 +11,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         check_auth!('config', 'edit')
         interactor.assert_permission!(:edit, id)
 
-        rule = EdiApp::EdiOutRepo.new.find_edi_out_rule(id)
-        destination_type = if !rule[:depot_id].nil_or_empty?
-                             'DEPOT'
-                           else
-                             !rule[:party_role_id].nil_or_empty? && rule[:flow_type] == 'PO' ? 'PARTY_ROLE' : nil
-                           end
-        po_mode = !destination_type.nil? ? "_#{destination_type.downcase}" : nil
-        show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id, "#{rule[:flow_type].downcase}#{po_mode}".to_sym) }
+        show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id) }
       end
 
       r.is do # rubocop:disable Metrics/BlockLength
@@ -28,14 +21,12 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         end
         r.patch do     # UPDATE
           res = interactor.update_edi_out_rule(id, params[:edi_out_rule])
-          po_mode = !params[:edi_out_rule][:destination_type].nil_or_empty? ? "_#{params[:edi_out_rule][:destination_type].downcase}" : nil
           if res.success
             # flash[:notice] = res.message
-            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id, "#{res.instance[:flow_type].downcase}#{po_mode}".to_sym) }
+            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id) }
           else
             re_show_form(r, res, url: "/edi/config/edi_out_rules/#{id}/edit") do
               Edi::Config::EdiOutRule::Edit.call(id,
-                                                 "#{params[:edi_out_rule][:flow_type].downcase}#{po_mode}".to_sym,
                                                  form_values: params[:edi_out_rule],
                                                  form_errors: res.errors)
             end
@@ -71,15 +62,13 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
           end
         else
           res = interactor.create_edi_out_rule(params[:edi_out_rule])
-          po_mode = !params[:edi_out_rule][:destination_type].nil_or_empty? ? "_#{params[:edi_out_rule][:destination_type].downcase}" : nil
           if res.success
-            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(res.instance[:id], "#{params[:edi_out_rule][:flow_type].downcase}#{po_mode}".to_sym) }
+            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(res.instance[:id]) }
           else
             re_show_form(r, res, url: '/edi/config/edi_out_rules') do
               Edi::Config::EdiOutRule::New.call(form_values: params[:edi_out_rule],
                                                 form_errors: res.errors,
-                                                remote: fetch?(r),
-                                                mode: "#{params[:edi_out_rule][:flow_type].downcase}#{po_mode}".to_sym)
+                                                remote: fetch?(r))
             end
           end
         end
@@ -113,7 +102,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
     end
 
     r.on 'destination_type_changed' do # rubocop:disable Metrics/BlockLength
-      if params[:changed_value] == 'DEPOT'
+      if params[:changed_value] == AppConst::DEPOT_DESTINATION_TYPE
         depots = MasterfilesApp::DepotRepo.new.for_select_depots
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'edi_out_rule_depot_id',
@@ -130,7 +119,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                                      options_array: []),
                       OpenStruct.new(type: :hide_element,
                                      dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
-      elsif params[:changed_value] == 'PARTY_ROLE'
+      elsif params[:changed_value] == AppConst::PARTY_ROLE_DESTINATION_TYPE
         roles = [AppConst::ROLE_CUSTOMER, AppConst::ROLE_SHIPPER, AppConst::ROLE_EXPORTER]
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'edi_out_rule_depot_id',
@@ -174,9 +163,10 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
   end
 
   def po_selected
+    po_rules = AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PO]
     json_actions([OpenStruct.new(type: :replace_select_options,
                                  dom_id: 'edi_out_rule_destination_type',
-                                 options_array: %w[DEPOT PARTY_ROLE]),
+                                 options_array: po_rules[:destination_types].to_a),
                   OpenStruct.new(type: :show_element,
                                  dom_id: 'edi_out_rule_destination_type_field_wrapper'),
                   OpenStruct.new(type: :replace_select_options,
@@ -195,7 +185,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
   end
 
   def ps_selected
-    roles = [AppConst::ROLE_MARKETER, AppConst::ROLE_TARGET_CUSTOMER]
+    ps_rules = AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PS]
     json_actions([OpenStruct.new(type: :replace_select_options,
                                  dom_id: 'edi_out_rule_destination_type',
                                  options_array: ['']),
@@ -208,7 +198,9 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                                  dom_id: 'edi_out_rule_depot_id_field_wrapper'),
                   OpenStruct.new(type: :replace_select_options,
                                  dom_id: 'edi_out_rule_role_id',
-                                 options_array: roles),
+                                 options_array: ps_rules[:roles].to_a),
+                  OpenStruct.new(type: :show_element,
+                                 dom_id: 'edi_out_rule_role_id_field_wrapper'),
                   OpenStruct.new(type: :replace_select_options,
                                  dom_id: 'edi_out_rule_party_role_id',
                                  options_array: []),

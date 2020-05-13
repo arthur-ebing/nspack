@@ -4,7 +4,7 @@ module Edi
   module Config
     module EdiOutRule
       class Edit
-      def self.call(id, mode, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Layout/IndentationWidth
+      def self.call(id, form_values: nil, form_errors: nil, mode: :edit) # rubocop:disable Metrics/AbcSize, Layout/IndentationWidth
         ui_rule = UiRules::Compiler.new(:edi_out, mode, id: id, form_values: form_values)
         rules   = ui_rule.compile
 

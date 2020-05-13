@@ -400,7 +400,20 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PO = 'PO'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
   PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
-  # EDI_OUT_RULES_FLOW_TYPES = ENV.fetch('EDI_OUT_RULES_FLOW_TYPES').split(',')
+  DEPOT_DESTINATION_TYPE = 'DEPOT'
+  PARTY_ROLE_DESTINATION_TYPE = 'PARTY_ROLE'
+  DESTINATION_TYPES = [DEPOT_DESTINATION_TYPE, PARTY_ROLE_DESTINATION_TYPE].freeze
+  EDI_OUT_RULES_TEMPLATE = {
+    EDI_FLOW_PS => {
+      depot: false,
+      roles: [ROLE_MARKETER, ROLE_TARGET_CUSTOMER]
+    },
+    EDI_FLOW_PO => {
+      depot: true,
+      destination_types: DESTINATION_TYPES,
+      roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+    }
+  }.freeze
 
   MF_VARIANT_TABLES = %i[
     standard_pack_codes
