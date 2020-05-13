@@ -52,7 +52,7 @@ module MesscadaApp
 
     def return_to_bay(params) # rubocop:disable Metrics/AbcSize
       state_machine = state_machine(params)
-      state_machine.qc_checkout
+      state_machine.return_to_bay
 
       return failed_response("Bay is in #{state_machine.current} state - cannot return to bay", current_bay_attributes(state_machine)) unless state_machine.target.action == :prepare_return
 
