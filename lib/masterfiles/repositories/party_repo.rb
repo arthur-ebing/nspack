@@ -348,7 +348,7 @@ module MasterfilesApp
     def for_select_party_roles(role, where: nil, active: true)
       ds = DB[:party_roles].where(role_id: DB[:roles].where(name: role).select(:id), active: active)
       ds = ds.where(where) unless where.nil?
-      ds = ds.select( :id, Sequel.function(:fn_party_role_name, :id))
+      ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
       ds.map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
