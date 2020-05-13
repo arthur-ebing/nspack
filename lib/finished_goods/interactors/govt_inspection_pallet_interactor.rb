@@ -98,6 +98,8 @@ module FinishedGoodsApp
       new_pallet_ids = []
       repo.transaction do
         pallet_ids.each do |pallet_id|
+          next if pallet_id.nil_or_empty?
+
           res = FinishedGoodsApp::RepackPallet.call(pallet_id, @user.user_name, true)
           return res unless res.success
 
