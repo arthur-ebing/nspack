@@ -215,6 +215,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LABEL_VARIABLE_SETS = ENV.fetch('LABEL_VARIABLE_SETS').strip.split(',')
   LABEL_PUBLISH_NOTIFY_URLS = ENV.fetch('LABEL_PUBLISH_NOTIFY_URLS', '').split(',')
   BATCH_PRINT_MAX_LABELS = ENV.fetch('BATCH_PRINT_MAX_LABELS', 20).to_i
+  PREVIEW_PRINTER_TYPE = ENV.fetch('PREVIEW_PRINTER_TYPE', 'zebra')
 
   # Label sizes. The arrays contain width then height.
   DEFAULT_LABEL_DIMENSION = ENV.fetch('DEFAULT_LABEL_DIMENSION', '84x64')
@@ -398,6 +399,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_RECEIVE_DIR = ENV['EDI_RECEIVE_DIR']
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
+  EDI_FLOW_UISTK = 'UISTK'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
   PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
   DEPOT_DESTINATION_TYPE = 'DEPOT'

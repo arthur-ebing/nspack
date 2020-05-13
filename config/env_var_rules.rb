@@ -89,7 +89,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { SHARED_CONFIG_HOST_PORT: 'IP address of shared_config in the format HOST:PORT' },
     { DEFAULT_RMT_CONTAINER_TYPE: 'This should be set behind the scenes, since it will almost always be the same thing, e.g. ‘bins’, for a given packhouse.' },
     { CHRUBY_STRING: 'The version of chruby used in development. Used in Rake tasks.' },
-    { PHC_LEVEL: 'Resource Level at which the PHC code is stored. Can be "LINE" or "PACKHOUSE".' }
+    { PHC_LEVEL: 'Resource Level at which the PHC code is stored. Can be "LINE" or "PACKHOUSE".' },
+    { PREVIEW_PRINTER_TYPE: 'Which printer type is the default choice for label image previews' }
   ].freeze
 
   MUST_OVERRIDE = [
