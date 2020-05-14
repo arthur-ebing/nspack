@@ -2,9 +2,10 @@
 
 module EdiApp
   class UistkOut < BaseEdiOutService
-    attr_reader :ps_repo
+    attr_reader :uistk_repo
 
     def initialize(edi_out_transaction_id, logger)
+      @uistk_repo = UistkOutRepo.new
       super(AppConst::EDI_FLOW_UISTK, edi_out_transaction_id, logger)
     end
 
@@ -13,7 +14,6 @@ module EdiApp
       prepare_data
       return success_response('No data for UISTK') if record_entries.length.zero?
 
-      # validate_data({ 'PS' => %i[sscc sequence_number] }, check_lengths: true)
       fname = create_csv_file
       log('Ending transform...')
       success_response('UistkOut was successful', fname)
@@ -22,8 +22,7 @@ module EdiApp
     private
 
     def prepare_data
-      add_csv_record(pallet_number: '123456789012345678', pallet_sequence_number: 1, production_run_id: 1, chem: nil)
-      add_csv_record(pallet_number: '123456789012345687', pallet_sequence_number: 1, production_run_id: 1, chem: 'LC')
+      uistk_repo.uistk_rows(party_role_id).each { |row| add_csv_record(row) }
     end
   end
 end
