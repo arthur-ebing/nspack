@@ -41,7 +41,7 @@ module UiRules
     end
 
     def common_fields
-      farm_pucs = @options[:id] ? @repo.selected_farm_pucs(@options[:id]) : @repo.for_select_pucs
+      farm_pucs = @options[:id] ? @repo.selected_farm_pucs(@options[:id]) : @repo.select_unallocated_pucs
       {
         owner_party_role_id: { renderer: :select,
                                options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FARM_OWNER),
