@@ -85,6 +85,7 @@ const crossbeamsGridFormatters = {
     let subPrefix = '';
     let subnode;
     let titleValue;
+    let promptValue;
     const checkBooleans = (checks, boolVal, data) => {
       let ok = false;
       checks.split(',').forEach((field) => {
@@ -113,6 +114,10 @@ const crossbeamsGridFormatters = {
       if (titleValue.indexOf('$:') > -1) {
         titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
       }
+    }
+    promptValue = item.prompt ? item.prompt : '';
+    if (item.prompt && item.prompt.indexOf('$:') > -1) {
+      promptValue = promptValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
     }
     if (item.is_separator) {
       // Add a separator - but only if the previous item is not also a separator.
@@ -163,7 +168,7 @@ const crossbeamsGridFormatters = {
     return { key: `${prefix}${key}`,
       name: item.text,
       url,
-      prompt: item.prompt,
+      prompt: promptValue,
       method: item.method,
       title: item.title,
       title_field: titleValue,
