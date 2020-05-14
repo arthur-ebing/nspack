@@ -414,6 +414,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
       depot: true,
       destination_types: DESTINATION_TYPES,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+    },
+    EDI_FLOW_UISTK => {
+      depot: false,
+      roles: [ROLE_MARKETER]
     }
   }.freeze
 

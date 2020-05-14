@@ -1,0 +1,5 @@
+---
+:pallet_number: :string
+:pallet_sequence_number: :integer
+:production_run_id: :integer
+:chem: :string

@@ -26,19 +26,25 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     load_schema
   end
 
+  def schema_record_sizes
+    yml_path = File.expand_path('edi/schemas/schema_record_sizes.yml', __dir__)
+    raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
+
+    required_sizes = YAML.load_file(yml_path)[flow_type]
+    # Flow type might point to another flow type (RL -> PO)
+    required_sizes = YAML.load_file(yml_path)[required_sizes] if required_sizes.is_a?(String)
+    required_sizes
+  end
+
   # Reads an XML schema and compares each record size attribute against the sum of its field sizes.
   def self.check_schema_size_differences(flow_type) # rubocop:disable Metrics/AbcSize
     file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.xml", __dir__)
     raise "There is no XML schema for EDI flow type #{flow_type}" unless File.exist?(file_path)
 
-    yml_path = File.expand_path('edi/schemas/schema_record_sizes.yml', __dir__)
-    raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
+    required_sizes = schema_record_size_path
 
     schema = Nokogiri::XML(File.read(file_path))
     keys = schema.xpath('.//record/@identifier').map(&:value)
-    required_sizes = YAML.load_file(yml_path)[flow_type]
-    # Flow type might point to another flow type (RL -> PO)
-    required_sizes = YAML.load_file(yml_path)[required_sizes] if required_sizes.is_a?(String)
 
     out = {}
     keys.each do |key|
@@ -49,7 +55,31 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     out
   end
 
+  def csv_schema?
+    schema_def = schema_record_sizes
+    schema_def.length == 1 && schema_def['CSV']
+  end
+
   def load_schema
+    if csv_schema?
+      @output_filename = "#{@output_filename}.csv"
+      load_csv_schema
+    else
+      load_flat_schema
+    end
+  end
+
+  def load_csv_schema
+    file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.yml", __dir__)
+    raise "There is no YML schema for EDI flow type #{flow_type}" unless File.exist?(file_path)
+
+    schema = YAML.load_file(file_path)
+    schema.each do |key, val|
+      record_definitions[flow_type][key] = val
+    end
+  end
+
+  def load_flat_schema
     file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.xml", __dir__)
     raise "There is no XML schema for EDI flow type #{flow_type}" unless File.exist?(file_path)
 
@@ -174,6 +204,19 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @validation_errors << "#{row_desc} - #{errors.join(', ')}." unless errors.empty?
   end
 
+  def add_csv_record(rec)
+    row = {}
+    record_definitions[flow_type].each_key do |name|
+      row[name] = csv_value_for(name, rec[name])
+    end
+    record_entries[flow_type] << row
+  end
+
+  def csv_value_for(name, value)
+    data_type = record_definitions[flow_type][name]
+    data_type == :text ? "'#{value}" : value
+  end
+
   def add_record(record_type, rec = {})
     row = {}
     record_definitions[record_type].each_key do |name|
@@ -295,6 +338,21 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     end
   rescue StandardError => e
     raise Crossbeams::InfoError, "EDI OUT field format error for rec type \"#{rec_type}\", field \"#{key}\": #{e}"
+  end
+
+  def create_csv_file # rubocop:disable Metrics/AbcSize
+    @output_paths.each do |path|
+      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
+
+      keys = record_definitions[flow_type].keys
+      CSV.open(File.join(path, @output_filename), 'w', headers: keys.map(&:to_s), write_headers: true) do |csv|
+        record_entries[flow_type].each do |hash|
+          csv << hash.values_at(*keys)
+        end
+      end
+    end
+    send_emails
+    @output_filename
   end
 
   # This should be moved to a EdiOutFlatFileFormatter perhaps
