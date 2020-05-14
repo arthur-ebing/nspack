@@ -199,7 +199,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                           prompt: true)
           form.add_select(:haulier_party_role_id,
                           'Haulier',
-                          items: MasterfilesApp::PartyRepo.new.for_select_party_roles,
+                          items: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_HAULIER),
                           prompt: true)
           form.add_field(:vehicle_weight_out,
                          'Vehicle Weight Out',
