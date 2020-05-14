@@ -66,11 +66,12 @@ module FinishedGoodsApp
       return ok_response if create_units.empty?
 
       res = api.elot(tur_query, repo.compile_preverify_pallets(create_units))
-      response = res.instance
-      if response['IsSuccessful']
-        save_response(response)
+      return failed_response(res.message) unless res.success
+
+      if res.instance['IsSuccessful']
+        save_response(res.instance)
       else
-        message = response['Message'].gsub("\n", '<br>').gsub("\r", '')
+        message = res.instance['Message'].to_s.gsub("\n", '<br>').gsub("\r", '')
         failed_response(message)
       end
     end
