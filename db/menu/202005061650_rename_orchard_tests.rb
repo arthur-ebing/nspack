@@ -10,7 +10,6 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
   down do
     change_program_function 'Test Types', functional_area: 'Quality', program: 'Config', rename: 'Orchard Test Types', seq: 1
 
-
     change_program_function 'New Test', functional_area: 'Quality', program: 'Test Results', rename: 'New Orchard Test Result', seq: 1
     change_program_function 'List Tests', functional_area: 'Quality', program: 'Test Results', rename: 'List Orchard Test Results', seq: 2
     change_program_function 'Search Tests', functional_area: 'Quality', program: 'Test Results', rename: 'Search Orchard Test Results', seq: 3

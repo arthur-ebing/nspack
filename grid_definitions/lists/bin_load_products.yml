@@ -1,0 +1,31 @@
+---
+:dataminer_definition: bin_load_products
+:actions:
+- :url: "/raw_materials/dispatch/bin_load_products/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/dispatch/bin_load_products/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+  :hide_if_true: completed
+- :url: "/raw_materials/dispatch/bin_load_products/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+  :hide_if_true: completed
+- :separator: true
+- :url: "/development/statuses/list/bin_load_products/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:conditions:
+  :standard:
+    - :col: bin_loads.id
+      :op: =
+      :val: $:bin_load_id$

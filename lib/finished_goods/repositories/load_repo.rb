@@ -48,7 +48,7 @@ module FinishedGoodsApp
                                            columns: %i[container_code],
                                            one_to_one: { container_code: :container_code } }],
                             lookup_functions: [{ function: :fn_current_status,
-                                                 args: ['loads', id],
+                                                 args: ['loads', :id],
                                                  col_name: :status }],
                             wrapper: LoadFlat)
     end
