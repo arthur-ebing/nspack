@@ -14,6 +14,10 @@
   \ \"cultivars\".\"cultivar_name\",\r\n  \"farms\".\"farm_code\",\r\n  \"orchards\".\"orchard_code\",\r\n
   \ \"pucs\".\"puc_code\",\r\n  \"rmt_delivery_destinations\".\"delivery_destination_code\",\r\n
   \ \"seasons\".\"season_code\",\r\n  SUM(\"rmt_bins\".qty_bins) AS qty_bins,\r\n
+
+  \ CASE WHEN (\r\n    SELECT\r\n      sum(qty_bins)\r\n    FROM\r\n      rmt_bins\r\n    WHERE\r\n
+                 \     rmt_delivery_id = rmt_deliveries.id\r\n      AND bin_tipped IS TRUE) > 0 THEN true ELSE false END AS contains_tipped_bins,
+
   \ CASE WHEN \"rmt_deliveries\".\"current\" THEN\r\n    'green'\r\n  WHEN delivery_tipped
   THEN\r\n    'gray'\r\n WHEN keep_open THEN\r\n    'blue'\r\n  ELSE\r\n    NULL\r\n
   \ END AS colour_rule\r\nFROM\r\n  \"rmt_deliveries\"\r\n  JOIN \"cultivars\" ON
@@ -326,6 +330,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contains_tipped_bins:
+    :name: contains_tipped_bins
+    :sequence_no: 18
+    :caption: Contains Tipped Bins
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

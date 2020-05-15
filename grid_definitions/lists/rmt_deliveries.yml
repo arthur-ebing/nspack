@@ -15,6 +15,7 @@
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
   :icon: delete
+  :prompt: You about to delete $:qty_bins$ bins belonging to this delivery. Are you sure?
   :is_delete: true
   :popup: true
   :hide_if_true: recalc_nett_weight

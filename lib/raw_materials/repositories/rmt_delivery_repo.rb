@@ -45,12 +45,10 @@ module RawMaterialsApp
       DB[qry, id].first
     end
 
-    def update_rmt_bins_inherited_field(id, res)
-      # Ask hans:
-      # selection/change of delivery.orchard affects the options for rmt_bin.cultivar drop_down. What should happen to
-      # rmt_bin.cultivar on delivery.orchard????
+    def update_rmt_bins_inherited_field(id, res) # rubocop:disable Metrics/AbcSize
       updates = { orchard_id: res.output[:orchard_id],
                   season_id: res.output[:season_id],
+                  cultivar_id: res.output[:cultivar_id],
                   bin_received_date_time: res.output[:date_delivered].to_s,
                   farm_id: res.output[:farm_id],
                   puc_id: res.output[:puc_id] }
@@ -68,6 +66,10 @@ module RawMaterialsApp
 
     def find_delivery_untipped_bins(id)
       DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false)
+    end
+
+    def find_delivery_tipped_bins(id)
+      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: true)
     end
 
     def find_rmt_bin_flat(id)
@@ -154,7 +156,7 @@ module RawMaterialsApp
     def delivery_confirmation_details(id)
       query = <<~SQL
         select d.id, c.cultivar_name, cg.cultivar_group_code, f.farm_code, p.puc_code, o.orchard_code
-        , d.truck_registration_number, d.date_delivered
+        , d.truck_registration_number, d.date_delivered, d.date_picked
         , count(b.id) as bins_received, (d.quantity_bins_with_fruit - count(b.id)) as qty_bins_remaining
         from rmt_deliveries d
         join cultivars c on c.id=d.cultivar_id

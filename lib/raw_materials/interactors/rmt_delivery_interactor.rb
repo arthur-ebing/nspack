@@ -33,14 +33,12 @@ module RawMaterialsApp
       repo.rmt_delivery_season(cultivar_id, date_delivered)
     end
 
-    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
+    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       params[:date_delivered] = rmt_delivery(id).date_delivered
       params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered]) unless params[:cultivar_id].nil_or_empty? || params[:date_delivered].to_s.nil_or_empty?
       res = validate_rmt_delivery_params(params)
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) if !res.messages.empty? && res.messages.one? && res.messages.include?(:season_id)
       return validation_failed_response(res) unless res.messages.empty?
-
-      validation = child_bins_cultivars_still_valid?(id, params[:orchard_id])
-      return failed_response('Delivery could not be updated: delivery orchard is out of sync with bins orchard') unless validation
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
@@ -54,15 +52,27 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def child_bins_cultivars_still_valid?(id, delivery_orchard_id)
-      delivery_cultivars = lookup_orchard_cultivars(delivery_orchard_id).map { |p| p[1] }
-      bins_cultivars = repo.find_delivery_untipped_bins(id).map { |p| p[:cultivar_id] }
+    def delete_rmt_delivery(id) # rubocop:disable Metrics/AbcSize
+      tipped_bins = repo.find_delivery_tipped_bins(id)
+      return failed_response("#{tipped_bins.length} have already been tipped") unless tipped_bins.empty?
 
-      (bins_cultivars.uniq - delivery_cultivars).empty?
-    end
-
-    def delete_rmt_delivery(id)
       repo.transaction do
+        bins = repo.find_bins_by_delivery_id(id)
+        unless bins.empty?
+          delivery = repo.delivery_confirmation_details(id)
+          before = { farm: delivery[:farm_code], puc: delivery[:puc_code], orchard: delivery[:orchard_code], cultivar_group: delivery[:cultivar_group_code],
+                     cultivar: delivery[:cultivar_name], date_picked: delivery[:date_picked], date_delivered: delivery[:date_delivered], delivery_id: id }
+          after = { farm: nil, puc: nil, orchard: nil, cultivar_group: nil, cultivar: nil, date_picked: nil, date_delivered: nil, delivery_id: nil }
+          reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_DELIVERY_DELETE), pallets_selected: bins.map { |b| b[:bin_asset_number] },
+                                pallets_affected: bins.map { |b| b[:bin_asset_number] } }
+
+          res = validate_reworks_run_params(reworks_run_attrs)
+          return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
+
+          create_delete_rmt_delivery_reworks_run(res, before: before, after: after)
+          repo.delete_rmt_bin(bins.map { |b| b[:id] })
+        end
+
         repo.delete_rmt_delivery(id)
         log_status('rmt_deliveries', id, 'DELETED')
         log_transaction
@@ -70,6 +80,16 @@ module RawMaterialsApp
       success_response('Deleted rmt delivery')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def create_delete_rmt_delivery_reworks_run(params, changes_made)
+      ProductionApp::ReworksRepo.new.create_reworks_run(user: params[:user],
+                                                        reworks_run_type_id: params[:reworks_run_type_id],
+                                                        scrap_reason_id: nil,
+                                                        remarks: nil,
+                                                        pallets_selected: "{ #{params[:pallets_selected].join(',')} }",
+                                                        pallets_affected: "{ #{params[:pallets_affected].join(',')} }",
+                                                        changes_made: { pallets: { pallet_sequences: { changes: changes_made } } }.to_json)
     end
 
     def delivery_set_current(id)
@@ -177,6 +197,10 @@ module RawMaterialsApp
 
     def validate_rmt_delivery_params(params)
       RmtDeliverySchema.call(params)
+    end
+
+    def validate_reworks_run_params(params)
+      ProductionApp::ReworksRunFlatSchema.call(params)
     end
   end
 end
