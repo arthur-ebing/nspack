@@ -19,7 +19,7 @@ module RawMaterialsApp
     end
 
     def test_bin_load
-      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load).returns(fake_bin_load)
+      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_flat).returns(fake_bin_load)
       entity = interactor.send(:bin_load, 1)
       assert entity.is_a?(BinLoad)
     end
@@ -28,7 +28,7 @@ module RawMaterialsApp
       attrs = fake_bin_load.to_h.reject { |k, _| k == :id }
       res = interactor.create_bin_load(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(BinLoad, res.instance)
+      assert_instance_of(BinLoadFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -47,7 +47,7 @@ module RawMaterialsApp
       attrs[:bin_load_purpose_id] = bin_load_purpose_id
       res = interactor.update_bin_load(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(BinLoad, res.instance)
+      assert_instance_of(BinLoadFlat, res.instance)
       assert_equal bin_load_purpose_id, res.instance.bin_load_purpose_id
       refute_equal value, res.instance.id
     end

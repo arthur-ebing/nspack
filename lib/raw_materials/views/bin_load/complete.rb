@@ -10,11 +10,11 @@ module RawMaterials
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
+            page.form_errors form_errors
             page.form do |form|
               form.caption 'Complete Bin Load'
               form.action "/raw_materials/dispatch/bin_loads/#{id}/complete"
               form.remote!
-              page.form_errors form_errors
               form.submit_captions 'Complete'
               form.add_text 'Are you sure you want to complete this bin load?', wrapper: :h3
               form.add_field :bin_load_purpose_id

@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show complete].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'bin_load'
     end
