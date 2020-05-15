@@ -68,5 +68,20 @@ module EdiApp
       ids = recs.reject { |r| ((r.last || '').split(',') & match_data).empty? }.map(&:first)
       DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
     end
+
+    def get_case_insensitive_match(table_name, args)
+      ds = DB[table_name]
+      args.each do |k, v|
+        ds = if v.is_a?(String)
+               ds.where(Sequel.function(:upper, k) => v.upcase)
+             else
+               ds.where(k => v)
+             end
+      end
+      values = ds.select_map(:id)
+      raise Crossbeams::FrameworkError, 'Method must return only one record' if values.length > 1
+
+      values.first
+    end
   end
 end
