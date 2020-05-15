@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show].include? @mode
+      set_show_fields if %i[show reopen].include? @mode
 
       add_behaviours
 
@@ -24,29 +24,37 @@ module UiRules
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: @form_object.container_material_type_code, caption: 'Container Type' }
       fields[:rmt_material_owner_party_role_id] = { renderer: :label, with_value: @form_object.container_material_owner, caption: 'Container Owner' }
       fields[:farm_id] = { renderer: :label, with_value: @form_object.farm_code, caption: 'Farm' }
-      fields[:puc_id] = { renderer: :label, with_value: @form_object.puc_code, caption: 'PUC' }
+      fields[:puc_id] = { renderer: :label, with_value: @form_object.puc_code, caption: 'Puc' }
       fields[:orchard_id] = { renderer: :label, with_value: @form_object.orchard_code, caption: 'Orchard' }
       fields[:rmt_class_id] = { renderer: :label, with_value: @form_object.rmt_class_code, caption: 'Rmt Class' }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
+      cultivar_ids = @repo.select_values(:rmt_bins, :cultivar_id, exit_ref: nil)
+      cultivar_group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids)
+
+      farm_ids = @repo.select_values(:rmt_bins, :farm_id, exit_ref: nil)
+      puc_ids = @repo.select_values(:rmt_bins, :puc_id, exit_ref: nil)
+      orchard_ids = @repo.select_values(:rmt_bins, :orchard_id, exit_ref: nil)
+
       {
-        bin_load_id: { renderer: :hidden,
-                       with_value: @form_object.bin_load_id,
-                       caption: 'Bin Load' },
-        qty_bins: { renderer: :integer,
-                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
-                    minvalue: 1,
+        bin_load_id: { renderer: :select,
+                       options: @repo.for_select_bin_loads,
+                       disabled_options: @repo.for_select_inactive_bin_loads,
+                       caption: 'Bin Load',
+                       hide_on_load: true,
+                       required: true },
+        qty_bins: { renderer: :numeric,
                     required: true },
         cultivar_group_id: { renderer: :select,
-                             options: @cultivar_repo.for_select_cultivar_groups,
+                             options: @cultivar_repo.for_select_cultivar_groups(where: { id: cultivar_group_ids }),
                              disabled_options: @cultivar_repo.for_select_inactive_cultivar_groups,
                              prompt: true,
                              caption: 'Cultivar Group',
                              required: true },
         cultivar_id: { renderer: :select,
-                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
+                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id,  id: cultivar_ids }),
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        prompt: true,
                        caption: 'Cultivar' },
@@ -60,17 +68,17 @@ module UiRules
                                             prompt: true,
                                             caption: 'Container Owner' },
         farm_id: { renderer: :select,
-                   options: @farm_repo.for_select_farms,
+                   options: @farm_repo.for_select_farms(where: { id: farm_ids }),
                    disabled_options: @farm_repo.for_select_inactive_farms,
                    prompt: true,
                    caption: 'Farm' },
         puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs,
+                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
                   disabled_options: @farm_repo.for_select_inactive_pucs,
                   prompt: true,
-                  caption: 'PUC' },
+                  caption: 'Puc' },
         orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
+                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id, id: orchard_ids }),
                       disabled_options: @farm_repo.for_select_inactive_orchards,
                       prompt: true,
                       hide_on_load: @form_object.puc_id.nil?,
@@ -93,7 +101,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(bin_load_id: @options[:bin_load_id],
+      @form_object = OpenStruct.new(bin_load_id: nil,
                                     qty_bins: nil,
                                     cultivar_id: nil,
                                     cultivar_group_id: nil,

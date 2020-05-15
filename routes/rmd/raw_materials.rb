@@ -36,26 +36,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.scan_bin_to_bin_load(params[:bin_load])
-          if res.success
-            stepper.allocate(res.instance)
-            if stepper.ready_to_ship?
-              res = interactor.allocate_and_ship_bin_load(bin_load_id, stepper.loaded)
-              if res.success
-                stepper.clear
-                store_locally(:flash_notice, rmd_success_message(res.message))
-                r.redirect('/rmd/raw_materials/dispatch/bin_load')
-              else
-                store_locally(:flash_notice, rmd_error_message(res.message))
-              end
+          scanned_number = params[:bin_load][:bin_asset_number]
+          interactor.validate!(:bin_exists, bin_load_id, bin_asset_number: scanned_number)
+          stepper.allocate(scanned_number)
+          if stepper.ready_to_ship?
+            res = interactor.ship_bin_load(bin_load_id, stepper.loaded)
+            if res.success
+              stepper.clear
+              store_locally(:flash_notice, rmd_success_message(res.message))
+              r.redirect('/rmd/raw_materials/dispatch/bin_load')
+            else
+              store_locally(:flash_notice, rmd_error_message(res.message))
+              r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
             end
-
-            store_locally(:flash_notice, rmd_success_message(stepper.message)) if stepper.message
-            store_locally(:flash_notice, rmd_warning_message(stepper.warning)) if stepper.warning
-            store_locally(:flash_notice, rmd_error_message(stepper.error)) if stepper.error
-          else
-            store_locally(:flash_notice, rmd_error_message(res.message))
           end
+
+          message = stepper.error.nil? ? rmd_success_message(stepper.message) : rmd_error_message(stepper.error)
+          store_locally(:flash_notice, message)
+          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
+        rescue Crossbeams::InfoError => e
+          store_locally(:flash_notice, rmd_error_message(e.message))
           r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
         end
       end
@@ -93,14 +93,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.scan_bin_load(params[:bin_load])
-          if res.success
-            stepper.setup_load(res.instance.id)
-            r.redirect("/rmd/raw_materials/dispatch/bin_load/#{res.instance.id}")
-          else
-            store_locally(:flash_notice, rmd_error_message(res.message))
-            r.redirect('/rmd/raw_materials/dispatch/bin_load')
-          end
+          bin_load_id = params[:bin_load][:bin_load_id]
+          interactor.validate!(:bin_load, bin_load_id)
+          stepper.setup_load(bin_load_id)
+          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
+
+        rescue Crossbeams::InfoError => e
+          stepper.write(form_state: { error_message: e.message })
+          r.redirect('/rmd/raw_materials/dispatch/bin_load')
         end
       end
     end
@@ -121,7 +121,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
         details = retrieve_from_local_store(:bin) || { cultivar_id: bin_delivery[:cultivar_id], bin_fullness: :Full }
 
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil?
         capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
@@ -145,7 +145,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
         form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
         form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
-        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)
@@ -328,7 +327,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.create_rebin(params[:rmt_bin])
+          res = interactor.create_rebins(params[:rmt_bin])
           if res.success
             store_locally(:flash_notice, "Rebin: #{params[:rmt_bin][:bin_asset_number]} created successfully")
           else
@@ -623,7 +622,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
 
         notice = retrieve_from_local_store(:flash_notice)
         rmt_container_material_type_id = retrieve_from_local_store(:rmt_container_material_type_id)
@@ -655,7 +653,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true)
-        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
@@ -672,11 +669,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         form.add_field(:bin_fullness, 'Bin Fullness', hide_on_load: true)
         form.add_field(:qty_bins, 'Qty Bins', hide_on_load: true)
-        if capture_inner_bins
-          form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
-        else
-          form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
-        end
 
         form.add_field(:bin_asset_number1, 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
         delivery[:qty_bins_remaining] = AppConst::BIN_SCANNING_BATCH_SIZE.to_i unless delivery[:qty_bins_remaining] < AppConst::BIN_SCANNING_BATCH_SIZE.to_i

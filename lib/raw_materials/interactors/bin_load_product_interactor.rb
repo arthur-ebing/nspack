@@ -36,18 +36,14 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def delete_bin_load_product(id) # rubocop:disable Metrics/AbcSize
-      instance = bin_load_product(id)
-      bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
-
+    def delete_bin_load_product(id)
+      name = bin_load_product(id).id
       repo.transaction do
-        repo.unallocate_bins(bin_ids, @user)
-
         repo.delete_bin_load_product(id)
         log_status(:bin_load_products, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted bin load product #{instance.product_code}", instance)
+      success_response("Deleted bin load product #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -56,17 +52,15 @@ module RawMaterialsApp
       res = AllocateBinLoadProductSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      new_allocation = res.to_h[:bin_ids]
-      current_allocation = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
-
+      bin_asset_number = res.to_h[:bin_asset_number]
       repo.transaction do
-        repo.unallocate_bins(current_allocation - new_allocation, @user)
-        repo.allocate_bins(id, new_allocation - current_allocation, @user)
+        bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
+        repo.update(:rmt_bins, bin_id, bin_load_product_id: id)
+        log_status(:rmt_bins, bin_id, 'BIN_ALLOCATED_ON_LOAD')
 
         log_transaction
       end
-      instance = bin_load_product(id)
-      success_response('Allocated to Bin Load', instance)
+      success_response("Allocated bin #{bin_asset_number} to Bin Load", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

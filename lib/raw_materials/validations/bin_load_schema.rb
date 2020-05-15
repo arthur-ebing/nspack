@@ -15,17 +15,4 @@ module RawMaterialsApp
     optional(:completed_at, %i[nil time]).maybe(:time?)
     optional(:completed, :bool).maybe(:bool?)
   end
-
-  ScanBinLoadSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:bin_load_id, :integer).filled(:int?)
-  end
-
-  ScanBinToBinLoadSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:bin_load_id, :integer).filled(:int?)
-    required(:bin_asset_number, Types::StrippedString).maybe(:str?)
-  end
 end

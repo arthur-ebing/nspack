@@ -7,8 +7,8 @@ module RawMaterialsApp
     optional(:id, :integer).filled(:int?)
     required(:bin_load_id, :integer).filled(:int?)
     required(:qty_bins, :integer).filled(:int?)
-    required(:cultivar_group_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).maybe(:int?)
+    required(:cultivar_group_id, :integer).maybe(:int?)
     required(:rmt_container_material_type_id, :integer).maybe(:int?)
     required(:rmt_material_owner_party_role_id, :integer).maybe(:int?)
     required(:farm_id, :integer).maybe(:int?)
@@ -21,6 +21,6 @@ module RawMaterialsApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:bin_ids, Types::IntArray).maybe { each(:int?) }
+    required(:bin_asset_number, Types::StrippedString).maybe(:str?)
   end
 end

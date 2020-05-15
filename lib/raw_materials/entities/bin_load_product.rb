@@ -28,6 +28,7 @@ module RawMaterialsApp
     attribute :puc_id, Types::Integer
     attribute :orchard_id, Types::Integer
     attribute :rmt_class_id, Types::Integer
+    attribute? :active, Types::Bool
     attribute :cultivar_group_code, Types::String
     attribute :cultivar_name, Types::String
     attribute :farm_code, Types::String
@@ -37,9 +38,6 @@ module RawMaterialsApp
     attribute :container_material_type_code, Types::String
     attribute :container_material_owner, Types::String
     attribute :product_code, Types::String
-    attribute :completed, Types::Bool
-    attribute :shipped, Types::Bool
-    attribute? :status, Types::String
-    attribute? :active, Types::Bool
+    attribute :status, Types::String
   end
 end

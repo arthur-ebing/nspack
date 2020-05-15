@@ -36,7 +36,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def delete_bin_load_purpose(id) # rubocop:disable Metrics/AbcSize
+    def delete_bin_load_purpose(id)
       name = bin_load_purpose(id).purpose_code
       repo.transaction do
         repo.delete_bin_load_purpose(id)
@@ -44,8 +44,6 @@ module RawMaterialsApp
         log_transaction
       end
       success_response("Deleted bin load purpose #{name}")
-    rescue Sequel::ForeignKeyConstraintViolation => e
-      failed_response("Unable to delete bin load purpose. Still referenced #{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

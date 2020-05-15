@@ -57,21 +57,21 @@ class TestBinLoadRoutes < RouteTester
     expect_json_replace_dialog(has_error: true)
   end
 
-  # def test_delete
-  #   authorise_pass! permission_check: RawMaterialsApp::TaskPermissionCheck::BinLoad
-  #   ensure_exists!(INTERACTOR)
-  #   INTERACTOR.any_instance.stubs(:delete_bin_load).returns(ok_response)
-  #   delete_as_fetch 'raw_materials/dispatch/bin_loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_flash_notice
-  # end
-  #
-  # def test_delete_fail
-  #   authorise_pass! permission_check: RawMaterialsApp::TaskPermissionCheck::BinLoad
-  #   ensure_exists!(INTERACTOR)
-  #   INTERACTOR.any_instance.stubs(:delete_bin_load).returns(bad_response)
-  #   delete_as_fetch 'raw_materials/dispatch/bin_loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-  #   expect_flash_notice
-  # end
+  def test_delete
+    authorise_pass! permission_check: RawMaterialsApp::TaskPermissionCheck::BinLoad
+    ensure_exists!(INTERACTOR)
+    INTERACTOR.any_instance.stubs(:delete_bin_load).returns(ok_response)
+    delete_as_fetch 'raw_materials/dispatch/bin_loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_json_delete_from_grid
+  end
+
+  def test_delete_fail
+    authorise_pass! permission_check: RawMaterialsApp::TaskPermissionCheck::BinLoad
+    ensure_exists!(INTERACTOR)
+    INTERACTOR.any_instance.stubs(:delete_bin_load).returns(bad_response)
+    delete_as_fetch 'raw_materials/dispatch/bin_loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_json_error
+  end
 
   def test_new
     authorise_pass!

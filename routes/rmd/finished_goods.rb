@@ -18,7 +18,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        form_name: :vehicle,
                                        notes: notice,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Scan Tripsheet And Location',
+                                       caption: 'Scan Pallet And Location',
                                        action: '/rmd/finished_goods/offload_vehicle',
                                        button_caption: 'Submit')
 
@@ -42,6 +42,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'scan_offload_vehicle_pallet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
       r.get do
         notice = retrieve_from_local_store(:flash_notice)
         form_state = {}
@@ -79,48 +81,30 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do
-        repo = MesscadaApp::MesscadaRepo.new
-        if FinishedGoodsApp::GovtInspectionRepo.new.find_vehicle_job(id).business_process_id == repo.find_business_process('FIRST_INTAKE')[:id]
-          seqs = repo.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number]).all
-          form = Crossbeams::RMDForm.new({ pallet_number: params[:pallet][:pallet_number] },
-                                         form_name: :pallet,
-                                         notes: nil,
-                                         scan_with_camera: @rmd_scan_with_camera,
-                                         caption: 'Validate Pallet',
-                                         reset_button: false,
-                                         action: "/rmd/finished_goods/reject_vehicle_pallet/#{id}",
-                                         button_caption: 'Reject Pallet')
+        res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
+        if res.success
+          store_locally(:flash_notice, res.message)
+        else
+          store_locally(:error, res)
+        end
 
-          form.add_label(:pallet_number, 'Pallet Number', params[:pallet][:pallet_number], params[:pallet][:pallet_number])
-          form.add_label(:pallet_sequences, 'Pallet Number Sequences', seqs.length)
-          form.add_label(:pallet_sequences, 'Pallet Ctn Qty', seqs.empty? ? '-' : seqs[0][:pallet_carton_quantity])
-          form.add_label(:packhouse, 'Packhouse', seqs.map { |s| s[:packhouse] }.uniq.join(','))
-          form.add_label(:commodity, 'Commodity', seqs.map { |s| s[:commodity] }.uniq.join(','))
-          form.add_label(:variety, 'Variety', seqs.map { |s| s[:marketing_variety] }.uniq.join(','))
-          form.add_label(:packed_tm_group, 'Packed Tm Group', seqs.map { |s| s[:packed_tm_group] }.uniq.join(','))
-          form.add_label(:grade, 'Grade', seqs.map { |s| s[:grade] }.uniq.join(','))
-          form.add_label(:size_ref, 'Size Ref', seqs.map { |s| s[:size_ref] }.uniq.join(','))
-          form.add_label(:std_pack, 'Std Pack', seqs.map { |s| s[:std_pack] }.uniq.join(','))
-          form.add_label(:actual_count, 'Actual Count', seqs.map { |s| s[:actual_count] }.uniq.join(','))
-          form.add_label(:stack_type, 'Stack Type', seqs.map { |s| s[:stack_type] }.uniq.join(','))
-          form.add_button('Accept Pallet', "/rmd/finished_goods/scan_offload_vehicle_pallet_submit/#{id}")
+        if !res.instance[:vehicle_job_offloaded]
+          r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
+        else
+          form = Crossbeams::RMDForm.new({},
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'Offload Pallet',
+                                         action: '/',
+                                         reset_button: false,
+                                         no_submit: true,
+                                         button_caption: '')
+
+          form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
-        else
-          offload_valid_vehicle_pallet(r, id)
         end
       end
-    end
-
-    r.on 'scan_offload_vehicle_pallet_submit', Integer do |id|
-      offload_valid_vehicle_pallet(r, id)
-    end
-
-    r.on 'reject_vehicle_pallet', Integer do |id|
-      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      store_locally(:error, interactor.failed_response("Pallet: #{params[:pallet][:pallet_number]} has been rejected"))
-      r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
     end
 
     # --------------------------------------------------------------------------
@@ -129,13 +113,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'dispatch' do
       repo = BaseRepo.new
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       # ALLOCATE PALLETS TO LOAD
       # --------------------------------------------------------------------------
       r.on 'allocate' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:allocate, load_id)
           r.on 'complete_allocation' do
             allocated = interactor.stepper(:allocate).allocated
             initial_allocated = interactor.stepper(:allocate).initial_allocated
@@ -187,15 +169,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           r.post do
             scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:allocate][:pallet_number]).pallet_number
-            res = interactor.check(:allocate_to_load, load_id, scanned_number)
-            if res.success
-              res = interactor.stepper_allocate_pallet(:allocate, load_id, scanned_number)
-              if res.success
-                store_locally(:flash_notice, rmd_success_message(res.message))
-                r.redirect("/rmd/finished_goods/dispatch/allocate/load/#{load_id}")
-              end
-            end
-            store_locally(:flash_notice, rmd_error_message(res.message))
+            res = interactor.stepper_allocate_pallet(:allocate, load_id, scanned_number)
+            message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
+            store_locally(:flash_notice, message)
+            r.redirect("/rmd/finished_goods/dispatch/allocate/load/#{load_id}")
+          rescue Crossbeams::InfoError => e
+            store_locally(:flash_notice, rmd_error_message(e.message))
             r.redirect("/rmd/finished_goods/dispatch/allocate/load/#{load_id}")
           end
         end
@@ -216,7 +195,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                            form_name: :allocate,
                                            scan_with_camera: @rmd_scan_with_camera,
                                            notes: retrieve_from_local_store(:flash_notice),
-                                           caption: 'Dispatch: Allocate Pallets',
+                                           caption: 'Scan Load',
                                            action: '/rmd/finished_goods/dispatch/allocate/load',
                                            button_caption: 'Submit')
 
@@ -234,7 +213,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.post do
             current_load = interactor.stepper(:allocate)
             load_id = params[:allocate][:load_id]
-            res = interactor.check(:allocate, load_id)
+            res = interactor.validate_load(load_id)
+
             if res.success
               current_load.setup_load(load_id)
               r.redirect("/rmd/finished_goods/dispatch/allocate/load/#{load_id}")
@@ -251,7 +231,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'truck_arrival' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:truck_arrival, load_id)
           r.on 'vehicle_type_changed' do
             if params[:changed_value].nil_or_empty?
               blank_json_response
@@ -276,17 +255,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.get do
             # set defaults
             form_state = {}
-            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload(load_id) if AppConst::VGM_REQUIRED
+            form_state[:stack_type_id] = repo.get_id(:container_stack_types, stack_type_code: 'S')
+            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload_from(load_id: load_id) if AppConst::VGM_REQUIRED
+            form_state[:cargo_temperature_id] = MasterfilesApp::CargoTemperatureRepo.new.cargo_temperature_id_for(AppConst::DEFAULT_CARGO_TEMP_ON_ARRIVAL)
+
             # checks if load_container exists
             container_id = repo.get_id(:load_containers, load_id: load_id)
             unless container_id.nil?
               form_state = form_state.merge(FinishedGoodsApp::LoadContainerRepo.new.find_load_container_flat(container_id).to_h)
-              form_state[:container] = 't'
+              form_state[:container] = 'true'
             end
 
             # checks if load_vehicle exists
             vehicle_id = repo.get_id(:load_vehicles, load_id: load_id)
-            form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle_flat(vehicle_id).to_h) unless vehicle_id.nil?
+            form_state = form_state.merge(FinishedGoodsApp::LoadVehicleRepo.new.find_load_vehicle(vehicle_id).to_h) unless vehicle_id.nil?
 
             # overrides if redirect from error
             res = retrieve_from_local_store(:res)
@@ -301,7 +283,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                            form_name: :truck_arrival,
                                            scan_with_camera: @rmd_scan_with_camera,
                                            notes: retrieve_from_local_store(:flash_notice),
-                                           caption: 'Truck Arrival',
+                                           caption: 'Capture Vehicle',
                                            action: "/rmd/finished_goods/dispatch/truck_arrival/load/#{load_id}",
                                            button_caption: 'Submit')
             form.behaviours do |behaviour|
@@ -312,8 +294,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             end
 
             form.add_label(:load_id, 'Load', load_id, load_id)
-            form.add_label(:load_vehicle_id, 'vehicle_id', vehicle_id, vehicle_id, hide_on_load: true)
-            form.add_label(:load_container_id, 'container_id', container_id, container_id, hide_on_load: true)
+            form.add_label(:vehicle_id, 'vehicle_id', vehicle_id, vehicle_id, hide_on_load: true)
+            form.add_label(:container_id, 'container_id', container_id, container_id, hide_on_load: true)
             form.add_field(:vehicle_number,
                            'Vehicle Number',
                            data_type: 'string',
@@ -333,9 +315,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                            allow_decimals: true,
                            required: false)
             form.add_field(:driver_name, 'Driver')
-            form.add_field(:driver_cell_number,
-                           'Driver Cell no',
-                           data_type: 'number')
+            form.add_field(:driver_cell_number, 'Driver Cell no')
             form.add_field(:dispatch_consignment_note_number,
                            'Consignment Note Number',
                            data_type: 'string',
@@ -415,17 +395,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
 
           r.post do
-            res = interactor.check(:truck_arrival, load_id)
+            attrs = params[:truck_arrival]
+            res = interactor.truck_arrival(attrs)
+
             if res.success
-              res = interactor.truck_arrival(load_id, params[:truck_arrival])
-              if res.success
-                store_locally(:flash_notice, rmd_success_message(res.message))
-                r.redirect('/rmd/finished_goods/dispatch/truck_arrival/load')
-              end
+              store_locally(:flash_notice, rmd_success_message(res.message))
+              r.redirect('/rmd/finished_goods/dispatch/truck_arrival/load')
+            else
+              res.instance = attrs
+              store_locally(:res, res)
+              r.redirect("/rmd/finished_goods/dispatch/truck_arrival/load/#{attrs[:load_id]}")
             end
-            res.instance = params[:truck_arrival]
-            store_locally(:res, res)
-            r.redirect("/rmd/finished_goods/dispatch/truck_arrival/load/#{load_id}")
           end
         end
 
@@ -443,7 +423,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                            form_name: :load,
                                            scan_with_camera: @rmd_scan_with_camera,
                                            notes: retrieve_from_local_store(:flash_notice),
-                                           caption: 'Dispatch: Truck Arrival',
+                                           caption: 'Scan Load',
                                            action: '/rmd/finished_goods/dispatch/truck_arrival/load',
                                            button_caption: 'Submit')
 
@@ -460,7 +440,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           r.post do
             load_id = params[:load][:load_id]
-            res = interactor.check(:truck_arrival, load_id)
+            res = interactor.validate_load(load_id)
             if res.success
               r.redirect("/rmd/finished_goods/dispatch/truck_arrival/load/#{load_id}")
             else
@@ -476,8 +456,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'load_truck' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:load_truck, load_id)
-
           r.get do
             form_state = interactor.stepper(:load_truck).form_state
             r.redirect('/rmd/finished_goods/dispatch/load_truck/load') if form_state.empty?
@@ -488,14 +466,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                            scan_with_camera: @rmd_scan_with_camera,
                                            links: [{ caption: 'Cancel', url: '/rmd/finished_goods/dispatch/load_truck/load/clear', prompt: 'Cancel Load?' }],
                                            notes: retrieve_from_local_store(:flash_notice),
-                                           caption: 'Load Truck',
+                                           caption: 'Scan Pallets',
                                            action: "/rmd/finished_goods/dispatch/load_truck/load/#{load_id}",
                                            button_caption: 'Submit')
+
             form.add_label(:load_id, 'Load', load_id)
             form.add_label(:voyage_code, 'Voyage Code', form_state[:voyage_code])
             form.add_label(:vehicle_number, 'Vehicle Number', form_state[:vehicle_number])
             form.add_label(:container_code, 'Container Code', form_state[:container_code]) unless form_state[:container_code].nil?
-            form.add_label(:requires_temp_tail, 'Requires Temp Tail', form_state[:requires_temp_tail].to_s)
             form.add_label(:allocation_count, 'Allocation Count', form_state[:allocation_count]) unless form_state[:allocation_count]&.zero?
 
             form.add_field(:pallet_number,
@@ -512,29 +490,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           r.post do
             scanned_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:load_truck][:pallet_number]).pallet_number
-
             res = interactor.stepper_load_pallet(:load_truck, load_id, scanned_number)
-            if res.instance[:load_loaded]
+            if res.instance[:load_complete]
               form_state = interactor.stepper(:load_truck).form_state || {}
               interactor.stepper(:load_truck).clear
               store_locally(:flash_notice, rmd_success_message(res.message))
-              if form_state[:requires_temp_tail]
-                store_locally(:temp_tail, OpenStruct.new(instance: { temp_tail_pallet_number: scanned_number, load_id: load_id }))
-                r.redirect('/rmd/finished_goods/dispatch/temp_tail')
+              if form_state[:container_code].nil_or_empty?
+                r.redirect('/rmd/finished_goods/dispatch/load_truck/load')
               else
-                res = interactor.ship_load(load_id)
-                if res.success
-                  store_locally(:flash_notice, rmd_success_message(res.message))
-                  r.redirect('/rmd/home')
-                else
-                  res = OpenStruct.new(instance: res.to_h.merge!(load_id: load_id))
-                  store_locally(:ship_load, res)
-                  r.redirect('/rmd/finished_goods/dispatch/ship_load')
-                end
+                store_locally(:temp_tail, OpenStruct.new(instance: { pallet_number: scanned_number }))
+                r.redirect('/rmd/finished_goods/dispatch/temp_tail')
               end
             end
             message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
             store_locally(:flash_notice, message)
+            r.redirect("/rmd/finished_goods/dispatch/load_truck/load/#{load_id}")
+          rescue Crossbeams::InfoError => e
+            store_locally(:flash_notice, rmd_error_message(e.message))
             r.redirect("/rmd/finished_goods/dispatch/load_truck/load/#{load_id}")
           end
         end
@@ -555,7 +527,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                            form_name: :load,
                                            scan_with_camera: @rmd_scan_with_camera,
                                            notes: retrieve_from_local_store(:flash_notice),
-                                           caption: 'Dispatch: Load Truck',
+                                           caption: 'Scan Load',
                                            action: '/rmd/finished_goods/dispatch/load_truck/load',
                                            button_caption: 'Submit')
 
@@ -573,7 +545,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.post do
             current_load = interactor.stepper(:load_truck)
             load_id = params[:load][:load_id]
-            res = interactor.check(:load_truck, load_id)
+            res = interactor.validate_load_truck(load_id)
+
             if res.success
               current_load.setup_load(load_id)
               r.redirect("/rmd/finished_goods/dispatch/load_truck/load/#{load_id}")
@@ -600,16 +573,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          form_name: :set_temp_tail,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: retrieve_from_local_store(:flash_notice),
-                                         caption: 'Dispatch: Set Temp Tail',
+                                         caption: 'Set Temp Tail',
                                          action: '/rmd/finished_goods/dispatch/temp_tail',
                                          button_caption: 'Submit')
-          form.add_field(:load_id,
-                         'Load',
-                         scan: 'key248_all',
-                         scan_type: :load,
-                         data_type: 'number',
-                         required: true)
-          form.add_field(:temp_tail_pallet_number,
+
+          form.add_field(:pallet_number,
                          'Pallet',
                          scan: 'key248_all',
                          scan_type: :pallet_number,
@@ -626,66 +594,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          load_id = params[:set_temp_tail][:load_id].to_i
-          res = interactor.update_temp_tail(load_id, params[:set_temp_tail])
-          if res.success
-            if res.instance.loaded
-              res = interactor.ship_load(load_id)
-              if res.success
-                store_locally(:flash_notice, rmd_success_message(res.message))
-                r.redirect('/rmd/home')
-              else
-                res = OpenStruct.new(instance: res.to_h.merge!(load_id: load_id))
-                store_locally(:ship_load, res)
-                r.redirect('/rmd/finished_goods/dispatch/ship_load')
-              end
-            else
-              r.redirect "/rmd/finished_goods/dispatch/load_truck/load/#{load_id}"
-            end
-          else
-            store_locally(:temp_tail, res)
-            r.redirect '/rmd/finished_goods/dispatch/temp_tail'
-          end
-        end
-      end
-
-      # SHIP LOAD
-      # --------------------------------------------------------------------------
-      r.on 'ship_load' do
-        r.get do
-          form_state = {}
-          res = retrieve_from_local_store(:ship_load)
-          unless res.nil?
-            form_state = res.instance
-            form_state[:error_message] = res.message
-            form_state[:errors] = res.errors
-          end
-          form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: :ship_load,
-                                         scan_with_camera: @rmd_scan_with_camera,
-                                         notes: retrieve_from_local_store(:flash_notice),
-                                         caption: 'Dispatch: Ship Load',
-                                         action: '/rmd/finished_goods/dispatch/ship_load',
-                                         button_caption: 'Ship')
-
-          form.add_field(:load_id,
-                         'Load',
-                         scan: 'key248_all',
-                         data_type: 'number',
-                         required: true)
-          form.add_csrf_tag csrf_tag
-          view(inline: form.render, layout: :layout_rmd)
-        end
-
-        r.post do
-          load_id = params[:ship_load][:load_id].to_i
-          res = interactor.ship_load(load_id)
+          res = interactor.update_pallets_temp_tail(params[:set_temp_tail])
           if res.success
             store_locally(:flash_notice, rmd_success_message(res.message))
             r.redirect('/rmd/home')
           else
-            store_locally(:ship_load, res)
-            r.redirect('/rmd/finished_goods/dispatch/ship_load')
+            store_locally(:temp_tail, res)
+            r.redirect('/rmd/finished_goods/dispatch/temp_tail')
           end
         end
       end
@@ -989,34 +904,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.redirect('/rmd/finished_goods/view_deck_pallets')
         end
       end
-    end
-  end
-
-  def offload_valid_vehicle_pallet(route, id) # rubocop:disable Metrics/AbcSize
-    interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-    res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
-    if res.success
-      store_locally(:flash_notice, res.message)
-    else
-      store_locally(:error, res)
-    end
-
-    if !res.instance[:vehicle_job_offloaded]
-      route.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
-    else
-      form = Crossbeams::RMDForm.new({},
-                                     form_name: :pallet,
-                                     scan_with_camera: @rmd_scan_with_camera,
-                                     caption: 'Offload Pallet',
-                                     action: '/',
-                                     reset_button: false,
-                                     no_submit: true,
-                                     button_caption: '')
-
-      form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
-      form.add_csrf_tag csrf_tag
-      view(inline: form.render, layout: :layout_rmd)
     end
   end
 end

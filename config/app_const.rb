@@ -46,9 +46,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # General
   DEFAULT_KEY = 'DEFAULT'
 
-  # Production Runs
-  ALLOW_CULTIVAR_GROUP_MIXING = make_boolean('ALLOW_CULTIVAR_GROUP_MIXING')
-
   # Deliveries
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
   DELIVERY_CAPTURE_INNER_BINS = make_boolean('CAPTURE_INNER_BINS')
@@ -87,8 +84,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PALLETIZED_SEQUENCE_UPDATED = 'PALLETIZED_SEQUENCE_UPDATED'
   PALLET_WEIGHED = 'PALLET WEIGHED'
   PALLET_MOVED = 'PALLET_MOVED'
-  PALLET_SCRAPPED = 'PALLET SCRAPPED'
-  PALLET_UNSCRAPPED = 'PALLET UNSCRAPPED'
 
   # Constants for stock types:
   PALLET_STOCK_TYPE = 'PALLET'
@@ -98,8 +93,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RMT_BIN_TIPPED_MANUALLY = 'TIPPED MANUALLY'
   RMT_BIN_WEIGHED_MANUALLY = 'WEIGHED MANUALLY'
   RMT_BIN_MOVED = 'BIN_MOVED'
-  BULK_WEIGH_RMT_BINS = 'BULK WEIGH BINS MANUALLY'
-  RMT_BIN_RECEIPT_DATE_OVERRIDE = 'RECEIPT DATE OVERRIDE'
 
   # Constants for PM Types
   PM_TYPE_FRUIT_STICKER = 'fruit_sticker'
@@ -141,7 +134,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_INSPECTION_BILLING = 'INSPECTION_BILLING'
   ROLE_TARGET_CUSTOMER = 'TARGET CUSTOMER'
   ROLE_TRANSPORTER = 'TRANSPORTER'
-  ROLE_FARM_MANAGER = 'FARM_MANAGER'
+
+  # Default roles
+  DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
+  DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
 
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'
@@ -180,7 +176,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE = 'BULK PRODUCTION RUN UPDATE'
   RUN_TYPE_BULK_BIN_RUN_UPDATE = 'BULK BIN RUN UPDATE'
   RUN_TYPE_DELIVERY_DELETE = 'DELIVERY DELETE'
-  RUN_TYPE_BULK_WEIGH_BINS = 'BULK WEIGH BINS'
 
   # Constants for Reworks run actions:
   REWORKS_ACTION_SINGLE_EDIT = 'SINGLE EDIT'
@@ -194,7 +189,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_ACTION_UPDATE_PALLET_DETAILS = 'UPDATE PALLET DETAILS'
   REWORKS_ACTION_BULK_PALLET_RUN_UPDATE = 'BULK PALLET RUN UPDATE'
   REWORKS_ACTION_BULK_BIN_RUN_UPDATE = 'BULK BIN RUN UPDATE'
-  REWORKS_ACTION_CHANGE_DELIVERIES_ORCHARDS = 'CHANGE DELIVERIES ORCHARDS'
 
   REWORKS_REPACK_PALLET_STATUS = 'REPACK SCRAP'
   REWORKS_REPACK_PALLET_NEW_STATUS = 'REPACKED'
@@ -331,20 +325,15 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
   LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   LOCATION_TYPES_EMPTY_BIN = 'EMPTY_BIN'
+  ONSITE_EMPTY_BIN_LOCATION = ENV.fetch('ONSITE_EMPTY_BIN_LOCATION')
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
-  # Loads:
-  DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
-  DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
   DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
+
+  # Load_containers:
   VGM_REQUIRED = make_boolean('VGM_REQUIRED')
-  MAX_PALLETS_ON_LOAD = ENV['MAX_PALLETS_ON_LOAD'] || 50
-  TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
-  # Constants for port types:
-  PORT_TYPE_POL = 'POL'
-  PORT_TYPE_POD = 'POD'
 
   # CLM_BUTTON_CAPTION_FORMAT
   #
@@ -375,7 +364,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # If all robots on site are homogenous, set the value here.
   # Else it will be looked up from the module name.
   ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
-  ROBOT_MSG_SEP = '###'
+
+  # Constants for port types:
+  PORT_TYPE_POL = 'POL'
+  PORT_TYPE_POD = 'POD'
 
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
@@ -423,6 +415,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     },
     EDI_FLOW_PO => {
       depot: true,
+      destination_types: DESTINATION_TYPES,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
     },
     EDI_FLOW_UISTK => {
@@ -431,24 +424,16 @@ class AppConst # rubocop:disable Metrics/ClassLength
     }
   }.freeze
 
-  MF_VARIANT_RULES = { standard_pack_codes: { table_name: 'standard_pack_codes',
-                                              column: 'standard_pack_code' },
-                       pucs: { table_name: 'pucs',
-                               column: 'puc_code' },
-                       marketing_varieties: { table_name: 'marketing_varieties',
-                                              column: 'marketing_variety_code' },
-                       fruit_size_references: { table_name: 'fruit_size_references',
-                                                column: 'size_reference' },
-                       marks: { table_name: 'marks',
-                                column: 'mark_code' },
-                       inventory_codes: { table_name: 'inventory_codes',
-                                          column: 'inventory_code' },
-                       grades: { table_name: 'grades',
-                                 column: 'grade_code' },
-                       packed_tm_group: { table_name: 'target_market_groups',
-                                          column: 'target_market_group_name' },
-                       organizations: { table_name: 'organizations',
-                                        column: 'medium_description' } }.freeze
+  MF_VARIANT_TABLES = %i[
+    standard_pack_codes
+    pucs
+    marketing_varieties
+    fruit_size_references
+    marks
+    inventory_codes
+    grades
+    packed_tm_group
+  ].freeze
 
   SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
@@ -467,8 +452,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
   PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
   QUALITY_API_NAMES = [PHYT_CLEAN_STANDARD].freeze
-  BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean('BYPASS_QUALITY_TEST_PRE_RUN_CHECK')
-  BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean('BYPASS_QUALITY_TEST_LOAD_CHECK')
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
@@ -477,22 +460,16 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PHYT_CLEAN_SEASON_ID = ENV['PHYT_CLEAN_SEASON_ID']
 
   # eCert
-  E_CERT_ENVIRONMENT = { QA: 'https://qa.', PRODUCTION: 'https://' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]
+  E_CERT_ENVIRONMENT = { QA: 'http://qa.', PRODUCTION: 'http://app.' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]
   E_CERT_API_CLIENT_ID = ENV['E_CERT_API_CLIENT_ID']
   E_CERT_API_CLIENT_SECRET = ENV['E_CERT_API_CLIENT_SECRET']
   E_CERT_BUSINESS_ID = ENV['E_CERT_BUSINESS_ID']
   E_CERT_BUSINESS_NAME = ENV['E_CERT_API_CLIENT_SECRET']
   E_CERT_INDUSTRY = ENV['E_CERT_INDUSTRY']
 
-  ASSET_TRANSACTION_TYPES = { adhoc_move: 'ADHOC_MOVE',
-                              adhoc_create: 'ADHOC_CREATE',
-                              adhoc_destroy: 'ADHOC_DESTROY',
+  ASSET_TRANSACTION_TYPES = { adhoc: 'ADHOC_EMPTY_BIN_MOVE',
                               receive: 'RECEIVE_BINS',
-                              issue: 'ISSUE_BINS',
+                              issue: 'BOOKOUT_BINS',
                               bin_tip: 'BIN_TIP',
                               rebin: 'REBIN' }.freeze
-
-  # Bin Control
-  ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
-  MAX_BINS_ON_LOAD = ENV['MAX_BINS_ON_LOAD'] || 50
 end

@@ -18,12 +18,6 @@
   :is_delete: true
   :popup: true
   :hide_if_true: completed
-- :url: "/raw_materials/dispatch/bin_load_products/$:id$/allocate"
-  :text: allocate to ship
-  :icon: add-outline
-  :popup: false
-  :hide_if_true: shipped
-  :hide_if_false: completed,allocate_to_ship
 - :separator: true
 - :url: "/development/statuses/list/bin_load_products/$:id$"
   :text: status

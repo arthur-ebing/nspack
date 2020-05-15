@@ -38,14 +38,6 @@ module MasterfilesApp
                           value: :id,
                           order_by: :orchard_code
 
-    build_for_select :farm_sections,
-                     label: :farm_section_name,
-                     value: :id,
-                     no_active_check: true,
-                     order_by: :farm_section_name
-
-    crud_calls_for :farm_sections, name: :farm_section, wrapper: FarmSection
-
     def for_select_pucs(where: nil)
       ds = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)
       ds = ds.where(where) unless where.nil?
@@ -87,9 +79,6 @@ module MasterfilesApp
                                    parent_tables: [{ parent_table: :farms,
                                                      columns: [:farm_code],
                                                      flatten_columns: { farm_code: :farm } },
-                                                   { parent_table: :farm_sections,
-                                                     columns: %i[farm_section_name farm_manager_party_role_id],
-                                                     flatten_columns: { farm_section_name: :farm_section_name, farm_manager_party_role_id: :farm_manager_party_role_id } },
                                                    { parent_table: :pucs,
                                                      columns: [:puc_code],
                                                      flatten_columns: { puc_code: :puc_code } }],
@@ -148,17 +137,6 @@ module MasterfilesApp
       DB[:orchards].join(:farms, id: :farm_id).where(farm_id: id).order(:orchard_code).select_map(:orchard_code)
     end
 
-    def find_orchard_farm_section(id)
-      query = <<~SQL
-        SELECT f.farm_section_name || ' - ' || fn_party_role_name(f.farm_manager_party_role_id) AS farm_section
-        FROM farm_sections f
-        JOIN orchards o on o.farm_section_id=f.id
-        WHERE o.id= ?
-      SQL
-      hash = DB[query, id].first
-      hash.nil? ? nil : hash[:farm_section]
-    end
-
     def selected_farm_orchard_codes(farm_id, puc_id)
       DB[:orchards]
         .where(farm_id: farm_id)
@@ -215,50 +193,6 @@ module MasterfilesApp
 
     def find_farm_group_farm_codes(id)
       DB[:farms].join(:farm_groups, id: :farm_group_id).where(farm_group_id: id).order(:farm_code).select_map(:farm_code)
-    end
-
-    def create_farm_section(params)
-      orchard_ids = params.delete(:orchard_ids).to_a
-      farm_section_id = DB[:farm_sections].insert(params)
-      DB[:orchards].where(id: orchard_ids).update(farm_section_id: farm_section_id)
-      farm_section_id
-    end
-
-    def find_farm_section(id)
-      query = <<~SQL
-        SELECT DISTINCT farm_sections.id, farm_sections.farm_manager_party_role_id, farm_sections.farm_section_name, farm_sections.description
-        , string_agg(orchard_code::text, ', '::text)AS orchards, orchards.farm_id
-        , fn_party_role_name(farm_sections.farm_manager_party_role_id) AS farm_manager_party_role, fn_current_status('farm_sections', farm_sections.id) AS status
-        FROM farm_sections
-        JOIN orchards ON orchards.farm_section_id = farm_sections.id
-        WHERE farm_sections.id = ?
-        GROUP BY farm_sections.id, farm_sections.farm_manager_party_role_id, farm_sections.farm_section_name, farm_sections.description, orchards.farm_id
-      SQL
-      hash = DB[query, id].first
-      return nil if hash.nil?
-
-      hash[:orchard_ids] = orchard_ids(hash[:id])
-      FarmSectionFlat.new(hash)
-    end
-
-    def orchard_ids(id)
-      DB[:orchards].where(farm_section_id: id).select_map(:id)
-    end
-
-    def update_farm_section(id, params) # rubocop:disable Metrics/AbcSize
-      orchard_ids = params.delete(:orchard_ids).map(&:to_i)
-      current_orchards = DB[:orchards].where(farm_section_id: id).select_map(:id)
-      new_orchards = orchard_ids - current_orchards
-      removed_orchards = current_orchards - orchard_ids
-
-      DB[:orchards].where(id: new_orchards).update(farm_section_id: id)
-      DB[:orchards].where(id: removed_orchards).update(farm_section_id: nil)
-      DB[:farm_sections].where(id: id).update(params)
-    end
-
-    def delete_farm_section(id)
-      DB[:orchards].where(farm_section_id: id).update(farm_section_id: nil)
-      DB[:farm_sections].where(id: id).delete
     end
   end
 end

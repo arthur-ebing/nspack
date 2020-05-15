@@ -16,7 +16,6 @@
   :icon: delete
   :is_delete: true
   :popup: true
-  :hide_if_true: in_use
 - :separator: true
 - :url: "/development/statuses/list/bin_load_purposes/$:id$"
   :text: status

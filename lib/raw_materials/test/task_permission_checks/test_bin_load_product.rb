@@ -20,21 +20,9 @@ module RawMaterialsApp
         puc_id: 1,
         orchard_id: 1,
         rmt_class_id: 1,
-        cultivar_group_code: 'ABC',
-        cultivar_name: 'ABC',
-        farm_code: 'ABC',
-        puc_code: 'ABC',
-        orchard_code: 'ABC',
-        rmt_class_code: 'ABC',
-        container_material_type_code: 'ABC',
-        container_material_owner: 'ABC',
-        product_code: 'ABC',
-        available_bin_ids: nil,
-        completed: false,
-        shipped: false,
-        status: 'ABC'
+        active: true
       }
-      RawMaterialsApp::BinLoadProductFlat.new(base_attrs.merge(attrs))
+      RawMaterialsApp::BinLoadProduct.new(base_attrs.merge(attrs))
     end
 
     def test_create
@@ -43,13 +31,13 @@ module RawMaterialsApp
     end
 
     def test_edit
-      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_product_flat).returns(entity)
+      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_product).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::BinLoadProduct.call(:edit, 1)
       assert res.success, 'Should be able to edit a bin_load_product'
     end
 
     def test_delete
-      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_product_flat).returns(entity)
+      RawMaterialsApp::BinLoadRepo.any_instance.stubs(:find_bin_load_product).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::BinLoadProduct.call(:delete, 1)
       assert res.success, 'Should be able to delete a bin_load_product'
     end

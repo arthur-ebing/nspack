@@ -1,22 +1,20 @@
 # frozen_string_literal: true
 
 module UiRules
-  class BinLoadRule < Base # rubocop:disable Metrics/ClassLength
+  class BinLoadRule < Base
     def generate_rules
       set_repo
       make_form_object
-      make_progress_step
       apply_form_values
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show].include? @mode
+      set_show_fields if %i[show complete].include? @mode
 
       form_name 'bin_load'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Bin Load' }
       fields[:bin_load_purpose_id] = { renderer: :label, with_value: @form_object.purpose_code, caption: 'Bin Load Purpose' }
       fields[:customer_party_role_id] = { renderer: :label, with_value: @form_object.customer, caption: 'Customer' }
       fields[:transporter_party_role_id] = { renderer: :label, with_value: @form_object.transporter, caption: 'Transporter' }
@@ -31,9 +29,6 @@ module UiRules
 
     def common_fields
       {
-        id: { renderer: :label,
-              with_value: @form_object.id,
-              caption: 'Bin Load' },
         bin_load_purpose_id: { renderer: :select,
                                options: @repo.for_select_bin_load_purposes,
                                disabled_options: @repo.for_select_inactive_bin_load_purposes,
@@ -56,14 +51,12 @@ module UiRules
                          prompt: true,
                          caption: 'Destination Depot',
                          required: true },
-        qty_bins: { renderer: :integer,
-                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
-                    minvalue: 1,
+        qty_bins: { renderer: :numeric,
                     required: true },
-        shipped_at: { renderer: :label, format: :without_timezone_or_seconds },
-        shipped: { renderer: :label, as_boolean: true },
-        completed_at: { renderer: :label, format: :without_timezone_or_seconds },
-        completed: { renderer: :label, as_boolean: true }
+        shipped_at: {},
+        shipped: { renderer: :checkbox },
+        completed_at: {},
+        completed: { renderer: :checkbox }
       }
     end
 
@@ -86,39 +79,6 @@ module UiRules
                                     shipped: nil,
                                     completed_at: nil,
                                     completed: nil)
-    end
-
-    def make_progress_step # rubocop:disable Metrics/AbcSize
-      id = @options[:id]
-      steps = ['Add Products', 'Complete', 'Allocate Bins', 'Ship', 'Finished']
-
-      actions = ['/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{id}/complete",
-                 '/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{id}/ship",
-                 '/list/bin_loads']
-      captions = %w[Close Complete Close Ship Close]
-
-      back_actions = ["/raw_materials/dispatch/bin_loads/#{id}/edit",
-                      "/raw_materials/dispatch/bin_loads/#{id}/edit",
-                      "/raw_materials/dispatch/bin_loads/#{id}/reopen",
-                      "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
-                      "/raw_materials/dispatch/bin_loads/#{id}/unship"]
-      back_captions = %w[Edit Edit Reopen Unallocate Unship]
-
-      step = 0
-      step = 1 if @form_object.products
-      step = 2 if @form_object.completed
-      step = 3 if @form_object.allocated
-      step = 4 if @form_object.shipped
-
-      form_object = @form_object.to_h.merge(steps: steps,
-                                            step: step,
-                                            action: actions[step],
-                                            caption: captions[step],
-                                            back_action: back_actions[step],
-                                            back_caption: back_captions[step])
-      @form_object = OpenStruct.new(form_object)
     end
 
     def set_repo
