@@ -38,7 +38,7 @@ module ProductionApp
       default = {
         product_setup_template_id: product_setup_template_id,
         marketing_variety_id: marketing_variety_id,
-        customer_variety_variety_id: nil,
+        customer_variety_id: nil,
         std_fruit_size_count_id: nil,
         basic_pack_code_id: basic_pack_code_id,
         standard_pack_code_id: standard_pack_code_id,

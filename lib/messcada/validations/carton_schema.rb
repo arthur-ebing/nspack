@@ -22,7 +22,7 @@ module MesscadaApp
     required(:production_line_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:marketing_variety_id, :integer).filled(:int?)
-    optional(:customer_variety_variety_id, :integer).maybe(:int?)
+    optional(:customer_variety_id, :integer).maybe(:int?)
     optional(:std_fruit_size_count_id, :integer).maybe(:int?)
     required(:basic_pack_code_id, :integer).filled(:int?)
     required(:standard_pack_code_id, :integer).filled(:int?)

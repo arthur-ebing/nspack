@@ -312,7 +312,7 @@ module ProductionApp
     end
 
     def sequence_setup_attrs(id)
-      DB["SELECT marketing_variety_id, customer_variety_variety_id, std_fruit_size_count_id, basic_pack_code_id,
+      DB["SELECT marketing_variety_id, customer_variety_id, std_fruit_size_count_id, basic_pack_code_id,
           standard_pack_code_id, fruit_actual_counts_for_pack_id, fruit_size_reference_id, marketing_org_party_role_id,
           packed_tm_group_id, mark_id, inventory_code_id, pallet_format_id, cartons_per_pallet_id, pm_bom_id, client_size_reference,
           client_product_code, treatment_ids, marketing_order_number, sell_by_code, grade_id, product_chars, pm_type_id, pm_subtype_id
@@ -331,7 +331,7 @@ module ProductionApp
     def sequence_edit_data(attrs)  # rubocop:disable Metrics/AbcSize
       pallet_format = MasterfilesApp::PackagingRepo.new.find_pallet_format(attrs[:pallet_format_id])
       { marketing_variety: get(:marketing_varieties, attrs[:marketing_variety_id], :marketing_variety_code),
-        customer_variety: customer_variety_variety(attrs[:customer_variety_variety_id]),
+        customer_variety: customer_variety(attrs[:customer_variety_id]),
         std_size: get(:std_fruit_size_counts, attrs[:std_fruit_size_count_id], :size_count_value),
         basic_pack: get(:basic_pack_codes, attrs[:basic_pack_code_id], :basic_pack_code),
         std_pack: get(:standard_pack_codes, attrs[:standard_pack_code_id], :standard_pack_code),
@@ -356,10 +356,10 @@ module ProductionApp
         product_chars: attrs[:product_chars] }
     end
 
-    def customer_variety_variety(customer_variety_variety_id)
+    def customer_variety(customer_variety_id)
       DB[:marketing_varieties]
         .join(:customer_varieties, variety_as_customer_variety_id: :id)
-        .where(Sequel[:customer_varieties][:id] => customer_variety_variety_id)
+        .where(Sequel[:customer_varieties][:id] => customer_variety_id)
         .get(:marketing_variety_code)
     end
 
@@ -482,7 +482,7 @@ module ProductionApp
 
     def find_pallet_sequence_setup_data(sequence_id)
       query = <<~SQL
-        SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_variety_id,
+        SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_id,
         ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
         ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
         ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code,

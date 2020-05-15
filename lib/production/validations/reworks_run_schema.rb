@@ -108,7 +108,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
 
     optional(:id, :integer).filled(:int?)
     required(:marketing_variety_id, :integer).filled(:int?)
-    required(:customer_variety_variety_id, :integer).maybe(:int?)
+    required(:customer_variety_id, :integer).maybe(:int?)
     required(:std_fruit_size_count_id, :integer).maybe(:int?)
     required(:basic_pack_code_id, :integer).filled(:int?)
     required(:standard_pack_code_id, :integer).filled(:int?)

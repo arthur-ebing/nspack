@@ -11,7 +11,7 @@ module ProductionApp
         id: 1,
         product_setup_template_id: 1,
         marketing_variety_id: 1,
-        customer_variety_variety_id: 1,
+        customer_variety_id: 1,
         std_fruit_size_count_id: 1,
         basic_pack_code_id: 1,
         standard_pack_code_id: 1,

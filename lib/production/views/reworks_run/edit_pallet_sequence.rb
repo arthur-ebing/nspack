@@ -56,7 +56,7 @@ module Production
                     fold.add_field :mark_id
                     fold.add_field :product_chars
                     fold.add_field :inventory_code_id
-                    fold.add_field :customer_variety_variety_id
+                    fold.add_field :customer_variety_id
                     fold.add_field :client_product_code
                     fold.add_field :client_size_reference
                     fold.add_field :marketing_order_number
