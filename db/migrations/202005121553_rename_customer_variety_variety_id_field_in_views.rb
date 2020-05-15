@@ -1189,7 +1189,7 @@ Sequel.migration do
            LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
            LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
            JOIN marketing_varieties ON marketing_varieties.id = carton_labels.marketing_variety_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = carton_labels.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = carton_labels.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = carton_labels.std_fruit_size_count_id
            LEFT JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
@@ -1300,7 +1300,7 @@ Sequel.migration do
            LEFT JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
            LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
            JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = pallet_sequences.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = pallet_sequences.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pallet_sequences.std_fruit_size_count_id
            LEFT JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
@@ -1407,7 +1407,7 @@ Sequel.migration do
            LEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id
            LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
            JOIN marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = product_setups.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = product_setups.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = product_setups.std_fruit_size_count_id
            LEFT JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
@@ -1517,7 +1517,7 @@ Sequel.migration do
            JOIN marks ON marks.id = pallet_sequences.mark_id
            JOIN pucs ON pucs.id = pallet_sequences.puc_id
            JOIN seasons ON seasons.id = pallet_sequences.season_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = pallet_sequences.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = pallet_sequences.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
            LEFT JOIN party_roles org_pr ON org_pr.id = pallet_sequences.marketing_org_party_role_id
@@ -1740,7 +1740,7 @@ Sequel.migration do
            JOIN inventory_codes ON inventory_codes.id = ps.inventory_code_id
            JOIN target_market_groups ON target_market_groups.id = ps.packed_tm_group_id
            JOIN grades ON grades.id = ps.grade_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = ps.std_fruit_size_count_id
            LEFT JOIN fruit_size_references ON fruit_size_references.id = ps.fruit_size_reference_id
@@ -1953,7 +1953,7 @@ Sequel.migration do
            JOIN inventory_codes ON inventory_codes.id = ps.inventory_code_id
            JOIN target_market_groups ON target_market_groups.id = ps.packed_tm_group_id
            JOIN grades ON grades.id = ps.grade_id
-           LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_id
+           LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_variety_id
            LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
            LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = ps.std_fruit_size_count_id
            LEFT JOIN fruit_size_references ON fruit_size_references.id = ps.fruit_size_reference_id
@@ -2113,7 +2113,7 @@ Sequel.migration do
              JOIN inventory_codes ON inventory_codes.id = ps.inventory_code_id
              JOIN target_market_groups ON target_market_groups.id = ps.packed_tm_group_id
              JOIN grades ON grades.id = ps.grade_id
-             LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_id
+             LEFT JOIN customer_varieties ON customer_varieties.id = ps.customer_variety_variety_id
              LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id
              LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = ps.std_fruit_size_count_id
              LEFT JOIN fruit_size_references ON fruit_size_references.id = ps.fruit_size_reference_id
