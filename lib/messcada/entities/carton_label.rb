@@ -14,7 +14,7 @@ module MesscadaApp
     attribute :production_line_id, Types::Integer
     attribute :season_id, Types::Integer
     attribute :marketing_variety_id, Types::Integer
-    attribute :customer_variety_variety_id, Types::Integer
+    attribute :customer_variety_id, Types::Integer
     attribute :std_fruit_size_count_id, Types::Integer
     attribute :basic_pack_code_id, Types::Integer
     attribute :standard_pack_code_id, Types::Integer

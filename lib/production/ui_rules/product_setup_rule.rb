@@ -24,7 +24,7 @@ module UiRules
     def set_show_fields  # rubocop:disable Metrics/AbcSize
       product_setup_template_id_label = @repo.find_hash(:product_setup_templates, @form_object.product_setup_template_id)[:template_name]
       marketing_variety_id_label = @repo.find_hash(:marketing_varieties, @form_object.marketing_variety_id)[:marketing_variety_code]
-      customer_variety_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_variety_id)&.variety_as_customer_variety
+      customer_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_id)&.variety_as_customer_variety
       std_fruit_size_count_id_label = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
       basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
       standard_pack_code_id_label = @repo.find_hash(:standard_pack_codes, @form_object.standard_pack_code_id)[:standard_pack_code]
@@ -45,7 +45,7 @@ module UiRules
       pm_subtype_id_label = MasterfilesApp::BomsRepo.new.find_pm_subtype(@form_object.pm_subtype_id)&.subtype_code
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
-      fields[:customer_variety_variety_id] = { renderer: :label, with_value: customer_variety_variety_id_label, caption: 'Customer Variety Variety' }
+      fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
       fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
       fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code', hide_on_load: @rules[:hide_some_fields] ? true : false }
@@ -90,7 +90,7 @@ module UiRules
       customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
                              []
                            else
-                             MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
+                             MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
                   []
@@ -195,13 +195,13 @@ module UiRules
                              searchable: true,
                              remove_search_for_small_list: false,
                              required: true },
-        customer_variety_variety_id: { renderer: :select,
-                                       options: customer_varieties,
-                                       disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_variety_varieties,
-                                       caption: 'Customer Variety',
-                                       prompt: 'Select Customer Variety',
-                                       searchable: true,
-                                       remove_search_for_small_list: false },
+        customer_variety_id: { renderer: :select,
+                               options: customer_varieties,
+                               disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
+                               caption: 'Customer Variety',
+                               prompt: 'Select Customer Variety',
+                               searchable: true,
+                               remove_search_for_small_list: false },
         client_product_code: {},
         client_size_reference: {},
         marketing_order_number: {},
@@ -291,7 +291,7 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(product_setup_template_id: @options[:product_setup_template_id],
                                     marketing_variety_id: nil,
-                                    customer_variety_variety_id: nil,
+                                    customer_variety_id: nil,
                                     std_fruit_size_count_id: nil,
                                     basic_pack_code_id: nil,
                                     standard_pack_code_id: nil,

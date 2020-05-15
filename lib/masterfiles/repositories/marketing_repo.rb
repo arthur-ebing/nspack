@@ -162,7 +162,7 @@ module MasterfilesApp
       packed_tm_groups - marketing_variety_packed_tm_groups(variety_as_customer_variety_id)
     end
 
-    def for_select_inactive_customer_variety_varieties
+    def for_select_inactive_customer_varieties
       DB[:marketing_varieties]
         .join(:customer_varieties, variety_as_customer_variety_id: :id)
         .where(Sequel[:customer_varieties][:active] => false)
@@ -173,7 +173,7 @@ module MasterfilesApp
         ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
 
-    def for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+    def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
       DB[:marketing_varieties]
         .join(:customer_varieties, variety_as_customer_variety_id: :id)
         .join(:customer_variety_varieties, customer_variety_id: :id)

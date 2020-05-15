@@ -349,28 +349,28 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'packed_tm_group_changed' do
         if params[:changed_value].blank? || params[:product_setup_marketing_variety_id].blank?
-          customer_variety_varieties = []
+          customer_varieties = []
         else
           packed_tm_group_id = params[:changed_value]
           marketing_variety_id = params[:product_setup_marketing_variety_id]
-          customer_variety_varieties = interactor.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+          customer_varieties = interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'product_setup_customer_variety_variety_id',
-                                     options_array: customer_variety_varieties)])
+                                     dom_id: 'product_setup_customer_variety_id',
+                                     options_array: customer_varieties)])
       end
 
       r.on 'marketing_variety_changed' do
         if params[:changed_value].blank? || params[:product_setup_packed_tm_group_id].blank?
-          customer_variety_varieties = []
+          customer_varieties = []
         else
           marketing_variety_id = params[:changed_value]
           packed_tm_group_id = params[:product_setup_packed_tm_group_id]
-          customer_variety_varieties = interactor.for_select_customer_variety_varieties(packed_tm_group_id, marketing_variety_id)
+          customer_varieties = interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'product_setup_customer_variety_variety_id',
-                                     options_array: customer_variety_varieties)])
+                                     dom_id: 'product_setup_customer_variety_id',
+                                     options_array: customer_varieties)])
       end
 
       r.on 'pallet_stack_type_changed' do

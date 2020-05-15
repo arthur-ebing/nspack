@@ -105,7 +105,7 @@ module UiRules
       customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
                              []
                            else
-                             MasterfilesApp::MarketingRepo.new.for_select_customer_variety_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
+                             MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
 
       pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
@@ -212,13 +212,13 @@ module UiRules
                                       searchable: true,
                                       remove_search_for_small_list: false,
                                       required: true }
-      fields[:customer_variety_variety_id] =  { renderer: :select,
-                                                options: customer_varieties,
-                                                disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_variety_varieties,
-                                                caption: 'Customer Variety',
-                                                prompt: 'Select Customer Variety',
-                                                searchable: true,
-                                                remove_search_for_small_list: false }
+      fields[:customer_variety_id] =  { renderer: :select,
+                                        options: customer_varieties,
+                                        disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
+                                        caption: 'Customer Variety',
+                                        prompt: 'Select Customer Variety',
+                                        searchable: true,
+                                        remove_search_for_small_list: false }
       fields[:client_product_code] =  {}
       fields[:client_size_reference] =  {}
       fields[:marketing_order_number] =  {}
