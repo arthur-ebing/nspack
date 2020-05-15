@@ -115,8 +115,8 @@ const crossbeamsGridFormatters = {
         titleValue = titleValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
       }
     }
-    promptValue = item.prompt ? item.prompt : '';
-    if (item.prompt && item.prompt.indexOf('$:') > -1) {
+    promptValue = item.prompt;
+    if (promptValue && promptValue.indexOf('$:') > -1) {
       promptValue = promptValue.replace(/\$:(.*?)\$/g, match => params.data[match.replace('$:', '').replace('$', '')]);
     }
     if (item.is_separator) {
