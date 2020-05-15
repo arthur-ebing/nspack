@@ -46,11 +46,13 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_bin_load(id)
-      params = { completed: true, completed_at: Time.now }
+    def complete_bin_load(id, params) # rubocop:disable Metrics/AbcSize
+      params = params.merge(completed: true, completed_at: Time.now)
+      res = validate_bin_load_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        repo.update_bin_load(id, params)
+        repo.update_bin_load(id, res)
         log_status(:bin_loads, id, 'COMPLETED')
         log_transaction
       end
@@ -90,10 +92,36 @@ module RawMaterialsApp
       end
       instance = bin_load(id)
       success_response("Unshipped Bin Load #{instance.id}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      failed_response('Bin Asset Number allocated elsewhere, Unable to unship load.')
+    rescue Sequel::UniqueConstraintViolation => e
+      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize
+      res = ScanBinLoadSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = res.to_h[:bin_load_id]
+      instance = bin_load(id)
+      return failed_response "Cant find Bin Load: #{id}" if instance.nil?
+      return failed_response "Bin Load: #{id} has not been completed" unless instance.completed
+      return failed_response "Bin Load: #{id} has already been shipped" if instance.shipped
+      return failed_response "Bin Load: #{id} Insufficient bins available" if instance.qty_bins_available < instance.qty_bins
+
+      success_response('Load valid', instance)
+    end
+
+    def scan_bin_to_bin_load(params)
+      res = ScanBinToBinLoadSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      bin_asset_number = res.to_h[:bin_asset_number]
+      bin_id, exit_ref = repo.get_value(:rmt_bins, %i[id exit_ref], bin_asset_number: bin_asset_number)
+      return failed_response "Bin:#{bin_asset_number} not found" if bin_id.nil?
+      return failed_response "Bin:#{bin_asset_number} is not in stock, exit reference:#{exit_ref}" unless exit_ref.nil?
+
+      success_response('ok', bin_asset_number)
     end
 
     def stepper(step_key)
@@ -103,11 +131,6 @@ module RawMaterialsApp
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::BinLoad.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
-    end
-
-    def validate!(task, id = nil, params = nil)
-      res = TaskPermissionCheck::BinLoad.call(task, id, params)
-      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def rmt_bins_matching_bin_load(column, args)
@@ -121,7 +144,7 @@ module RawMaterialsApp
     end
 
     def bin_load(id)
-      repo.find_bin_load(id)
+      repo.find_bin_load_flat(id)
     end
 
     def validate_bin_load_params(params)

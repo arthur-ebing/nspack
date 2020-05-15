@@ -118,7 +118,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.complete_bin_load(id)
+          res = interactor.complete_bin_load(id, params[:bin_load])
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
@@ -191,9 +191,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
       end
-    rescue Crossbeams::TaskNotPermittedError => e
-      flash[:error] = "Task not permitted, #{e.message}"
-      redirect_to_last_grid(r)
     end
 
     r.on 'bin_loads' do
@@ -262,55 +259,51 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'bin_load_products' do
       r.on 'cultivar_group_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          list = MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: params[:changed_value] })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_cultivar_id', options_array: list)
-          json_actions(actions)
-        end
+        actions = []
+        list = if params[:changed_value].nil_or_empty?
+                 MasterfilesApp::CultivarRepo.new.for_select_cultivars
+               else
+                 MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { cultivar_group_id: params[:changed_value] })
+               end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_cultivar_id', options_array: list)
+        json_actions(actions)
       end
 
       r.on 'rmt_container_material_type_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          repo = MasterfilesApp::PartyRepo.new
-          party_role_ids = repo.select_values(:rmt_container_material_owners,
-                                              :rmt_material_owner_party_role_id,
-                                              rmt_container_material_type_id: params[:changed_value])
-          list = repo.for_select_party_roles(AppConst::ROLE_RMT_BIN_OWNER, where: { id: party_role_ids })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_rmt_material_owner_party_role_id', options_array: list)
-          json_actions(actions)
-        end
+        actions = []
+        repo = MasterfilesApp::PartyRepo.new
+        list = if params[:changed_value].nil_or_empty?
+                 repo.for_select_party_roles(AppConst::ROLE_RMT_BIN_OWNER)
+               else
+                 party_role_ids = repo.select_values(:rmt_container_material_owners, :rmt_material_owner_party_role_id, rmt_container_material_type_id: params[:changed_value])
+                 repo.for_select_party_roles(AppConst::ROLE_RMT_BIN_OWNER, where: { id: party_role_ids })
+               end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_rmt_material_owner_party_role_id', options_array: list)
+        json_actions(actions)
       end
 
       r.on 'farm_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          actions = []
-          puc_list = MasterfilesApp::FarmRepo.new.for_select_pucs(where: { farm_id: params[:changed_value] })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_puc_id', options_array: puc_list)
-
-          orchard_list = MasterfilesApp::FarmRepo.new.for_select_orchards(where: { farm_id: params[:changed_value] })
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_orchard_id', options_array: orchard_list)
-          json_actions(actions)
-        end
+        actions = []
+        puc_list = if params[:changed_value].nil_or_empty?
+                     MasterfilesApp::FarmRepo.new.for_select_pucs
+                   else
+                     MasterfilesApp::FarmRepo.new.for_select_pucs(where: { farm_id: params[:changed_value] })
+                   end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_puc_id', options_array: puc_list)
+        json_actions(actions)
       end
 
       r.on 'puc_changed' do
         actions = []
         if params[:changed_value].nil_or_empty?
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'bin_load_product_orchard_id_field_wrapper')
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_orchard_id', options_array: [])
+          show_hide_element = :hide_element
+          orchard_list = []
         else
+          show_hide_element = :show_element
           orchard_list = MasterfilesApp::FarmRepo.new.for_select_orchards(where: { puc_id: params[:changed_value] })
-          actions << OpenStruct.new(type: :show_element, dom_id: 'bin_load_product_orchard_id_field_wrapper')
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_orchard_id', options_array: orchard_list)
         end
+        actions << OpenStruct.new(type: show_hide_element, dom_id: 'bin_load_product_orchard_id_field_wrapper')
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'bin_load_product_orchard_id', options_array: orchard_list)
         json_actions(actions)
       end
     end

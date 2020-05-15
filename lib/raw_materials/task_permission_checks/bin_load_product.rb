@@ -3,18 +3,12 @@
 module RawMaterialsApp
   module TaskPermissionCheck
     class BinLoadProduct < BaseService
-      attr_reader :task, :repo, :bin_load_product, :bin_load, :rmt_bin
-      def initialize(task, id = nil, bin_asset_number = nil)
-        @repo = BinLoadRepo.new
-        unless id.nil?
-          @bin_load_product = repo.find_bin_load_product_flat(id)
-          @bin_load = repo.find_bin_load_flat(@bin_load_product&.bin_load_id)
-        end
-        unless bin_asset_number.nil?
-          bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
-          @rmt_bin = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_bin_flat(bin_id)
-        end
+      attr_reader :task, :entity
+      def initialize(task, bin_load_product_id = nil)
         @task = task
+        @repo = BinLoadRepo.new
+        @id = bin_load_product_id
+        @entity = @id ? @repo.find_bin_load_product_flat(@id) : nil
       end
 
       CHECKS = {
@@ -24,7 +18,7 @@ module RawMaterialsApp
       }.freeze
 
       def call
-        return failed_response 'Bin Load Product record not found' unless bin_load_product || task == :create
+        return failed_response 'Bin Load Product record not found' unless entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
@@ -51,7 +45,7 @@ module RawMaterialsApp
       end
 
       def bin_load_completed?
-        @bin_load&.completed
+        entity.completed
       end
     end
   end

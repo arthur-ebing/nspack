@@ -36,26 +36,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          scanned_number = params[:bin_load][:bin_asset_number]
-          interactor.validate!(:bin_exists, bin_load_id, bin_asset_number: scanned_number)
-          stepper.allocate(scanned_number)
-          if stepper.ready_to_ship?
-            res = interactor.ship_bin_load(bin_load_id, stepper.loaded)
-            if res.success
-              stepper.clear
-              store_locally(:flash_notice, rmd_success_message(res.message))
-              r.redirect('/rmd/raw_materials/dispatch/bin_load')
-            else
-              store_locally(:flash_notice, rmd_error_message(res.message))
-              r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
+          res = interactor.scan_bin_to_bin_load(params[:bin_load])
+          if res.success
+            stepper.allocate(res.instance)
+            if stepper.ready_to_ship?
+              res = interactor.ship_bin_load(bin_load_id, stepper.loaded)
+              if res.success
+                stepper.clear
+                store_locally(:flash_notice, rmd_success_message(res.message))
+                r.redirect('/rmd/raw_materials/dispatch/bin_load')
+              else
+                store_locally(:flash_notice, rmd_error_message(res.message))
+              end
             end
-          end
 
-          message = stepper.error.nil? ? rmd_success_message(stepper.message) : rmd_error_message(stepper.error)
-          store_locally(:flash_notice, message)
-          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
-        rescue Crossbeams::InfoError => e
-          store_locally(:flash_notice, rmd_error_message(e.message))
+            message = rmd_warning_message(stepper.warning_message) || rmd_success_message(stepper.message)
+            store_locally(:flash_notice, message)
+          else
+            store_locally(:flash_notice, rmd_error_message(e.message))
+          end
           r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
         end
       end
@@ -93,14 +92,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          bin_load_id = params[:bin_load][:bin_load_id]
-          interactor.validate!(:bin_load, bin_load_id)
-          stepper.setup_load(bin_load_id)
-          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
-
-        rescue Crossbeams::InfoError => e
-          stepper.write(form_state: { error_message: e.message })
-          r.redirect('/rmd/raw_materials/dispatch/bin_load')
+          res = interactor.scan_bin_load(params[:bin_load])
+          if res.success
+            stepper.setup_load(res.instance.id)
+            r.redirect("/rmd/raw_materials/dispatch/bin_load/#{res.instance.id}")
+          else
+            stepper.write(form_state: { error_message: res.message })
+            r.redirect('/rmd/raw_materials/dispatch/bin_load')
+          end
         end
       end
     end

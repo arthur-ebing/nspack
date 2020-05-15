@@ -11,7 +11,6 @@ module RawMaterialsApp
     def setup_load(bin_load_id)
       @bin_load_id = bin_load_id
       bin_load_flat = repo.find_bin_load_flat(bin_load_id)
-      bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: bin_load_id)
       raise 'Setup Bin Load called without bin_load_id' if bin_load_flat.nil?
 
       form_state = { bin_load_id: bin_load_id,
@@ -19,8 +18,7 @@ module RawMaterialsApp
                      transporter: bin_load_flat.transporter,
                      dest_depot: bin_load_flat.dest_depot,
                      qty_bins: bin_load_flat.qty_bins }
-      loaded = repo.select_values(:rmt_bins, %i[bin_load_product_id bin_asset_number], bin_load_product_id: bin_load_product_ids)
-      write(bin_load_id: bin_load_id, form_state: form_state, loaded: loaded)
+      write(bin_load_id: bin_load_id, form_state: form_state)
     end
 
     def bin_load_id
@@ -32,7 +30,7 @@ module RawMaterialsApp
     end
 
     def loaded
-      current_step[:loaded] ||= {}
+      current_step[:loaded] ||= []
     end
 
     def ready_to_ship?
@@ -43,12 +41,12 @@ module RawMaterialsApp
       !form_state[:error_message].nil?
     end
 
-    def error
-      form_state[:error]
-    end
-
     def message
       form_state[:message]
+    end
+
+    def warning_message
+      form_state[:warning_message]
     end
 
     def allocate(bin_asset_number) # rubocop:disable Metrics/AbcSize
@@ -67,7 +65,7 @@ module RawMaterialsApp
         return load_bin(bin_load_product_id, bin_asset_number)
       end
 
-      form_state[:error] = "All matching Bin Products fully allocated. Bin:#{bin_asset_number} not added."
+      form_state[:warning_message] = "All matching Bin Products fully allocated. Bin:#{bin_asset_number} not added."
     end
 
     def load_bin(bin_load_product_id, bin_asset_number) # rubocop:disable Metrics/AbcSize
@@ -80,7 +78,7 @@ module RawMaterialsApp
         current_step[:loaded].delete(product_bin)
         message = "Removed: #{bin_asset_number}"
       else
-        return form_state[:error] = "Bin Product fully allocated. Bin:#{bin_asset_number} not allocated." if qty_loaded >= qty_bins
+        return form_state[:warning_message] = "Bin Product fully allocated. Bin:#{bin_asset_number} not allocated." if qty_loaded >= qty_bins
 
         current_step[:loaded] << product_bin
         message = "Added: #{bin_asset_number}"

@@ -22,13 +22,15 @@ module RawMaterialsApp
       return nil if hash.nil?
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
-      hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).reduce(0, :+)
+      hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
+      hash[:qty_bins_available] = rmt_bins_matching_bin_load(:bin_asset_number, bin_load_id: id).count
       BinLoadFlat.new(hash)
     end
 
     def find_bin_load_product_flat(id)
       hash = find_with_association(:bin_load_products, id,
-                                   parent_tables: [{ parent_table: :cultivar_groups, foreign_key: :cultivar_group_id, columns: %i[cultivar_group_code], flatten_columns: { cultivar_group_code: :cultivar_group_code } },
+                                   parent_tables: [{ parent_table: :bin_loads, foreign_key: :bin_load_id, columns: %i[completed], flatten_columns: { completed: :completed } },
+                                                   { parent_table: :cultivar_groups, foreign_key: :cultivar_group_id, columns: %i[cultivar_group_code], flatten_columns: { cultivar_group_code: :cultivar_group_code } },
                                                    { parent_table: :cultivars, foreign_key: :cultivar_id, columns: %i[cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } },
                                                    { parent_table: :farms,  foreign_key: :farm_id, columns: %i[farm_code], flatten_columns: { farm_code: :farm_code } },
                                                    { parent_table: :pucs, foreign_key: :puc_id,  columns: %i[puc_code], flatten_columns: { puc_code: :puc_code } },
@@ -39,17 +41,13 @@ module RawMaterialsApp
                                                       { function: :fn_party_role_name, args: [:rmt_material_owner_party_role_id], col_name: :container_material_owner }])
       return nil if hash.nil?
 
-      product_code = hash[:cultivar_group_code]
       keys = %i[cultivar_name container_material_type_code container_material_owner farm_code puc_code orchard_code rmt_class_code]
-      keys.each do |k|
-        product_code = "#{product_code}_#{hash[k] || '***'}"
-      end
-      hash[:product_code] = product_code
+      hash[:product_code] = "#{hash[:cultivar_group_code]}_#{keys.map { |k| hash[k] || '***' }.join('_')}"
       BinLoadProductFlat.new(hash)
     end
 
     def rmt_bins_matching_bin_load(column, args = {}) # rubocop:disable Metrics/AbcSize
-      raise Crossbeams::FrameworkError, "rmt_bins_matching_bin_load(#{args})" if args.values.include? nil
+      raise Crossbeams::FrameworkError, "rmt_bins_matching_bin_load(#{args})" if args.values.any?(&:nil?)
 
       query = <<~SQL
         SELECT DISTINCT
@@ -61,6 +59,7 @@ module RawMaterialsApp
         JOIN bin_load_products ON bin_load_products.cultivar_group_id = cultivars.cultivar_group_id
 
         WHERE rmt_bins.bin_asset_number <> ''
+        AND rmt_bins.bin_asset_number IS NOT NULL
         AND rmt_bins.exit_ref IS NULL
         AND cultivars.cultivar_group_id IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))
         AND rmt_bins.cultivar_id IN (COALESCE(bin_load_products.cultivar_id, rmt_bins.cultivar_id))
@@ -108,7 +107,7 @@ module RawMaterialsApp
         rmt_bin_ids = select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_id)
         rmt_bin_ids.each do |rmt_bin_id|
           bin_asset_number = get(:rmt_bins, rmt_bin_id, :shipped_asset_number)
-          raise Sequel::UniqueConstraintViolation if exists?(:rmt_bins, bin_asset_number: bin_asset_number)
+          raise Sequel::UniqueConstraintViolation, 'Bin Asset Number allocated elsewhere, Unable to unship load.' if exists?(:rmt_bins, bin_asset_number: bin_asset_number)
 
           params = { bin_asset_number: bin_asset_number,
                      shipped_asset_number: nil,

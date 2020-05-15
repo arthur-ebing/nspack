@@ -25,7 +25,8 @@ module RawMaterialsApp
         transporter: 'ABC',
         dest_depot: 'ABC',
         products: true,
-        qty_product_bins: 1
+        qty_product_bins: 1,
+        qty_bins_available: 10
       }
       RawMaterialsApp::BinLoadFlat.new(base_attrs.merge(attrs))
     end

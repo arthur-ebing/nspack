@@ -38,6 +38,7 @@ module RawMaterialsApp
     attribute :container_material_type_code, Types::String
     attribute :container_material_owner, Types::String
     attribute :product_code, Types::String
+    attribute :completed, Types::Bool
     attribute :status, Types::String
   end
 end
