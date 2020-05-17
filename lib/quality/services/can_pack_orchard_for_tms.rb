@@ -19,6 +19,8 @@ module QualityApp
     end
 
     def call
+      return success_response('CanPackOrchardForTms Check bypassed') if AppConst::BYPASS_QUALITY_TEST_PRE_RUN_CHECK
+
       create_applicable_tests
 
       update_applicable_tests

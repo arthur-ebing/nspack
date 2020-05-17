@@ -92,6 +92,8 @@ module MesscadaApp
       end
 
       def not_failed_otmc_check
+        return success_response('failed otmc check bypassed') if AppConst::BYPASS_QUALITY_TEST_LOAD_CHECK
+
         errors = pallet_numbers - repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil).uniq
         raise Crossbeams::InfoError, "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
 
