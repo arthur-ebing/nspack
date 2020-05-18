@@ -9,7 +9,17 @@
 :page_controls:
   - :control_type: :link
     :url: "/raw_materials/empty_bins/empty_bin_transactions/adhoc_transaction/new"
-    :text: Adhoc Transaction
+    :text: Adhoc Move
+    :style: :button
+    :behaviour: :popup
+  - :control_type: :link
+    :url: "/raw_materials/empty_bins/empty_bin_transactions/adhoc_create/new"
+    :text: Adhoc Create
+    :style: :button
+    :behaviour: :popup
+  - :control_type: :link
+    :url: "/raw_materials/empty_bins/empty_bin_transactions/adhoc_destroy/new"
+    :text: Adhoc Destroy
     :style: :button
     :behaviour: :popup
   - :control_type: :link

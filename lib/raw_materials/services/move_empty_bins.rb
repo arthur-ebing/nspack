@@ -22,8 +22,8 @@ module RawMaterialsApp
       @owner_id = owner_id
 
       @opts = opts
-      @asset_type_id = @opts.fetch(:asset_transaction_type_id)
-      @ref_no = @opts.fetch(:ref_no)
+      @asset_type_id = @opts[:asset_transaction_type_id]
+      @ref_no = @opts[:ref_no]
       @parent_transaction_id = @opts[:parent_transaction_id]
       @business_process_id = @opts[:business_process_id]
       @fruit_reception_delivery_id = @opts[:fruit_reception_delivery_id]

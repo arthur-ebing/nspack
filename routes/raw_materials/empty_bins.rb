@@ -33,27 +33,27 @@ class Nspack < Roda
         end
         r.on 'new' do    # NEW
           check_auth!('empty bins', 'new')
-          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(remote: fetch?(r)) }
+          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(remote: fetch?(r), interactor: @interactor) }
         end
         r.on 'add' do
           stepper.add_bin_set(params[:empty_bin_transaction_item])
           empty_bin_types = stepper.for_select_bin_sets
-          json_actions([OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'empty_bin_transaction_item_empty_bin_type_ids',
-                                       options_array: empty_bin_types),
+          json_actions([OpenStruct.new(type: :replace_list_items,
+                                       dom_id: 'bin_set_list',
+                                       items: empty_bin_types),
                         OpenStruct.new(type: :clear_form_validation,
-                                       dom_id: 'empty_bin_transaction_item_empty_bin_type_ids')],
+                                       dom_id: 'empty_bin_transaction_item')],
                        'Bin Type Added',
                        keep_dialog_open: true)
         end
-        r.on 'remove' do
-          stepper.remove_bin_set(params[:empty_bin_transaction_item])
+        r.on 'remove', Integer do |id|
+          stepper.remove_bin_set(id)
           empty_bin_types = stepper.for_select_bin_sets
-          json_actions([OpenStruct.new(type: :replace_select_options,
-                                       dom_id: 'empty_bin_transaction_item_empty_bin_type_ids',
-                                       options_array: empty_bin_types),
+          json_actions([OpenStruct.new(type: :replace_list_items,
+                                       dom_id: 'bin_set_list',
+                                       items: empty_bin_types),
                         OpenStruct.new(type: :clear_form_validation,
-                                       dom_id: 'empty_bin_transaction_item_empty_bin_type_ids')],
+                                       dom_id: 'empty_bin_transaction_item')],
                        'Bin Type Removed',
                        keep_dialog_open: true)
         end
@@ -86,26 +86,6 @@ class Nspack < Roda
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'empty_bin_transaction_truck_registration_number',
                                      value: truck_registration_number)])
-      end
-      r.on 'adhoc_transaction' do
-        r.on 'new' do
-          check_auth!('empty bins', 'new')
-          stepper.reset
-          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocTransaction.call(remote: fetch?(r)) }
-        end
-        r.post do        # CREATE
-          res = @interactor.validate_adhoc_params(params[:empty_bin_transaction])
-          if res.success
-            stepper.merge(params[:empty_bin_transaction])
-            r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
-          else
-            re_show_form(r, res, url: '/raw_materials/empty_bins/empty_bin_transactions/adhoc_transaction/new') do
-              RawMaterials::EmptyBins::EmptyBinTransaction::AdhocTransaction.call(form_values: params[:empty_bin_transaction],
-                                                                                  form_errors: res.errors,
-                                                                                  remote: fetch?(r))
-            end
-          end
-        end
       end
       r.on 'issue_empty_bins' do
         r.on 'new' do
@@ -143,6 +123,66 @@ class Nspack < Roda
               RawMaterials::EmptyBins::EmptyBinTransaction::ReceiveEmptyBins.call(form_values: params[:empty_bin_transaction],
                                                                                   form_errors: res.errors,
                                                                                   remote: fetch?(r))
+            end
+          end
+        end
+      end
+      r.on 'adhoc_transaction' do
+        r.on 'new' do
+          check_auth!('empty bins', 'new')
+          stepper.reset
+          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocMove.call(remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = @interactor.validate_adhoc_params(params[:empty_bin_transaction])
+          if res.success
+            stepper.merge(params[:empty_bin_transaction])
+            r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
+          else
+            re_show_form(r, res, url: '/raw_materials/empty_bins/empty_bin_transactions/adhoc_transaction/new') do
+              RawMaterials::EmptyBins::EmptyBinTransaction::AdhocMove.call(form_values: params[:empty_bin_transaction],
+                                                                           form_errors: res.errors,
+                                                                           remote: fetch?(r))
+            end
+          end
+        end
+      end
+      r.on 'adhoc_create' do
+        r.on 'new' do
+          check_auth!('empty bins', 'new')
+          stepper.reset
+          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocCreate.call(remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = @interactor.validate_adhoc_create_params(params[:empty_bin_transaction])
+          if res.success
+            stepper.merge(params[:empty_bin_transaction])
+            r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
+          else
+            re_show_form(r, res, url: '/raw_materials/empty_bins/empty_bin_transactions/adhoc_create/new') do
+              RawMaterials::EmptyBins::EmptyBinTransaction::AdhocCreate.call(form_values: params[:empty_bin_transaction],
+                                                                             form_errors: res.errors,
+                                                                             remote: fetch?(r))
+            end
+          end
+        end
+      end
+      r.on 'adhoc_destroy' do
+        r.on 'new' do
+          check_auth!('empty bins', 'new')
+          stepper.reset
+          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocDestroy.call(remote: fetch?(r)) }
+        end
+        r.post do        # CREATE
+          res = @interactor.validate_adhoc_destroy_params(params[:empty_bin_transaction])
+          if res.success
+            stepper.merge(params[:empty_bin_transaction])
+            r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
+          else
+            re_show_form(r, res, url: '/raw_materials/empty_bins/empty_bin_transactions/adhoc_destroy/new') do
+              RawMaterials::EmptyBins::EmptyBinTransaction::AdhocDestroy.call(form_values: params[:empty_bin_transaction],
+                                                                              form_errors: res.errors,
+                                                                              remote: fetch?(r))
             end
           end
         end

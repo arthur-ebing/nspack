@@ -2,24 +2,29 @@
 :caption: Empty Bin Transaction History
 :sql: "SELECT \"empty_bin_transaction_items\".\"id\",\r\n       \"empty_bin_transaction_items\".\"empty_bin_transaction_id\",\r\n
   \      \"empty_bin_transactions\".\"created_by\",\r\n       \"asset_transaction_types\".\"transaction_type_code\",\r\n
-  \      \"empty_bin_transaction_items\".\"rmt_container_material_owner_id\",\r\n
-  \      \"empty_bin_transaction_items\".\"quantity_bins\",\r\n       rcmt.container_material_type_code,
-  \     fn_party_role_name(rmt_container_material_owners.rmt_material_owner_party_role_id)
+  \      \"business_processes\".\"process\",\r\n       \"empty_bin_transaction_items\".\"rmt_container_material_owner_id\",\r\n
+  \      \"empty_bin_transaction_items\".\"quantity_bins\",\r\n       rcmt.container_material_type_code,\r\n
+  \      fn_party_role_name(rmt_container_material_owners.rmt_material_owner_party_role_id)
   as material_owner,\r\n       \"empty_bin_transaction_items\".\"empty_bin_from_location_id\",\r\n
   \      \"empty_bin_transaction_items\".\"empty_bin_to_location_id\",\r\n       from_locations.\"location_long_code\"
   AS from_location,\r\n       to_locations.\"location_long_code\" AS to_location,\r\n
-  \      \"empty_bin_transactions\".\"reference_number\",\r\n       \"empty_bin_transactions\".\"fruit_reception_delivery_id\",\r\n
+  \      concat_ws('_', f.farm_code, o.orchard_code, to_char(rd.date_delivered, 'D-MON-YYYY'))
+  as delivery,\r\n       \"empty_bin_transactions\".\"reference_number\",\r\n       \"empty_bin_transactions\".\"fruit_reception_delivery_id\",\r\n
   \      \"empty_bin_transactions\".\"truck_registration_number\",\r\n       \"empty_bin_transactions\".\"created_at\"\r\nFROM
-  \"empty_bin_transaction_items\"\r\n     JOIN \"locations\" from_locations ON from_locations.\"id\"
-  = \"empty_bin_transaction_items\".\"empty_bin_from_location_id\"\r\n     JOIN \"locations\"
-  to_locations ON to_locations.\"id\" = \"empty_bin_transaction_items\".\"empty_bin_to_location_id\"\r\n
-  \    JOIN \"empty_bin_transactions\" ON \"empty_bin_transactions\".\"id\" = \"empty_bin_transaction_items\".\"empty_bin_transaction_id\"\r\n
-  \    JOIN \"asset_transaction_types\" ON \"asset_transaction_types\".\"id\" = \"empty_bin_transactions\".\"asset_transaction_type_id\"\r\n
-  \    JOIN \"rmt_container_material_owners\" ON \"rmt_container_material_owners\".\"id\"
-  = \"empty_bin_transaction_items\".\"rmt_container_material_owner_id\"\r\n     LEFT
+  \"empty_bin_transaction_items\"\r\n         LEFT JOIN \"locations\" from_locations
+  ON from_locations.\"id\" = \"empty_bin_transaction_items\".\"empty_bin_from_location_id\"\r\n
+  \        LEFT JOIN \"locations\" to_locations ON to_locations.\"id\" = \"empty_bin_transaction_items\".\"empty_bin_to_location_id\"\r\n
+  \        LEFT JOIN \"empty_bin_transactions\" ON \"empty_bin_transactions\".\"id\"
+  = \"empty_bin_transaction_items\".\"empty_bin_transaction_id\"\r\n         LEFT
+  JOIN \"asset_transaction_types\" ON \"asset_transaction_types\".\"id\" = \"empty_bin_transactions\".\"asset_transaction_type_id\"\r\n
+  \        LEFT JOIN \"rmt_container_material_owners\" ON \"rmt_container_material_owners\".\"id\"
+  = \"empty_bin_transaction_items\".\"rmt_container_material_owner_id\"\r\n         LEFT
   JOIN rmt_container_material_types rcmt on rmt_container_material_owners.rmt_container_material_type_id
-  = rcmt.id\r\nORDER BY \"empty_bin_transaction_items\".\"empty_bin_transaction_id\",
-  material_owner"
+  = rcmt.id\r\n         LEFT JOIN \"business_processes\" ON \"business_processes\".\"id\"
+  = \"empty_bin_transactions\".\"business_process_id\"\r\n         LEFT JOIN rmt_deliveries
+  rd on empty_bin_transactions.fruit_reception_delivery_id = rd.id\r\n         LEFT
+  JOIN orchards o on rd.orchard_id = o.id\r\n         LEFT JOIN farms f on o.farm_id
+  = f.id\r\nORDER BY created_at desc"
 :limit: 
 :offset: 
 :external_settings:
@@ -52,7 +57,7 @@
     :hide: true
     :pinned: 
     :groupable: false
-    :group_by_seq: '1'
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -89,9 +94,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  process:
+    :name: process
+    :sequence_no: 5
+    :caption: Process
+    :namespaced_name: business_processes.process
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   rmt_container_material_owner_id:
     :name: rmt_container_material_owner_id
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Rmt container material owner
     :namespaced_name: empty_bin_transaction_items.rmt_container_material_owner_id
     :data_type: :integer
@@ -107,7 +128,7 @@
     :group_max: false
   quantity_bins:
     :name: quantity_bins
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Qty
     :namespaced_name: empty_bin_transaction_items.quantity_bins
     :data_type: :integer
@@ -123,7 +144,7 @@
     :group_max: false
   container_material_type_code:
     :name: container_material_type_code
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Type
     :namespaced_name: rcmt.container_material_type_code
     :data_type: :string
@@ -139,7 +160,7 @@
     :group_max: false
   material_owner:
     :name: material_owner
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Owner
     :namespaced_name: 
     :data_type: :string
@@ -155,7 +176,7 @@
     :group_max: false
   empty_bin_from_location_id:
     :name: empty_bin_from_location_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Empty bin from location
     :namespaced_name: empty_bin_transaction_items.empty_bin_from_location_id
     :data_type: :integer
@@ -171,7 +192,7 @@
     :group_max: false
   empty_bin_to_location_id:
     :name: empty_bin_to_location_id
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Empty bin to location
     :namespaced_name: empty_bin_transaction_items.empty_bin_to_location_id
     :data_type: :integer
@@ -187,7 +208,7 @@
     :group_max: false
   from_location:
     :name: from_location
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: From location
     :namespaced_name: from_locations.location_long_code
     :data_type: :string
@@ -203,7 +224,7 @@
     :group_max: false
   to_location:
     :name: to_location
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: To location
     :namespaced_name: to_locations.location_long_code
     :data_type: :string
@@ -217,9 +238,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  delivery:
+    :name: delivery
+    :sequence_no: 14
+    :caption: Delivery
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   reference_number:
     :name: reference_number
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Reference number
     :namespaced_name: empty_bin_transactions.reference_number
     :data_type: :string
@@ -235,7 +272,7 @@
     :group_max: false
   fruit_reception_delivery_id:
     :name: fruit_reception_delivery_id
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Fruit reception delivery
     :namespaced_name: empty_bin_transactions.fruit_reception_delivery_id
     :data_type: :string
@@ -251,7 +288,7 @@
     :group_max: false
   truck_registration_number:
     :name: truck_registration_number
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Truck registration number
     :namespaced_name: empty_bin_transactions.truck_registration_number
     :data_type: :string
@@ -267,7 +304,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: empty_bin_transactions.created_at
     :data_type: :datetime
@@ -325,6 +362,54 @@
   :list_def: 
 - :column: empty_bin_transaction_items.id
   :caption: Id
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: business_processes.process
+  :caption: Business Process
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: asset_transaction_types.transaction_type_code
+  :caption: Asset Transaction Type
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: empty_bin_transactions.created_by
+  :caption: Created By
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: empty_bin_transactions.reference_number
+  :caption: Reference Number
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: empty_bin_transactions.fruit_reception_delivery_id
+  :caption: Fruit Reception Delivery Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: empty_bin_transactions.truck_registration_number
+  :caption: Truck Registration Number
   :data_type: :string
   :control_type: :text
   :default_value: 

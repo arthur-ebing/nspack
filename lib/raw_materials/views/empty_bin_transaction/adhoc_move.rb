@@ -3,9 +3,9 @@
 module RawMaterials
   module EmptyBins
     module EmptyBinTransaction
-      class AdhocTransaction
+      class AdhocMove
         def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:empty_bin_transaction, :adhoc, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:empty_bin_transaction, :adhoc, form_values: form_values, adhoc_type: 'move')
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -13,7 +13,7 @@ module RawMaterials
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Adhoc Empty Bin Transaction'
+              form.caption 'Adhoc Move Empty Bins'
               form.action '/raw_materials/empty_bins/empty_bin_transactions/adhoc_transaction'
               form.remote! if remote
               form.add_field :asset_transaction_type_id

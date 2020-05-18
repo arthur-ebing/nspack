@@ -10,8 +10,8 @@ module RawMaterialsApp
     def for_select_bin_sets
       for_select = []
       bin_sets.each do |r|
-        owner_bin_type = @repo.find_owner_bin_type(r[:rmt_container_material_owner_id], r[:rmt_container_material_type_id])
-        combined_id = "#{r[:rmt_container_material_owner_id]}_#{r[:rmt_container_material_type_id]}"
+        owner_bin_type = @repo.find_owner_bin_type(r[:rmt_material_owner_party_role_id], r[:rmt_container_material_type_id])
+        combined_id = "#{r[:rmt_material_owner_party_role_id]}_#{r[:rmt_container_material_type_id]}"
         name = "#{owner_bin_type.owner_party_name}, #{owner_bin_type.container_material_type_code}, QTY: #{r[:quantity_bins]}"
         for_select << [name, combined_id]
       end
@@ -30,7 +30,7 @@ module RawMaterialsApp
       sets = bin_sets
       added = false
       sets.each do |r|
-        same_owner = r[:rmt_container_material_owner_id] == set[:rmt_container_material_owner_id]
+        same_owner = r[:rmt_material_owner_party_role_id] == set[:rmt_material_owner_party_role_id]
         same_type = r[:rmt_container_material_type_id] == set[:rmt_container_material_type_id]
         next unless same_owner && same_type
 
@@ -44,8 +44,8 @@ module RawMaterialsApp
 
     def remove_bin_set(set)
       sets = bin_sets
-      owner_id, type_id = set[:empty_bin_type_ids].split('_')
-      sets.reject! { |r| r[:rmt_container_material_owner_id] == owner_id && r[:rmt_container_material_type_id] == type_id }
+      owner_id, type_id = combined_id.split('_')
+      sets.reject! { |r| r[:rmt_material_owner_party_role_id] == owner_id && r[:rmt_container_material_type_id] == type_id }
       self.bin_sets = sets
     end
 

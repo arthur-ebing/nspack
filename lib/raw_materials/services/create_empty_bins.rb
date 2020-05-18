@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class CreateEmptyBins < BaseService
-    # @param [Integer] asset_type_id
+    # @param [Integer] total_quantity (Total qty bins in parent transaction)
     # @param [Integer] to_location_id
     # @param [String] ref_no
     # @param [Array] bin_sets: Array of hashes{
@@ -11,24 +11,25 @@ module RawMaterialsApp
     # }
     # @param [Hash{
     #   [Integer] business_process_id
+    #   [Integer] asset_transaction_type_id
     #   [Integer] parent_transaction_id
     #   [Integer] rmt_delivery_id
     #   [Boolean] is_adhoc
     # }] opts
     #
-    def initialize(asset_type_id, to_location_id, ref_no, bin_sets = [], opts = {})
+    def initialize(total_quantity, to_location_id, ref_no, bin_sets = [], opts = {})
       @repo = EmptyBinsRepo.new
-      @asset_type_id = asset_type_id
+      @quantity_bins = total_quantity
       @to_location_id = to_location_id
       @ref_no = ref_no
 
       @opts = opts
       @business_process_id = @opts[:business_process_id]
+      @asset_type_id = @opts[:asset_transaction_type_id]
       @parent_transaction_id = @opts[:parent_transaction_id]
-      @delivery_id = @opts[:rmt_delivery_id]
-      @truck_reg_no = @repo.find(:rmt_deliveries, RmtDelivery, @delivery_id)&.truck_registration_number if @delivery_id
+      # @delivery_id = @opts[:rmt_delivery_id]
+      # @truck_reg_no = @repo.find(:rmt_deliveries, RmtDelivery, @delivery_id)&.truck_registration_number if @delivery_id
       @is_adhoc = @opts[:is_adhoc]
-
       @bin_sets = bin_sets
     end
 
@@ -47,15 +48,16 @@ module RawMaterialsApp
     private
 
     def create_empty_bin_transaction_items(response_hash)
-      @bin_sets.each do |bin|
+      @bin_sets.each do |set|
+        owner_id = @repo.get_owner_id(set)
         transaction_item_id = @repo.create_empty_bin_transaction_item(
           empty_bin_transaction_id: @parent_transaction_id,
-          rmt_container_material_owner_id: bin[:rmt_container_material_owner_id],
+          rmt_container_material_owner_id: owner_id,
           empty_bin_from_location_id: nil,
           empty_bin_to_location_id: @to_location_id,
-          quantity_bins: bin[:quantity]
+          quantity_bins: set[:quantity_bins]
         )
-        response_hash[:transaction_item_ids] << bin.merge(transaction_item_id: transaction_item_id)
+        response_hash[:transaction_item_ids] << transaction_item_id
       end
       success_response('ok', response_hash)
     end
@@ -67,11 +69,11 @@ module RawMaterialsApp
         asset_transaction_type_id: @asset_type_id,
         empty_bin_to_location_id: @to_location_id,
         business_process_id: @business_process_id,
-        fruit_reception_delivery_id: @delivery_id,
-        truck_registration_number: @truck_reg_no,
+        # fruit_reception_delivery_id: @delivery_id,
+        # truck_registration_number: @truck_reg_no,
         reference_number: @ref_no,
-        active: true,
         is_adhoc: @is_adhoc,
+        quantity_bins: @quantity_bins,
         created_by: @opts[:user_name]
       }
       @parent_transaction_id = @repo.create_empty_bin_transaction(attrs)

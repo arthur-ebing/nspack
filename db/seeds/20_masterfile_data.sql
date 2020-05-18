@@ -128,6 +128,8 @@ SELECT 'GLOBAL', null, null, false, false, false, false, false, false, false
 -- ASSET TRANSACTION TYPES
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BIN_TIP',	'Bins Emptied on tipping') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('REBIN',	'Bins Filled via rebinning') ON CONFLICT DO NOTHING;
-INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_EMPTY_BIN_MOVE', 'Adhoc Empty Bin Moves') ON CONFLICT DO NOTHING;
-INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('BOOKOUT_BINS', 'Bookout Bins to Farms') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_MOVE', 'Adhoc Empty Bin Moves') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_CREATE', 'Adhoc Create Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_DESTROY', 'Adhoc Destroy Empty Bins') ON CONFLICT DO NOTHING;
+INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ISSUE_BINS', 'Issue Bins to Farms') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('RECEIVE_BINS', 'Receive Bins Empty Bins') ON CONFLICT DO NOTHING;

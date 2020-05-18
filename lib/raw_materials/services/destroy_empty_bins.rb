@@ -2,7 +2,7 @@
 
 module RawMaterialsApp
   class DestroyEmptyBins < BaseService
-    # Only one remove at a time
+    # Only one owner bin type pair remove at a time
     # @param [Integer] rmt_container_material_owner_id
     # @param [Integer] location_id
     # @param [Integer] quantity
@@ -22,10 +22,10 @@ module RawMaterialsApp
       @quantity = quantity
 
       @opts = opts
-      @ref_no = @opts.fetch(:ref_no)
+      @ref_no = @opts[:ref_no]
       @business_process_id = @opts[:business_process_id]
       @parent_transaction_id = @opts[:parent_transaction_id]
-      @asset_type_id = @opts[:asset_type_id]
+      @asset_type_id = @opts[:asset_transaction_type_id]
       @is_adhoc = @opts[:is_adhoc]
       @user_name = @opts[:user_name]
     end
@@ -61,8 +61,8 @@ module RawMaterialsApp
         asset_transaction_type_id: @asset_type_id,
         business_process_id: @business_process_id,
         reference_number: @ref_no,
-        active: true,
         is_adhoc: @is_adhoc,
+        quantity_bins: @quantity,
         created_by: @opts[:user_name]
       }
       @parent_transaction_id = @repo.create_empty_bin_transaction(attrs)

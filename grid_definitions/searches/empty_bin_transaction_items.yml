@@ -1,0 +1,8 @@
+---
+:dataminer_definition: empty_bin_transaction_items
+:actions:
+- :url: "/raw_materials/empty_bins/empty_bin_transactions/$:empty_bin_transaction_id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true

@@ -78,6 +78,8 @@ module RawMaterialsApp
     end
 
     def onsite_empty_bin_location_id
+      return nil unless AppConst::ONSITE_EMPTY_BIN_LOCATION
+
       DB[:locations].where(
         location_long_code: AppConst::ONSITE_EMPTY_BIN_LOCATION
       ).join(:location_types, id: :location_type_id).where(
@@ -103,12 +105,18 @@ module RawMaterialsApp
       DB[:rmt_container_material_types].where(id: type_ids).map { |r| [r[:container_material_type_code], r[:id]] }
     end
 
+    def get_owner_id(set)
+      get_id(:rmt_container_material_owners,
+             rmt_material_owner_party_role_id: set[:rmt_material_owner_party_role_id],
+             rmt_container_material_type_id: set[:rmt_container_material_type_id])
+    end
+
     def create_empty_bin_location_ids(bin_sets, to_location_id)
       bin_sets.each do |set|
         id = get_id_or_create(:empty_bin_locations,
-                              rmt_container_material_owner_id: set[:rmt_container_material_owner_id],
+                              rmt_container_material_owner_id: get_owner_id(set),
                               location_id: to_location_id)
-        update(:empty_bin_locations, id, quantity: set[:qty])
+        update(:empty_bin_locations, id, quantity: set[:quantity_bins])
       end
       ok_response
     end
@@ -150,10 +158,10 @@ module RawMaterialsApp
 
     def validate_empty_bin_location_quantities(from_location_id, bin_sets = []) # rubocop:disable Metrics/AbcSize
       bin_sets.each do |set|
-        qty = empty_bin_location_qty(set[:rmt_container_material_owner_id], set[:rmt_container_material_type_id], from_location_id)
+        qty = empty_bin_location_qty(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id], from_location_id)
         next if qty >= set[:quantity_bins].to_i
 
-        owner_bin_type = find_owner_bin_type(set[:rmt_container_material_owner_id], set[:rmt_container_material_type_id])
+        owner_bin_type = find_owner_bin_type(set[:rmt_material_owner_party_role_id], set[:rmt_container_material_type_id])
         bin_type = owner_bin_type.container_material_type_code
         location_code = DB[:locations].where(id: from_location_id).get(:location_long_code)
         message = "Insufficient amount of #{bin_type} from #{owner_bin_type.owner_party_name} at #{location_code}: #{qty} Available"
@@ -177,6 +185,35 @@ module RawMaterialsApp
       to_ids = DB[:empty_bin_transaction_items].where(empty_bin_to_location_id: loc_id).select_map(:id)
       item_ids = (from_ids || []) + (to_ids || [])
       success_response('ok', item_ids.sort.uniq)
+    end
+
+    def for_select_rmt_deliveries
+      DB[:rmt_deliveries].join(:farms, id: :farm_id)
+                         .join(:orchards, id: Sequel[:rmt_deliveries][:orchard_id])
+                         .select(:farm_code, :orchard_code, :date_delivered, Sequel[:rmt_deliveries][:id])
+                         .map { |r| ["#{r[:farm_code]}_#{r[:orchard_code]}_#{r[:date_delivered].strftime('%d/%m/%Y')}", r[:id]] }.uniq
+    end
+
+    def resolve_for_header(header) # rubocop:disable Metrics/AbcSize
+      values = {
+        business_process_id: DB[:business_processes].where(id: header[:business_process_id]).get(:process),
+        reference_number: header[:reference_number],
+        asset_transaction_type_id: DB[:asset_transaction_types].where(id: header[:asset_transaction_type_id]).get(:transaction_type_code),
+        empty_bin_to_location_id: DB[:locations].where(id: header[:empty_bin_to_location_id]).get(:location_long_code),
+        total_quantity_bins: header[:quantity_bins]
+      }
+      values[:empty_bin_from_location_id] = DB[:locations].where(id: header[:empty_bin_from_location_id]).get(:location_long_code) unless header[:empty_bin_from_location_id].nil_or_empty?
+      values[:fruit_reception_delivery_id] = rmt_delivery_code(header[:fruit_reception_delivery_id]) unless header[:fruit_reception_delivery_id].nil_or_empty?
+      values[:truck_registration_number] = header[:truck_registration_number] unless header[:truck_registration_number].nil_or_empty?
+      values
+    end
+
+    def rmt_delivery_code(del_id) # rubocop:disable Metrics/AbcSize
+      DB[:rmt_deliveries].join(:farms, id: :farm_id)
+                         .join(:orchards, id: Sequel[:rmt_deliveries][:orchard_id])
+                         .where(Sequel[:rmt_deliveries][:id] => del_id)
+                         .select(:farm_code, :orchard_code, :date_delivered, Sequel[:rmt_deliveries][:id])
+                         .map { |r| "#{r[:farm_code]}_#{r[:orchard_code]}_#{r[:date_delivered].strftime('%d/%m/%Y')}" }
     end
   end
 end

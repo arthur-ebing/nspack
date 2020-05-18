@@ -17,10 +17,10 @@ module RawMaterialsApp
       @location_id = location_id
       @quantity = quantity
 
-      @ref_no = @opts.fetch(:ref_no)
+      @ref_no = @opts[:ref_no]
       @opts = opts.merge(business_process_id: @repo.get_id(:business_processes, process: 'ADHOC_TRANSACTIONS'),
                          parent_transaction_id: nil,
-                         asset_type_id: @repo.get_id(:asset_transaction_types, transaction_type_code: 'REBIN'),
+                         asset_transaction_type_id: @repo.get_id(:asset_transaction_types, transaction_type_code: 'REBIN'),
                          is_adhoc: false)
     end
 

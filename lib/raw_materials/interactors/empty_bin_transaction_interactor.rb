@@ -6,40 +6,25 @@ module RawMaterialsApp
       res = validate_stepper
       return res unless res.success
 
-      @parent_transaction_id = nil
-      repo.transaction do # rubocop:disable Metrics/BlockLength
-        res.instance[:bin_sets].each do |set|
-          owner_id = repo.get_id(:rmt_container_material_owners,
-                                 rmt_material_owner_party_role_id: set[:rmt_container_material_owner_id],
-                                 rmt_container_material_type_id: set[:rmt_container_material_type_id])
-          opts = {
-            asset_transaction_type_id: res.instance[:asset_transaction_type_id],
-            parent_transaction_id: @parent_transaction_id,
-            business_process_id: res.instance[:business_process_id],
-            ref_no: res.instance[:reference_number],
-            fruit_reception_delivery_id: res.instance[:fruit_reception_delivery_id],
-            truck_registration_number: res.instance[:truck_registration_number],
-            quantity_bins: res.instance[:quantity_bins].to_i,
-            is_adhoc: false,
-            user_name: @user.user_name
-          }
-          empty_bin_move_response = RawMaterialsApp::MoveEmptyBins.call(
-            owner_id,
-            set[:quantity_bins].to_i,
-            res.instance[:empty_bin_to_location_id],
-            res.instance[:empty_bin_from_location_id],
-            opts
-          )
-          raise Crossbeams::InfoError, empty_bin_move_response.message unless empty_bin_move_response.success
+      parent_id = nil
+      info = OpenStruct.new(res.instance.merge(parent_transaction_id: parent_id,
+                                               rmt_delivery_id: res.instance[:fruit_reception_delivery_id],
+                                               ref_no: res.instance[:reference_number],
+                                               user_name: @user.user_name))
+      repo.transaction do
+        info.bin_sets.each do |set|
+          info.parent_transaction_id = parent_id
+          res = perform_bin_operation(set, info)
+          raise Crossbeams::InfoError, res.message unless res.success
 
-          transaction_item_id = empty_bin_move_response.instance
-          @parent_transaction_id = empty_bin_transaction_item(transaction_item_id)&.empty_bin_transaction_id
+          parent_id = res.instance[:parent_transaction_id] if res.instance.is_a?(Hash)
+          parent_id ||= empty_bin_transaction_item(res.instance)&.empty_bin_transaction_id
         end
       end
-      log_status(:empty_bin_transactions, @parent_transaction_id, 'CREATED')
+      log_status(:empty_bin_transactions, parent_id, 'CREATED')
       log_transaction
-      instance = empty_bin_transaction(@parent_transaction_id)
-      success_response("Created empty bin transaction #{instance.truck_registration_number}", instance)
+      instance = empty_bin_transaction(parent_id)
+      success_response('Empty Bin Transaction Successful', instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { truck_registration_number: ['This empty bin transaction already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -78,9 +63,19 @@ module RawMaterialsApp
       res.messages.empty? ? ok_response : validation_failed_response(res)
     end
 
+    def validate_adhoc_create_params(params)
+      res = AdhocCreateEmptyBinSchema.call(params)
+      res.messages.empty? ? ok_response : validation_failed_response(res)
+    end
+
+    def validate_adhoc_destroy_params(params)
+      res = AdhocDestroyEmptyBinSchema.call(params)
+      res.messages.empty? ? ok_response : validation_failed_response(res)
+    end
+
     def validate_stepper # rubocop:disable Metrics/AbcSize
       hash = stepper.read
-      unless hash[:bin_sets].nil_or_empty?
+      unless hash[:bin_sets].nil_or_empty? || hash[:create]
         res = repo.validate_empty_bin_location_quantities(hash[:empty_bin_from_location_id], hash[:bin_sets])
         return res unless res.success
       end
@@ -109,6 +104,17 @@ module RawMaterialsApp
 
     def empty_bin_transaction_item(item_id)
       repo.find_empty_bin_transaction_item(item_id)
+    end
+
+    def perform_bin_operation(set, info) # rubocop:disable Metrics/AbcSize
+      owner_id = repo.get_owner_id(set)
+      if info.destroy
+        DestroyEmptyBins.call(owner_id, info.empty_bin_from_location_id, set[:quantity_bins].to_i, info.to_h)
+      elsif info.create
+        CreateEmptyBins.call(info.quantity_bins, info.empty_bin_to_location_id, info.ref_no, [set], info.to_h)
+      else
+        MoveEmptyBins.call(owner_id, set[:quantity_bins].to_i, info.empty_bin_to_location_id, info.empty_bin_from_location_id, info.to_h)
+      end
     end
   end
 end

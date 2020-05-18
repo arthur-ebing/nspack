@@ -16,45 +16,22 @@ module UiRules
                                when :adhoc
                                  adhoc_transaction_fields
                                else
-                                 show_fields
+                                 common_fields
                                end
-      # set_show_fields if @mode == :show
-
+      set_show_fields if @mode == :show
       form_name 'empty_bin_transaction'
     end
 
-    # def set_show_fields
-    #   # asset_transaction_type_id_label = RawMaterialsApp::AssetTransactionTypeRepo.new.find_asset_transaction_type(@form_object.asset_transaction_type_id)&.transaction_type_code
-    #   asset_transaction_type_id_label = @repo.find(:asset_transaction_types, RawMaterialsApp::AssetTransactionType, @form_object.asset_transaction_type_id)&.transaction_type_code
-    #   # empty_bin_to_location_id_label = RawMaterialsApp::LocationRepo.new.find_location(@form_object.empty_bin_to_location_id)&.location_long_code
-    #   empty_bin_to_location_id_label = @repo.find(:locations, RawMaterialsApp::Location, @form_object.empty_bin_to_location_id)&.location_long_code
-    #   # fruit_reception_delivery_id_label = RawMaterialsApp::RmtDeliveryRepo.new.find_rmt_delivery(@form_object.fruit_reception_delivery_id)&.truck_registration_number
-    #   fruit_reception_delivery_id_label = @repo.find(:rmt_deliveries, RawMaterialsApp::RmtDelivery, @form_object.fruit_reception_delivery_id)&.truck_registration_number
-    #   # business_process_id_label = RawMaterialsApp::BusinessProcessRepo.new.find_business_process(@form_object.business_process_id)&.process
-    #   business_process_id_label = @repo.find(:business_processes, RawMaterialsApp::BusinessProcess, @form_object.business_process_id)&.process
-    #   fields[:asset_transaction_type_id] = { renderer: :label, with_value: asset_transaction_type_id_label, caption: 'Asset Transaction Type' }
-    #   fields[:empty_bin_to_location_id] = { renderer: :label, with_value: empty_bin_to_location_id_label, caption: 'Empty Bin To Location' }
-    #   fields[:fruit_reception_delivery_id] = { renderer: :label, with_value: fruit_reception_delivery_id_label, caption: 'Fruit Reception Delivery' }
-    #   fields[:business_process_id] = { renderer: :label, with_value: business_process_id_label, caption: 'Business Process' }
-    #   fields[:quantity_bins] = { renderer: :label }
-    #   fields[:truck_registration_number] = { renderer: :label }
-    #   fields[:reference_number] = { renderer: :label }
-    #   fields[:created_by] = { renderer: :label }
-    #   fields[:is_adhoc] = { renderer: :label, as_boolean: true }
-    # end
-
-    def show_fields
-      {
-        asset_transaction_type_id: { renderer: :label, value: @form_object.transaction_type_code, caption: 'Transaction Type Code' },
-        quantity_bins: { renderer: :label, caption: 'Total Qty Empty Bins' },
-        reference_number: { renderer: :label },
-        business_process_id: { renderer: :label, value: @form_object.process, caption: 'Business Process' },
-        fruit_reception_delivery_id: { renderer: :label, value: @form_object.fruit_reception_delivery_id, caption: 'Delivery' },
-        empty_bin_to_location_id: { renderer: :label, value: @form_object.location_long_code, caption: 'To Location' },
-        created_by: { renderer: :label },
-        truck_registration_number: { renderer: :label },
-        is_adhoc: { renderer: :label }
-      }
+    def set_show_fields # rubocop:disable Metrics/AbcSize
+      fields[:asset_transaction_type_id] = { renderer: :label, with_value: @form_object.transaction_type_code, caption: 'Transaction Type Code' }
+      fields[:quantity_bins] = { renderer: :label, caption: 'Total Qty Empty Bins' }
+      fields[:reference_number] = { renderer: :label }
+      fields[:business_process_id] = { renderer: :label, with_value: @form_object.process, caption: 'Business Process' }
+      fields[:fruit_reception_delivery_id] = { renderer: :label, with_value: @form_object.fruit_reception_delivery_id, caption: 'Delivery' }
+      fields[:empty_bin_to_location_id] = { renderer: :label, with_value: @form_object.location_long_code, caption: 'To Location' }
+      fields[:created_by] = { renderer: :label }
+      fields[:truck_registration_number] = { renderer: :label }
+      fields[:is_adhoc] = { renderer: :label }
     end
 
     def adhoc_transaction_fields
@@ -69,6 +46,8 @@ module UiRules
                                     selected: onsite_empty_bin_location_id,
                                     caption: 'To Location',
                                     required: true },
+        create: { renderer: :hidden, value: true },
+        destroy: { renderer: :hidden, value: true },
         is_adhoc: { renderer: :hidden, value: true }
       }
       common_fields.merge(fields)
@@ -88,7 +67,7 @@ module UiRules
                                     required: true },
         fruit_reception_delivery_id: { renderer: :select,
                                        prompt: true,
-                                       options: RawMaterialsApp::RmtDeliveryRepo.new.for_select_rmt_deliveries,
+                                       options: delivery_options,
                                        caption: 'Fruit Reception Delivery' },
         truck_registration_number: {}
       }
@@ -112,7 +91,7 @@ module UiRules
       {
         asset_transaction_type_id: { renderer: :hidden, value: asset_transaction_type },
         quantity_bins: { renderer: :integer, required: true, caption: 'Total Qty Empty Bins' },
-        reference_number: { required: true }
+        reference_number: {}
       }
     end
 
@@ -147,15 +126,21 @@ module UiRules
                                     business_process_id: adhoc_process_id,
                                     quantity_bins: nil,
                                     reference_number: nil,
-                                    is_adhoc: true)
+                                    is_adhoc: true,
+                                    create: true,
+                                    destroy: true)
     end
 
     private
 
     def asset_transaction_type
-      return @repo.asset_transaction_type_id_for_mode(@mode) if %i[adhoc issue receive].include?(@mode)
-
-      @form_object.asset_transaction_type_id
+      if %i[issue receive].include?(@mode)
+        @repo.asset_transaction_type_id_for_mode(@mode)
+      elsif @mode == :adhoc
+        @repo.asset_transaction_type_id_for_mode("#{@mode}_#{@options[:adhoc_type]}".to_sym)
+      else
+        @form_object.asset_transaction_type_id
+      end
     end
 
     def onsite_empty_bin_location_id
@@ -178,6 +163,10 @@ module UiRules
       behaviours do |behaviour|
         behaviour.dropdown_change :fruit_reception_delivery_id, notify: [{ url: '/raw_materials/empty_bins/empty_bin_transactions/delivery_id_changed' }]
       end
+    end
+
+    def delivery_options
+      @repo.for_select_rmt_deliveries
     end
   end
 end
