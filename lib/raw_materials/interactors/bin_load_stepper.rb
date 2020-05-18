@@ -103,15 +103,13 @@ module RawMaterialsApp
       bin_load_product_ids.each do |bin_load_product_id|
         product_entity = repo.find_bin_load_product_flat(bin_load_product_id)
         loaded_bins = loaded_bins(loaded, bin_load_product_id)
-        progress_text = "#{progress_text}Loaded: (#{loaded_bins.length} of #{product_entity.qty_bins}) #{product_entity.product_code}<br>"
+        progress_text = "#{progress_text}Loaded: #{loaded_bins.length} of #{product_entity.qty_bins} #{product_entity.product_code}<br>"
         progress_text = "#{progress_text}#{loaded_bins.join(', ')}<br>"
 
-        bin_asset_numbers = repo.rmt_bins_matching_bin_load(:bin_asset_number, bin_load_product_id: bin_load_product_id) - loaded_bins
-        progress_text = "#{progress_text}<br>---Available Bins: #{bin_asset_numbers.first(25).join(', ')}<br><br>"
+        # bin_asset_numbers = repo.rmt_bins_matching_bin_load(:bin_asset_number, bin_load_product_id: bin_load_product_id) - loaded_bins
+        # progress_text = "#{progress_text}<br>-- Available Bins: #{bin_asset_numbers.first(5).join(', ')}<br><br>"
       end
-      <<~HTML
-        #{progress_text}
-      HTML
+      progress_text
     end
 
     private
