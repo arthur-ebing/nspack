@@ -65,7 +65,7 @@ module MesscadaApp
         res = MesscadaApp::TipBin.new(res).call
 
         if res.success
-          log_status(:rmt_bins, res.instance[:rmt_bin_id], 'TIPPED')
+          log_status('rmt_bins', res.instance[:rmt_bin_id], 'TIPPED')
           log_transaction
         end
         res
@@ -289,6 +289,12 @@ module MesscadaApp
 
     private
 
+    def robot_message(msg, short: nil)
+      return msg if short.nil?
+
+      "#{msg}#{AppConst::ROBOT_MSG_SEP}#{short}"
+    end
+
     def pallet_changes_on_verify(params)
       changeset = {}
       changeset[:fruit_sticker_pm_product_id] = params[:fruit_sticker_pm_product_id] unless params[:fruit_sticker_pm_product_id].nil_or_empty?
@@ -368,7 +374,10 @@ module MesscadaApp
     end
 
     def validate_device_exists(resource_code)
-      return failed_response("Resource Code:#{resource_code} could not be found#{AppConst::ROBOT_MSG_SEP}#{resource_code} not found}") unless resource_code_exists?(resource_code)
+      unless resource_code_exists?(resource_code)
+        return failed_response(robot_message("Resource Code:#{resource_code} could not be found",
+                                             short: "#{resource_code} not found"))
+      end
 
       ok_response
     end
