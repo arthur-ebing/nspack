@@ -9,12 +9,11 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields new_fields if @mode == :new
       common_values_for_fields edit_fields if @mode == :edit
       common_values_for_fields bulk_edit_fields if @mode == :bulk_edit
 
-      set_show_fields if %i[show reopen].include? @mode
-      add_behaviours if %i[new edit bulk_edit].include? @mode
+      set_show_fields if %i[show].include? @mode
+      add_behaviours if %i[edit bulk_edit].include? @mode
 
       form_name 'orchard_test_result'
     end
@@ -45,24 +44,6 @@ module UiRules
       fields[:classification] = { renderer: :label, as_boolean: true }
       fields[:freeze_result] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
-    end
-
-    def new_fields
-      puc_ids = @repo.select_values(:orchards, :puc_id).uniq
-      {
-        orchard_test_type_id: { renderer: :select,
-                                options: @repo.for_select_orchard_test_types,
-                                disabled_options: @repo.for_select_inactive_orchard_test_types,
-                                caption: 'Test Type',
-                                required: true,
-                                prompt: true },
-        puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
-                  disabled_options: @farm_repo.for_select_inactive_pucs,
-                  caption: 'Puc',
-                  required: true,
-                  prompt: true }
-      }
     end
 
     def edit_fields
@@ -123,11 +104,6 @@ module UiRules
     end
 
     def make_form_object
-      if %i[new].include? @mode
-        @form_object = OpenStruct.new(orchard_test_type_id: nil)
-        return
-      end
-
       form_object = @repo.find_orchard_test_result_flat(@options[:id]).to_h
       @classification = @repo.get(:orchard_test_types, form_object[:orchard_test_type_id], :result_type) == AppConst::CLASSIFICATION
       form_object[:puc_ids] = Array(form_object[:puc_id])

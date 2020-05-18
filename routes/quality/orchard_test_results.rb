@@ -20,7 +20,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = "#{res.message} #{res.errors}"
         end
-        r.redirect "/quality/test_results/orchard_test_results/#{id}/edit"
+        r.redirect '/list/orchard_test_results'
       end
 
       r.on 'edit' do   # EDIT

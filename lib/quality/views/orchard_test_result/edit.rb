@@ -14,10 +14,6 @@ module Quality
             page.form_values form_values
             page.form_errors form_errors
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Back',
-                                  url: '/list/orchard_test_results',
-                                  style: :back_button)
               if ui_rule.form_object.api_name == AppConst::PHYT_CLEAN_STANDARD && !ui_rule.form_object.freeze_result
                 section.add_control(control_type: :link,
                                     text: 'Puc PhytClean Call',

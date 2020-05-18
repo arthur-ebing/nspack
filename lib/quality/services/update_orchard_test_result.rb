@@ -49,13 +49,14 @@ module QualityApp
 
       attrs[:freeze_result] = params[:freeze_result] || false
       attrs[:api_result] = params[:api_result]
+      attrs[:api_result] = nil if attrs[:api_result].empty?
       attrs[:applicable_from] = params[:applicable_from]
       attrs[:applicable_to] = params[:applicable_to]
 
-      params[:group_ids].each do |id|
-        next if repo.exists?(:orchard_test_results, attrs.merge(id: id))
+      params[:group_ids].each do |group_id|
+        next if repo.exists?(:orchard_test_results, attrs.merge(id: group_id))
 
-        repo.update_orchard_test_result(id, attrs)
+        repo.update_orchard_test_result(group_id, attrs)
       end
     end
   end
