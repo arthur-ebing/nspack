@@ -42,7 +42,7 @@ module RawMaterialsApp
       write(read.merge(bin_sets: sets.uniq))
     end
 
-    def remove_bin_set(set)
+    def remove_bin_set(combined_id)
       sets = bin_sets
       owner_id, type_id = combined_id.split('_')
       sets.reject! { |r| r[:rmt_material_owner_party_role_id] == owner_id && r[:rmt_container_material_type_id] == type_id }
