@@ -82,6 +82,16 @@ module RawMaterialsApp
       res
     end
 
+    def validate_adhoc_create_params(params)
+      res = AdhocCreateEmptyBinSchema.call(params)
+      res.messages.empty? ? ok_response : validation_failed_response(res)
+    end
+
+    def validate_adhoc_destroy_params(params)
+      res = AdhocDestroyEmptyBinSchema.call(params)
+      res.messages.empty? ? ok_response : validation_failed_response(res)
+    end
+
     def validate_stepper # rubocop:disable Metrics/AbcSize
       hash = stepper.read
       unless hash[:bin_sets].nil_or_empty? || hash[:create]

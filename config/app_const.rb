@@ -325,7 +325,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LOCATION_TYPES_RECEIVING_BAY = 'RECEIVING BAY'
   LOCATION_TYPES_COLD_BAY_DECK = ENV.fetch('LOCATION_TYPES_COLD_BAY_DECK', 'DECK')
   LOCATION_TYPES_EMPTY_BIN = 'EMPTY_BIN'
-  ONSITE_EMPTY_BIN_LOCATION = ENV.fetch('ONSITE_EMPTY_BIN_LOCATION')
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
@@ -470,9 +469,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   E_CERT_BUSINESS_NAME = ENV['E_CERT_API_CLIENT_SECRET']
   E_CERT_INDUSTRY = ENV['E_CERT_INDUSTRY']
 
-  ASSET_TRANSACTION_TYPES = { adhoc: 'ADHOC_EMPTY_BIN_MOVE',
+  ASSET_TRANSACTION_TYPES = { adhoc_move: 'ADHOC_MOVE',
+                              adhoc_create: 'ADHOC_CREATE',
+                              adhoc_destroy: 'ADHOC_DESTROY',
                               receive: 'RECEIVE_BINS',
-                              issue: 'BOOKOUT_BINS',
+                              issue: 'ISSUE_BINS',
                               bin_tip: 'BIN_TIP',
                               rebin: 'REBIN' }.freeze
+
+  # Empty Bin Control
+  ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
 end
