@@ -10,15 +10,11 @@
   \           FROM rmt_bins\r\n            WHERE puc_id = puc_id\r\n              AND
   orchard_id = orchard_id\r\n              AND cultivar_id = cultivar_id\r\n              AND
   exit_ref IS NULL) AS bins_in_stock,\r\n    api_result,\r\n    puc_code,\r\n    orchard_code,\r\n
-  \   cultivar_code,\r\n    tm_group_codes,\r\n    (SELECT string_agg(DISTINCT ps.pallet_number,
-  ', ' ORDER BY ps.pallet_number)\r\n     FROM pallet_sequences ps\r\n     JOIN pallets
-  p ON ps.pallet_id = p.id\r\n     WHERE p.exit_ref IS NULL\r\n       AND puc_id =
-  puc_id\r\n       AND orchard_id = orchard_id\r\n       AND cultivar_id = cultivar_id\r\n
-  \      AND packed_tm_group_id = ANY(tm_group_ids)) AS pallets_in_stock,\r\n    active,\r\n
-  \   created_at,\r\n    updated_at,\r\n    CASE\r\n        WHEN freeze_result THEN
-  'ready'\r\n        WHEN NOT passed AND NOT classification THEN 'error'\r\n        WHEN
-  NOT passed AND classification THEN 'warning'\r\n        WHEN passed AND NOT classification
-  THEN 'ok'\r\n        ELSE NULL::text\r\n        END AS colour_rule\r\nFROM vw_orchard_test_results_flat\r\nORDER
+  \   cultivar_code,\r\n    tm_group_codes,\r\n    active,\r\n    created_at,\r\n
+  \   updated_at,\r\n    CASE\r\n        WHEN freeze_result THEN 'ready'\r\n        WHEN
+  NOT passed AND NOT classification THEN 'error'\r\n        WHEN NOT passed AND classification
+  THEN 'warning'\r\n        WHEN passed AND NOT classification THEN 'ok'\r\n        ELSE
+  NULL::text\r\n        END AS colour_rule\r\nFROM vw_orchard_test_results_flat\r\nORDER
   BY updated_at DESC"
 :limit: 
 :offset: 
@@ -302,25 +298,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  pallets_in_stock:
-    :name: pallets_in_stock
-    :sequence_no: 18
-    :caption: Pallets in stock
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   active:
     :name: active
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -336,7 +316,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
@@ -352,7 +332,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Updated at
     :namespaced_name: updated_at
     :data_type: :datetime
@@ -368,7 +348,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 22
+    :sequence_no: 21
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

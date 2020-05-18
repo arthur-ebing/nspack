@@ -31,11 +31,11 @@
   \   internal_reinspection_at,\r\n    stock_created_at,\r\n    intake_created_at,\r\n
   \   first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n    seq_scrapped_at,\r\n
   \   packed_date,\r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n    repacked_date,\r\n
-  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
-  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
-  \   target_customer,\r\n    CASE WHEN fn_pallet_verification_failed (pallet_id)
-  THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n
-  \   vw_pallet_sequence_flat"
+  \   repacked_from_pallet_id,\r\n    phyto_data,\r\n    failed_otmc_results,\r\n
+  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
+  \   target_customer_party_role_id,\r\n    target_customer,\r\n    CASE WHEN fn_pallet_verification_failed
+  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
+  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2160,9 +2160,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  phyto_data:
+    :name: phyto_data
+    :sequence_no: 133
+    :caption: Phyto data
+    :namespaced_name: phyto_data
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 133
+    :sequence_no: 134
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
@@ -2178,7 +2194,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 134
+    :sequence_no: 135
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :string
@@ -2194,7 +2210,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 135
+    :sequence_no: 136
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -2210,7 +2226,7 @@
     :group_max: false
   verified_by:
     :name: verified_by
-    :sequence_no: 136
+    :sequence_no: 137
     :caption: Verified by
     :namespaced_name: verified_by
     :data_type: :string
@@ -2226,7 +2242,7 @@
     :group_max: false
   edi_size_count:
     :name: edi_size_count
-    :sequence_no: 137
+    :sequence_no: 138
     :caption: Edi size count
     :namespaced_name: edi_size_count
     :data_type: :string
@@ -2242,7 +2258,7 @@
     :group_max: false
   target_customer_party_role_id:
     :name: target_customer_party_role_id
-    :sequence_no: 138
+    :sequence_no: 139
     :caption: Target customer party role
     :namespaced_name: target_customer_party_role_id
     :data_type: :integer
@@ -2258,7 +2274,7 @@
     :group_max: false
   target_customer:
     :name: target_customer
-    :sequence_no: 139
+    :sequence_no: 140
     :caption: Target customer
     :namespaced_name: target_customer
     :data_type: :string
@@ -2274,7 +2290,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 140
+    :sequence_no: 141
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

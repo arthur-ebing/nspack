@@ -39,7 +39,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_orchard_test_result(id, params[:orchard_test_result])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            r.redirect '/list/orchard_test_results'
           else
             re_show_form(r, res, url: "/quality/test_results/orchard_test_results/#{id}/bulk_edit") do
               Quality::TestResults::OrchardTestResult::BulkEdit.call(id,
@@ -59,7 +59,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_orchard_test_result(id, params[:orchard_test_result])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            r.redirect '/list/orchard_test_results'
           else
             re_show_form(r, res, url: "/quality/test_results/orchard_test_results/#{id}/edit") do
               Quality::TestResults::OrchardTestResult::Edit.call(id,
