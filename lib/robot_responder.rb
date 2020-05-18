@@ -26,6 +26,26 @@ module Crossbeams
       MesscadaApp::MesscadaRepo.new.display_lines_for(@robot_feedback.device)
     end
 
+    def long_message(msg)
+      return msg if msg.nil_or_empty?
+
+      if msg.include?(AppConst::ROBOT_MSG_SEP)
+        msg.split(AppConst::ROBOT_MSG_SEP).first
+      else
+        msg
+      end
+    end
+
+    def short_message(msg)
+      return msg if msg.nil_or_empty?
+
+      if msg.include?(AppConst::ROBOT_MSG_SEP)
+        msg.split(AppConst::ROBOT_MSG_SEP).last
+      else
+        msg
+      end
+    end
+
     def render_4_lines
       line1, line2, line3, line4 = @robot_feedback.four_lines
       orange = @robot_feedback.orange || false
@@ -35,15 +55,15 @@ module Crossbeams
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
           <orange>#{orange}</orange>
-          <lcd1>#{@robot_feedback.msg || line1}</lcd1>
-          <lcd2>#{line2}</lcd2>
-          <lcd3>#{line3}</lcd3>
-          <lcd4>#{line4}</lcd4>#{confirmation}
+          <lcd1>#{short_message(@robot_feedback.msg || line1)}</lcd1>
+          <lcd2>#{short_message(line2)}</lcd2>
+          <lcd3>#{short_message(line3)}</lcd3>
+          <lcd4>#{short_message(line4)}</lcd4>#{confirmation}
         </robot_feedback>
       XML
     end
 
-    def render_6_lines
+    def render_6_lines # rubocop:disable Metrics/AbcSize
       orange = @robot_feedback.orange || false
       <<~XML
         <robot_feedback>
@@ -51,13 +71,13 @@ module Crossbeams
           <red>#{@robot_feedback.red}</red>
           <green>#{@robot_feedback.green}</green>
           <orange>#{orange}</orange>
-          <msg>#{@robot_feedback.msg}</msg>
-          <lcd1>#{@robot_feedback.line1}</lcd1>
-          <lcd2>#{@robot_feedback.line2}</lcd2>
-          <lcd3>#{@robot_feedback.line3}</lcd3>
-          <lcd4>#{@robot_feedback.line4}</lcd4>
-          <lcd5>#{@robot_feedback.line5}</lcd5>
-          <lcd6>#{@robot_feedback.line6}</lcd6>#{confirmation}
+          <msg>#{long_message(@robot_feedback.msg)}</msg>
+          <lcd1>#{long_message(@robot_feedback.line1)}</lcd1>
+          <lcd2>#{long_message(@robot_feedback.line2)}</lcd2>
+          <lcd3>#{long_message(@robot_feedback.line3)}</lcd3>
+          <lcd4>#{long_message(@robot_feedback.line4)}</lcd4>
+          <lcd5>#{long_message(@robot_feedback.line5)}</lcd5>
+          <lcd6>#{long_message(@robot_feedback.line6)}</lcd6>#{confirmation}
         </robot_feedback>
       XML
     end

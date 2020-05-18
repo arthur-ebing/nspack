@@ -120,6 +120,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             <div>
               <div id="url_sent">&nbsp;</div>
               <select id="sel_urls"></select>
+              <label><input type="checkbox" id="short_lines" name="short_lines" /> Simulate 22-character lines</label>
               <table>
               <tr>
                 <th style="min-width:15em;text-align:right">Host</th><td><input type="text" id="url_host" value="localhost" /></td>
@@ -166,6 +167,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             const urlPort = document.getElementById('url_port');
             const urlSent = document.getElementById('url_sent');
             const selUrls = document.getElementById('sel_urls');
+            const shortLines = document.getElementById('short_lines');
             const lP1 = document.getElementById('l_p1');
             const p1 = document.getElementById('p1');
             const lP2 = document.getElementById('l_p2');
@@ -190,6 +192,14 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               });
               urlSent.innerHTML = '&nbsp;';
               xmlResult.value = '';
+            };
+
+            const setText = function setText(txt) {
+              if (shortLines.checked) {
+                return txt.substring(0, 22);
+              } else {
+                return txt;
+              }
             };
 
             const fetchResponse = function fetchResponse(url) {
@@ -283,32 +293,32 @@ class App < Roda # rubocop:disable Metrics/ClassLength
 
                 txt = xmlDoc.getElementsByTagName('msg')[0];
                 if (txt && txt.childNodes.length > 0) {
-                  lcd1.textContent = txt.childNodes[0].nodeValue;
+                  lcd1.textContent = setText(txt.childNodes[0].nodeValue);
                 } else {
                   txt = xmlDoc.getElementsByTagName('lcd1')[0];
                   console.log(txt);
                   if (txt.childNodes.length > 0) {
-                    lcd1.textContent = txt.childNodes[0].nodeValue;
+                    lcd1.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                   txt = xmlDoc.getElementsByTagName('lcd2')[0];
                   if (txt.childNodes.length > 0) {
-                    lcd2.textContent = txt.childNodes[0].nodeValue;
+                    lcd2.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                   txt = xmlDoc.getElementsByTagName('lcd3')[0];
                   if (txt.childNodes.length > 0) {
-                    lcd3.textContent = txt.childNodes[0].nodeValue;
+                    lcd3.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                   txt = xmlDoc.getElementsByTagName('lcd4')[0];
                   if (txt.childNodes.length > 0) {
-                    lcd4.textContent = txt.childNodes[0].nodeValue;
+                    lcd4.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                   txt = xmlDoc.getElementsByTagName('lcd5')[0];
                   if (txt.childNodes.length > 0) {
-                    lcd5.textContent = txt.childNodes[0].nodeValue;
+                    lcd5.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                   txt = xmlDoc.getElementsByTagName('lcd6')[0];
                   if (txt.childNodes.length > 0) {
-                    lcd6.textContent = txt.childNodes[0].nodeValue;
+                    lcd6.textContent = setText(txt.childNodes[0].nodeValue);
                   }
                 }
 

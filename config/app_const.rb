@@ -362,6 +362,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # If all robots on site are homogenous, set the value here.
   # Else it will be looked up from the module name.
   ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
+  ROBOT_MSG_SEP = '###'
 
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
