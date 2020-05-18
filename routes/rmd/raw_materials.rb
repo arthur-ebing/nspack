@@ -1,6 +1,110 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
+  route 'raw_materials', 'rmd' do |r|
+    r.on 'dispatch' do
+      # --------------------------------------------------------------------------
+      # BIN LOADS
+      # --------------------------------------------------------------------------
+      r.on 'bin_load', Integer do |bin_load_id|
+        interactor = RawMaterialsApp::BinLoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        stepper = interactor.stepper(:bin_load)
+        r.get do
+          form_state = stepper.form_state
+          r.redirect('/rmd/raw_materials/dispatch/bin_load') if form_state.empty?
+
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin_load,
+                                         progress: stepper.progress,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         links: [{ caption: 'Cancel', url: '/rmd/raw_materials/dispatch/bin_load/clear', prompt: 'Cancel Bin Load?' }],
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Scan Bins',
+                                         action: "/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}",
+                                         button_caption: 'Submit')
+
+          form.add_label(:bin_load_id, 'Bin Load', bin_load_id)
+          form.add_label(:customer, 'Customer', form_state[:customer])
+          form.add_label(:transporter, 'Transporter', form_state[:transporter])
+          form.add_label(:dest_depot, 'Destination Depot', form_state[:dest_depot])
+          form.add_label(:qty_bins, 'qty Bins', form_state[:qty_bins])
+          form.add_field(:bin_asset_number, 'Bin Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: true)
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.scan_bin_to_bin_load(params[:bin_load])
+          if res.success
+            stepper.allocate(res.instance)
+            if stepper.ready_to_ship?
+              res = interactor.ship_bin_load(bin_load_id, stepper.loaded)
+              if res.success
+                stepper.clear
+                store_locally(:flash_notice, rmd_success_message(res.message))
+                r.redirect('/rmd/raw_materials/dispatch/bin_load')
+              else
+                store_locally(:flash_notice, rmd_error_message(res.message))
+              end
+            end
+
+            message = rmd_warning_message(stepper.warning_message) || rmd_success_message(stepper.message)
+            store_locally(:flash_notice, message)
+          else
+            store_locally(:flash_notice, rmd_error_message(e.message))
+          end
+          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
+        end
+      end
+
+      r.on 'bin_load' do
+        interactor = RawMaterialsApp::BinLoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        stepper = interactor.stepper(:bin_load)
+        r.on 'clear' do
+          stepper.clear
+          r.redirect('/rmd/raw_materials/dispatch/bin_load')
+        end
+
+        r.get do
+          form_state = {}
+          r.redirect("/rmd/raw_materials/dispatch/bin_load/#{stepper.bin_load_id}") unless stepper.bin_load_id.nil?
+
+          form_state = stepper.form_state if stepper.error?
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :bin_load,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Scan Bin Load',
+                                         action: '/rmd/raw_materials/dispatch/bin_load',
+                                         button_caption: 'Submit')
+
+          form.add_field(:bin_load_id,
+                         'Bin Load',
+                         data_type: 'number',
+                         scan: 'key248_all',
+                         scan_type: :load,
+                         submit_form: true,
+                         required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.scan_bin_load(params[:bin_load])
+          if res.success
+            stepper.setup_load(res.instance.id)
+            r.redirect("/rmd/raw_materials/dispatch/bin_load/#{res.instance.id}")
+          else
+            stepper.write(form_state: { error_message: res.message })
+            r.redirect('/rmd/raw_materials/dispatch/bin_load')
+          end
+        end
+      end
+    end
+  end
+
   # --------------------------------------------------------------------------
   # DELIVERIES
   # --------------------------------------------------------------------------
@@ -711,3 +815,4 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

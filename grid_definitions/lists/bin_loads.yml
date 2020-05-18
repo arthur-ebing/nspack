@@ -1,0 +1,58 @@
+---
+:dataminer_definition: bin_loads
+:actions:
+- :url: "/raw_materials/dispatch/bin_loads/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :hide_if_true: completed
+- :url: "/raw_materials/dispatch/bin_loads/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :hide_if_true: completed
+  :popup: true
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :hide_if_false: has_products
+  :hide_if_true: completed
+  :auth:
+    :function: Raw Materials
+    :program: dispatch
+    :permission: edit
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :prompt: 'Are you sure you want to reopen this bin load?'
+  :hide_if_false: completed
+  :hide_if_true: shipped
+  :auth:
+    :function: Raw Materials
+    :program: dispatch
+    :permission: edit
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/unship"
+  :text: Unship for editing
+  :icon: toggle-off
+  :prompt: 'Are you sure you want to unship this bin load?'
+  :hide_if_false: shipped
+  :auth:
+    :function: Raw Materials
+    :program: dispatch
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/bin_loads/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/dispatch/bin_loads/new"
+  :text: New Bin Load
+  :style: :button
+  :behaviour: :popup

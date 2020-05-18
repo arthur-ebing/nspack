@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :depot_code
               form.add_field :description
+              form.add_field :bin_depot
               form.add_field :city_id
             end
           end

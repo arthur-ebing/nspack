@@ -43,7 +43,6 @@ module FinishedGoods
             end
             page.add_notice 'Click button to allocate pasted pallets from the list or use Checkboxes to select from the grid below'
             page.section do |section|
-              section.fit_height!
               section.add_grid('stock_pallets',
                                '/list/stock_pallets/grid_multi',
                                caption: 'Choose Pallets',

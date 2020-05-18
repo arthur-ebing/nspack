@@ -1,0 +1,30 @@
+---
+:dataminer_definition: bin_load_purposes
+:actions:
+- :url: "/raw_materials/dispatch/bin_load_purposes/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/dispatch/bin_load_purposes/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/raw_materials/dispatch/bin_load_purposes/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/bin_load_purposes/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/dispatch/bin_load_purposes/new"
+  :text: New Bin Load Purpose
+  :style: :button
+  :behaviour: :popup

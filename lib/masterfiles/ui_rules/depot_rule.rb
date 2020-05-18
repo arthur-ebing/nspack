@@ -18,6 +18,7 @@ module UiRules
       fields[:city_id] = { renderer: :label, with_value: city_id_label, caption: 'City' }
       fields[:depot_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:bin_depot] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -28,7 +29,8 @@ module UiRules
                    caption: 'City',
                    prompt: 'Optional' },
         depot_code: { required: true },
-        description: {}
+        description: {},
+        bin_depot: { renderer: :checkbox }
       }
     end
 
@@ -41,7 +43,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(city_id: nil,
                                     depot_code: nil,
-                                    description: nil)
+                                    description: nil,
+                                    bin_depot: false)
     end
   end
 end

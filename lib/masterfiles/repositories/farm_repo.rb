@@ -38,10 +38,11 @@ module MasterfilesApp
                           value: :id,
                           order_by: :orchard_code
 
-    build_for_select :pucs,
-                     label: :puc_code,
-                     value: :id,
-                     order_by: :puc_code
+    def for_select_pucs(where: nil)
+      ds = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[puc_code id])
+    end
     build_inactive_select :pucs,
                           label: :puc_code,
                           value: :id,
