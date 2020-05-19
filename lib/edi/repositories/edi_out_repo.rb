@@ -76,5 +76,20 @@ module EdiApp
       config = load_config
       config[:out_dirs].keys + config[:mail_recipients].keys.map { |m| "mail:#{m}" }
     end
+
+    def can_transform_for_depot?(flow_type)
+      AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:depot]
+    end
+
+    def can_transform_for_party?(flow_type)
+      !AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:roles].nil_or_empty?
+    end
+
+    def destinations_for_flow(flow_type)
+      sel = []
+      sel << AppConst::DEPOT_DESTINATION_TYPE if AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:depot]
+      sel << AppConst::PARTY_ROLE_DESTINATION_TYPE unless AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:roles].empty?
+      sel
+    end
   end
 end

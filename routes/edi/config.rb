@@ -75,9 +75,34 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
       end
     end
 
-    r.on 'flow_type_changed' do
-      return po_selected if params[:changed_value] == AppConst::EDI_FLOW_PO
-      return ps_selected if params[:changed_value] == AppConst::EDI_FLOW_PS
+    r.on 'flow_type_changed' do # rubocop:disable Metrics/BlockLength
+      unless params[:changed_value].nil_or_empty?
+        repo = EdiApp::EdiOutRepo.new
+        rules_template = AppConst::EDI_OUT_RULES_TEMPLATE
+        destinations = repo.destinations_for_flow(params[:changed_value])
+        party_role_default_destination_screen = (destinations.size == 1 && destinations[0] == AppConst::PARTY_ROLE_DESTINATION_TYPE)
+        actions = [OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'edi_out_rule_destination_type',
+                                  options_array: destinations),
+                   OpenStruct.new(type: destinations.nil_or_empty? || party_role_default_destination_screen ? :hide_element : :show_element,
+                                  dom_id: 'edi_out_rule_destination_type_field_wrapper'),
+                   OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'edi_out_rule_depot_id',
+                                  options_array: []),
+                   OpenStruct.new(type: repo.can_transform_for_depot?(params[:changed_value]) ? :show_element : :hide_element,
+                                  dom_id: 'edi_out_rule_depot_id_field_wrapper'),
+                   OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'edi_out_rule_role_id',
+                                  options_array: party_role_default_destination_screen ? rules_template[params[:changed_value]][:roles].to_a : []),
+                   OpenStruct.new(type: repo.can_transform_for_party?(params[:changed_value]) ? :show_element : :hide_element,
+                                  dom_id: 'edi_out_rule_role_id_field_wrapper'),
+                   OpenStruct.new(type: :replace_select_options,
+                                  dom_id: 'edi_out_rule_party_role_id',
+                                  options_array: []),
+                   OpenStruct.new(type: repo.can_transform_for_party?(params[:changed_value]) ? :show_element : :hide_element,
+                                  dom_id: 'edi_out_rule_party_role_id_field_wrapper')]
+        return json_actions(actions)
+      end
 
       json_actions([OpenStruct.new(type: :replace_select_options,
                                    dom_id: 'edi_out_rule_destination_type',
@@ -120,7 +145,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                       OpenStruct.new(type: :hide_element,
                                      dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
       elsif params[:changed_value] == AppConst::PARTY_ROLE_DESTINATION_TYPE
-        roles = [AppConst::ROLE_CUSTOMER, AppConst::ROLE_SHIPPER, AppConst::ROLE_EXPORTER]
+        roles = AppConst::EDI_OUT_RULES_TEMPLATE[params[:edi_out_rule_flow_type]][:roles].to_a
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'edi_out_rule_depot_id',
                                      options_array: []),
@@ -160,51 +185,5 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
                     OpenStruct.new(type: :show_element,
                                    dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
     end
-  end
-
-  def po_selected
-    po_rules = AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PO]
-    json_actions([OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_destination_type',
-                                 options_array: po_rules[:destination_types].to_a),
-                  OpenStruct.new(type: :show_element,
-                                 dom_id: 'edi_out_rule_destination_type_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_depot_id',
-                                 options_array: []),
-                  OpenStruct.new(type: :show_element,
-                                 dom_id: 'edi_out_rule_depot_id_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_role_id',
-                                 options_array: []),
-                  OpenStruct.new(type: :show_element,
-                                 dom_id: 'edi_out_rule_role_id_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_party_role_id',
-                                 options_array: [])])
-  end
-
-  def ps_selected
-    ps_rules = AppConst::EDI_OUT_RULES_TEMPLATE[AppConst::EDI_FLOW_PS]
-    json_actions([OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_destination_type',
-                                 options_array: ['']),
-                  OpenStruct.new(type: :hide_element,
-                                 dom_id: 'edi_out_rule_destination_type_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_depot_id',
-                                 options_array: []),
-                  OpenStruct.new(type: :hide_element,
-                                 dom_id: 'edi_out_rule_depot_id_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_role_id',
-                                 options_array: ps_rules[:roles].to_a),
-                  OpenStruct.new(type: :show_element,
-                                 dom_id: 'edi_out_rule_role_id_field_wrapper'),
-                  OpenStruct.new(type: :replace_select_options,
-                                 dom_id: 'edi_out_rule_party_role_id',
-                                 options_array: []),
-                  OpenStruct.new(type: :show_element,
-                                 dom_id: 'edi_out_rule_party_role_id_field_wrapper')])
   end
 end

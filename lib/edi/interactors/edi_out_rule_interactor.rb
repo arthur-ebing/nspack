@@ -65,17 +65,17 @@ module EdiApp
       repo.find_edi_out_rule(id)
     end
 
-    def validate_edi_out_rule_params(params) # rubocop:disable Metrics/PerceivedComplexity
-      if params[:flow_type] == 'PO'
+    def validate_edi_out_rule_params(params)
+      if repo.can_transform_for_depot?(params[:flow_type])
         if params[:destination_type].nil_or_empty?
-          EdiOutRulePoDestSchema.call(params)
-        elsif params[:destination_type] == 'DEPOT'
-          EdiOutRulePoDepotSchema.call(params)
-        elsif params[:destination_type] == 'PARTY_ROLE'
-          EdiOutRulePoPartyRoleSchema.call(params)
+          EdiOutRuleDestSchema.call(params)
+        elsif params[:destination_type] == AppConst::DEPOT_DESTINATION_TYPE
+          EdiOutRuleDepotSchema.call(params)
+        elsif params[:destination_type] == AppConst::PARTY_ROLE_DESTINATION_TYPE
+          EdiOutRulePartyRoleSchema.call(params)
         end
-      elsif params[:flow_type] == 'PS'
-        EdiOutRulePsSchema.call(params)
+      else
+        EdiOutRulePartyRoleSchema.call(params)
       end
     end
   end

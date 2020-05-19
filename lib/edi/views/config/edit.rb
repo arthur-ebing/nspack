@@ -16,13 +16,24 @@ module Edi
             form.caption 'Edit Edi Out Rule'
             form.action "/edi/config/edi_out_rules/#{id}"
             form.method :update
-            form.add_field :flow_type
-            form.add_field :destination_type
-            form.add_field :depot_id
-            form.add_field :role_id
-            form.add_field :party_role_id
-            form.add_field :hub_address
-            form.add_field :directory_keys
+            form.row do |row|
+              row.column do |col|
+                col.add_field :flow_type
+                col.add_field :role_id
+                col.add_field :party_role_id
+                col.add_field :hub_address
+              end
+              row.column do |col|
+                col.add_field :destination_type
+                col.add_field :depot_id
+              end
+            end
+
+            form.row do |row|
+              row.column do |col|
+                col.add_field :directory_keys
+              end
+            end
           end
         end
 
