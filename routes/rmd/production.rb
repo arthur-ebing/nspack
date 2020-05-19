@@ -63,6 +63,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:gross_weight, 'Plt Gross', pallet_sequence[:gross_weight])
         form.add_label(:nett_weight, 'Plt Nett', pallet_sequence[:nett_weight])
         form.add_label(:sequence_nett_weight, 'Seq Nett', pallet_sequence[:sequence_nett_weight])
+        form.add_label(:allocated, 'Allocated', pallet_sequence[:allocated])
+        form.add_label(:in_stock, 'In stock', pallet_sequence[:in_stock])
+        fields_for_rmd_allocated_pallet_sequence_display(form, pallet_sequence) if pallet_sequence[:allocated]
         form.add_prev_next_nav('/rmd/production/pallet_inquiry/scan_pallet_sequence/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -704,6 +707,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     form.add_label(:mark, 'Mark', pallet_sequence[:mark])
     form.add_label(:inventory_code, 'Inventory Code', pallet_sequence[:inventory_code])
     form.add_label(:bom, 'Bom Code', pallet_sequence[:bom])
+  end
+
+  def fields_for_rmd_allocated_pallet_sequence_display(form, pallet_sequence) # rubocop:disable Metrics/AbcSize
+    form.add_section_header('Load/Shipping')
+    form.add_label(:order_number, 'Order Number', pallet_sequence[:order_number])
+    form.add_label(:customer_order_number, 'Customer Order Number', pallet_sequence[:customer_order_number])
+    form.add_label(:customer_reference, 'Customer Reference', pallet_sequence[:customer_reference])
+    form.add_label(:customer, 'Customer', pallet_sequence[:customer])
+    form.add_label(:target_customer, 'Target Customer', pallet_sequence[:target_customer])
+    form.add_label(:vessel, 'Vessel', pallet_sequence[:vessel])
+    form.add_label(:pol, 'POL', pallet_sequence[:pol])
+    form.add_label(:pod, 'POD', pallet_sequence[:pod])
+    form.add_label(:final_destination, 'Final Destination', pallet_sequence[:final_destination])
+    form.add_label(:depot, 'Depot', pallet_sequence[:depot])
   end
 end
 # rubocop:enable Metrics/BlockLength

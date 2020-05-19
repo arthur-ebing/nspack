@@ -14,8 +14,9 @@
   vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
   exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
   AS departure_date, active, exit_ref, created_by, verified_by, edi_size_count, target_customer_party_role_id,
-  target_customer, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id
-  DESC, pallet_sequence_number ASC
+  target_customer, consignment_note_number, dispatch_note, order_number, depot, po_file_name,
+  colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id DESC, pallet_sequence_number
+  ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1484,9 +1485,89 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 92
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_note:
+    :name: dispatch_note
+    :sequence_no: 93
+    :caption: Dispatch note
+    :namespaced_name: dispatch_note
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 94
+    :caption: Order number
+    :namespaced_name: order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot:
+    :name: depot
+    :sequence_no: 95
+    :caption: Depot
+    :namespaced_name: depot
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  po_file_name:
+    :name: po_file_name
+    :sequence_no: 96
+    :caption: Po file name
+    :namespaced_name: po_file_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 92
+    :sequence_no: 97
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

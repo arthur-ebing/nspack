@@ -31,8 +31,9 @@
   \   first_cold_storage_at,\r\n    active,\r\n    extended_columns,\r\n    seq_scrapped_at,\r\n
   \   packed_at,\r\n    packed_date,\r\n    repacked,\r\n    repacked_at,\r\n    repacked_date,\r\n
   \   repacked_from_pallet_id,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
-  \   target_customer_party_role_id,\r\n    target_customer,\r\n    colour_rule\r\nFROM\r\n
-  \   vw_pallet_sequence_flat"
+  \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
+  \   dispatch_note,\r\n    customer_order_number,\r\n    customer_reference, \r\n
+  \   depot,\r\n    po_file_name,\r\n    colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2125,9 +2126,105 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 131
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_note:
+    :name: dispatch_note
+    :sequence_no: 132
+    :caption: Dispatch note
+    :namespaced_name: dispatch_note
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_order_number:
+    :name: customer_order_number
+    :sequence_no: 133
+    :caption: Cust Order number
+    :namespaced_name: customer_order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_reference:
+    :name: customer_reference
+    :sequence_no: 134
+    :caption: Cust Ref
+    :namespaced_name: customer_reference
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot:
+    :name: depot
+    :sequence_no: 135
+    :caption: Depot
+    :namespaced_name: depot
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  po_file_name:
+    :name: po_file_name
+    :sequence_no: 136
+    :caption: Po file name
+    :namespaced_name: po_file_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 131
+    :sequence_no: 137
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

@@ -1,10 +1,11 @@
 ---
 :caption: Pallet Coldroom Locations
 :sql: "SELECT DISTINCT ON (pallet_number, zero_load_id)\r\n    vw.id,\r\n    pallet_id,\r\n
-  \   pallet_number,\r\n    pallet_sequence_number,\r\n    LOCATION,\r\n    SPLIT_PART(locations.location_long_code,
-  '_', 1) AS coldroom,\r\n    SPLIT_PART(locations.location_long_code, '_', 2) AS
-  bay,\r\n    SPLIT_PART(locations.location_long_code, '_', 3) AS deck,\r\n    SPLIT_PART(locations.location_long_code,
-  '_', 4) AS deck_position,\r\n    cultivar,\r\n    carton_quantity,\r\n    pallet_carton_quantity,\r\n
+  \   pallet_number,\r\n    pallet_sequence_number,\r\n    LOCATION,\r\n    substr(SPLIT_PART(locations.location_long_code,
+  '_', 1), 2) AS coldroom,\r\n    substr(SPLIT_PART(locations.location_long_code,
+  '_', 2), 2) AS bay,\r\n    substr(SPLIT_PART(locations.location_long_code, '_',
+  3), 2) AS deck,\r\n    substr(SPLIT_PART(locations.location_long_code, '_', 4),
+  2) AS deck_position,\r\n    cultivar,\r\n    carton_quantity,\r\n    pallet_carton_quantity,\r\n
   \   pallet_size,\r\n    pallet_age,\r\n    stock_age,\r\n    cold_age,\r\n    ambient_age,\r\n
   \   pack_to_inspect_age,\r\n    inspect_to_cold_age,\r\n    inspect_to_exit_warm_age,\r\n
   \   vw.created_at,\r\n    palletized_at,\r\n    govt_first_inspection_at,\r\n    govt_inspection_passed,\r\n
@@ -22,7 +23,10 @@
   \   vw.active,\r\n    zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n
   \   edi_in_consignment_note_number,\r\n    packed_at,\r\n    packed_date,\r\n    packed_week,\r\n
   \   repacked,\r\n    repacked_at,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
-  \   failed_otmc,\r\n    CASE \r\n      WHEN fn_pallet_verification_failed (pallet_id)
+  \   failed_otmc,\r\n    consignment_note_number,\r\n    dispatch_note,\r\n    order_number,\r\n
+  \   customer_order_number,\r\n    customer_reference, \r\n    customer, \r\n    target_customer,
+  \r\n    vessel, \r\n    pol, \r\n    pod, \r\n    final_destination,\r\n    depot,\r\n
+  \   po_file_name,\r\n    CASE \r\n      WHEN fn_pallet_verification_failed (pallet_id)
   THEN 'error'\r\n      ELSE colour_rule\r\n    END AS colour_rule\r\nFROM vw_pallet_sequence_flat
   vw\r\nLEFT JOIN (\r\n    SELECT\r\n        locations.id,\r\n        location_long_code\r\n
   \   FROM locations\r\n    JOIN location_types ON locations.location_type_id = location_types.id\r\n
@@ -127,7 +131,7 @@
     :caption: Coldroom
     :namespaced_name: 
     :data_type: :string
-    :width: 120
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -143,7 +147,7 @@
     :caption: Bay
     :namespaced_name: 
     :data_type: :string
-    :width: 120
+    :width: 60
     :format: 
     :hide: false
     :pinned: 
@@ -159,7 +163,7 @@
     :caption: Deck
     :namespaced_name: 
     :data_type: :string
-    :width: 120
+    :width: 70
     :format: 
     :hide: false
     :pinned: 
@@ -172,7 +176,7 @@
   deck_position:
     :name: deck_position
     :sequence_no: 9
-    :caption: Deck position
+    :caption: Deck Position
     :namespaced_name: 
     :data_type: :string
     :width: 120
@@ -1433,9 +1437,217 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 88
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_note:
+    :name: dispatch_note
+    :sequence_no: 89
+    :caption: Dispatch note
+    :namespaced_name: dispatch_note
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  order_number:
+    :name: order_number
+    :sequence_no: 90
+    :caption: Order number
+    :namespaced_name: order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_order_number:
+    :name: customer_order_number
+    :sequence_no: 91
+    :caption: Cust Order number
+    :namespaced_name: customer_order_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer_reference:
+    :name: customer_reference
+    :sequence_no: 92
+    :caption: Customer Reference
+    :namespaced_name: customer_reference
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  customer:
+    :name: customer
+    :sequence_no: 93
+    :caption: Customer
+    :namespaced_name: customer
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  target_customer:
+    :name: target_customer
+    :sequence_no: 94
+    :caption: Target customer
+    :namespaced_name: target_customer
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel:
+    :name: vessel
+    :sequence_no: 95
+    :caption: Vessel
+    :namespaced_name: vessel
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pol:
+    :name: pol
+    :sequence_no: 96
+    :caption: Pol
+    :namespaced_name: pol
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pod:
+    :name: pod
+    :sequence_no: 97
+    :caption: Pod
+    :namespaced_name: pod
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  final_destination:
+    :name: final_destination
+    :sequence_no: 98
+    :caption: Final destination
+    :namespaced_name: final_destination
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot:
+    :name: depot
+    :sequence_no: 99
+    :caption: Depot
+    :namespaced_name: depot
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  po_file_name:
+    :name: po_file_name
+    :sequence_no: 100
+    :caption: Po file name
+    :namespaced_name: po_file_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 88
+    :sequence_no: 101
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

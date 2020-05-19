@@ -19,8 +19,8 @@
   inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
   intake_created_at, first_cold_storage_at, active, extended_columns, seq_scrapped_at,
   created_by, verified_by, edi_size_count, target_customer_party_role_id, target_customer,
-  colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id DESC, pallet_sequence_number
-  ASC
+  consignment_note_number, dispatch_note, depot, po_file_name, colour_rule FROM vw_scrapped_pallet_sequence_flat
+  ORDER BY pallet_id DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1921,9 +1921,73 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 119
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dispatch_note:
+    :name: dispatch_note
+    :sequence_no: 120
+    :caption: Dispatch note
+    :namespaced_name: dispatch_note
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  depot:
+    :name: depot
+    :sequence_no: 121
+    :caption: Depot
+    :namespaced_name: depot
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  po_file_name:
+    :name: po_file_name
+    :sequence_no: 122
+    :caption: Po file name
+    :namespaced_name: po_file_name
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 119
+    :sequence_no: 123
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

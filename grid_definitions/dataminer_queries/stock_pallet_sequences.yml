@@ -25,9 +25,9 @@
   \   active,\r\n    extended_columns,\r\n    seq_scrapped_at,\r\n    inspected_dest_country,\r\n
   \   depot_pallet,\r\n    edi_in_file,\r\n    edi_in_consignment_note_number,\r\n
   \   packed_at,\r\n    packed_date,\r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n
-  \   repacked_from_pallet_id,\r\n    phyto_data,\r\n    failed_otmc_results,\r\n
-  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
-  \   target_customer_party_role_id,\r\n    target_customer,\r\n    colour_rule \r\nFROM
+  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
+  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
+  \   target_customer,\r\n    consignment_note_number,\r\n    colour_rule \r\nFROM
   vw_pallet_sequence_flat \r\nORDER BY pallet_sequence_number DESC"
 :limit: 
 :offset: 
@@ -1721,25 +1721,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  phyto_data:
-    :name: phyto_data
-    :sequence_no: 106
-    :caption: Phyto data
-    :namespaced_name: phyto_data
-    :data_type: :string
-    :width: 100
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 107
+    :sequence_no: 106
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
@@ -1755,7 +1739,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 108
+    :sequence_no: 107
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :string
@@ -1771,7 +1755,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 109
+    :sequence_no: 108
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -1787,7 +1771,7 @@
     :group_max: false
   verified_by:
     :name: verified_by
-    :sequence_no: 110
+    :sequence_no: 109
     :caption: Verified by
     :namespaced_name: verified_by
     :data_type: :string
@@ -1803,7 +1787,7 @@
     :group_max: false
   edi_size_count:
     :name: edi_size_count
-    :sequence_no: 111
+    :sequence_no: 110
     :caption: Edi size count
     :namespaced_name: edi_size_count
     :data_type: :string
@@ -1819,7 +1803,7 @@
     :group_max: false
   target_customer_party_role_id:
     :name: target_customer_party_role_id
-    :sequence_no: 112
+    :sequence_no: 111
     :caption: Target customer party role
     :namespaced_name: target_customer_party_role_id
     :data_type: :integer
@@ -1835,9 +1819,25 @@
     :group_max: false
   target_customer:
     :name: target_customer
-    :sequence_no: 113
+    :sequence_no: 112
     :caption: Target customer
     :namespaced_name: target_customer
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 113
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
     :data_type: :string
     :width: 120
     :format: 

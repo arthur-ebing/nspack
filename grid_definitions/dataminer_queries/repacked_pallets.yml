@@ -21,7 +21,7 @@
   \    zero_load_id,\r\n     temp_tail,\r\n     depot_pallet,\r\n     edi_in_file,\r\n
   \    edi_in_consignment_note_number,\r\n     failed_otmc_results,\r\n     failed_otmc,\r\n
   \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
-  \   target_customer,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
+  \   target_customer,\r\n    consignment_note_number,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
   \            THEN 'error' ELSE colour_rule\r\n        END AS colour_rule\r\nFROM
   vw_repacked_pallet_sequence_flat\r\nORDER BY repacked_at DESC"
 :limit: 
@@ -1364,9 +1364,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  consignment_note_number:
+    :name: consignment_note_number
+    :sequence_no: 84
+    :caption: Cons Note number
+    :namespaced_name: consignment_note_number
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 84
+    :sequence_no: 85
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
