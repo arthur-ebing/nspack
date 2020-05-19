@@ -79,7 +79,6 @@ module RawMaterialsApp
       farm_id = create_farm
       puc_id = create_puc
       orchard_id = create_orchard
-      rmt_class_id = create_rmt_class
 
       {
         id: 1,
@@ -92,7 +91,7 @@ module RawMaterialsApp
         farm_id: farm_id,
         puc_id: puc_id,
         orchard_id: orchard_id,
-        rmt_class_id: rmt_class_id,
+        rmt_class_id: nil,
         active: true
       }
     end
