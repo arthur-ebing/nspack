@@ -24,9 +24,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-menu_migrations.git
-  revision: ff3c7c3a35c1a7af31ea39771ea445be986eff82
+  revision: 79a975bd31607e840384128c7a0fc478b9d558de
   specs:
-    crossbeams-menu_migrations (0.1.1)
+    crossbeams-menu_migrations (0.1.2)
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-rack_middleware.git
