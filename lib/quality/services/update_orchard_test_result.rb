@@ -5,13 +5,14 @@ module QualityApp
     attr_reader :id, :orchard_test_type, :orchard_test_result, :api_attribute
     attr_accessor :params, :otmc_result, :attrs
 
-    def initialize(id, params)
+    def initialize(id, params, user = nil)
       @id = id
       @orchard_test_result = repo.find_orchard_test_result_flat(id)
       @orchard_test_type = repo.find_orchard_test_type_flat(@orchard_test_result.orchard_test_type_id)
       @params = params.to_h
       @attrs = {}
       @api_attribute = @orchard_test_type.api_attribute&.to_sym
+      @user = user
     end
 
     def call
@@ -57,6 +58,7 @@ module QualityApp
         next if repo.exists?(:orchard_test_results, attrs.merge(id: group_id))
 
         repo.update_orchard_test_result(group_id, attrs)
+        repo.log_status(:orchard_test_results, group_id, 'UPDATED', user_name: @user&.user_name)
       end
     end
   end

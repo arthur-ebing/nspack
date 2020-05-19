@@ -4,9 +4,10 @@ module QualityApp
   class CreateOrchardTestResults < BaseService
     attr_reader :repo, :orchard_test_type, :orchard_test_type_id, :args
 
-    def initialize(args = {})
+    def initialize(args, user)
       @repo = OrchardTestRepo.new
       @args = args.to_h
+      @user = user
     end
 
     def call
@@ -34,6 +35,7 @@ module QualityApp
 
       (current_result_ids - valid_result_ids).each do |id|
         repo.delete_orchard_test_result(id)
+        log_status(:orchard_test_results, id, 'DELETED', user_name: @user&.user_name)
       end
     end
 
@@ -66,7 +68,7 @@ module QualityApp
           end
 
           id = repo.create_orchard_test_result(attrs)
-          repo.log_status(:orchard_test_results, id, 'CREATED')
+          repo.log_status(:orchard_test_results, id, 'CREATED', user_name: @user&.user_name)
         end
       end
     end

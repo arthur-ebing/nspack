@@ -13,12 +13,13 @@ module QualityApp
       @puc_ids = repo.select_values(:orchard_test_results, :puc_id).uniq if @puc_ids.empty?
       @attrs = {}
       @glossary = {}
+      @user = OpenStruct.new(user_name: 'ApiPhytCleanStandardData')
     end
 
     def call # rubocop:disable Metrics/AbcSize
       raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
 
-      res = QualityApp::CreateOrchardTestResults.call
+      res = QualityApp::CreateOrchardTestResults.call(nil, @user)
       return failed_response(res.message) unless res.success
 
       res = api.auth_token_call
@@ -82,13 +83,14 @@ module QualityApp
 
           cultivar_ids.each do |cultivar_id|
             update_attrs = { puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id, orchard_test_type_id: orchard_test_type_id }
-            orchard_test_result_id = repo.get_id(:orchard_test_results, update_attrs)
-            next if orchard_test_result_id.nil?
+            result_id = repo.get_id(:orchard_test_results, update_attrs)
+            next if result_id.nil?
 
-            next if repo.get(:orchard_test_results, orchard_test_result_id, :freeze_result)
+            next if repo.get(:orchard_test_results, result_id, :freeze_result)
 
             update_attrs[:api_result] = api_result
-            QualityApp::UpdateOrchardTestResult.call(orchard_test_result_id, update_attrs)
+            update_res = QualityApp::UpdateOrchardTestResult.call(result_id, update_attrs, @user)
+            raise Crossbeams::InfoError, update_res.message unless update_res.success
           end
         end
       end

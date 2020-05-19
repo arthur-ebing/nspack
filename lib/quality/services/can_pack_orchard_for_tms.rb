@@ -47,7 +47,7 @@ module QualityApp
     def create_applicable_tests
       repo.select_values(:orchard_test_types, :id).each do |orchard_test_type_id|
         args = { orchard_test_type_id: orchard_test_type_id, puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id }
-        service_res = CreateOrchardTestResults.call(args)
+        service_res = CreateOrchardTestResults.call(args, @user)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
       end
 

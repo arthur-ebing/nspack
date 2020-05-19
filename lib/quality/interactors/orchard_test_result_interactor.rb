@@ -3,14 +3,13 @@
 module QualityApp
   class OrchardTestResultInteractor < BaseInteractor
     def phyt_clean_request(puc_ids = nil)
-      service_res = nil
       repo.transaction do
         service_res = QualityApp::PhytCleanStandardData.call(puc_ids)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
+        service_res
       end
-      service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -20,7 +19,7 @@ module QualityApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        service_res = CreateOrchardTestResults.call(res)
+        service_res = CreateOrchardTestResults.call(res, @user)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
@@ -33,17 +32,13 @@ module QualityApp
     end
 
     def create_orchard_test_results
-      ids = repo.select_values(:orchard_test_types, :id)
-      service_res = nil
-      ids.each do |id|
-        repo.transaction do
-          service_res = CreateOrchardTestResults.call(orchard_test_type_id: id)
-          raise Crossbeams::InfoError, service_res.message unless service_res.success
+      repo.transaction do
+        service_res = CreateOrchardTestResults.call(nil, @user)
+        raise Crossbeams::InfoError, service_res.message unless service_res.success
 
-          log_transaction
-        end
+        log_transaction
+        service_res
       end
-      service_res
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -53,7 +48,7 @@ module QualityApp
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        service_res = QualityApp::UpdateOrchardTestResult.call(id, res)
+        service_res = QualityApp::UpdateOrchardTestResult.call(id, res, @user)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
