@@ -1,0 +1,108 @@
+---
+:caption: Pallet Sequences Audit
+:sql: "SELECT\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n    event_id,\r\n
+  \   action_tstamp_clk AS transaction_at,\r\n    action,\r\n    changed_fields\r\nFROM\r\n
+  \   audit.logged_actions\r\n    JOIN public.pallet_sequences ON logged_actions.row_data_id
+  = pallet_sequences.id\r\nWHERE\r\n    table_name = 'pallet_sequences'\r\nORDER BY
+  action_tstamp_clk DESC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 1
+    :caption: Pallet number
+    :namespaced_name: pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_sequence_number:
+    :name: pallet_sequence_number
+    :sequence_no: 2
+    :caption: Pallet sequence number
+    :namespaced_name: pallet_sequence_number
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  event_id:
+    :name: event_id
+    :sequence_no: 3
+    :caption: Event
+    :namespaced_name: event_id
+    :data_type: :integer
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  transaction_at:
+    :name: transaction_at
+    :sequence_no: 4
+    :caption: Transaction at
+    :namespaced_name: action_tstamp_clk
+    :data_type: :datetime
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  action:
+    :name: action
+    :sequence_no: 5
+    :caption: Action
+    :namespaced_name: action
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  changed_fields:
+    :name: changed_fields
+    :sequence_no: 6
+    :caption: Changed fields
+    :namespaced_name: changed_fields
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []
