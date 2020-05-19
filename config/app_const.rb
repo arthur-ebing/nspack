@@ -415,7 +415,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
     },
     EDI_FLOW_PO => {
       depot: true,
-      destination_types: DESTINATION_TYPES,
       roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
     },
     EDI_FLOW_UISTK => {
