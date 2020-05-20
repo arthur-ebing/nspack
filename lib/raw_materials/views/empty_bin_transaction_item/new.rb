@@ -22,7 +22,7 @@ module RawMaterials
                 form.add_field :rmt_material_owner_party_role_id
                 form.add_field :rmt_container_material_type_id
                 form.add_field :quantity_bins
-                form.add_list ui_rule.form_object.bin_sets, caption: 'Bin Sets List', dom_id: 'bin_set_list'
+                form.add_field :bin_sets
 
                 form.submit_captions 'Add Bin Set', 'Adding'
               end

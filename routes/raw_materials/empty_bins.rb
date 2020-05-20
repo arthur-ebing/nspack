@@ -39,18 +39,18 @@ class Nspack < Roda
           stepper.add_bin_set(params[:empty_bin_transaction_item])
           empty_bin_types = stepper.for_select_bin_sets
           json_actions([OpenStruct.new(type: :replace_list_items,
-                                       dom_id: 'bin_set_list',
+                                       dom_id: 'empty_bin_transaction_item_bin_sets',
                                        items: empty_bin_types),
                         OpenStruct.new(type: :clear_form_validation,
                                        dom_id: 'empty_bin_transaction_item')],
                        'Bin Type Added',
                        keep_dialog_open: true)
         end
-        r.on 'remove', Integer do |id|
-          stepper.remove_bin_set(id)
+        r.on 'remove', String do |combined_ids|
+          stepper.remove_bin_set(combined_ids)
           empty_bin_types = stepper.for_select_bin_sets
           json_actions([OpenStruct.new(type: :replace_list_items,
-                                       dom_id: 'bin_set_list',
+                                       dom_id: 'empty_bin_transaction_item_bin_sets',
                                        items: empty_bin_types),
                         OpenStruct.new(type: :clear_form_validation,
                                        dom_id: 'empty_bin_transaction_item')],
