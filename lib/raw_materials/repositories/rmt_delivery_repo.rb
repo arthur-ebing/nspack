@@ -69,7 +69,7 @@ module RawMaterialsApp
     end
 
     def find_delivery_tipped_bins(id)
-      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: true)
+      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: true).all
     end
 
     def find_rmt_bin_flat(id)
