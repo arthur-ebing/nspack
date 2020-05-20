@@ -15,7 +15,7 @@
   \   bin_load_products.created_at,\r\n    bin_load_products.updated_at,\r\n    fn_current_status('bin_load_products',
   bin_load_products.id) AS status,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN
   'ready'\r\n        WHEN COALESCE(pm.available_in_stock_bins,0) < bin_load_products.qty_bins
-  THEN 'warning'\r\n    END AS colour_rule\r\n\r\nFROM bin_load_products\r\n         JOIN
+  THEN 'warning'\r\n        END AS colour_rule\r\n\r\nFROM bin_load_products\r\n         JOIN
   bin_loads ON bin_loads.id = bin_load_products.bin_load_id\r\n         LEFT JOIN
   cultivar_groups ON cultivar_groups.id = bin_load_products.cultivar_group_id\r\n
   \        LEFT JOIN cultivars ON cultivars.id = bin_load_products.cultivar_id\r\n
@@ -36,15 +36,15 @@
   rmt_bins.bin_asset_number <> ''\r\n        AND rmt_bins.exit_ref IS NULL\r\n        AND
   cultivars.cultivar_group_id IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))\r\n
   \       AND rmt_bins.cultivar_id IN (COALESCE(bin_load_products.cultivar_id, rmt_bins.cultivar_id))\r\n
-  \       AND rmt_bins.farm_id IN (COALESCE(bin_load_products.farm_id, rmt_bins.farm_id))\r\n
-  \       AND rmt_bins.puc_id IN (COALESCE(bin_load_products.puc_id, rmt_bins.puc_id))\r\n
-  \       AND rmt_bins.orchard_id IN (COALESCE(bin_load_products.orchard_id, rmt_bins.orchard_id))\r\n
-  \       AND COALESCE(rmt_bins.rmt_class_id,0) IN (COALESCE(bin_load_products.rmt_class_id,
-  COALESCE(rmt_bins.rmt_class_id,0)))\r\n        AND rmt_bins.rmt_container_material_type_id
-  IN (COALESCE(bin_load_products.rmt_container_material_type_id, rmt_bins.rmt_container_material_type_id))\r\n
-  \       AND rmt_bins.rmt_material_owner_party_role_id IN (COALESCE(bin_load_products.rmt_material_owner_party_role_id,
-  rmt_bins.rmt_material_owner_party_role_id))\r\n      GROUP BY bin_load_products.id)
-  pm ON bin_load_products.id = pm.id"
+  \       AND COALESCE(rmt_bins.farm_id,0) IN (COALESCE(bin_load_products.farm_id,
+  COALESCE(rmt_bins.farm_id,0)))\r\n        AND COALESCE(rmt_bins.puc_id,0) IN (COALESCE(bin_load_products.puc_id,
+  COALESCE(rmt_bins.puc_id,0)))\r\n        AND COALESCE(rmt_bins.orchard_id,0) IN
+  (COALESCE(bin_load_products.orchard_id, COALESCE(rmt_bins.orchard_id,0)))\r\n        AND
+  COALESCE(rmt_bins.rmt_class_id,0) IN (COALESCE(bin_load_products.rmt_class_id, COALESCE(rmt_bins.rmt_class_id,0)))\r\n
+  \       AND COALESCE(rmt_bins.rmt_container_material_type_id,0) IN (COALESCE(bin_load_products.rmt_container_material_type_id,
+  COALESCE(rmt_bins.rmt_container_material_type_id,0)))\r\n        AND COALESCE(rmt_bins.rmt_material_owner_party_role_id,0)
+  IN (COALESCE(bin_load_products.rmt_material_owner_party_role_id, COALESCE(rmt_bins.rmt_material_owner_party_role_id,0)))\r\n
+  \     GROUP BY bin_load_products.id) pm ON bin_load_products.id = pm.id"
 :limit: 
 :offset: 
 :external_settings:
