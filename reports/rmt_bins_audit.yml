@@ -13,14 +13,15 @@
   -- updated\r\n    WHEN action = 'D' THEN\r\n        'orange' -- deleted\r\n    WHEN
   action = 'C' THEN\r\n        'black' -- current\r\n    END AS colour_rule\r\nFROM
   (\r\n    SELECT\r\n        logged_actions.row_data_id,\r\n        event_id,\r\n
-  \       logged_action_details.user_name,\r\n        status_logs.status,\r\n        action_tstamp_clk
-  AS transaction_at,\r\n        action,\r\n        changed_fields,\r\n        row_data
-  -> 'bin_asset_number' AS bin_asset_number,\r\n        row_data -> 'farm_id' AS farm_id,\r\n
-  \       row_data -> 'puc_id' AS puc_id,\r\n        row_data -> 'orchard_id' AS orchard_id,\r\n
-  \       row_data -> 'cultivar_id' AS cultivar_id,\r\n        row_data -> 'bin_fullness'
-  AS bin_fullness,\r\n        row_data -> 'location_id' AS location_id,\r\n        row_data
-  -> 'bin_load_product_id' AS bin_load_product_id,\r\n        row_data -> 'rmt_container_material_type_id'
-  AS rmt_container_material_type_id,\r\n        row_data -> 'rmt_container_material_owner_id'
+  \       logged_action_details.user_name,\r\n        string_agg(status_logs.status,
+  ' --- ') AS status,\r\n        action_tstamp_clk AS transaction_at,\r\n        action,\r\n
+  \       changed_fields,\r\n        row_data -> 'bin_asset_number' AS bin_asset_number,\r\n
+  \       row_data -> 'farm_id' AS farm_id,\r\n        row_data -> 'puc_id' AS puc_id,\r\n
+  \       row_data -> 'orchard_id' AS orchard_id,\r\n        row_data -> 'cultivar_id'
+  AS cultivar_id,\r\n        row_data -> 'bin_fullness' AS bin_fullness,\r\n        row_data
+  -> 'location_id' AS location_id,\r\n        row_data -> 'bin_load_product_id' AS
+  bin_load_product_id,\r\n        row_data -> 'rmt_container_material_type_id' AS
+  rmt_container_material_type_id,\r\n        row_data -> 'rmt_container_material_owner_id'
   AS rmt_material_owner_party_role_id,\r\n        row_data -> 'production_run_tipped_id'
   AS production_run_tipped_id,\r\n        row_data -> 'gross_weight' AS gross_weight,\r\n
   \       row_data -> 'nett_weight' AS nett_weight,\r\n        row_data -> 'bin_tipped'
@@ -32,9 +33,10 @@
   \       row_data -> 'created_at' AS created_at\r\n    FROM\r\n        audit.logged_actions\r\n
   \   LEFT JOIN audit.status_logs ON status_logs.transaction_id = logged_actions.transaction_id\r\n
   \       AND logged_actions.row_data_id = status_logs.row_data_id\r\n        AND
-  status_logs.table_name = 'rmt_bins'\r\n    LEFT JOIN audit.logged_action_details
-  ON logged_action_details.transaction_id = logged_actions.transaction_id\r\nWHERE\r\n
-  \   logged_actions.table_name = 'rmt_bins'\r\nUNION\r\nSELECT\r\n    id AS row_data_id,\r\n
+  status_logs.table_name = 'rmt_bins'\r\n    LEFT JOIN (SELECT DISTINCT transaction_id,
+  user_name FROM audit.logged_action_details) logged_action_details ON logged_action_details.transaction_id
+  = logged_actions.transaction_id\r\nWHERE\r\n    logged_actions.table_name = 'rmt_bins'\r\nGROUP
+  BY event_id, logged_action_details.user_name\r\nUNION\r\nSELECT\r\n    id AS row_data_id,\r\n
   \   999999999 AS event_id,\r\n    NULL AS user_name,\r\n    NULL AS status,\r\n
   \   NULL AS transaction_at,\r\n    'C' AS action,\r\n    NULL AS changed_fields,\r\n
   \   bin_asset_number::text,\r\n    farm_id::text,\r\n    puc_id::text,\r\n    orchard_id::text,\r\n

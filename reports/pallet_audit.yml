@@ -12,41 +12,44 @@
   action = 'D' THEN\r\n             'orange' -- deleted\r\n         WHEN action =
   'C' THEN\r\n             'black' -- current\r\n        END AS colour_rule\r\nFROM
   (\r\n         SELECT\r\n             logged_actions.row_data_id,\r\n             event_id,\r\n
-  \            logged_action_details.user_name,\r\n             status_logs.status,\r\n
-  \            action_tstamp_clk AS transaction_at,\r\n             action,\r\n             changed_fields,\r\n
-  \            row_data -> 'pallet_number' AS pallet_number,\r\n             row_data
-  -> 'pallet_format_id' AS pallet_format_id,\r\n             row_data -> 'location_id'
-  AS location_id,\r\n             row_data -> 'in_stock' AS in_stock,\r\n             row_data
-  -> 'shipped' AS shipped,\r\n             row_data -> 'shipped_at' AS shipped_at,\r\n
-  \            row_data -> 'inspected' AS inspected,\r\n             row_data -> 'govt_first_inspection_at'
-  AS govt_first_inspection_at,\r\n             row_data -> 'govt_reinspection_at'
-  AS govt_reinspection_at,\r\n             row_data -> 'stock_created_at' AS stock_created_at,\r\n
-  \            row_data -> 'first_cold_storage_at' AS first_cold_storage_at,\r\n             row_data
-  -> 'build_status' AS build_status,\r\n             row_data -> 'carton_quantity'
-  AS carton_quantity,\r\n             row_data -> 'load_id' AS load_id,\r\n             row_data
-  -> 'gross_weight' AS gross_weight,\r\n             row_data -> 'nett_weight' AS
-  nett_weight,\r\n             row_data -> 'palletized_at' AS palletized_at,\r\n             row_data
-  -> 'temp_tail' AS temp_tail\r\n         FROM\r\n             audit.logged_actions\r\n
-  \                LEFT JOIN audit.status_logs ON status_logs.transaction_id = logged_actions.transaction_id\r\n
-  \                AND logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND
-  status_logs.table_name = 'pallets'\r\n                 LEFT JOIN audit.logged_action_details
-  ON logged_action_details.transaction_id = logged_actions.transaction_id\r\n         WHERE\r\n
-  \                logged_actions.table_name = 'pallets'\r\n         UNION\r\n         SELECT\r\n
-  \            id AS row_data_id,\r\n             999999999 AS event_id,\r\n             NULL
-  AS user_name,\r\n             NULL AS status,\r\n             NULL AS transaction_at,\r\n
-  \            'C' AS action,\r\n             NULL AS changed_fields,\r\n             pallet_number::text,\r\n
-  \            pallet_format_id::text,\r\n             location_id::text,\r\n             in_stock::text,\r\n
-  \            shipped::text,\r\n             shipped_at::text,\r\n             inspected::text,\r\n
-  \            govt_first_inspection_at::text,\r\n             govt_reinspection_at::text,\r\n
-  \            stock_created_at::text,\r\n             first_cold_storage_at::text,\r\n
-  \            build_status::text,\r\n             carton_quantity::text,\r\n             load_id::text,\r\n
-  \            gross_weight::text,\r\n             nett_weight::text,\r\n             palletized_at::text,\r\n
-  \            temp_tail::text\r\n         FROM\r\n             pallets) sq\r\n         LEFT
-  JOIN pallet_formats ON pallet_formats.id = sq.pallet_format_id::int\r\n         LEFT
-  JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id\r\n         LEFT
-  JOIN pallet_stack_types ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id\r\n
-  \        LEFT JOIN locations ON locations.id = sq.location_id::int\r\nORDER BY\r\n
-  \   row_data_id DESC,\r\n    event_id"
+  \            logged_action_details.user_name,\r\n             string_agg(status_logs.status,
+  ' --- ') AS status,\r\n             action_tstamp_clk AS transaction_at,\r\n             action,\r\n
+  \            changed_fields,\r\n             row_data -> 'pallet_number' AS pallet_number,\r\n
+  \            row_data -> 'pallet_format_id' AS pallet_format_id,\r\n             row_data
+  -> 'location_id' AS location_id,\r\n             row_data -> 'in_stock' AS in_stock,\r\n
+  \            row_data -> 'shipped' AS shipped,\r\n             row_data -> 'shipped_at'
+  AS shipped_at,\r\n             row_data -> 'inspected' AS inspected,\r\n             row_data
+  -> 'govt_first_inspection_at' AS govt_first_inspection_at,\r\n             row_data
+  -> 'govt_reinspection_at' AS govt_reinspection_at,\r\n             row_data -> 'stock_created_at'
+  AS stock_created_at,\r\n             row_data -> 'first_cold_storage_at' AS first_cold_storage_at,\r\n
+  \            row_data -> 'build_status' AS build_status,\r\n             row_data
+  -> 'carton_quantity' AS carton_quantity,\r\n             row_data -> 'load_id' AS
+  load_id,\r\n             row_data -> 'gross_weight' AS gross_weight,\r\n             row_data
+  -> 'nett_weight' AS nett_weight,\r\n             row_data -> 'palletized_at' AS
+  palletized_at,\r\n             row_data -> 'temp_tail' AS temp_tail\r\n         FROM\r\n
+  \            audit.logged_actions\r\n                 LEFT JOIN audit.status_logs
+  ON status_logs.transaction_id = logged_actions.transaction_id\r\n                 AND
+  logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND status_logs.table_name
+  = 'pallets'\r\n                 LEFT JOIN (SELECT DISTINCT transaction_id, user_name
+  FROM audit.logged_action_details) logged_action_details ON logged_action_details.transaction_id
+  = logged_actions.transaction_id\r\n         WHERE\r\n                 logged_actions.table_name
+  = 'pallets'\r\n         GROUP BY event_id, logged_action_details.user_name\r\n         UNION\r\n
+  \        SELECT\r\n             id AS row_data_id,\r\n             999999999 AS
+  event_id,\r\n             NULL AS user_name,\r\n             NULL AS status,\r\n
+  \            NULL AS transaction_at,\r\n             'C' AS action,\r\n             NULL
+  AS changed_fields,\r\n             pallet_number::text,\r\n             pallet_format_id::text,\r\n
+  \            location_id::text,\r\n             in_stock::text,\r\n             shipped::text,\r\n
+  \            shipped_at::text,\r\n             inspected::text,\r\n             govt_first_inspection_at::text,\r\n
+  \            govt_reinspection_at::text,\r\n             stock_created_at::text,\r\n
+  \            first_cold_storage_at::text,\r\n             build_status::text,\r\n
+  \            carton_quantity::text,\r\n             load_id::text,\r\n             gross_weight::text,\r\n
+  \            nett_weight::text,\r\n             palletized_at::text,\r\n             temp_tail::text\r\n
+  \        FROM\r\n             pallets) sq\r\n         LEFT JOIN pallet_formats ON
+  pallet_formats.id = sq.pallet_format_id::int\r\n         LEFT JOIN pallet_bases
+  ON pallet_bases.id = pallet_formats.pallet_base_id\r\n         LEFT JOIN pallet_stack_types
+  ON pallet_stack_types.id = pallet_formats.pallet_stack_type_id\r\n         LEFT
+  JOIN locations ON locations.id = sq.location_id::int\r\nORDER BY\r\n    row_data_id
+  DESC,\r\n    event_id"
 :limit: 
 :offset: 
 :external_settings:

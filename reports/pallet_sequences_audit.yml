@@ -13,28 +13,30 @@
   \        WHEN action = 'D' THEN\r\n             'orange' -- deleted\r\n         WHEN
   action = 'C' THEN\r\n             'black' -- current\r\n        END AS colour_rule\r\nFROM
   (\r\n         SELECT\r\n             logged_actions.row_data_id,\r\n             event_id,\r\n
-  \            logged_action_details.user_name,\r\n             status_logs.status,\r\n
-  \            action_tstamp_clk AS transaction_at,\r\n             action,\r\n             changed_fields,\r\n
-  \            row_data -> 'pallet_number' AS pallet_number,\r\n             row_data
-  -> 'pallet_sequence_number' AS pallet_sequence_number,\r\n             row_data
-  -> 'farm_id' AS farm_id,\r\n             row_data -> 'puc_id' AS puc_id,\r\n             row_data
-  -> 'orchard_id' AS orchard_id,\r\n             row_data -> 'cultivar_id' AS cultivar_id,\r\n
-  \            row_data -> 'marketing_variety_id' AS marketing_variety_id,\r\n             row_data
-  -> 'standard_pack_code_id' AS standard_pack_code_id,\r\n             row_data ->
-  'fruit_size_reference_id' AS fruit_size_reference_id,\r\n             row_data ->
-  'fruit_actual_counts_for_pack_id' AS fruit_actual_counts_for_pack_id,\r\n             row_data
-  -> 'mark_id' AS mark_id,\r\n             row_data -> 'production_run_id' AS production_run_id,\r\n
-  \            row_data -> 'carton_quantity' AS carton_quantity,\r\n             row_data
-  -> 'packed_tm_group_id' AS packed_tm_group_id,\r\n             row_data -> 'phyto_data'
-  AS phyto_data,\r\n             row_data -> 'failed_otmc_results' AS failed_otmc_result_ids\r\n
-  \        FROM\r\n             audit.logged_actions\r\n                 LEFT JOIN
-  audit.status_logs ON status_logs.transaction_id = logged_actions.transaction_id\r\n
-  \                AND logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND
-  status_logs.table_name = 'pallet_sequences'\r\n                 LEFT JOIN audit.logged_action_details
-  ON logged_action_details.transaction_id = logged_actions.transaction_id\r\n         WHERE\r\n
-  \                logged_actions.table_name = 'pallet_sequences'\r\n         UNION\r\n
-  \        SELECT\r\n             id AS row_data_id,\r\n             999999999 AS
-  event_id,\r\n             NULL AS user_name,\r\n             NULL AS status,\r\n
+  \            logged_action_details.user_name,\r\n             string_agg(status_logs.status,
+  ' --- ') AS status,\r\n             action_tstamp_clk AS transaction_at,\r\n             action,\r\n
+  \            changed_fields,\r\n             row_data -> 'pallet_number' AS pallet_number,\r\n
+  \            row_data -> 'pallet_sequence_number' AS pallet_sequence_number,\r\n
+  \            row_data -> 'farm_id' AS farm_id,\r\n             row_data -> 'puc_id'
+  AS puc_id,\r\n             row_data -> 'orchard_id' AS orchard_id,\r\n             row_data
+  -> 'cultivar_id' AS cultivar_id,\r\n             row_data -> 'marketing_variety_id'
+  AS marketing_variety_id,\r\n             row_data -> 'standard_pack_code_id' AS
+  standard_pack_code_id,\r\n             row_data -> 'fruit_size_reference_id' AS
+  fruit_size_reference_id,\r\n             row_data -> 'fruit_actual_counts_for_pack_id'
+  AS fruit_actual_counts_for_pack_id,\r\n             row_data -> 'mark_id' AS mark_id,\r\n
+  \            row_data -> 'production_run_id' AS production_run_id,\r\n             row_data
+  -> 'carton_quantity' AS carton_quantity,\r\n             row_data -> 'packed_tm_group_id'
+  AS packed_tm_group_id,\r\n             row_data -> 'phyto_data' AS phyto_data,\r\n
+  \            row_data -> 'failed_otmc_results' AS failed_otmc_result_ids\r\n         FROM\r\n
+  \            audit.logged_actions\r\n                 LEFT JOIN audit.status_logs
+  ON status_logs.transaction_id = logged_actions.transaction_id\r\n                 AND
+  logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND status_logs.table_name
+  = 'pallet_sequences'\r\n                 LEFT JOIN (SELECT DISTINCT transaction_id,
+  user_name FROM audit.logged_action_details) logged_action_details ON logged_action_details.transaction_id
+  = logged_actions.transaction_id\r\n         WHERE\r\n                 logged_actions.table_name
+  = 'pallet_sequences'\r\n         GROUP BY event_id, logged_action_details.user_name\r\n
+  \        UNION\r\n         SELECT\r\n             id AS row_data_id,\r\n             999999999
+  AS event_id,\r\n             NULL AS user_name,\r\n             NULL AS status,\r\n
   \            NULL AS transaction_at,\r\n             'C' AS action,\r\n             NULL
   AS changed_fields,\r\n             pallet_number::text AS pallet_number,\r\n             pallet_sequence_number::text
   AS pallet_sequence_number,\r\n             farm_id::text,\r\n             puc_id::text,\r\n
