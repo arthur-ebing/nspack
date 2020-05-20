@@ -36,15 +36,24 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(remote: fetch?(r), interactor: @interactor) }
         end
         r.on 'add' do
-          stepper.add_bin_set(params[:empty_bin_transaction_item])
-          empty_bin_types = stepper.for_select_bin_sets
-          json_actions([OpenStruct.new(type: :replace_list_items,
-                                       dom_id: 'empty_bin_transaction_item_bin_sets',
-                                       items: empty_bin_types),
-                        OpenStruct.new(type: :clear_form_validation,
-                                       dom_id: 'empty_bin_transaction_item')],
-                       'Bin Type Added',
-                       keep_dialog_open: true)
+          res = stepper.add_bin_set(params[:empty_bin_transaction_item])
+          if res.success
+            empty_bin_types = stepper.for_select_bin_sets
+            json_actions([OpenStruct.new(type: :replace_list_items,
+                                         dom_id: 'empty_bin_transaction_item_bin_sets',
+                                         items: empty_bin_types),
+                          OpenStruct.new(type: :clear_form_validation,
+                                         dom_id: 'empty_bin_transaction_item')],
+                         'Bin Type Added',
+                         keep_dialog_open: true)
+          else
+            re_show_form(r, res, url: '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new') do
+              RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(form_values: {},
+                                                                         form_errors: res.errors,
+                                                                         remote: true,
+                                                                         interactor: @interactor)
+            end
+          end
         end
         r.on 'remove', String do |combined_ids|
           stepper.remove_bin_set(combined_ids)

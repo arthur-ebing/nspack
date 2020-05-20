@@ -2,6 +2,8 @@
 
 module RawMaterialsApp
   class EmptyBinControlStep < BaseStep
+    include Crossbeams::Responses
+
     def initialize(user, ip, repo)
       super(user, :empty_bin_control, ip)
       @repo = repo
@@ -28,18 +30,16 @@ module RawMaterialsApp
 
     def add_bin_set(set) # rubocop:disable Metrics/AbcSize
       sets = bin_sets
-      added = false
       sets.each do |r|
         same_owner = r[:rmt_material_owner_party_role_id] == set[:rmt_material_owner_party_role_id]
         same_type = r[:rmt_container_material_type_id] == set[:rmt_container_material_type_id]
         next unless same_owner && same_type
 
-        qty = r[:quantity_bins].to_i + set[:quantity_bins].to_i
-        r[:quantity_bins] = qty
-        added = true
+        return validation_failed_response(OpenStruct.new(messages: { base: ['This combination already exists.'] }))
       end
-      sets << set unless added
+      sets << set
       write(read.merge(bin_sets: sets.uniq))
+      success_response('ok', bin_sets)
     end
 
     def remove_bin_set(combined_id)
