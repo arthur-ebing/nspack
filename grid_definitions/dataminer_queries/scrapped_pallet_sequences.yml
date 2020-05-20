@@ -19,8 +19,9 @@
   inspection_age, internal_inspection_at, internal_reinspection_at, stock_created_at,
   intake_created_at, first_cold_storage_at, active, extended_columns, seq_scrapped_at,
   created_by, verified_by, edi_size_count, target_customer_party_role_id, target_customer,
-  consignment_note_number, dispatch_note, depot, po_file_name, colour_rule FROM vw_scrapped_pallet_sequence_flat
-  ORDER BY pallet_id DESC, pallet_sequence_number ASC
+  consignment_note_number, dispatch_note, depot, po_file_name, repacked_from_pallet_number,
+  repacked_to_pallet_number, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER
+  BY pallet_id DESC, pallet_sequence_number ASC
 :limit: 
 :offset: 
 :external_settings:
@@ -1985,9 +1986,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  repacked_from_pallet_number:
+    :name: repacked_from_pallet_number
+    :sequence_no: 123
+    :caption: Repacked from pallet number
+    :namespaced_name: repacked_from_pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_to_pallet_number:
+    :name: repacked_to_pallet_number
+    :sequence_no: 124
+    :caption: Repacked to pallet number
+    :namespaced_name: repacked_to_pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 123
+    :sequence_no: 125
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

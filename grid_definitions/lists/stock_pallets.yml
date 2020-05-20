@@ -135,9 +135,9 @@
     - :col: govt_inspection_passed
       :op: =
       :val: false
-    - :col: repacked
-      :op: =
-      :val: false
+#    - :col: repacked
+#      :op: =
+#      :val: false
   :target_customer_pallets:
     - :col: in_stock
       :op: =

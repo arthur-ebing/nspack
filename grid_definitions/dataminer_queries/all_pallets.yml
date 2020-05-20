@@ -32,10 +32,11 @@
   \   seq_scrapped_at,\r\n    depot_pallet,\r\n    edi_in_file,\r\n    edi_in_consignment_note_number,\r\n
   \   govt_inspection_sheet_id,\r\n    addendum_manifest,\r\n    packed_date,\r\n
   \   packed_week,\r\n    repacked,\r\n    repacked_at,\r\n    repacked_date,\r\n
-  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
-  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
-  \   target_customer,\r\n    consignment_note_number,\r\n    dispatch_note,\r\n    customer_order_number,\r\n
-  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
+  \   repacked_from_pallet_id,\r\n    repacked_from_pallet_number,\r\n    failed_otmc_results,\r\n
+  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
+  \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
+  \   dispatch_note,\r\n    customer_order_number,\r\n    customer_reference, \r\n
+  \   depot,\r\n    po_file_name,\r\n    CASE WHEN fn_pallet_verification_failed(pallet_id)\r\n
   \            THEN 'error' ELSE colour_rule\r\n        END AS colour_rule\r\n\r\nFROM
   vw_pallet_sequence_flat\r\nORDER BY pallet_id DESC, pallet_sequence_number ASC"
 :limit: 
@@ -2170,6 +2171,22 @@
     :data_type: :integer
     :width: 150
     :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  repacked_from_pallet_number:
+    :name: repacked_from_pallet_number
+    :sequence_no: 134
+    :caption: Repacked from pallet number
+    :namespaced_name: repacked_from_pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
     :hide: false
     :pinned: 
     :groupable: false
@@ -2180,7 +2197,7 @@
     :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 134
+    :sequence_no: 135
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
@@ -2196,7 +2213,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 135
+    :sequence_no: 136
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :string
@@ -2212,7 +2229,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 136
+    :sequence_no: 137
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -2228,7 +2245,7 @@
     :group_max: false
   verified_by:
     :name: verified_by
-    :sequence_no: 137
+    :sequence_no: 138
     :caption: Verified by
     :namespaced_name: verified_by
     :data_type: :string
@@ -2244,7 +2261,7 @@
     :group_max: false
   edi_size_count:
     :name: edi_size_count
-    :sequence_no: 138
+    :sequence_no: 139
     :caption: Edi size count
     :namespaced_name: edi_size_count
     :data_type: :string
@@ -2260,7 +2277,7 @@
     :group_max: false
   target_customer_party_role_id:
     :name: target_customer_party_role_id
-    :sequence_no: 139
+    :sequence_no: 140
     :caption: Target customer party role
     :namespaced_name: target_customer_party_role_id
     :data_type: :integer
@@ -2276,7 +2293,7 @@
     :group_max: false
   target_customer:
     :name: target_customer
-    :sequence_no: 140
+    :sequence_no: 141
     :caption: Target customer
     :namespaced_name: target_customer
     :data_type: :string
@@ -2292,7 +2309,7 @@
     :group_max: false
   consignment_note_number:
     :name: consignment_note_number
-    :sequence_no: 141
+    :sequence_no: 142
     :caption: Cons Note number
     :namespaced_name: consignment_note_number
     :data_type: :string
@@ -2308,7 +2325,7 @@
     :group_max: false
   dispatch_note:
     :name: dispatch_note
-    :sequence_no: 142
+    :sequence_no: 143
     :caption: Dispatch note
     :namespaced_name: dispatch_note
     :data_type: :string
@@ -2324,7 +2341,7 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 143
+    :sequence_no: 144
     :caption: Cust Order number
     :namespaced_name: customer_order_number
     :data_type: :string
@@ -2340,7 +2357,7 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 144
+    :sequence_no: 145
     :caption: Cust Ref
     :namespaced_name: customer_reference
     :data_type: :string
@@ -2356,7 +2373,7 @@
     :group_max: false
   depot:
     :name: depot
-    :sequence_no: 145
+    :sequence_no: 146
     :caption: Depot
     :namespaced_name: depot
     :data_type: :string
@@ -2372,7 +2389,7 @@
     :group_max: false
   po_file_name:
     :name: po_file_name
-    :sequence_no: 146
+    :sequence_no: 147
     :caption: Po file name
     :namespaced_name: po_file_name
     :data_type: :string
@@ -2388,7 +2405,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 147
+    :sequence_no: 148
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
