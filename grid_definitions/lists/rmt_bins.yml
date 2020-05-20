@@ -24,6 +24,12 @@
   :title: Print
   :popup: true
   :hide_if_false: discrete_bin
+- :separator: true
+- :url: "/development/transactions/list/rmt_bins/$:id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
+  :popup: true
 :captions:
   :conditions:
     :location_bins: Location Bins

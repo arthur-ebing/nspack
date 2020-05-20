@@ -12,6 +12,11 @@
   :icon: information-solid
   :title: Status
   :popup: true
+- :url: "/development/transactions/list/pallets/$:id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
+  :popup: true
 :captions:
   :conditions:
     :location_pallets: Location Pallets
