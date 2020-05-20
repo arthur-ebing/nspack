@@ -1,5 +1,5 @@
 ---
-:caption: Pallets Audit
+:caption: Audit Pallets
 :sql: "SELECT\r\n    event_id,\r\n    user_name,\r\n    status,\r\n    transaction_at,\r\n
   \   action,\r\n    changed_fields,\r\n    pallet_number,\r\n    CONCAT(pallet_bases.pallet_base_code,
   '_', pallet_stack_types.stack_type_code) AS pallet_format,\r\n    locations.location_long_code,\r\n
@@ -54,6 +54,7 @@
     gray: Updated
     orange: Deleted
     black: Currnent
+  :render_url: 
 :columns:
   event_id:
     :name: event_id

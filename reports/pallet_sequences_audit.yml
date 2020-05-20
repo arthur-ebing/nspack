@@ -1,5 +1,5 @@
 ---
-:caption: Pallet Sequences Audit
+:caption: Audit Pallet Sequences
 :sql: "SELECT\r\n    event_id,\r\n    user_name,\r\n    status,\r\n    transaction_at,\r\n
   \   action,\r\n    changed_fields,\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n
   \   farms.farm_code,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_code,\r\n
@@ -68,6 +68,7 @@
     gray: Updated
     orange: Deleted
     black: Current
+  :render_url: 
 :columns:
   event_id:
     :name: event_id
