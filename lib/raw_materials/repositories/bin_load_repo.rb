@@ -63,12 +63,12 @@ module RawMaterialsApp
         AND rmt_bins.exit_ref IS NULL
         AND cultivars.cultivar_group_id IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))
         AND rmt_bins.cultivar_id IN (COALESCE(bin_load_products.cultivar_id, rmt_bins.cultivar_id))
-        AND rmt_bins.farm_id IN (COALESCE(bin_load_products.farm_id, rmt_bins.farm_id))
-        AND rmt_bins.puc_id IN (COALESCE(bin_load_products.puc_id, rmt_bins.puc_id))
-        AND rmt_bins.orchard_id IN (COALESCE(bin_load_products.orchard_id, rmt_bins.orchard_id))
+        AND COALESCE(rmt_bins.farm_id,0) IN (COALESCE(bin_load_products.farm_id, COALESCE(rmt_bins.farm_id,0)))
+        AND COALESCE(rmt_bins.puc_id,0) IN (COALESCE(bin_load_products.puc_id, COALESCE(rmt_bins.puc_id,0)))
+        AND COALESCE(rmt_bins.orchard_id,0) IN (COALESCE(bin_load_products.orchard_id, COALESCE(rmt_bins.orchard_id,0)))
         AND COALESCE(rmt_bins.rmt_class_id,0) IN (COALESCE(bin_load_products.rmt_class_id, COALESCE(rmt_bins.rmt_class_id,0)))
-        AND rmt_bins.rmt_container_material_type_id IN (COALESCE(bin_load_products.rmt_container_material_type_id, rmt_bins.rmt_container_material_type_id))
-        AND rmt_bins.rmt_material_owner_party_role_id IN (COALESCE(bin_load_products.rmt_material_owner_party_role_id, rmt_bins.rmt_material_owner_party_role_id))
+        AND COALESCE(rmt_bins.rmt_container_material_type_id,0) IN (COALESCE(bin_load_products.rmt_container_material_type_id, COALESCE(rmt_bins.rmt_container_material_type_id,0)))
+        AND COALESCE(rmt_bins.rmt_material_owner_party_role_id,0) IN (COALESCE(bin_load_products.rmt_material_owner_party_role_id, COALESCE(rmt_bins.rmt_material_owner_party_role_id,0)))
       SQL
       query = "#{query} AND bin_load_products.bin_load_id = #{args[:bin_load_id]}" unless args[:bin_load_id].nil?
       query = "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]}" unless args[:bin_load_product_id].nil?
