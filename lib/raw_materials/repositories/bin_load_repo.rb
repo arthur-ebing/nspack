@@ -72,7 +72,7 @@ module RawMaterialsApp
       SQL
       query = "#{query} AND bin_load_products.bin_load_id = #{args[:bin_load_id]}" unless args[:bin_load_id].nil?
       query = "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]}" unless args[:bin_load_product_id].nil?
-      query = "#{query} AND rmt_bins.bin_asset_number = #{args[:bin_asset_number]}::TEXT" unless args[:bin_asset_number].nil?
+      query = "#{query} AND UPPER(rmt_bins.bin_asset_number) = UPPER('#{args[:bin_asset_number]}')" unless args[:bin_asset_number].nil?
       DB[query].map { |q| q[column] }.uniq
     end
 
