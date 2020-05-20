@@ -1,7 +1,7 @@
 ---
 :caption: Audit RMT Bins
-:sql: "SELECT\r\n    row_data_id AS row_id,\r\n    event_id,\r\n    user_name,\r\n
-  \   status,\r\n    transaction_at,\r\n    action,\r\n    changed_fields,\r\n    bin_asset_number,\r\n
+:sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    user_name,\r\n    status,\r\n
+  \   transaction_at,\r\n    action,\r\n    changed_fields,\r\n    bin_asset_number,\r\n
   \   farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n
   \   location_id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
   AS container_material_type,\r\n    fn_party_role_name (sq.rmt_material_owner_party_role_id::int)
@@ -62,10 +62,10 @@
     black: Current
   :render_url: 
 :columns:
-  row_id:
-    :name: row_id
+  row_data_id:
+    :name: row_data_id
     :sequence_no: 1
-    :caption: Row
+    :caption: Row Id
     :namespaced_name: row_data_id
     :data_type: :string
     :width: 
