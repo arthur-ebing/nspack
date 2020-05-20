@@ -31,13 +31,6 @@ module UiRules
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      cultivar_ids = @repo.select_values(:rmt_bins, :cultivar_id, exit_ref: nil)
-      cultivar_group_ids = @repo.select_values(:cultivars, :cultivar_group_id, id: cultivar_ids)
-
-      farm_ids = @repo.select_values(:rmt_bins, :farm_id, exit_ref: nil)
-      puc_ids = @repo.select_values(:rmt_bins, :puc_id, exit_ref: nil)
-      orchard_ids = @repo.select_values(:rmt_bins, :orchard_id, exit_ref: nil)
-
       {
         bin_load_id: { renderer: :select,
                        options: @repo.for_select_bin_loads,
@@ -48,13 +41,13 @@ module UiRules
         qty_bins: { renderer: :numeric,
                     required: true },
         cultivar_group_id: { renderer: :select,
-                             options: @cultivar_repo.for_select_cultivar_groups(where: { id: cultivar_group_ids }),
+                             options: @cultivar_repo.for_select_cultivar_groups,
                              disabled_options: @cultivar_repo.for_select_inactive_cultivar_groups,
                              prompt: true,
                              caption: 'Cultivar Group',
                              required: true },
         cultivar_id: { renderer: :select,
-                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id,  id: cultivar_ids }),
+                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        prompt: true,
                        caption: 'Cultivar' },
@@ -68,17 +61,17 @@ module UiRules
                                             prompt: true,
                                             caption: 'Container Owner' },
         farm_id: { renderer: :select,
-                   options: @farm_repo.for_select_farms(where: { id: farm_ids }),
+                   options: @farm_repo.for_select_farms,
                    disabled_options: @farm_repo.for_select_inactive_farms,
                    prompt: true,
                    caption: 'Farm' },
         puc_id: { renderer: :select,
-                  options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
+                  options: @farm_repo.for_select_pucs,
                   disabled_options: @farm_repo.for_select_inactive_pucs,
                   prompt: true,
                   caption: 'Puc' },
         orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id, id: orchard_ids }),
+                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
                       disabled_options: @farm_repo.for_select_inactive_orchards,
                       prompt: true,
                       hide_on_load: @form_object.puc_id.nil?,
