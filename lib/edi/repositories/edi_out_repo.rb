@@ -77,6 +77,21 @@ module EdiApp
       config[:out_dirs].keys + config[:mail_recipients].keys.map { |m| "mail:#{m}" }
     end
 
+    def format_targets(targets) # rubocop:disable Metrics/AbcSize
+      formatted_targets = []
+      config = load_config
+      targets.each do |target|
+        if target.include?('mail:')
+          email_target = config[:mail_recipients][target.sub('mail:', '').to_sym]
+          formatted_targets << "#{target.sub('mail:', '')}: #{email_target[:to]} , #{email_target[:cc]}"
+        else
+          formatted_targets << "#{target}: #{config[:out_dirs][target.to_sym].sub('$ROOT', ENV['HOME'])}"
+        end
+      end
+
+      formatted_targets
+    end
+
     def can_transform_for_depot?(flow_type)
       AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:depot]
     end
@@ -90,6 +105,22 @@ module EdiApp
       sel << AppConst::DEPOT_DESTINATION_TYPE if AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:depot]
       sel << AppConst::PARTY_ROLE_DESTINATION_TYPE unless AppConst::EDI_OUT_RULES_TEMPLATE[flow_type][:roles].empty?
       sel
+    end
+
+    def find_edi_out_rule_flat(id)
+      query = <<~SQL
+        SELECT e.id, flow_type, depots.depot_code, fn_party_role_name(party_role_id) AS party
+        , roles.name AS role, hub_address, directory_keys, array_to_string(directory_keys, '; ') AS targets, depot_id
+        , party_role_id, e.active
+        FROM edi_out_rules e
+        LEFT JOIN depots ON depots.id = e.depot_id
+        LEFT JOIN party_roles ON party_roles.id = party_role_id
+        LEFT JOIN roles ON roles.id = party_roles.role_id
+        where e.id = ?
+      SQL
+      hash = DB[query, id].first
+
+      EdiOutRuleFlat.new(hash)
     end
   end
 end

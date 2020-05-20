@@ -22,14 +22,21 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_edi_out_rule(id, params[:edi_out_rule])
           if res.success
-            # flash[:notice] = res.message
-            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(id) }
+            row_keys = %i[
+              id
+              flow_type
+              depot_id
+              depot_code
+              party_role_id
+              party
+              role
+              hub_address
+              directory_keys
+              targets
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res, url: "/edi/config/edi_out_rules/#{id}/edit") do
-              Edi::Config::EdiOutRule::Edit.call(id,
-                                                 form_values: params[:edi_out_rule],
-                                                 form_errors: res.errors)
-            end
+            re_show_form(r, res) { Edi::Config::EdiOutRule::Edit.call(id, form_values: params[:edi_out_rule], form_errors: res.errors) }
           end
         end
         r.delete do    # DELETE
@@ -51,7 +58,7 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         show_partial_or_page(r) { Edi::Config::EdiOutRule::New.call(remote: fetch?(r)) }
       end
 
-      r.post do
+      r.post do # rubocop:disable Metrics/BlockLength
         params[:edi_out_rule].delete_if { |_k, v| v.nil_or_empty? }
         if params[:edi_out_rule][:flow_type].nil_or_empty?
           res = OpenStruct.new(message: 'Validation Error', errors: { flow_type: ['must be filled'] })
@@ -63,7 +70,20 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
         else
           res = interactor.create_edi_out_rule(params[:edi_out_rule])
           if res.success
-            show_partial_or_page(r) { Edi::Config::EdiOutRule::Edit.call(res.instance[:id]) }
+            row_keys = %i[
+              id
+              flow_type
+              depot_id
+              depot_code
+              party_role_id
+              party
+              role
+              hub_address
+              directory_keys
+              targets
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
           else
             re_show_form(r, res, url: '/edi/config/edi_out_rules') do
               Edi::Config::EdiOutRule::New.call(form_values: params[:edi_out_rule],

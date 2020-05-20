@@ -62,7 +62,7 @@ module EdiApp
     end
 
     def edi_out_rule(id)
-      repo.find_edi_out_rule(id)
+      repo.find_edi_out_rule_flat(id)
     end
 
     def validate_edi_out_rule_params(params)
