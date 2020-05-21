@@ -74,9 +74,9 @@ module QualityApp
       save_to_yaml(attrs, "PhytCleanStandardData_#{attrs[:puc_code]}")
 
       attrs[:orchards].each do |orchard_args, orchard_attrs|
-        puc_id = repo.get_id(:pucs, puc_code: orchard_args[:puc_code])
-        orchard_id = repo.get_id(:orchards, orchard_code: orchard_args[:orchard_code].downcase, puc_id: puc_id)
-        cultivar_ids = repo.select_values(:cultivars, :id, cultivar_code: orchard_args[:cultivar_code])
+        puc_id = repo.get_id(:pucs, Sequel.function(:lower, :puc_code) => orchard_args[:puc_code].downcase)
+        orchard_id = repo.get_id(:orchards, Sequel.function(:lower, :orchard_code) => orchard_args[:orchard_code].downcase, puc_id: puc_id)
+        cultivar_ids = repo.select_values(:cultivars, :id, Sequel.function(:lower, :cultivar_code) => orchard_args[:cultivar_code].downcase)
         orchard_attrs.each do |api_attribute, api_result|
           orchard_test_type_id = repo.get_id(:orchard_test_types, api_name: AppConst::PHYT_CLEAN_STANDARD, api_attribute: api_attribute.to_s)
           next if orchard_test_type_id.nil?

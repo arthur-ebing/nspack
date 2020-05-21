@@ -50,7 +50,7 @@ module QualityApp
 
       attrs[:freeze_result] = params[:freeze_result] || false
       attrs[:api_result] = params[:api_result]
-      attrs[:api_result] = nil if attrs[:api_result].empty?
+      attrs[:api_result] = nil if attrs[:api_result].nil_or_empty?
       attrs[:applicable_from] = params[:applicable_from]
       attrs[:applicable_to] = params[:applicable_to]
 
