@@ -21,6 +21,7 @@ module RawMaterials
               form.action '/list/bin_loads'
               form.row do |row|
                 row.column do |col|
+                  col.add_field :id
                   col.add_field :bin_load_purpose_id
                   col.add_field :customer_party_role_id
                   col.add_field :transporter_party_role_id

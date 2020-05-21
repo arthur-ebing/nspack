@@ -15,6 +15,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Bin Load' }
       fields[:bin_load_purpose_id] = { renderer: :label, with_value: @form_object.purpose_code, caption: 'Bin Load Purpose' }
       fields[:customer_party_role_id] = { renderer: :label, with_value: @form_object.customer, caption: 'Customer' }
       fields[:transporter_party_role_id] = { renderer: :label, with_value: @form_object.transporter, caption: 'Transporter' }
@@ -29,6 +30,9 @@ module UiRules
 
     def common_fields
       {
+        id: { renderer: :label,
+              with_value: @form_object.id,
+              caption: 'Bin Load' },
         bin_load_purpose_id: { renderer: :select,
                                options: @repo.for_select_bin_load_purposes,
                                disabled_options: @repo.for_select_inactive_bin_load_purposes,
