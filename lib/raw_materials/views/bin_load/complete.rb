@@ -17,6 +17,7 @@ module RawMaterials
               form.remote!
               form.submit_captions 'Complete'
               form.add_text 'Are you sure you want to complete this bin load?', wrapper: :h3
+              form.add_field :id
               form.add_field :bin_load_purpose_id
               form.add_field :customer_party_role_id
               form.add_field :transporter_party_role_id

@@ -21,6 +21,7 @@ module RawMaterials
             page.form do |form|
               form.action "/raw_materials/dispatch/bin_loads/#{id}"
               form.method :update
+              form.add_field :id
               form.add_field :bin_load_purpose_id
               form.add_field :customer_party_role_id
               form.add_field :transporter_party_role_id
