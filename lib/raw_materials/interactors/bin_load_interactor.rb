@@ -13,7 +13,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Created Bin Load #{instance.id}", instance)
+      success_response("Created Bin Load #{id}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { id: ['This Bin Load already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -29,19 +29,18 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Updated Bin Load #{instance.id}", instance)
+      success_response("Updated Bin Load #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_bin_load(id)
-      name = bin_load(id).id
       repo.transaction do
         repo.delete_bin_load(id)
         log_status(:bin_loads, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted Bin Load #{name}")
+      success_response("Deleted Bin Load #{id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -57,7 +56,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Completed Bin Load #{instance.id}", instance)
+      success_response("Completed Bin Load #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -69,7 +68,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Reopened Bin Load #{instance.id}", instance)
+      success_response("Reopened Bin Load #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -80,7 +79,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Shipped Bin Load #{instance.id}", instance)
+      success_response("Shipped Bin Load #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -91,22 +90,23 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Unshipped Bin Load #{instance.id}", instance)
+      success_response("Unshipped Bin Load #{id}", instance)
     rescue Sequel::UniqueConstraintViolation => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize
+    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = ScanBinLoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      id = res.to_h[:bin_load_id]
+      id = params[:bin_load_id]
       instance = bin_load(id)
       return failed_response "Cant find Bin Load: #{id}" if instance.nil?
-      return failed_response "Bin Load: #{id} has not been completed" unless instance.completed
       return failed_response "Bin Load: #{id} has already been shipped" if instance.shipped
+      return failed_response "Bin Load: #{id} has not been completed" unless instance.completed || AppConst::BYPASS_BIN_LOAD_COMPLETED_CHECK
+      return failed_response "Bin Load: #{id} Qty's do not match" unless instance.qty_bins == instance.qty_product_bins
       return failed_response "Bin Load: #{id} Insufficient bins available" if instance.qty_bins_available < instance.qty_bins
 
       success_response('Load valid', instance)
@@ -116,10 +116,9 @@ module RawMaterialsApp
       res = ScanBinToBinLoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      bin_asset_number = res.to_h[:bin_asset_number]
-      bin_id, exit_ref = repo.get_value(:rmt_bins, %i[id exit_ref], bin_asset_number: bin_asset_number)
-      return failed_response "Bin:#{bin_asset_number} not found" if bin_id.nil?
-      return failed_response "Bin:#{bin_asset_number} is not in stock, exit reference:#{exit_ref}" unless exit_ref.nil?
+      bin_asset_number = params[:bin_asset_number]
+      bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
+      return failed_response "Bin:#{bin_asset_number} not in stock" if bin_id.nil?
 
       success_response('ok', bin_asset_number)
     end

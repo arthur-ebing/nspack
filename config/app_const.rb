@@ -476,6 +476,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
                               bin_tip: 'BIN_TIP',
                               rebin: 'REBIN' }.freeze
 
-  # Empty Bin Control
+  # Bin Control
   ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
+  BYPASS_BIN_LOAD_COMPLETED_CHECK = make_boolean('BYPASS_BIN_LOAD_COMPLETED_CHECK')
 end

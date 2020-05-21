@@ -77,8 +77,9 @@ module RawMaterialsApp
     end
 
     def ship_bin_load(id, product_bin, user)
-      params = { shipped: true,
-                 shipped_at: Time.now }
+      params = { shipped: true, shipped_at: Time.now }
+      params.merge!(completed: true, completed_at: Time.now) unless get(:bin_loads, id, :completed)
+
       update_bin_load(id, params)
       log_status(:bin_loads, id, 'SHIPPED', user_name: user.user_name)
 

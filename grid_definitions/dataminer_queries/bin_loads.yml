@@ -9,16 +9,17 @@
   \   bin_loads.shipped,\r\n    bin_loads.shipped_at,\r\n    bin_loads.completed,\r\n
   \   bin_loads.completed_at,\r\n    bin_loads.active,\r\n    EXISTS (select id from
   bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    bin_loads.created_at,\r\n
-  \   bin_loads.updated_at,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN 'ready'\r\n
-  \       WHEN bin_loads.completed THEN 'ok'\r\n    END AS colour_rule\r\n\r\nFROM
+  \   bin_loads.updated_at,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN 'blue'\r\n
+  \       WHEN bin_loads.completed THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
   bin_loads\r\n         LEFT JOIN bin_load_purposes ON bin_load_purposes.id = bin_loads.bin_load_purpose_id\r\n
-  \        JOIN depots ON depots.id = bin_loads.dest_depot_id"
+  \        JOIN depots ON depots.id = bin_loads.dest_depot_id\r\nORDER BY bin_loads.updated_at
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
   :colour_key:
-    ready: Shipped
-    ok: Completed
+    blue: Shipped
+    green: Completed
 :columns:
   status:
     :name: status
