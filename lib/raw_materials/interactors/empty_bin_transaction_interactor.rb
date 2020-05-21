@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  class EmptyBinTransactionInteractor < BaseInteractor
+  class EmptyBinTransactionInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_empty_bin_transaction # rubocop:disable Metrics/AbcSize
       res = validate_stepper
       return res unless res.success
@@ -50,27 +50,36 @@ module RawMaterialsApp
 
     def validate_receive_params(params)
       res = ReceiveEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : validation_failed_response(res)
+      res.messages.empty? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_issue_params(params)
       res = IssueEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : validation_failed_response(res)
+      res.messages.empty? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_params(params)
       res = AdhocEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : validation_failed_response(res)
+      res.messages.empty? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_create_params(params)
       res = AdhocCreateEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : validation_failed_response(res)
+      res.messages.empty? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_destroy_params(params)
       res = AdhocDestroyEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : validation_failed_response(res)
+      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+    end
+
+    def adjusted_failed_response(res)
+      res = validation_failed_response(res)
+      errors = []
+      errors << 'System Asset Transaction Types are missing.' if res.errors[:asset_transaction_type_id]
+      errors << 'System Business Processes are missing.' if res.errors[:business_process_id]
+      res.errors[:base] = errors if errors.any?
+      res
     end
 
     def validate_stepper # rubocop:disable Metrics/AbcSize

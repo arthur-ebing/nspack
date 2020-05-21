@@ -18,6 +18,7 @@ module UiRules
                                             options: @repo.for_select_empty_bin_owners,
                                             min_charwidth: 30,
                                             caption: 'Owner',
+                                            prompt: true,
                                             required: true },
         rmt_container_material_type_id: { renderer: :select,
                                           options: [],
