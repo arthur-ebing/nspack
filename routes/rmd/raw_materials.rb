@@ -53,7 +53,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             message = rmd_warning_message(stepper.warning_message) || rmd_success_message(stepper.message)
             store_locally(:flash_notice, message)
           else
-            store_locally(:flash_notice, rmd_error_message(e.message))
+            store_locally(:flash_notice, rmd_error_message(res.message))
           end
           r.redirect("/rmd/raw_materials/dispatch/bin_load/#{bin_load_id}")
         end
