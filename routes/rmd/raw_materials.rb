@@ -326,7 +326,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.create_rebins(params[:rmt_bin])
+          res = interactor.create_rebin(params[:rmt_bin])
           if res.success
             store_locally(:flash_notice, "Rebin: #{params[:rmt_bin][:bin_asset_number]} created successfully")
           else
