@@ -13,6 +13,11 @@
   \      reinspection,\r\n       awaiting_inspection_results,\r\n       cancelled_id,\r\n
   \      cancelled,\r\n       cancelled_at,\r\n       govt_inspection_sheets.active,\r\n
   \      govt_inspection_sheets.created_at,\r\n       govt_inspection_sheets.updated_at,\r\n
+
+  \      govt_inspection_sheets.tripsheet_created,\r\n       govt_inspection_sheets.tripsheet_loaded,\r\n
+  \      govt_inspection_sheets.tripsheet_loaded_at,\r\n       govt_inspection_sheets.tripsheet_offloaded,\r\n
+  \      govt_inspection_sheets.tripsheet_affloaded_at,\r\n
+
   \      govt_inspection_api_results.upn_number AS upn_number,\r\n       created_by,\r\n
   \      string_agg(pallets.pallet_number::text, ', '::text) AS pallet_numbers,\r\n
   \      CASE\r\n           WHEN cancelled THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected

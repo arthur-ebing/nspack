@@ -20,6 +20,29 @@ class Nspack < Roda
         show_partial { Production::Runs::ProductionRun::Edit.call(id) }
       end
 
+      r.on 'rebins' do
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        r.get do
+          # check_auth!('deliveries', 'new')
+          show_partial_or_page(r) { Production::Runs::Rebins::CreateRebins.call(id, remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.create_rebin_groups(id, params[:rebin])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json(request.referer)
+          else
+            re_show_form(r, res, url: "/production/runs/production_runs/#{id}/rebins") do
+              Production::Runs::Rebins::CreateRebins.call(id, form_values: params[:rebin],
+                                                              form_errors: res.errors.empty? ? nil : res.errors,
+                                                              remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'clone' do
         r.get do
           check_auth!('runs', 'edit')
@@ -563,6 +586,15 @@ class Nspack < Roda
         else
           { flash: { error: res.message } }.to_json
         end
+      end
+    end
+
+    r.on 'container_material_type_combo_changed' do
+      if !params[:changed_value].nil_or_empty?
+        container_material_owners = RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(params[:changed_value])
+        json_replace_select_options('rebin_rmt_material_owner_party_role_id', container_material_owners)
+      else
+        json_replace_select_options('rebin_rmt_material_owner_party_role_id', [])
       end
     end
   end
