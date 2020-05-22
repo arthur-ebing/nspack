@@ -56,7 +56,7 @@ module RawMaterialsApp
       end
 
       def complete_check
-        return failed_response "Bin Load: #{id}  Qty's do not match" unless bin_load.qty_bins == bin_load.qty_product_bins
+        return failed_response "Bin Load: #{id} Qty's do not match" unless bin_load.qty_bins == bin_load.qty_product_bins
         return failed_response "Bin Load: #{id} does not have products" unless products?
         return failed_response "Bin Load: #{id} has already been completed" if completed?
 

@@ -23,7 +23,8 @@ module RawMaterialsApp
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
       hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
-      hash[:qty_bins_available] = rmt_bins_matching_bin_load(:bin_asset_number, bin_load_id: id).count
+      hash[:available_bin_ids] = rmt_bins_matching_bin_load(:bin_id, bin_load_id: id)
+      hash[:qty_bins_available] = hash[:available_bin_ids].count
       BinLoadFlat.new(hash)
     end
 
@@ -51,6 +52,7 @@ module RawMaterialsApp
 
       query = <<~SQL
         SELECT DISTINCT
+          rmt_bins.id AS bin_id,
           rmt_bins.bin_asset_number,
           bin_load_products.id AS bin_load_product_id,
           bin_load_products.bin_load_id
@@ -76,12 +78,11 @@ module RawMaterialsApp
       DB[query].map { |q| q[column] }.uniq
     end
 
-    def ship_bin_load(id, product_bin, user)
+    def ship_bin_load(bin_load_id, product_bin, user)
       params = { shipped: true, shipped_at: Time.now }
-      params.merge!(completed: true, completed_at: Time.now) unless get(:bin_loads, id, :completed)
-
-      update_bin_load(id, params)
-      log_status(:bin_loads, id, 'SHIPPED', user_name: user.user_name)
+      params.merge!(completed: true, completed_at: Time.now) unless get(:bin_loads, bin_load_id, :completed)
+      update_bin_load(bin_load_id, params)
+      log_status(:bin_loads, bin_load_id, 'SHIPPED', user_name: user.user_name)
 
       product_bin.each do |bin_load_product_id, bin_asset_number|
         rmt_bin_id = get_id(:rmt_bins, bin_asset_number: bin_asset_number)
@@ -91,19 +92,41 @@ module RawMaterialsApp
                    exit_ref: 'SHIPPED',
                    exit_ref_date_time: Time.now }
         update(:rmt_bins, rmt_bin_id, params)
-        log_status(:rmt_bins, rmt_bin_id, 'BIN_DISPATCHED_ON_LOAD', user_name: user.user_name)
+        log_status(:rmt_bins, rmt_bin_id, 'BIN DISPATCHED ON LOAD', user_name: user.user_name)
+      end
+      ship_deliveries(bin_load_id, user)
+    end
+
+    def ship_deliveries(bin_load_id, user) # rubocop:disable Metrics/AbcSize
+      ds = DB[:rmt_deliveries].join(:rmt_bins, rmt_delivery_id: :id).join(:bin_load_products, id: :bin_load_product_id).join(:bin_loads, id: :bin_load_id)
+      rmt_delivery_ids = ds.where(Sequel[:bin_loads][:id] => bin_load_id).select_map(Sequel[:rmt_deliveries][:id]).uniq
+      rmt_delivery_ids.each do |rmt_delivery_id|
+        delivery_shipped = get(:rmt_deliveries, rmt_delivery_id, :shipped)
+        next if delivery_shipped
+
+        ship_delivery = ds.where(Sequel[:rmt_deliveries][:id] => rmt_delivery_id).select_map(Sequel[:bin_loads][:shipped]).all?
+        next unless ship_delivery
+
+        update(:rmt_deliveries, rmt_delivery_id, shipped: true)
+        log_status(:rmt_deliveries, rmt_delivery_id, 'DELIVERY SHIPPED', user_name: user.user_name)
       end
     end
 
-    def unship_bin_load(id, user)
+    def unship_bin_load(bin_load_id, user)
+      unship_deliveries(bin_load_id, user)
+
+      unship_bins(bin_load_id, user)
+
       params = { shipped: false,
                  shipped_at: nil,
                  completed: false,
                  completed_at: nil }
-      update_bin_load(id, params)
-      log_status(:bin_loads, id, 'UNSHIPPED', user_name: user.user_name)
+      update_bin_load(bin_load_id, params)
+      log_status(:bin_loads, bin_load_id, 'UNSHIPPED', user_name: user.user_name)
+    end
 
-      bin_load_product_ids = select_values(:bin_load_products, :id, bin_load_id: id)
+    def unship_bins(bin_load_id, user)
+      bin_load_product_ids = select_values(:bin_load_products, :id, bin_load_id: bin_load_id)
       bin_load_product_ids.each do |bin_load_product_id|
         rmt_bin_ids = select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_id)
         rmt_bin_ids.each do |rmt_bin_id|
@@ -118,6 +141,18 @@ module RawMaterialsApp
           update(:rmt_bins, rmt_bin_id, params)
           log_status(:rmt_bins, rmt_bin_id, 'UNSHIPPED', user_name: user.user_name)
         end
+      end
+    end
+
+    def unship_deliveries(bin_load_id, user) # rubocop:disable Metrics/AbcSize
+      ds = DB[:rmt_deliveries].join(:rmt_bins, rmt_delivery_id: :id).join(:bin_load_products, id: :bin_load_product_id).join(:bin_loads, id: :bin_load_id)
+      rmt_delivery_ids = ds.where(Sequel[:bin_loads][:id] => bin_load_id).select_map(Sequel[:rmt_deliveries][:id]).uniq
+      rmt_delivery_ids.each do |rmt_delivery_id|
+        delivery_shipped = get(:rmt_deliveries, rmt_delivery_id, :shipped)
+        next unless delivery_shipped
+
+        update(:rmt_deliveries, rmt_delivery_id, shipped: false)
+        log_status(:rmt_deliveries, rmt_delivery_id, 'DELIVERY UNSHIPPED', user_name: user.user_name)
       end
     end
   end

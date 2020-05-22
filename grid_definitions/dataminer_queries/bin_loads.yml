@@ -43,7 +43,7 @@
     :caption: Bin Load
     :namespaced_name: bin_loads.id
     :data_type: :integer
-    :width: 70
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -91,7 +91,7 @@
     :caption: Customer
     :namespaced_name: 
     :data_type: :string
-    :width: 100
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -123,7 +123,7 @@
     :caption: Transporter
     :namespaced_name: 
     :data_type: :string
-    :width: 100
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -155,7 +155,7 @@
     :caption: Depot code
     :namespaced_name: depots.depot_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -171,7 +171,7 @@
     :caption: Purpose code
     :namespaced_name: bin_load_purposes.purpose_code
     :data_type: :string
-    :width: 100
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -187,7 +187,7 @@
     :caption: Qty bins
     :namespaced_name: bin_loads.qty_bins
     :data_type: :integer
-    :width: 70
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -203,7 +203,7 @@
     :caption: Shipped
     :namespaced_name: bin_loads.shipped
     :data_type: :boolean
-    :width: 70
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -219,8 +219,8 @@
     :caption: Shipped at
     :namespaced_name: bin_loads.shipped_at
     :data_type: :datetime
-    :width: 100
-    :format: 
+    :width: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -235,7 +235,7 @@
     :caption: Completed
     :namespaced_name: bin_loads.completed
     :data_type: :boolean
-    :width: 70
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -251,8 +251,8 @@
     :caption: Completed at
     :namespaced_name: bin_loads.completed_at
     :data_type: :datetime
-    :width: 100
-    :format: 
+    :width: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -267,9 +267,9 @@
     :caption: Active
     :namespaced_name: bin_loads.active
     :data_type: :boolean
-    :width: 70
+    :width: 10
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -283,7 +283,7 @@
     :caption: Has products
     :namespaced_name: 
     :data_type: :boolean
-    :width: 70
+    :width: 100
     :format: 
     :hide: true
     :pinned: 
@@ -299,8 +299,8 @@
     :caption: Created at
     :namespaced_name: bin_loads.created_at
     :data_type: :datetime
-    :width: 100
-    :format: 
+    :width: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -315,8 +315,8 @@
     :caption: Updated at
     :namespaced_name: bin_loads.updated_at
     :data_type: :datetime
-    :width: 100
-    :format: 
+    :width: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false

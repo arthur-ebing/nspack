@@ -8,7 +8,7 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:bin_load, :complete, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_errors form_errors
             page.form do |form|
@@ -25,10 +25,22 @@ module RawMaterials
               form.add_field :qty_bins
             end
             page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Add Product',
+                                  url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
+                                  grid_id: 'bin_load_products',
+                                  behaviour: :popup,
+                                  style: :button)
               section.add_grid('bin_load_products',
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',
-                               height: 40)
+                               height: 15)
+              unless ui_rule.form_object.available_bin_ids.nil_or_empty?
+                section.add_grid('rmt_bins',
+                                 "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
+                                 caption: 'Available Bins for Load',
+                                 height: 45)
+              end
             end
           end
 

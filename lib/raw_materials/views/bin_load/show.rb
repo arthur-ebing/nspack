@@ -41,7 +41,18 @@ module RawMaterials
               section.add_grid('bin_load_products',
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',
-                               height: 40)
+                               height: 15)
+              if ui_rule.form_object.shipped
+                section.add_grid('rmt_bins',
+                                 "/list/rmt_bins/grid?key=bin_load&bin_load_id=#{id}",
+                                 caption: 'Shipped Bins on Load',
+                                 height: 45)
+              else
+                section.add_grid('rmt_bins',
+                                 "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
+                                 caption: 'Available Bins for Load',
+                                 height: 45)
+              end
             end
           end
 
