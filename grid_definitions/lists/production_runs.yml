@@ -113,10 +113,16 @@
   :text: Carton packout report
   :icon: printer
   :loading_window: true
+- :separator: true
 - :url: "/development/statuses/list/production_runs/$:id$"
   :text: status
   :icon: information-solid
   :title: Status
+  :popup: true
+- :url: "/development/transactions/list/production_runs/$:id$"
+  :text: transactions
+  :icon: code
+  :title: Transactions
   :popup: true
 :page_controls:
 - :control_type: :link
