@@ -34,7 +34,7 @@ module RawMaterialsApp
         bin_asset_numbers.map(&:last).each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
           bin_id = repo.create_rmt_bin(params)
-          log_status('rmt_bins', bin_id, 'BIN_RECEIVED')
+          log_status(:rmt_bins, bin_id, 'BIN RECEIVED')
           created_bins << rmt_bin(bin_id)
         end
         repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
@@ -57,7 +57,7 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
-        log_status('rmt_bins', id, 'BIN_RECEIVED')
+        log_status(:rmt_bins, id, 'BIN RECEIVED')
         log_transaction
       end
       instance = rmt_bin(id)
@@ -129,7 +129,7 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
-        log_status('rmt_bins', id, 'REBIN_CREATED')
+        log_status(:rmt_bins, id, 'REBIN CREATED')
         log_transaction
       end
       instance = rmt_bin(id)
@@ -165,10 +165,10 @@ module RawMaterialsApp
         submitted_bins.each do |bin_asset_number|
           bin_params = { bin_asset_number: bin_asset_number }.merge(params)
           id = repo.create_rmt_bin(bin_params)
-          log_status('rmt_bins', id, 'BIN_RECEIVED')
+          log_status(:rmt_bins, id, 'BIN RECEIVED')
         end
 
-        log_status('rmt_deliveries', delivery_id, 'DELIVERY_RECEIVED')
+        log_status(:rmt_deliveries, delivery_id, 'DELIVERY RECEIVED')
         log_transaction
       end
       success_response('Bins Scanned Successfully',
@@ -211,7 +211,7 @@ module RawMaterialsApp
 
     def pdt_update_rmt_bin(id, params)
       res = update_rmt_bin(id, params)
-      log_status('rmt_bins', res.instance[:id], 'BIN_PDT_EDIT') if res.success
+      log_status(:rmt_bins, res.instance[:id], 'BIN PDT EDIT') if res.success
       res
     end
 
@@ -237,7 +237,7 @@ module RawMaterialsApp
     def delete_rmt_bin(id)
       repo.transaction do
         repo.delete_rmt_bin(id)
-        log_status('rmt_bins', id, 'DELETED')
+        log_status(:rmt_bins, id, 'DELETED')
         log_transaction
       end
       success_response('Deleted rmt bin')

@@ -109,10 +109,10 @@ module FinishedGoodsApp
         res = create_reworks_run(pallet_numbers)
         return res unless res.success
 
-        repo.log_multiple_statuses('pallets', pallet_ids, AppConst::REWORKS_REPACK_PALLET_STATUS)
-        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(pallet_ids), AppConst::REWORKS_REPACK_PALLET_STATUS)
-        repo.log_multiple_statuses('pallets', new_pallet_ids, AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
-        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(new_pallet_ids), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        repo.log_multiple_statuses(:pallets, pallet_ids, AppConst::REWORKS_REPACK_PALLET_STATUS)
+        repo.log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(pallet_ids), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        repo.log_multiple_statuses(:pallets, new_pallet_ids, AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
+        repo.log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(new_pallet_ids), AppConst::REWORKS_REPACK_PALLET_STATUS)
       end
 
       success_response('Selected pallets have been repacked successfully')

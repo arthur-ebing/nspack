@@ -89,9 +89,9 @@ module FinishedGoodsApp
     end
 
     def log_stock_item_status(stock_type)
-      return repo.log_status('pallets', stock_item[:id], AppConst::PALLET_MOVED) if stock_type == 'PALLET'
+      return repo.log_status(:pallets, stock_item[:id], AppConst::PALLET_MOVED) if stock_type == 'PALLET'
 
-      repo.log_status('rmt_bins', stock_item[:id], AppConst::RMT_BIN_MOVED)
+      repo.log_status(:rmt_bins, stock_item[:id], AppConst::RMT_BIN_MOVED)
     end
 
     def validate

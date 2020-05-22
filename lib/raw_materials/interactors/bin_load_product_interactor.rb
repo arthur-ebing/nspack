@@ -56,7 +56,7 @@ module RawMaterialsApp
       repo.transaction do
         bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
         repo.update(:rmt_bins, bin_id, bin_load_product_id: id)
-        log_status(:rmt_bins, bin_id, 'BIN_ALLOCATED_ON_LOAD')
+        log_status(:rmt_bins, bin_id, 'BIN ALLOCATED ON LOAD')
 
         log_transaction
       end

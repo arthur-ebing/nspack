@@ -17,7 +17,7 @@ module RawMaterialsApp
       repo.transaction do
         id = repo.create_rmt_delivery(res)
         repo.delivery_set_current(id) if res[:current]
-        log_status('rmt_deliveries', id, 'DELIVERY_RECEIVED')
+        log_status(:rmt_deliveries, id, 'DELIVERY_RECEIVED')
         log_transaction
       end
       instance = rmt_delivery(id)
@@ -74,7 +74,7 @@ module RawMaterialsApp
         end
 
         repo.delete_rmt_delivery(id)
-        log_status('rmt_deliveries', id, 'DELETED')
+        log_status(:rmt_deliveries, id, 'DELETED')
         log_transaction
       end
       success_response('Deleted rmt delivery')
@@ -104,7 +104,7 @@ module RawMaterialsApp
     def open_delivery(id)
       repo.transaction do
         repo.update_rmt_delivery(id, keep_open: true, delivery_tipped: false)
-        log_status('rmt_deliveries', id, 'DELIVERY_OPENED')
+        log_status(:rmt_deliveries, id, 'DELIVERY OPENED')
         log_transaction
       end
       instance = rmt_delivery(id)
@@ -121,7 +121,7 @@ module RawMaterialsApp
 
       repo.transaction do
         repo.update_rmt_delivery(id, changeset)
-        log_status('rmt_deliveries', id, 'DELIVERY_OPENED')
+        log_status(:rmt_deliveries, id, 'DELIVERY OPENED')
         log_transaction
       end
       instance = rmt_delivery(id)

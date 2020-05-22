@@ -10,7 +10,7 @@ module FinishedGoodsApp
       id = nil
       repo.transaction do
         id = repo.create_govt_inspection_sheet(res)
-        log_status(:govt_inspection_sheets, id, 'FINDING_SHEET_CREATED')
+        log_status(:govt_inspection_sheets, id, 'CREATED')
         log_transaction
       end
       instance = govt_inspection_sheet(id)
@@ -66,14 +66,14 @@ module FinishedGoodsApp
       return failed_response('Inspection sheet must have at least one pallet attached.') unless res
 
       repo.update_govt_inspection_sheet(id, completed: true)
-      log_status(:govt_inspection_sheets, id, 'FINDING_SHEET_COMPLETED')
+      log_status(:govt_inspection_sheets, id, 'COMPLETED')
 
       success_response('Completed sheet.')
     end
 
     def reopen_govt_inspection_sheet(id)
       repo.update_govt_inspection_sheet(id, completed: false)
-      log_status(:govt_inspection_sheets, id, 'FINDING_SHEET_REOPENED')
+      log_status(:govt_inspection_sheets, id, 'REOPENED')
 
       success_response('Reopened sheet.')
     end
@@ -83,7 +83,7 @@ module FinishedGoodsApp
       return res unless res.success
 
       reinspection = repo.get(:govt_inspection_sheets, id, :reinspection)
-      status = reinspection ? 'MANUALLY_REINSPECTED_BY_GOVT' : 'MANUALLY_INSPECTED_BY_GOVT'
+      status = reinspection ? 'MANUALLY REINSPECTED BY GOVT' : 'MANUALLY INSPECTED BY GOVT'
       attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
 
       repo.transaction do
@@ -118,7 +118,7 @@ module FinishedGoodsApp
                             :destination_country_id)
         attrs[:cancelled_id] = id
         clone_id = repo.create_govt_inspection_sheet(attrs)
-        log_status(:govt_inspection_sheets, clone_id, 'CREATED_FROM_CANCELLED')
+        log_status(:govt_inspection_sheets, clone_id, 'CREATED FROM CANCELLED')
 
         repo.all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
           params = { pallet_id: govt_inspection_pallet[:pallet_id],  govt_inspection_sheet_id: clone_id }
@@ -142,7 +142,7 @@ module FinishedGoodsApp
         govt_inspection_pallets.each do |govt_inspection_pallet|
           attrs = { inspected: nil, govt_inspection_passed: nil, last_govt_inspection_pallet_id: nil, in_stock: nil, stock_created_at: nil }
           repo.update(:pallets, govt_inspection_pallet[:pallet_id], attrs)
-          log_status(:pallets, govt_inspection_pallet[:pallet_id], 'INSPECTION_CANCELLED')
+          log_status(:pallets, govt_inspection_pallet[:pallet_id], 'INSPECTION CANCELLED')
         end
         log_transaction
       end
@@ -165,10 +165,10 @@ module FinishedGoodsApp
           raise unit_res.messages.to_s unless unit_res.messages.empty?
 
           repo.create_vehicle_job_unit(unit_res)
-          log_status(:pallets, govt_inspection_pallet[:pallet_id], 'ADDED_TO_INTAKE_TRIPSHEET')
+          log_status(:pallets, govt_inspection_pallet[:pallet_id], 'ADDED TO INTAKE TRIPSHEET')
         end
         repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_created: true, tripsheet_created_at: Time.now)
-        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'FIRST_INTAKE_TRIP_SHEET_CREATED')
+        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'FIRST INTAKE TRIP SHEET CREATED')
         log_transaction
       end
       success_response('Intake Tripsheet Created')
@@ -184,8 +184,8 @@ module FinishedGoodsApp
         repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
         repo.load_vehicle_job_units(vehicle_job_id)
         repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_loaded: true, tripsheet_loaded_at: Time.now)
-        log_multiple_statuses(:pallets, repo.get_tripsheet_pallet_ids(vehicle_job_id), 'LOADED_ON_VEHICLE')
-        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'LOADED_ON_VEHICLE')
+        log_multiple_statuses(:pallets, repo.get_tripsheet_pallet_ids(vehicle_job_id), 'LOADED ON VEHICLE')
+        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'LOADED ON VEHICLE')
       end
 
       success_response('Vehicle Loaded Successfully')
@@ -208,8 +208,8 @@ module FinishedGoodsApp
         tripsheet_pallets = repo.get_tripsheet_pallet_ids(vehicle_job_id)
         repo.delete_vehicle_job(vehicle_job_id)
         repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_created: false, tripsheet_created_at: nil, tripsheet_loaded: false, tripsheet_loaded_at: nil)
-        log_multiple_statuses(:pallets, tripsheet_pallets, 'INTAKE_TRIP_SHEET_CANCELED')
-        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'INTAKE_TRIP_SHEET_CANCELED')
+        log_multiple_statuses(:pallets, tripsheet_pallets, 'INTAKE TRIP SHEET CANCELED')
+        log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'INTAKE TRIP SHEET CANCELED')
       end
 
       success_response 'Tripsheet deleted successfully'
@@ -237,9 +237,9 @@ module FinishedGoodsApp
             raise unit_res.messages.to_s unless unit_res.messages.empty?
 
             repo.create_vehicle_job_unit(unit_res)
-            log_status(:pallets, new_vehicle_job_unit, 'ADDED_TO_INTAKE_TRIPSHEET')
+            log_status(:pallets, new_vehicle_job_unit, 'ADDED TO INTAKE TRIPSHEET')
           end
-          log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET_REFRESHED')
+          log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET REFRESHED')
         end
       end
 
@@ -293,7 +293,7 @@ module FinishedGoodsApp
               raise res.message unless res.success
             end
             repo.update(:pallets, tripsheet_pallets.map { |p| p[:stock_item_id] }, in_stock: true, stock_created_at: Time.now) if AppConst::CREATE_STOCK_AT_FIRST_INTAKE
-            log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET_OFFLOADED')
+            log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET OFFLOADED')
             instance.store(:vehicle_job_offloaded, true)
             instance.store(:pallets_moved, tripsheet_pallets.all.size)
             instance.store(:location, repo.get(:locations, location_to_id, :location_long_code))

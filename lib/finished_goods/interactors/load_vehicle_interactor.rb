@@ -13,8 +13,8 @@ module FinishedGoodsApp
       repo.transaction do
         id = repo.create_load_vehicle(res)
         log_status(:load_vehicles, id, 'CREATED')
-        log_status(:loads, load_id, 'TRUCK_ARRIVED')
-        log_multiple_statuses(:pallets, pallet_ids, 'TRUCK_ARRIVED') unless pallet_ids.empty?
+        log_status(:loads, load_id, 'TRUCK ARRIVED')
+        log_multiple_statuses(:pallets, pallet_ids, 'TRUCK ARRIVED') unless pallet_ids.empty?
         log_transaction
       end
       instance = load_vehicle(id)

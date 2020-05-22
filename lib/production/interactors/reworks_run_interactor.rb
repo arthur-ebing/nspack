@@ -115,11 +115,11 @@ module ProductionApp
 
     def log_deliveries_and_bins_statuses(delivery_ids)
       repo.find_bins(delivery_ids).each do |bin|
-        log_status('rmt_bins', bin[:id], 'DELIVERY_ORCHARD_CHANGE')
+        log_status(:rmt_bins, bin[:id], 'DELIVERY ORCHARD CHANGE')
       end
 
       repo.find_deliveries(delivery_ids).each do |del|
-        log_status('rmt_deliveries', del[:id], 'DELIVERY_ORCHARD_CHANGE')
+        log_status(:rmt_deliveries, del[:id], 'DELIVERY ORCHARD CHANGE')
       end
     end
 
