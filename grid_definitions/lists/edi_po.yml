@@ -1,0 +1,7 @@
+---
+:dataminer_definition: edi_po
+:conditions:
+  :standard:
+    - :col: record_id
+      :op: =
+      :val: $:record_id$

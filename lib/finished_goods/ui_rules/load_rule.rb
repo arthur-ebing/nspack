@@ -32,7 +32,7 @@ module UiRules
       # Load Details
       voyage_code_label = FinishedGoodsApp::VoyagePortRepo.new.find_voyage_port_flat(@form_object.pol_voyage_port_id)&.voyage_code
       depot_label = MasterfilesApp::DepotRepo.new.find_depot(@form_object.depot_id)&.depot_code
-      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load Id' }
+      fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load' }
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
       fields[:order_number] = { renderer: :label }
@@ -136,7 +136,7 @@ module UiRules
 
         # Load Details
         id: { renderer: :label,
-              caption: 'Load Id' },
+              caption: 'Load' },
         load_id: { hide_on_load: true },
         order_number: {},
         customer_order_number: {},
