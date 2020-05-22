@@ -65,7 +65,7 @@ module MesscadaApp
         res = MesscadaApp::TipBin.new(res).call
 
         if res.success
-          log_status('rmt_bins', res.instance[:rmt_bin_id], 'TIPPED')
+          log_status(:rmt_bins, res.instance[:rmt_bin_id], 'TIPPED')
           log_transaction
         end
         res
