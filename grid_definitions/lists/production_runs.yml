@@ -124,6 +124,17 @@
   :icon: code
   :title: Transactions
   :popup: true
+- :separator: true
+- :submenu:
+    :text: Rebins
+    :items:
+      - :url: /production/runs/production_runs/$:id$/rebins
+        :text: create rebin
+        :icon: add-solid
+        :popup: true
+      - :url: /production/runs/production_runs/$:id$/print_barcodes
+        :text: print barcodes
+        :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/production/runs/production_runs/new"
