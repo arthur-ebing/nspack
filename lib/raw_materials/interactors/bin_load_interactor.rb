@@ -107,7 +107,12 @@ module RawMaterialsApp
       return failed_response "Bin Load: #{id} has already been shipped" if instance.shipped
       return failed_response "Bin Load: #{id} has not been completed" unless instance.completed || AppConst::BYPASS_BIN_LOAD_COMPLETED_CHECK
       return failed_response "Bin Load: #{id} Qty's do not match" unless instance.qty_bins == instance.qty_product_bins
-      return failed_response "Bin Load: #{id} Insufficient bins available" if instance.qty_bins_available < instance.qty_bins
+
+      products = repo.select_values(:bin_load_products, %i[id qty_bins], bin_load_id: id)
+      products.each do |bin_load_product_id, qty_bins|
+        qty_available = repo.rmt_bins_matching_bin_load(:bin_asset_number, bin_load_product_id: bin_load_product_id).count
+        return failed_response("Bin Load: #{id} Insufficient bins available") if qty_available < qty_bins
+      end
 
       success_response('Load valid', instance)
     end

@@ -38,10 +38,26 @@
     - :col: rmt_delivery_id
       :op: =
       :val: $:delivery_id$
+  :in_stock:
+    - :col: null_exit_ref
+      :op: =
+      :val: true
   :tipped:
     - :col: bin_tipped
       :op: =
       :val: $:tipped$
+  :shipped:
+    - :col: shipped
+      :op: =
+      :val: true
+  :bin_load:
+    - :col: bin_load_id
+      :op: =
+      :val: $:bin_load_id$
+  :available:
+    - :col: id
+      :op: IN
+      :val: $:ids$
   :location_bins:
     - :col: null_exit_ref
       :op: =
@@ -49,44 +65,3 @@
     - :col: location_id
       :op: IN
       :val: $:location_ids$
-
-#- :url: "/raw_materials/deliveries/rmt_bins/$:id$/complete"
-#  :text: Complete
-#  :icon: toggle-on
-#  :popup: true
-#  :hide_if_true: completed
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: edit
-#- :url: "/raw_materials/deliveries/rmt_bins/$:id$/approve"
-#  :text: Approve/Reject
-#  :icon: gavel
-#  :popup: true
-#  :hide_if_false: completed
-#  :hide_if_true: approved
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: approve
-#- :url: "/raw_materials/deliveries/rmt_bins/$:id$/reopen"
-#  :text: Re-open for editing
-#  :icon: toggle-off
-#  :popup: true
-#  :hide_if_false: approved
-#  :auth:
-#    :function: raw_materials
-#    :program: deliveries
-#    :permission: edit
-#- :separator: true
-#- :url: "/development/statuses/list/rmt_bins/$:id$"
-#  :text: status
-#  :icon: information-solid
-#  :title: Status
-#  :popup: true
-#:page_controls:
-#- :control_type: :link
-#  :url: "/raw_materials/deliveries/rmt_bins/new"
-#  :text: New Rmt Bin
-#  :style: :button
-#  :behaviour: :popup
