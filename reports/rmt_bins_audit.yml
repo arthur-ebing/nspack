@@ -1,9 +1,10 @@
 ---
 :caption: Audit RMT Bins
 :sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    user_name,\r\n    status,\r\n
-  \   transaction_at,\r\n    action,\r\n    changed_fields,\r\n    bin_asset_number,\r\n
-  \   farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n
-  \   location_id,\r\n    bin_loads.id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
+  \   transaction_at,\r\n    action,\r\n    COALESCE(changed_fields, row_data) AS
+  changed_fields,\r\n    bin_asset_number,\r\n    farm_code,\r\n    puc_code,\r\n
+  \   orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n    location_id,\r\n
+  \   bin_loads.id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
   AS container_material_type,\r\n    fn_party_role_name (sq.rmt_material_owner_party_role_id::int)
   AS rmt_material_owner,\r\n    production_run_tipped_id,\r\n    gross_weight,\r\n
   \   nett_weight,\r\n    bin_tipped,\r\n    bin_received_date_time AS bin_received_at,\r\n
@@ -19,39 +20,39 @@
   action\r\n                 WHEN 'I' THEN\r\n                     'INS'\r\n                 WHEN
   'U' THEN\r\n                     'UPD'\r\n                 WHEN 'D' THEN\r\n                     'DEL'\r\n
   \                ELSE\r\n                     'TRUNC'\r\n                 END AS
-  action,\r\n             changed_fields,\r\n             row_data -> 'bin_asset_number'
-  AS bin_asset_number,\r\n             row_data -> 'farm_id' AS farm_id,\r\n             row_data
-  -> 'puc_id' AS puc_id,\r\n             row_data -> 'orchard_id' AS orchard_id,\r\n
-  \            row_data -> 'cultivar_id' AS cultivar_id,\r\n             row_data
-  -> 'bin_fullness' AS bin_fullness,\r\n             row_data -> 'location_id' AS
-  location_id,\r\n             row_data -> 'bin_load_product_id' AS bin_load_product_id,\r\n
-  \            row_data -> 'rmt_container_material_type_id' AS rmt_container_material_type_id,\r\n
-  \            row_data -> 'rmt_material_owner_party_role_id' AS rmt_material_owner_party_role_id,\r\n
-  \            row_data -> 'production_run_tipped_id' AS production_run_tipped_id,\r\n
-  \            row_data -> 'gross_weight' AS gross_weight,\r\n             row_data
-  -> 'nett_weight' AS nett_weight,\r\n             row_data -> 'bin_tipped' AS bin_tipped,\r\n
-  \            row_data -> 'bin_received_date_time' AS bin_received_date_time,\r\n
-  \            row_data -> 'exit_ref' AS exit_ref,\r\n             row_data -> 'exit_ref_date_time'
-  AS exit_ref_date_time,\r\n             row_data -> 'tipped_asset_number' AS tipped_asset_number,\r\n
-  \            row_data -> 'shipped_asset_number' AS shipped_asset_number,\r\n             row_data
-  -> 'scrapped_at' AS scrapped_at,\r\n             row_data -> 'unscrapped_at' AS
-  unscrapped_at,\r\n             row_data -> 'created_at' AS created_at\r\n         FROM\r\n
-  \            audit.logged_actions\r\n                 LEFT JOIN audit.status_logs
-  ON status_logs.transaction_id = logged_actions.transaction_id\r\n                 AND
-  logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND status_logs.table_name
-  = 'rmt_bins'\r\n                 LEFT JOIN ( SELECT DISTINCT\r\n                                 transaction_id,\r\n
-  \                                user_name\r\n                             FROM\r\n
-  \                                audit.logged_action_details) logged_action_details
-  ON logged_action_details.transaction_id = logged_actions.transaction_id\r\n         WHERE\r\n
-  \                logged_actions.table_name = 'rmt_bins'\r\n         GROUP BY\r\n
-  \            event_id,\r\n             logged_action_details.user_name\r\n         UNION\r\n
-  \        SELECT\r\n             id AS row_data_id,\r\n             999999999 AS
-  event_id,\r\n             NULL AS user_name,\r\n             fn_current_status ('rmt_bins',
-  id) AS status,\r\n             NULL AS transaction_at,\r\n             NULL AS action,\r\n
-  \            NULL AS changed_fields,\r\n             bin_asset_number::text,\r\n
-  \            farm_id::text,\r\n             puc_id::text,\r\n             orchard_id::text,\r\n
-  \            cultivar_id::text,\r\n             bin_fullness::text,\r\n             location_id::text,\r\n
-  \            bin_load_product_id::text,\r\n             rmt_container_material_type_id::text,\r\n
+  action,\r\n             changed_fields,\r\n             row_data,\r\n             row_data
+  -> 'bin_asset_number' AS bin_asset_number,\r\n             row_data -> 'farm_id'
+  AS farm_id,\r\n             row_data -> 'puc_id' AS puc_id,\r\n             row_data
+  -> 'orchard_id' AS orchard_id,\r\n             row_data -> 'cultivar_id' AS cultivar_id,\r\n
+  \            row_data -> 'bin_fullness' AS bin_fullness,\r\n             row_data
+  -> 'location_id' AS location_id,\r\n             row_data -> 'bin_load_product_id'
+  AS bin_load_product_id,\r\n             row_data -> 'rmt_container_material_type_id'
+  AS rmt_container_material_type_id,\r\n             row_data -> 'rmt_material_owner_party_role_id'
+  AS rmt_material_owner_party_role_id,\r\n             row_data -> 'production_run_tipped_id'
+  AS production_run_tipped_id,\r\n             row_data -> 'gross_weight' AS gross_weight,\r\n
+  \            row_data -> 'nett_weight' AS nett_weight,\r\n             row_data
+  -> 'bin_tipped' AS bin_tipped,\r\n             row_data -> 'bin_received_date_time'
+  AS bin_received_date_time,\r\n             row_data -> 'exit_ref' AS exit_ref,\r\n
+  \            row_data -> 'exit_ref_date_time' AS exit_ref_date_time,\r\n             row_data
+  -> 'tipped_asset_number' AS tipped_asset_number,\r\n             row_data -> 'shipped_asset_number'
+  AS shipped_asset_number,\r\n             row_data -> 'scrapped_at' AS scrapped_at,\r\n
+  \            row_data -> 'unscrapped_at' AS unscrapped_at,\r\n             row_data
+  -> 'created_at' AS created_at\r\n         FROM\r\n             audit.logged_actions\r\n
+  \                LEFT JOIN audit.status_logs ON status_logs.transaction_id = logged_actions.transaction_id\r\n
+  \                AND logged_actions.row_data_id = status_logs.row_data_id\r\n                 AND
+  status_logs.table_name = 'rmt_bins'\r\n                 LEFT JOIN ( SELECT DISTINCT\r\n
+  \                                transaction_id,\r\n                                 user_name\r\n
+  \                            FROM\r\n                                 audit.logged_action_details)
+  logged_action_details ON logged_action_details.transaction_id = logged_actions.transaction_id\r\n
+  \        WHERE\r\n                 logged_actions.table_name = 'rmt_bins'\r\n         GROUP
+  BY\r\n             event_id,\r\n             logged_action_details.user_name\r\n
+  \        UNION\r\n         SELECT\r\n             id AS row_data_id,\r\n             999999999
+  AS event_id,\r\n             NULL AS user_name,\r\n             fn_current_status
+  ('rmt_bins', id) AS status,\r\n             NULL AS transaction_at,\r\n             NULL
+  AS action,\r\n             NULL AS changed_fields,\r\n             NULL AS row_data,\r\n
+  \            bin_asset_number::text,\r\n             farm_id::text,\r\n             puc_id::text,\r\n
+  \            orchard_id::text,\r\n             cultivar_id::text,\r\n             bin_fullness::text,\r\n
+  \            location_id::text,\r\n             bin_load_product_id::text,\r\n             rmt_container_material_type_id::text,\r\n
   \            rmt_material_owner_party_role_id::text,\r\n             production_run_tipped_id::text,\r\n
   \            gross_weight::text,\r\n             nett_weight::text,\r\n             bin_tipped::text,\r\n
   \            bin_received_date_time::text,\r\n             exit_ref::text,\r\n             exit_ref_date_time::text,\r\n
@@ -176,7 +177,7 @@
     :name: changed_fields
     :sequence_no: 7
     :caption: Changed fields
-    :namespaced_name: changed_fields
+    :namespaced_name: 
     :data_type: :string
     :width: 300
     :format: 

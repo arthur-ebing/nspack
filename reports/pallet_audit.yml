@@ -1,23 +1,23 @@
 ---
 :caption: Audit Pallets
 :sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    user_name,\r\n    status,\r\n
-  \   transaction_at,\r\n    action,\r\n    changed_fields,\r\n    pallet_number,\r\n
-  \   CONCAT(pallet_base_code, '_', stack_type_code) AS pallet_format,\r\n    location_long_code,\r\n
-  \   in_stock,\r\n    shipped,\r\n    shipped_at,\r\n    inspected,\r\n    govt_first_inspection_at,\r\n
-  \   govt_reinspection_at,\r\n    stock_created_at,\r\n    first_cold_storage_at,\r\n
-  \   build_status,\r\n    carton_quantity,\r\n    load_id,\r\n    gross_weight,\r\n
-  \   nett_weight,\r\n    palletized_at,\r\n    temp_tail,\r\n    CASE WHEN action
-  = 'INS' THEN\r\n        'blue' -- created\r\n    WHEN action = 'UPD' THEN\r\n        'gray'
-  -- updated\r\n    WHEN action = 'DEL' THEN\r\n        'orange' -- deleted\r\n    WHEN
-  action = 'TRUNC' THEN\r\n        'black' -- current\r\n    END AS colour_rule\r\nFROM
-  (\r\n    SELECT\r\n        logged_actions.row_data_id,\r\n        event_id,\r\n
-  \       logged_action_details.user_name,\r\n        string_agg(status_logs.status,
+  \   transaction_at,\r\n    action,\r\n    COALESCE(changed_fields, row_data) AS
+  changed_fields,\r\n    pallet_number,\r\n    CONCAT(pallet_base_code, '_', stack_type_code)
+  AS pallet_format,\r\n    location_long_code,\r\n    in_stock,\r\n    shipped,\r\n
+  \   shipped_at,\r\n    inspected,\r\n    govt_first_inspection_at,\r\n    govt_reinspection_at,\r\n
+  \   stock_created_at,\r\n    first_cold_storage_at,\r\n    build_status,\r\n    carton_quantity,\r\n
+  \   load_id,\r\n    gross_weight,\r\n    nett_weight,\r\n    palletized_at,\r\n
+  \   temp_tail,\r\n    CASE WHEN action = 'INS' THEN\r\n        'blue' -- created\r\n
+  \   WHEN action = 'UPD' THEN\r\n        'gray' -- updated\r\n    WHEN action = 'DEL'
+  THEN\r\n        'orange' -- deleted\r\n    WHEN action = 'TRUNC' THEN\r\n        'black'
+  -- current\r\n    END AS colour_rule\r\nFROM (\r\n    SELECT\r\n        logged_actions.row_data_id,\r\n
+  \       event_id,\r\n        logged_action_details.user_name,\r\n        string_agg(status_logs.status,
   ' --- ') AS status,\r\n        action_tstamp_clk AS transaction_at,\r\n        CASE
   action\r\n        WHEN 'I' THEN\r\n            'INS'\r\n        WHEN 'U' THEN\r\n
   \           'UPD'\r\n        WHEN 'D' THEN\r\n            'DEL'\r\n        ELSE\r\n
-  \           'TRUNC'\r\n        END AS action,\r\n        changed_fields,\r\n        row_data
-  -> 'pallet_number' AS pallet_number,\r\n        row_data -> 'pallet_format_id' AS
-  pallet_format_id,\r\n        row_data -> 'location_id' AS location_id,\r\n        row_data
+  \           'TRUNC'\r\n        END AS action,\r\n        changed_fields,\r\n        row_data,\r\n
+  \       row_data -> 'pallet_number' AS pallet_number,\r\n        row_data -> 'pallet_format_id'
+  AS pallet_format_id,\r\n        row_data -> 'location_id' AS location_id,\r\n        row_data
   -> 'in_stock' AS in_stock,\r\n        row_data -> 'shipped' AS shipped,\r\n        row_data
   -> 'shipped_at' AS shipped_at,\r\n        row_data -> 'inspected' AS inspected,\r\n
   \       row_data -> 'govt_first_inspection_at' AS govt_first_inspection_at,\r\n
@@ -37,10 +37,10 @@
   \       logged_action_details.user_name\r\n    UNION\r\n    SELECT\r\n        id
   AS row_data_id,\r\n        999999999 AS event_id,\r\n        NULL AS user_name,\r\n
   \       fn_current_status ('pallets', id) AS status,\r\n        NULL AS transaction_at,\r\n
-  \       NULL AS action,\r\n        NULL AS changed_fields,\r\n        pallet_number::text,\r\n
-  \       pallet_format_id::text,\r\n        location_id::text,\r\n        in_stock::text,\r\n
-  \       shipped::text,\r\n        shipped_at::text,\r\n        inspected::text,\r\n
-  \       govt_first_inspection_at::text,\r\n        govt_reinspection_at::text,\r\n
+  \       NULL AS action,\r\n        NULL AS changed_fields,\r\n        NULL AS row_data,\r\n
+  \       pallet_number::text,\r\n        pallet_format_id::text,\r\n        location_id::text,\r\n
+  \       in_stock::text,\r\n        shipped::text,\r\n        shipped_at::text,\r\n
+  \       inspected::text,\r\n        govt_first_inspection_at::text,\r\n        govt_reinspection_at::text,\r\n
   \       stock_created_at::text,\r\n        first_cold_storage_at::text,\r\n        build_status::text,\r\n
   \       carton_quantity::text,\r\n        load_id::text,\r\n        gross_weight::text,\r\n
   \       nett_weight::text,\r\n        palletized_at::text,\r\n        temp_tail::text\r\n
@@ -159,7 +159,7 @@
     :name: changed_fields
     :sequence_no: 7
     :caption: Changed fields
-    :namespaced_name: changed_fields
+    :namespaced_name: 
     :data_type: :string
     :width: 300
     :format: 

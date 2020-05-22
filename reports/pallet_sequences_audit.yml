@@ -1,33 +1,34 @@
 ---
 :caption: Audit Pallet Sequences
 :sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    user_name,\r\n    status,\r\n
-  \   transaction_at,\r\n    action,\r\n    changed_fields,\r\n    pallet_number,\r\n
-  \   pallet_sequence_number,\r\n    farms.farm_code,\r\n    pucs.puc_code,\r\n    orchards.orchard_code,\r\n
-  \   cultivars.cultivar_code,\r\n    marketing_varieties.marketing_variety_code,\r\n
-  \   target_market_groups.target_market_group_name AS packed_tm_group,\r\n    standard_pack_codes.standard_pack_code,\r\n
-  \   fruit_size_references.size_reference,\r\n    fruit_actual_counts_for_packs.actual_count_for_pack
-  AS actual_count,\r\n    marks.mark_code,\r\n    phyto_data,\r\n    array_agg(orchard_test_types.test_type_code
-  ORDER BY orchard_test_types.test_type_code) FILTER (WHERE orchard_test_types.test_type_code
-  IS NOT NULL) AS failed_otmc_results,\r\n    CASE WHEN action = 'INS' THEN\r\n        'blue'
-  -- created\r\n    WHEN action = 'UPD' THEN\r\n        'gray' -- updated\r\n    WHEN
-  action = 'DEL' THEN\r\n        'orange' -- deleted\r\n    WHEN action = 'TRUNC'
-  THEN\r\n        'black' -- current\r\n    END AS colour_rule\r\nFROM (\r\n    SELECT\r\n
-  \       logged_actions.row_data_id,\r\n        event_id,\r\n        logged_action_details.user_name,\r\n
-  \       string_agg(status_logs.status, ' --- ') AS status,\r\n        action_tstamp_clk
-  AS transaction_at,\r\n        CASE action\r\n        WHEN 'I' THEN\r\n            'INS'\r\n
-  \       WHEN 'U' THEN\r\n            'UPD'\r\n        WHEN 'D' THEN\r\n            'DEL'\r\n
-  \       ELSE\r\n            'TRUNC'\r\n        END AS action,\r\n        changed_fields,\r\n
-  \       row_data -> 'pallet_number' AS pallet_number,\r\n        row_data -> 'pallet_sequence_number'
-  AS pallet_sequence_number,\r\n        row_data -> 'farm_id' AS farm_id,\r\n        row_data
-  -> 'puc_id' AS puc_id,\r\n        row_data -> 'orchard_id' AS orchard_id,\r\n        row_data
-  -> 'cultivar_id' AS cultivar_id,\r\n        row_data -> 'marketing_variety_id' AS
-  marketing_variety_id,\r\n        row_data -> 'standard_pack_code_id' AS standard_pack_code_id,\r\n
-  \       row_data -> 'fruit_size_reference_id' AS fruit_size_reference_id,\r\n        row_data
-  -> 'fruit_actual_counts_for_pack_id' AS fruit_actual_counts_for_pack_id,\r\n        row_data
-  -> 'mark_id' AS mark_id,\r\n        row_data -> 'production_run_id' AS production_run_id,\r\n
-  \       row_data -> 'carton_quantity' AS carton_quantity,\r\n        row_data ->
-  'packed_tm_group_id' AS packed_tm_group_id,\r\n        row_data -> 'phyto_data'
-  AS phyto_data,\r\n        row_data -> 'failed_otmc_results' AS failed_otmc_result_ids\r\n
+  \   transaction_at,\r\n    action,\r\n    coalesce(changed_fields, row_data) AS
+  changed_fields,\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n    farms.farm_code,\r\n
+  \   pucs.puc_code,\r\n    orchards.orchard_code,\r\n    cultivars.cultivar_code,\r\n
+  \   marketing_varieties.marketing_variety_code,\r\n    target_market_groups.target_market_group_name
+  AS packed_tm_group,\r\n    standard_pack_codes.standard_pack_code,\r\n    fruit_size_references.size_reference,\r\n
+  \   fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,\r\n    marks.mark_code,\r\n
+  \   phyto_data,\r\n    array_agg(orchard_test_types.test_type_code ORDER BY orchard_test_types.test_type_code)
+  FILTER (WHERE orchard_test_types.test_type_code IS NOT NULL) AS failed_otmc_results,\r\n
+  \   CASE WHEN action = 'INS' THEN\r\n        'blue' -- created\r\n    WHEN action
+  = 'UPD' THEN\r\n        'gray' -- updated\r\n    WHEN action = 'DEL' THEN\r\n        'orange'
+  -- deleted\r\n    WHEN action = 'TRUNC' THEN\r\n        'black' -- current\r\n    END
+  AS colour_rule\r\nFROM (\r\n    SELECT\r\n        logged_actions.row_data_id,\r\n
+  \       event_id,\r\n        logged_action_details.user_name,\r\n        string_agg(status_logs.status,
+  ' --- ') AS status,\r\n        action_tstamp_clk AS transaction_at,\r\n        CASE
+  action\r\n        WHEN 'I' THEN\r\n            'INS'\r\n        WHEN 'U' THEN\r\n
+  \           'UPD'\r\n        WHEN 'D' THEN\r\n            'DEL'\r\n        ELSE\r\n
+  \           'TRUNC'\r\n        END AS action,\r\n        changed_fields,\r\n        row_data,
+  \r\n        row_data -> 'pallet_number' AS pallet_number,\r\n        row_data ->
+  'pallet_sequence_number' AS pallet_sequence_number,\r\n        row_data -> 'farm_id'
+  AS farm_id,\r\n        row_data -> 'puc_id' AS puc_id,\r\n        row_data -> 'orchard_id'
+  AS orchard_id,\r\n        row_data -> 'cultivar_id' AS cultivar_id,\r\n        row_data
+  -> 'marketing_variety_id' AS marketing_variety_id,\r\n        row_data -> 'standard_pack_code_id'
+  AS standard_pack_code_id,\r\n        row_data -> 'fruit_size_reference_id' AS fruit_size_reference_id,\r\n
+  \       row_data -> 'fruit_actual_counts_for_pack_id' AS fruit_actual_counts_for_pack_id,\r\n
+  \       row_data -> 'mark_id' AS mark_id,\r\n        row_data -> 'production_run_id'
+  AS production_run_id,\r\n        row_data -> 'carton_quantity' AS carton_quantity,\r\n
+  \       row_data -> 'packed_tm_group_id' AS packed_tm_group_id,\r\n        row_data
+  -> 'phyto_data' AS phyto_data,\r\n        row_data -> 'failed_otmc_results' AS failed_otmc_result_ids\r\n
   \   FROM\r\n        audit.logged_actions\r\n    LEFT JOIN audit.status_logs ON status_logs.transaction_id
   = logged_actions.transaction_id\r\n        AND logged_actions.row_data_id = status_logs.row_data_id\r\n
   \       AND status_logs.table_name = 'pallet_sequences'\r\n    LEFT JOIN ( SELECT
@@ -38,30 +39,31 @@
   \   UNION\r\n    SELECT\r\n        id AS row_data_id,\r\n        999999999 AS event_id,\r\n
   \       NULL AS user_name,\r\n        fn_current_status ('pallet_sequences', id)
   AS status,\r\n        NULL AS transaction_at,\r\n        NULL AS action,\r\n        NULL
-  AS changed_fields,\r\n        pallet_number::text AS pallet_number,\r\n        pallet_sequence_number::text
-  AS pallet_sequence_number,\r\n        farm_id::text,\r\n        puc_id::text,\r\n
-  \       orchard_id::text,\r\n        cultivar_id::text,\r\n        marketing_variety_id::text,\r\n
-  \       standard_pack_code_id::text,\r\n        fruit_size_reference_id::text,\r\n
-  \       fruit_actual_counts_for_pack_id::text,\r\n        mark_id::text,\r\n        production_run_id::text,\r\n
-  \       carton_quantity::text,\r\n        packed_tm_group_id::text,\r\n        phyto_data::text,\r\n
-  \       failed_otmc_results::text AS failed_otmc_result_ids\r\n    FROM\r\n        pallet_sequences)
-  sq\r\n    LEFT JOIN farms ON farms.id = sq.farm_id::int\r\n    LEFT JOIN pucs ON
-  pucs.id = sq.puc_id::int\r\n    LEFT JOIN orchards ON orchards.id = sq.orchard_id::int\r\n
-  \   LEFT JOIN cultivars ON cultivars.id = sq.cultivar_id::int\r\n    LEFT JOIN marketing_varieties
-  ON marketing_varieties.id = sq.marketing_variety_id::int\r\n    LEFT JOIN target_market_groups
-  ON target_market_groups.id = sq.packed_tm_group_id::int\r\n    LEFT JOIN standard_pack_codes
-  ON standard_pack_codes.id = sq.standard_pack_code_id::int\r\n    LEFT JOIN fruit_size_references
-  ON fruit_size_references.id = sq.fruit_size_reference_id::int\r\n    LEFT JOIN fruit_actual_counts_for_packs
+  AS changed_fields,\r\n        NULL AS row_data,\r\n        pallet_number::text AS
+  pallet_number,\r\n        pallet_sequence_number::text AS pallet_sequence_number,\r\n
+  \       farm_id::text,\r\n        puc_id::text,\r\n        orchard_id::text,\r\n
+  \       cultivar_id::text,\r\n        marketing_variety_id::text,\r\n        standard_pack_code_id::text,\r\n
+  \       fruit_size_reference_id::text,\r\n        fruit_actual_counts_for_pack_id::text,\r\n
+  \       mark_id::text,\r\n        production_run_id::text,\r\n        carton_quantity::text,\r\n
+  \       packed_tm_group_id::text,\r\n        phyto_data::text,\r\n        failed_otmc_results::text
+  AS failed_otmc_result_ids\r\n    FROM\r\n        pallet_sequences) sq\r\n    LEFT
+  JOIN farms ON farms.id = sq.farm_id::int\r\n    LEFT JOIN pucs ON pucs.id = sq.puc_id::int\r\n
+  \   LEFT JOIN orchards ON orchards.id = sq.orchard_id::int\r\n    LEFT JOIN cultivars
+  ON cultivars.id = sq.cultivar_id::int\r\n    LEFT JOIN marketing_varieties ON marketing_varieties.id
+  = sq.marketing_variety_id::int\r\n    LEFT JOIN target_market_groups ON target_market_groups.id
+  = sq.packed_tm_group_id::int\r\n    LEFT JOIN standard_pack_codes ON standard_pack_codes.id
+  = sq.standard_pack_code_id::int\r\n    LEFT JOIN fruit_size_references ON fruit_size_references.id
+  = sq.fruit_size_reference_id::int\r\n    LEFT JOIN fruit_actual_counts_for_packs
   ON fruit_actual_counts_for_packs.id = sq.fruit_actual_counts_for_pack_id::int\r\n
   \   LEFT JOIN marks ON marks.id = sq.mark_id::int\r\n    LEFT JOIN orchard_test_types
   ON orchard_test_types.id = ANY (sq.failed_otmc_result_ids::int[])\r\nGROUP BY\r\n
   \   sq.row_data_id,\r\n    sq.event_id,\r\n    sq.user_name,\r\n    sq.status,\r\n
   \   sq.phyto_data,\r\n    sq.transaction_at,\r\n    sq.action,\r\n    sq.changed_fields,\r\n
-  \   sq.pallet_number,\r\n    sq.pallet_sequence_number,\r\n    farms.id,\r\n    pucs.id,\r\n
-  \   orchards.id,\r\n    cultivars.id,\r\n    marketing_varieties.id,\r\n    target_market_groups.id,\r\n
-  \   standard_pack_codes.id,\r\n    fruit_size_references.id,\r\n    fruit_actual_counts_for_packs.id,\r\n
-  \   marks.id\r\nORDER BY\r\n    row_data_id DESC,\r\n    event_id,\r\n    pallet_number
-  DESC,\r\n    pallet_sequence_number"
+  \   sq.row_data,\r\n    sq.pallet_number,\r\n    sq.pallet_sequence_number,\r\n
+  \   farms.id,\r\n    pucs.id,\r\n    orchards.id,\r\n    cultivars.id,\r\n    marketing_varieties.id,\r\n
+  \   target_market_groups.id,\r\n    standard_pack_codes.id,\r\n    fruit_size_references.id,\r\n
+  \   fruit_actual_counts_for_packs.id,\r\n    marks.id\r\nORDER BY\r\n    row_data_id
+  DESC,\r\n    event_id,\r\n    pallet_number DESC,\r\n    pallet_sequence_number"
 :limit: 
 :offset: 
 :external_settings:
@@ -172,7 +174,7 @@
     :name: changed_fields
     :sequence_no: 7
     :caption: Changed fields
-    :namespaced_name: changed_fields
+    :namespaced_name: 
     :data_type: :string
     :width: 200
     :format: 
