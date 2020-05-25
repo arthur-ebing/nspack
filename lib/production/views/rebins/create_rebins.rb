@@ -18,6 +18,7 @@ module Production
               form.action "/production/runs/production_runs/#{id}/rebins"
               form.remote! if remote
               form.add_field :qty_bins_to_create
+              form.add_field :rmt_class_id
               form.add_field :farm_code
               form.add_field :puc_code
               form.add_field :orchard_code

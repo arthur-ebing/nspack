@@ -92,6 +92,22 @@ module RawMaterialsApp
                                                         changes_made: { pallets: { pallet_sequences: { changes: changes_made } } }.to_json)
     end
 
+    def set_receive_date(id, params) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        bins = repo.find_bins_by_delivery_id(id)
+        repo.update_rmt_delivery(id, date_delivered: params[:date_received])
+        repo.update(:rmt_bins, bins.map { |b| b[:id] }, bin_received_date_time: params[:date_received])
+        log_multiple_statuses(:rmt_bins, bins.map { |b| b[:id] }, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
+        log_status(:rmt_deliveries, id, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+
+      success_response('Delivery/Bins: date_delivered/date_delivered have been updated', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def delivery_set_current(id)
       repo.transaction do
         repo.delivery_set_current(id)

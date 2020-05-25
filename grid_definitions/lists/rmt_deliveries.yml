@@ -12,6 +12,9 @@
   :title: Edit
   :popup: false
   :hide_if_true: delivery_tipped
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_receive_date"
+  :text: set_receive_date
+  :popup: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
   :icon: delete

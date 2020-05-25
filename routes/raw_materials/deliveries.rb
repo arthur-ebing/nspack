@@ -19,6 +19,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
       end
 
+      r.on 'set_receive_date' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::SetReceiveDate.call(id) }
+        end
+
+        r.post do
+          res = interactor.set_receive_date(id, params[:rmt_delivery])
+          if res.success
+            if res.success
+              flash[:notice] = res.message
+            else
+              flash[:error] = unwrap_failed_response(res)
+            end
+            r.redirect("/list/rmt_deliveries/with_params?key=standard&id=#{id}")
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::SetReceiveDate.call(id, form_values: params[:rmt_delivery], form_errors: res.errors) }
+          end
+        end
+      end
+
       # --------------------------------------------------------------------------
       # BIN BARCODES SHEET
       # --------------------------------------------------------------------------
