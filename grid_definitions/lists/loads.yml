@@ -34,12 +34,17 @@
   :title: Allocate Pallets
   :hide_if_true: shipped
 - :url: "/finished_goods/dispatch/loads/$:id$/re_send_po_edi"
-  :text: Re-send PO EDI
+  :text: re-send PO EDI
   :icon: play
-  :title: Re-send PO EDI
+  :title: re-send PO EDI
   :popup: true
   :hide_if_false: shipped
 - :separator: true
+- :url: "/list/edi_po/with_params?key=standard&record_id=$:id$"
+  :text: view EDI transactions
+  :icon: list
+  :title: view EDI transactions
+  :popup: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
   :icon: information-solid

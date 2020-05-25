@@ -4,32 +4,33 @@
   loads.id) AS status,\r\n    voyages.voyage_code,\r\n    depots.depot_code AS depot,\r\n
   \   pol_port.port_code AS pol,\r\n    pol_voyage_ports.eta AS eta,\r\n    pol_voyage_ports.ata
   AS ata,\r\n    pod_port.port_code AS pod,\r\n    pod_voyage_ports.etd AS etd,\r\n
-  \   pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n    loads.created_at,\r\n
-  \   fn_party_role_name(loads.customer_party_role_id) AS customer,\r\n    fn_party_role_name(loads.consignee_party_role_id)
-  AS consignee,\r\n    fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,\r\n
+  \   pod_voyage_ports.atd AS atd,\r\n    vessels.vessel_code,\r\n    fn_party_role_name(loads.customer_party_role_id)
+  AS customer,\r\n    fn_party_role_name(loads.consignee_party_role_id) AS consignee,\r\n
+  \   fn_party_role_name(loads.final_receiver_party_role_id) AS final_receiver,\r\n
   \   fn_party_role_name(loads.exporter_party_role_id) AS exporter,\r\n    fn_party_role_name(loads.billing_client_party_role_id)
   AS billing_client,\r\n    fn_party_role_name(load_vehicles.haulier_party_role_id)
   AS haulier,\r\n    destination_cities.city_name AS final_destination_city,\r\n    loads.order_number,\r\n
   \   loads.customer_order_number,\r\n    loads.customer_reference,\r\n    loads.exporter_certificate_code,\r\n
   \   loads.allocated,\r\n    loads.allocated_at,\r\n    loads.shipped,\r\n    loads.shipped_at,\r\n
-  \   loads.transfer_load,\r\n    loads.edi_file_name,\r\n    loads.updated_at,\r\n
-  \   voyages.id AS voyage_id,\r\n    load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n
-  \   load_vehicles.vehicle_number,\r\n    load_vehicles.driver_name,\r\n    load_vehicles.driver_cell_number,\r\n
-  \   load_vehicles.id IS NOT NULL AS truck_arrived,\r\n    pallets.pallet_quantity,\r\n
-  \   pallets.pallet_carton_quantity,\r\n    pallets.pallet_numbers,\r\n    pallets.temp_tail,\r\n
-  \   cargo_temperatures.temperature_code || ' - ' || cargo_temperatures.set_point_temperature
-  AS cargo_temperature,\r\n    container_stack_types.stack_type_code || ' - ' || COALESCE(container_stack_types.description,'')
-  AS stack_type,\r\n    CASE\r\n        WHEN loads.shipped THEN 'ready'\r\n        WHEN
-  loads.allocated THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM loads\r\n         JOIN
-  depots ON depots.id = loads.depot_id\r\n         JOIN destination_cities ON destination_cities.id
-  = loads.final_destination_id\r\n         JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id
-  = loads.pol_voyage_port_id\r\n         JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id
-  = loads.pod_voyage_port_id\r\n         JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n
-  \        JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN
-  voyages ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels
-  ON voyages.vessel_id = vessels.id\r\n         LEFT JOIN load_containers ON loads.id
-  = load_containers.load_id\r\n         LEFT JOIN cargo_temperatures ON load_containers.cargo_temperature_id
-  = cargo_temperatures.id\r\n         LEFT JOIN container_stack_types ON load_containers.stack_type_id
+  \   loads.transfer_load,\r\n    loads.edi_file_name,\r\n    voyages.id AS voyage_id,\r\n
+  \   load_containers.container_code,\r\n    load_voyages.booking_reference,\r\n    load_vehicles.vehicle_number,\r\n
+  \   load_vehicles.driver_name,\r\n    load_vehicles.driver_cell_number,\r\n    load_vehicles.id
+  IS NOT NULL AS truck_arrived,\r\n    pallets.pallet_quantity,\r\n    pallets.pallet_carton_quantity,\r\n
+  \   pallets.pallet_numbers,\r\n    pallets.temp_tail,\r\n    cargo_temperatures.temperature_code
+  || ' - ' || cargo_temperatures.set_point_temperature AS cargo_temperature,\r\n    container_stack_types.stack_type_code
+  || ' - ' || COALESCE(container_stack_types.description,'') AS stack_type,\r\n    loads.created_at,\r\n
+  \   loads.updated_at,\r\n    CASE\r\n        WHEN loads.shipped THEN 'blue'\r\n
+  \       WHEN loads.allocated THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
+  loads\r\n         JOIN depots ON depots.id = loads.depot_id\r\n         JOIN destination_cities
+  ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
+  pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
+  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
+  \        JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n         JOIN
+  ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN voyages
+  ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels ON voyages.vessel_id
+  = vessels.id\r\n         LEFT JOIN load_containers ON loads.id = load_containers.load_id\r\n
+  \        LEFT JOIN cargo_temperatures ON load_containers.cargo_temperature_id =
+  cargo_temperatures.id\r\n         LEFT JOIN container_stack_types ON load_containers.stack_type_id
   = container_stack_types.id\r\n         LEFT JOIN load_voyages ON loads.id = load_voyages.load_id\r\n
   \        LEFT JOIN load_vehicles ON loads.id = load_vehicles.load_id\r\n         LEFT
   JOIN (\r\n    SELECT\r\n        COUNT(id) AS pallet_quantity,\r\n        SUM(carton_quantity::numeric)
@@ -41,8 +42,8 @@
 :offset: 
 :external_settings:
   :colour_key:
-    ready: Shipped
-    ok: Allocated
+    blue: Shipped
+    green: Allocated
 :columns:
   id:
     :name: id
@@ -66,7 +67,7 @@
     :caption: Load
     :namespaced_name: loads.id
     :data_type: :string
-    :width: 
+    :width: 70
     :format: 
     :hide: false
     :pinned: 
@@ -82,7 +83,7 @@
     :caption: Status
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 180
     :format: 
     :hide: false
     :pinned: 
@@ -98,7 +99,7 @@
     :caption: Voyage code
     :namespaced_name: voyages.voyage_code
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: 
@@ -114,7 +115,7 @@
     :caption: Depot
     :namespaced_name: depots.depot_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -130,7 +131,7 @@
     :caption: POL
     :namespaced_name: pol_port.port_code
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -145,9 +146,9 @@
     :sequence_no: 7
     :caption: ETA
     :namespaced_name: pol_voyage_ports.eta
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -161,9 +162,9 @@
     :sequence_no: 8
     :caption: ATA
     :namespaced_name: pol_voyage_ports.ata
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -178,7 +179,7 @@
     :caption: POD
     :namespaced_name: pod_port.port_code
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -193,9 +194,9 @@
     :sequence_no: 10
     :caption: ETD
     :namespaced_name: pod_voyage_ports.etd
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -209,9 +210,9 @@
     :sequence_no: 11
     :caption: ATD
     :namespaced_name: pod_voyage_ports.atd
-    :data_type: :string
+    :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -226,7 +227,7 @@
     :caption: Vessel code
     :namespaced_name: vessels.vessel_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -236,29 +237,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 13
-    :caption: Created at
-    :namespaced_name: loads.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   customer:
     :name: customer
-    :sequence_no: 14
+    :sequence_no: 13
     :caption: Customer
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -270,11 +255,11 @@
     :group_max: false
   consignee:
     :name: consignee
-    :sequence_no: 15
+    :sequence_no: 14
     :caption: Consignee
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -286,11 +271,11 @@
     :group_max: false
   final_receiver:
     :name: final_receiver
-    :sequence_no: 16
+    :sequence_no: 15
     :caption: Final receiver
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -302,11 +287,11 @@
     :group_max: false
   exporter:
     :name: exporter
-    :sequence_no: 17
+    :sequence_no: 16
     :caption: Exporter
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 10
     :format: 
     :hide: false
     :pinned: 
@@ -318,11 +303,11 @@
     :group_max: false
   billing_client:
     :name: billing_client
-    :sequence_no: 18
+    :sequence_no: 17
     :caption: Billing client
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -334,11 +319,11 @@
     :group_max: false
   haulier:
     :name: haulier
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Haulier
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -350,11 +335,11 @@
     :group_max: false
   final_destination_city:
     :name: final_destination_city
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Final destination city
     :namespaced_name: destination_cities.city_name
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -366,11 +351,11 @@
     :group_max: false
   order_number:
     :name: order_number
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Order number
     :namespaced_name: loads.order_number
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -382,11 +367,11 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 22
+    :sequence_no: 21
     :caption: Customer order number
     :namespaced_name: loads.customer_order_number
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -398,11 +383,11 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 23
+    :sequence_no: 22
     :caption: Customer reference
     :namespaced_name: loads.customer_reference
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -414,11 +399,11 @@
     :group_max: false
   exporter_certificate_code:
     :name: exporter_certificate_code
-    :sequence_no: 24
+    :sequence_no: 23
     :caption: Exporter certificate code
     :namespaced_name: loads.exporter_certificate_code
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -430,11 +415,11 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 25
+    :sequence_no: 24
     :caption: Allocated
     :namespaced_name: loads.allocated
     :data_type: :boolean
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -446,12 +431,12 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 26
+    :sequence_no: 25
     :caption: Allocated at
     :namespaced_name: loads.allocated_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -462,11 +447,11 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 27
+    :sequence_no: 26
     :caption: Shipped
     :namespaced_name: loads.shipped
     :data_type: :boolean
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -478,12 +463,12 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 28
+    :sequence_no: 27
     :caption: Shipped at
     :namespaced_name: loads.shipped_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -494,11 +479,11 @@
     :group_max: false
   transfer_load:
     :name: transfer_load
-    :sequence_no: 29
+    :sequence_no: 28
     :caption: Transfer load
     :namespaced_name: loads.transfer_load
     :data_type: :boolean
-    :width: 
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -510,11 +495,11 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 30
+    :sequence_no: 29
     :caption: Edi file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -524,29 +509,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 31
-    :caption: Updated at
-    :namespaced_name: loads.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   voyage_id:
     :name: voyage_id
-    :sequence_no: 32
+    :sequence_no: 30
     :caption: Voyage
     :namespaced_name: voyages.id
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -558,11 +527,11 @@
     :group_max: false
   container_code:
     :name: container_code
-    :sequence_no: 33
+    :sequence_no: 31
     :caption: Container code
     :namespaced_name: load_containers.container_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -574,11 +543,11 @@
     :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 34
+    :sequence_no: 32
     :caption: Booking reference
     :namespaced_name: load_voyages.booking_reference
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -590,11 +559,11 @@
     :group_max: false
   vehicle_number:
     :name: vehicle_number
-    :sequence_no: 35
+    :sequence_no: 33
     :caption: Vehicle number
     :namespaced_name: load_vehicles.vehicle_number
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -606,11 +575,11 @@
     :group_max: false
   driver_name:
     :name: driver_name
-    :sequence_no: 36
+    :sequence_no: 34
     :caption: Driver
     :namespaced_name: load_vehicles.driver_name
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -622,11 +591,11 @@
     :group_max: false
   driver_cell_number:
     :name: driver_cell_number
-    :sequence_no: 37
+    :sequence_no: 35
     :caption: Driver cell
     :namespaced_name: load_vehicles.driver_cell_number
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -638,10 +607,10 @@
     :group_max: false
   truck_arrived:
     :name: truck_arrived
-    :sequence_no: 38
+    :sequence_no: 36
     :caption: Truck arrived
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: true
@@ -654,11 +623,11 @@
     :group_max: false
   pallet_quantity:
     :name: pallet_quantity
-    :sequence_no: 39
-    :caption: Pallet quantity
+    :sequence_no: 37
+    :caption: Pallet qty
     :namespaced_name: pallets.pallet_quantity
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -670,11 +639,11 @@
     :group_max: false
   pallet_carton_quantity:
     :name: pallet_carton_quantity
-    :sequence_no: 40
-    :caption: Pallet carton quantity
+    :sequence_no: 38
+    :caption: Pallet carton qty
     :namespaced_name: pallets.pallet_carton_quantity
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -686,11 +655,11 @@
     :group_max: false
   pallet_numbers:
     :name: pallet_numbers
-    :sequence_no: 41
+    :sequence_no: 39
     :caption: Pallet numbers
     :namespaced_name: pallets.pallet_numbers
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -702,11 +671,11 @@
     :group_max: false
   temp_tail:
     :name: temp_tail
-    :sequence_no: 42
+    :sequence_no: 40
     :caption: Temp tail
     :namespaced_name: pallets.temp_tail
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -718,11 +687,11 @@
     :group_max: false
   cargo_temperature:
     :name: cargo_temperature
-    :sequence_no: 43
+    :sequence_no: 41
     :caption: Cargo temperature
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -734,13 +703,45 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 44
+    :sequence_no: 42
     :caption: Stack type
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 43
+    :caption: Created at
+    :namespaced_name: loads.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 44
+    :caption: Updated at
+    :namespaced_name: loads.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
