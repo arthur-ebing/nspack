@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-label_designer.git
-  revision: d64098befcf4a45112ffdf0c763d8b9134f362ba
+  revision: e5ebbc158bf11e5c69b5202fd1fb00693ef19da6
   specs:
     crossbeams-label_designer (0.2.3)
       dry-configurable
@@ -125,7 +125,7 @@ GEM
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     jaro_winkler (1.5.4)
-    json (2.2.0)
+    json (2.3.0)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
