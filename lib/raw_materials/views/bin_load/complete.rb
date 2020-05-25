@@ -11,6 +11,12 @@ module RawMaterials
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_errors form_errors
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: '/list/bin_loads',
+                                  style: :back_button)
+            end
             page.form do |form|
               form.caption 'Complete Bin Load'
               form.action "/raw_materials/dispatch/bin_loads/#{id}/complete"
