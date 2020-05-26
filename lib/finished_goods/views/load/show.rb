@@ -152,7 +152,7 @@ module FinishedGoods
                     col.add_field :vehicle_weight_out
                     col.add_control(control_type: :link,
                                     text: 'Go to Load Vehicle',
-                                    url: "/rmd/dispatch/truck_arrival/load/#{id}",
+                                    url: "/rmd/finished_goods/dispatch/truck_arrival/load/#{id}",
                                     style: :button)
                   end
                 end
