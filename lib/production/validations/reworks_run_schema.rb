@@ -60,6 +60,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pallets_selected, :array).filled(:array?) { each(:str?) }
     optional(:make_changes, :bool).maybe(:bool?)
     required(:allow_cultivar_mixing, :bool).maybe(:bool?)
+    required(:gross_weight, :decimal).maybe(:decimal?)
   end
 
   ReworksRunPrintBarcodeSchema = Dry::Validation.Params do
@@ -187,5 +188,15 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:from_production_run_id, :integer).filled(:int?)
     required(:to_production_run_id, :integer).filled(:int?)
     optional(:make_changes, :bool).maybe(:bool?)
+  end
+
+  ReworksBulkWeighBinsSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
+    optional(:make_changes, :bool).maybe(:bool?)
+    required(:gross_weight, :decimal).filled(:decimal?)
+    required(:avg_gross_weight, :bool).maybe(:bool?)
   end
 end

@@ -32,8 +32,10 @@ module UiRules
       @rules[:same_pallet_list] = @form_object.pallets_selected.split("\n") == @form_object.pallets_affected.split("\n")
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+      @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
+      @rules[:bin_run_type] = bin_run_type?
 
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] ? 'Bins' : 'Pallets'
+      text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
 
       fields[:created_at] = { renderer: :label,
                               format: :without_timezone_or_seconds }
@@ -120,13 +122,15 @@ module UiRules
       @rules[:single_edit] = @rules[:single_pallet_edit] || @rules[:weigh_rmt_bins]
       @rules[:bulk_bin_run_update] = AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE == reworks_run_type_id_label
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
+      @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
+      @rules[:bin_run_type] = bin_run_type?
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
                      else
                        'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
-      text_area_caption = @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] ? 'Bins' : 'Pallets'
+      text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
       scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_bins) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_pallets)
       {
         reworks_run_type_id: { renderer: :hidden },
@@ -168,7 +172,13 @@ module UiRules
         pallet_number: { renderer: :input,
                          subtype: :integer,
                          required: true },
-        spacer: { hide_on_load: true }
+        spacer: { hide_on_load: true },
+        gross_weight: { renderer: :numeric,
+                        caption: @rules[:tip_bins] ? 'Average Gross Weight' : 'Gross Weight',
+                        hide_on_load: @rules[:bulk_weigh_bins] || @rules[:tip_bins] ? false : true },
+        avg_gross_weight: { renderer: :checkbox,
+                            hide_on_load: @rules[:bulk_weigh_bins] ? false : true }
+
       }
     end
 
@@ -187,6 +197,10 @@ module UiRules
                                     scrap_reason_id: nil,
                                     pallets_selected: nil,
                                     production_run_id: nil)
+    end
+
+    def bin_run_type?
+      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins]
     end
   end
 end

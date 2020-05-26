@@ -2,22 +2,26 @@
 
 module MesscadaApp
   class UpdateBinWeights < BaseService
-    attr_reader :repo, :bin_number, :gross_weight, :measurement_unit, :force_find_by_id
+    attr_reader :repo, :bin_number, :gross_weight, :measurement_unit, :force_find_by_id, :weighed_manually, :avg_gross_weight
 
-    def initialize(params, force_find_by_id = false)
+    def initialize(params, options = {})  # rubocop:disable Metrics/AbcSize
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       @bin_number = params[:bin_number]
       @gross_weight = params[:gross_weight]
       @measurement_unit = params[:measurement_unit]
-      @force_find_by_id = force_find_by_id
+      @force_find_by_id = options[:force_find_by_id].nil? ? false : options[:force_find_by_id]
+      @weighed_manually = options[:weighed_manually].nil? ? false : options[:weighed_manually]
+      @avg_gross_weight = options[:avg_gross_weight].nil? ? false : options[:avg_gross_weight]
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       rmt_bin = find_rmt_bin
       return failed_response("Bin:#{bin_number} could not be found") if rmt_bin.nil?
       return failed_response('Bin Scrapped') if rmt_bin[:scrapped]
 
-      updates = { gross_weight: gross_weight }
+      updates = { gross_weight: gross_weight,
+                  weighed_manually: weighed_manually,
+                  avg_gross_weight: avg_gross_weight }
       tare_weight = repo.get_rmt_bin_tare_weight(rmt_bin)
       updates[:nett_weight] = (gross_weight - tare_weight) if tare_weight
 

@@ -14,6 +14,9 @@ module Production
           elsif rules[:tip_bins]
             grid = 'rmt_bins_reworks'
             grid_key = 'tip_bins_reworks'
+          elsif rules[:bulk_weigh_bins]
+            grid = 'rmt_bins_reworks'
+            grid_key = 'bulk_weigh_bins'
           elsif rules[:scrap_bin]
             grid = 'rmt_bins_reworks'
             grid_key = 'scrap_bins_reworks'
@@ -25,7 +28,7 @@ module Production
             grid_key = 'reworks_pallets'
           end
 
-          multi_select_caption = rules[:tip_bins] || rules[:weigh_rmt_bins] || rules[:scrap_bin] || rules[:unscrap_bin] ? 'Bins' : 'Pallets'
+          multi_select_caption = rules[:bin_run_type] ? 'Bins' : 'Pallets'
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -42,7 +45,11 @@ module Production
                   col.add_field :remarks
                   col.add_field :pallets_selected
                 end
-                unless rules[:single_edit] || rules[:bulk_production_run_update]
+                if rules[:single_edit] || rules[:bulk_production_run_update]
+                  row.column do |col|
+                    col.add_field :spacer
+                  end
+                else
                   row.column do |col|
                     col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
                     col.add_control(control_type: :link,
@@ -58,11 +65,26 @@ module Production
                   col.add_field :production_run_id
                   col.add_field :allow_cultivar_mixing
                 end
+                row.column do |col|
+                  col.add_field :spacer
+                end
               end
               form.row do |row|
                 row.column do |col|
                   col.add_field :from_production_run_id
                   col.add_field :to_production_run_id
+                end
+                row.column do |col|
+                  col.add_field :spacer
+                end
+              end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :gross_weight
+                  col.add_field :avg_gross_weight
+                end
+                row.column do |col|
+                  col.add_field :spacer
                 end
               end
             end

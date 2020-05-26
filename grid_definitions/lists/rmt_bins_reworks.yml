@@ -19,6 +19,10 @@
     - :col: production_run_tipped_id
       :op: =
       :val: $:production_run_id$
+  :bulk_weigh_bins:
+    - :col: scrapped
+      :op: =
+      :val: false
 :multiselect:
   :tip_bins_reworks:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
@@ -37,3 +41,8 @@
     :multiselect_save_method: remote
     :can_be_cleared: false
     :conditions: production_run_tip_bins
+  :bulk_weigh_bins:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
+    :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: bulk_weigh_bins

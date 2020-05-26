@@ -247,7 +247,7 @@ module ProductionApp
       end
     end
 
-    def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def create_reworks_run(reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       res = validate_pallets_selected_input(reworks_run_type, params)
       return validation_failed_response(res) unless res.success
@@ -264,6 +264,8 @@ module ProductionApp
       return success_response('ok', attrs.merge(display_page: display_page(reworks_run_type))) if make_changes
 
       return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
+
+      return bulk_weigh_bins(attrs) if AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type
 
       rw_res = failed_response('create_reworks_run_record')
       repo.transaction do
@@ -287,7 +289,8 @@ module ProductionApp
       when AppConst::RUN_TYPE_TIP_BINS,
            AppConst::RUN_TYPE_WEIGH_RMT_BINS,
            AppConst::RUN_TYPE_SCRAP_BIN,
-          AppConst::RUN_TYPE_UNSCRAP_BIN
+          AppConst::RUN_TYPE_UNSCRAP_BIN,
+          AppConst::RUN_TYPE_BULK_WEIGH_BINS
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
@@ -738,8 +741,10 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_tip_bins(attrs)  # rubocop:disable Metrics/AbcSize
+    def manually_tip_bins(attrs)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       attrs = attrs.to_h
+      avg_gross_weight = attrs[:gross_weight].nil_or_empty? ? false : true
+      before_state = manually_tip_bin_before_state(attrs, avg_gross_weight)
 
       rw_res = nil
       repo.transaction do
@@ -747,11 +752,17 @@ module ProductionApp
         rw_res = ProductionApp::ManuallyTipBins.call(attrs)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
+        if avg_gross_weight
+          rw_res = ProductionApp::BulkWeighBins.call(attrs, true, avg_gross_weight)
+          return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+
+        end
+
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
                               pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
-                                           before: manually_tip_bin_before_state(attrs).sort.to_h, after: manually_tip_bin_after_state(attrs).sort.to_h)
+                                           before: before_state.sort.to_h, after: manually_tip_bin_after_state(attrs, avg_gross_weight).sort.to_h)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
         log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_TIPPED_MANUALLY)
@@ -765,7 +776,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def manually_tip_bin_before_state(attrs)
+    def manually_tip_bin_before_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: nil,
                    production_run_tipped_id: nil,
                    exit_ref_date_time: nil,
@@ -774,10 +785,11 @@ module ProductionApp
                    tipped_manually: false }
       defaults = defaults.merge!(tipped_asset_number: nil, bin_asset_number: attrs[:pallets_selected].first) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge!(allow_cultivar_mixing: production_run_allow_cultivar_mixing(attrs[:production_run_id])) if attrs[:allow_cultivar_mixing]
+      defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       defaults
     end
 
-    def manually_tip_bin_after_state(attrs)
+    def manually_tip_bin_after_state(attrs, avg_gross_weight = false)
       defaults = { bin_tipped_date_time: Time.now,
                    production_run_tipped_id: attrs[:production_run_id],
                    exit_ref_date_time: Time.now,
@@ -786,7 +798,35 @@ module ProductionApp
                    tipped_manually: true }
       defaults = defaults.merge!(tipped_asset_number: attrs[:pallets_selected].first, bin_asset_number: nil) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       defaults = defaults.merge!(allow_cultivar_mixing: attrs[:allow_cultivar_mixing]) if attrs[:allow_cultivar_mixing]
+      defaults = defaults.merge!(manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)) if avg_gross_weight
       defaults
+    end
+
+    def bulk_weigh_bins(attrs)  # rubocop:disable Metrics/AbcSize
+      attrs = attrs.to_h
+      before_state = manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)
+
+      rw_res = nil
+      repo.transaction do
+        rw_res = ProductionApp::BulkWeighBins.call(attrs, true, attrs[:avg_gross_weight])
+        return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           nil,
+                                           before: before_state, after: manually_weigh_rmt_bin_state(attrs[:pallets_selected].first))
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::BULK_WEIGH_RMT_BINS)
+      end
+      success_response('Rmt Bulk Bin Weighing was successfully', pallet_number: attrs[:pallets_selected])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('bulk_weigh_bins'))
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
     end
 
     def manually_weigh_rmt_bin(params)  # rubocop:disable Metrics/AbcSize
@@ -799,10 +839,11 @@ module ProductionApp
 
       rw_res = nil
       repo.transaction do
-        rw_res = MesscadaApp::UpdateBinWeights.call(attrs, true)
+        options = { force_find_by_id: true, weighed_manually: true, avg_gross_weight: false }
+        rw_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
         return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
 
-        repo.update_rmt_bin(rmt_bin_id, weighed_manually: true)
+        # repo.update_rmt_bin(rmt_bin_id, weighed_manually: true)
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: Array(attrs[:bin_number]),
                               pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
         rw_res = create_reworks_run_record(reworks_run_attrs,
@@ -821,7 +862,8 @@ module ProductionApp
       instance = rmt_bin(rmt_bin_id)
       { gross_weight: instance[:gross_weight],
         nett_weight: instance[:nett_weight],
-        weighed_manually: instance[:weighed_manually] }
+        weighed_manually: instance[:weighed_manually],
+        avg_gross_weight: instance[:avg_gross_weight] }
     end
 
     def production_run_details_table(production_run_id)
@@ -1063,7 +1105,8 @@ module ProductionApp
           AppConst::RUN_TYPE_UNSCRAP_BIN,
            AppConst::RUN_TYPE_REPACK,
            AppConst::RUN_TYPE_TIP_BINS,
-           AppConst::RUN_TYPE_RECALC_NETT_WEIGHT
+           AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
+          AppConst::RUN_TYPE_BULK_WEIGH_BINS
         false
       else
         true
@@ -1158,7 +1201,8 @@ module ProductionApp
       when AppConst::RUN_TYPE_SCRAP_BIN,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE,
           AppConst::RUN_TYPE_TIP_BINS,
-          AppConst::RUN_TYPE_WEIGH_RMT_BINS
+          AppConst::RUN_TYPE_WEIGH_RMT_BINS,
+          AppConst::RUN_TYPE_BULK_WEIGH_BINS
 
         scrapped_bins = repo.scrapped_bins?(rmt_bins)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{scrapped_bins.join(', ')} already scrapped"] }, pallets_selected: rmt_bins) unless scrapped_bins.nil_or_empty?
@@ -1205,6 +1249,8 @@ module ProductionApp
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
         ReworksRunBulkProductionRunUpdateSchema.call(params)
+      when AppConst::RUN_TYPE_BULK_WEIGH_BINS
+        ReworksBulkWeighBinsSchema.call(params)
       else
         ReworksRunNewSchema.call(params)
       end
