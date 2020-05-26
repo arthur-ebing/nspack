@@ -46,11 +46,13 @@ module FinishedGoods
                                   text: 'Unship Load',
                                   url: "/finished_goods/dispatch/loads/#{id}/unship",
                                   visible: rules[:can_unship],
+                                  prompt: 'Are you sure, you want to Unship this load?',
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Ship Load',
                                   url: "/finished_goods/dispatch/loads/#{id}/ship",
                                   visible: rules[:can_ship],
+                                  prompt: 'Are you sure, you want to Ship this load?',
                                   style: :button)
             end
             page.form do |form| # rubocop:disable Metrics/BlockLength
