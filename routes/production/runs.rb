@@ -43,6 +43,19 @@ class Nspack < Roda
         end
       end
 
+      r.on 'print_barcodes' do
+        res = CreateJasperReport.call(report_name: 'bin_ticket',
+                                      user: current_user.login_name,
+                                      file: 'bin_ticket',
+                                      params: { bin_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
       r.on 'clone' do
         r.get do
           check_auth!('runs', 'edit')

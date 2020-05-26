@@ -1,0 +1,12 @@
+---
+:dataminer_definition: rmt_bins
+:conditions:
+  :standard:
+    - :col: production_run_tipped_id
+      :op: =
+      :val: $:id$
+:multiselect:
+  :standard:
+    :url: "/production/runs/production_runs/$:id$/print_barcodes"
+    :conditions: standard
+    :multiselect_save_method: loading

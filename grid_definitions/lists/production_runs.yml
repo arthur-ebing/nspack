@@ -132,7 +132,7 @@
         :text: create rebin
         :icon: add-solid
         :popup: true
-      - :url: /production/runs/production_runs/$:id$/print_barcodes
+      - :url: "/list/run_rebins/multi?key=standard&id=$:id$"
         :text: print barcodes
         :popup: true
 :page_controls:
