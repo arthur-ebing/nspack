@@ -28,7 +28,7 @@ class LoadUnshipLocationRevert < BaseScript
         DB.transaction do
           p "Updated row #{pallet_id} #{pallet_number}: #{attrs}"
           DB[:pallets].where(id: pallet_id).update(attrs)
-          log_status(:pallets, pallet_id, 'UNSHIP LOCATION REVERT', comment: "reverted_transaction_id_5032061")
+          log_status(:pallets, pallet_id, 'UNSHIP LOCATION REVERT', comment: 'reverted_transaction_id_5032061')
         end
       end
     end
