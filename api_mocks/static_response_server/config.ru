@@ -26,7 +26,9 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     '/messcada/carton_palletizing/qc_out',
     '/messcada/carton_palletizing/return_to_bay',
     '/messcada/carton_palletizing/refresh',
-    '/messcada/carton_palletizing/complete'
+    '/messcada/carton_palletizing/complete',
+    '/messcada/yesnoresponse/yes',
+    '/messcada/yesnoresponse/no'
   ].freeze
 
   route do |r|
@@ -36,7 +38,10 @@ class App < Roda # rubocop:disable Metrics/ClassLength
         <h1 style="color:#333">A Mock NSPack server</h1>
         <form action="/edit">
         <p>
-          Choose URL to change XML response:
+          Choose a URL to change its XML response:
+        </p>
+        <p>
+          Note the two <em>yesnoresponses</em> are not to be called directly. These are chosen as possible URLS to call after showing Yes/No choice to the user.
         </p>
         <select name="url">
           #{opts}
@@ -64,6 +69,20 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               else
                 'red'
               end
+      yesval = if res.yes_url.nil? || res.yes_url.empty?
+                 ''
+               elsif res.yes_url == 'noop'
+                 'noop'
+               else
+                 'yesurl'
+               end
+      noval = if res.no_url.nil? || res.no_url.empty?
+                ''
+              elsif res.no_url == 'noop'
+                'noop'
+              else
+                'nourl'
+              end
       <<~HTML
         <h1 style="color:#333">A Mock NSPack server</h1>
         <a href="/">HOME</a>
@@ -82,10 +101,20 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             <tr><th style="text-align:right">lcd3</th><td><input type="text" name="lcd3" style="width:30em" value="#{res.lcd3.tr('"', '`')}" /></td></tr>
             <tr><th style="text-align:right">lcd4</th><td><input type="text" name="lcd4" style="width:30em" value="#{res.lcd4.tr('"', '`')}" /></td></tr>
             <tr><th style="text-align:right">lcd5</th><td><input type="text" name="lcd5" style="width:30em" value="#{res.lcd5.tr('"', '`')}" /></td></tr>
-            <tr><th style="text-align:right">lcd6</th><td><input type="text" name="lcd6" style="width:30em" value="#{res.lcd6.tr('"', '`')}" /></td></tr>
+            <tr><th style="text-align:right">lcd6</th><td><input type="text" name="lcd6" style="width:30em" value="#{res.lcd6.tr('"', '`')}" /><br>
+              <em><smaller>NOTE: If left blank, the mock server will echo the parameters in lcd6.</smaller></em>
+            </td></tr>
             <tr><th style="text-align:right">confirm_msg</th><td><input type="text" name="confirm" style="width:30em" value="#{(res.text || '').tr('"', '`')}" /></td></tr>
-            <tr><th style="text-align:right">yes_url</th><td><input type="text" name="yesurl" style="width:30em" value="#{(res.yes_url || '').tr('"', '`')}" /></td></tr>
-            <tr><th style="text-align:right">no_url</th><td><input type="text" name="nourl" style="width:30em" value="#{(res.no_url || '').tr('"', '`')}" /></td></tr>
+            <tr><th style="text-align:right">yes_url</th><td><select name="yesurl" >
+            <option value="">Not selected</option>
+            <option value="yesurl" #{yesval == 'yesurl' ? 'selected' : ''}>/messcada/yesnoresponse/yes</option>
+            <option value="noop" #{yesval == 'noop' ? 'selected' : ''}>No Op</option>
+            </select></td></tr>
+            <tr><th style="text-align:right">no_url</th><td><select name="nourl" >
+            <option value="">Not selected</option>
+            <option value="nourl" #{noval == 'nourl' ? 'selected' : ''}>/messcada/yesnoresponse/no</option>
+            <option value="noop" #{noval == 'noop' ? 'selected' : ''}>No Op</option>
+            </select></td></tr>
           </tbody>
         </table>
         <input type="hidden" name="url_key" value="#{key}" />
@@ -98,6 +127,16 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'update' do
+      yesval = if params[:yesurl].nil? || params[:yesurl].empty? || params[:yesurl] == 'noop'
+                 'noop'
+               else
+                 "#{request.base_url}/messcada/yesnoresponse/yes"
+               end
+      noval = if params[:nourl].nil? || params[:nourl].empty? || params[:nourl] == 'noop'
+                'noop'
+              else
+                "#{request.base_url}/messcada/yesnoresponse/no"
+              end
       builder = Nokogiri::XML::Builder.new do |xml|
         xml.robot_feedback do
           xml.status params[:state] == 'green' ? 'true' : 'false'
@@ -114,8 +153,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           unless params[:confirm].empty?
             xml.confirm do
               xml.text_ params[:confirm]
-              xml.yes_url params[:yesurl] || 'noop'
-              xml.no_url params[:nourl] || 'noop'
+              xml.yes_url yesval
+              xml.no_url noval
             end
           end
         end
@@ -141,51 +180,59 @@ class App < Roda # rubocop:disable Metrics/ClassLength
       r.on 'rmt' do
         r.on 'bin_tipping' do
           r.on 'weighing' do
-            respond(request.path)
+            respond(request.path, params)
           end
-          respond(request.path)
+          respond(request.path, params)
         end
       end
       r.on 'production' do
         r.on 'carton_labeling' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'carton_verification' do
           r.on 'weighing/labeling' do
-            respond(request.path)
+            respond(request.path, params)
           end
-          respond(request.path)
+          respond(request.path, params)
         end
       end
       r.on 'fg/pallet_weighing' do
-        respond(request.path)
+        respond(request.path, params)
       end
       r.on 'hr' do
         r.on 'register_id' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'logon' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'logoff' do
-          respond(request.path)
+          respond(request.path, params)
+        end
+      end
+      r.on 'yesnoresponse' do
+        r.on 'yes' do
+          respond(request.path, params)
+        end
+        r.on 'no' do
+          respond(request.path, params)
         end
       end
       r.on 'carton_palletizing' do
         r.on 'scan_carton' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'qc_out' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'return_to_bay' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'refresh' do
-          respond(request.path)
+          respond(request.path, params)
         end
         r.on 'complete' do
-          respond(request.path)
+          respond(request.path, params)
         end
       end
     rescue StandardError => e
@@ -193,7 +240,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def default_response(url, key)
+  def default_response(url, key, params = nil)
     <<~XML
       <robot_feedback>
         <status>true</status>
@@ -204,9 +251,9 @@ class App < Roda # rubocop:disable Metrics/ClassLength
         <lcd1>Default response</lcd1>
         <lcd2>URL: #{url}</lcd2>
         <lcd3></lcd3>
-        <lcd4>No response file named "#{key}"</lcd4>
+        <lcd4>There is no saved XML response file named "#{key}" yet</lcd4>
         <lcd5></lcd5>
-        <lcd6></lcd6>
+        <lcd6>#{params ? params.map { |k, v| "#{k}=#{v}" }.join(', ') : ''}</lcd6>
       </robot_feedback>
     XML
   end
@@ -229,12 +276,14 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     XML
   end
 
-  def respond(url)
+  def respond(url, params = nil)
     key = "#{url.delete_prefix('/').tr('/', '_')}.xml"
     if File.exist?(File.join('responses', key))
-      File.read(File.join('responses', key))
+      xml = File.read(File.join('responses', key))
+      xml.gsub!('<lcd6></lcd6>', "<lcd6>#{params ? params.map { |k, v| "#{k}=#{v}" }.join(', ') : ''}</lcd6>") if params && xml.include?('<lcd6></lcd6>')
+      xml
     else
-      default_response(url, key)
+      default_response(url, key, params)
     end
   end
 
@@ -245,15 +294,17 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     formatter.format(lexer.lex(xml))
   end
 
-  def unpack_xml(xml)
-    doc = Nokogiri::XML(xml)
-    #     keys = schema.xpath('.//record/@identifier').map(&:value)
-    # keys.each do |key|
-    #   rec_size = schema.xpath(".//record[@identifier='#{key}']/@size").map(&:value).first.to_i
-    #   tot_size = schema.xpath(".//record[@identifier='#{key}']/fields/field/@size").map(&:value).map(&:to_i).sum
-    # var_list = doc.css('variable_type').map(&:text)
-    # hs = { red: doc.xpath(
+  def unpack_xml(xml) # rubocop:disable Metrics/AbcSize
+    parse_opt = Nokogiri::XML::ParseOptions.new.noblanks
+    doc = Nokogiri::XML(xml, nil, nil, parse_opt)
     hs = doc.children.first.element_children.map(&:name).zip(doc.children.first.element_children.map(&:text))
+    unless doc.children.first.children.last.children.empty?
+      confs = doc.children.first.children.last.children
+      ends = confs.map(&:name).zip(confs.map(&:text))
+      ends.each do |k, v|
+        hs << [k, v]
+      end
+    end
     OpenStruct.new(hs.to_h)
   end
 end
