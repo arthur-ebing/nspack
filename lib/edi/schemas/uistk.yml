@@ -3,3 +3,5 @@
 :pallet_sequence_number: :integer
 :production_run_id: :integer
 :chemical_content: :string
+:packhouse_num: :string
+:inspection_point: :string
