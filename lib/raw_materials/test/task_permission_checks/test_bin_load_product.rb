@@ -29,7 +29,9 @@ module RawMaterialsApp
         container_material_type_code: 'ABC',
         container_material_owner: 'ABC',
         product_code: 'ABC',
+        available_bin_ids: nil,
         completed: false,
+        shipped: false,
         status: 'ABC'
       }
       RawMaterialsApp::BinLoadProductFlat.new(base_attrs.merge(attrs))

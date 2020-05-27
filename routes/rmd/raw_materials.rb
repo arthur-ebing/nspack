@@ -40,7 +40,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             stepper.allocate(res.instance)
             if stepper.ready_to_ship?
-              res = interactor.ship_bin_load(bin_load_id, stepper.loaded)
+              res = interactor.allocate_and_ship_bin_load(bin_load_id, stepper.loaded)
               if res.success
                 stepper.clear
                 store_locally(:flash_notice, rmd_success_message(res.message))

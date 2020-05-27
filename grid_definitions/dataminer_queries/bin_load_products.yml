@@ -10,9 +10,10 @@
   \   bin_load_products.puc_id,\r\n    pucs.puc_code,\r\n    bin_load_products.orchard_id,\r\n
   \   orchards.orchard_code,\r\n    bin_load_products.rmt_class_id,\r\n    rmt_classes.rmt_class_code,\r\n
   \   pm.available_bin_asset_numbers,\r\n    COALESCE(pm.available_in_stock_bins,
-  0) AS available_bins,\r\n    rb.shipped_asset_numbers,\r\n    COALESCE(rb.bins_count,
-  0) AS shipped_bins,\r\n    bin_loads.completed,\r\n    bin_loads.shipped,\r\n    bin_load_products.active,\r\n
-  \   bin_load_products.created_at,\r\n    bin_load_products.updated_at,\r\n    fn_current_status('bin_load_products',
+  0) AS available_bins,\r\n    rb.allocated_asset_numbers,\r\n    COALESCE(rb.qty_bins,
+  0) AS allocated_bins,\r\n    rb.shipped_asset_numbers,\r\n    bin_loads.completed,\r\n
+  \   bin_loads.shipped,\r\n    bin_load_products.active,\r\n    bin_load_products.created_at,\r\n
+  \   bin_load_products.updated_at,\r\n    fn_current_status('bin_load_products',
   bin_load_products.id) AS status,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN
   'blue'\r\n        WHEN COALESCE(pm.available_in_stock_bins,0) < bin_load_products.qty_bins
   THEN 'orange'\r\n        END AS colour_rule\r\n\r\nFROM bin_load_products\r\n         JOIN
@@ -25,16 +26,17 @@
   rmt_classes.id = bin_load_products.rmt_class_id\r\n         LEFT JOIN rmt_container_material_types
   ON rmt_container_material_types.id = bin_load_products.rmt_container_material_type_id\r\n
   \        LEFT JOIN\r\n     (SELECT\r\n          bin_load_product_id,\r\n          STRING_AGG(DISTINCT
-  rmt_bins.shipped_asset_number, ', ') AS shipped_asset_numbers,\r\n          COUNT(DISTINCT
-  rmt_bins.id) AS bins_count\r\n      FROM rmt_bins\r\n      GROUP BY bin_load_product_id)
-  rb ON bin_load_products.id = rb.bin_load_product_id\r\n         LEFT JOIN\r\n     (SELECT\r\n
+  rmt_bins.shipped_asset_number, ', ') AS shipped_asset_numbers,\r\n          STRING_AGG(DISTINCT
+  rmt_bins.bin_asset_number, ', ') AS allocated_asset_numbers,\r\n          SUM(rmt_bins.qty_bins)
+  AS qty_bins\r\n      FROM rmt_bins\r\n      GROUP BY bin_load_product_id) rb ON
+  bin_load_products.id = rb.bin_load_product_id\r\n         LEFT JOIN\r\n     (SELECT\r\n
   \         bin_load_products.id,\r\n          STRING_AGG(DISTINCT rmt_bins.bin_asset_number,
-  ', ') AS available_bin_asset_numbers,\r\n          COUNT(DISTINCT rmt_bins.id) AS
-  available_in_stock_bins\r\n\r\n      FROM rmt_bins\r\n               JOIN cultivars
-  ON rmt_bins.cultivar_id = cultivars.id\r\n               JOIN bin_load_products
-  ON bin_load_products.cultivar_group_id = cultivars.cultivar_group_id\r\n\r\n      WHERE
-  rmt_bins.bin_asset_number <> ''\r\n        AND rmt_bins.exit_ref IS NULL\r\n        AND
-  cultivars.cultivar_group_id IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))\r\n
+  ', ') AS available_bin_asset_numbers,\r\n          SUM(rmt_bins.qty_bins) AS available_in_stock_bins\r\n\r\n
+  \     FROM rmt_bins\r\n               JOIN cultivars ON rmt_bins.cultivar_id = cultivars.id\r\n
+  \              JOIN bin_load_products ON bin_load_products.cultivar_group_id = cultivars.cultivar_group_id\r\n\r\n
+  \     WHERE rmt_bins.bin_asset_number <> ''\r\n        AND rmt_bins.exit_ref IS
+  NULL\r\n        AND rmt_bins.bin_load_product_id IS NULL\r\n        AND cultivars.cultivar_group_id
+  IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))\r\n
   \       AND rmt_bins.cultivar_id IN (COALESCE(bin_load_products.cultivar_id, rmt_bins.cultivar_id))\r\n
   \       AND COALESCE(rmt_bins.farm_id,0) IN (COALESCE(bin_load_products.farm_id,
   COALESCE(rmt_bins.farm_id,0)))\r\n        AND COALESCE(rmt_bins.puc_id,0) IN (COALESCE(bin_load_products.puc_id,
@@ -90,7 +92,7 @@
     :caption: Required
     :namespaced_name: bin_load_products.qty_bins
     :data_type: :integer
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: left
@@ -394,7 +396,39 @@
     :caption: Available
     :namespaced_name: 
     :data_type: :integer
-    :width: 80
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_asset_numbers:
+    :name: allocated_asset_numbers
+    :sequence_no: 23
+    :caption: Allocated asset numbers
+    :namespaced_name: rb.allocated_asset_numbers
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_bins:
+    :name: allocated_bins
+    :sequence_no: 24
+    :caption: Allocated
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 95
     :format: 
     :hide: false
     :pinned: left
@@ -406,7 +440,7 @@
     :group_max: false
   shipped_asset_numbers:
     :name: shipped_asset_numbers
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Shipped asset numbers
     :namespaced_name: rb.shipped_asset_numbers
     :data_type: :string
@@ -420,25 +454,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  shipped_bins:
-    :name: shipped_bins
-    :sequence_no: 24
-    :caption: Shipped
-    :namespaced_name: 
-    :data_type: :integer
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: left
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   completed:
     :name: completed
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Completed
     :namespaced_name: bin_loads.completed
     :data_type: :boolean
@@ -454,7 +472,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Shipped
     :namespaced_name: bin_loads.shipped
     :data_type: :boolean
@@ -470,7 +488,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Active
     :namespaced_name: bin_load_products.active
     :data_type: :boolean
@@ -486,7 +504,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Created at
     :namespaced_name: bin_load_products.created_at
     :data_type: :datetime
@@ -502,7 +520,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Updated at
     :namespaced_name: bin_load_products.updated_at
     :data_type: :datetime
@@ -518,7 +536,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Status
     :namespaced_name: 
     :data_type: :string
@@ -534,7 +552,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

@@ -31,14 +31,13 @@ module RawMaterials
                   col.add_field :customer_party_role_id
                   col.add_field :transporter_party_role_id
                   col.add_field :dest_depot_id
-                  col.add_field :qty_bins
                 end
                 row.column do |col|
+                  col.add_field :qty_bins
                   col.add_field :shipped_at
                   col.add_field :shipped
                   col.add_field :completed_at
                   col.add_field :completed
-                  col.add_field :active
                 end
               end
             end
@@ -53,10 +52,12 @@ module RawMaterials
                                  caption: 'Shipped Bins on Load',
                                  height: 45)
               else
-                section.add_grid('rmt_bins',
-                                 "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
-                                 caption: 'Available Bins for Load',
-                                 height: 45)
+                unless ui_rule.form_object.available_bin_ids.empty?
+                  section.add_grid('rmt_bins',
+                                   "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
+                                   caption: 'Available Bins for Load',
+                                   height: 45)
+                end
               end
             end
           end

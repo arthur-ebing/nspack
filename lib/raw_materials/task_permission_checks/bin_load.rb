@@ -23,7 +23,7 @@ module RawMaterialsApp
       }.freeze
 
       def call
-        return failed_response 'Bin Load record not found' unless bin_load || task == :create
+        return failed_response 'Bin load record not found' unless bin_load || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
@@ -38,39 +38,41 @@ module RawMaterialsApp
       end
 
       def edit_check
-        return failed_response "Bin Load: #{id} has been completed" if completed?
+        return failed_response "Bin load:#{id} has been completed" if completed?
 
         all_ok
       end
 
       def delete_check
-        return failed_response "Bin Load: #{id} has been completed" if completed?
+        return failed_response "Bin load:#{id} has been completed" if completed?
 
         all_ok
       end
 
       def reopen_check
-        return failed_response "Bin Load: #{id} has not been completed" unless completed?
+        return failed_response "Bin load:#{id} has not been completed" unless completed?
 
         all_ok
       end
 
       def complete_check
-        return failed_response "Bin Load: #{id} Qty's do not match" unless bin_load.qty_bins == bin_load.qty_product_bins
-        return failed_response "Bin Load: #{id} does not have products" unless products?
-        return failed_response "Bin Load: #{id} has already been completed" if completed?
+        return failed_response "Bin load:#{id} - Product Qty's do not match load Qty" unless bin_load.qty_bins == bin_load.qty_product_bins
+        return failed_response "Bin load:#{id} - Does not have products" unless products?
+        return failed_response "Bin load:#{id} - has already been completed" if completed?
 
         all_ok
       end
 
       def ship_check
-        return failed_response "Bin Load: #{id} has not been completed" unless completed?
+        complete_check if AppConst::BYPASS_BIN_LOAD_COMPLETED_CHECK
+        return failed_response "Bin load:#{id} - has already been shipped" if shipped?
+        return failed_response "Bin load:#{id} - Incorrect bins allocated" unless correctly_allocated?
 
         all_ok
       end
 
       def unship_check
-        return failed_response "Bin Load: #{id} has not been shipped" unless shipped?
+        return failed_response "Bin load:#{id} - has not been shipped" unless shipped?
 
         all_ok
       end
@@ -89,6 +91,14 @@ module RawMaterialsApp
 
       def shipped?
         bin_load.shipped
+      end
+
+      def correctly_allocated?
+        bin_load_products = repo.select_values(:bin_load_products, %i[id qty_bins], bin_load_id: id)
+        bin_load_products.each do |bin_load_product_id, qty_bins|
+          return false unless qty_bins == repo.select_values(:rmt_bins, :qty_bins, bin_load_product_id: bin_load_product_id).sum
+        end
+        true
       end
     end
   end

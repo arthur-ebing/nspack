@@ -57,10 +57,10 @@ module UiRules
                          required: true },
         qty_bins: { renderer: :numeric,
                     required: true },
-        shipped_at: {},
-        shipped: { renderer: :checkbox },
-        completed_at: {},
-        completed: { renderer: :checkbox }
+        shipped_at: { renderer: :label, format: :without_timezone_or_seconds },
+        shipped: { renderer: :label, as_boolean: true },
+        completed_at: { renderer: :label, format: :without_timezone_or_seconds },
+        completed: { renderer: :label, as_boolean: true }
       }
     end
 

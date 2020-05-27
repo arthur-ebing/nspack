@@ -12,7 +12,7 @@
   :text: delete
   :icon: delete
   :is_delete: true
-  :hide_if_true: completed
+  :hide_if_true: has_products, completed
   :popup: true
 - :url: "/raw_materials/dispatch/bin_loads/$:id$/complete"
   :text: complete
@@ -29,6 +29,16 @@
   :prompt: 'Are you sure you want to reopen this bin load?'
   :hide_if_false: completed
   :hide_if_true: shipped
+  :auth:
+    :function: Raw Materials
+    :program: dispatch
+    :permission: edit
+- :url: "/raw_materials/dispatch/bin_loads/$:id$/ship"
+  :text: ship
+  :icon: cheveron-right
+  :prompt: 'Are you sure you want to ship this bin load?'
+  :hide_if_true: shipped
+  :hide_if_false: completed
   :auth:
     :function: Raw Materials
     :program: dispatch

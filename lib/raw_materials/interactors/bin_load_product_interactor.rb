@@ -52,15 +52,16 @@ module RawMaterialsApp
       res = AllocateBinLoadProductSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      bin_asset_number = res.to_h[:bin_asset_number]
+      bin_ids = res.to_h[:bin_ids]
       repo.transaction do
-        bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
-        repo.update(:rmt_bins, bin_id, bin_load_product_id: id)
-        log_status(:rmt_bins, bin_id, 'BIN ALLOCATED ON LOAD')
+        unallocate_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id) - bin_ids
+
+        repo.unallocate_bin_load(unallocate_ids, @user)
+        repo.allocate_bin_load(id, bin_ids, @user)
 
         log_transaction
       end
-      success_response("Allocated bin #{bin_asset_number} to Bin Load", instance)
+      success_response('Allocated to Bin Load')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -1439,14 +1439,6 @@
   :list_def:
   - true
   - false
-- :column: shipped
-  :caption: Shipped
-  :data_type: :string
-  :control_type: :text
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 1
-  :list_def: 
 - :column: bin_load_id
   :caption: Bin Load
   :data_type: :string
@@ -1458,6 +1450,22 @@
 - :column: id
   :caption: Id
   :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: bin_load_product_id
+  :caption: Bin Load Product Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: shipped
+  :caption: Shipped?
+  :data_type: :boolean
   :control_type: :text
   :default_value: 
   :ordered_list: false

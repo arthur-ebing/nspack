@@ -21,12 +21,22 @@ module RawMaterials
             page.form do |form|
               form.action "/raw_materials/dispatch/bin_loads/#{id}"
               form.method :update
-              form.add_field :id
-              form.add_field :bin_load_purpose_id
-              form.add_field :customer_party_role_id
-              form.add_field :transporter_party_role_id
-              form.add_field :dest_depot_id
-              form.add_field :qty_bins
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :id
+                  col.add_field :bin_load_purpose_id
+                  col.add_field :customer_party_role_id
+                  col.add_field :transporter_party_role_id
+                  col.add_field :dest_depot_id
+                end
+                row.column do |col|
+                  col.add_field :qty_bins
+                  col.add_field :shipped_at
+                  col.add_field :shipped
+                  col.add_field :completed_at
+                  col.add_field :completed
+                end
+              end
             end
             page.section do |section|
               section.add_control(control_type: :link,
@@ -39,12 +49,6 @@ module RawMaterials
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',
                                height: 15)
-              unless ui_rule.form_object.available_bin_ids.nil_or_empty?
-                section.add_grid('rmt_bins',
-                                 "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
-                                 caption: 'Available Bins for Load',
-                                 height: 45)
-              end
             end
           end
 

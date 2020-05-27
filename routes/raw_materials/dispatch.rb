@@ -142,6 +142,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'ship' do
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:ship, id)
+
+        res = interactor.ship_bin_load(id)
+        if res.success
+          flash[:notice] = res.message
+          r.redirect '/list/bin_loads'
+        else
+          flash[:error] = res.message
+          redirect_to_last_grid(r)
+        end
+      end
+
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:unship, id)
@@ -228,6 +242,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial { RawMaterials::Dispatch::BinLoadProduct::Edit.call(id) }
+      end
+
+      r.on 'allocate' do
+        check_auth!('dispatch', 'edit')
+        show_partial_or_page(r) { RawMaterials::Dispatch::BinLoadProduct::Allocate.call(id) }
+      end
+
+      r.on 'allocate_multiselect' do
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:edit, id)
+        res = interactor.allocate_bin_load_product(id, bin_ids: multiselect_grid_choices(params))
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        r.redirect request.referer
       end
 
       r.is do
