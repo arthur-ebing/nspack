@@ -16,15 +16,21 @@ module RawMaterials
               form.caption 'New Bin Load Product'
               form.action "/raw_materials/dispatch/bin_loads/#{bin_load_id}/bin_load_products"
               form.remote! if remote
-              form.add_field :qty_bins
-              form.add_field :cultivar_group_id
-              form.add_field :cultivar_id
-              form.add_field :rmt_container_material_type_id
-              form.add_field :rmt_material_owner_party_role_id
-              form.add_field :farm_id
-              form.add_field :puc_id
-              form.add_field :orchard_id
-              form.add_field :rmt_class_id
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :qty_bins
+                  col.add_field :cultivar_group_id
+                  col.add_field :cultivar_id
+                  col.add_field :rmt_container_material_type_id
+                  col.add_field :rmt_material_owner_party_role_id
+                end
+                row.column do |col|
+                  col.add_field :farm_id
+                  col.add_field :puc_id
+                  col.add_field :orchard_id
+                  col.add_field :rmt_class_id
+                end
+              end
             end
           end
 

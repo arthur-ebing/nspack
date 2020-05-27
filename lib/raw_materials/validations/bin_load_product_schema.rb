@@ -21,6 +21,6 @@ module RawMaterialsApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:bin_asset_number, Types::StrippedString).maybe(:str?)
+    required(:bin_ids, Types::IntArray).filled { each(:int?) }
   end
 end

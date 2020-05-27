@@ -34,7 +34,7 @@ module RawMaterialsApp
     end
 
     def ready_to_ship?
-      current_step[:loaded].length == current_step[:form_state][:qty_bins]
+      loaded.length == current_step[:form_state][:qty_bins]
     end
 
     def error?

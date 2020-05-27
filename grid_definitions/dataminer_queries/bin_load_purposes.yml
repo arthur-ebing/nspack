@@ -1,9 +1,9 @@
 ---
 :caption: Bin Load Purposes
-:sql: SELECT "bin_load_purposes"."id", "bin_load_purposes"."purpose_code", "bin_load_purposes"."description",
-  "bin_load_purposes"."active", "bin_load_purposes"."created_at", "bin_load_purposes"."updated_at",
-  fn_current_status('bin_load_purposes', "bin_load_purposes"."id") AS status FROM
-  "bin_load_purposes"
+:sql: "SELECT\r\n    id,\r\n    purpose_code,\r\n    description,\r\n    active,\r\n
+  \   created_at,\r\n    updated_at,\r\n    fn_current_status ('bin_load_purposes',
+  id) AS status,\r\n    EXISTS(SELECT id FROM bin_loads WHERE bin_load_purpose_id
+  = bin_load_purposes.id) AS in_use\r\nFROM\r\n    bin_load_purposes"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -12,7 +12,7 @@
     :name: id
     :sequence_no: 1
     :caption: Id
-    :namespaced_name: bin_load_purposes.id
+    :namespaced_name: id
     :data_type: :integer
     :width: 
     :format: 
@@ -28,7 +28,7 @@
     :name: purpose_code
     :sequence_no: 2
     :caption: Purpose code
-    :namespaced_name: bin_load_purposes.purpose_code
+    :namespaced_name: purpose_code
     :data_type: :string
     :width: 
     :format: 
@@ -44,7 +44,7 @@
     :name: description
     :sequence_no: 3
     :caption: Description
-    :namespaced_name: bin_load_purposes.description
+    :namespaced_name: description
     :data_type: :string
     :width: 
     :format: 
@@ -60,7 +60,7 @@
     :name: active
     :sequence_no: 4
     :caption: Active
-    :namespaced_name: bin_load_purposes.active
+    :namespaced_name: active
     :data_type: :boolean
     :width: 
     :format: 
@@ -76,7 +76,7 @@
     :name: created_at
     :sequence_no: 5
     :caption: Created at
-    :namespaced_name: bin_load_purposes.created_at
+    :namespaced_name: created_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -92,7 +92,7 @@
     :name: updated_at
     :sequence_no: 6
     :caption: Updated at
-    :namespaced_name: bin_load_purposes.updated_at
+    :namespaced_name: updated_at
     :data_type: :datetime
     :width: 
     :format: 
@@ -113,6 +113,22 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  in_use:
+    :name: in_use
+    :sequence_no: 8
+    :caption: In use
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
