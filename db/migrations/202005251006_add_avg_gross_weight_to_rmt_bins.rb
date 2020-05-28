@@ -99,10 +99,6 @@ Sequel.migration do
   end
 
   down do
-    alter_table(:rmt_bins) do
-      drop_column :avg_gross_weight
-    end
-
     run <<~SQL
      DROP VIEW public.vw_bins;
       CREATE OR REPLACE VIEW public.vw_bins AS
@@ -194,5 +190,8 @@ Sequel.migration do
           OWNER TO postgres;
 
     SQL
+    alter_table(:rmt_bins) do
+      drop_column :avg_gross_weight
+    end
   end
 end

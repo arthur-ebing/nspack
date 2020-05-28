@@ -127,7 +127,7 @@ Sequel.migration do
                 LEFT JOIN bin_load_products ON bin_load_products.id = rmt_bins.bin_load_product_id
                 LEFT JOIN bin_loads ON bin_loads.id = bin_load_products.bin_load_id;
       
-        ALTER TABLE public.vw_bins
+        ALTER TABLE public.vw_rmt_bins_flat
             OWNER TO postgres;
     SQL
   end
