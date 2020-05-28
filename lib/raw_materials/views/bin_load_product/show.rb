@@ -36,10 +36,12 @@ module RawMaterials
                                  caption: 'Shipped Bins on Product',
                                  height: 20)
               else
-                section.add_grid('rmt_bins_available',
-                                 "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
-                                 caption: 'Available Bins for Product',
-                                 height: 20)
+                unless ui_rule.form_object.available_bin_ids.nil_or_empty?
+                  section.add_grid('rmt_bins_available',
+                                   "/list/rmt_bins/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
+                                   caption: 'Available Bins for Product',
+                                   height: 20)
+                end
               end
             end
           end

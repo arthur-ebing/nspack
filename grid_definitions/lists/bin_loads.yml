@@ -14,15 +14,6 @@
   :is_delete: true
   :hide_if_true: has_products, completed
   :popup: true
-- :url: "/raw_materials/dispatch/bin_loads/$:id$/complete"
-  :text: complete
-  :icon: toggle-on
-  :hide_if_false: has_products
-  :hide_if_true: completed
-  :auth:
-    :function: Raw Materials
-    :program: dispatch
-    :permission: edit
 - :url: "/raw_materials/dispatch/bin_loads/$:id$/reopen"
   :text: re-open for editing
   :icon: toggle-off
@@ -38,7 +29,7 @@
   :icon: cheveron-right
   :prompt: 'Are you sure you want to ship this bin load?'
   :hide_if_true: shipped
-  :hide_if_false: completed
+  :hide_if_false:  completed, able_to_ship
   :auth:
     :function: Raw Materials
     :program: dispatch

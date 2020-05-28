@@ -8,9 +8,12 @@
   AS bin_depot_code,\r\n    bin_load_purposes.purpose_code,\r\n    bin_loads.qty_bins,\r\n
   \   bin_loads.shipped,\r\n    bin_loads.shipped_at,\r\n    bin_loads.completed,\r\n
   \   bin_loads.completed_at,\r\n    bin_loads.active,\r\n    EXISTS (select id from
-  bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    bin_loads.created_at,\r\n
+  bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    (select
+  SUM(rmt_bins.qty_bins)\r\n     from rmt_bins\r\n     join bin_load_products blp
+  on rmt_bins.bin_load_product_id = blp.id\r\n     where bin_load_id = bin_loads.id\r\n
+  \    group by bin_load_id) = bin_loads.qty_bins is true AS able_to_ship,\r\n    bin_loads.created_at,\r\n
   \   bin_loads.updated_at,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN 'blue'\r\n
-  \       WHEN bin_loads.completed THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
+  \       WHEN bin_loads.completed THEN 'green'\r\n        END AS colour_rule\r\n\r\nFROM
   bin_loads\r\n         LEFT JOIN bin_load_purposes ON bin_load_purposes.id = bin_loads.bin_load_purpose_id\r\n
   \        JOIN depots ON depots.id = bin_loads.dest_depot_id\r\nORDER BY bin_loads.updated_at
   DESC"
@@ -27,7 +30,7 @@
     :caption: Status
     :namespaced_name: 
     :data_type: :string
-    :width: 100
+    :width: 140
     :format: 
     :hide: false
     :pinned: 
@@ -293,9 +296,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  able_to_ship:
+    :name: able_to_ship
+    :sequence_no: 18
+    :caption: Able to ship
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Created at
     :namespaced_name: bin_loads.created_at
     :data_type: :datetime
@@ -311,7 +330,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Updated at
     :namespaced_name: bin_loads.updated_at
     :data_type: :datetime
@@ -327,7 +346,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

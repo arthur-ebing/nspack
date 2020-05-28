@@ -98,7 +98,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.create_bin_load_product(args)
           if res.success
             flash[:notice] = res.message
-            redirect_via_json "/raw_materials/dispatch/bin_loads/#{id}/edit"
+            redirect_via_json "/raw_materials/dispatch/bin_loads/#{id}"
           else
             re_show_form(r, res, url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new") do
               RawMaterials::Dispatch::BinLoadProduct::New.call(form_values: params[:bin_load_product],
@@ -111,21 +111,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       # BIN LOADS
       r.on 'complete' do
-        r.get do
-          check_auth!('dispatch', 'edit')
-          interactor.assert_permission!(:complete, id)
-          show_partial_or_page(r)  { RawMaterials::Dispatch::BinLoad::Complete.call(id) }
-        end
+        check_auth!('dispatch', 'edit')
+        interactor.assert_permission!(:complete, id)
 
-        r.post do
-          res = interactor.complete_bin_load(id, params[:bin_load])
-          if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-          else
-            re_show_form(r, res) { RawMaterials::Dispatch::BinLoad::Complete.call(id, form_values: params[:bin_load], form_errors: res.errors) }
-          end
+        res = interactor.complete_bin_load(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
         end
+        r.redirect '/list/bin_loads'
       end
 
       r.on 'reopen' do
@@ -217,7 +212,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.create_bin_load(params[:bin_load])
         if res.success
           flash[:notice] = res.message
-          redirect_via_json "/raw_materials/dispatch/bin_loads/#{res.instance.id}/edit"
+          redirect_via_json "/raw_materials/dispatch/bin_loads/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/raw_materials/dispatch/bin_loads/new') do
             RawMaterials::Dispatch::BinLoad::New.call(form_values: params[:bin_load],
@@ -258,7 +253,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = res.message
         end
-        r.redirect request.referer
+        r.redirect "/raw_materials/dispatch/bin_loads/#{res.instance.bin_load_id}"
       end
 
       r.is do
@@ -270,7 +265,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_bin_load_product(id, params[:bin_load_product])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json "/raw_materials/dispatch/bin_loads/#{res.instance.bin_load_id}/edit"
+            redirect_via_json "/raw_materials/dispatch/bin_loads/#{res.instance.bin_load_id}"
           else
             re_show_form(r, res) { RawMaterials::Dispatch::BinLoadProduct::Edit.call(id, form_values: params[:bin_load_product], form_errors: res.errors) }
           end
@@ -280,7 +275,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_bin_load_product(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            redirect_via_json "/raw_materials/dispatch/bin_loads/#{res.instance.bin_load_id}"
           else
             show_json_error(res.message, status: 200)
           end

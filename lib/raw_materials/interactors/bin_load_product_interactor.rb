@@ -36,14 +36,18 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def delete_bin_load_product(id)
-      name = bin_load_product(id).id
+    def delete_bin_load_product(id) # rubocop:disable Metrics/AbcSize
+      instance = bin_load_product(id)
+      bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
+
       repo.transaction do
+        repo.unallocate_bin(bin_ids, @user)
+
         repo.delete_bin_load_product(id)
         log_status(:bin_load_products, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted bin load product #{name}")
+      success_response("Deleted bin load product #{instance.product_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -56,12 +60,13 @@ module RawMaterialsApp
       repo.transaction do
         unallocate_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id) - bin_ids
 
-        repo.unallocate_bin_load(unallocate_ids, @user)
-        repo.allocate_bin_load(id, bin_ids, @user)
+        repo.unallocate_bin(unallocate_ids, @user)
+        repo.allocate_bin(id, bin_ids, @user)
 
         log_transaction
       end
-      success_response('Allocated to Bin Load')
+      instance = bin_load_product(id)
+      success_response('Allocated to Bin Load', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

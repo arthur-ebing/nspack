@@ -14,8 +14,9 @@ module RawMaterials
             page.form_errors form_errors
             page.form do |form|
               form.caption 'Allocate Bin'
-              form.action "/raw_materials/dispatch/bin_loads/#{ui_rule.form_object.bin_load_id}/edit"
+              form.action "/raw_materials/dispatch/bin_loads/#{ui_rule.form_object.bin_load_id}"
               form.submit_captions 'Close'
+              form.no_submit!
               form.row do |row|
                 row.column do |col|
                   col.add_field :bin_load_id
@@ -32,6 +33,12 @@ module RawMaterials
                   col.add_field :rmt_class_id
                 end
               end
+            end
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: "/raw_materials/dispatch/bin_loads/#{ui_rule.form_object.bin_load_id}",
+                                  style: :back_button)
             end
             page.section do |section|
               section.add_grid('rmt_bins',
