@@ -22,8 +22,12 @@ module RawMaterials
                                   style: :button)
             end
             page.form do |form|
-              form.submit_captions 'Close'
               form.action '/list/bin_loads'
+              form.submit_captions 'Close'
+              if ui_rule.form_object.can_complete
+                form.action "/raw_materials/dispatch/bin_loads/#{id}/complete"
+                form.submit_captions 'Complete'
+              end
               form.row do |row|
                 row.column do |col|
                   col.add_field :id
@@ -42,6 +46,14 @@ module RawMaterials
               end
             end
             page.section do |section|
+              unless ui_rule.form_object.completed
+                section.add_control(control_type: :link,
+                                    text: 'Add Product',
+                                    url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
+                                    grid_id: 'bin_load_products',
+                                    behaviour: :popup,
+                                    style: :button)
+              end
               section.add_grid('bin_load_products',
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',

@@ -14,7 +14,7 @@ module RawMaterialsApp
 
     def find_bin_load_flat(id)
       hash = find_with_association(:bin_loads, id,
-                                   parent_tables: [{ parent_table: :bin_load_purposes, foreign_key: :bin_load_purpose, columns: %i[purpose_code], flatten_columns: { purpose_code: :purpose_code } },
+                                   parent_tables: [{ parent_table: :bin_load_purposes, foreign_key: :bin_load_purpose_id, columns: %i[purpose_code], flatten_columns: { purpose_code: :purpose_code } },
                                                    { parent_table: :depots,  foreign_key: :dest_depot_id, columns: %i[depot_code], flatten_columns: { depot_code: :dest_depot } }],
                                    lookup_functions: [{ function: :fn_party_role_name, args: [:customer_party_role_id], col_name: :customer },
                                                       { function: :fn_party_role_name, args: [:transporter_party_role_id], col_name: :transporter },
@@ -23,6 +23,7 @@ module RawMaterialsApp
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
       hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
+      hash[:can_complete] = hash[:qty_product_bins] == hash[:qty_bins] && !hash[:completed]
       hash[:available_bin_ids] = rmt_bins_matching_bin_load(:bin_id, bin_load_id: id)
       hash[:qty_bins_available] = hash[:available_bin_ids].count
       BinLoadFlat.new(hash)
@@ -84,12 +85,12 @@ module RawMaterialsApp
       DB[query].map { |q| q[column] }.uniq
     end
 
-    def allocate_bin_load(bin_load_product_id, bin_ids, user)
+    def allocate_bin(bin_load_product_id, bin_ids, user)
       update(:rmt_bins, bin_ids, bin_load_product_id: bin_load_product_id)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN ALLOCATED ON LOAD', user_name: user.user_name)
     end
 
-    def unallocate_bin_load(bin_ids, user)
+    def unallocate_bin(bin_ids, user)
       update(:rmt_bins, bin_ids, bin_load_product_id: nil)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN UNALLOCATED FROM LOAD', user_name: user.user_name)
     end

@@ -38,18 +38,6 @@ module RawMaterials
                 end
               end
             end
-            page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Add Product',
-                                  url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
-                                  grid_id: 'bin_load_products',
-                                  behaviour: :popup,
-                                  style: :button)
-              section.add_grid('bin_load_products',
-                               "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
-                               caption: 'Bin Load Products',
-                               height: 15)
-            end
           end
 
           layout

@@ -47,13 +47,10 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def complete_bin_load(id, params) # rubocop:disable Metrics/AbcSize
-      params = params.merge(completed: true, completed_at: Time.now)
-      res = validate_bin_load_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
-
+    def complete_bin_load(id)
+      params = { completed: true, completed_at: Time.now }
       repo.transaction do
-        repo.update_bin_load(id, res)
+        repo.update_bin_load(id, params)
         log_status(:bin_loads, id, 'COMPLETED')
         log_transaction
       end
@@ -82,11 +79,11 @@ module RawMaterialsApp
 
       repo.transaction do
         rmt_bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
-        repo.unallocate_bin_load(rmt_bin_ids, @user) unless rmt_bin_ids.empty?
+        repo.unallocate_bin(rmt_bin_ids, @user) unless rmt_bin_ids.empty?
 
         product_bin.each do |bin_load_product_id, bin_asset_number|
           rmt_bin_id = repo.select_values(:rmt_bins, :id, bin_asset_number: bin_asset_number)
-          repo.allocate_bin_load(bin_load_product_id, rmt_bin_id, @user)
+          repo.allocate_bin(bin_load_product_id, rmt_bin_id, @user)
         end
 
         repo.ship_bin_load(id, @user, 'SHIPPED')

@@ -22,7 +22,7 @@
   :text: allocate to ship
   :icon: add-outline
   :popup: false
-  :hide_if_true: completed
+  :hide_if_false: allocate_to_ship
 - :separator: true
 - :url: "/development/statuses/list/bin_load_products/$:id$"
   :text: status
