@@ -51,6 +51,11 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def assert_personnel_identifier_permission!(task, id = nil)
+      res = TaskPermissionCheck::PersonnelIdentifier.call(task, id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
     def de_link_personnel_identifier(id)
       contract_worker_id = repo.find_contract_worker_id_by_identifier_id(id)
 
@@ -63,7 +68,10 @@ module MasterfilesApp
       success_response('Successfully de-linked identifier from worker', in_use: false, contract_worker: nil)
     end
 
-    def link_to_personnel_identifier(id, params)
+    def link_to_personnel_identifier(id, params) # rubocop:disable Metrics/AbcSize
+      res = validate_contract_worker_link_params(params.merge(id: id))
+      return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
         repo.update_contract_worker(params[:contract_worker_id], personnel_identifier_id: id)
         repo.update(:personnel_identifiers, id, in_use: true)
@@ -85,6 +93,10 @@ module MasterfilesApp
 
     def validate_contract_worker_params(params)
       ContractWorkerSchema.call(params)
+    end
+
+    def validate_contract_worker_link_params(params)
+      ContractWorkerLinkSchema.call(params)
     end
   end
 end

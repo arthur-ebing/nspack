@@ -409,7 +409,7 @@ class Nspack < Roda
       r.on 'link_contract_worker' do
         r.get do
           check_auth!('hr', 'edit')
-          # interactor.assert_permission!(:edit, id)
+          interactor.assert_personnel_identifier_permission!(:link, id)
           show_partial { Masterfiles::HumanResources::PersonnelIdentifier::LinkWorker.call(id) }
         end
 
@@ -430,7 +430,7 @@ class Nspack < Roda
       r.on 'de_link_contract_worker' do
         r.get do
           check_auth!('hr', 'edit')
-          # interactor.assert_permission!(:edit, id)
+          interactor.assert_personnel_identifier_permission!(:de_link, id)
           show_partial { Masterfiles::HumanResources::PersonnelIdentifier::DeLinkWorker.call(id) }
         end
 

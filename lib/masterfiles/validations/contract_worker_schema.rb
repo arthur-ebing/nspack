@@ -18,4 +18,11 @@ module MasterfilesApp
     required(:start_date, %i[nil time]).maybe(:time?)
     required(:end_date, %i[nil time]).maybe(:time?)
   end
+
+  ContractWorkerLinkSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    optional(:id, :integer).filled(:int?)
+    required(:contract_worker_id, :integer).filled(:int?)
+  end
 end
