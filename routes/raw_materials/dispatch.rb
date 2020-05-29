@@ -120,7 +120,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = res.message
         end
-        r.redirect '/list/bin_loads'
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
       r.on 'reopen' do
@@ -130,11 +130,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.reopen_bin_load(id)
         if res.success
           flash[:notice] = res.message
-          r.redirect "/raw_materials/dispatch/bin_loads/#{id}/edit"
         else
           flash[:error] = res.message
-          redirect_to_last_grid(r)
         end
+        redirect_to_last_grid(r)
       end
 
       r.on 'ship' do

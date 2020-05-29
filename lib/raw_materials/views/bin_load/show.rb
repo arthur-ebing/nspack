@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Dispatch
     module BinLoad
@@ -8,7 +9,7 @@ module RawMaterials
           ui_rule = UiRules::Compiler.new(:bin_load, :show, id: id)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.section do |section|
               section.add_control(control_type: :link,
@@ -22,12 +23,9 @@ module RawMaterials
                                   style: :button)
             end
             page.form do |form|
-              form.action '/list/bin_loads'
-              form.submit_captions 'Close'
-              if ui_rule.form_object.can_complete
-                form.action "/raw_materials/dispatch/bin_loads/#{id}/complete"
-                form.submit_captions 'Complete'
-              end
+              form.action ui_rule.form_object.action
+              form.submit_captions ui_rule.form_object.caption
+
               form.row do |row|
                 row.column do |col|
                   col.add_field :id
@@ -38,12 +36,16 @@ module RawMaterials
                 end
                 row.column do |col|
                   col.add_field :qty_bins
-                  col.add_field :shipped_at
-                  col.add_field :shipped
                   col.add_field :completed_at
                   col.add_field :completed
+                  col.add_field :shipped_at
+                  col.add_field :shipped
                 end
               end
+            end
+            page.section do |section|
+              section.add_progress_step ui_rule.form_object.steps, position: ui_rule.form_object.step
+              section.show_border!
             end
             page.section do |section|
               unless ui_rule.form_object.completed
@@ -60,16 +62,14 @@ module RawMaterials
                                height: 15)
               if ui_rule.form_object.shipped
                 section.add_grid('rmt_bins',
-                                 "/list/rmt_bins_bin_loads/grid?key=bin_load&bin_load_id=#{id}",
+                                 "/list/bin_loads_matching_rmt_bins/grid?key=shipped_bin_load&bin_load_id=#{id}",
                                  caption: 'Shipped Bins on Load',
                                  height: 45)
               else
-                unless ui_rule.form_object.available_bin_ids.empty?
-                  section.add_grid('rmt_bins',
-                                   "/list/rmt_bins_bin_loads/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
-                                   caption: 'Available Bins for Load',
-                                   height: 45)
-                end
+                section.add_grid('rmt_bins',
+                                 "/list/bin_loads_matching_rmt_bins/grid?key=bin_load&bin_load_id=#{id}",
+                                 caption: 'Available Bins for Load',
+                                 height: 45)
               end
             end
           end
@@ -80,3 +80,4 @@ module RawMaterials
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

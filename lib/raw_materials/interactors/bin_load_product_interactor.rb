@@ -57,6 +57,8 @@ module RawMaterialsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       bin_ids = res.to_h[:bin_ids]
+      return failed_response('Exceeded max allocation', bin_load_product(id)) if bin_ids.length > 35
+
       repo.transaction do
         unallocate_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id) - bin_ids
 

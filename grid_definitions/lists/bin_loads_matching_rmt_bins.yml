@@ -1,0 +1,33 @@
+---
+:dataminer_definition: bin_loads_matching_rmt_bins
+:conditions:
+  :bin_load:
+    - :col: bin_load_products.bin_load_id
+      :op: =
+      :val: $:bin_load_id$
+  :shipped_bin_load:
+    - :col: bin_load_products.bin_load_id
+      :op: =
+      :val: $:bin_load_id$
+    - :col: rmt_bins.shipped
+      :op: =
+      :val: TRUE
+  :bin_load_product:
+    - :col: bin_load_products.id
+      :op: =
+      :val: $:bin_load_product_id$
+  :shipped_bin_load_product:
+    - :col: bin_load_products.id
+      :op: =
+      :val: $:bin_load_product_id$
+    - :col: rmt_bins.shipped
+      :op: =
+      :val: TRUE
+:multiselect:
+  :bin_load_product:
+    :url: "/raw_materials/dispatch/bin_load_products/$:id$/allocate_multiselect"
+    :preselect: "SELECT id FROM vw_rmt_bins_flat WHERE bin_load_product_id = $:bin_load_product_id$"
+    :section_caption: 'Allocate Bins to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: bin_load_product

@@ -78,7 +78,8 @@ module RawMaterialsApp
       return failed_response "Bin load:#{id} - has already been shipped" if instance.shipped
 
       repo.transaction do
-        rmt_bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
+        bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
+        rmt_bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_ids)
         repo.unallocate_bin(rmt_bin_ids, @user) unless rmt_bin_ids.empty?
 
         product_bin.each do |bin_load_product_id, bin_asset_number|

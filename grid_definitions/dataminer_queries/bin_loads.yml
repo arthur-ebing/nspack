@@ -6,20 +6,13 @@
   \   bin_loads.transporter_party_role_id,\r\n    fn_party_role_name(bin_loads.transporter_party_role_id)
   AS transporter_party_role,\r\n    bin_loads.dest_depot_id AS bin_depot_id,\r\n    depots.depot_code
   AS bin_depot_code,\r\n    bin_load_purposes.purpose_code,\r\n    bin_loads.qty_bins,\r\n
-  \   bin_loads.shipped,\r\n    bin_loads.shipped_at,\r\n    bin_loads.completed,\r\n
-  \   bin_loads.completed_at,\r\n    bin_loads.active,\r\n    EXISTS (select id from
-  bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    CASE\r\n
-  \       WHEN bin_loads.shipped THEN FALSE\r\n        ELSE (select bool_and(product_pass)\r\n
-  \             from (select (SUM(rmt_bins.qty_bins) = blp.qty_bins) IS TRUE AS product_pass,\r\n
-  \                          blp.bin_load_id\r\n                    from  bin_load_products
-  blp\r\n                    left join rmt_bins on rmt_bins.bin_load_product_id =
-  blp.id\r\n                    where blp.bin_load_id = bin_loads.id\r\n                    group
-  by blp.id) products\r\n              group by products.bin_load_id)\r\n    END IS
-  TRUE AS able_to_ship,\r\n    bin_loads.created_at,\r\n    bin_loads.updated_at,\r\n
-  \   CASE\r\n        WHEN bin_loads.shipped THEN 'blue'\r\n        WHEN bin_loads.completed
-  THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM bin_loads\r\n         LEFT JOIN
-  bin_load_purposes ON bin_load_purposes.id = bin_loads.bin_load_purpose_id\r\n         JOIN
-  depots ON depots.id = bin_loads.dest_depot_id\r\n\r\nORDER BY bin_loads.updated_at
+  \   bin_loads.completed,\r\n    bin_loads.completed_at,\r\n    bin_loads.shipped,\r\n
+  \   bin_loads.shipped_at,\r\n    bin_loads.active,\r\n    EXISTS (select id from
+  bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    bin_loads.created_at,\r\n
+  \   bin_loads.updated_at,\r\n    CASE\r\n        WHEN bin_loads.shipped THEN 'blue'\r\n
+  \       WHEN bin_loads.completed THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
+  bin_loads\r\n         LEFT JOIN bin_load_purposes ON bin_load_purposes.id = bin_loads.bin_load_purpose_id\r\n
+  \        JOIN depots ON depots.id = bin_loads.dest_depot_id\r\n\r\nORDER BY bin_loads.updated_at
   DESC"
 :limit: 
 :offset: 
@@ -204,41 +197,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  shipped:
-    :name: shipped
-    :sequence_no: 12
-    :caption: Shipped
-    :namespaced_name: bin_loads.shipped
-    :data_type: :boolean
-    :width: 90
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  shipped_at:
-    :name: shipped_at
-    :sequence_no: 13
-    :caption: Shipped at
-    :namespaced_name: bin_loads.shipped_at
-    :data_type: :datetime
-    :width: 
-    :format: :datetime_with_secs
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   completed:
     :name: completed
-    :sequence_no: 14
+    :sequence_no: 12
     :caption: Completed
     :namespaced_name: bin_loads.completed
     :data_type: :boolean
@@ -254,9 +215,41 @@
     :group_max: false
   completed_at:
     :name: completed_at
-    :sequence_no: 15
+    :sequence_no: 13
     :caption: Completed at
     :namespaced_name: bin_loads.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped:
+    :name: shipped
+    :sequence_no: 14
+    :caption: Shipped
+    :namespaced_name: bin_loads.shipped
+    :data_type: :boolean
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_at:
+    :name: shipped_at
+    :sequence_no: 15
+    :caption: Shipped at
+    :namespaced_name: bin_loads.shipped_at
     :data_type: :datetime
     :width: 
     :format: :datetime_with_secs
@@ -300,25 +293,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  able_to_ship:
-    :name: able_to_ship
-    :sequence_no: 18
-    :caption: Able to ship
-    :namespaced_name: 
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 18
     :caption: Created at
     :namespaced_name: bin_loads.created_at
     :data_type: :datetime
@@ -334,7 +311,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 20
+    :sequence_no: 19
     :caption: Updated at
     :namespaced_name: bin_loads.updated_at
     :data_type: :datetime
@@ -350,7 +327,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 21
+    :sequence_no: 20
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

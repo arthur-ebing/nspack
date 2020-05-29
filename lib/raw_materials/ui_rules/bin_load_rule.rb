@@ -5,6 +5,7 @@ module UiRules
     def generate_rules
       set_repo
       make_form_object
+      make_progress_step
       apply_form_values
 
       common_values_for_fields common_fields
@@ -83,6 +84,24 @@ module UiRules
                                     shipped: nil,
                                     completed_at: nil,
                                     completed: nil)
+    end
+
+    def make_progress_step # rubocop:disable Metrics/AbcSize
+      steps = ['Add Products', 'Complete', 'Allocate Bins', 'Ship', 'Finished']
+      actions = ['/list/bin_loads',
+                 "/raw_materials/dispatch/bin_loads/#{@options[:id]}/complete",
+                 '/list/bin_loads',
+                 "/raw_materials/dispatch/bin_loads/#{@options[:id]}/ship",
+                 '/list/bin_loads']
+      captions = %w[Close Complete Close Ship Close]
+      step = 0
+      step = 1 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:complete, @options[:id]).success
+      step = 2 if @form_object.completed
+      step = 3 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:ship, @options[:id]).success
+      step = 4 if @form_object.shipped
+
+      form_object = @form_object.to_h.merge(steps: steps, step: step, action: actions[step], caption: captions[step])
+      @form_object = OpenStruct.new(form_object)
     end
 
     def set_repo

@@ -38,7 +38,6 @@ module RawMaterialsApp
     attribute :container_material_type_code, Types::String
     attribute :container_material_owner, Types::String
     attribute :product_code, Types::String
-    attribute :available_bin_ids, Types::Array
     attribute :completed, Types::Bool
     attribute :shipped, Types::Bool
     attribute :status, Types::String

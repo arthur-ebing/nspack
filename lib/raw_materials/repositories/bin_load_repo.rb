@@ -23,9 +23,6 @@ module RawMaterialsApp
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
       hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
-      hash[:can_complete] = hash[:qty_product_bins] == hash[:qty_bins] && !hash[:completed]
-      hash[:available_bin_ids] = rmt_bins_matching_bin_load(:bin_id, bin_load_id: id)
-      hash[:qty_bins_available] = hash[:available_bin_ids].count
       BinLoadFlat.new(hash)
     end
 
@@ -45,7 +42,6 @@ module RawMaterialsApp
 
       keys = %i[cultivar_name container_material_type_code container_material_owner farm_code puc_code orchard_code rmt_class_code]
       hash[:product_code] = "#{hash[:cultivar_group_code]}_#{keys.map { |k| hash[k] || '***' }.join('_')}"
-      hash[:available_bin_ids] = rmt_bins_matching_bin_load(:bin_id, bin_load_product_id: id)
       BinLoadProductFlat.new(hash)
     end
 
@@ -65,6 +61,7 @@ module RawMaterialsApp
         WHERE rmt_bins.bin_asset_number <> ''
         AND rmt_bins.bin_asset_number IS NOT NULL
         AND rmt_bins.exit_ref IS NULL
+        AND (rmt_bins.bin_load_product_id IS NULL OR rmt_bins.bin_load_product_id = bin_load_products.id)
         AND cultivars.cultivar_group_id IN (COALESCE(bin_load_products.cultivar_group_id, cultivars.cultivar_group_id))
         AND rmt_bins.cultivar_id IN (COALESCE(bin_load_products.cultivar_id, rmt_bins.cultivar_id))
         AND COALESCE(rmt_bins.farm_id,0) IN (COALESCE(bin_load_products.farm_id, COALESCE(rmt_bins.farm_id,0)))
@@ -74,14 +71,11 @@ module RawMaterialsApp
         AND COALESCE(rmt_bins.rmt_container_material_type_id,0) IN (COALESCE(bin_load_products.rmt_container_material_type_id, COALESCE(rmt_bins.rmt_container_material_type_id,0)))
         AND COALESCE(rmt_bins.rmt_material_owner_party_role_id,0) IN (COALESCE(bin_load_products.rmt_material_owner_party_role_id, COALESCE(rmt_bins.rmt_material_owner_party_role_id,0)))
       SQL
-      query = "#{query} AND bin_load_products.bin_load_id = #{args[:bin_load_id]}" unless args[:bin_load_id].nil?
       query = "#{query} AND UPPER(rmt_bins.bin_asset_number) = UPPER('#{args[:bin_asset_number]}')" unless args[:bin_asset_number].nil?
-      query = if args[:bin_load_product_id].nil?
-                "#{query} AND rmt_bins.bin_load_product_id IS NULL"
-              else
-                "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]} AND (rmt_bins.bin_load_product_id IS NULL OR rmt_bins.bin_load_product_id = #{args[:bin_load_product_id]})"
-              end
-      DB[query].map { |q| q[column] }.uniq
+      query = "#{query} AND bin_load_products.bin_load_id = #{args[:bin_load_id]}" unless args[:bin_load_id].nil?
+      query = "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]}" unless args[:bin_load_product_id].nil?
+
+      DB[query].map { |q| q[column] }.uniq.first(100)
     end
 
     def allocate_bin(bin_load_product_id, bin_ids, user)

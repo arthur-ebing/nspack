@@ -24,16 +24,6 @@
     :function: Raw Materials
     :program: dispatch
     :permission: edit
-- :url: "/raw_materials/dispatch/bin_loads/$:id$/ship"
-  :text: ship
-  :icon: cheveron-right
-  :prompt: 'Are you sure you want to ship this bin load?'
-  :hide_if_true: shipped
-  :hide_if_false: able_to_ship
-  :auth:
-    :function: Raw Materials
-    :program: dispatch
-    :permission: edit
 - :url: "/raw_materials/dispatch/bin_loads/$:id$/unship"
   :text: unship for editing
   :icon: toggle-off

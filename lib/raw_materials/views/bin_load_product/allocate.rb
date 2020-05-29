@@ -42,16 +42,16 @@ module RawMaterials
             end
             page.section do |section|
               section.add_grid('rmt_bins',
-                               '/list/rmt_bins_bin_loads/grid_multi',
+                               '/list/bin_loads_matching_rmt_bins/grid_multi',
                                caption: 'Available Bins for Product',
                                is_multiselect: true,
                                can_be_cleared: true,
                                multiselect_url: "/raw_materials/dispatch/bin_load_products/#{id}/allocate_multiselect",
-                               multiselect_key: 'allocate',
+                               multiselect_key: 'bin_load_product',
                                height: 40,
-                               multiselect_params: { key: 'allocate',
+                               multiselect_params: { key: 'bin_load_product',
                                                      id: id,
-                                                     ids: ui_rule.form_object.available_bin_ids })
+                                                     bin_load_product_id: id })
             end
           end
 
