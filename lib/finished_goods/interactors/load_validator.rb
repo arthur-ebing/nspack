@@ -30,6 +30,8 @@ module FinishedGoodsApp
     end
 
     def validate_allocate_list(load_id, pallet_numbers)
+      raise Crossbeams::InfoError, "Load: #{load_id}, Exceeded max pallet allocation." if pallet_numbers.length > 35
+
       validate_pallets(:not_on_load, pallet_numbers, load_id)
       validate_pallets(:not_shipped, pallet_numbers)
       validate_pallets(:in_stock, pallet_numbers)
