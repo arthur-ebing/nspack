@@ -42,7 +42,7 @@ module RawMaterials
             end
             page.section do |section|
               section.add_grid('rmt_bins',
-                               '/list/rmt_bins/grid_multi',
+                               '/list/rmt_bins_bin_loads/grid_multi',
                                caption: 'Available Bins for Product',
                                is_multiselect: true,
                                can_be_cleared: true,

@@ -37,9 +37,9 @@
     :caption: Id
     :namespaced_name: id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
