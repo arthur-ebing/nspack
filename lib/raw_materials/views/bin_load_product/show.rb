@@ -32,16 +32,14 @@ module RawMaterials
             page.section do |section|
               if ui_rule.form_object.shipped
                 section.add_grid('rmt_bins_shipped',
-                                 "/list/rmt_bins_bin_loads/grid?key=bin_load_product&bin_load_product_id=#{id}",
+                                 "/list/bin_loads_matching_rmt_bins/grid?key=shipped_bin_load_product&bin_load_product_id=#{id}",
                                  caption: 'Shipped Bins on Product',
                                  height: 20)
               else
-                unless ui_rule.form_object.available_bin_ids.nil_or_empty?
-                  section.add_grid('rmt_bins_available',
-                                   "/list/rmt_bins_bin_loads/grid?key=available&ids=#{ui_rule.form_object.available_bin_ids}",
-                                   caption: 'Available Bins for Product',
-                                   height: 20)
-                end
+                section.add_grid('rmt_bins_available',
+                                 "/list/bin_loads_matching_rmt_bins/grid?key=bin_load_product&bin_load_product_id=#{id}",
+                                 caption: 'Available Bins for Product',
+                                 height: 20)
               end
             end
           end

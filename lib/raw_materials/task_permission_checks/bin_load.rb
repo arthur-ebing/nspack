@@ -66,6 +66,7 @@ module RawMaterialsApp
       def ship_check
         complete_check if AppConst::BYPASS_BIN_LOAD_COMPLETED_CHECK
         return failed_response "Bin load:#{id} - has already been shipped" if shipped?
+        return failed_response "Bin load:#{id} - Does not have products" unless products?
         return failed_response "Bin load:#{id} - Incorrect bins allocated" unless correctly_allocated?
 
         all_ok

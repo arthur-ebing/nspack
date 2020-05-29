@@ -50,7 +50,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               end
             end
 
-            message = rmd_warning_message(stepper.warning_message) || rmd_success_message(stepper.message)
+            message = rmd_error_message(stepper.error) || rmd_warning_message(stepper.warning) || rmd_success_message(stepper.message)
             store_locally(:flash_notice, message)
           else
             store_locally(:flash_notice, rmd_error_message(res.message))

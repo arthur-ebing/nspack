@@ -31,9 +31,6 @@ module RawMaterialsApp
     attribute :transporter, Types::String
     attribute :dest_depot, Types::String
     attribute :products, Types::Bool
-    attribute :can_complete, Types::Bool
     attribute :qty_product_bins, Types::Integer
-    attribute :available_bin_ids, Types::Array
-    attribute :qty_bins_available, Types::Integer
   end
 end

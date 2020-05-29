@@ -31,10 +31,10 @@ module RawMaterials
                 end
                 row.column do |col|
                   col.add_field :qty_bins
-                  col.add_field :shipped_at
-                  col.add_field :shipped
                   col.add_field :completed_at
                   col.add_field :completed
+                  col.add_field :shipped_at
+                  col.add_field :shipped
                 end
               end
             end
