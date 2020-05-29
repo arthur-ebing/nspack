@@ -464,7 +464,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PHYT_CLEAN_SEASON_ID = ENV['PHYT_CLEAN_SEASON_ID']
 
   # eCert
-  E_CERT_ENVIRONMENT = { QA: 'http://qa.', PRODUCTION: 'http://app.' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]
+  E_CERT_ENVIRONMENT = { QA: 'https://qa.', PRODUCTION: 'https://' }[ENV.fetch('E_CERT_ENVIRONMENT', 'QA').to_sym]
   E_CERT_API_CLIENT_ID = ENV['E_CERT_API_CLIENT_ID']
   E_CERT_API_CLIENT_SECRET = ENV['E_CERT_API_CLIENT_SECRET']
   E_CERT_BUSINESS_ID = ENV['E_CERT_BUSINESS_ID']
