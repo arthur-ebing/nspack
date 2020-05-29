@@ -29,7 +29,7 @@
   :icon: cheveron-right
   :prompt: 'Are you sure you want to ship this bin load?'
   :hide_if_true: shipped
-  :hide_if_false:  completed, able_to_ship
+  :hide_if_false: able_to_ship
   :auth:
     :function: Raw Materials
     :program: dispatch
