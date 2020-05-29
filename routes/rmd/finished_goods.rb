@@ -18,7 +18,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        form_name: :vehicle,
                                        notes: notice,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Scan Pallet And Location',
+                                       caption: 'Scan Tripsheet And Location',
                                        action: '/rmd/finished_goods/offload_vehicle',
                                        button_caption: 'Submit')
 
@@ -42,8 +42,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'scan_offload_vehicle_pallet', Integer do |id|
-      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       r.get do
         notice = retrieve_from_local_store(:flash_notice)
         form_state = {}
@@ -81,30 +79,48 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do
-        res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
-        if res.success
-          store_locally(:flash_notice, res.message)
-        else
-          store_locally(:error, res)
-        end
-
-        if !res.instance[:vehicle_job_offloaded]
-          r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
-        else
-          form = Crossbeams::RMDForm.new({},
+        repo = MesscadaApp::MesscadaRepo.new
+        if FinishedGoodsApp::GovtInspectionRepo.new.find_vehicle_job(id).business_process_id == repo.find_business_process('FIRST_INTAKE')[:id]
+          seqs = repo.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number]).all
+          form = Crossbeams::RMDForm.new({ pallet_number: params[:pallet][:pallet_number] },
                                          form_name: :pallet,
+                                         notes: nil,
                                          scan_with_camera: @rmd_scan_with_camera,
-                                         caption: 'Offload Pallet',
-                                         action: '/',
+                                         caption: 'Validate Pallet',
                                          reset_button: false,
-                                         no_submit: true,
-                                         button_caption: '')
+                                         action: "/rmd/finished_goods/reject_vehicle_pallet/#{id}",
+                                         button_caption: 'Reject Pallet')
 
-          form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
+          form.add_label(:pallet_number, 'Pallet Number', params[:pallet][:pallet_number], params[:pallet][:pallet_number])
+          form.add_label(:pallet_sequences, 'Pallet Number Sequences', seqs.length)
+          form.add_label(:pallet_sequences, 'Pallet Ctn Qty', seqs.empty? ? '-' : seqs[0][:pallet_carton_quantity])
+          form.add_label(:packhouse, 'Packhouse', seqs.map { |s| s[:packhouse] }.uniq.join(','))
+          form.add_label(:commodity, 'Commodity', seqs.map { |s| s[:commodity] }.uniq.join(','))
+          form.add_label(:variety, 'Variety', seqs.map { |s| s[:marketing_variety] }.uniq.join(','))
+          form.add_label(:packed_tm_group, 'Packed Tm Group', seqs.map { |s| s[:packed_tm_group] }.uniq.join(','))
+          form.add_label(:grade, 'Grade', seqs.map { |s| s[:grade] }.uniq.join(','))
+          form.add_label(:size_ref, 'Size Ref', seqs.map { |s| s[:size_ref] }.uniq.join(','))
+          form.add_label(:std_pack, 'Std Pack', seqs.map { |s| s[:std_pack] }.uniq.join(','))
+          form.add_label(:actual_count, 'Actual Count', seqs.map { |s| s[:actual_count] }.uniq.join(','))
+          form.add_label(:stack_type, 'Stack Type', seqs.map { |s| s[:stack_type] }.uniq.join(','))
+          form.add_button('Accept Pallet', "/rmd/finished_goods/scan_offload_vehicle_pallet_submit/#{id}")
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
+        else
+          offload_valid_vehicle_pallet(r, id)
         end
       end
+    end
+
+    r.on 'scan_offload_vehicle_pallet_submit', Integer do |id|
+      offload_valid_vehicle_pallet(r, id)
+    end
+
+    r.on 'reject_vehicle_pallet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      store_locally(:error, interactor.failed_response("Pallet: #{params[:pallet][:pallet_number]} has been rejected"))
+      r.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
     end
 
     # --------------------------------------------------------------------------
@@ -904,6 +920,34 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.redirect('/rmd/finished_goods/view_deck_pallets')
         end
       end
+    end
+  end
+
+  def offload_valid_vehicle_pallet(route, id) # rubocop:disable Metrics/AbcSize
+    interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+    res = interactor.offload_vehicle_pallet(params[:pallet][:pallet_number])
+    if res.success
+      store_locally(:flash_notice, res.message)
+    else
+      store_locally(:error, res)
+    end
+
+    if !res.instance[:vehicle_job_offloaded]
+      route.redirect("/rmd/finished_goods/scan_offload_vehicle_pallet/#{id}")
+    else
+      form = Crossbeams::RMDForm.new({},
+                                     form_name: :pallet,
+                                     scan_with_camera: @rmd_scan_with_camera,
+                                     caption: 'Offload Pallet',
+                                     action: '/',
+                                     reset_button: false,
+                                     no_submit: true,
+                                     button_caption: '')
+
+      form.add_section_header("#{res.instance[:pallets_moved]} Pallets have been moved to location #{res.instance[:location]}")
+      form.add_csrf_tag csrf_tag
+      view(inline: form.render, layout: :layout_rmd)
     end
   end
 end

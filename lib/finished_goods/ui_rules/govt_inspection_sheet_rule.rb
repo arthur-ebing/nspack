@@ -153,6 +153,7 @@ module UiRules
       rules[:cancel_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded
       rules[:refresh_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded && @repo.refresh_tripsheet?(@form_object.id)
       rules[:print_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded
+      rules[:tripsheet_complete] = @repo.refresh_to_complete_offload?(@form_object.id)
     end
   end
 end

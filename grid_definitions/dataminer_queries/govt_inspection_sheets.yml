@@ -20,11 +20,11 @@
 
   \      govt_inspection_api_results.upn_number AS upn_number,\r\n       created_by,\r\n
   \      string_agg(pallets.pallet_number::text, ', '::text) AS pallet_numbers,\r\n
-  \      CASE\r\n           WHEN cancelled THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected
+  \      CASE\r\n      WHEN tripsheet_offloaded THEN 'ready'      WHEN cancelled THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected
   AND NOT bool_and(govt_inspection_pallets.passed) THEN 'error'\r\n           WHEN
   govt_inspection_sheets.inspected AND bool_and(govt_inspection_pallets.passed) THEN
   'ok'\r\n           WHEN awaiting_inspection_results THEN 'inprogress'\r\n           WHEN
-  completed THEN 'ready'\r\n           END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\nJOIN
+  completed THEN 'yellow'\r\n           END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\nJOIN
   destination_countries ON destination_countries.id = destination_country_id\r\nJOIN
   destination_regions on destination_countries.destination_region_id = destination_regions.id\r\nLEFT
   JOIN govt_inspection_api_results ON govt_inspection_api_results.id = govt_inspection_api_result_id\r\nJOIN

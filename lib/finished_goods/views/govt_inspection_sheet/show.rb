@@ -49,6 +49,7 @@ module FinishedGoods
                 action = 'cancel_tripsheet'
               end
 
+              refresh_tripsheet_action = rules[:tripsheet_complete] ? 'refresh_tripsheet' : 'refresh_tripsheet_confirmed'
               section.add_control(control_type: :link,
                                   text: 'Cancel Tripsheet',
                                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/#{action}",
@@ -57,8 +58,9 @@ module FinishedGoods
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Refresh Tripsheet',
-                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/refresh_tripsheet",
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/#{refresh_tripsheet_action}",
                                   visible: rules[:refresh_tripsheet],
+                                  behaviour: rules[:tripsheet_complete] ? :popup : false,
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'Print Tripsheet',

@@ -1,0 +1,8 @@
+---
+:dataminer_definition: vehicle_jobs
+:actions:
+- :url: "/finished_goods/interwarehouse_transfers/vehicle_jobs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true

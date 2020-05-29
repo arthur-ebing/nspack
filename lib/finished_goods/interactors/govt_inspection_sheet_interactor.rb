@@ -240,6 +240,8 @@ module FinishedGoodsApp
             log_status(:pallets, new_vehicle_job_unit, 'ADDED TO INTAKE TRIPSHEET')
           end
           log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET REFRESHED')
+
+          complete_offload_vehicle(vehicle_job_id) if repo.tripsheet_offload_complete?(vehicle_job_id)
         end
       end
 
@@ -278,22 +280,14 @@ module FinishedGoodsApp
       vehicle_job_unit = repo.find_vehicle_job_unit_by(:stock_item_id, pallet[:id])
       return failed_response('Pallet is not on tripsheet') unless vehicle_job_unit
 
-      instance = { vehicle_job_offloaded: false }
+      instance = { vehicle_job_offloaded: false, vehicle_job_id: vehicle_job_unit[:vehicle_job_id] }
       unless vehicle_job_unit[:offloaded_at]
         repo.transaction do
           tripsheet_pallets = repo.get_vehicle_job_units(vehicle_job_unit[:vehicle_job_id])
           repo.update(:vehicle_job_units, vehicle_job_unit[:id], offloaded_at: Time.now)
           if (tripsheet_pallets.all.find_all { |p| !p[:offloaded_at] }).empty?
-            govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_unit[:vehicle_job_id], :govt_inspection_sheet_id)
-            repo.update(:vehicle_jobs, vehicle_job_unit[:vehicle_job_id], offloaded_at: Time.now)
-            repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_offloaded: true, tripsheet_affloaded_at: Time.now)
-            location_to_id = repo.get(:vehicle_jobs, vehicle_job_unit[:vehicle_job_id], :planned_location_to_id)
-            tripsheet_pallets.each do |p|
-              res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, p[:stock_item_id], location_to_id, 'MOVE_PALLET', nil).call
-              raise res.message unless res.success
-            end
-            repo.update(:pallets, tripsheet_pallets.map { |p| p[:stock_item_id] }, in_stock: true, stock_created_at: Time.now) if AppConst::CREATE_STOCK_AT_FIRST_INTAKE
-            log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET OFFLOADED')
+            #------------------------------------------------------------------------------------------------------------------------------------
+            location_to_id = complete_offload_vehicle(vehicle_job_unit[:vehicle_job_id])
             instance.store(:vehicle_job_offloaded, true)
             instance.store(:pallets_moved, tripsheet_pallets.all.size)
             instance.store(:location, repo.get(:locations, location_to_id, :location_long_code))
@@ -306,6 +300,22 @@ module FinishedGoodsApp
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def complete_offload_vehicle(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
+      repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
+      repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_offloaded: true, tripsheet_affloaded_at: Time.now)
+      location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
+      tripsheet_pallets = repo.get_vehicle_job_units(vehicle_job_id)
+      tripsheet_pallets.each do |p|
+        res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, p[:stock_item_id], location_to_id, 'MOVE_PALLET', nil).call
+        raise res.message unless res.success
+      end
+      repo.update(:pallets, tripsheet_pallets.map { |p| p[:stock_item_id] }, in_stock: true, stock_created_at: Time.now) if AppConst::CREATE_STOCK_AT_FIRST_INTAKE
+      log_status(:govt_inspection_sheets, govt_inspection_sheet_id, 'TRIPSHEET OFFLOADED')
+
+      location_to_id
     end
 
     def assert_permission!(task, id = nil)

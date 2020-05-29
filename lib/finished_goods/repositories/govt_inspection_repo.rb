@@ -123,6 +123,17 @@ module FinishedGoodsApp
       DB[query, vehicle_job_id]
     end
 
+    def get_inspection_vehicle_job_units(govt_inspection_sheet_id)
+      query = <<~SQL
+        SELECT u.*
+        FROM  vehicle_job_units u
+        JOIN pallets p on p.id=u.stock_item_id
+        JOIN govt_inspection_pallets g on g.pallet_id=p.id
+        WHERE g.govt_inspection_sheet_id = ?
+      SQL
+      DB[query, govt_inspection_sheet_id]
+    end
+
     def get_vehicle_job_location(vehicle_job_id)
       query = <<~SQL
         SELECT l.location_long_code
@@ -165,6 +176,26 @@ module FinishedGoodsApp
       tripsheet_pallets = get_vehicle_job_units(vehicle_job_id)
 
       tripsheet_pallets.map { |p| p[:stock_item_id] }.sort != govt_inspection_pallets.map { |p| p[:pallet_id] }.sort
+    end
+
+    def get_vehicle_jobs_pallets(vehicle_job_id)
+      query = <<~SQL
+        SELECT p.pallet_number
+        FROM vehicle_jobs v
+        JOIN vehicle_job_units u on u.vehicle_job_id = v.id
+        JOIN pallets p on p.id = u.stock_item_id
+        WHERE v.id = ?
+      SQL
+      DB[query, vehicle_job_id].map { |p| p[:pallet_number] }
+    end
+
+    def tripsheet_offload_complete?(vehicle_job_id)
+      tripsheet_pallets = get_vehicle_job_units(vehicle_job_id)
+      (tripsheet_pallets.all.find_all { |p| !p[:offloaded_at] }).empty?
+    end
+
+    def refresh_to_complete_offload?(govt_inspection_sheet_id)
+      (get_inspection_vehicle_job_units(govt_inspection_sheet_id).all.find_all { |p| !p[:offloaded_at] }).empty?
     end
   end
 end

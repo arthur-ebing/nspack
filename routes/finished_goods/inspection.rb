@@ -111,6 +111,20 @@ class Nspack < Roda
       end
 
       r.on 'refresh_tripsheet' do
+        show_partial do
+          FinishedGoods::Tripsheet::RefreshTripsheetConfirm.call(id,
+                                                                 notice: 'A refresh will leave only offloaded pallets remaining in the tripsheet. Do you want to:
+                                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+        end
+      end
+
+      r.on 'refresh_tripsheet_cancelled' do
+        flash[:error] = 'refresh_tripsheet cancelled'
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+      end
+
+      r.on 'refresh_tripsheet_confirmed' do
         r.get do
           res = interactor.refresh_tripsheet(id)
           if res.success
@@ -381,6 +395,21 @@ class Nspack < Roda
           flash[:error] = res.message
         end
         redirect_to_last_grid(r)
+      end
+    end
+  end
+
+  route 'interwarehouse_transfers', 'finished_goods' do |r|
+    # VEHICLE JOBS
+    # --------------------------------------------------------------------------
+    r.on 'vehicle_jobs', Integer do |id|
+      # interactor = FinishedGoodsApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.is do
+        r.get do       # SHOW
+          # check_auth!('interwarehouse transfers', 'read')
+          show_partial { FinishedGoods::InterwarehouseTransfers::VehicleJob::Show.call(id) }
+        end
       end
     end
   end
