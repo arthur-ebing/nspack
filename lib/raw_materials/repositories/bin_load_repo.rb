@@ -79,9 +79,8 @@ module RawMaterialsApp
       query = if args[:bin_load_product_id].nil?
                 "#{query} AND rmt_bins.bin_load_product_id IS NULL"
               else
-                "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]}"
+                "#{query} AND bin_load_products.id = #{args[:bin_load_product_id]} AND (rmt_bins.bin_load_product_id IS NULL OR rmt_bins.bin_load_product_id = #{args[:bin_load_product_id]})"
               end
-
       DB[query].map { |q| q[column] }.uniq
     end
 

@@ -9,16 +9,18 @@
   \   bin_loads.shipped,\r\n    bin_loads.shipped_at,\r\n    bin_loads.completed,\r\n
   \   bin_loads.completed_at,\r\n    bin_loads.active,\r\n    EXISTS (select id from
   bin_load_products where bin_load_id = bin_loads.id) AS has_products,\r\n    CASE\r\n
-  \       WHEN bin_loads.shipped THEN FALSE\r\n        ELSE NOT FALSE = ALL(select
-  SUM(rmt_bins.qty_bins) = blp.qty_bins\r\n                             from rmt_bins\r\n
-  \                            join bin_load_products blp on rmt_bins.bin_load_product_id
-  = blp.id\r\n                             where blp.bin_load_id = bin_loads.id\r\n
-  \                            group by blp.id)\r\n    END IS TRUE AS able_to_ship,\r\n
-  \   bin_loads.created_at,\r\n    bin_loads.updated_at,\r\n    CASE\r\n        WHEN
-  bin_loads.shipped THEN 'blue'\r\n        WHEN bin_loads.completed THEN 'green'\r\n
-  \   END AS colour_rule\r\n\r\nFROM bin_loads\r\nLEFT JOIN bin_load_purposes ON bin_load_purposes.id
-  = bin_loads.bin_load_purpose_id\r\nJOIN depots ON depots.id = bin_loads.dest_depot_id\r\n\r\nORDER
-  BY bin_loads.updated_at DESC"
+  \       WHEN bin_loads.shipped THEN FALSE\r\n        ELSE (select bool_and(product_pass)\r\n
+  \             from (select (SUM(rmt_bins.qty_bins) = blp.qty_bins) IS TRUE AS product_pass,\r\n
+  \                          blp.bin_load_id\r\n                    from  bin_load_products
+  blp\r\n                    left join rmt_bins on rmt_bins.bin_load_product_id =
+  blp.id\r\n                    where blp.bin_load_id = bin_loads.id\r\n                    group
+  by blp.id) products\r\n              group by products.bin_load_id)\r\n    END IS
+  TRUE AS able_to_ship,\r\n    bin_loads.created_at,\r\n    bin_loads.updated_at,\r\n
+  \   CASE\r\n        WHEN bin_loads.shipped THEN 'blue'\r\n        WHEN bin_loads.completed
+  THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM bin_loads\r\n         LEFT JOIN
+  bin_load_purposes ON bin_load_purposes.id = bin_loads.bin_load_purpose_id\r\n         JOIN
+  depots ON depots.id = bin_loads.dest_depot_id\r\n\r\nORDER BY bin_loads.updated_at
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -306,7 +308,7 @@
     :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
