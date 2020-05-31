@@ -88,7 +88,8 @@ module FinishedGoodsApp
                                         Weight: pallet_sequence[:sequence_nett_weight].to_f.round(2),
                                         WeightUnitCode: 'KG',
                                         TrackingUnitLocation: nil,
-                                        TrackingUnitOrigin: pallet_sequence[:production_region] }
+                                        TrackingUnitOrigin: pallet_sequence[:production_region],
+                                        InspectionPoint: pallet_sequence[:inspection_point] }
       end
       preverify_pallet_sequences
     end

@@ -56,6 +56,11 @@ class Nspack < Roda
       end
 
       r.is do
+        r.get do       # SHOW
+          check_auth!('ecert', 'read')
+          show_partial { FinishedGoods::Ecert::EcertTrackingUnit::Show.call(id) }
+        end
+
         r.delete do    # DELETE
           check_auth!('ecert', 'delete')
           interactor.assert_permission!(:delete, id)

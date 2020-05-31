@@ -15,10 +15,8 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      # pallet_id_label = FinishedGoodsApp::PalletRepo.new.find_pallet(@form_object.pallet_id)&.pallet_number
-      pallet_id_label = @repo.find(:pallets, FinishedGoodsApp::Pallet, @form_object.pallet_id)&.pallet_number
-      # ecert_agreement_id_label = FinishedGoodsApp::EcertRepo.new.find_ecert_agreement(@form_object.ecert_agreement_id)&.code
-      ecert_agreement_id_label = @repo.find(:ecert_agreements, FinishedGoodsApp::EcertAgreement, @form_object.ecert_agreement_id)&.code
+      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
+      ecert_agreement_id_label = @repo.get(:ecert_agreements, @form_object.ecert_agreement_id, :code)
       fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
       fields[:ecert_agreement_id] = { renderer: :label, with_value: ecert_agreement_id_label, caption: 'Ecert Agreement' }
       fields[:business_id] = { renderer: :label }
@@ -26,8 +24,8 @@ module UiRules
       fields[:elot_key] = { renderer: :label }
       fields[:verification_key] = { renderer: :label }
       fields[:passed] = { renderer: :label, as_boolean: true }
-      fields[:process_result] = { renderer: :label }
-      fields[:rejection_reasons] = { renderer: :label }
+      fields[:process_result] = { renderer: :label, with_value: @form_object.process_result.to_s.gsub('\\n', '') }
+      fields[:rejection_reasons] = { renderer: :label, with_value: @form_object.rejection_reasons.uniq }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 

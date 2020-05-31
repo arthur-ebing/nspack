@@ -2,6 +2,11 @@
 :dataminer_definition: ecert_tracking_units
 :actions:
 - :url: "/finished_goods/ecert/ecert_tracking_units/$:id$"
+  :text: view
+  :icon: view-show
+  :title: 'Ecert Tracking Unit'
+  :popup: true
+- :url: "/finished_goods/ecert/ecert_tracking_units/$:id$"
   :text: delete
   :icon: delete
   :is_delete: true
