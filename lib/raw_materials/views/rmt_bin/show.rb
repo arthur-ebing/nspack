@@ -18,6 +18,7 @@ module RawMaterials
               form.add_field :orchard_id
               form.add_field :season_id
               form.add_field :cultivar_id
+              form.add_field :rmt_class_id
               form.add_field :rmt_container_type_id
               form.add_field :qty_bins
               form.add_field :qty_inner_bins

@@ -18,6 +18,7 @@ module RawMaterials
               form.action is_direct_create ? "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/direct_create" : "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins"
               form.remote! if remote
               form.add_field :rmt_container_type_id
+              form.add_field :rmt_class_id
               form.add_field :qty_bins
               form.add_field :qty_inner_bins
               form.add_field :bin_fullness

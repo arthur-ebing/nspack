@@ -58,6 +58,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
+      rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
       orchard_id_label = MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code
       season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
@@ -77,6 +78,7 @@ module UiRules
       fields[:qty_inner_bins] = { renderer: :label, hide_on_load: @rules[:capture_inner_bins] ? false : true }
       fields[:bin_fullness] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
+      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Rmt Class' }
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: rmt_container_material_type_id_label, caption: 'Container Material Type' }
       fields[:rmt_material_owner_party_role_id] = { renderer: :label, with_value: rmt_material_owner_party_role_id_label, caption: 'Container Material Owner' }
       fields[:rmt_inner_container_type_id] = { renderer: :label, with_value: rmt_inner_container_type_id_label, caption: 'Inner Container Type' }
@@ -94,6 +96,7 @@ module UiRules
         bin_fullness: { renderer: :select, options: ['Quarter', 'Half', 'Three Quarters', 'Full'], caption: 'Bin Fullness', required: true, prompt: true },
         nett_weight: {},
         rmt_container_type_id: { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true },
+        rmt_class_id: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true, prompt: true },
         rmt_container_material_type_id: { renderer: :select, options: !@form_object.rmt_container_type_id.nil_or_empty? ? MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }) : [],
                                           disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
                                           caption: 'Container Material Type', required: true, prompt: true },

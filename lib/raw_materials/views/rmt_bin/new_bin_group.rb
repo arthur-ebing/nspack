@@ -18,6 +18,7 @@ module RawMaterials
               form.action "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups"
               form.remote! if remote
               form.add_field :qty_bins_to_create
+              form.add_field :rmt_class_id
               form.add_field :rmt_container_type_id
               # form.add_field :qty_bins
               # form.add_field :qty_inner_bins

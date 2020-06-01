@@ -35,7 +35,7 @@ module UiRules
         rmt_container_material_type_id: { renderer: :select, options: !@form_object.rmt_container_type_id.nil_or_empty? ? MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }) : [],
                                           disabled_options: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_inactive_rmt_container_material_types,
                                           caption: 'Container Material Type', required: true, prompt: true },
-        rmt_material_owner_party_role_id: { renderer: :select, options: !@form_object.rmt_container_material_type_id.nil_or_empty? ? @repo.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true },
+        rmt_material_owner_party_role_id: { renderer: :select, options: !@form_object.rmt_container_material_type_id.nil_or_empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(@form_object.rmt_container_material_type_id) : [], caption: 'Container Material Owner', required: true, prompt: true },
         gross_weight: {}
       }
     end

@@ -7,6 +7,7 @@ module RawMaterialsApp
     optional(:id, :integer).filled(:int?)
     required(:orchard_id, :integer).filled(:int?)
     required(:rmt_delivery_id, :integer).filled(:int?)
+    required(:rmt_class_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).filled(:int?)
     required(:puc_id, :integer).filled(:int?)
@@ -28,12 +29,13 @@ module RawMaterialsApp
     optional(:scrapped_bin_asset_number, Types::StrippedString).maybe(:str?)
   end
 
-  RmtRebinBinSchema = Dry::Validation.Params do
+  RmtRebinBinSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
     required(:orchard_id, :integer).filled(:int?)
     required(:rmt_delivery_id, :integer).filled(:int?)
+    required(:rmt_class_id, :integer).filled(:int?)
     required(:season_id, :integer).filled(:int?)
     required(:production_run_rebin_id, :integer).filled(:int?)
     required(:cultivar_id, :integer).filled(:int?)

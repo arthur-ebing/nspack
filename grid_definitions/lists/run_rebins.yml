@@ -2,7 +2,7 @@
 :dataminer_definition: rmt_bins
 :conditions:
   :standard:
-    - :col: production_run_tipped_id
+    - :col: production_run_rebin_id
       :op: =
       :val: $:id$
 :multiselect:
