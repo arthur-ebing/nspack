@@ -52,8 +52,16 @@
   :popup: false
   :hide_if_false: keep_open
   :prompt: 'You are about to close this delivery. Are you sure?'
+
+:captions:
+  :conditions:
+    :production_run_deliveries: Deliveries for Production Run
 :conditions:
   :standard:
     - :col: rmt_deliveries.id
       :op: =
       :val: $:id$
+  :production_run_deliveries:
+    - :col: rmt_deliveries.id
+      :op: IN
+      :val: $:ids$

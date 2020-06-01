@@ -33,6 +33,8 @@
 :captions:
   :conditions:
     :location_bins: Location Bins
+    :production_run_bin: Bins for Production Run
+    :production_run_rebin: Rebins for Production Run
 :conditions:
   :standard:
     - :col: rmt_delivery_id
@@ -57,3 +59,19 @@
     - :col: location_id
       :op: IN
       :val: $:location_ids$
+  :production_run_bin:
+    - :col: production_run_tipped_id
+      :op: =
+      :val: $:id$
+  :production_run_rebin:
+    - :col: production_run_rebin_id
+      :op: =
+      :val: $:id$
+:multiselect:
+  :allocate:
+    :url: "/raw_materials/dispatch/bin_load_products/$:id$/allocate_multiselect"
+    :preselect: "SELECT id FROM vw_rmt_bins_flat WHERE bin_load_product_id = $:id$"
+    :section_caption: 'Allocate Bins to load'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: available

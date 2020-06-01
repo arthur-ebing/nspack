@@ -20,47 +20,47 @@
   :hide_if_false: setup_complete
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/close"
-  :text: Close this run
+  :text: close this run
   :icon: lock-closed
   :title: Close this run
   :popup: true
   :hide_if_false: completed
   :hide_if_true: closed
 - :url: "/production/runs/production_runs/$:id$/complete_setup"
-  :text: Mark setup as complete
+  :text: mark setup as complete
   :icon: toggle-on
   :title: Mark setup as complete
   :popup: true
   :hide_if_true: setup_complete,reconfiguring
 - :url: "/production/runs/production_runs/$:id$/execute_run"
-  :text: Execute run
+  :text: execute run
   :icon: play
   :title: Execute run
   :popup: true
   :hide_if_true: running,completed
   :hide_if_false: setup_complete
 - :url: "/production/runs/production_runs/$:id$/re_execute_run"
-  :text: Re-execute run
+  :text: re-execute run
   :icon: play
   :title: Re-execute run
   :popup: true
   :hide_if_false: reconfiguring
 - :url: "/production/runs/production_runs/$:id$/complete_run"
-  :text: Complete all run stages
+  :text: complete all run stages
   :icon: minus-solid
   :title: Complete all run stages
   :popup: true
   :hide_if_true: reconfiguring
   :hide_if_false: running,tipping,labeling
 - :url: "/production/runs/production_runs/$:id$/complete_stage"
-  :text: Complete current run stage
+  :text: complete current run stage
   :icon: minus-outline
   :title: Complete current run stage
   :popup: true
   :hide_if_true: reconfiguring
   :hide_if_false: running
 - :url: "/production/runs/production_runs/$:id$/re_configure"
-  :text: Re-configure
+  :text: re-configure
   :icon: edit
   :title: Re-configure
   :popup: true
@@ -95,22 +95,49 @@
   :is_delete: true
   :popup: true
   :hide_if_true: setup_complete,reconfiguring
+- :submenu:
+    :text: list
+    :items:
+      - :url: "/list/rmt_deliveries/with_params?key=production_run_deliveries&ids=$:delivery_ids$"
+        :text: deliveries
+        :icon: list
+        :hide_if_false: has_deliveries
+      - :url: "/list/rmt_bins/with_params?key=production_run_bin&id=$:id$"
+        :text: bins
+        :icon: list
+        :hide_if_false: has_bins
+      - :url: "/list/rmt_bins/with_params?key=production_run_rebin&id=$:id$"
+        :text: rebins
+        :icon: list
+        :hide_if_false: has_rebins
+      - :url: "/list/pallets_view/with_params?key=production_run_pallets&production_run_id=$:id$"
+        :text: pallets
+        :icon: list
+        :hide_if_false: has_pallets
+      - :url: "/list/pallet_sequences_view/with_params?key=production_run_sequences&id=$:id$"
+        :text: pallet sequences
+        :icon: list
+        :hide_if_false: has_pallets
+      - :url: "/list/cartons/with_params?key=production_run_cartons&id=$:id$"
+        :text: cartons
+        :icon: list
+        :hide_if_false: has_cartons
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/show_stats"
-  :text: View run stats
+  :text: view run stats
   :icon: view-show
   :title: View run stats
   :popup: true
 - :url: "/production/runs/production_runs/$:id$/packout_report"
-  :text: Packout report
+  :text: packout report
   :icon: printer
   :loading_window: true
 - :url: "/production/runs/production_runs/$:id$/packout_report_derived"
-  :text: Packout report (derived weights)
+  :text: packout report (derived weights)
   :icon: printer
   :loading_window: true
 - :url: "/production/runs/production_runs/$:id$/carton_packout_report"
-  :text: Carton packout report
+  :text: carton packout report
   :icon: printer
   :loading_window: true
 - :separator: true
@@ -126,7 +153,7 @@
   :popup: true
 - :separator: true
 - :submenu:
-    :text: Rebins
+    :text: rebins
     :items:
       - :url: /production/runs/production_runs/$:id$/rebins
         :text: create rebin

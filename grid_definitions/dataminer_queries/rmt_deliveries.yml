@@ -10,21 +10,24 @@
   \   rmt_deliveries.qty_empty_bins,\r\n    rmt_deliveries.current,\r\n    rmt_deliveries.keep_open,\r\n
   \   rmt_deliveries.delivery_tipped,\r\n    rmt_deliveries.shipped,\r\n    rmt_deliveries.date_picked
   AS picked_at,\r\n    rmt_deliveries.date_delivered AS delivered_at,\r\n    rmt_deliveries.tipping_complete_date_time
-  AS tipped_at,\r\n    --\r\n    SUM(rmt_bins.qty_bins) AS qty_bins,\r\n    SUM(rmt_bins.qty_bins)
-  filter (WHERE rmt_delivery_id = rmt_deliveries.id AND bin_tipped IS TRUE) > 0 IS
-  TRUE AS contains_tipped_bins,\r\n    SUM(rmt_bins.qty_bins) filter (WHERE rmt_delivery_id
-  = rmt_deliveries.id AND bin_tipped IS TRUE) AS qty_bins_tipped,\r\n    --\r\n    rmt_deliveries.created_at,\r\n
+  AS tipping_completed_at,\r\n    --\r\n    SUM(rmt_bins.qty_bins) AS qty_bins,\r\n
+  \   ARRAY_AGG(distinct production_run_tipped_id order by production_run_tipped_id)
+  filter (where production_run_tipped_id is not null) AS production_runs,\r\n    SUM(rmt_bins.qty_bins)
+  filter (where rmt_delivery_id = rmt_deliveries.id and bin_tipped is true) > 0 IS
+  TRUE AS contains_tipped_bins,\r\n    SUM(rmt_bins.qty_bins) filter (where rmt_delivery_id
+  = rmt_deliveries.id and bin_tipped is true) AS qty_bins_tipped,\r\n    --\r\n    rmt_deliveries.created_at,\r\n
   \   rmt_deliveries.updated_at,\r\n    CASE\r\n        WHEN rmt_deliveries.current
   THEN 'green'\r\n        WHEN delivery_tipped THEN 'gray'\r\n        WHEN keep_open
-  THEN 'orange'\r\n        WHEN shipped THEN 'blue'\r\n    END AS colour_rule\r\nFROM\r\n
-  \   rmt_deliveries\r\nJOIN seasons ON seasons.id = rmt_deliveries.season_id\r\nJOIN
-  farms ON farms.id = rmt_deliveries.farm_id\r\nJOIN pucs ON pucs.id = rmt_deliveries.puc_id\r\nJOIN
-  orchards ON orchards.id = rmt_deliveries.orchard_id\r\nJOIN cultivars ON cultivars.id
-  = rmt_deliveries.cultivar_id\r\nLEFT JOIN rmt_delivery_destinations ON rmt_delivery_destinations.id
-  = rmt_deliveries.rmt_delivery_destination_id\r\nLEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id
-  = rmt_deliveries.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n    cultivars.id,\r\n
-  \   farms.id,\r\n    orchards.id,\r\n    pucs.id,\r\n    rmt_delivery_destinations.id,\r\n
-  \   seasons.id\r\nORDER BY\r\n    rmt_deliveries.updated_at DESC"
+  THEN 'orange'\r\n        WHEN shipped THEN 'blue'\r\n        END AS colour_rule\r\nFROM\r\n
+  \   rmt_deliveries\r\n        JOIN seasons ON seasons.id = rmt_deliveries.season_id\r\n
+  \       JOIN farms ON farms.id = rmt_deliveries.farm_id\r\n        JOIN pucs ON
+  pucs.id = rmt_deliveries.puc_id\r\n        JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n
+  \       JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT
+  JOIN rmt_delivery_destinations ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
+  \       LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\nGROUP
+  BY\r\n    rmt_deliveries.id,\r\n    cultivars.id,\r\n    farms.id,\r\n    orchards.id,\r\n
+  \   pucs.id,\r\n    rmt_delivery_destinations.id,\r\n    seasons.id\r\nORDER BY\r\n
+  \   rmt_deliveries.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -418,13 +421,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  tipped_at:
-    :name: tipped_at
+  tipping_completed_at:
+    :name: tipping_completed_at
     :sequence_no: 25
-    :caption: Tipped at
+    :caption: Tipping completed at
     :namespaced_name: rmt_deliveries.tipping_complete_date_time
     :data_type: :datetime
-    :width: 
+    :width: 150
     :format: :datetime_with_secs
     :hide: false
     :pinned: 
@@ -450,9 +453,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  production_runs:
+    :name: production_runs
+    :sequence_no: 27
+    :caption: Production runs
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   contains_tipped_bins:
     :name: contains_tipped_bins
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Contains Tipped Bins
     :namespaced_name: 
     :data_type: :boolean
@@ -468,7 +487,7 @@
     :group_max: false
   qty_bins_tipped:
     :name: qty_bins_tipped
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Qty Bins Tipped
     :namespaced_name: 
     :data_type: :number
@@ -484,7 +503,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Created at
     :namespaced_name: rmt_deliveries.created_at
     :data_type: :datetime
@@ -500,7 +519,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Updated at
     :namespaced_name: rmt_deliveries.updated_at
     :data_type: :datetime
@@ -516,7 +535,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

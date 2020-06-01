@@ -1,7 +1,10 @@
 ---
 :dataminer_definition: cartons
+:captions:
+  :conditions:
+    :production_run_cartons: Cartons on Production Run
 :conditions:
-  :standard:
+  :production_run_cartons:
     - :col: carton_labels.production_run_id
       :op: =
-      :val: $:carton_labels.production_run_id$
+      :val: $:id$

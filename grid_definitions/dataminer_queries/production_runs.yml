@@ -1,39 +1,44 @@
 ---
 :caption: Production Runs
-:sql: "SELECT\r\n  \"production_runs\".\"id\",\r\n  fn_production_run_code (\"production_runs\".\"id\")
-  AS production_run_code,\r\n  fn_current_status ('production_runs', \"production_runs\".\"id\")
-  AS status,\r\n  \"production_runs\".\"running\",\r\n  \"production_runs\".\"reconfiguring\",\r\n
-  \ \"plant_resources2\".\"plant_resource_code\" AS line_code,\r\n  \"cultivars\".\"cultivar_name\",\r\n
-  \ \"production_runs\".\"active_run_stage\",\r\n  \"cultivar_groups\".\"cultivar_group_code\",\r\n
-  \ \"farms\".\"farm_code\",\r\n  \"orchards\".\"orchard_code\",\r\n  \"plant_resources\".\"plant_resource_code\"
-  AS packhouse_code,\r\n  \"product_setup_templates\".\"template_name\",\r\n  \"pucs\".\"puc_code\",\r\n
-  \ \"seasons\".\"season_code\",\r\n  fn_production_run_code (\"production_runs\".\"cloned_from_run_id\")
-  AS cloned_from_run_code,\r\n  \"production_runs\".\"started_at\",\r\n  \"production_runs\".\"closed_at\",\r\n
-  \ \"production_runs\".\"re_executed_at\",\r\n  \"production_runs\".\"completed_at\",\r\n
-  \ \"production_runs\".\"allow_cultivar_mixing\",\r\n  \"production_runs\".\"allow_orchard_mixing\",\r\n
-  \ \"production_runs\".\"tipping\",\r\n  \"production_runs\".\"labeling\",\r\n  \"production_runs\".\"closed\",\r\n
-  \ \"production_runs\".\"setup_complete\",\r\n  \"production_runs\".\"completed\",\r\n
-  \ \"production_runs\".\"farm_id\",\r\n  \"production_runs\".\"puc_id\",\r\n  \"production_runs\".\"packhouse_resource_id\",\r\n
-  \ \"production_runs\".\"production_line_id\",\r\n  \"production_runs\".\"season_id\",\r\n
-  \ \"production_runs\".\"orchard_id\",\r\n  \"production_runs\".\"cultivar_group_id\",\r\n
-  \ \"production_runs\".\"cultivar_id\",\r\n  \"production_runs\".\"product_setup_template_id\",\r\n
-  \ \"production_runs\".\"cloned_from_run_id\",\r\n  \"production_runs\".\"active\",\r\n
-  \ \"production_runs\".\"created_at\",\r\n  \"production_runs\".\"updated_at\",\r\n
-  \ \"production_runs\".\"allocation_required\",\r\n  CASE WHEN \"production_runs\".\"product_setup_template_id\"
-  IS NOT NULL\r\n    AND \"production_runs\".\"setup_complete\"\r\n    AND NOT \"production_runs\".\"reconfiguring\"
-  THEN\r\n    TRUE\r\n  ELSE\r\n    FALSE\r\n  END AS view_allocs,\r\n  CASE WHEN
-  \"production_runs\".\"reconfiguring\" THEN\r\n    'inprogress'\r\n  WHEN \"production_runs\".\"running\"
-  THEN\r\n    'ok'\r\n  END AS colour_rule\r\nFROM\r\n  \"production_runs\"\r\n  LEFT
-  JOIN \"cultivar_groups\" ON \"cultivar_groups\".\"id\" = \"production_runs\".\"cultivar_group_id\"\r\n
-  \ LEFT JOIN \"cultivars\" ON \"cultivars\".\"id\" = \"production_runs\".\"cultivar_id\"\r\n
-  \ JOIN \"farms\" ON \"farms\".\"id\" = \"production_runs\".\"farm_id\"\r\n  LEFT
-  JOIN \"orchards\" ON \"orchards\".\"id\" = \"production_runs\".\"orchard_id\"\r\n
-  \ JOIN \"plant_resources\" ON \"plant_resources\".\"id\" = \"production_runs\".\"packhouse_resource_id\"\r\n
-  \ LEFT JOIN \"product_setup_templates\" ON \"product_setup_templates\".\"id\" =
-  \"production_runs\".\"product_setup_template_id\"\r\n  JOIN \"plant_resources\"
-  plant_resources2 ON \"plant_resources2\".\"id\" = \"production_runs\".\"production_line_id\"\r\n
-  \ JOIN \"pucs\" ON \"pucs\".\"id\" = \"production_runs\".\"puc_id\"\r\n  JOIN \"seasons\"
-  ON \"seasons\".\"id\" = \"production_runs\".\"season_id\""
+:sql: "SELECT\r\n    production_runs.id,\r\n    fn_production_run_code (production_runs.id)
+  AS production_run_code,\r\n    fn_current_status ('production_runs', production_runs.id)
+  AS status,\r\n    production_runs.running,\r\n    production_runs.reconfiguring,\r\n
+  \   plant_resources2.plant_resource_code AS line_code,\r\n    cultivars.cultivar_name,\r\n
+  \   production_runs.active_run_stage,\r\n    cultivar_groups.cultivar_group_code,\r\n
+  \   farms.farm_code,\r\n    orchards.orchard_code,\r\n    plant_resources.plant_resource_code
+  AS packhouse_code,\r\n    product_setup_templates.template_name,\r\n    pucs.puc_code,\r\n
+  \   seasons.season_code,\r\n    fn_production_run_code (production_runs.cloned_from_run_id)
+  AS cloned_from_run_code,\r\n    production_runs.started_at,\r\n    production_runs.closed_at,\r\n
+  \   production_runs.re_executed_at,\r\n    production_runs.completed_at,\r\n    production_runs.allow_cultivar_mixing,\r\n
+  \   production_runs.allow_orchard_mixing,\r\n    production_runs.tipping,\r\n    production_runs.labeling,\r\n
+  \   production_runs.closed,\r\n    production_runs.setup_complete,\r\n    production_runs.completed,\r\n
+  \   production_runs.farm_id,\r\n    production_runs.puc_id,\r\n    production_runs.packhouse_resource_id,\r\n
+  \   production_runs.production_line_id,\r\n    production_runs.season_id,\r\n    production_runs.orchard_id,\r\n
+  \   production_runs.cultivar_group_id,\r\n    production_runs.cultivar_id,\r\n    production_runs.product_setup_template_id,\r\n
+  \   production_runs.cloned_from_run_id,\r\n    production_runs.active,\r\n    production_runs.created_at,\r\n
+  \   production_runs.updated_at,\r\n    production_runs.allocation_required,\r\n
+  \   (production_runs.product_setup_template_id IS NOT NULL AND production_runs.setup_complete
+  AND NOT production_runs.reconfiguring)::bool AS view_allocs,\r\n    (select array_agg(distinct
+  pallet_id) from pallet_sequences where production_run_id = production_runs.id group
+  by production_run_id) AS pallet_ids,\r\n    EXISTS(select pallet_id from pallet_sequences
+  where production_run_id = production_runs.id) AS has_pallets,\r\n    (select array_agg(distinct
+  rmt_delivery_id) from rmt_bins where production_run_tipped_id = production_runs.id
+  group by production_run_tipped_id) AS delivery_ids,\r\n    EXISTS(select rmt_delivery_id
+  from rmt_bins where production_run_tipped_id = production_runs.id) AS has_deliveries,\r\n
+  \   EXISTS(select id from rmt_bins where production_run_tipped_id = production_runs.id)
+  AS has_bins,\r\n    EXISTS(select id from rmt_bins where production_run_rebin_id
+  = production_runs.id) AS has_rebins,\r\n    EXISTS(select id from cartons where
+  production_run_id = production_runs.id) AS has_cartons,\r\n    CASE\r\n        WHEN
+  production_runs.reconfiguring THEN 'inprogress'\r\n        WHEN production_runs.running
+  THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT JOIN
+  cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id\r\nLEFT
+  JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN farms ON farms.id
+  = production_runs.farm_id\r\nLEFT JOIN orchards ON orchards.id = production_runs.orchard_id\r\nJOIN
+  plant_resources ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT
+  JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
+  plant_resources plant_resources2 ON plant_resources2.id = production_runs.production_line_id\r\nJOIN
+  pucs ON pucs.id = production_runs.puc_id\r\nJOIN seasons ON seasons.id = production_runs.season_id\r\n\r\nORDER
+  BY production_runs.id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -47,7 +52,7 @@
     :caption: Id
     :namespaced_name: production_runs.id
     :data_type: :integer
-    :width: 80
+    :width: 60
     :format: 
     :hide: false
     :pinned: left
@@ -63,7 +68,7 @@
     :caption: Production run code
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: left
@@ -79,7 +84,7 @@
     :caption: Status
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: left
@@ -95,7 +100,7 @@
     :caption: Running?
     :namespaced_name: production_runs.running
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: left
@@ -111,7 +116,7 @@
     :caption: Reconfig?
     :namespaced_name: production_runs.reconfiguring
     :data_type: :boolean
-    :width: 120
+    :width: 100
     :format: 
     :hide: false
     :pinned: left
@@ -127,7 +132,7 @@
     :caption: Line code
     :namespaced_name: plant_resources2.plant_resource_code
     :data_type: :string
-    :width: 100
+    :width: 80
     :format: 
     :hide: false
     :pinned: left
@@ -143,7 +148,7 @@
     :caption: Cultivar name
     :namespaced_name: cultivars.cultivar_name
     :data_type: :string
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -159,7 +164,7 @@
     :caption: Active run stage
     :namespaced_name: production_runs.active_run_stage
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -175,7 +180,7 @@
     :caption: Cultivar group code
     :namespaced_name: cultivar_groups.cultivar_group_code
     :data_type: :string
-    :width: 
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -223,7 +228,7 @@
     :caption: Packhouse code
     :namespaced_name: plant_resources.plant_resource_code
     :data_type: :string
-    :width: 
+    :width: 110
     :format: 
     :hide: false
     :pinned: 
@@ -271,7 +276,7 @@
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
-    :width: 
+    :width: 95
     :format: 
     :hide: false
     :pinned: 
@@ -287,7 +292,7 @@
     :caption: Cloned from run
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: 
@@ -304,7 +309,7 @@
     :namespaced_name: production_runs.started_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -320,7 +325,7 @@
     :namespaced_name: production_runs.closed_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -336,7 +341,7 @@
     :namespaced_name: production_runs.re_executed_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -352,7 +357,7 @@
     :namespaced_name: production_runs.completed_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -447,7 +452,7 @@
     :caption: Setup complete
     :namespaced_name: production_runs.setup_complete
     :data_type: :boolean
-    :width: 140
+    :width: 130
     :format: 
     :hide: false
     :pinned: 
@@ -463,7 +468,7 @@
     :caption: Completed
     :namespaced_name: production_runs.completed
     :data_type: :boolean
-    :width: 120
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -672,7 +677,7 @@
     :namespaced_name: production_runs.updated_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -713,9 +718,121 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_ids:
+    :name: pallet_ids
+    :sequence_no: 43
+    :caption: Pallet ids
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_pallets:
+    :name: has_pallets
+    :sequence_no: 44
+    :caption: Has pallets
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  delivery_ids:
+    :name: delivery_ids
+    :sequence_no: 45
+    :caption: Delivery ids
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_deliveries:
+    :name: has_deliveries
+    :sequence_no: 46
+    :caption: Has deliveries
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_bins:
+    :name: has_bins
+    :sequence_no: 47
+    :caption: Has bins
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_rebins:
+    :name: has_rebins
+    :sequence_no: 48
+    :caption: Has rebins
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_cartons:
+    :name: has_cartons
+    :sequence_no: 49
+    :caption: Has cartons
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 43
+    :sequence_no: 50
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

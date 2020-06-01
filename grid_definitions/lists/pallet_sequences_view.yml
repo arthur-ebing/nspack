@@ -1,0 +1,14 @@
+---
+:dataminer_definition: pallet_sequences_view
+:captions:
+  :conditions:
+    :production_run_sequences: Pallet Sequences on Production Run
+:conditions:
+  :standard:
+    - :col: vw_pallets.pallet_id
+      :op: =
+      :val: $:id$
+  :production_run_sequences:
+    - :col: vw_pallet_sequences.production_run_id
+      :op: =
+      :val: $:id$
