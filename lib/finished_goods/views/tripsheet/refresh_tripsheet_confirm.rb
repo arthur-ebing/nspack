@@ -25,7 +25,7 @@ module FinishedGoods
             form.row do |row|
               row.column do |col|
                 col.add_control(control_type: :link,
-                                text: 'Abondon Refresh?',
+                                text: 'Abondon_Refresh?',
                                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/refresh_tripsheet_cancelled",
                                 visible: rules[:inspected],
                                 style: :button)
@@ -37,7 +37,7 @@ module FinishedGoods
 
               row.column do |col|
                 col.add_control(control_type: :link,
-                                text: 'Refresh And Complete Offload?',
+                                text: 'Refresh_And_Complete_Offload?',
                                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/refresh_tripsheet_confirmed",
                                 visible: rules[:inspected],
                                 style: :button)

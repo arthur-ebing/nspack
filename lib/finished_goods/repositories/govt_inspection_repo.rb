@@ -123,17 +123,6 @@ module FinishedGoodsApp
       DB[query, vehicle_job_id]
     end
 
-    def get_inspection_vehicle_job_units(govt_inspection_sheet_id)
-      query = <<~SQL
-        SELECT u.*
-        FROM  vehicle_job_units u
-        JOIN pallets p on p.id=u.stock_item_id
-        JOIN govt_inspection_pallets g on g.pallet_id=p.id
-        WHERE g.govt_inspection_sheet_id = ?
-      SQL
-      DB[query, govt_inspection_sheet_id]
-    end
-
     def get_vehicle_job_location(vehicle_job_id)
       query = <<~SQL
         SELECT l.location_long_code
@@ -195,7 +184,15 @@ module FinishedGoodsApp
     end
 
     def refresh_to_complete_offload?(govt_inspection_sheet_id)
-      (get_inspection_vehicle_job_units(govt_inspection_sheet_id).all.find_all { |p| !p[:offloaded_at] }).empty?
+      query = <<~SQL
+        SELECT EXISTS(SELECT u.id
+        FROM  vehicle_job_units u
+        JOIN pallets p on p.id=u.stock_item_id
+        JOIN govt_inspection_pallets g on g.pallet_id=p.id
+        WHERE g.govt_inspection_sheet_id = ?
+          AND u.offloaded_at IS NULL)
+      SQL
+      !DB[query, govt_inspection_sheet_id].single_value
     end
   end
 end

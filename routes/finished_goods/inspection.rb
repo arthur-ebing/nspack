@@ -113,9 +113,7 @@ class Nspack < Roda
       r.on 'refresh_tripsheet' do
         show_partial do
           FinishedGoods::Tripsheet::RefreshTripsheetConfirm.call(id,
-                                                                 notice: 'A refresh will leave only offloaded pallets remaining in the tripsheet. Do you want to:
-                                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+                                                                 notice: 'A refresh will leave only offloaded pallets remaining in the tripsheet. Do you want to:')
         end
       end
 
