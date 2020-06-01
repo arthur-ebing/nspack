@@ -120,7 +120,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = ScanBinLoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -128,7 +128,7 @@ module RawMaterialsApp
       instance = bin_load(id)
       return failed_response "Cant find bin load: #{id}" if instance.nil?
       return failed_response "Bin load:#{id} - has already been shipped" if instance.shipped
-      return failed_response "Bin load:#{id} - has not been completed" unless instance.completed || AppConst::BYPASS_BIN_LOAD_COMPLETED_CHECK
+      return failed_response "Bin load:#{id} - has not been completed" unless instance.completed
       return failed_response "Bin load:#{id} - Product Qty's do not match load Qty" unless instance.qty_bins == instance.qty_product_bins
 
       products = repo.select_values(:bin_load_products, %i[id qty_bins], bin_load_id: id)
