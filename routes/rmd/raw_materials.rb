@@ -145,6 +145,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
         form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
         form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
+        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                   required: true, prompt: true)
         form.add_label(:qty_bins, 'Qty Bins', 1, 1)
@@ -653,6 +654,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true)
+        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
 
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
