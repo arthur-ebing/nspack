@@ -481,5 +481,4 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Bin Control
   ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
-  BYPASS_BIN_LOAD_COMPLETED_CHECK = make_boolean('BYPASS_BIN_LOAD_COMPLETED_CHECK')
 end
