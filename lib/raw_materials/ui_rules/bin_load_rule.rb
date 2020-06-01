@@ -97,7 +97,6 @@ module UiRules
       step = 0
       step = 1 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:complete, @options[:id]).success
       step = 2 if @form_object.completed
-      p RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:ship, @options[:id])
       step = 3 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:ship, @options[:id]).success
       step = 4 if @form_object.shipped
 

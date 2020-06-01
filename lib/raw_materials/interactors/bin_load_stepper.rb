@@ -54,9 +54,7 @@ module RawMaterialsApp
     end
 
     def allocate(bin_asset_number) # rubocop:disable Metrics/AbcSize
-      p bin_asset_number
       bin_load_product_ids = repo.rmt_bins_matching_bin_load(:bin_load_product_id, bin_load_id: bin_load_id, bin_asset_number: bin_asset_number)
-      p bin_load_product_ids
       return form_state[:error] = "Bin:#{bin_asset_number} does not match a product on this load" if bin_load_product_ids.empty?
 
       # Unallocate
@@ -66,31 +64,25 @@ module RawMaterialsApp
       bin_load_product_ids.each do |bin_load_product_id|
         qty_bins = repo.get(:bin_load_products, bin_load_product_id, :qty_bins)
         qty_loaded = loaded_bins(loaded, bin_load_product_id).length
-        next if qty_loaded >= qty_bins
+        return load_bin(bin_load_product_id, bin_asset_number) if qty_loaded < qty_bins
 
-        return load_bin(bin_load_product_id, bin_asset_number)
+        form_state[:warning] = "Bin Product fully allocated. Bin:#{bin_asset_number} not allocated."
       end
 
       form_state[:warning] = "All matching Bin Products fully allocated. Bin:#{bin_asset_number} not added."
     end
 
-    def load_bin(bin_load_product_id, bin_asset_number) # rubocop:disable Metrics/AbcSize
-      qty_bins = repo.get(:bin_load_products, bin_load_product_id, :qty_bins)
-      qty_loaded = loaded_bins(loaded, bin_load_product_id).length
-
+    def load_bin(bin_load_product_id, bin_asset_number)
       product_bin = [bin_load_product_id, bin_asset_number]
       case product_bin
       when *current_step[:loaded]
         current_step[:loaded].delete(product_bin)
-        message = "Removed: #{bin_asset_number}"
+        form_state[:warning] = "Removed: #{bin_asset_number}"
       else
-        return form_state[:warning] = "Bin Product fully allocated. Bin:#{bin_asset_number} not allocated." if qty_loaded >= qty_bins
-
         current_step[:loaded] << product_bin
-        message = "Added: #{bin_asset_number}"
+        form_state[:message] = "Added: #{bin_asset_number}"
       end
       write(current_step)
-      form_state[:message] = message
     end
 
     def loaded_bins(loaded, bin_load_product_id)

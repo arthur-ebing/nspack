@@ -13,7 +13,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Created bin load #{id}", instance)
+      success_response("Created Bin load: #{id}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { id: ['This bin load already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -29,7 +29,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Updated bin load #{id}", instance)
+      success_response("Updated Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,7 +40,7 @@ module RawMaterialsApp
         log_status(:bin_loads, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted bin load #{id}")
+      success_response("Deleted Bin load: #{id}")
     rescue Sequel::ForeignKeyConstraintViolation => e
       failed_response("Unable to delete bin load. Still referenced #{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
@@ -55,7 +55,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Completed bin load #{id}", instance)
+      success_response("Completed Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -67,7 +67,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Reopened bin load #{id}", instance)
+      success_response("Reopened Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -75,7 +75,7 @@ module RawMaterialsApp
     def allocate_and_ship_bin_load(id, product_bin) # rubocop:disable Metrics/AbcSize
       instance = bin_load(id)
       return failed_response "Cant find bin load: #{id}" if instance.nil?
-      return failed_response "Bin load:#{id} - has already been shipped" if instance.shipped
+      return failed_response "Bin load: #{id} - has already been shipped" if instance.shipped
 
       repo.transaction do
         bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
@@ -91,7 +91,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Shipped bin load #{id}", instance)
+      success_response("Shipped Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -102,7 +102,7 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Shipped bin load #{id}", instance)
+      success_response("Shipped Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -113,28 +113,26 @@ module RawMaterialsApp
         log_transaction
       end
       instance = bin_load(id)
-      success_response("Unshipped bin load #{id}", instance)
+      success_response("Unshipped Bin load: #{id}", instance)
     rescue Sequel::UniqueConstraintViolation => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def scan_bin_load(params) # rubocop:disable Metrics/AbcSize
       res = ScanBinLoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = params[:bin_load_id]
       instance = bin_load(id)
-      return failed_response "Cant find bin load: #{id}" if instance.nil?
-      return failed_response "Bin load:#{id} - has already been shipped" if instance.shipped
-      return failed_response "Bin load:#{id} - has not been completed" unless instance.completed
-      return failed_response "Bin load:#{id} - Product Qty's do not match load Qty" unless instance.qty_bins == instance.qty_product_bins
+      res = TaskPermissionCheck::BinLoad.call(:allocate, id)
+      return failed_response res.message unless res.success
 
       products = repo.select_values(:bin_load_products, %i[id qty_bins], bin_load_id: id)
       products.each do |bin_load_product_id, qty_bins|
         qty_available = repo.rmt_bins_matching_bin_load(:bin_asset_number, bin_load_product_id: bin_load_product_id).count
-        return failed_response("Bin load: #{id} Insufficient bins available") if qty_available < qty_bins
+        return failed_response("Bin load: #{id} - Insufficient bins available") if qty_available < qty_bins
       end
 
       success_response('Load valid', instance)

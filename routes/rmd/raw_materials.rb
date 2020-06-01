@@ -50,8 +50,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               end
             end
 
-            message = rmd_error_message(stepper.error) || rmd_warning_message(stepper.warning) || rmd_success_message(stepper.message)
-            store_locally(:flash_notice, message)
+            store_locally(:flash_notice, rmd_success_message(stepper.message)) if stepper.message
+            store_locally(:flash_notice, rmd_warning_message(stepper.warning)) if stepper.warning
+            store_locally(:flash_notice, rmd_error_message(stepper.error)) if stepper.error
           else
             store_locally(:flash_notice, rmd_error_message(res.message))
           end
@@ -97,7 +98,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             stepper.setup_load(res.instance.id)
             r.redirect("/rmd/raw_materials/dispatch/bin_load/#{res.instance.id}")
           else
-            stepper.write(form_state: { error_message: res.message })
+            store_locally(:flash_notice, rmd_error_message(res.message))
             r.redirect('/rmd/raw_materials/dispatch/bin_load')
           end
         end
