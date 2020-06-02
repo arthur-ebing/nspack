@@ -654,7 +654,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:bins_received, 'Bins Received', delivery[:bins_received])
         form.add_label(:qty_bins_remaining, 'Qty Bins Remaining', delivery[:qty_bins_remaining])
         form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id], required: true, prompt: true)
-        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: true)
+        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
 
         if capture_container_material
           form.add_select(:rmt_container_material_type_id, 'Container Material Type',
