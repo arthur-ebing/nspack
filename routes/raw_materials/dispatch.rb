@@ -77,6 +77,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'bin_loads', Integer do |id|
       interactor = RawMaterialsApp::BinLoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      check_bin_load = RawMaterialsApp::TaskPermissionCheck::BinLoad
 
       # Check for notfound:
       r.on !interactor.exists?(:bin_loads, id) do
@@ -93,15 +94,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { RawMaterials::Dispatch::BinLoadProduct::New.call(id, remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          args = params[:bin_load_product] || {}
-          args[:bin_load_id] = id
-          res = interactor.create_bin_load_product(args)
+          res = interactor.create_bin_load_product(params[:bin_load_product])
           if res.success
             flash[:notice] = res.message
             redirect_via_json "/raw_materials/dispatch/bin_loads/#{id}"
           else
             re_show_form(r, res, url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new") do
-              RawMaterials::Dispatch::BinLoadProduct::New.call(form_values: params[:bin_load_product],
+              RawMaterials::Dispatch::BinLoadProduct::New.call(id,
+                                                               form_values: params[:bin_load_product],
                                                                form_errors: res.errors,
                                                                remote: fetch?(r))
             end
@@ -112,56 +112,86 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # BIN LOADS
       r.on 'complete' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:complete, id)
-
-        res = interactor.complete_bin_load(id)
+        res = check_bin_load.call(:complete, id)
         if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
+          res = interactor.complete_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+          end
         end
+        flash[:error] = res.message
         r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
       r.on 'reopen' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:reopen, id)
-
-        res = interactor.reopen_bin_load(id)
+        res = check_bin_load.call(:reopen, id)
         if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
+          res = interactor.reopen_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+          end
         end
-        redirect_to_last_grid(r)
+        flash[:error] = res.message
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+      end
+
+      r.on 'unallocate' do
+        check_auth!('dispatch', 'edit')
+        res = check_bin_load.call(:reopen, id)
+        if res.success
+          res = interactor.unallocate_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
       r.on 'ship' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:ship, id)
-
-        res = interactor.ship_bin_load(id)
+        res = check_bin_load.call(:ship, id)
         if res.success
-          flash[:notice] = res.message
-          r.redirect '/list/bin_loads'
-        else
-          flash[:error] = res.message
-          redirect_to_last_grid(r)
+          res = interactor.ship_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+          end
         end
+        flash[:error] = res.message
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:unship, id)
-
-        res = interactor.unship_bin_load(id)
+        res = check_bin_load.call(:unship, id)
         if res.success
-          flash[:notice] = res.message
-          r.redirect "/raw_materials/dispatch/bin_loads/#{id}/edit"
-        else
-          flash[:error] = res.message
-          redirect_to_last_grid(r)
+          res = interactor.unship_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+          end
         end
+        flash[:error] = res.message
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
+      end
+
+      r.on 'delete' do    # DELETE
+        check_auth!('dispatch', 'delete')
+        res = check_bin_load.call(:delete, id)
+        if res.success
+          res = interactor.delete_bin_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect '/list/bin_loads'
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
       end
 
       r.on 'edit' do   # EDIT
@@ -180,22 +210,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_bin_load(id, params[:bin_load])
           if res.success
             flash[:notice] = res.message
-            r.redirect '/list/bin_loads'
+            r.redirect "/raw_materials/dispatch/bin_loads/#{id}"
           else
             re_show_form(r, res, url: "/raw_materials/dispatch/bin_loads/#{id}/edit") do
               RawMaterials::Dispatch::BinLoad::Edit.call(id, form_values: params[:bin_load], form_errors: res.errors)
             end
-          end
-        end
-
-        r.delete do    # DELETE
-          check_auth!('dispatch', 'delete')
-          interactor.assert_permission!(:delete, id)
-          res = interactor.delete_bin_load(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            show_json_error(res.message, status: 200)
           end
         end
       end
@@ -252,7 +271,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = res.message
         end
-        r.redirect "/raw_materials/dispatch/bin_loads/#{res.instance.bin_load_id}"
+        r.redirect "/raw_materials/dispatch/bin_load_products/#{id}/allocate"
       end
 
       r.is do

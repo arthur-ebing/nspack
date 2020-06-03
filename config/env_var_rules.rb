@@ -75,7 +75,10 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { PHYT_CLEAN_API_PASSWORD: 'optional. PhytClean API Password' },
     { PHYT_CLEAN_SEASON_ID: 'optional. PhytClean Standard Data season id' },
     { BYPASS_QUALITY_TEST_LOAD_CHECK: 'optional. Bypasses Quality checks at Pallet Loading' },
-    { BYPASS_QUALITY_TEST_PRE_RUN_CHECK: 'optional. Bypasses Quality checks before a run is started' }
+    { BYPASS_QUALITY_TEST_PRE_RUN_CHECK: 'optional. Bypasses Quality checks before a run is started' },
+    { MAX_BINS_ON_LOAD: 'optional. Sets maximum bins allowed on load' },
+    { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' }
+
   ].freeze
 
   NO_OVERRIDE = [

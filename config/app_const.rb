@@ -331,11 +331,15 @@ class AppConst # rubocop:disable Metrics/ClassLength
   INSTALL_LOCATION = ENV.fetch('INSTALL_LOCATION')
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
+  # Loads:
   DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
-
-  # Load_containers:
   VGM_REQUIRED = make_boolean('VGM_REQUIRED')
+  MAX_PALLETS_ON_LOAD = ENV['MAX_PALLETS_ON_LOAD'] || 50
+
+  # Constants for port types:
+  PORT_TYPE_POL = 'POL'
+  PORT_TYPE_POD = 'POD'
 
   # CLM_BUTTON_CAPTION_FORMAT
   #
@@ -367,10 +371,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Else it will be looked up from the module name.
   ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
   ROBOT_MSG_SEP = '###'
-
-  # Constants for port types:
-  PORT_TYPE_POL = 'POL'
-  PORT_TYPE_POD = 'POD'
 
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
@@ -481,4 +481,5 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Bin Control
   ONSITE_EMPTY_BIN_LOCATION = ENV['ONSITE_EMPTY_BIN_LOCATION']
+  MAX_BINS_ON_LOAD = ENV['MAX_BINS_ON_LOAD'] || 50
 end

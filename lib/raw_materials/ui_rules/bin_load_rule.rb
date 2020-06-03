@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class BinLoadRule < Base
+  class BinLoadRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       set_repo
       make_form_object
@@ -57,6 +57,8 @@ module UiRules
                          caption: 'Destination Depot',
                          required: true },
         qty_bins: { renderer: :numeric,
+                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
+                    minvalue: 1,
                     required: true },
         shipped_at: { renderer: :label, format: :without_timezone_or_seconds },
         shipped: { renderer: :label, as_boolean: true },
@@ -87,20 +89,35 @@ module UiRules
     end
 
     def make_progress_step # rubocop:disable Metrics/AbcSize
+      id = @options[:id]
       steps = ['Add Products', 'Complete', 'Allocate Bins', 'Ship', 'Finished']
+
       actions = ['/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{@options[:id]}/complete",
+                 "/raw_materials/dispatch/bin_loads/#{id}/complete",
                  '/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{@options[:id]}/ship",
+                 "/raw_materials/dispatch/bin_loads/#{id}/ship",
                  '/list/bin_loads']
       captions = %w[Close Complete Close Ship Close]
+
+      back_actions = ["/raw_materials/dispatch/bin_loads/#{id}/edit",
+                      "/raw_materials/dispatch/bin_loads/#{id}/edit",
+                      "/raw_materials/dispatch/bin_loads/#{id}/reopen",
+                      "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
+                      "/raw_materials/dispatch/bin_loads/#{id}/unship"]
+      back_captions = %w[Edit Edit Reopen Unallocate Unship]
+
       step = 0
-      step = 1 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:complete, @options[:id]).success
+      step = 1 if @form_object.products
       step = 2 if @form_object.completed
-      step = 3 if RawMaterialsApp::TaskPermissionCheck::BinLoad.call(:ship, @options[:id]).success
+      step = 3 if @form_object.allocated
       step = 4 if @form_object.shipped
 
-      form_object = @form_object.to_h.merge(steps: steps, step: step, action: actions[step], caption: captions[step])
+      form_object = @form_object.to_h.merge(steps: steps,
+                                            step: step,
+                                            action: actions[step],
+                                            caption: captions[step],
+                                            back_action: back_actions[step],
+                                            back_caption: back_captions[step])
       @form_object = OpenStruct.new(form_object)
     end
 

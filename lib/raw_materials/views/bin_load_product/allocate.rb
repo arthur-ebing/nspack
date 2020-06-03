@@ -40,6 +40,7 @@ module RawMaterials
                                   url: "/raw_materials/dispatch/bin_loads/#{ui_rule.form_object.bin_load_id}",
                                   style: :back_button)
             end
+            page.add_notice 'Use the checkboxes to select bins from the grid below afterwards press Save selection to allocate.'
             page.section do |section|
               section.add_grid('rmt_bins',
                                '/list/bin_loads_matching_rmt_bins/grid_multi',

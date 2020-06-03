@@ -9,7 +9,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       add_behaviours
 
@@ -32,13 +32,12 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        bin_load_id: { renderer: :select,
-                       options: @repo.for_select_bin_loads,
-                       disabled_options: @repo.for_select_inactive_bin_loads,
-                       caption: 'Bin Load',
-                       hide_on_load: true,
-                       required: true },
+        bin_load_id: { renderer: :hidden,
+                       with_value: @form_object.bin_load_id,
+                       caption: 'Bin Load' },
         qty_bins: { renderer: :numeric,
+                    maxvalue: AppConst::MAX_BINS_ON_LOAD,
+                    minvalue: 1,
                     required: true },
         cultivar_group_id: { renderer: :select,
                              options: @cultivar_repo.for_select_cultivar_groups,
@@ -47,7 +46,7 @@ module UiRules
                              caption: 'Cultivar Group',
                              required: true },
         cultivar_id: { renderer: :select,
-                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
+                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: [@form_object.cultivar_group_id].find { |x| !x.nil_or_empty? } }),
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        prompt: true,
                        caption: 'Cultivar' },
@@ -71,7 +70,7 @@ module UiRules
                   prompt: true,
                   caption: 'Puc' },
         orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
+                      options: @farm_repo.for_select_orchards(where: { puc_id: [@form_object.puc_id, ''].find { |x| !x.nil_or_empty? } }),
                       disabled_options: @farm_repo.for_select_inactive_orchards,
                       prompt: true,
                       hide_on_load: @form_object.puc_id.nil?,
@@ -94,7 +93,7 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(bin_load_id: nil,
+      @form_object = OpenStruct.new(bin_load_id: @options[:bin_load_id],
                                     qty_bins: nil,
                                     cultivar_id: nil,
                                     cultivar_group_id: nil,

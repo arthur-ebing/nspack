@@ -30,7 +30,8 @@ module RawMaterialsApp
     attribute :customer, Types::String
     attribute :transporter, Types::String
     attribute :dest_depot, Types::String
-    attribute :products, Types::Bool
+    attribute? :products, Types::Bool
+    attribute? :allocated, Types::Bool
     attribute :qty_product_bins, Types::Integer
   end
 end

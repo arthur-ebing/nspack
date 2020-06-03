@@ -23,6 +23,7 @@ module RawMaterialsApp
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
       hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
+      hash[:allocated] = exists?(:rmt_bins, bin_load_product_id: select_values(:bin_load_products, :id, bin_load_id: id))
       BinLoadFlat.new(hash)
     end
 
@@ -35,7 +36,7 @@ module RawMaterialsApp
                                                    { parent_table: :pucs, foreign_key: :puc_id,  columns: %i[puc_code], flatten_columns: { puc_code: :puc_code } },
                                                    { parent_table: :orchards, foreign_key: :orchard_id, columns: %i[orchard_code], flatten_columns: { orchard_code: :orchard_code } },
                                                    { parent_table: :rmt_classes, foreign_key: :rmt_class_id, columns: %i[rmt_class_code], flatten_columns: { rmt_class_code: :rmt_class_code } },
-                                                   { parent_table: :rmt_container_material_types, foreign_key: :rmt_container_material_type_id, columns: %i[container_material_type_code], flatten_columns: { container_material_type: :container_material_type_code } }],
+                                                   { parent_table: :rmt_container_material_types, foreign_key: :rmt_container_material_type_id, columns: %i[container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } }],
                                    lookup_functions: [{ function: :fn_current_status, args: ['bin_load_products', :id], col_name: :status },
                                                       { function: :fn_party_role_name, args: [:rmt_material_owner_party_role_id], col_name: :container_material_owner }])
       return nil if hash.nil?
@@ -78,18 +79,19 @@ module RawMaterialsApp
       DB[query].map { |q| q[column] }.uniq.first(100)
     end
 
-    def allocate_bin(bin_load_product_id, bin_ids, user)
+    def allocate_bins(bin_load_product_id, bin_ids, user)
       update(:rmt_bins, bin_ids, bin_load_product_id: bin_load_product_id)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN ALLOCATED ON LOAD', user_name: user.user_name)
     end
 
-    def unallocate_bin(bin_ids, user)
+    def unallocate_bins(bin_ids, user)
       update(:rmt_bins, bin_ids, bin_load_product_id: nil)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN UNALLOCATED FROM LOAD', user_name: user.user_name)
     end
 
     def ship_bin_load(bin_load_id, user, status = 'SHIPPED') # rubocop:disable Metrics/AbcSize
-      params = { shipped: true, shipped_at: Time.now }
+      params = { shipped: true,
+                 shipped_at: Time.now }
       params.merge!(completed: true, completed_at: Time.now) unless get(:bin_loads, bin_load_id, :completed)
       update_bin_load(bin_load_id, params)
       log_status(:bin_loads, bin_load_id, status, user_name: user.user_name)
@@ -113,9 +115,7 @@ module RawMaterialsApp
       unship_bins(bin_load_id, user)
 
       params = { shipped: false,
-                 shipped_at: nil,
-                 completed: false,
-                 completed_at: nil }
+                 shipped_at: nil }
       update_bin_load(bin_load_id, params)
       log_status(:bin_loads, bin_load_id, 'UNSHIPPED', user_name: user.user_name)
     end
@@ -126,7 +126,7 @@ module RawMaterialsApp
         rmt_bin_ids = select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_id)
         rmt_bin_ids.each do |rmt_bin_id|
           bin_asset_number = get(:rmt_bins, rmt_bin_id, :shipped_asset_number)
-          raise Sequel::UniqueConstraintViolation, 'Bin Asset Number allocated elsewhere, Unable to unship load.' if exists?(:rmt_bins, bin_asset_number: bin_asset_number)
+          raise Sequel::UniqueConstraintViolation, "Bin Asset Number #{bin_asset_number} allocated elsewhere, Unable to unship load." if exists?(:rmt_bins, bin_asset_number: bin_asset_number)
 
           params = { bin_asset_number: bin_asset_number,
                      shipped_asset_number: nil,

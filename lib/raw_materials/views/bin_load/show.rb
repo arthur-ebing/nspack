@@ -17,8 +17,21 @@ module RawMaterials
                                   url: '/list/bin_loads',
                                   style: :back_button)
               section.add_control(control_type: :link,
+                                  text: "#{Crossbeams::Layout::Icon.render(:edit)} #{ui_rule.form_object.back_caption}",
+                                  url: ui_rule.form_object.back_action,
+                                  prompt: "Are you sure, you want to #{ui_rule.form_object.back_caption.downcase} this load?",
+                                  visible: !ui_rule.form_object.back_action.nil?,
+                                  css_class: 'f6 link dim br2 ph3 pv2 dib white bg-green')
+              section.add_control(control_type: :link,
+                                  text: "#{Crossbeams::Layout::Icon.render(:checkoff)} Delete",
+                                  url: "/raw_materials/dispatch/bin_loads/#{id}/delete",
+                                  prompt: 'Are you sure, you want to delete this load?',
+                                  visible: !ui_rule.form_object.completed,
+                                  css_class: 'f6 link dim br2 ph3 pv2 dib white bg-green')
+              section.add_control(control_type: :link,
                                   text: 'Print Bin Load',
                                   url: "/raw_materials/reports/bin_load/#{id}",
+                                  visible: ui_rule.form_object.products,
                                   loading_window: true,
                                   style: :button)
             end
@@ -60,7 +73,7 @@ module RawMaterials
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',
                                height: 15)
-              if ui_rule.form_object.shipped
+              if ui_rule.form_object.allocated
                 section.add_grid('rmt_bins',
                                  "/list/bin_loads_matching_rmt_bins/grid?key=shipped_bin_load&bin_load_id=#{id}",
                                  caption: 'Shipped Bins on Load',
