@@ -39,27 +39,27 @@ module RawMaterialsApp
       end
 
       def edit_check
-        return failed_response "Bin load: #{id} has been completed" if completed?
+        return failed_response "Bin load: #{id} - Has been completed" if completed?
 
         all_ok
       end
 
       def delete_check
-        return failed_response "Bin load: #{id} has been completed" if completed?
+        return failed_response "Bin load: #{id} - Has been completed" if completed?
 
         all_ok
       end
 
       def reopen_check
-        return failed_response "Bin load: #{id} has not been completed" unless completed?
+        return failed_response "Bin load: #{id} - Has not been completed" unless completed?
 
         all_ok
       end
 
       def complete_check
-        return failed_response "Bin load: #{id} - Product Qty's do not match load Qty" unless bin_load.qty_bins == bin_load.qty_product_bins
+        return failed_response "Bin load: #{id} - Product Qty's do not match Load Qty" unless bin_load.qty_bins == bin_load.qty_product_bins
         return failed_response "Bin load: #{id} - Does not have products" unless products?
-        return failed_response "Bin load: #{id} - has already been completed" if completed?
+        return failed_response "Bin load: #{id} - Has already been completed" if completed?
 
         all_ok
       end
@@ -73,14 +73,14 @@ module RawMaterialsApp
 
       def ship_check
         return failed_response "Bin load: #{id} - Has not been completed" unless completed?
-        return failed_response "Bin load: #{id} - has already been shipped" if shipped?
-        return failed_response "Bin load: #{id} - Incorrect bins allocated" unless correctly_allocated?
+        return failed_response "Bin load: #{id} - Has already been shipped" if shipped?
+        return failed_response "Bin load: #{id} - Bins incorrectly allocated" unless correctly_allocated?
 
         all_ok
       end
 
       def unship_check
-        return failed_response "Bin load: #{id} - has not been shipped" unless shipped?
+        return failed_response "Bin load: #{id} - Has not been shipped" unless shipped?
 
         all_ok
       end

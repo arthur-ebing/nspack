@@ -15,7 +15,7 @@ module RawMaterials
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: '/list/bin_loads',
+                                  url: "/raw_materials/dispatch/bin_loads/#{id}",
                                   style: :back_button)
             end
             page.form do |form|

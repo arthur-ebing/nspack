@@ -34,8 +34,13 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def delete_bin_load(id)
+    def delete_bin_load(id) # rubocop:disable Metrics/AbcSize
+      bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
+
       repo.transaction do
+        repo.delete(:bin_load_products, bin_load_product_ids)
+        log_multiple_statuses(:bin_load_products, bin_load_product_ids, 'DELETED')
+
         repo.delete_bin_load(id)
         log_status(:bin_loads, id, 'DELETED')
         log_transaction
@@ -73,18 +78,14 @@ module RawMaterialsApp
     end
 
     def allocate_and_ship_bin_load(id, product_bin) # rubocop:disable Metrics/AbcSize
-      instance = bin_load(id)
-      return failed_response "Cant find bin load: #{id}" if instance.nil?
-      return failed_response "Bin load: #{id} - has already been shipped" if instance.shipped
-
       repo.transaction do
         bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
         rmt_bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_ids)
-        repo.unallocate_bin(rmt_bin_ids, @user) unless rmt_bin_ids.empty?
+        repo.unallocate_bins(rmt_bin_ids, @user) unless rmt_bin_ids.empty?
 
         product_bin.each do |bin_load_product_id, bin_asset_number|
           rmt_bin_id = repo.select_values(:rmt_bins, :id, bin_asset_number: bin_asset_number)
-          repo.allocate_bin(bin_load_product_id, rmt_bin_id, @user)
+          repo.allocate_bins(bin_load_product_id, rmt_bin_id, @user)
         end
 
         repo.ship_bin_load(id, @user, 'SHIPPED')
@@ -92,6 +93,20 @@ module RawMaterialsApp
       end
       instance = bin_load(id)
       success_response("Shipped Bin load: #{id}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def unallocate_bin_load(id)
+      bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
+      bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_ids)
+      repo.transaction do
+        repo.unallocate_bins(bin_ids, @user)
+
+        log_transaction
+      end
+      instance = bin_load(id)
+      success_response("Unallocated pallets from Bin load: #{id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
