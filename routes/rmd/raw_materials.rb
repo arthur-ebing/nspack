@@ -121,7 +121,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
         details = retrieve_from_local_store(:bin) || { cultivar_id: bin_delivery[:cultivar_id], bin_fullness: :Full }
 
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil?
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
         capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
@@ -623,6 +623,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
         capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
 
         notice = retrieve_from_local_store(:flash_notice)
         rmt_container_material_type_id = retrieve_from_local_store(:rmt_container_material_type_id)
@@ -671,6 +672,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         form.add_field(:bin_fullness, 'Bin Fullness', hide_on_load: true)
         form.add_field(:qty_bins, 'Qty Bins', hide_on_load: true)
+        if capture_inner_bins
+          form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
+        else
+          form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
+        end
 
         form.add_field(:bin_asset_number1, 'Asset Number1', scan: 'key248_all', scan_type: :bin_asset, submit_form: false, required: true)
         delivery[:qty_bins_remaining] = AppConst::BIN_SCANNING_BATCH_SIZE.to_i unless delivery[:qty_bins_remaining] < AppConst::BIN_SCANNING_BATCH_SIZE.to_i
