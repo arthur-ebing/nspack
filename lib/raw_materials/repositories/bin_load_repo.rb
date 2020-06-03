@@ -80,11 +80,20 @@ module RawMaterialsApp
     end
 
     def allocate_bins(bin_load_product_id, bin_ids, user)
+      return if bin_ids.nil_or_empty?
+
+      qty_bins = get(:bin_load_products, bin_load_product_id, :qty_bins)
+      current_qty_rmt_bins = select_values(:rmt_bins, :qty_bins, bin_load_product_id: bin_load_product_id).sum
+      new_qty_rmt_bins = select_values(:rmt_bins, :qty_bins, id: bin_ids).sum
+      raise Crossbeams::InfoError,'Bin allocation exceeded product specification' if (current_qty_rmt_bins + new_qty_rmt_bins) > qty_bins
+
       update(:rmt_bins, bin_ids, bin_load_product_id: bin_load_product_id)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN ALLOCATED ON LOAD', user_name: user.user_name)
     end
 
     def unallocate_bins(bin_ids, user)
+      return if bin_ids.nil_or_empty?
+
       update(:rmt_bins, bin_ids, bin_load_product_id: nil)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN UNALLOCATED FROM LOAD', user_name: user.user_name)
     end
