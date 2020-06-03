@@ -890,11 +890,11 @@ module ProductionApp
     def for_select_actual_count_standard_pack_codes(standard_pack_code_ids)
       return [] if standard_pack_code_ids.empty?
 
-      MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: [[:id, standard_pack_code_ids.map { |r| r }]])
+      MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: { id: standard_pack_code_ids })
     end
 
     def for_select_actual_count_size_references(size_reference_ids)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: [[:id, size_reference_ids.map { |r| r }]]) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: { id: size_reference_ids }) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
     end
 
     def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
