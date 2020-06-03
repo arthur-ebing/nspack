@@ -33,18 +33,18 @@ module RawMaterialsApp
       end
 
       def edit_check
-        return failed_response 'Bin Load has been shipped' if bin_load_shipped?
+        return failed_response 'Bin Load has been shipped' if shipped?
 
         all_ok
       end
 
       def delete_check
-        return failed_response 'Bin Load has been shipped' if bin_load_shipped?
+        return failed_response 'Bin Load has been shipped' if shipped?
 
         all_ok
       end
 
-      def bin_load_shipped?
+      def shipped?
         entity.shipped
       end
     end

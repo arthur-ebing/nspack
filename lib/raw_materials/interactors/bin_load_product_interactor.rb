@@ -56,16 +56,12 @@ module RawMaterialsApp
       res = AllocateBinLoadProductSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      bin_ids = res.to_h[:bin_ids]
-      qty_bins = repo.get(:bin_load_products, id, :qty_bins)
-      qty_rmt_bins = repo.select_values(:rmt_bins, :qty_bins, id: bin_ids).sum
-      return failed_response('Bin allocation exceeded product specification') if qty_rmt_bins > qty_bins
+      new_allocation = res.to_h[:bin_ids]
+      current_allocation = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)
 
       repo.transaction do
-        unallocate_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: id) - bin_ids
-        repo.unallocate_bins(unallocate_ids, @user)
-
-        repo.allocate_bins(id, bin_ids, @user)
+        repo.unallocate_bins(current_allocation - new_allocation, @user)
+        repo.allocate_bins(id, new_allocation - current_allocation, @user)
 
         log_transaction
       end

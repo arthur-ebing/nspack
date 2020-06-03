@@ -24,7 +24,7 @@ module UiRules
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: @form_object.container_material_type_code, caption: 'Container Type' }
       fields[:rmt_material_owner_party_role_id] = { renderer: :label, with_value: @form_object.container_material_owner, caption: 'Container Owner' }
       fields[:farm_id] = { renderer: :label, with_value: @form_object.farm_code, caption: 'Farm' }
-      fields[:puc_id] = { renderer: :label, with_value: @form_object.puc_code, caption: 'Puc' }
+      fields[:puc_id] = { renderer: :label, with_value: @form_object.puc_code, caption: 'PUC' }
       fields[:orchard_id] = { renderer: :label, with_value: @form_object.orchard_code, caption: 'Orchard' }
       fields[:rmt_class_id] = { renderer: :label, with_value: @form_object.rmt_class_code, caption: 'Rmt Class' }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -46,7 +46,7 @@ module UiRules
                              caption: 'Cultivar Group',
                              required: true },
         cultivar_id: { renderer: :select,
-                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: [@form_object.cultivar_group_id].find { |x| !x.nil_or_empty? } }),
+                       options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        prompt: true,
                        caption: 'Cultivar' },
@@ -68,9 +68,9 @@ module UiRules
                   options: @farm_repo.for_select_pucs,
                   disabled_options: @farm_repo.for_select_inactive_pucs,
                   prompt: true,
-                  caption: 'Puc' },
+                  caption: 'PUC' },
         orchard_id: { renderer: :select,
-                      options: @farm_repo.for_select_orchards(where: { puc_id: [@form_object.puc_id, ''].find { |x| !x.nil_or_empty? } }),
+                      options: @farm_repo.for_select_orchards(where: { puc_id: @form_object.puc_id }),
                       disabled_options: @farm_repo.for_select_inactive_orchards,
                       prompt: true,
                       hide_on_load: @form_object.puc_id.nil?,
