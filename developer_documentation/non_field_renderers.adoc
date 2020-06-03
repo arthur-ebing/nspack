@@ -46,14 +46,19 @@ section.add_control(control_type: :link, text: 'Do something', url: '/path/to/so
 |None. must be provided.
 
 |options - :style
-|How the link is styled - as a normal link, or to look like a button. A back button renders in blue with a left-pointing arrow glyph.
-|`:link`, `:button`, `:small_button` or `:back_button`.
+|How the link is styled - as a normal link, or to look like a button. A back button renders in blue with a left-pointing arrow glyph. An action button renders in green.
+|`:link`, `:button`, `:small_button`, `:action_button` or `:back_button`.
 |`:link`
 
 |options - :behaviour
 |How the link behaves when clicked. Can open the url in a new page, can open the url in a popup dialog or can replace an already-open dialog.
 |`:direct`, `:popup` or `:replace_dialog`.
 |`:direct`
+
+|options - :icon
+|Icon to appear to the left of the text. Not applicable for `:loading_window` or `style: :back_button` options.
+|`Symbol`. Can be any of the link:/development/layout_icons[Layout icon] names.
+|n/a
 
 |options - :css_class
 |Extra class string to add to the link's class.
