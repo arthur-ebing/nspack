@@ -350,6 +350,10 @@ module RawMaterialsApp
         tare_weight = repo.get_rmt_bin_tare_weight(params)
         params[:nett_weight] = (params[:gross_weight].to_i - tare_weight) if tare_weight
       end
+
+      location_id = repo.get_run_packhouse_location(params[:production_run_rebin_id])
+      params = params.merge(location_id: location_id)
+
       params
     end
 

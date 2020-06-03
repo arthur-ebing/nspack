@@ -277,5 +277,15 @@ module RawMaterialsApp
         .select(:rmt_material_owner_party_role_id, Sequel.function(:fn_party_role_name, :rmt_material_owner_party_role_id))
         .map { |r| [r[:fn_party_role_name], r[:rmt_material_owner_party_role_id]] }
     end
+
+    def get_run_packhouse_location(id)
+      query = <<~SQL
+        select p.location_id
+        from production_runs r
+        JOIN plant_resources p on p.id=r.packhouse_resource_id
+        WHERE r.id = ?
+      SQL
+      DB[query, id].get(:location_id)
+    end
   end
 end
