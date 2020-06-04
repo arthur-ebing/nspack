@@ -575,8 +575,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           fruit_actual_counts_for_pack_id = params[:changed_value]
           actual_count = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id)
-          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids)
-          size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids)
+          standard_pack_codes = interactor.for_select_actual_count_standard_pack_codes(actual_count.standard_pack_code_ids.to_a)
+          size_references = interactor.for_select_actual_count_size_references(actual_count.size_reference_ids.to_a)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_standard_pack_code_id',
