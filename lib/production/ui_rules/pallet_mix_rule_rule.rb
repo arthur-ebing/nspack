@@ -18,7 +18,7 @@ module UiRules
       form_name 'pallet_mix_rule'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:scope] = { renderer: :label }
       fields[:production_run_id] = { renderer: :label }
       fields[:pallet_id] = { renderer: :label }
@@ -29,6 +29,8 @@ module UiRules
       fields[:allow_std_count_mix] = { renderer: :label, as_boolean: true }
       fields[:allow_mark_mix] = { renderer: :label, as_boolean: true }
       fields[:allow_inventory_code_mix] = { renderer: :label, as_boolean: true }
+      fields[:allow_cultivar_mix] = { renderer: :label, as_boolean: true }
+      fields[:allow_cultivar_group_mix] = { renderer: :label, as_boolean: true }
     end
 
     # def set_approve_fields
@@ -52,7 +54,9 @@ module UiRules
         allow_pack_mix: { renderer: :checkbox },
         allow_std_count_mix: { renderer: :checkbox },
         allow_mark_mix: { renderer: :checkbox },
-        allow_inventory_code_mix: { renderer: :checkbox }
+        allow_inventory_code_mix: { renderer: :checkbox },
+        allow_cultivar_mix: { renderer: :checkbox },
+        allow_cultivar_group_mix: { renderer: :checkbox }
       }
     end
 
@@ -75,15 +79,9 @@ module UiRules
                                     allow_pack_mix: nil,
                                     allow_std_count_mix: nil,
                                     allow_mark_mix: nil,
+                                    allow_cultivar_mix: nil,
+                                    allow_cultivar_group_mix: nil,
                                     allow_inventory_code_mix: nil)
     end
-
-    # private
-
-    # def add_approve_behaviours
-    #   behaviours do |behaviour|
-    #     behaviour.enable :reject_reason, when: :approve_action, changes_to: ['r']
-    #   end
-    # end
   end
 end

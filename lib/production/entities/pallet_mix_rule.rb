@@ -13,5 +13,7 @@ module ProductionApp
     attribute :allow_std_count_mix, Types::Bool
     attribute :allow_mark_mix, Types::Bool
     attribute :allow_inventory_code_mix, Types::Bool
+    attribute :allow_cultivar_mix, Types::Bool
+    attribute :allow_cultivar_group_mix, Types::Bool
   end
 end

@@ -27,6 +27,8 @@ module Production
               form.add_field :allow_std_count_mix
               form.add_field :allow_mark_mix
               form.add_field :allow_inventory_code_mix
+              form.add_field :allow_cultivar_mix
+              form.add_field :allow_cultivar_group_mix
             end
           end
 

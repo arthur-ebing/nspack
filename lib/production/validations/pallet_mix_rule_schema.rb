@@ -15,5 +15,7 @@ module ProductionApp
     optional(:allow_std_count_mix, :bool).maybe(:bool?)
     optional(:allow_mark_mix, :bool).maybe(:bool?)
     optional(:allow_inventory_code_mix, :bool).maybe(:bool?)
+    optional(:allow_cultivar_mix, :bool).maybe(:bool?)
+    optional(:allow_cultivar_group_mix, :bool).maybe(:bool?)
   end
 end
