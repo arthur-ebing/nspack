@@ -131,7 +131,7 @@ module UiRules
                        'Bin' # @rules[:scan_rmt_bin_asset_numbers] ? 'Bin asset number' : 'Bin id'
                      end
       text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
-      scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_bins) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: :applies_to_pallets)
+      scrap_reason = @rules[:scrap_bin] ? MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: { applies_to_bins: true }) : MasterfilesApp::QualityRepo.new.for_select_scrap_reasons(where: { applies_to_pallets: true })
       {
         reworks_run_type_id: { renderer: :hidden },
         reworks_run_type: { renderer: :label,
