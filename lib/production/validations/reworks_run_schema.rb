@@ -199,4 +199,16 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:gross_weight, :decimal).filled(:decimal?)
     required(:avg_gross_weight, :bool).maybe(:bool?)
   end
+
+  ReworksOrchardChangeSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:delivery_ids, :array).filled(:array?) { each(:int?) }
+    required(:from_orchard, :integer).filled(:int?)
+    required(:from_cultivar, :integer).maybe(:int?)
+    required(:to_orchard, :integer).filled(:int?)
+    required(:to_cultivar, :integer).filled(:int?)
+    required(:allow_cultivar_mixing, :bool).maybe(:bool?)
+    required(:ignore_runs_that_allow_mixing, :bool).maybe(:bool?)
+  end
 end

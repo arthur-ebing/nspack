@@ -18,11 +18,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.validate_change_delivery_orchard_screen_params(params[:change_deliveries_orchard])
           if res.success
-            store_locally(:allow_cultivar_mixing, params[:change_deliveries_orchard][:allow_cultivar_mixing])
-            store_locally(:from_orchard, params[:change_deliveries_orchard][:from_orchard])
-            store_locally(:from_cultivar, params[:change_deliveries_orchard][:from_cultivar])
-            store_locally(:to_orchard, params[:change_deliveries_orchard][:to_orchard])
-            store_locally(:to_cultivar, params[:change_deliveries_orchard][:to_cultivar])
+            store_locally(:change_deliveries_orchard_params, params[:change_deliveries_orchard])
             show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::FromOrchardDeliveries.call(nil, form_values: params[:change_deliveries_orchard]) }
           else
             re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
@@ -39,24 +35,24 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         # FIX: USe helper "multiselect_grid_choices" to get ids from list and store and pass as an array, not string
         # FIX: Use one Hash for all of these... { from_orchard: val, from_cultivar: val ... }
         # TODO: show no of bins affected next to delivery id (336 - 25 bins)
-        from_orchard = retrieve_from_local_store(:from_orchard)
-        from_cultivar = retrieve_from_local_store(:from_cultivar)
-        to_orchard = retrieve_from_local_store(:to_orchard)
-        to_cultivar = retrieve_from_local_store(:to_cultivar)
-        form_values = { from: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(from_orchard),
-                        from_cultivar: from_cultivar.nil_or_empty? ? ProductionApp::ReworksRepo.new.find_from_deliveries_cultivar(params[:selection][:list]).group_by { |h| h[:cultivar_name] }.keys.join(',') : MasterfilesApp::CultivarRepo.new.find_cultivar(from_cultivar)&.cultivar_name,
-                        to: MasterfilesApp::FarmRepo.new.find_farm_orchard_by_orchard_id(to_orchard),
-                        to_cultivar: MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name,
-                        affected_deliveries: params[:selection][:list].gsub(',', "\n").to_s }
-        store_locally(:deliveries, params[:selection][:list])
-        store_locally(:to_orchard, to_orchard)
-        store_locally(:to_cultivar, to_cultivar)
-        show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::Summary.call(form_values: form_values, remote: fetch?(r)) }
+        res = interactor.resolve_deliveries_from_multiselect(retrieve_from_local_store(:change_deliveries_orchard_params), multiselect_grid_choices(params))
+        if res.success
+          store_locally(:change_deliveries_orchard_params, res.instance)
+          show_partial_or_page(r) { Production::Reworks::ChangeDeliveriesOrchard::Summary.call(form_values: res.instance, remote: fetch?(r)) }
+        else
+          re_show_form(r, res, url: '/production/reworks/change_deliveries_orchard') do
+            res[:message] = unwrap_failed_response(res)
+            Production::Reworks::ChangeDeliveriesOrchard::SelectOrchards.call(form_values: res.instance,
+                                                                              form_errors: res.errors,
+                                                                              remote: fetch?(r))
+          end
+        end
       end
 
       r.on 'apply_change_deliveries_orchard_changes' do
         reworks_run_type_id = ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_CHANGE_DELIVERIES_ORCHARDS)
-        res = interactor.apply_change_deliveries_orchard_changes(retrieve_from_local_store(:allow_cultivar_mixing), retrieve_from_local_store(:to_orchard), retrieve_from_local_store(:to_cultivar), retrieve_from_local_store(:deliveries), reworks_run_type_id)
+        params = retrieve_from_local_store(:change_deliveries_orchard_params).merge({ reworks_run_type_id: reworks_run_type_id })
+        res = interactor.change_deliveries_orchards(params)
         if res.success
           flash[:notice] = 'Delivery Orchards Changed Successfully'
           r.redirect('/production/reworks/change_deliveries_orchard')
@@ -101,9 +97,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'allow_cultivar_mixing_changed' do
         actions = if params[:changed_value] == 't'
-                    [OpenStruct.new(type: :hide_element, dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper')]
+                    [OpenStruct.new(type: :hide_element,
+                                    dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper'),
+                     OpenStruct.new(type: :hide_element,
+                                    dom_id: 'change_deliveries_orchard_ignore_runs_that_allow_mixing_field_wrapper')]
                   else
-                    [OpenStruct.new(type: :show_element, dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper')]
+                    [OpenStruct.new(type: :show_element,
+                                    dom_id: 'change_deliveries_orchard_from_cultivar_field_wrapper'),
+                     OpenStruct.new(type: :show_element,
+                                    dom_id: 'change_deliveries_orchard_ignore_runs_that_allow_mixing_field_wrapper')]
                   end
         json_actions(actions)
       end
@@ -113,6 +115,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # Check for notfound:
       r.on !interactor.exists?(:reworks_runs, id) do
         handle_not_found(r)
+      end
+
+      r.on 'list_children_reworks_runs' do
+        check_auth!('reworks', 'edit')
+        r.redirect "/list/reworks_run_details/with_params?key=view_children&parent_id=#{id}"
       end
 
       r.is do

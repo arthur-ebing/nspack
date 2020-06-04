@@ -15,13 +15,21 @@ module Production
             page.form do |form|
               form.caption 'Change Deliveries Orchard'
               form.action '/production/reworks/change_deliveries_orchard'
-              form.remote! if remote
-              form.add_field :allow_cultivar_mixing
-              form.add_field :from_orchard
-              form.add_field :from_cultivar
-              form.add_field :to_orchard
-              form.add_field :to_cultivar
               form.submit_captions 'Next'
+              form.remote! if remote
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :allow_cultivar_mixing
+                  col.add_field :from_orchard
+                  col.add_field :from_cultivar
+                  col.add_field :to_orchard
+                  col.add_field :to_cultivar
+                  col.add_field :ignore_runs_that_allow_mixing
+                end
+                row.column do |col|
+                  col.add_field :spacer
+                end
+              end
             end
           end
 

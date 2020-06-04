@@ -44,6 +44,62 @@ module ProductionApp
       FromCultivarSchema.call(params)
     end
 
+    def resolve_deliveries_from_multiselect(params, multiselect_list)  # rubocop:disable Metrics/AbcSize
+      return failed_response('Delivery selection cannot be empty') if multiselect_list.nil_or_empty?
+
+      rmt_deliveries = selected_deliveries(multiselect_list)
+      deliveries_farms = repo.deliveries_farms(rmt_deliveries)
+      return failed_response("INVALID FARMS: #{deliveries_farms.join(',')} deliveries must all have the same farm") unless deliveries_farms.length == 1
+
+      same_cultivar_group = deliveries_cultivar_group(params[:from_cultivar].to_i) == deliveries_cultivar_group(params[:to_cultivar].to_i)
+      return failed_response('INVALID CULTIVAR: cultivars must be within the same cultivar group') unless same_cultivar_group
+
+      params[:affected_deliveries] = rmt_deliveries.join("\n")
+      success_response('', params)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def change_deliveries_orchards(params) # rubocop:disable Metrics/AbcSize
+      delivery_ids = params[:affected_deliveries].split("\n").map(&:strip).reject(&:empty?)
+      allow_cultivar_mixing = params[:allow_cultivar_mixing] == 't'
+      ignore_runs_that_allow_mixing = params[:ignore_runs_that_allow_mixing] == 't'
+
+      change_attrs = { delivery_ids: resolve_deliveries(delivery_ids),
+                       from_orchard: params[:from_orchard].to_i,
+                       from_cultivar: params[:from_cultivar].to_i,
+                       to_orchard: params[:to_orchard].to_i,
+                       to_cultivar: params[:to_cultivar].to_i,
+                       allow_cultivar_mixing: allow_cultivar_mixing,
+                       ignore_runs_that_allow_mixing: ignore_runs_that_allow_mixing }
+
+      reworks_run_attrs = { allow_cultivar_mixing: allow_cultivar_mixing,
+                            user: @user.user_name,
+                            pallets_affected: delivery_ids,
+                            pallets_selected: delivery_ids,
+                            reworks_run_type_id: params[:reworks_run_type_id],
+                            changes_made: calc_changes_made(params[:to_orchard].to_i, params[:to_cultivar].to_i, delivery_ids) }
+
+      return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
+
+      res = validate_reworks_run_params(reworks_run_attrs)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      rw_res = ProductionApp::ChangeDeliveriesOrchards.call(change_attrs, reworks_run_attrs)
+      return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('apply_change_deliveries_orchard_changes'))
+      failed_response(e.message)
+    end
+
+    def resolve_deliveries(affected_deliveries)
+      affected_deliveries.map { |x| x.gsub(/['"]/, '').to_i }
+    end
+
     def apply_change_deliveries_orchard_changes(allow_cultivar_mixing, to_orchard, to_cultivar, delivery_ids, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
       reworks_run_attrs = { allow_cultivar_mixing: allow_cultivar_mixing == 't', user: @user.user_name, pallets_affected: delivery_ids.split(','), pallets_selected: delivery_ids.split(','), reworks_run_type_id: reworks_run_type_id }
       res = validate_reworks_run_params(reworks_run_attrs)
@@ -52,7 +108,7 @@ module ProductionApp
       reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard.to_i, to_cultivar.to_i, delivery_ids)
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
 
-      return failed_response('Cannot proceed. Some bins in some of the deliveries are in production_runs that do not allow orchard mixing') unless check_bins_production_runs_allow_mixing?(delivery_ids)
+      return failed_response('Cannot proceed. Some bins in some of the deliveries are in production_runs that do not allow orchard mixing') unless check_bins_production_runs_allow_mixing?(delivery_ids.join(','))
 
       repo.transaction do
         repo.bin_bulk_update(delivery_ids.split(','), to_orchard, to_cultivar)
@@ -86,7 +142,7 @@ module ProductionApp
       cultivar = MasterfilesApp::CultivarRepo.new.find_cultivar(to_cultivar)&.cultivar_name
 
       changes = []
-      repo.find_from_deliveries_cultivar(delivery_ids).group_by { |h| h[:cultivar_name] }.each do |_k, v|
+      repo.find_from_deliveries_cultivar(resolve_deliveries(delivery_ids).join(',')).group_by { |h| h[:cultivar_name] }.each do |_k, v|
         change = { before: {}, after: {}, change_descriptions: { before: {}, after: {} } }
 
         if to_orchard != v[0][:orchard_id]
@@ -759,7 +815,8 @@ module ProductionApp
         end
 
         reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
-                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false }
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: false,
+                              allow_cultivar_mixing: attrs[:allow_cultivar_mixing] }
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            nil,
                                            before: before_state.sort.to_h, after: manually_tip_bin_after_state(attrs, avg_gross_weight).sort.to_h)
@@ -996,6 +1053,10 @@ module ProductionApp
       repo.selected_pallet_sequences(sequence_ids)
     end
 
+    def selected_deliveries(rmt_deliveries_ids)
+      repo.selected_deliveries(rmt_deliveries_ids)
+    end
+
     def pallet_sequence_pallet_number(sequence_id)
       repo.selected_pallet_numbers(sequence_id)
     end
@@ -1082,11 +1143,11 @@ module ProductionApp
     end
 
     def oldest_sequence_id(pallet_number)
-      @repo.oldest_sequence_id(pallet_number)
+      repo.oldest_sequence_id(pallet_number)
     end
 
     def pallet_standard_pack_code(pallet_number)
-      @repo.where_hash(:pallet_sequences, id: oldest_sequence_id(pallet_number))[:standard_pack_code_id]
+      repo.where_hash(:pallet_sequences, id: oldest_sequence_id(pallet_number))[:standard_pack_code_id]
     end
 
     def production_run_allow_cultivar_mixing(production_run_id)
@@ -1095,6 +1156,10 @@ module ProductionApp
 
     def includes_in_stock_pallets?(pallet_numbers)
       repo.includes_in_stock_pallets?(pallet_numbers)
+    end
+
+    def deliveries_cultivar_group(cultivar_id)
+      repo.deliveries_cultivar_group(cultivar_id)
     end
 
     def make_changes?(reworks_run_type)

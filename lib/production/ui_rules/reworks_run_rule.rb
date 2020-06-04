@@ -10,6 +10,7 @@ module UiRules
       @rules[:show_changes_made] = !@form_object.changes_made.nil_or_empty?
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+      @rules[:has_children] = @form_object.has_children
 
       common_values_for_fields common_fields
 
@@ -19,6 +20,12 @@ module UiRules
     end
 
     def set_show_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      if @form_object[:has_children]
+        compact_header(columns: %i[deliveries production_runs tipped_bins carton_labels cartons pallet_sequences
+                                   shipped_pallet_sequences inspected_pallet_sequences],
+                       display_columns: 2)
+      end
+
       reworks_run_type_id_label = @repo.find_hash(:reworks_run_types, @form_object.reworks_run_type_id)[:run_type]
       scrap_reason_id_label = MasterfilesApp::QualityRepo.new.find_scrap_reason(@form_object.scrap_reason_id)&.scrap_reason
       @rules[:scrap_pallet] = AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type_id_label
@@ -47,7 +54,7 @@ module UiRules
                                    caption: 'Scrap Reason',
                                    hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true }
       fields[:remarks] = { renderer: :label,
-                           hide_on_load: @rules[:scrap_pallet] || @rules[:scrap_bin] ? false : true }
+                           hide_on_load: !@form_object.remarks.nil_or_empty? ? false : true }
       fields[:reworks_action] = { renderer: :label,
                                   hide_on_load: !@form_object.reworks_action.nil_or_empty? ? false : true }
       fields[:user] = { renderer: :label }
@@ -73,8 +80,7 @@ module UiRules
       fields[:pallet_sequence_number] = { renderer: :label,
                                           hide_on_load: !@form_object.pallet_sequence_number.nil_or_empty? ? false : true }
       fields[:allow_cultivar_mixing] = { renderer: :label,
-                                         as_boolean: true,
-                                         hide_on_load: @rules[:tip_bins] ? false : true }
+                                         as_boolean: true }
       if @rules[:array_of_changes_made]
         @form_object.changes_made_array.to_a.each_with_index do |change, i|
           left_record = change['change_descriptions'].nil_or_empty? ? change['before'] : change['change_descriptions']['before']
@@ -188,7 +194,10 @@ module UiRules
         return
       end
 
-      @form_object = @repo.find_reworks_run(@options[:id])
+      hash = @repo.find_reworks_run(@options[:id]).to_h
+      hash = hash.merge(make_compact_details(hash[:pallets_affected])) if hash[:has_children]
+
+      @form_object = OpenStruct.new(hash)
     end
 
     def make_new_form_object
@@ -201,6 +210,19 @@ module UiRules
 
     def bin_run_type?
       @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins]
+    end
+
+    def make_compact_details(affected_deliveries)
+      deliveries_ids = affected_deliveries.split("\n").map(&:strip).reject(&:empty?)
+      res = @repo.change_objects_counts(deliveries_ids)
+      { deliveries: res[:deliveries],
+        production_runs: res[:production_runs],
+        tipped_bins: res[:tipped_bins],
+        carton_labels: res[:carton_labels],
+        cartons: res[:cartons],
+        pallet_sequences: res[:pallet_sequences],
+        shipped_pallet_sequences: res[:shipped_pallet_sequences],
+        inspected_pallet_sequences: res[:inspected_pallet_sequences] }
     end
   end
 end

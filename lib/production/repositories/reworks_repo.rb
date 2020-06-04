@@ -40,8 +40,9 @@ module ProductionApp
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes', null) AS changes_made_array,
-        COALESCE((reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after' ->> 'allow_cultivar_mixing')::boolean,false) AS allow_cultivar_mixing,
-        reworks_runs.created_at, reworks_runs.updated_at
+        reworks_runs.allow_cultivar_mixing,
+        reworks_runs.created_at, reworks_runs.updated_at,
+        EXISTS(SELECT id FROM reworks_runs cr WHERE cr.parent_id = reworks_runs.id) AS has_children
         FROM reworks_runs JOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id
         LEFT JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id
         WHERE reworks_runs.id = #{id}
@@ -698,6 +699,118 @@ module ProductionApp
 
       query = "SELECT EXISTS( SELECT id FROM pallets WHERE in_stock AND	pallet_number IN ('#{pallet_numbers.join('\',\'')}'))"
       DB[query].single_value
+    end
+
+    def selected_deliveries(rmt_deliveries_ids)
+      select_values(:rmt_deliveries, :id, id: rmt_deliveries_ids)
+    end
+
+    def deliveries_farms(delivery_ids)
+      DB[:rmt_deliveries]
+        .join(:farms, id: :farm_id)
+        .where(Sequel[:rmt_deliveries][:id] => delivery_ids)
+        .distinct(Sequel[:farms][:id])
+        .select_map(Sequel[:farms][:id])
+    end
+
+    def deliveries_cultivar_group(cultivar_id)
+      DB[:cultivars]
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .where(Sequel[:cultivars][:id] => cultivar_id)
+        .get(:cultivar_group_code)
+    end
+
+    def deliveries_production_runs(delivery_ids, ignore_runs_that_allow_mixing = false)
+      ds = DB[:rmt_bins]
+           .join(:production_runs, id: :production_run_tipped_id)
+           .where(rmt_delivery_id: delivery_ids)
+
+      ds = ds.where(allow_orchard_mixing: false) if ignore_runs_that_allow_mixing
+      ds.select_map(:production_run_tipped_id).uniq
+    end
+
+    def invalidates_marketing_varieties?(production_runs, cultivar_id)
+      query = <<~SQL
+         query = <<~SQL
+          SELECT EXISTS(
+           SELECT DISTINCT id FROM carton_labels WHERE production_run_id IN (#{production_runs.join(',')})
+           AND marketing_variety_id NOT IN (
+              SELECT DISTINCT marketing_variety_id FROM marketing_varieties_for_cultivars WHERE cultivar_id = #{cultivar_id}
+           )
+           UNION
+           SELECT DISTINCT id FROM cartons WHERE production_run_id IN (#{production_runs.join(',')})
+           AND marketing_variety_id NOT IN (
+              SELECT DISTINCT marketing_variety_id FROM marketing_varieties_for_cultivars WHERE cultivar_id = #{cultivar_id}
+           )
+          UNION
+           SELECT DISTINCT id FROM pallet_sequences WHERE production_run_id IN (#{production_runs.join(',')})
+           AND marketing_variety_id NOT IN (
+              SELECT DISTINCT marketing_variety_id FROM marketing_varieties_for_cultivars WHERE cultivar_id = #{cultivar_id}
+           )
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def update_delivery(delivery_id, attrs)
+      DB[:rmt_deliveries].where(id: delivery_id).update(attrs)
+    end
+
+    def update_objects(objects_table_name, objects_ids, attrs)
+      DB[objects_table_name.to_sym].where(id: objects_ids).update(attrs)
+    end
+
+    def changes_made_objects(objects_table_name, objects_ids)
+      query = <<~SQL
+        SELECT DISTINCT orchard_id, cultivar_id, cultivars.cultivar_name, farms.farm_code || '_' || orchards.orchard_code AS farm_orchard_code
+        FROM #{objects_table_name} t
+        JOIN orchards on orchards.id = t.orchard_id
+        JOIN cultivars on cultivars.id = t.cultivar_id
+        JOIN farms on farms.id = t.farm_id
+        WHERE t.id IN (#{objects_ids})
+      SQL
+      DB[query].all
+    end
+
+    def change_objects_counts(delivery_ids, ignore_runs_that_allow_mixing = false)  # rubocop:disable Metrics/AbcSize
+      production_runs = deliveries_production_runs(delivery_ids, ignore_runs_that_allow_mixing)
+
+      tipped_bins_query = <<~SQL
+        SELECT COUNT(id) FROM rmt_bins WHERE production_run_tipped_id IN (#{production_runs.join(',')})
+      SQL
+
+      carton_labels_query = <<~SQL
+        SELECT COUNT(id) FROM carton_labels WHERE production_run_id IN (#{production_runs.join(',')})
+      SQL
+
+      cartons_query = <<~SQL
+        SELECT COUNT(id) FROM cartons WHERE production_run_id IN (#{production_runs.join(',')})
+      SQL
+
+      pallet_sequences_query = <<~SQL
+        SELECT COUNT(id) FROM pallet_sequences WHERE production_run_id IN (#{production_runs.join(',')})
+      SQL
+
+      shipped_ps_query = <<~SQL
+        SELECT COUNT(pallet_sequences.id) FROM pallets
+        JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
+        WHERE shipped AND production_run_id IN (#{production_runs.join(',')})
+      SQL
+
+      inspected_ps_query = <<~SQL
+        SELECT COUNT(pallet_sequences.id) FROM pallets
+        JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
+        WHERE inspected AND production_run_id IN (#{production_runs.join(',')})
+      SQL
+
+      { deliveries: delivery_ids.count,
+        production_runs: production_runs.count,
+        tipped_bins: DB[tipped_bins_query].single_value,
+        carton_labels: DB[carton_labels_query].single_value,
+        cartons: DB[cartons_query].single_value,
+        pallet_sequences: DB[pallet_sequences_query].single_value,
+        shipped_pallet_sequences: DB[shipped_ps_query].single_value,
+        inspected_pallet_sequences: DB[inspected_ps_query].single_value }
     end
   end
 end

@@ -5,18 +5,20 @@
   reworks_runs.pallets_unscrapped, reworks_runs.pallets_selected) AS pallets_selected,\r\nreworks_runs.pallets_affected,\r\nreworks_runs.changes_made
   -> 'pallets' ->> 'pallet_number' AS pallet_number,\r\nreworks_runs.changes_made
   -> 'pallets' -> 'pallet_sequences' ->> 'pallet_id'  AS pallet_id,\r\nreworks_runs.changes_made
-  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,\r\nCOALESCE(reworks_runs.changes_made
-  -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'after' ->> 'allow_cultivar_mixing',
-  'false') AS allow_cultivar_mixing,\r\nreworks_runs.changes_made -> 'pallets' ->
-  'pallet_sequences' -> 'changes' ->> 'before' AS before_state,\r\nreworks_runs.changes_made
-  -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state, \r\nreworks_runs.updated_at\r\nFROM
-  reworks_runs\r\nJOIN reworks_run_types ON reworks_run_types.id = reworks_runs.reworks_run_type_id\r\nLEFT
-  JOIN scrap_reasons ON scrap_reasons.id = reworks_runs.scrap_reason_id\r\nORDER BY
-  id DESC"
+  -> 'pallets' -> 'pallet_sequences' ->> 'pallet_sequence_number'  AS pallet_sequence_number,\r\nreworks_runs.allow_cultivar_mixing,\r\nreworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'before' AS before_state,\r\nreworks_runs.changes_made
+  -> 'pallets' -> 'pallet_sequences' -> 'changes' ->> 'after' AS after_state, \r\nreworks_runs.updated_at,
+  \r\nreworks_runs.parent_id,\r\nEXISTS(SELECT id FROM reworks_runs cr WHERE cr.parent_id
+  = reworks_runs.id) AS has_children,\r\nCASE WHEN parent_id IS NULL THEN 'ready'\r\nELSE
+  NULL::text\r\nEND AS colour_rule\r\nFROM reworks_runs\r\nJOIN reworks_run_types
+  ON reworks_run_types.id = reworks_runs.reworks_run_type_id\r\nLEFT JOIN scrap_reasons
+  ON scrap_reasons.id = reworks_runs.scrap_reason_id\r\nORDER BY id DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
+  :colour_key:
+    ready: Parent Reworks Run
 :columns:
   id:
     :name: id
@@ -246,7 +248,7 @@
     :name: allow_cultivar_mixing
     :sequence_no: 15
     :caption: Allow cultivar mixing
-    :namespaced_name: 
+    :namespaced_name: reworks_runs.allow_cultivar_mixing
     :data_type: :boolean
     :width: 
     :format: 
@@ -306,6 +308,54 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  parent_id:
+    :name: parent_id
+    :sequence_no: 19
+    :caption: Parent
+    :namespaced_name: reworks_runs.parent_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_children:
+    :name: has_children
+    :sequence_no: 20
+    :caption: Has children
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 21
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
 :query_parameter_definitions:
 - :column: reworks_runs.reworks_run_type_id
   :caption: Reworks run type
@@ -339,3 +389,11 @@
   :ordered_list: false
   :ui_priority: 4
   :list_def: 
+- :column: reworks_runs.parent_id
+  :caption: Reworks run parent
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 5
+  :list_def: SELECT DISTINCT parent_id FROM reworks_runs ORDER BY parent_id

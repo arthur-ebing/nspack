@@ -25,7 +25,8 @@ module Production
                                is_multiselect: true,
                                multiselect_url: '/production/reworks/change_deliveries_orchard/selected_deliveries',
                                multiselect_key: multiselect_params[:key],
-                               multiselect_params: multiselect_params)
+                               multiselect_params: multiselect_params,
+                               height: 45)
             end
           end
 

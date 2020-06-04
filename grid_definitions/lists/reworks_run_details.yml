@@ -6,7 +6,24 @@
   :icon: view-show
   :title: View
   :popup: true
+- :separator: true
+- :url: "/production/reworks/reworks_runs/$:id$/list_children_reworks_runs"
+  :text: view children
+  :icon: list
+  :title: Children
+  :popup: true
+  :hide_if_false: has_children
+- :url: "/production/reworks/reworks_runs/$:parent_id$"
+  :text: view parent run
+  :icon: view-show
+  :title: View
+  :popup: true
+  :hide_if_null: parent_id
 :conditions:
+  :view_children:
+    - :col: reworks_runs.parent_id
+      :op: =
+      :val: $:parent_id$
   :search_by_pallet_number:
     - :col: reworks_runs.id
       :op: IN
