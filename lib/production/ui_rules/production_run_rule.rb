@@ -11,6 +11,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+
       common_values_for_fields common_fields unless %i[allocate_setups complete_stage confirm].include?(@mode)
 
       set_show_fields if %i[show reopen template show_stats].include? @mode
@@ -46,13 +48,16 @@ module UiRules
       fields[:allow_cultivar_mixing] = { renderer: :label, as_boolean: true }
       fields[:allow_orchard_mixing] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:allow_cultivar_group_mixing] = { renderer: :label,
+                                               as_boolean: true,
+                                               hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true }
     end
 
     def make_header_table(columns = nil, display_columns = 2)
       compact_header(columns: columns || %i[production_run_code template_name packhouse_code
                                             line_code farm_code puc_code orchard_code season_code
-                                            cultivar_group_code cultivar_name allow_cultivar_mixing
-                                            allow_orchard_mixing status active_run_stage],
+                                            cultivar_group_code cultivar_name allow_cultivar_group_mixing
+                                            allow_cultivar_mixing allow_orchard_mixing status active_run_stage],
                      display_columns: display_columns,
                      header_captions: {
                        production_run_code: 'Run',
@@ -65,6 +70,7 @@ module UiRules
                        season_code: 'Season',
                        cultivar_group_code: 'Cultivar group',
                        cultivar_code: 'Cultivar',
+                       allow_cultivar_group_mixing: 'Mix Cultivar Group?',
                        allow_cultivar_mixing: 'Mix Cultivar?',
                        allow_orchard_mixing: 'Mix Orchard?',
                        status: 'Status',
@@ -200,7 +206,9 @@ module UiRules
         labeling: { renderer: :label, as_boolean: true },
         closed: { renderer: :label, as_boolean: true },
         setup_complete: { renderer: :label, as_boolean: true },
-        completed: { renderer: :label, as_boolean: true }
+        completed: { renderer: :label, as_boolean: true },
+        allow_cultivar_group_mixing: { renderer: :checkbox,
+                                       hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true }
       }
     end
 
@@ -277,7 +285,8 @@ module UiRules
                                     labeling: nil,
                                     closed: nil,
                                     setup_complete: nil,
-                                    completed: nil)
+                                    completed: nil,
+                                    allow_cultivar_group_mixing: nil)
     end
 
     private

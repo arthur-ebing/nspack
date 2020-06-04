@@ -576,7 +576,9 @@ module ProductionApp
       template = product_setup_repo.find_product_setup_template(run.product_setup_template_id)
 
       errors = {}
-      errors[:cultivar_group_id] = ['does not match the template'] if template.cultivar_group_id != instance[:cultivar_group_id]
+      unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && instance[:allow_cultivar_group_mixing]
+        errors[:cultivar_group_id] = ['does not match the template'] if template.cultivar_group_id != instance[:cultivar_group_id]
+      end
       unless template.season_id.nil?
         errors[:season_id] = ['does not match the template'] if template.season_id != instance[:season_id]
       end

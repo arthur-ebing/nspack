@@ -26,6 +26,7 @@ module Production
                   col.add_field :puc_id
                   col.add_field :season_id
                   col.add_field :cultivar_id
+                  col.add_field :allow_cultivar_group_mixing
                   col.add_field :allow_cultivar_mixing
                   col.add_field :allow_orchard_mixing
                 end

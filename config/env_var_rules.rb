@@ -77,7 +77,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { BYPASS_QUALITY_TEST_LOAD_CHECK: 'optional. Bypasses Quality checks at Pallet Loading' },
     { BYPASS_QUALITY_TEST_PRE_RUN_CHECK: 'optional. Bypasses Quality checks before a run is started' },
     { MAX_BINS_ON_LOAD: 'optional. Sets maximum bins allowed on load' },
-    { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' }
+    { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' },
+    { ALLOW_CULTIVAR_GROUP_MIXING: 'Allow users to set allow_cultivar_group_mixing flag on production_runs' }
 
   ].freeze
 

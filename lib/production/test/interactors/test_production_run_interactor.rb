@@ -108,7 +108,8 @@ module ProductionApp
         running: false,
         tipping: false,
         labeling: false,
-        active: true
+        active: true,
+        allow_cultivar_group_mixing: false
       }
     end
 

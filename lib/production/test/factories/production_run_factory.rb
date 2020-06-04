@@ -40,7 +40,8 @@ module ProductionApp
         labeling: false,
         active: true,
         created_at: '2010-01-01 12:00',
-        updated_at: '2010-01-01 12:00'
+        updated_at: '2010-01-01 12:00',
+        allow_cultivar_group_mixing: false
       }
       DB[:production_runs].insert(default.merge(opts))
     end

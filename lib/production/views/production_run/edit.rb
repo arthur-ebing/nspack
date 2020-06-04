@@ -23,6 +23,7 @@ module Production
                   col.add_field :farm_id
                   col.add_field :orchard_id
                   col.add_field :cultivar_group_id
+                  col.add_field :allow_cultivar_group_mixing
                   col.add_field :allow_cultivar_mixing
                 end
                 row.column do |col|

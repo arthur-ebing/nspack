@@ -27,6 +27,7 @@ module ProductionApp
     attribute :running, Types::Bool
     attribute :tipping, Types::Bool
     attribute :labeling, Types::Bool
+    attribute :allow_cultivar_group_mixing, Types::Bool
     attribute? :active, Types::Bool
     attribute? :allocation_required, Types::Bool
 
@@ -83,5 +84,6 @@ module ProductionApp
     attribute :packhouse_code, Types::String
     attribute :line_code, Types::String
     attribute :status, Types::String
+    attribute :allow_cultivar_group_mixing, Types::Bool
   end
 end

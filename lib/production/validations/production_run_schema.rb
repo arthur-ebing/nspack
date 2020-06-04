@@ -15,6 +15,7 @@ module ProductionApp
     optional(:product_setup_template_id, :integer).maybe(:int?)
     required(:allow_cultivar_mixing, :bool).maybe(:bool?)
     required(:allow_orchard_mixing, :bool).maybe(:bool?)
+    required(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ProductionRunSchema = Dry::Validation.Params do
@@ -43,6 +44,7 @@ module ProductionApp
     optional(:closed, :bool).maybe(:bool?)
     optional(:setup_complete, :bool).maybe(:bool?)
     optional(:completed, :bool).maybe(:bool?)
+    required(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ProductionRunReconfigureSchema = Dry::Validation.Params do
@@ -71,6 +73,7 @@ module ProductionApp
     optional(:closed, :bool).maybe(:bool?)
     optional(:setup_complete, :bool).maybe(:bool?)
     optional(:completed, :bool).maybe(:bool?)
+    required(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ProductionRunTemplateSchema = Dry::Validation.Params do

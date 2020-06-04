@@ -46,6 +46,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # General
   DEFAULT_KEY = 'DEFAULT'
 
+  # Production Runs
+  ALLOW_CULTIVAR_GROUP_MIXING = make_boolean('ALLOW_CULTIVAR_GROUP_MIXING')
+
   # Deliveries
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
   DELIVERY_CAPTURE_INNER_BINS = make_boolean('CAPTURE_INNER_BINS')
