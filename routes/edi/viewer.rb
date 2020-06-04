@@ -15,8 +15,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.post do
         res = interactor.edi_upload(params[:edi_file_upload])
         if res.success
-          @page = interactor.build_grids_for(res.instance[:flow_type], res.instance[:fn], upload_name: res.instance[:upload_name])
-          view('edi/show_in_grids')
+          if res.instance[:upload_name].match(/.xml$/i)
+            show_partial_or_page(r) { Edi::Viewer::File::XML.call(res.instance[:flow_type], res.instance[:fn]) }
+          elsif res.instance[:upload_name].match(/.csv$/i)
+            show_partial_or_page(r) { Edi::Viewer::File::CSV.call(res.instance[:flow_type], res.instance[:fn], upload_name: res.instance[:upload_name]) }
+          else
+            @page = interactor.build_grids_for(res.instance[:flow_type], res.instance[:fn], upload_name: res.instance[:upload_name])
+            view('edi/show_in_grids')
+          end
         else
           re_show_form(r, res, url: '/edi/viewer/upload') do
             Edi::Viewer::File::Upload.call(form_values: params[:edi_file_upload],
@@ -28,8 +34,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'display_edi_file' do
+      r.on 'csv_grid' do
+        interactor.csv_grid(params[:file_path])
+      end
+
       if UtilityFunctions.xml_file?(params[:file_path])
         show_partial_or_page(r) { Edi::Viewer::File::XML.call(params[:flow_type], params[:file_path]) }
+      elsif params[:file_path].match(/.csv$/i)
+        show_partial_or_page(r) { Edi::Viewer::File::CSV.call(params[:flow_type], params[:file_path]) }
       else
         @page = interactor.build_grids_for(params[:flow_type], params[:file_path])
         view('edi/show_in_grids')

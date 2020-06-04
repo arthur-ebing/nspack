@@ -13,6 +13,13 @@ module EdiApp
                        end
     end
 
+    def schema_record_sizes
+      yml_path = File.expand_path('../schemas/schema_record_sizes.yml', __dir__)
+      raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
+
+      YAML.load_file(yml_path)
+    end
+
     # Are there any rules for a flow type?
     #
     # @param flow_type [string] the EDI flow type

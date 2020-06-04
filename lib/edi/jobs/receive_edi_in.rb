@@ -99,10 +99,7 @@ module EdiApp
       end
 
       def config
-        yml_path = File.expand_path('../schemas/schema_record_sizes.yml', __dir__)
-        raise 'There is no schema_record_sizes.yml file' unless File.exist?(yml_path)
-
-        YAML.load_file(yml_path)
+        @config ||= EdiOutRepo.new.schema_record_sizes
       end
 
       def log(msg)

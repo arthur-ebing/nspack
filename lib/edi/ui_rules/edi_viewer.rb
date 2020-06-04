@@ -3,7 +3,7 @@
 module UiRules
   class EdiViewerRule < Base
     def generate_rules
-      # @repo = EdiApp::ViewerRepo.new
+      @repo = EdiApp::EdiOutRepo.new
       make_form_object
       apply_form_values
 
@@ -14,7 +14,7 @@ module UiRules
 
     def common_fields
       {
-        flow_type: { renderer: :select, options: %w[PO PS], required: true },
+        flow_type: { renderer: :select, options: @repo.schema_record_sizes.keys, required: true },
         file_name: { renderer: :file, required: true }
       }
     end

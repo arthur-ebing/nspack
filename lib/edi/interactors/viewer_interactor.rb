@@ -27,6 +27,14 @@ module EdiApp
       )
     end
 
+    def csv_grid(file_name)
+      recs = CSV.read(file_name, headers: true)
+      {
+        columnDefs: grid_columns_for_csv(recs.first),
+        rowDefs: recs.map { |r| Hash[r.to_a] }
+      }.to_json
+    end
+
     def file_path_from_in_transaction(id)
       repo = EdiInRepo.new
       tran = repo.find_edi_in_transaction(id)
@@ -151,8 +159,7 @@ module EdiApp
     end
 
     def file_row_for_grid(file, options = {}) # rubocop:disable Metrics/AbcSize
-      flow = file.basename.to_s[0, 2]
-      flow = 'PO' if flow == 'RL'
+      flow = work_out_flow_type(file.basename.to_s)
       {
         id: yield,
         flow_type: flow,
@@ -165,6 +172,26 @@ module EdiApp
         edi_out: options[:edi_out] || false,
         in_error: options[:in_error] || false
       }
+    end
+
+    def work_out_flow_type(file_name)
+      config = EdiOutRepo.new.schema_record_sizes
+      # Ensure longest flow types are matched first
+      # (in case of something like flows: PO and POS)
+      keys = config.keys.sort_by(&:length).reverse
+
+      flow_type = '???'
+      keys.each do |key|
+        next unless file_name.upcase.start_with?(key.upcase)
+
+        flow_type = if config[key].is_a?(String)
+                      config[key]
+                    else
+                      key.upcase
+                    end
+        break
+      end
+      flow_type
     end
 
     def grid_columns_for_edi_files
@@ -183,6 +210,12 @@ module EdiApp
         mk.col 'edi_in', 'EDI in?', data_type: :boolean, hide: true
         mk.col 'edi_out', 'EDI out?', data_type: :boolean, hide: true
         mk.col 'in_error', 'Error?', data_type: :boolean, hide: true
+      end
+    end
+
+    def grid_columns_for_csv(rec)
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        rec.to_a.each { |key, _| mk.col key }
       end
     end
 
