@@ -372,7 +372,9 @@ module ProductionApp
       end
     end
 
-    def create_reworks_run_record(attrs, reworks_action, changes) # rubocop:disable Metrics/AbcSize
+    def create_reworks_run_record(attrs, reworks_action, changes) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      attrs[:allow_cultivar_group_mixing] = false unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+
       res = validate_reworks_run_params(attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
