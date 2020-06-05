@@ -37,5 +37,6 @@ module ProductionApp
     attribute :created_at, Types::DateTime
     attribute :allow_cultivar_mixing, Types::Bool
     attribute :has_children, Types::Bool
+    attribute :allow_cultivar_group_mixing, Types::Bool
   end
 end

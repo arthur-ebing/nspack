@@ -50,6 +50,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:pallet_sequence_id, :integer).maybe(:int?)
     optional(:affected_sequences, :array).maybe(:array?) { each(:int?) }
     optional(:make_changes, :bool).maybe(:bool?)
+    required(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ReworksRunTipBinsSchema = Dry::Validation.Params do
@@ -80,6 +81,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:production_run_id, :integer).filled(:int?)
     required(:old_production_run_id, :integer).filled(:int?)
     required(:reworks_run_type_id, :integer).filled(:int?)
+    optional(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ProductionRunUpdateFarmDetailsSchema = Dry::Validation.Params do
@@ -188,6 +190,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:from_production_run_id, :integer).filled(:int?)
     required(:to_production_run_id, :integer).filled(:int?)
     optional(:make_changes, :bool).maybe(:bool?)
+    optional(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
   end
 
   ReworksBulkWeighBinsSchema = Dry::Validation.Params do

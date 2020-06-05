@@ -21,6 +21,7 @@ module Production
                 row.column do |col|
                   col.add_field :pallet_sequence_id
                   col.add_field :old_production_run_id
+                  col.add_field :allow_cultivar_group_mixing
                   col.add_field :production_run_id
                   col.add_field :reworks_run_type_id
                   col.add_table [],

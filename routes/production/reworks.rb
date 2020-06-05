@@ -493,6 +493,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      value: production_run_details)])
       end
 
+      r.on 'allow_cultivar_group_mixing_changed' do
+        old_production_run_id = params[:reworks_run_sequence_old_production_run_id]
+        allow_cultivar_group_mixing = if params[:changed_value] == 't' && AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+                                        true
+                                      else
+                                        false
+                                      end
+        production_runs = ProductionApp::ReworksRepo.new.for_select_production_runs(old_production_run_id, allow_cultivar_group_mixing)
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_production_run_id',
+                                     options_array: production_runs)])
+      end
+
       r.on 'edit_reworks_farm_details' do # Edit pallet sequence
         r.get do
           show_partial_or_page(r) { Production::Reworks::ReworksRun::EditFarmDetails.call(id, reworks_run_type_id) }

@@ -23,6 +23,7 @@ module Production
               form.add_field :pallets_affected
               form.add_field :pallet_number
               form.add_field :pallet_sequence_number
+              form.add_field :allow_cultivar_group_mixing
               form.add_field :allow_cultivar_mixing
               if rules[:has_children]
                 form.add_text 'Affected Objects'

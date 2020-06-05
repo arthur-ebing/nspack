@@ -222,11 +222,14 @@ module ProductionApp
       id = nil
       repo.transaction do
         res = resolve_update_selected_input(reworks_run_type, attrs)
-        id = repo.create_reworks_run(user: attrs[:user],
-                                     reworks_run_type_id: attrs[:reworks_run_type_id],
-                                     pallets_selected: "{ #{attrs[:pallets_selected].join(',')} }",
-                                     pallets_affected: "{ #{attrs[:pallets_selected].join(',')} }",
-                                     changes_made: res[:changes_made])
+        reworks_run_attrs = { user: attrs[:user],
+                              reworks_run_type_id: attrs[:reworks_run_type_id],
+                              pallets_selected: "{ #{attrs[:pallets_selected].join(',')} }",
+                              pallets_affected: "{ #{attrs[:pallets_selected].join(',')} }",
+                              changes_made: res[:changes_made] }
+        reworks_run_attrs = reworks_run_attrs.merge!(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]) if attrs[:allow_cultivar_group_mixing]
+
+        id = repo.create_reworks_run(reworks_run_attrs)
         resolve_log_reworks_runs_status_and_transaction(reworks_run_type, id, res[:children])
       end
       success_response((res[:message]).to_s, reworks_run_id: id)
@@ -649,7 +652,7 @@ module ProductionApp
         repo.update_pallet_sequence(sequence_id, after_attrs)
         after_descriptions_state = production_run_description_changes(attrs[:production_run_id], vw_flat_sequence_data(sequence_id))
         change_descriptions = { before: before_descriptions_state.sort.to_h, after: after_descriptions_state.sort.to_h }
-        rw_res = create_reworks_run_record(reworks_run_attrs,
+        rw_res = create_reworks_run_record(reworks_run_attrs.merge!(allow_cultivar_group_mixing: attrs[:allow_cultivar_group_mixing]),
                                            AppConst::REWORKS_ACTION_CHANGE_PRODUCTION_RUN,
                                            before: before_attrs.sort.to_h, after: after_attrs.sort.to_h, change_descriptions: change_descriptions)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
@@ -1154,6 +1157,10 @@ module ProductionApp
       repo.production_run_allow_cultivar_mixing(production_run_id)
     end
 
+    def production_run_allow_cultivar_group_mixing(production_run_id)
+      repo.production_run_allow_cultivar_group_mixing(production_run_id)
+    end
+
     def includes_in_stock_pallets?(pallet_numbers)
       repo.includes_in_stock_pallets?(pallet_numbers)
     end
@@ -1281,6 +1288,7 @@ module ProductionApp
       from_production_run_id = params[:from_production_run_id]
       to_production_run_id = params[:to_production_run_id]
       pallets_selected = params[:pallets_selected]
+      allow_cultivar_group_mixing = params[:allow_cultivar_group_mixing] == 't' if AppConst::ALLOW_CULTIVAR_GROUP_MIXING
 
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{to_production_run_id} should be different"] }, to_production_run_id: to_production_run_id) unless from_production_run_id != to_production_run_id
 
@@ -1290,8 +1298,13 @@ module ProductionApp
       new_production_run = repo.production_run_exists?(from_production_run_id)
       return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{to_production_run_id} doesn't exist"] }, to_production_run_id: to_production_run_id) if new_production_run.nil_or_empty?
 
-      same_cultivar_group = repo.same_cultivar_group?(from_production_run_id, to_production_run_id)
-      return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different cultivar groups"] }, to_production_run_id: to_production_run_id) unless same_cultivar_group
+      if AppConst::ALLOW_CULTIVAR_GROUP_MIXING && allow_cultivar_group_mixing
+        same_commodity = repo.same_commodity?(from_production_run_id, to_production_run_id)
+        return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different same_commodities"] }, to_production_run_id: to_production_run_id) unless same_commodity
+      else
+        same_cultivar_group = repo.same_cultivar_group?(from_production_run_id, to_production_run_id)
+        return OpenStruct.new(success: false, messages: { to_production_run_id: ["#{from_production_run_id} and #{to_production_run_id} belongs to different cultivar groups"] }, to_production_run_id: to_production_run_id) unless same_cultivar_group
+      end
 
       if AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE == reworks_run_type
         res = validate_pallet_numbers(reworks_run_type, params[:pallets_selected], from_production_run_id)

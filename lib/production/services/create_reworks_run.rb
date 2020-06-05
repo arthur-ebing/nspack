@@ -4,7 +4,7 @@ module ProductionApp
   class CreateReworksRun < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :user_name, :reworks_run_type, :pallets_selected, :pallets_affected,
                 :scrap_reason_id, :scrap_remarks, :make_changes,  :reworks_run_booleans, :reworks_action, :changes,
-                :affected_pallet_sequences
+                :affected_pallet_sequences, :allow_cultivar_group_mixing
 
     def initialize(params, reworks_action, changes)  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ReworksRepo.new
@@ -17,7 +17,7 @@ module ProductionApp
                                    else
                                      params[:affected_sequences]
                                    end
-
+      @allow_cultivar_group_mixing = params[:allow_cultivar_group_mixing].nil? ? false : params[:allow_cultivar_group_mixing]
       @make_changes = params[:make_changes]
       @reworks_action = reworks_action
       @changes = changes
@@ -102,7 +102,8 @@ module ProductionApp
         pallets_affected: "{ #{pallets_affected.join(',')} }",
         changes_made: reworks_run_booleans[:rmt_bin_change] ? resolve_bin_changes : resolve_pallet_changes,
         pallets_scrapped: reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:repack_pallets] ? "{ #{pallets_selected.join(',')} }" : nil,
-        pallets_unscrapped: reworks_run_booleans[:unscrap_pallets] ? "{ #{pallets_selected.join(',')} }" : nil
+        pallets_unscrapped: reworks_run_booleans[:unscrap_pallets] ? "{ #{pallets_selected.join(',')} }" : nil,
+        allow_cultivar_group_mixing: allow_cultivar_group_mixing
       }
     end
 

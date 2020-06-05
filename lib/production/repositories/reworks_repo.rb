@@ -40,6 +40,7 @@ module ProductionApp
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'before', null) AS before_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes' -> 'change_descriptions' -> 'after', null) AS after_descriptions_state,
         COALESCE(reworks_runs.changes_made -> 'pallets' -> 'pallet_sequences' -> 'changes', null) AS changes_made_array,
+        reworks_runs.allow_cultivar_group_mixing,
         reworks_runs.allow_cultivar_mixing,
         reworks_runs.created_at, reworks_runs.updated_at,
         EXISTS(SELECT id FROM reworks_runs cr WHERE cr.parent_id = reworks_runs.id) AS has_children
@@ -79,6 +80,20 @@ module ProductionApp
           FROM production_runs
           WHERE id = #{new_production_run_id}
             AND	cultivar_group_id = (SELECT cultivar_group_id FROM production_runs WHERE id = #{old_production_run_id}))
+      SQL
+      DB[query].single_value
+    end
+
+    def same_commodity?(old_production_run_id, new_production_run_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT production_runs.id
+          FROM production_runs
+          LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
+          WHERE production_runs.id = #{new_production_run_id}
+            AND	cultivar_groups.commodity_id = (SELECT cultivar_groups.commodity_id FROM production_runs
+                                                LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
+                                                WHERE production_runs.id = #{old_production_run_id}))
       SQL
       DB[query].single_value
     end
@@ -404,12 +419,22 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:carton_quantity)
     end
 
-    def for_select_production_runs(production_run_id)
+    def for_select_production_runs(production_run_id, allow_cultivar_group_mixing = false)
+      conditions = if AppConst::ALLOW_CULTIVAR_GROUP_MIXING && allow_cultivar_group_mixing
+                     " AND cultivar_groups.commodity_id = (SELECT cultivar_groups.commodity_id FROM production_runs
+                                                           LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
+                                                           WHERE production_runs.id = #{production_run_id})"
+                   else
+                     " AND production_runs.cultivar_group_id = (SELECT production_runs.cultivar_group_id FROM production_runs
+                                                                WHERE production_runs.id = #{production_run_id})"
+                   end
+
       query = <<~SQL
-        SELECT fn_production_run_code(id) AS production_run_code, id
+        SELECT fn_production_run_code(production_runs.id) AS production_run_code, production_runs.id
         FROM production_runs
-        WHERE id NOT IN (#{production_run_id})
-        AND cultivar_group_id = (SELECT cultivar_group_id FROM production_runs WHERE id = #{production_run_id})
+        LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
+        WHERE production_runs.id NOT IN (#{production_run_id})
+        #{conditions}
         ORDER BY id DESC
         LIMIT 500
       SQL
@@ -688,6 +713,10 @@ module ProductionApp
 
     def production_run_allow_cultivar_mixing(production_run_id)
       DB[:production_runs].where(id: production_run_id).get(:allow_cultivar_mixing)
+    end
+
+    def production_run_allow_cultivar_group_mixing(production_run_id)
+      DB[:production_runs].where(id: production_run_id).get(:allow_cultivar_group_mixing)
     end
 
     def in_stock_pallets?(pallet_numbers)

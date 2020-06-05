@@ -6,6 +6,7 @@ module UiRules
       @repo = ProductionApp::ReworksRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
+      @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
 
       make_form_object
       apply_form_values
@@ -13,6 +14,7 @@ module UiRules
       @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
+      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table
@@ -40,7 +42,7 @@ module UiRules
 
     def set_change_production_run_fields
       fields[:production_run_id] = { renderer: :select,
-                                     options: ProductionApp::ReworksRepo.new.for_select_production_runs(@options[:old_production_run_id]),
+                                     options: @repo.for_select_production_runs(@options[:old_production_run_id]),
                                      caption: 'Production Runs',
                                      prompt: 'Select New Production Run',
                                      searchable: true,
@@ -48,6 +50,8 @@ module UiRules
       fields[:pallet_sequence_id] = { renderer: :hidden }
       fields[:old_production_run_id] = { renderer: :hidden }
       fields[:reworks_run_type_id] = { renderer: :hidden }
+      fields[:allow_cultivar_group_mixing] = { renderer: :checkbox,
+                                               hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true }
     end
 
     def set_pallet_sequence_fields  # rubocop:disable Metrics/AbcSize
@@ -85,7 +89,7 @@ module UiRules
                                   caption: 'Cultivar Group' }
       fields[:cultivar_id] = { renderer: :select,
                                options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
-                               disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
+                               disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                                caption: 'Cultivar' }
       fields[:season_id] = { renderer: :select,
                              options: MasterfilesApp::CalendarRepo.new.for_select_seasons_for_cultivar_group(@form_object.cultivar_group_id),
@@ -126,30 +130,30 @@ module UiRules
                                  caption: 'Commodity' }
       fields[:marketing_variety_id] =  { renderer: :select,
                                          options: @repo.for_select_template_commodity_marketing_varieties(commodity_id),
-                                         disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
+                                         disabled_options: @cultivar_repo.for_select_inactive_marketing_varieties,
                                          caption: 'Marketing Variety',
                                          required: true,
                                          prompt: 'Select Marketing Variety',
                                          searchable: true,
                                          remove_search_for_small_list: false }
       fields[:std_fruit_size_count_id] =  { renderer: :select,
-                                            options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
-                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_std_fruit_size_counts,
+                                            options: @fruit_size_repo.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
+                                            disabled_options: @fruit_size_repo.for_select_inactive_std_fruit_size_counts,
                                             caption: 'Std Size Count',
                                             prompt: 'Select Size Count',
                                             searchable: true,
                                             remove_search_for_small_list: false }
       fields[:basic_pack_code_id] =  { renderer: :select,
-                                       options: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes,
-                                       disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_basic_pack_codes,
+                                       options: @fruit_size_repo.for_select_basic_pack_codes,
+                                       disabled_options: @fruit_size_repo.for_select_inactive_basic_pack_codes,
                                        caption: 'Basic Pack',
                                        required: true,
                                        prompt: 'Select Basic Pack',
                                        searchable: true,
                                        remove_search_for_small_list: false }
       fields[:standard_pack_code_id] =  { renderer: :select,
-                                          options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
-                                          disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
+                                          options: @fruit_size_repo.for_select_standard_pack_codes,
+                                          disabled_options: @fruit_size_repo.for_select_inactive_standard_pack_codes,
                                           caption: 'Standard Pack',
                                           required: true,
                                           prompt: 'Select Standard Pack',
@@ -157,15 +161,15 @@ module UiRules
                                           remove_search_for_small_list: false,
                                           hide_on_load: @rules[:hide_some_fields] ? true : false }
       fields[:fruit_actual_counts_for_pack_id] =  { renderer: :select,
-                                                    options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs,
-                                                    disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_actual_counts_for_packs,
+                                                    options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs,
+                                                    disabled_options: @fruit_size_repo.for_select_inactive_fruit_actual_counts_for_packs,
                                                     caption: 'Actual Count',
                                                     prompt: 'Select Actual Count',
                                                     searchable: true,
                                                     remove_search_for_small_list: false }
       fields[:fruit_size_reference_id] =  { renderer: :select,
-                                            options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references,
-                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_size_references,
+                                            options: @fruit_size_repo.for_select_fruit_size_references,
+                                            disabled_options: @fruit_size_repo.for_select_inactive_fruit_size_references,
                                             caption: 'Size Reference',
                                             prompt: 'Select Size Reference',
                                             searchable: true,
@@ -311,7 +315,7 @@ module UiRules
     end
 
     def make_farm_details_form_object
-      res = ProductionApp::ReworksRepo.new.where_hash(:pallet_sequences, id: @options[:pallet_sequence_id])
+      res = @repo.where_hash(:pallet_sequences, id: @options[:pallet_sequence_id])
       @form_object = OpenStruct.new(farm_id: res[:farm_id],
                                     puc_id: res[:puc_id],
                                     orchard_id: res[:orchard_id],
@@ -336,6 +340,9 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
+        behaviour.input_change :allow_cultivar_group_mixing,
+                               notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/allow_cultivar_group_mixing_changed",
+                                          param_keys: %i[reworks_run_sequence_old_production_run_id] }]
         behaviour.dropdown_change :production_run_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/production_run_changed" }]
       end

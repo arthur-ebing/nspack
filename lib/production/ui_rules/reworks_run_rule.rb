@@ -11,6 +11,7 @@ module UiRules
       @rules[:single_pallet_selected] = @form_object.pallets_selected.split("\n").length == 1 unless @form_object.pallets_selected.nil_or_empty?
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:has_children] = @form_object.has_children
+      @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
 
       common_values_for_fields common_fields
 
@@ -81,6 +82,10 @@ module UiRules
                                           hide_on_load: !@form_object.pallet_sequence_number.nil_or_empty? ? false : true }
       fields[:allow_cultivar_mixing] = { renderer: :label,
                                          as_boolean: true }
+      fields[:allow_cultivar_group_mixing] = { renderer: :label,
+                                               as_boolean: true,
+                                               hide_on_load: @rules[:allow_cultivar_group_mixing] ? false : true }
+
       if @rules[:array_of_changes_made]
         @form_object.changes_made_array.to_a.each_with_index do |change, i|
           left_record = change['change_descriptions'].nil_or_empty? ? change['before'] : change['change_descriptions']['before']
@@ -130,6 +135,7 @@ module UiRules
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
+      @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
@@ -183,8 +189,9 @@ module UiRules
                         caption: @rules[:tip_bins] ? 'Average Gross Weight' : 'Gross Weight',
                         hide_on_load: @rules[:bulk_weigh_bins] || @rules[:tip_bins] ? false : true },
         avg_gross_weight: { renderer: :checkbox,
-                            hide_on_load: @rules[:bulk_weigh_bins] ? false : true }
-
+                            hide_on_load: @rules[:bulk_weigh_bins] ? false : true },
+        allow_cultivar_group_mixing: { renderer: :checkbox,
+                                       hide_on_load: @rules[:show_allow_cultivar_group_mixing] ? false : true }
       }
     end
 
