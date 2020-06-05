@@ -26,13 +26,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     load_schema
   end
 
-  def schema_record_sizes
-    required_sizes = @repo.schema_record_sizes[flow_type]
-    # Flow type might point to another flow type (RL -> PO)
-    required_sizes = @repo.schema_record_sizes[required_sizes] if required_sizes.is_a?(String)
-    required_sizes
-  end
-
   # Reads an XML schema and compares each record size attribute against the sum of its field sizes.
   def self.check_schema_size_differences(flow_type) # rubocop:disable Metrics/AbcSize
     file_path = File.expand_path("edi/schemas/#{flow_type.downcase}.xml", __dir__)
@@ -50,6 +43,91 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       out[key] = { rec: rec_size, fields: tot_size, required_size: required_sizes[key], xml_to_required_diff: required_sizes[key] - rec_size, diff: rec_size - tot_size }
     end
     out
+  end
+
+  # VALIDATE fixed len record size vs sum of fields... (include end_padding field)
+  # send in "for fixed" and raise err if field leng too long after formatting
+  def validate_data(identifiers, check_lengths = false)
+    @validation_errors = []
+    @identifiers = identifiers
+    @check_lengths = check_lengths
+    record_entries.each_key do |key|
+      validate_entries(key)
+    end
+
+    raise "Validation of #{flow_type} failed:\n#{@validation_errors.join("\n")}" unless @validation_errors.empty?
+
+    ok_response
+  end
+
+  def build_hash_from_data(rec, rec_id)
+    hs = {}
+    record_definitions[rec_id].each_key { |key| hs[key] = rec[key] if rec[key] }
+    hs
+  end
+
+  def add_csv_record(rec)
+    row = {}
+    record_definitions[flow_type].each_key do |name|
+      row[name] = csv_value_for(name, rec[name])
+    end
+    record_entries[flow_type] << row
+  end
+
+  def add_record(record_type, rec = {})
+    row = {}
+    record_definitions[record_type].each_key do |name|
+      row[name] = value_for(record_type, name, rec[name])
+    end
+    record_entries[record_type] << row
+  end
+
+  def create_csv_file # rubocop:disable Metrics/AbcSize
+    @output_paths.each do |path|
+      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
+
+      keys = record_definitions[flow_type].keys
+      CSV.open(File.join(path, @output_filename), 'w', headers: keys.map(&:to_s), write_headers: true) do |csv|
+        record_entries[flow_type].each do |hash|
+          csv << hash.values_at(*keys)
+        end
+      end
+    end
+    send_emails
+    @output_filename
+  end
+
+  # This should be moved to a EdiOutFlatFileFormatter perhaps
+  def create_flat_file
+    lines = []
+    record_entries.each_key do |key|
+      lines += build_flat_rows(key)
+    end
+
+    @output_paths.each do |path|
+      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
+
+      File.open(File.join(path, @output_filename), 'w') { |f| f.puts lines.join("\n") }
+    end
+    send_emails
+    @output_filename
+  end
+
+  def log(msg)
+    logger.info "#{flow_type}: #{msg}"
+  end
+
+  def log_err(msg)
+    logger.error "#{flow_type}: #{msg}"
+  end
+
+  private
+
+  def schema_record_sizes
+    required_sizes = @repo.schema_record_sizes[flow_type]
+    # Flow type might point to another flow type (RL -> PO)
+    required_sizes = @repo.schema_record_sizes[required_sizes] if required_sizes.is_a?(String)
+    required_sizes
   end
 
   def csv_schema?
@@ -167,21 +245,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     # Idea: perhaps build a Dry:Schema for validation?
   end
 
-  # VALIDATE fixed len record size vs sum of fields... (include end_padding field)
-  # send in "for fixed" and raise err if field leng too long after formatting
-  def validate_data(identifiers, check_lengths = false)
-    @validation_errors = []
-    @identifiers = identifiers
-    @check_lengths = check_lengths
-    record_entries.each_key do |key|
-      validate_entries(key)
-    end
-
-    raise "Validation of #{flow_type} failed:\n#{@validation_errors.join("\n")}" unless @validation_errors.empty?
-
-    ok_response
-  end
-
   def validate_entries(key)
     rules = record_definitions[key]
     record_entries[key].each do |rec|
@@ -201,25 +264,9 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @validation_errors << "#{row_desc} - #{errors.join(', ')}." unless errors.empty?
   end
 
-  def add_csv_record(rec)
-    row = {}
-    record_definitions[flow_type].each_key do |name|
-      row[name] = csv_value_for(name, rec[name])
-    end
-    record_entries[flow_type] << row
-  end
-
   def csv_value_for(name, value)
     data_type = record_definitions[flow_type][name]
     data_type == :text ? "'#{value}" : value
-  end
-
-  def add_record(record_type, rec = {})
-    row = {}
-    record_definitions[record_type].each_key do |name|
-      row[name] = value_for(record_type, name, rec[name])
-    end
-    record_entries[record_type] << row
   end
 
   def value_for(record_type, name, value)
@@ -337,37 +384,6 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     raise Crossbeams::InfoError, "EDI OUT field format error for rec type \"#{rec_type}\", field \"#{key}\": #{e}"
   end
 
-  def create_csv_file # rubocop:disable Metrics/AbcSize
-    @output_paths.each do |path|
-      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
-
-      keys = record_definitions[flow_type].keys
-      CSV.open(File.join(path, @output_filename), 'w', headers: keys.map(&:to_s), write_headers: true) do |csv|
-        record_entries[flow_type].each do |hash|
-          csv << hash.values_at(*keys)
-        end
-      end
-    end
-    send_emails
-    @output_filename
-  end
-
-  # This should be moved to a EdiOutFlatFileFormatter perhaps
-  def create_flat_file
-    lines = []
-    record_entries.each_key do |key|
-      lines += build_flat_rows(key)
-    end
-
-    @output_paths.each do |path|
-      raise Crossbeams::FrameworkError, "The path '#{path}' does not exist for writing EDI files" unless File.exist?(path)
-
-      File.open(File.join(path, @output_filename), 'w') { |f| f.puts lines.join("\n") }
-    end
-    send_emails
-    @output_filename
-  end
-
   def build_flat_rows(key)
     rules = record_definitions[key]
     lines = []
@@ -383,19 +399,5 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
       fields << format_flat_edi_field(row[key], rule.length, rule.format, rec_type, key)
     end
     fields.join
-  end
-
-  def build_hash_from_data(rec, rec_id)
-    hs = {}
-    record_definitions[rec_id].each_key { |key| hs[key] = rec[key] if rec[key] }
-    hs
-  end
-
-  def log(msg)
-    logger.info "#{flow_type}: #{msg}"
-  end
-
-  def log_err(msg)
-    logger.error "#{flow_type}: #{msg}"
   end
 end
