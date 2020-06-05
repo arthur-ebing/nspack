@@ -64,7 +64,7 @@ module RawMaterialsApp
                      cultivar: delivery[:cultivar_name], date_picked: delivery[:date_picked], date_delivered: delivery[:date_delivered], delivery_id: id }
           after = { farm: nil, puc: nil, orchard: nil, cultivar_group: nil, cultivar: nil, date_picked: nil, date_delivered: nil, delivery_id: nil }
           reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: ProductionApp::ReworksRepo.new.get_reworks_run_type_id(AppConst::RUN_TYPE_DELIVERY_DELETE), pallets_selected: bins.map { |b| b[:bin_asset_number] },
-                                pallets_affected: bins.map { |b| b[:bin_asset_number] } }
+                                pallets_affected: bins.map { |b| b[:bin_asset_number] }, allow_cultivar_group_mixing: nil }
 
           res = validate_reworks_run_params(reworks_run_attrs)
           return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
