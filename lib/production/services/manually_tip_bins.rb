@@ -64,10 +64,10 @@ module ProductionApp
       repo.tipped_bins?(bin_number)
     end
 
-    def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def validate_setup_requirements # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return "INVALID FARM: Run requires: #{run_attrs[:farm_code]}. Bin is: #{bin_attrs[:farm_code]}" unless bin_attrs[:farm_id] == run_attrs[:farm_id]
       return "INVALID ORCHARD: Run requires: #{run_attrs[:orchard_code]}. Bin is: #{bin_attrs[:orchard_code]}" if !run_attrs[:allow_orchard_mixing] && (bin_attrs[:orchard_id] != run_attrs[:orchard_id])
-      return "INVALID CULTIVAR GROUP: Run requires: #{run_attrs[:cultivar_group_code]}. Bin is: #{bin_attrs[:cultivar_group_code]}" unless bin_attrs[:cultivar_group_id] == run_attrs[:cultivar_group_id]
+      return "INVALID CULTIVAR GROUP: Run requires: #{run_attrs[:cultivar_group_code]}. Bin is: #{bin_attrs[:cultivar_group_code]}" if !run_attrs[:allow_cultivar_group_mixing] && (bin_attrs[:cultivar_group_id] != run_attrs[:cultivar_group_id])
       return "INVALID CULTIVAR: Run requires: #{run_attrs[:cultivar_name]}. Bin is: #{bin_attrs[:cultivar_name]}" if !run_attrs[:allow_cultivar_mixing] && (bin_attrs[:cultivar_id] != run_attrs[:cultivar_id])
     end
 
