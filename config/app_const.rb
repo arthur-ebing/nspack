@@ -140,10 +140,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROLE_TARGET_CUSTOMER = 'TARGET CUSTOMER'
   ROLE_TRANSPORTER = 'TRANSPORTER'
 
-  # Default roles
-  DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
-  DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
-
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'
 
@@ -336,11 +332,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   raise "Install location #{INSTALL_LOCATION} cannot be more than 7 characters in length" if INSTALL_LOCATION.length > 7
 
   # Loads:
+  DEFAULT_EXPORTER = ENV['DEFAULT_EXPORTER']
+  DEFAULT_INSPECTION_BILLING = ENV['DEFAULT_INSPECTION_BILLING']
   DEFAULT_DEPOT = ENV['DEFAULT_DEPOT']
   IN_TRANSIT_LOCATION = 'IN_TRANSIT_EX_PACKHSE'
   VGM_REQUIRED = make_boolean('VGM_REQUIRED')
   MAX_PALLETS_ON_LOAD = ENV['MAX_PALLETS_ON_LOAD'] || 50
-
+  TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
   # Constants for port types:
   PORT_TYPE_POL = 'POL'
   PORT_TYPE_POD = 'POD'

@@ -69,7 +69,7 @@ module RawMaterials
                                     url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
                                     grid_id: 'bin_load_products',
                                     behaviour: :popup,
-                                    style: :button)
+                                    style: :action_button)
               end
               section.add_grid('bin_load_products',
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",

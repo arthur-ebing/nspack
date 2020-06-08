@@ -25,6 +25,7 @@ module RawMaterialsApp
         transporter: 'ABC',
         dest_depot: 'ABC',
         products: true,
+        allocated: false,
         can_complete: true,
         qty_product_bins: 1,
         qty_bins_available: 10,

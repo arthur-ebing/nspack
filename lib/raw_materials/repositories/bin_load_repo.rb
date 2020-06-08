@@ -22,8 +22,8 @@ module RawMaterialsApp
       return nil if hash.nil?
 
       hash[:products] = exists?(:bin_load_products, bin_load_id: id)
-      hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
       hash[:allocated] = exists?(:rmt_bins, bin_load_product_id: select_values(:bin_load_products, :id, bin_load_id: id))
+      hash[:qty_product_bins] = select_values(:bin_load_products, :qty_bins, bin_load_id: id).sum
       BinLoadFlat.new(hash)
     end
 
@@ -85,7 +85,7 @@ module RawMaterialsApp
       qty_bins = get(:bin_load_products, bin_load_product_id, :qty_bins)
       current_qty_rmt_bins = select_values(:rmt_bins, :qty_bins, bin_load_product_id: bin_load_product_id).sum
       new_qty_rmt_bins = select_values(:rmt_bins, :qty_bins, id: bin_ids).sum
-      raise Crossbeams::InfoError,'Bin allocation exceeded product specification' if (current_qty_rmt_bins + new_qty_rmt_bins) > qty_bins
+      raise Crossbeams::InfoError, 'Bin allocation exceeded product specification' if (current_qty_rmt_bins + new_qty_rmt_bins) > qty_bins
 
       update(:rmt_bins, bin_ids, bin_load_product_id: bin_load_product_id)
       log_multiple_statuses(:rmt_bins, bin_ids, 'BIN ALLOCATED ON LOAD', user_name: user.user_name)
