@@ -108,20 +108,21 @@ module ProductionApp
     end
 
     def update_orchard_changes  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      repo.transaction do
-        unless reworks_run_attrs[:changes_made].nil_or_empty?
-          repo.update_delivery(delivery_ids, default_changes_to_apply)
-          parent_id = create_reworks_run(delivery_ids, 'deliveries')
-          repo.log_multiple_statuses(:rmt_deliveries, delivery_ids, AppConst::REWORKS_ACTION_CHANGE_DELIVERIES_ORCHARDS, user_name: reworks_run_attrs[:user_name])
+      # repo.transaction do
+      unless reworks_run_attrs[:changes_made].nil_or_empty?
+        send_bus_message("Cascading orchard change - updating #{delivery_ids.count} deliveries records", message_type: :information, target_user: reworks_run_attrs[:user_name])
+        repo.update_delivery(delivery_ids, default_changes_to_apply)
+        parent_id = create_reworks_run(delivery_ids, 'deliveries')
+        repo.log_multiple_statuses(:rmt_deliveries, delivery_ids, AppConst::REWORKS_ACTION_CHANGE_DELIVERIES_ORCHARDS, user_name: reworks_run_attrs[:user_name])
 
-          reworks_run_attrs[:parent_id] = parent_id
-        end
-        update_objects_changes(production_runs, 'production_runs') unless production_runs.nil_or_empty?
-        update_objects_changes(tipped_bins, 'rmt_bins') unless tipped_bins.nil_or_empty?
-        update_objects_changes(carton_labels, 'carton_labels') unless carton_labels.nil_or_empty?
-        update_objects_changes(cartons, 'cartons') unless cartons.nil_or_empty?
-        update_objects_changes(pallet_sequences, 'pallet_sequences') unless pallet_sequences.nil_or_empty?
+        reworks_run_attrs[:parent_id] = parent_id
       end
+      update_objects_changes(production_runs, 'production_runs') unless production_runs.nil_or_empty?
+      update_objects_changes(tipped_bins, 'rmt_bins') unless tipped_bins.nil_or_empty?
+      update_objects_changes(carton_labels, 'carton_labels') unless carton_labels.nil_or_empty?
+      update_objects_changes(cartons, 'cartons') unless cartons.nil_or_empty?
+      update_objects_changes(pallet_sequences, 'pallet_sequences') unless pallet_sequences.nil_or_empty?
+      # end
 
       ok_response
     rescue Crossbeams::InfoError => e
@@ -135,6 +136,7 @@ module ProductionApp
       attrs = table_name == 'production_runs' ? default_changes_to_apply.merge(allow_cultivar_mixing: change_attrs[:allow_cultivar_mixing]) : default_changes_to_apply
       reworks_run_attrs[:changes_made] = res.instance.to_json
 
+      send_bus_message("Cascading orchard change - updating #{pallets_selected.count} #{table_name} records", message_type: :information, target_user: reworks_run_attrs[:user_name])
       repo.update_objects(table_name, pallets_selected, attrs)
       create_reworks_run(pallets_selected, table_name)
       repo.log_multiple_statuses(table_name.to_s.to_sym, pallets_selected, AppConst::REWORKS_ACTION_CHANGE_DELIVERIES_ORCHARDS, user_name: reworks_run_attrs[:user_name])

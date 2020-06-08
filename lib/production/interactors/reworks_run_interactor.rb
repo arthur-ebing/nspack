@@ -64,6 +64,7 @@ module ProductionApp
       delivery_ids = params[:affected_deliveries].split("\n").map(&:strip).reject(&:empty?)
       allow_cultivar_mixing = params[:allow_cultivar_mixing] == 't'
       ignore_runs_that_allow_mixing = params[:ignore_runs_that_allow_mixing] == 't'
+      allow_cultivar_group_mixing = false unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && !params[:allow_cultivar_group_mixing].nil?
 
       change_attrs = { delivery_ids: resolve_deliveries(delivery_ids),
                        from_orchard: params[:from_orchard].to_i,
@@ -78,17 +79,21 @@ module ProductionApp
                             pallets_affected: delivery_ids,
                             pallets_selected: delivery_ids,
                             reworks_run_type_id: params[:reworks_run_type_id],
-                            changes_made: calc_changes_made(params[:to_orchard].to_i, params[:to_cultivar].to_i, delivery_ids) }
+                            changes_made: calc_changes_made(params[:to_orchard].to_i, params[:to_cultivar].to_i, delivery_ids),
+                            allow_cultivar_group_mixing: allow_cultivar_group_mixing }
 
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
 
       res = validate_reworks_run_params(reworks_run_attrs)
       return validation_failed_response(res) unless res.messages.empty?
 
-      rw_res = ProductionApp::ChangeDeliveriesOrchards.call(change_attrs, reworks_run_attrs)
-      return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
+      # rw_res = ProductionApp::ChangeDeliveriesOrchards.call(change_attrs, reworks_run_attrs)
+      # return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
 
-      ok_response
+      attrs = { change_attrs: change_attrs, reworks_run_attrs: reworks_run_attrs }
+      Que.enqueue attrs, job_class: 'ProductionApp::Job::ApplyDeliveriesOrchardChanges', queue: AppConst::QUEUE_NAME
+
+      success_response('Change Deliveries Orchard has been enqued.')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e
