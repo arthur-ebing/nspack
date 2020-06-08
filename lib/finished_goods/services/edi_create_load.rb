@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   class EdiCreateLoad < BaseService
     attr_accessor :attrs, :payload, :load_id, :pallet_numbers
-    attr_reader :repo, :load_validator, :user
+    attr_reader :repo, :user
 
     def initialize(payload = {})
       @payload = payload
@@ -11,7 +11,6 @@ module FinishedGoodsApp
       @pallet_numbers = []
       @repo = LoadRepo.new
       @user = OpenStruct.new(user_name: 'EDI_Create_Load')
-      @load_validator = LoadValidator.new
     end
 
     def call
@@ -28,25 +27,23 @@ module FinishedGoodsApp
     private
 
     def allocate_pallets # rubocop:disable Metrics/AbcSize
-      res = load_validator.validate_allocate_list(load_id, pallet_numbers)
+      res = validate_allocate_list(load_id, pallet_numbers)
       return validation_failed_response(messages: { pallets: [res.message] }) unless res.success
 
-      current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
-      new_allocation = pallet_numbers
+      current_allocation = repo.select_values(:pallets, :id, load_id: load_id)
+      new_allocation = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
 
       allocate = new_allocation - current_allocation
       unallocate = current_allocation - new_allocation
 
       unless unallocate.empty?
-        res = validate_pallets(:not_shipped, unallocate)
-        return res unless res.success
+        not_shipped = repo.select_values(:pallets, :pallet_number, id: unallocate, shipped: false)
+        return validation_failed_response(messages: { pallets: ["Pallets: #{not_shipped} not shipped"] }) unless not_shipped.empty?
 
-        res = repo.unallocate_pallets(load_id, unallocate, user.user_name)
-        raise Crossbeams::InfoError, res.message unless res.success
+        repo.unallocate_pallets(unallocate, user.user_name)
       end
 
-      res = repo.allocate_pallets(load_id, allocate, user.user_name)
-      raise Crossbeams::InfoError, res.message unless res.success
+      repo.allocate_pallets(load_id, allocate, user.user_name)
 
       success_response("Allocation applied to load: #{load_id}")
     end
@@ -108,6 +105,22 @@ module FinishedGoodsApp
       pallets.each do |hash|
         pallet_numbers << hash['pallet_number']
       end
+    end
+
+    def validate_allocate_list(load_id, pallet_numbers)
+      check_pallets(:not_on_load, pallet_numbers, load_id)
+      check_pallets(:not_shipped, pallet_numbers)
+      check_pallets(:in_stock, pallet_numbers)
+      check_pallets(:not_failed_otmc, pallet_numbers)
+
+      success_response('ok')
+    rescue Crossbeams::TaskNotPermittedError => e
+      failed_response(e.message)
+    end
+
+    def check_pallets(check, pallet_numbers, load_id = nil)
+      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
     def get_party_role_id(party_role_name, role_name)

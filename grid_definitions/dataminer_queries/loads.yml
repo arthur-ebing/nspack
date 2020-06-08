@@ -19,12 +19,13 @@
   \   pallets.pallet_numbers,\r\n    pallets.temp_tail,\r\n    cargo_temperatures.temperature_code
   || ' - ' || cargo_temperatures.set_point_temperature AS cargo_temperature,\r\n    container_stack_types.stack_type_code
   || ' - ' || COALESCE(container_stack_types.description,'') AS stack_type,\r\n    loads.created_at,\r\n
-  \   loads.updated_at,\r\n    CASE\r\n        WHEN loads.shipped THEN 'blue'\r\n
-  \       WHEN loads.allocated THEN 'green'\r\n    END AS colour_rule\r\n\r\nFROM
-  loads\r\n         JOIN depots ON depots.id = loads.depot_id\r\n         JOIN destination_cities
-  ON destination_cities.id = loads.final_destination_id\r\n         JOIN voyage_ports
-  pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n         JOIN
-  voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
+  \   loads.updated_at,\r\n    EXISTS(select id from edi_out_transactions where record_id
+  = loads.id and flow_type = 'PO') AS edi_out_transactions,\r\n    CASE\r\n        WHEN
+  loads.shipped THEN 'blue'\r\n        WHEN loads.allocated THEN 'green'\r\n    END
+  AS colour_rule\r\n\r\nFROM loads\r\n         JOIN depots ON depots.id = loads.depot_id\r\n
+  \        JOIN destination_cities ON destination_cities.id = loads.final_destination_id\r\n
+  \        JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id\r\n
+  \        JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id\r\n
   \        JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id\r\n         JOIN
   ports pod_port ON pod_port.id = pod_voyage_ports.port_id\r\n         JOIN voyages
   ON pol_voyage_ports.voyage_id = voyages.id\r\n         LEFT JOIN vessels ON voyages.vessel_id
@@ -749,9 +750,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  edi_out_transactions:
+    :name: edi_out_transactions
+    :sequence_no: 45
+    :caption: Edi out transactions
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 45
+    :sequence_no: 46
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

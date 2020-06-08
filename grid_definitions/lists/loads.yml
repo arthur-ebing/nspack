@@ -4,47 +4,16 @@
 - :url: "/finished_goods/dispatch/loads/$:id$"
   :text: view
   :icon: view-show
-  :title: View
-- :url: "/finished_goods/dispatch/loads/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :hide_if_true: shipped
-- :url: "/finished_goods/dispatch/loads/$:id$/edit"
-  :text: edit shipped
-  :icon: edit
-  :title: Edit
   :hide_if_false: shipped
-  :has_permission:
-    - load
-    - can_unship
+- :url: "/finished_goods/dispatch/loads/$:id$"
+  :text: manage
+  :icon: edit
+  :hide_if_true: shipped
+- :separator: true
 - :url: "/finished_goods/dispatch/loads/$:id$/copy"
   :text: copy
   :icon: copy
-  :title: Copy
-- :url: "/finished_goods/dispatch/loads/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
-  :hide_if_true: shipped,allocated
-- :url: "/finished_goods/dispatch/loads/$:id$/allocate"
-  :text: allocate pallets
-  :icon: edit
-  :title: Allocate Pallets
-  :hide_if_true: shipped
-- :url: "/finished_goods/dispatch/loads/$:id$/re_send_po_edi"
-  :text: re-send PO EDI
-  :icon: play
-  :title: re-send PO EDI
-  :popup: true
-  :hide_if_false: shipped
 - :separator: true
-- :url: "/list/edi_po/with_params?key=standard&record_id=$:id$"
-  :text: view EDI transactions
-  :icon: list
-  :title: view EDI transactions
-  :popup: true
 - :url: "/development/statuses/list/loads/$:id$"
   :text: status
   :icon: information-solid
@@ -54,18 +23,6 @@
 - :control_type: :link
   :url: "/finished_goods/dispatch/loads/new"
   :text: New Load
-  :style: :button
-- :control_type: :link
-  :url: "/finished_goods/dispatch/loads/last/view"
-  :text: View Last Load
-  :style: :button
-- :control_type: :link
-  :url: "/finished_goods/dispatch/loads/last/edit"
-  :text: Edit Last Load
-  :style: :button
-- :control_type: :link
-  :url: "/finished_goods/dispatch/loads/last/allocate"
-  :text: Allocate Last Load
   :style: :button
 :conditions:
   :standard:

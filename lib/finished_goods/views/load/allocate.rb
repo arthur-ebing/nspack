@@ -5,7 +5,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class Allocate
-        def self.call(id, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:load, :allocate, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -16,13 +16,8 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: back_url,
-                                  style: :back_button)
-              section.add_control(control_type: :link,
-                                  text: 'Reports',
-                                  visible: rules[:allocated],
                                   url: "/finished_goods/dispatch/loads/#{id}",
-                                  style: :button)
+                                  style: :back_button)
             end
             page.form do |form|
               form.action "/finished_goods/dispatch/loads/#{id}/allocate"
@@ -41,7 +36,7 @@ module FinishedGoods
                 end
               end
             end
-            page.add_notice 'Click button to allocate pasted pallets from the list or use Checkboxes to select from the grid below'
+            page.add_notice 'Use the checkboxes and save selection button to select pallets from the grid below. - Or add pallets by listing pallet numbers in the box above and pressing Allocate pasted pallets.'
             page.section do |section|
               section.add_grid('stock_pallets',
                                '/list/stock_pallets/grid_multi',

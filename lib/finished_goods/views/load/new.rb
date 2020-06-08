@@ -5,7 +5,7 @@ module FinishedGoods
   module Dispatch
     module Load
       class New
-        def self.call(id: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           form_values = FinishedGoodsApp::LoadRepo.new.find_load_flat(id).to_h unless id.nil? # copy load
           ui_rule = UiRules::Compiler.new(:load, :new, form_values: form_values)
           rules   = ui_rule.compile
@@ -17,7 +17,7 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: back_url,
+                                  url: '/list/loads',
                                   style: :back_button)
             end
             page.form do |form|
@@ -50,6 +50,7 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :exporter_certificate_code
                     col.add_field :edi_file_name
+                    col.add_field :requires_temp_tail
                   end
                 end
               end

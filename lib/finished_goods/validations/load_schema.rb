@@ -25,6 +25,7 @@ module FinishedGoodsApp
     required(:final_destination_id, :integer).filled(:int?)
     optional(:shipped_at, %i[nil time]).maybe(:time?)
     optional(:shipped, :bool).maybe(:bool?)
+    required(:requires_temp_tail, :bool).filled(:bool?)
     required(:transfer_load, :bool).maybe(:bool?)
     optional(:shipping_line_party_role_id, :integer).maybe(:int?)
     optional(:shipper_party_role_id, :integer).maybe(:int?)
@@ -55,5 +56,6 @@ module FinishedGoodsApp
     optional(:order_number, Types::StrippedString).maybe(:str?)
     optional(:allocated, :bool).maybe(:bool?)
     optional(:allocated_at, %i[nil time]).maybe(:time?)
+    required(:requires_temp_tail, :bool).filled(:bool?)
   end
 end

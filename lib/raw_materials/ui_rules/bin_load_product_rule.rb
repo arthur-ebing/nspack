@@ -35,7 +35,7 @@ module UiRules
         bin_load_id: { renderer: :hidden,
                        with_value: @form_object.bin_load_id,
                        caption: 'Bin Load' },
-        qty_bins: { renderer: :numeric,
+        qty_bins: { renderer: :integer,
                     maxvalue: AppConst::MAX_BINS_ON_LOAD,
                     minvalue: 1,
                     required: true },

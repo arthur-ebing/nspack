@@ -6,27 +6,22 @@ module UiRules
       @repo = FinishedGoodsApp::LoadRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
+      make_progress_step
       apply_form_values
-      add_rules
       add_behaviours
 
       common_values_for_fields common_fields
-      set_show_fields if %i[show ship allocate].include? @mode
+      set_show_fields if %i[show allocate].include? @mode
       form_name 'load'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       # Parties and Locations
-      customer_label = @party_repo.find_party_role(@form_object.customer_party_role_id)&.party_name
-      exporter_label = @party_repo.find_party_role(@form_object.exporter_party_role_id)&.party_name
-      billing_client_label = @party_repo.find_party_role(@form_object.billing_client_party_role_id)&.party_name
-      consignee_label = @party_repo.find_party_role(@form_object.consignee_party_role_id)&.party_name
-      final_receiver_label = @party_repo.find_party_role(@form_object.final_receiver_party_role_id)&.party_name
-      fields[:customer_party_role_id] = { renderer: :label, with_value: customer_label, caption: 'Customer' }
-      fields[:exporter_party_role_id] = { renderer: :label, with_value: exporter_label, caption: 'Exporter' }
-      fields[:billing_client_party_role_id] = { renderer: :label, with_value: billing_client_label, caption: 'Billing Client' }
-      fields[:consignee_party_role_id] = { renderer: :label, with_value: consignee_label, caption: 'Consignee' }
-      fields[:final_receiver_party_role_id] = { renderer: :label, with_value: final_receiver_label, caption: 'Final Receiver' }
+      fields[:customer_party_role_id] = { renderer: :label, with_value: @form_object.customer, caption: 'Customer' }
+      fields[:exporter_party_role_id] = { renderer: :label, with_value: @form_object.exporter, caption: 'Exporter' }
+      fields[:billing_client_party_role_id] = { renderer: :label, with_value: @form_object.billing_client, caption: 'Billing Client' }
+      fields[:consignee_party_role_id] = { renderer: :label, with_value: @form_object.consignee, caption: 'Consignee' }
+      fields[:final_receiver_party_role_id] = { renderer: :label, with_value: @form_object.final_receiver, caption: 'Final Receiver' }
       fields[:status] = { renderer: :label }
 
       # Load Details
@@ -41,7 +36,9 @@ module UiRules
       fields[:exporter_certificate_code] = { renderer: :label }
       fields[:edi_file_name] = { renderer: :label }
       fields[:shipped_at] = { renderer: :label }
-      fields[:shipped] = { renderer: :label, as_boolean: true }
+      fields[:requires_temp_tail] = { renderer: :label, as_boolean: true }
+      fields[:temp_tail_pallet_number] = { renderer: :label, caption: 'Temp Tail Pallet', hide_on_load: @form_object.temp_tail.nil_or_empty? }
+      fields[:temp_tail] = { renderer: :label, caption: 'Temp Tail', hide_on_load: @form_object.temp_tail.nil_or_empty? }
       fields[:active] = { renderer: :label, as_boolean: true }
 
       # Voyage Ports
@@ -62,11 +59,8 @@ module UiRules
       fields[:atd] = { renderer: :label, caption: 'ATD' }
 
       # Load Voyage
-      load_voyage = @repo.where(:load_voyages, FinishedGoodsApp::LoadVoyage, load_id: @form_object.id)
-      shipping_line_label = @party_repo.find_party_role(load_voyage&.shipping_line_party_role_id)&.party_name
-      shipper_label = @party_repo.find_party_role(load_voyage&.shipper_party_role_id)&.party_name
-      fields[:shipping_line_party_role_id] = { renderer: :label, with_value: shipping_line_label, caption: 'Shipping Line' }
-      fields[:shipper_party_role_id] = { renderer: :label, with_value: shipper_label, caption: 'Shipper' }
+      fields[:shipping_line_party_role_id] = { renderer: :label, with_value: @form_object.shipping_line, caption: 'Shipping Line' }
+      fields[:shipper_party_role_id] = { renderer: :label, with_value: @form_object.shipper, caption: 'Shipper' }
       fields[:booking_reference] = { renderer: :label }
       fields[:memo_pad] = { renderer: :label }
 
@@ -90,18 +84,17 @@ module UiRules
       fields[:stack_type] = { renderer: :label, with_value: "#{container&.stack_type_code} - #{container&.stack_type_description}" }
       fields[:temperature_rhine] = { renderer: :label, with_value: container&.container_temperature_rhine }
       fields[:temperature_rhine2] = { renderer: :label, with_value: container&.container_temperature_rhine2 }
-      fields[:max_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_gross_weight) }
-      fields[:tare_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.tare_weight) }
-      fields[:max_payload] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.max_payload) }
-      fields[:actual_payload] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.actual_payload) }
+      fields[:max_gross_weight] = { renderer: :label, with_value: container&.max_gross_weight }
+      fields[:tare_weight] = { renderer: :label, with_value: container&.tare_weight }
+      fields[:max_payload] = { renderer: :label, with_value: container&.max_payload }
+      fields[:actual_payload] = { renderer: :label, with_value: container&.actual_payload }
       fields[:cargo_temperature] = { renderer: :label, with_value: "#{container&.cargo_temperature_code} - #{container&.set_point_temperature}" }
-      fields[:verified_gross_weight] = { renderer: :label, with_value: UtilityFunctions.delimited_number(container&.verified_gross_weight) }
+      fields[:verified_gross_weight] = { renderer: :label, with_value: container&.verified_gross_weight }
       fields[:verified_gross_weight_date] = { renderer: :label, with_value: container&.verified_gross_weight_date }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      {
-        # Parties
+      { # Parties
         customer_party_role_id: { renderer: :select,
                                   options: @party_repo.for_select_party_roles(AppConst::ROLE_CUSTOMER),
                                   disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_CUSTOMER),
@@ -150,7 +143,7 @@ module UiRules
         edi_file_name: { renderer: :label },
         shipped_at: { renderer: rules[:can_unship] ? :datetime : :label,
                       required: true },
-        shipped: { renderer: :label, as_boolean: true  },
+        requires_temp_tail: { renderer: :checkbox, as_boolean: true },
 
         # Voyage Ports
         voyage_type_id: { renderer: :select,
@@ -211,10 +204,16 @@ module UiRules
                        placeholder: 'Paste pallet numbers here',
                        caption: 'Allocate',
                        required: true },
-        # Search by Pallet
-        pallet_number: { renderer: :input,
-                         subtype: :integer,
-                         required: true },
+        # Temp Tail
+        temp_tail_pallet_number: { renderer: :select,
+                                   options: @repo.select_values(:pallets, :pallet_number, load_id: @options[:id]),
+                                   caption: 'Pallet',
+                                   hide_on_load: @mode != :temp_tail,
+                                   required: true },
+        temp_tail: { renderer: :input,
+                     subtype: :integer,
+                     hide_on_load: @mode != :temp_tail,
+                     required: true },
         spacer: { hide_on_load: true }
       }
     end
@@ -222,11 +221,13 @@ module UiRules
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @repo.find_load_flat(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_list: nil, load_id: @form_object.id))
+      hash = @repo.find_load_flat(@options[:id]).to_h
+      hash[:pallet_list] = nil
+      @form_object = OpenStruct.new(hash)
     end
 
     def make_new_form_object
+      last_id = @repo.select_values(:loads, :id).max
       @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
@@ -243,8 +244,50 @@ module UiRules
                                     customer_reference: nil,
                                     exporter_certificate_code: nil,
                                     shipped_at: nil,
-                                    shipped: nil,
+                                    shipped: false,
+                                    loaded: false,
+                                    requires_temp_tail: @repo.get(:loads, last_id, :requires_temp_tail),
                                     transfer_load: nil)
+    end
+
+    def make_progress_step # rubocop:disable Metrics/AbcSize
+      id = @options[:id]
+      steps = ['Allocate Pallets', 'Truck Arrival', 'Load Truck', 'Ship', 'Finished']
+      actions = ['/list/loads',
+                 '/list/loads',
+                 "/finished_goods/dispatch/loads/#{id}/load_truck",
+                 "/finished_goods/dispatch/loads/#{id}/ship",
+                 '/list/loads']
+      captions = ['Close', 'Close', 'Load Truck', 'Ship', 'Close']
+
+      back_actions = ["/finished_goods/dispatch/loads/#{id}/edit",
+                      "/finished_goods/dispatch/loads/#{id}/edit",
+                      "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
+                      "/finished_goods/dispatch/loads/#{id}/unload_truck",
+                      "/finished_goods/dispatch/loads/#{id}/unship"]
+
+      back_prompts = ['Are you sure, you want to edit this load?',
+                      'Are you sure, you want to edit this load?',
+                      'Are you sure, you want to delete the vehicle from this load?',
+                      'Are you sure, you want to unload this load?',
+                      'Are you sure, you want to unship this load?']
+
+      back_captions = ['Edit', 'Edit', 'Delete Truck', 'Unload Truck', 'Unship']
+
+      step = 0
+      step = 1 if @form_object.allocated
+      step = 2 if @form_object.vehicle
+      step = 3 if @form_object.loaded
+      step = 4 if @form_object.shipped
+
+      form_object = @form_object.to_h.merge(steps: steps,
+                                            step: step,
+                                            action: actions[step],
+                                            caption: captions[step],
+                                            back_action: back_actions[step],
+                                            back_prompt: back_prompts[step],
+                                            back_caption: back_captions[step])
+      @form_object = OpenStruct.new(form_object)
     end
 
     private
@@ -256,19 +299,6 @@ module UiRules
         behaviour.dropdown_change :voyage_type_id, notify: [{ url: '/finished_goods/dispatch/loads/voyage_type_changed' }] if %i[new edit].include? @mode
         behaviour.dropdown_change :pod_port_id, notify: [{ url: '/finished_goods/dispatch/loads/pod_port_changed' }] if @mode == :new
       end
-    end
-
-    def add_rules # rubocop:disable Metrics/AbcSize
-      unless @options[:user]&.permission_tree.nil?
-        rules[:can_unship] = @form_object.shipped &&
-                             Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_unship)
-        rules[:can_ship] = !@form_object.shipped &&
-                           Crossbeams::Config::UserPermissions.can_user?(@options[:user], :load, :can_ship) &&
-                           !@repo.get_id(:load_vehicles, load_id: @form_object.id).nil_or_empty?
-      end
-      rules[:shipped] = @form_object.shipped
-      rules[:allocated] = @form_object.allocated
-      rules[:has_container] = !@form_object.container_code.nil_or_empty?
     end
   end
 end

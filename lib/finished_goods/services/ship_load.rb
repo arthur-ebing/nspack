@@ -24,7 +24,7 @@ module FinishedGoodsApp
 
     def ship_load # rubocop:disable Metrics/AbcSize
       load_container_id = repo.get_id(:load_containers, load_id: load_id)
-      verified_gross_weight = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight_from(load_id: load_id)
+      verified_gross_weight = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight(load_container_id)
       attrs = { verified_gross_weight: verified_gross_weight, verified_gross_weight_date: Time.now }
       repo.update(:load_containers, load_container_id, attrs) unless load_container_id.nil?
 

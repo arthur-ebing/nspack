@@ -68,8 +68,6 @@ module FinishedGoodsApp
       end
     end
 
-    private
-
     def load_attrs
       repo = BaseRepo.new
       create_port_type(port_type_code: AppConst::PORT_TYPE_POL) if repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL).nil?
@@ -93,6 +91,7 @@ module FinishedGoodsApp
       vessel_id = create_vessel
       {
         id: 1,
+        load_id: 1,
         customer_party_role_id: customer_party_role_id,
         consignee_party_role_id: consignee_party_role_id,
         billing_client_party_role_id: billing_client_party_role_id,
@@ -131,13 +130,20 @@ module FinishedGoodsApp
         memo_pad: Faker::Lorem.word,
         vehicle_number: Faker::Lorem.word,
         container_code: Faker::Lorem.word,
-        status: Faker::Lorem.word
+        status: Faker::Lorem.word,
+        edi: false,
+        vehicle: false,
+        container: false,
+        loaded: false,
+        requires_temp_tail: false
       }
     end
 
     def fake_load(overrides = {})
       LoadFlat.new(load_attrs.merge(overrides))
     end
+
+    private
 
     def interactor
       @interactor ||= LoadInteractor.new(current_user, {}, {}, {})

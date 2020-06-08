@@ -4,9 +4,9 @@
 module FinishedGoods
   module Dispatch
     module Load
-      class Edit # rubocop:disable Metrics/ClassLength
-        def self.call(id, user: nil, back_url: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:load, :edit, id: id, user: user, form_values: form_values)
+      class Edit
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:load, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -16,7 +16,7 @@ module FinishedGoods
             page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: back_url,
+                                  url: "/finished_goods/dispatch/loads/#{id}",
                                   style: :back_button)
             end
             page.form do |form|
@@ -54,7 +54,7 @@ module FinishedGoods
                     col.add_field :exporter_certificate_code
                     col.add_field :edi_file_name
                     col.add_field :shipped_at
-                    col.add_field :shipped
+                    col.add_field :requires_temp_tail
                   end
                 end
               end
@@ -89,21 +89,6 @@ module FinishedGoods
                     col.add_field :memo_pad
                   end
                 end
-              end
-            end
-            unless rules[:shipped]
-              page.section do |section|
-                section.add_grid('stock_pallets',
-                                 '/list/stock_pallets/grid_multi',
-                                 caption: 'Choose Pallets',
-                                 is_multiselect: true,
-                                 can_be_cleared: true,
-                                 multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                                 multiselect_key: 'allocate',
-                                 height: 40,
-                                 multiselect_params: { key: 'allocate',
-                                                       id: id,
-                                                       in_stock: true })
               end
             end
           end

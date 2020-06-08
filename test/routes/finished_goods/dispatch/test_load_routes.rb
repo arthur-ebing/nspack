@@ -63,16 +63,16 @@ class TestLoadRoutes < RouteTester
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::Load
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_load).returns(ok_response)
-    delete_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_delete_from_grid
+    patch_as_fetch 'finished_goods/dispatch/loads/1/delete', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_flash_notice
   end
 
   def test_delete_fail
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::Load
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_load).returns(bad_response)
-    delete_as_fetch 'finished_goods/dispatch/loads/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_error
+    patch_as_fetch 'finished_goods/dispatch/loads/1/delete', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_flash_error
   end
 
   def test_new
@@ -94,11 +94,11 @@ class TestLoadRoutes < RouteTester
   def test_create_remotely
     authorise_pass!
     ensure_exists!(INTERACTOR)
-    row_vals = Hash.new(1)
+    row_vals = {id:1}
     INTERACTOR.any_instance.stubs(:create_load).returns(ok_response(instance: row_vals))
     FinishedGoodsApp::CreateLoad.any_instance.stubs(:call).returns(ok_response(instance: row_vals))
     post_as_fetch 'finished_goods/dispatch/loads', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect
+    expect_ok_redirect(url:'/finished_goods/dispatch/loads/1')
   end
 
   def test_create_remotely_fail

@@ -19,7 +19,7 @@ module FinishedGoodsApp
     end
 
     def ecert_tracking_unit_status(pallet_number)
-      res = validate_pallets(:exists, pallet_number)
+      res = check_pallets(:exists, pallet_number)
       return res unless res.success
 
       res = api.tracking_unit_status(pallet_number)
@@ -65,8 +65,8 @@ module FinishedGoodsApp
       EcertTrackingUnitSchema.call(params)
     end
 
-    def validate_pallets(check, pallet_numbers)
-      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
+    def check_pallets(check, pallet_numbers)
+      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
     end
   end
 end

@@ -4,21 +4,19 @@ module FinishedGoodsApp
   class TruckArrival < BaseService
     attr_reader :vehicle_params, :container_params, :load_id, :user_name, :messages
 
-    def initialize(vehicle_attrs, container_attrs, user)
+    def initialize(load_id, vehicle_attrs, container_attrs, user)
       @vehicle_params = vehicle_attrs.to_h
       @container_params = container_attrs.to_h
 
-      @load_id = vehicle_params[:load_id]
-      @vehicle_id = @vehicle_params.delete(:vehicle_id)
-      @container_id = @container_params.delete(:container_id)
+      @load_id = load_id
+      @vehicle_id = @vehicle_params.delete(:load_vehicle_id)
+      @container_id = @container_params.delete(:load_container_id)
 
       @user_name = user.user_name
       @messages = []
     end
 
     def call
-      success_response("Load: #{load_id}, already Shipped", load_id) if shipped
-
       create_vehicle
       update_vehicle
       delete_container_when_not_required
@@ -31,10 +29,6 @@ module FinishedGoodsApp
     end
 
     private
-
-    def shipped
-      repo.find_load(load_id)&.shipped
-    end
 
     def delete_container_when_not_required
       container_id = repo.get_id(:load_containers, load_id: load_id)
@@ -52,7 +46,7 @@ module FinishedGoodsApp
       repo.log_status(:loads, @load_id, 'TRUCK ARRIVED', user_name: @user_name)
       pallet_ids = repo.select_values(:pallets, :id, load_id: @load_id)
       repo.log_multiple_statuses(:pallets, pallet_ids, 'TRUCK ARRIVED', user_name: @user_name)
-      messages << 'Created load vehicle'
+      messages << 'Logged Truck Arrival'
     end
 
     def update_vehicle

@@ -56,7 +56,7 @@ module UiRules
                          prompt: true,
                          caption: 'Destination Depot',
                          required: true },
-        qty_bins: { renderer: :numeric,
+        qty_bins: { renderer: :integer,
                     maxvalue: AppConst::MAX_BINS_ON_LOAD,
                     minvalue: 1,
                     required: true },

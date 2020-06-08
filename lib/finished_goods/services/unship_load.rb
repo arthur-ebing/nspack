@@ -38,12 +38,14 @@ module FinishedGoodsApp
     end
 
     def unship_pallets # rubocop:disable Metrics/AbcSize
-      if pallet_number.nil?
-        pallet_ids = repo.select_values(:pallets, :id, load_id: load_id)
-      else
-        load_validator.validate_pallets(:shipped, pallet_number)
-        pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_number)
-      end
+      pallet_ids = if pallet_number.nil?
+                     repo.select_values(:pallets, :id, load_id: load_id)
+                   else
+                     repo.select_values(:pallets, :id, pallet_number: pallet_number)
+                   end
+
+      not_shipped = repo.select_values(:pallets, :pallet_number, id: pallet_ids, shipped: false)
+      raise Crossbeams::InfoError, "Pallets: #{not_shipped} not shipped." unless not_shipped.empty?
 
       location_type_id = repo.get_id(:location_types, location_type_code: 'SITE')
       location_id = repo.get_id(:locations, location_type_id: location_type_id)
@@ -57,11 +59,8 @@ module FinishedGoodsApp
     end
 
     def unallocate_pallet
-      UnallocatePallets.call(load_id, pallet_number, user)
-    end
-
-    def load_validator
-      LoadValidator.new
+      pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
+      repo.unallocate_pallets(pallet_id, user)
     end
 
     def repo

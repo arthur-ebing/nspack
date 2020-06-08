@@ -349,8 +349,8 @@ module FinishedGoodsApp
       GovtInspectionSheetSchema.call(params)
     end
 
-    def validate_pallets(check, pallet_numbers)
-      MesscadaApp::TaskPermissionCheck::ValidatePallets.call(check, pallet_numbers)
+    def check_pallets(check, pallet_numbers)
+      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
     end
 
     def validate_govt_inspection_add_pallet_params(params) # rubocop:disable Metrics/AbcSize
@@ -361,14 +361,14 @@ module FinishedGoodsApp
       pallet_number = attrs.delete(:pallet_number)
 
       %i[not_shipped not_failed_otmc verification_passed pallet_weight].each do |check|
-        res = validate_pallets(check, pallet_number)
+        res = check_pallets(check, pallet_number)
         return res unless res.success
       end
 
       res = if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
-              validate_pallets(:not_inspected, pallet_number)
+              check_pallets(:not_inspected, pallet_number)
             else
-              validate_pallets(:not_on_inspection_sheet, pallet_number)
+              check_pallets(:not_on_inspection_sheet, pallet_number)
             end
       return res unless res.success
 

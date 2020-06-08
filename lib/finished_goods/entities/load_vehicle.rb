@@ -16,6 +16,7 @@ module FinishedGoodsApp
 
   class LoadVehicleFlat < Dry::Struct
     attribute :id, Types::Integer
+    attribute :load_vehicle_id, Types::Integer
     attribute :load_id, Types::Integer
     attribute :vehicle_type_id, Types::Integer
     attribute :vehicle_type_code, Types::String

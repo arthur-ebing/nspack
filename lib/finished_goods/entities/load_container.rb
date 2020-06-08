@@ -23,6 +23,7 @@ module FinishedGoodsApp
 
   class LoadContainerFlat < Dry::Struct
     attribute :id, Types::Integer
+    attribute :load_container_id, Types::Integer
     attribute :load_id, Types::Integer
     attribute :container_code, Types::String
     attribute :container_vents, Types::String
@@ -42,6 +43,7 @@ module FinishedGoodsApp
     attribute :stack_type_description, Types::String
     attribute :verified_gross_weight, Types::Decimal
     attribute :verified_gross_weight_date, Types::DateTime
+    attribute? :container, Types::Bool
     attribute? :active, Types::Bool
   end
 end

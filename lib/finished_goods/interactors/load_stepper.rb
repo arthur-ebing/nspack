@@ -43,10 +43,11 @@ module FinishedGoodsApp
       raise 'Setup Load called without load_id' if load_flat.nil?
 
       form_state = { load_id: load_id,
-                     voyage_code: load_flat.voyage_code,
-                     vehicle_number: load_flat.vehicle_number,
-                     container_code: load_flat.container_code,
                      allocation_count: initial_count }
+      %i[voyage_code vehicle_number container_code requires_temp_tail temp_tail].each do |k|
+        form_state[k] = load_flat.to_h[k]
+      end
+
       allocated = LoadRepo.new.select_values(:pallets, :pallet_number, load_id: load_id)
 
       write(form_state: form_state, allocated: allocated, initial_allocated: allocated.clone, scanned: [])

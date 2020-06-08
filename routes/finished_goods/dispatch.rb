@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+# rubocop:disable Metrics/BlockLength, Metrics/ClassLength
+class Nspack < Roda
   route 'dispatch', 'finished_goods' do |r|
     # VOYAGES_PORTS
     # --------------------------------------------------------------------------
@@ -239,38 +239,153 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
-      # Unship only pallet
-      r.on 'unship', String do |pallet_number|
+      r.on 'truck_arrival' do
+        r.get do       # SHOW
+          check_auth!('dispatch', 'edit')
+          interactor.assert_permission!(:truck_arrival, id)
+          show_partial_or_page(r) { FinishedGoods::Dispatch::LoadVehicle::Edit.call(id) }
+        end
+
+        r.patch do # UPDATE
+          res = interactor.truck_arrival(id, params[:load_vehicle])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/finished_goods/dispatch/loads/#{id}"
+          else
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::LoadVehicle::Edit.call(id, form_values: params[:load_vehicle], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'delete_load_vehicle' do    # DELETE
         check_auth!('dispatch', 'edit')
-        interactor.assert_permission!(:unship, id)
-        res = interactor.unship_load(id, pallet_number)
-        flash[:notice] = res.message
+        res = interactor.check(:delete_load_vehicle, id)
+        if res.success
+          res = interactor.delete_load_vehicle(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'load_truck' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.check(:load_truck, id)
+        if res.success
+          res = interactor.load_truck(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'unload_truck' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.check(:unload_truck, id)
+        if res.success
+          res = interactor.unload_truck(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'temp_tail' do
+        r.get do       # SHOW
+          check_auth!('dispatch', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::TempTail.call(id) }
+        end
+
+        r.patch do # UPDATE
+          res = interactor.update_temp_tail(id, params[:load])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          else
+            re_show_form(r, res, url: request.fullpath) { FinishedGoods::Dispatch::Load::TempTail.call(id, form_values: params[:load], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'delete_temp_tail' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.check(:unload_truck, id)
+        if res.success
+          res = interactor.delete_temp_tail(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'ship' do
+        check_auth!('dispatch', 'edit')
+        res = interactor.check(:ship, id)
+        if res.success
+          res = interactor.ship_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
+        end
+        flash[:error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
-        res = interactor.unship_load(id)
+        res = interactor.check(:unship, id)
         if res.success
-          flash[:notice] = res.message
-          r.redirect "/finished_goods/dispatch/loads/#{id}/edit"
-        else
-          flash[:error] = res.message
-          r.redirect "/finished_goods/dispatch/loads/#{id}"
+          res = interactor.unship_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
         end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
-      r.on 'ship' do
+      # Unship only pallet
+      r.on 'unship', String do |pallet_number|
         check_auth!('dispatch', 'edit')
-        res = interactor.ship_load(id)
-
+        res = interactor.check(:unship, id)
         if res.success
-          flash[:notice] = res.message
-          r.redirect '/list/loads'
-        else
-          flash[:error] = res.message
-          r.redirect "/finished_goods/dispatch/loads/#{id}"
+          res = interactor.unship_load(id, pallet_number)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
+          end
         end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
+      r.on 'delete' do    # DELETE
+        check_auth!('dispatch', 'edit')
+        res = interactor.check(:delete, id)
+        if res.success
+          res = interactor.delete_load(id)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect '/list/loads'
+          end
+        end
+        flash[:error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 're_send_po_edi' do
@@ -302,7 +417,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.get do       # SHOW
           check_auth!('dispatch', 'edit')
           interactor.assert_permission!(:edit, id)
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Allocate.call(id, back_url: session[:last_grid_url]) }
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Allocate.call(id) }
         end
 
         r.patch do # UPDATE
@@ -318,41 +433,30 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'copy' do    # COPY
         check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(id: id, back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(id: id) }
       end
 
       r.on 'edit' do   # EDIT
         check_auth!('dispatch', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id, user: current_user, back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Edit.call(id) }
       end
 
       r.is do
         r.get do       # SHOW
           check_auth!('dispatch', 'read')
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id, user: current_user, back_url: request.referer) }
+          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(id) }
         end
 
         r.patch do     # UPDATE
           res = interactor.update_load(params[:load])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            r.redirect "/finished_goods/dispatch/loads/#{id}"
           else
             re_show_form(r, res, url: "/finished_goods/dispatch/loads/#{id}") do
-              FinishedGoods::Dispatch::Load::Edit.call(id, user: current_user, form_values: params[:load], form_errors: res.errors)
+              FinishedGoods::Dispatch::Load::Edit.call(id, form_values: params[:load], form_errors: res.errors)
             end
-          end
-        end
-
-        r.delete do    # DELETE
-          check_auth!('dispatch', 'delete')
-          interactor.assert_permission!(:delete, id)
-          res = interactor.delete_load(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            show_json_error(res.message, status: 200)
           end
         end
       end
@@ -360,31 +464,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'loads' do
       interactor = FinishedGoodsApp::LoadInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      r.on 'last', String do |mode|
-        if mode == 'view'
-          id = FinishedGoodsApp::LoadRepo.new.last_load
-          r.redirect "/finished_goods/dispatch/loads/#{id}" unless id.nil?
-        else
-          id = FinishedGoodsApp::LoadRepo.new.last_load(exclude_shipped: true)
-          r.redirect "/finished_goods/dispatch/loads/#{id}/#{mode}" unless id.nil?
-        end
-      end
 
       r.on 'voyage_type_changed' do
+        actions = []
         if params[:changed_value].nil_or_empty?
-          blank_json_response
+          vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels
+          pol_port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POL)
+          pod_port_list = MasterfilesApp::PortRepo.new.for_select_ports(port_type_code: AppConst::PORT_TYPE_POD)
         else
-          actions = []
-
           vessel_list = MasterfilesApp::VesselRepo.new.for_select_vessels(voyage_type_id: params[:changed_value])
           pol_port_list = MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: params[:changed_value], port_type_code: AppConst::PORT_TYPE_POL)
           pod_port_list = MasterfilesApp::PortRepo.new.for_select_ports(voyage_type_id: params[:changed_value], port_type_code: AppConst::PORT_TYPE_POD)
-
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_vessel_id', options_array: vessel_list)
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pol_port_id', options_array: pol_port_list)
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pod_port_id', options_array: pod_port_list)
-          json_actions(actions)
         end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_vessel_id', options_array: vessel_list)
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pol_port_id', options_array: pol_port_list)
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'load_pod_port_id', options_array: pod_port_list)
+        json_actions(actions)
       end
 
       r.on 'pod_port_changed' do
@@ -397,39 +492,75 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'customer_changed' do
+        actions = []
         if params[:changed_value].nil_or_empty?
-          blank_json_response
+          consignee_value = MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_CONSIGNEE)
+          receiver_value = MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FINAL_RECEIVER)
         else
-          actions = []
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
           consignee_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_CONSIGNEE, party_id)
           receiver_value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_FINAL_RECEIVER, party_id)
-
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_consignee_party_role_id', value: consignee_value)
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_final_receiver_party_role_id', value: receiver_value)
-          json_actions(actions)
         end
+        actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_consignee_party_role_id', value: consignee_value)
+        actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_final_receiver_party_role_id', value: receiver_value)
+        json_actions(actions)
       end
 
       r.on 'exporter_changed' do
         if params[:changed_value].nil_or_empty?
-          blank_json_response
+          value = MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_BILLING_CLIENT)
         else
           party_id = MasterfilesApp::PartyRepo.new.find_party_role(params[:changed_value])&.party_id
           value = MasterfilesApp::PartyRepo.new.party_role_id_from_role_and_party_id(AppConst::ROLE_BILLING_CLIENT, party_id)
-          json_change_select_value('load_billing_client_party_role_id', value)
         end
+        json_change_select_value('load_billing_client_party_role_id', value)
       end
 
-      r.on 'unship' do
-        attrs = params[:unship]
-        check_auth!('dispatch', 'edit')
-        if attrs.nil_or_empty?
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Unship.call(back_url: request.referer) }
-        else
-          show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(attrs[:id], back_url: request.referer) }
+      r.on 'container_changed' do
+        switch =  case params[:changed_value]
+                  when 't'
+                    true
+                  when 'f', ''
+                    false
+                  else
+                    MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(params[:changed_value]).has_container
+                  end
+
+        action = switch ? :show_element : :hide_element
+
+        actions = []
+        actions << OpenStruct.new(type: :change_select_value, dom_id: 'load_vehicle_container', value:  switch ? 't' : 'f')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_container_code_field_wrapper')
+        actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_container_code', required: switch)
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_container_vents_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_container_seal_code_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_container_temperature_rhine_field_wrapper')
+        actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_container_temperature_rhine', required: switch)
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_container_temperature_rhine2_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_internal_container_code_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_max_gross_weight_field_wrapper')
+        actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_max_gross_weight', required: switch)
+        if AppConst::VGM_REQUIRED
+          actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_tare_weight_field_wrapper')
+          actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_tare_weight', required: switch)
+          actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_max_payload_field_wrapper')
+          actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_max_payload', required: switch)
+          actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_actual_payload_field_wrapper')
         end
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_cargo_temperature_id_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_stack_type_id_field_wrapper')
+        json_actions(actions)
       end
+
+      # r.on 'unship' do
+      #   attrs = params[:unship]
+      #   check_auth!('dispatch', 'edit')
+      #   if attrs.nil_or_empty?
+      #     show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Unship.call(back_url: request.referer) }
+      #   else
+      #     show_partial_or_page(r) { FinishedGoods::Dispatch::Load::Show.call(attrs[:id], back_url: request.referer) }
+      #   end
+      # end
 
       r.on 'search_load_by_pallet' do # SEARCH
         r.get do
@@ -450,23 +581,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'new' do    # NEW
         check_auth!('dispatch', 'new')
-        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call(back_url: request.referer) }
+        show_partial_or_page(r) { FinishedGoods::Dispatch::Load::New.call }
       end
 
       r.post do        # CREATE
         res = interactor.create_load(params[:load])
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          r.redirect "/finished_goods/dispatch/loads/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/finished_goods/dispatch/loads/new') do
-            FinishedGoods::Dispatch::Load::New.call(back_url: request.referer,
-                                                    form_values: params[:load],
-                                                    form_errors: res.errors)
+            FinishedGoods::Dispatch::Load::New.call(form_values: params[:load], form_errors: res.errors)
           end
         end
       end
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/BlockLength, Metrics/ClassLength
