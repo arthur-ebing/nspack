@@ -217,6 +217,78 @@ module ProductionApp
       success_response('ok', id)
     end
 
+    def system_modules
+      query = <<~SQL
+        SELECT s.system_resource_code as name,
+        'TODO: type' as module_type,
+        'TODO: function' as function,
+        p.plant_resource_code as alias,
+        'TODO: ip' as network_interface,
+        'TODO: port' as port,
+        'TODO: MACaddr' as mac_address,
+        'TODO: TTL' as ttl,
+        'TODO: cycle time' as cycle_time,
+        'TODO: Publishing' as publishing,
+        'TODO: Login' as login,
+        'TODO: Logoff' as logoff,
+        'TODO: URL' as url,
+        'TODO: Par1' as par1,
+        'TODO: Par2' as par2,
+        'TODO: Par3' as par3,
+        'TODO: Par4' as par4,
+        'TODO: Par5' as par5,
+        'TODO: ReaderID' as readerid,
+        'TODO: ContainerType' as container_type,
+        'TODO: WeightUnits' as weight_units,
+        'TODO: Printer' as printer,
+        'TODO: PrinterTypes' as printer_types,
+
+        s.id, s.plant_resource_type_id, s.system_resource_type_id,
+               s.description, s.active,
+               t.system_resource_type_code, t.peripheral,
+               e.plant_resource_type_code
+        FROM public.system_resources s
+        JOIN system_resource_types t ON t.id = s.system_resource_type_id
+        LEFT OUTER JOIN plant_resource_types e ON e.id = s.plant_resource_type_id
+        LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
+        WHERE t.system_resource_type_code = 'MODULE'
+          AND s.active
+      SQL
+      DB[query].all
+    end
+
+    def system_peripherals
+      query = <<~SQL
+        SELECT s.system_resource_code as name,
+        'TODO: function' as function,
+        p.plant_resource_code as alias,
+        'TODO: type' as type,
+        'TODO: model' as model,
+        'TODO: conn type' AS connection_type,
+        'TODO: ip' as network_interface,
+        'TODO: port' as port,
+        'TODO: TTL:' as ttl,
+        'TODO: cycle time' as cycle_time,
+        'TODO: Lang' as language,
+        'TODO: User' as username,
+        'TODO: Pass' as password,
+        'TODO: Pixel/mm' as pixels_mm
+        ,
+         s.id, s.plant_resource_type_id, s.system_resource_type_id,
+               s.description, s.active,
+               t.system_resource_type_code, t.peripheral,
+               e.plant_resource_type_code
+          FROM public.system_resources s
+          JOIN system_resource_types t ON t.id = s.system_resource_type_id
+          LEFT OUTER JOIN plant_resource_types e ON e.id = s.plant_resource_type_id
+          LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
+        WHERE t.system_resource_type_code = 'PERIPHERAL'
+          AND e.plant_resource_type_code = 'PRINTER'
+          AND s.active
+      SQL
+      DB[query].all
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res, sys_code)

@@ -109,6 +109,12 @@ module ProductionApp
       success_response('ok', MasterfilesApp::LocationRepo.new.find_location(location_id))
     end
 
+    def system_resource_xml
+      success_response('ok',
+                       modules: ProductionApp::BuildModulesXml.call.instance,
+                       peripherals: ProductionApp::BuildPeripheralsXml.call.instance)
+    end
+
     private
 
     def repo

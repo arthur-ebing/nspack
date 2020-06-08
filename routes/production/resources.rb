@@ -238,6 +238,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # SYSTEM RESOURCES
+    # --------------------------------------------------------------------------
+    r.on 'system_resources' do
+      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.system_resource_xml
+      show_page { Production::Resources::SystemResource::ShowXml.call(res) }
+      # view(inline: res.instance[:modules].to_s)
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
