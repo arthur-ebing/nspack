@@ -91,7 +91,7 @@ module ProductionApp
       # return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
 
       attrs = { change_attrs: change_attrs, reworks_run_attrs: reworks_run_attrs }
-      Que.enqueue attrs, job_class: 'ProductionApp::Job::ApplyDeliveriesOrchardChanges', queue: AppConst::QUEUE_NAME
+      Job::ApplyDeliveriesOrchardChanges.enqueue(attrs)
 
       success_response('Change Deliveries Orchard has been enqued.')
     rescue Crossbeams::InfoError => e
