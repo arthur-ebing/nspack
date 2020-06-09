@@ -18,19 +18,19 @@ module ProductionApp
             res = ProductionApp::ChangeDeliveriesOrchards.call(change_attrs, reworks_run_attrs)
 
             if res.success
-              send_bus_message('Reworks Cascading orchard change - Applying deliveries orchard changes was successful', message_type: :information, target_user: user_name)
-
+              send_bus_message('Reworks Cascading orchard change - Applying deliveries orchard changes was successful', message_type: :success, target_user: user_name)
             else
-              send_bus_message('Reworks Cascading orchard change - Applying deliveries orchard changes failed', message_type: :error, target_user: user_name)
               msg = res.instance.empty? ? res.message : "\n#{res.message}\n#{res.instance}"
               ErrorMailer.send_error_email(subject: 'Apply Deliveries Orchard Changes failed',
                                            message: msg)
+              send_bus_message('Reworks Cascading orchard change - Applying deliveries orchard changes failed', message_type: :error, target_user: user_name)
             end
             finish
           end
         rescue StandardError => e
           log_err(e.message)
           ErrorMailer.send_exception_email(e, subject: 'Apply Deliveries Orchard Changes')
+          send_bus_message("Failed to Apply Deliveries Orchard Changes - #{e.message}", message_type: :error, target_user: user_name)
           expire
         end
       end
