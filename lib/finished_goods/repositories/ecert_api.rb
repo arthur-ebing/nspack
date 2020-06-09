@@ -67,7 +67,7 @@ module FinishedGoodsApp
     end
 
     def save_to_yaml(payload)
-      File.open('tmp/eCert_store.yml', 'w') { |f| f << payload.to_yaml }
+      File.open(File.join(ENV['ROOT'], 'tmp', 'eCert_store.yml'), 'w') { |f| f << payload.to_yaml }
     end
   end
 end
