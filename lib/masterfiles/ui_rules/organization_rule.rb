@@ -18,9 +18,9 @@ module UiRules
 
     def set_show_fields
       fields[:parent_organization] = { renderer: :label, caption: 'Parent' }
-      fields[:party_name] = { renderer: :label, caption: 'Organization Name' }
+      fields[:medium_description] = { caption: 'Organization Code',
+                                      renderer: :label }
       fields[:short_description] = { renderer: :label }
-      fields[:medium_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
@@ -31,8 +31,9 @@ module UiRules
     def common_fields
       {
         parent_id: { renderer: :select, options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) }, prompt: true },
+        medium_description: { caption: 'Organization Code',
+                              required: true },
         short_description: { required: true },
-        medium_description: { required: true },
         long_description: {},
         vat_number: {},
         role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }

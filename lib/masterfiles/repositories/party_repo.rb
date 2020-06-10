@@ -52,8 +52,7 @@ module MasterfilesApp
       hash = add_dependent_ids(hash)
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
-      parent_hash = DB[:organizations].where(id: hash[:parent_id]).first
-      hash[:parent_organization] = parent_hash ? parent_hash[:medium_description] : nil
+      hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
       Organization.new(hash)
     end
 

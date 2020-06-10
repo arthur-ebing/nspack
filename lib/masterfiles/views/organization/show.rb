@@ -15,9 +15,12 @@ module Masterfiles
             page.form do |form|
               form.view_only!
               form.add_field :parent_organization
-              form.add_field :party_name
-              form.add_field :short_description
               form.add_field :medium_description
+              form.add_field :short_description
+              form.add_text 'Note: The short description should be limited to 2 characters for use with EDIs',
+                            dom_id: 'short_desc_warn',
+                            hide_on_load: rules[:short_too_long],
+                            css_classes: 'orange b'
               form.add_field :long_description
               form.add_field :vat_number
               # form.add_field :variants
