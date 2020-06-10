@@ -260,14 +260,14 @@ module UiRules
                  '/list/loads']
       captions = ['Close', 'Close', 'Load Truck', 'Ship', 'Close']
 
-      back_actions = ["/finished_goods/dispatch/loads/#{id}/edit",
-                      "/finished_goods/dispatch/loads/#{id}/edit",
+      back_actions = [nil,
+                      nil,
                       "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
                       "/finished_goods/dispatch/loads/#{id}/unload_truck",
                       "/finished_goods/dispatch/loads/#{id}/unship"]
 
-      back_prompts = ['Are you sure, you want to edit this load?',
-                      'Are you sure, you want to edit this load?',
+      back_prompts = [nil,
+                      nil,
                       'Are you sure, you want to delete the vehicle from this load?',
                       'Are you sure, you want to unload this load?',
                       'Are you sure, you want to unship this load?']

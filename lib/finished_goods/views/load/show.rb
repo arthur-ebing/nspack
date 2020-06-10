@@ -24,6 +24,12 @@ module FinishedGoods
                                   visible: !ui_rule.form_object.back_action.nil?,
                                   style: :action_button)
               section.add_control(control_type: :link,
+                                  text: 'Edit',
+                                  icon: :edit,
+                                  url: "/finished_goods/dispatch/loads/#{id}/edit",
+                                  prompt: 'Are you sure, you want to edit this load?',
+                                  style: :action_button)
+              section.add_control(control_type: :link,
                                   text: 'Delete',
                                   icon: :checkoff,
                                   url: "/finished_goods/dispatch/loads/#{id}/delete",
@@ -179,7 +185,6 @@ module FinishedGoods
                                       text: 'Edit Truck Arrival',
                                       url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
                                       icon: :edit,
-                                      visible: !ui_rule.form_object.loaded,
                                       behaviour: :popup,
                                       style: :action_button)
                     end

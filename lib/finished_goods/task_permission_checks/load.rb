@@ -44,8 +44,6 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        return failed_response("Load: #{id} has already been shipped") if shipped?
-
         all_ok
       end
 

@@ -242,7 +242,7 @@ class Nspack < Roda
       r.on 'truck_arrival' do
         r.get do       # SHOW
           check_auth!('dispatch', 'edit')
-          interactor.assert_permission!(:truck_arrival, id)
+          # interactor.assert_permission!(:truck_arrival, id)
           show_partial_or_page(r) { FinishedGoods::Dispatch::LoadVehicle::Edit.call(id) }
         end
 
