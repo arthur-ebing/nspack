@@ -17,6 +17,11 @@
   :is_delete: true
   :popup: true
 - :separator: true
+- :url: "/masterfiles/farms/farms/$:id$/list_farm_sections"
+  :text: sections
+  :title: Sections for $:farm_code$
+  :icon: list
+  :popup: true
 - :url: "/masterfiles/farms/farms/$:id$/list_farm_orchards"
   :text: orchards
   :title: Orchards for $:farm_code$

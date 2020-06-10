@@ -42,6 +42,7 @@ module RawMaterials
                     col.add_field :farm_id
                     col.add_field :puc_id
                     col.add_field :orchard_id
+                    col.add_field :farm_section
                     col.add_field :cultivar_id
                     col.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
                   end

@@ -11,6 +11,8 @@ module MasterfilesApp
         id: 1,
         farm_id: 1,
         puc_id: 1,
+        farm_manager_party_role_id: 1,
+        farm_section_name: 'ABC',
         orchard_code: 'ABC',
         description: 'ABC',
         cultivar_ids: [1, 2, 3],

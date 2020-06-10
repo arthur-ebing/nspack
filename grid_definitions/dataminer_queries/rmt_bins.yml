@@ -1,6 +1,6 @@
 ---
 :caption: Rmt Bins
-:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    status,\r\n    qty_bins,\r\n
+:sql: "SELECT\r\n    id,\r\n    asset_number,\r\n    status,\r\n    qty_bins,\r\n    farm_section_name,\r\n    farm_manager,\r\n
   \   discrete_bin,\r\n    qty_inner_bins,\r\n    bin_fullness,\r\n    nett_weight,\r\n
   \   gross_weight,\r\n    avg_gross_weight,\r\n    weighed_manually,\r\n    active,\r\n
   \   created_at,\r\n    updated_at,\r\n    location_id,\r\n    location_long_code,\r\n
@@ -395,6 +395,38 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_section_name:
+    :name: farm_section_name
+    :sequence_no: 23
+    :caption: Farm Section
+    :namespaced_name: farm_section_name
+    :data_type: :string
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_manager:
+    :name: farm_manager
+    :sequence_no: 23
+    :caption: Farm manager
+    :namespaced_name: farm_manager
+    :data_type: :string
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

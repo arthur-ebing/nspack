@@ -167,6 +167,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect "/list/orchards/with_params?key=standard&orchards.farm_id=#{id}"
       end
 
+      r.on 'list_farm_sections' do
+        check_auth!('farms', 'edit')
+        r.redirect "/list/farm_sections/with_params?key=standard&orchards.farm_id=#{id}"
+      end
+
       r.on 'link_farm_pucs' do
         r.post do
           res = interactor.associate_farms_pucs(id, multiselect_grid_choices(params))
@@ -658,6 +663,85 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             Masterfiles::Farms::RmtContainerMaterialType::New.call(form_values: params[:rmt_container_material_type],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # FARM SECTIONS
+    # --------------------------------------------------------------------------
+    r.on 'farm_sections', Integer do |id|
+      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:farms, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'new' do    # NEW
+        check_auth!('farms', 'new')
+        show_partial_or_page(r) { Masterfiles::Farms::FarmSection::New.call(id, remote: fetch?(r)) }
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('farms', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Farms::FarmSection::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('farms', 'read')
+          show_partial { Masterfiles::Farms::FarmSection::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_farm_section(id, params[:farm_section])
+          if res.success
+            update_grid_row(id, changes: { farm_manager_party_role: res.instance[:farm_manager_party_role],
+                                           farm_section_name: res.instance[:farm_section_name],
+                                           orchards: res.instance[:orchards],
+                                           status: res.instance[:status],
+                                           description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Farms::FarmSection::Edit.call(id, form_values: params[:farm_section], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('farms', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_farm_section(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'farm_sections' do
+      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.post do        # CREATE
+        res = interactor.create_farm_section(params[:farm_section])
+        if res.success
+          row_keys = %i[
+            id
+            farm_manager_party_role_id
+            farm_section_name
+            description
+            orchards
+            farm_manager_party_role
+            status
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/farms/farm_sections/new') do
+            Masterfiles::Farms::FarmSection::New.call(form_values: params[:farm_section],
+                                                      form_errors: res.errors,
+                                                      remote: fetch?(r))
           end
         end
       end

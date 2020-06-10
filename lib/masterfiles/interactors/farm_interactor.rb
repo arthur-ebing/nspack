@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class FarmInteractor < BaseInteractor
+  class FarmInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_farm(params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -52,6 +52,59 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def create_farm_section(params) # rubocop:disable Metrics/AbcSize
+      res = validate_farm_section_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_farm_section(params)
+        log_status(:farm_sections, id, 'CREATED')
+        log_transaction
+      end
+      instance = farm_section(id)
+      success_response("Created farm section #{instance.farm_section_name}",
+                       instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { farm_section_name: ['This farm section already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def update_farm_section(id, params)
+      res = validate_farm_section_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_farm_section(id, params)
+        log_transaction
+      end
+      instance = farm_section(id)
+      success_response("Updated farm section #{instance.farm_section_name}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def delete_farm_section(id) # rubocop:disable Metrics/AbcSize
+      name = farm_section(id).farm_section_name
+      repo.transaction do
+        repo.delete_farm_section(id)
+        log_status(:farm_sections, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted farm section #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete farm section. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::Farm.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
@@ -82,6 +135,14 @@ module MasterfilesApp
 
     def validate_farm_params(params)
       FarmSchema.call(params)
+    end
+
+    def farm_section(id)
+      repo.find_farm_section(id)
+    end
+
+    def validate_farm_section_params(params)
+      FarmSectionSchema.call(params)
     end
   end
 end

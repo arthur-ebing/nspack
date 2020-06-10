@@ -48,6 +48,17 @@ module MasterfilesApp
       DB[:farms].insert(default.merge(opts))
     end
 
+    def create_farm_section(opts = {})
+      party_role_id = create_party_role
+
+      default = {
+        farm_manager_party_role_id: party_role_id,
+        farm_section_name: Faker::Lorem.unique.word,
+        description: Faker::Lorem.word
+      }
+      DB[:farm_sections].insert(default.merge(opts))
+    end
+
     def create_orchard(opts = {})
       farm_id = create_farm
       puc_id = create_puc

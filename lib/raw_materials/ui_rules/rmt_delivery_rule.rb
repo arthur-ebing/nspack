@@ -31,7 +31,9 @@ module UiRules
       season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
       farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
       puc_id_label = MasterfilesApp::FarmRepo.new.find_puc(@form_object.puc_id)&.puc_code
+      # farm_section_label = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(@form_object.orchard_id)
       fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
+      fields[:farm_section] = { renderer: :label, with_value: @options[:farm_section].to_s, hide_on_load: @options[:farm_section].nil_or_empty?, caption: 'Farm Section' }
       fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:rmt_delivery_destination_id] = { renderer: :label, with_value: rmt_delivery_destination_id_label, caption: 'Destination' }
       fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
@@ -56,6 +58,7 @@ module UiRules
                    required: true, prompt: true },  # ClientSettings.default_farm
         puc_id: { renderer: :select, options: [], caption: 'Puc', required: true, prompt: true },  # ClientSettings.default_puc
         orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: true, prompt: true  },
+        farm_section: { renderer: :label, with_value: @options[:farm_section].to_s, hide_on_load: @options[:farm_section].nil_or_empty?  },
         cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: true, prompt: true },
         rmt_delivery_destination_id: { renderer: :select, options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
                                        disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations, caption: 'Destination',
@@ -83,6 +86,7 @@ module UiRules
       end
 
       @form_object = @repo.find_rmt_delivery(@options[:id])
+      @options[:farm_section] = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(@form_object.orchard_id)
     end
 
     def make_new_form_object

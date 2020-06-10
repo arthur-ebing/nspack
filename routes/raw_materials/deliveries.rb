@@ -120,7 +120,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_rmt_delivery(id, params[:rmt_delivery])
           if res.success
-            # Ask james: how to refresh bins grid
             show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true) }
           else
             re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
@@ -350,10 +349,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'orchard_combo_changed' do
         if !params[:rmt_delivery_orchard_id].to_s.empty?
+          farm_section = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(params[:rmt_delivery_orchard_id])
           cultivars = interactor.lookup_orchard_cultivars(params[:rmt_delivery_orchard_id])
-          json_replace_select_options('rmt_delivery_cultivar_id', cultivars)
+          json_actions([OpenStruct.new(type: farm_section.nil_or_empty? ? :hide_element : :show_element,
+                                       dom_id: 'rmt_delivery_farm_section_field_wrapper'),
+                        OpenStruct.new(type: :replace_inner_html,
+                                       dom_id: 'rmt_delivery_farm_section',
+                                       value: farm_section),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'rmt_delivery_cultivar_id',
+                                       options_array: cultivars)])
         else
-          json_replace_select_options('rmt_delivery_cultivar_id', [])
+          json_actions([OpenStruct.new(type: :hide_element,
+                                       dom_id: 'rmt_delivery_farm_section_field_wrapper'),
+                        OpenStruct.new(type: :replace_inner_html,
+                                       dom_id: 'rmt_delivery_farm_section',
+                                       value: nil),
+                        OpenStruct.new(type: :replace_select_options,
+                                       dom_id: 'rmt_delivery_cultivar_id',
+                                       options_array: [])])
         end
       end
 
