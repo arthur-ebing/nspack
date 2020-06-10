@@ -2,7 +2,7 @@
 
 module MesscadaApp
   module TaskPermissionCheck
-    class Pallets < BaseService
+    class Pallets < BaseService # rubocop:disable Metrics/ClassLength
       attr_reader :task, :pallet_numbers, :repo, :load_id
       def initialize(task, pallet_numbers, load_id = nil)
         @task = task
@@ -24,7 +24,8 @@ module MesscadaApp
         not_inspected: :not_inspected_check,
         not_failed_otmc: :not_failed_otmc_check,
         verification_passed: :verification_passed_check,
-        pallet_weight: :pallet_weight_check
+        pallet_weight: :pallet_weight_check,
+        allocate: :allocate_check
       }.freeze
 
       def call
@@ -127,6 +128,22 @@ module MesscadaApp
 
         errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, gross_weight: nil).uniq
         return failed_response "Pallet: #{errors.join(', ')}, gross weight not filled." unless errors.empty?
+
+        all_ok
+      end
+
+      def allocate_check
+        res = not_on_load_check
+        return res unless res.success
+
+        res = not_shipped_check
+        return res unless res.success
+
+        res = in_stock_check
+        return res unless res.success
+
+        res = not_failed_otmc_check
+        return res unless res.success
 
         all_ok
       end

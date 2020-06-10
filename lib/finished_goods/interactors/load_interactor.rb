@@ -76,7 +76,7 @@ module FinishedGoodsApp
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
       unless pallet_numbers.empty?
-        res = validate_allocate_list(load_id, pallet_numbers)
+        res = check_pallets(:allocate, pallet_numbers, load_id)
         return res unless res.success
       end
 
@@ -104,7 +104,7 @@ module FinishedGoodsApp
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = validate_allocate_list(load_id, pallet_numbers)
+      res = check_pallets(:allocate, pallet_numbers, load_id)
       return res unless res.success
 
       pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
@@ -219,7 +219,7 @@ module FinishedGoodsApp
     end
 
     def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = validate_allocate_list(load_id, pallet_number)
+      res = check_pallets(:allocate, pallet_number, load_id)
       return res unless res.success
 
       message = stepper(step_key).allocate_pallet(pallet_number)
@@ -264,20 +264,8 @@ module FinishedGoodsApp
       TaskPermissionCheck::Load.call(task, id, pallet_number)
     end
 
-    def validate_allocate_list(load_id, pallet_numbers)
-      check_pallets(:not_on_load, pallet_numbers, load_id)
-      check_pallets(:not_shipped, pallet_numbers)
-      check_pallets(:in_stock, pallet_numbers)
-      check_pallets(:not_failed_otmc, pallet_numbers)
-
-      success_response('ok')
-    rescue Crossbeams::TaskNotPermittedError => e
-      failed_response(e.message)
-    end
-
     def check_pallets(check, pallet_numbers, load_id = nil)
-      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
-      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
     end
 
     private
