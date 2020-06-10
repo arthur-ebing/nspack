@@ -519,11 +519,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               interactor.stepper(:load_truck).clear
               store_locally(:flash_notice, rmd_success_message(res.message))
               if form_state[:requires_temp_tail]
-                store_locally(:temp_tail, OpenStruct.new(instance: { pallet_number: scanned_number, load_id: load_id }))
+                store_locally(:temp_tail, OpenStruct.new(instance: { temp_tail_pallet_number: scanned_number, load_id: load_id }))
                 r.redirect('/rmd/finished_goods/dispatch/temp_tail')
               else
-                store_locally(:ship_load, OpenStruct.new(instance: { load_id: load_id }))
-                r.redirect('/rmd/finished_goods/dispatch/ship_load')
+                res = interactor.ship_load(load_id)
+                if res.success
+                  store_locally(:flash_notice, rmd_success_message(res.message))
+                  r.redirect('/rmd/home')
+                else
+                  res = OpenStruct.new(instance: res.to_h.merge!(load_id: load_id))
+                  store_locally(:ship_load, res)
+                  r.redirect('/rmd/finished_goods/dispatch/ship_load')
+                end
               end
             end
             message = res.success ? rmd_success_message(res.message) : rmd_error_message(res.message)
@@ -622,9 +629,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           load_id = params[:set_temp_tail][:load_id].to_i
           res = interactor.update_temp_tail(load_id, params[:set_temp_tail])
           if res.success
-            if BaseRepo.new.get(:loads, load_id, :loaded)
-              store_locally(:ship_load, OpenStruct.new(instance: { load_id: load_id }))
-              r.redirect '/rmd/finished_goods/dispatch/ship_load'
+            if res.instance.loaded
+              res = interactor.ship_load(load_id)
+              if res.success
+                store_locally(:flash_notice, rmd_success_message(res.message))
+                r.redirect('/rmd/home')
+              else
+                res = OpenStruct.new(instance: res.to_h.merge!(load_id: load_id))
+                store_locally(:ship_load, res)
+                r.redirect('/rmd/finished_goods/dispatch/ship_load')
+              end
             else
               r.redirect "/rmd/finished_goods/dispatch/load_truck/load/#{load_id}"
             end
@@ -665,16 +679,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.post do
           load_id = params[:ship_load][:load_id].to_i
-          res = interactor.check(:ship, load_id)
+          res = interactor.ship_load(load_id)
           if res.success
-            res = interactor.ship_load(load_id)
-            if res.success
-              store_locally(:flash_notice, rmd_success_message(res.message))
-              r.redirect('/rmd/home')
-            end
+            store_locally(:flash_notice, rmd_success_message(res.message))
+            r.redirect('/rmd/home')
+          else
+            store_locally(:ship_load, res)
+            r.redirect('/rmd/finished_goods/dispatch/ship_load')
           end
-          store_locally(:ship_load, res)
-          r.redirect('/rmd/finished_goods/dispatch/ship_load')
         end
       end
     end

@@ -34,7 +34,10 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_load(id)
+    def delete_load(id) # rubocop:disable Metrics/AbcSize
+      res = check(:delete, id)
+      return failed_response(res.message) unless res.success
+
       load_voyage_id = repo.get_id(:load_voyages, load_id: id)
       repo.transaction do
         # DELETE LOAD_VOYAGE
@@ -51,9 +54,12 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def delete_load_vehicle(load_id) # rubocop:disable Metrics/AbcSize
-      vehicle_id = repo.get_id(:load_vehicles, load_id: load_id)
-      container_id = repo.get_id(:load_containers, load_id: load_id)
+    def delete_load_vehicle(id) # rubocop:disable Metrics/AbcSize
+      res = check(:delete_load_vehicle, id)
+      return failed_response(res.message) unless res.success
+
+      vehicle_id = repo.get_id(:load_vehicles, load_id: id)
+      container_id = repo.get_id(:load_containers, load_id: id)
 
       repo.transaction do
         if container_id
@@ -65,7 +71,7 @@ module FinishedGoodsApp
         log_status(:load_vehicles, vehicle_id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted load vehicle for Load: #{load_id}")
+      success_response("Deleted load vehicle for Load: #{id}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -141,6 +147,9 @@ module FinishedGoodsApp
     end
 
     def load_truck(id)
+      res = check(:load_truck, id)
+      return failed_response(res.message) unless res.success
+
       repo.transaction do
         repo.update_load(id, loaded: true)
         log_transaction
@@ -151,6 +160,9 @@ module FinishedGoodsApp
     end
 
     def unload_truck(id)
+      res = check(:unload_truck, id)
+      return failed_response(res.message) unless res.success
+
       repo.transaction do
         repo.update_load(id, loaded: false)
         log_transaction
@@ -173,12 +185,15 @@ module FinishedGoodsApp
         repo.update(:pallets, id, temp_tail: params[:temp_tail])
         log_transaction
       end
-      success_response("Set temp tail to pallet: #{pallet_number}")
+      success_response("Set temp tail to pallet: #{pallet_number}", load_entity(load_id))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_temp_tail(id)
+      res = check(:unload_truck, id)
+      return failed_response(res.message) unless res.success
+
       ids = repo.select_values(:pallets, :id, load_id: id)
       repo.transaction do
         repo.update(:pallets, ids, temp_tail: nil)
@@ -190,6 +205,9 @@ module FinishedGoodsApp
     end
 
     def ship_load(id)
+      res = check(:ship, id)
+      return failed_response(res.message) unless res.success
+
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user)
@@ -203,6 +221,9 @@ module FinishedGoodsApp
     end
 
     def unship_load(id, pallet_number = nil)
+      res = check(:unship, id)
+      return failed_response(res.message) unless res.success
+
       res = nil
       repo.transaction do
         res = UnshipLoad.call(id, @user, pallet_number)

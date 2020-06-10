@@ -19,21 +19,6 @@ module MesscadaApp
       DB[:rmt_bins].where(id: stock_item_id).update(upd)
     end
 
-    def where_pallets(args) # rubocop:disable Metrics/AbcSize
-      has_nett_weight = args.delete(:has_nett_weight)
-      has_gross_weight = args.delete(:has_gross_weight)
-      on_load = args.delete(:on_load)
-
-      ds = DB[:pallets].where(args)
-      ds = ds.exclude { nett_weight.> 0 } if has_nett_weight # rubocop:disable Style/NumericPredicate
-      ds = ds.exclude { gross_weight.> 0 } if has_gross_weight # rubocop:disable Style/NumericPredicate
-      unless on_load.nil?
-        ds = ds.exclude(load_id: on_load)
-        ds = ds.exclude(load_id: nil)
-      end
-      ds.select_map(:pallet_number)
-    end
-
     def carton_label_exists?(carton_label_id)
       exists?(:carton_labels, id: carton_label_id)
     end

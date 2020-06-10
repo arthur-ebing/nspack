@@ -43,52 +43,65 @@ module MesscadaApp
       private
 
       def exists_check
-        errors = (pallet_numbers - repo.where_pallets(pallet_number: pallet_numbers)).uniq
+        pallets_exists = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers)
+
+        errors = pallet_numbers - pallets_exists
         return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
 
         all_ok
       end
 
       def not_shipped_check
-        errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: true).uniq
+        pallets_shipped = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: true)
+        errors = pallets_shipped
         return failed_response "Pallet: #{errors.join(', ')} already shipped." unless errors.empty?
 
         all_ok
       end
 
       def shipped_check
-        errors = repo.where_pallets(pallet_number: pallet_numbers, shipped: false).uniq
+        pallets_not_shipped = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: false)
+        errors = pallets_not_shipped
         return failed_response "Pallet: #{errors.join(', ')} not shipped." unless errors.empty?
 
         all_ok
       end
 
       def in_stock_check
-        errors = repo.where_pallets(pallet_number: pallet_numbers, in_stock: false).uniq
+        pallets_not_in_stock = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, in_stock: false)
+        errors = pallets_not_in_stock
+
         return failed_response "Pallet: #{errors.join(', ')} not in stock." unless errors.empty?
 
         all_ok
       end
 
       def nett_weight_check
-        errors = repo.where_pallets(pallet_number: pallet_numbers, has_nett_weight: true).uniq
+        pallets_with_nett_weight = repo.select_values(:pallets, :pallet_number, Sequel.lit('nett_weight IS NOT NULL'))
+        errors = pallet_numbers - pallets_with_nett_weight
         return failed_response "Pallet: #{errors.join(', ')} does not have nett weight." unless errors.empty?
 
         all_ok
       end
 
       def gross_weight_check
-        errors = repo.where_pallets(pallet_number: pallet_numbers, has_gross_weight: true).uniq
+        pallets_with_gross_weight = repo.select_values(:pallets, :pallet_number, Sequel.lit('gross_weight IS NOT NULL'))
+        errors = pallet_numbers - pallets_with_gross_weight
         return failed_response "Pallet: #{errors.join(', ')} does not have gross weight." unless errors.empty?
 
         all_ok
       end
 
       def not_on_load_check
-        raise ArgumentError, 'Load is nil.' if load_id.nil?
+        pallets_on_load = if load_id.nil?
+                            []
+                          else
+                            repo.select_values(:pallets, :pallet_number, load_id: load_id)
+                          end
+        available_pallets = repo.select_values(:pallets, :pallet_number, load_id: nil)
 
-        errors = repo.where_pallets(pallet_number: pallet_numbers, on_load: load_id).uniq
-        return failed_response "Pallet: #{errors.join(', ')} already allocated to other load." unless errors.empty?
+        errors = pallet_numbers - pallets_on_load - available_pallets
+        return failed_response "Pallet: #{errors.join(', ')} already allocated to other loads." unless errors.empty?
 
         all_ok
       end
@@ -96,7 +109,8 @@ module MesscadaApp
       def not_failed_otmc_check
         return success_response('failed otmc check bypassed') if AppConst::BYPASS_QUALITY_TEST_LOAD_CHECK
 
-        errors = pallet_numbers - repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil).uniq
+        passed_pallets = repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, failed_otmc_results: nil).uniq
+        errors = pallet_numbers - passed_pallets
         return failed_response "Pallet: #{errors.join(', ')} failed a OTMC test." unless errors.empty?
 
         all_ok

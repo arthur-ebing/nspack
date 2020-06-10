@@ -259,43 +259,22 @@ class Nspack < Roda
 
       r.on 'delete_load_vehicle' do    # DELETE
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:delete_load_vehicle, id)
-        if res.success
-          res = interactor.delete_load_vehicle(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.delete_load_vehicle(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'load_truck' do
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:load_truck, id)
-        if res.success
-          res = interactor.load_truck(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.load_truck(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'unload_truck' do
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:unload_truck, id)
-        if res.success
-          res = interactor.unload_truck(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.unload_truck(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
@@ -319,85 +298,49 @@ class Nspack < Roda
 
       r.on 'delete_temp_tail' do
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:unload_truck, id)
-        if res.success
-          res = interactor.delete_temp_tail(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.delete_temp_tail(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'ship' do
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:ship, id)
-        if res.success
-          res = interactor.ship_load(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.ship_load(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'unship' do
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:unship, id)
-        if res.success
-          res = interactor.unship_load(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.unship_load(id)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       # Unship only pallet
       r.on 'unship', String do |pallet_number|
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:unship, id)
-        if res.success
-          res = interactor.unship_load(id, pallet_number)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/dispatch/loads/#{id}"
-          end
-        end
-        flash[:error] = res.message
+        res = interactor.unship_load(id, pallet_number)
+        flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 'delete' do    # DELETE
         check_auth!('dispatch', 'edit')
-        res = interactor.check(:delete, id)
+        res = interactor.delete_load(id)
         if res.success
-          res = interactor.delete_load(id)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect '/list/loads'
-          end
+          flash[:notice] = res.message
+          r.redirect '/list/loads'
+        else
+          flash[:error] = res.message
+          r.redirect "/finished_goods/dispatch/loads/#{id}"
         end
-        flash[:error] = res.message
-        r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
       r.on 're_send_po_edi' do
         check_auth!('dispatch', 'edit')
         res = interactor.send_po_edi(id)
-
-        error = if res.success
-                  nil
-                else
-                  res.message
-                end
-        update_dialog_content(content: wrap_content_in_style(res.message, error.nil? ? :success : :error, caption: ''))
+        update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
       end
 
       r.on 'allocate_multiselect' do
@@ -405,11 +348,7 @@ class Nspack < Roda
         interactor.assert_permission!(:edit, id)
         pallet_numbers = BaseRepo.new.select_values(:pallet_sequences, :pallet_number, id: multiselect_grid_choices(params)).uniq
         res = interactor.allocate_multiselect(id, pallet_numbers)
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
+        flash[res.success ? :notice : :error] = res.message
         r.redirect request.referer
       end
 
@@ -568,7 +507,7 @@ class Nspack < Roda
         end
 
         r.post do # FIND
-          res = interactor.find_load_with(params[:load][:pallet_number])
+          res = interactor.find_load_with(params[:load_search][:pallet_number])
           if res.success
             r.redirect "/finished_goods/dispatch/loads/#{res.instance}"
           else
