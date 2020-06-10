@@ -69,6 +69,10 @@ module EdiApp
       DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
     end
 
+    def get_variant_id(table_name, code)
+      DB[:masterfile_variants].where(masterfile_table: table_name.to_s, code: code).get(:masterfile_id)
+    end
+
     def get_case_insensitive_match(table_name, args)
       ds = DB[table_name]
       args.each do |k, v|

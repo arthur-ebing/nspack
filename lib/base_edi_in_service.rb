@@ -21,12 +21,12 @@ class BaseEdiInService < BaseService
     raise
   end
 
-  def log(msg)
-    logger.info "#{file_name}: #{msg}"
+  def log(message)
+    logger.info "#{file_name}: #{message}"
   end
 
-  def log_err(msg)
-    logger.error "#{file_name}: #{msg}"
+  def log_err(message)
+    logger.error "#{file_name}: #{message}"
   end
 
   def match_data_on(match_data)
