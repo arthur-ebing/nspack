@@ -162,8 +162,7 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_masterfile_variant(id, params[:masterfile_variant])
           if res.success
-            flash[:notice] = res.message
-            redirect_via_json '/masterfiles/general/masterfile_variants/list_masterfile_variants'
+            update_grid_row(id, changes: { variant_code: res.instance[:variant_code] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::General::MasterfileVariant::Edit.call(id, form_values: params[:masterfile_variant], form_errors: res.errors) }
           end
@@ -213,8 +212,17 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_masterfile_variant(params[:masterfile_variant])
         if res.success
-          flash[:notice] = res.message
-          redirect_via_json '/masterfiles/general/masterfile_variants/list_masterfile_variants'
+          row_keys = %i[
+            id
+            variant
+            masterfile_table
+            masterfile_column
+            masterfile_code
+            variant_code
+            masterfile_id
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
         else
           re_show_form(r, res, url: '/masterfiles/general/masterfile_variants/new') do
             Masterfiles::General::MasterfileVariant::New.call(form_values: params[:masterfile_variant],
@@ -226,6 +234,5 @@ class Nspack < Roda
     end
   end
 end
-
 # rubocop:enable Metrics/ClassLength
 # rubocop:enable Metrics/BlockLength

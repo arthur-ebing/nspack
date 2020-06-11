@@ -44,7 +44,7 @@ class TestMasterfileVariantRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:update_masterfile_variant).returns(ok_response(instance: row_vals))
     patch_as_fetch 'masterfiles/general/masterfile_variants/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect(url: '/masterfiles/general/masterfile_variants/list_masterfile_variants')
+    expect_json_update_grid
   end
 
   def test_update_fail
@@ -95,7 +95,7 @@ class TestMasterfileVariantRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_masterfile_variant).returns(ok_response(instance: row_vals))
     post_as_fetch 'masterfiles/general/masterfile_variants', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_ok_json_redirect(url: '/masterfiles/general/masterfile_variants/list_masterfile_variants')
+    expect_json_add_to_grid(has_notice: true)
   end
 
   def test_create_remotely_fail

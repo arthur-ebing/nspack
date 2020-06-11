@@ -13,8 +13,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = masterfile_variant(id)
-      success_response("Created masterfile variant #{instance.masterfile_table}",
-                       instance)
+      success_response("Created masterfile variant #{instance.masterfile_table}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { variant_code: ['This variant code already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -85,7 +84,7 @@ module MasterfilesApp
     end
 
     def masterfile_variant(id)
-      repo.find_masterfile_variant(id)
+      repo.find_masterfile_variant_flat(id)
     end
 
     def validate_masterfile_variant_params(params)

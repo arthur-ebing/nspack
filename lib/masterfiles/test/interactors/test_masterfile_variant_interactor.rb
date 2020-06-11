@@ -12,7 +12,7 @@ module MasterfilesApp
     end
 
     def test_masterfile_variant
-      MasterfilesApp::MasterfileVariantRepo.any_instance.stubs(:find_masterfile_variant).returns(fake_masterfile_variant)
+      MasterfilesApp::MasterfileVariantRepo.any_instance.stubs(:find_masterfile_variant_flat).returns(fake_masterfile_variant)
       entity = interactor.send(:masterfile_variant, 1)
       assert entity.is_a?(MasterfileVariant)
     end
@@ -21,7 +21,7 @@ module MasterfilesApp
       attrs = fake_masterfile_variant.to_h.reject { |k, _| k == :id }
       res = interactor.create_masterfile_variant(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(MasterfileVariant, res.instance)
+      assert_instance_of(MasterfileVariantFlat, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -35,12 +35,12 @@ module MasterfilesApp
     def test_update_masterfile_variant
       id = create_masterfile_variant
       attrs = interactor.send(:repo).find_hash(:masterfile_variants, id).reject { |k, _| k == :id }
-      value = attrs[:masterfile_table]
-      attrs[:masterfile_table] = 'a_change'
+      value = attrs[:variant_code]
+      attrs[:variant_code] = 'a_change'
       res = interactor.update_masterfile_variant(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(MasterfileVariant, res.instance)
-      assert_equal 'a_change', res.instance.masterfile_table
+      assert_instance_of(MasterfileVariantFlat, res.instance)
+      assert_equal 'a_change', res.instance.variant_code
       refute_equal value, res.instance.masterfile_table
     end
 
@@ -65,7 +65,7 @@ module MasterfilesApp
     def masterfile_variant_attrs
       {
         id: 1,
-        masterfile_table: Faker::Lorem.unique.word,
+        masterfile_table: 'target_market_groups',
         variant_code: 'ABC',
         masterfile_id: 1
       }
