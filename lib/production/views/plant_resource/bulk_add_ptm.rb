@@ -4,16 +4,14 @@ module Production
   module Resources
     module PlantResource
       class BulkAddPtm
-        def self.call(id: nil, form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
+        def self.call(id: nil, form_values: nil, form_errors: nil, remote: true)
           # ui_rule = UiRules::Compiler.new(:plant_resource, :new, parent_id: id, form_values: form_values)
           # rules   = ui_rule.compile
           rules = { name: 'resource',
                     fields: { no_robots: { renderer: :integer, required: true },
                               plant_resource_prefix: { required: true },
                               starting_no: {},
-                              starting_sys_no: {}
-                            },
-                  }
+                              starting_sys_no: {} } }
           # default prefix to ph/line concat.
           # Use new UI rule: bulk_add_resource
           form_object = OpenStruct.new(no_robots: 2, plant_resource_prefix: 'PTM', starting_no: nil, starting_sys_no: nil)
