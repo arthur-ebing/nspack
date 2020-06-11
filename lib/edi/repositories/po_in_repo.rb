@@ -54,7 +54,7 @@ module EdiApp
     end
 
     def find_variant_id(table_name, code)
-      DB[:masterfile_variants].where(masterfile_table: table_name.to_s, code: code).get(:masterfile_id)
+      DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: code).get(:masterfile_id)
     end
 
     def find_marketing_variety_id(code)
