@@ -38,7 +38,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: cf3e82f7d0180fa09a49cd71dc7fb99ddacad236
+  revision: 1eb716b9a38cd53bfca9e105dc215b2616a31515
   specs:
     roda-data_grid (0.4.1)
       caxlsx
@@ -136,7 +136,7 @@ GEM
       rack (>= 1.1.3)
     metaclass (0.0.4)
     method_source (0.9.2)
-    mimemagic (0.3.4)
+    mimemagic (0.3.5)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
@@ -186,7 +186,7 @@ GEM
     rerun (0.13.0)
       listen (~> 3.0)
     rexml (3.2.4)
-    roda (3.31.0)
+    roda (3.32.0)
       rack
     roda-message_bus (1.0.0)
       message_bus (>= 2.0.0)
@@ -195,7 +195,7 @@ GEM
     rodauth (1.20.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rouge (3.19.0)
+    rouge (3.20.0)
     rubocop (0.82.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
