@@ -429,16 +429,24 @@ class AppConst # rubocop:disable Metrics/ClassLength
     }
   }.freeze
 
-  MF_VARIANT_TABLES = %i[
-    standard_pack_codes
-    pucs
-    marketing_varieties
-    fruit_size_references
-    marks
-    inventory_codes
-    grades
-    packed_tm_group
-  ].freeze
+  MF_VARIANT_RULES = { standard_pack_codes: { table_name: 'standard_pack_codes',
+                                              column: 'standard_pack_code' },
+                       pucs: { table_name: 'pucs',
+                               column: 'puc_code' },
+                       marketing_varieties: { table_name: 'marketing_varieties',
+                                              column: 'marketing_variety_code' },
+                       fruit_size_references: { table_name: 'fruit_size_references',
+                                                column: 'size_reference' },
+                       marks: { table_name: 'marks',
+                                column: 'mark_code' },
+                       inventory_codes: { table_name: 'inventory_codes',
+                                          column: 'inventory_code' },
+                       grades: { table_name: 'grades',
+                                 column: 'grade_code' },
+                       packed_tm_group: { table_name: 'target_market_groups',
+                                          column: 'target_market_group_name' },
+                       organizations: { table_name: 'organizations',
+                                        column: 'medium_description' } }.freeze
 
   SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']
