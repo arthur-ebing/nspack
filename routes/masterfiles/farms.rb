@@ -679,8 +679,33 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'new' do    # NEW
-        check_auth!('farms', 'new')
-        show_partial_or_page(r) { Masterfiles::Farms::FarmSection::New.call(id, remote: fetch?(r)) }
+        r.get do
+          check_auth!('farms', 'new')
+          show_partial_or_page(r) { Masterfiles::Farms::FarmSection::New.call(id, remote: fetch?(r)) }
+        end
+
+        r.post do        # CREATE
+          res = interactor.create_farm_section(id, params[:farm_section])
+          if res.success
+            row_keys = %i[
+              id
+              farm_manager_party_role_id
+              farm_section_name
+              description
+              orchards
+              farm_manager_party_role
+            ]
+            add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                         notice: res.message)
+          else
+            re_show_form(r, res, url: "/masterfiles/farms/farm_sections/#{id}/new") do
+              Masterfiles::Farms::FarmSection::New.call(id,
+                                                        form_values: params[:farm_section],
+                                                        form_errors: res.errors,
+                                                        remote: fetch?(r))
+            end
+          end
+        end
       end
 
       r.on 'edit' do   # EDIT
@@ -715,33 +740,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             delete_grid_row(id, notice: res.message)
           else
             show_json_error(res.message, status: 200)
-          end
-        end
-      end
-    end
-
-    r.on 'farm_sections' do
-      interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      r.post do        # CREATE
-        res = interactor.create_farm_section(params[:farm_section])
-        if res.success
-          row_keys = %i[
-            id
-            farm_manager_party_role_id
-            farm_section_name
-            description
-            orchards
-            farm_manager_party_role
-            status
-          ]
-          add_grid_row(attrs: select_attributes(res.instance, row_keys),
-                       notice: res.message)
-        else
-          re_show_form(r, res, url: '/masterfiles/farms/farm_sections/new') do
-            Masterfiles::Farms::FarmSection::New.call(form_values: params[:farm_section],
-                                                      form_errors: res.errors,
-                                                      remote: fetch?(r))
           end
         end
       end

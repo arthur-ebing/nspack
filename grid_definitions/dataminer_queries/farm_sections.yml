@@ -2,7 +2,7 @@
 :caption: Farm Sections
 :sql: SELECT "farm_sections"."id", "farm_sections"."farm_manager_party_role_id", "farm_sections"."farm_section_name",
   fn_party_role_name("farm_sections"."farm_manager_party_role_id")AS farm_manager_party_role, string_agg(orchard_code::text, ', '::text) AS orchards
-  , fn_current_status('farm_sections', "farm_sections"."id")AS status, "farm_sections"."description"
+  , "farm_sections"."description"
   FROM "farm_sections" JOIN orchards on orchards.farm_section_id=farm_sections.id
   GROUP BY "farm_sections"."id", "farm_sections"."farm_manager_party_role_id", "farm_sections"."farm_section_name", "farm_sections"."description"
 :limit: 
@@ -77,22 +77,6 @@
     :name: farm_manager_party_role
     :sequence_no: 5
     :caption: Farm manager party role
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 6
-    :caption: Status
     :namespaced_name: 
     :data_type: :string
     :width: 

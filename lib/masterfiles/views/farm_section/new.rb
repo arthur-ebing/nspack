@@ -14,7 +14,7 @@ module Masterfiles
             page.form_errors form_errors
             page.form do |form|
               form.caption 'New Farm Section'
-              form.action '/masterfiles/farms/farm_sections'
+              form.action "/masterfiles/farms/farm_sections/#{id}/new"
               form.remote! if remote
               form.add_field :farm_section_name
               form.add_field :farm_manager_party_role_id

@@ -52,7 +52,8 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def create_farm_section(params) # rubocop:disable Metrics/AbcSize
+    def create_farm_section(farm_id, params) # rubocop:disable Metrics/AbcSize
+      params[:farm_id] = farm_id
       res = validate_farm_section_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -75,7 +76,8 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_farm_section(id, params)
+    def update_farm_section(id, params) # rubocop:disable Metrics/AbcSize
+      params[:farm_id] = repo.get(:orchards, params[:orchard_ids][0], :farm_id)
       res = validate_farm_section_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 

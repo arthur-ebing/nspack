@@ -5,6 +5,7 @@ module MasterfilesApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
+    required(:farm_id, :integer).filled(:int?)
     required(:farm_manager_party_role_id, :integer).filled(:int?)
     required(:farm_section_name, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
