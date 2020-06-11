@@ -17,27 +17,33 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:parent_organization] = { renderer: :label, caption: 'Parent' }
-      fields[:medium_description] = { caption: 'Organization Code',
-                                      renderer: :label }
+      fields[:parent_organization] = { renderer: :label,
+                                       caption: 'Parent' }
+      fields[:medium_description] = { renderer: :label,
+                                      caption: 'Organization Code' }
       fields[:short_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
-      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
-      # fields[:variants] = { renderer: :label }
+      fields[:role_names] = { renderer: :list,
+                              caption: 'Roles',
+                              items: @form_object.role_names.map(&:capitalize!) }
       # fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
-        parent_id: { renderer: :select, options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) }, prompt: true },
+        parent_id: { renderer: :select,
+                     options: @repo.for_select_organizations.reject { |i| i.include?(@options[:id]) },
+                     prompt: true },
         medium_description: { caption: 'Organization Code',
                               required: true },
         short_description: { required: true },
         long_description: {},
         vat_number: {},
-        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
-        # variants: {}
+        role_ids: { renderer: :multi,
+                    options: @repo.for_select_roles,
+                    selected: @form_object.role_ids,
+                    required: true  }
       }
     end
 
@@ -52,8 +58,6 @@ module UiRules
                                     medium_description: nil,
                                     long_description: nil,
                                     vat_number: nil,
-                                    # variants: nil,
-                                    # active: true,
                                     role_ids: [])
     end
 

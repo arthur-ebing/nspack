@@ -6,7 +6,7 @@ module MasterfilesApp
 
     optional(:id, :integer).filled(:int?)
     optional(:masterfile_table, Types::StrippedString).filled(:str?)
-    required(:code, Types::StrippedString).filled(:str?)
-    required(:masterfile_id, :integer).filled(:int?)
+    required(:variant_code, Types::StrippedString).filled(:str?)
+    optional(:masterfile_id, :integer).filled(:int?)
   end
 end

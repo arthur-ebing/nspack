@@ -46,10 +46,10 @@ module MasterfilesApp
 
     def test_update_masterfile_variant_fail
       id = create_masterfile_variant
-      attrs = interactor.send(:repo).find_hash(:masterfile_variants, id).reject { |k, _| %i[id masterfile_id].include?(k) }
+      attrs = interactor.send(:repo).find_hash(:masterfile_variants, id).reject { |k, _| %i[id variant_code].include?(k) }
       res = interactor.update_masterfile_variant(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:masterfile_id]
+      assert_equal ['is missing'], res.errors[:variant_code]
     end
 
     def test_delete_masterfile_variant
@@ -66,7 +66,7 @@ module MasterfilesApp
       {
         id: 1,
         masterfile_table: Faker::Lorem.unique.word,
-        code: 'ABC',
+        variant_code: 'ABC',
         masterfile_id: 1
       }
     end

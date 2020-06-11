@@ -30,8 +30,7 @@ class Nspack < Roda
                                            short_description: res.instance[:short_description],
                                            medium_description: res.instance[:medium_description],
                                            long_description: res.instance[:long_description],
-                                           vat_number: res.instance[:vat_number],
-                                           variants: res.instance[:variants] },
+                                           vat_number: res.instance[:vat_number] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
@@ -40,7 +39,12 @@ class Nspack < Roda
         r.delete do    # DELETE
           check_auth!('parties', 'delete')
           res = interactor.delete_organization(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end

@@ -2,7 +2,6 @@
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda
   route 'general', 'masterfiles' do |r|
     # UOM TYPES
@@ -164,7 +163,7 @@ class Nspack < Roda
           res = interactor.update_masterfile_variant(id, params[:masterfile_variant])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json '/masterfiles/general/masterfile_variants/list_masterfile_variants'
           else
             re_show_form(r, res) { Masterfiles::General::MasterfileVariant::Edit.call(id, form_values: params[:masterfile_variant], form_errors: res.errors) }
           end
@@ -183,34 +182,39 @@ class Nspack < Roda
 
     r.on 'masterfile_variants' do
       interactor = MasterfilesApp::MasterfileVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'list_masterfile_variants' do
+        show_page { Masterfiles::General::MasterfileVariant::Grid.call }
+      end
+
+      r.on 'grid' do
+        interactor.masterfile_variant_grid
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      r.on 'masterfile_table_changed' do
+        repo = MasterfilesApp::MasterfileVariantRepo.new
+        action = params[:changed_value].empty? ? :hide_element : :show_element
+        actions = []
+        hash = repo.lookup_mf_variant(params[:changed_value])
+        options_array = repo.select_values(hash[:table_name].to_sym, [hash[:column].to_sym, :id])
+        actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_variant_code_field_wrapper')
+        actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_masterfile_id_field_wrapper')
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'masterfile_variant_masterfile_id', options_array: options_array)
+        json_actions(actions)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('general', 'new')
         show_partial_or_page(r) { Masterfiles::General::MasterfileVariant::New.call(remote: fetch?(r)) }
-      end
-
-      r.on 'selected_masterfile', String, Integer do |table, id|
-        res = interactor.selected_masterfile(table, id)
-        if res.success
-          json_actions(
-            [
-              OpenStruct.new(type: :replace_input_value,
-                             dom_id: 'masterfile_variant_masterfile_id',
-                             value: res.instance[:id]),
-              OpenStruct.new(type: :replace_input_value,
-                             dom_id: 'masterfile_variant_masterfile_code',
-                             value: res.instance[:lookup_code])
-            ]
-          )
-        else
-          show_json_error(res.message)
-        end
       end
 
       r.post do        # CREATE
         res = interactor.create_masterfile_variant(params[:masterfile_variant])
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          redirect_via_json '/masterfiles/general/masterfile_variants/list_masterfile_variants'
         else
           re_show_form(r, res, url: '/masterfiles/general/masterfile_variants/new') do
             Masterfiles::General::MasterfileVariant::New.call(form_values: params[:masterfile_variant],

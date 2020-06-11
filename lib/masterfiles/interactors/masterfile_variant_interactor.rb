@@ -16,12 +16,12 @@ module MasterfilesApp
       success_response("Created masterfile variant #{instance.masterfile_table}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { masterfile_table: ['This masterfile variant already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { variant_code: ['This variant code already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_masterfile_variant(id, params)
+    def update_masterfile_variant(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_masterfile_variant_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -30,14 +30,15 @@ module MasterfilesApp
         log_transaction
       end
       instance = masterfile_variant(id)
-      success_response("Updated masterfile variant #{instance.masterfile_table}",
-                       instance)
+      success_response("Updated masterfile variant #{instance.variant_code}", instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { variant_code: ['This variant code already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_masterfile_variant(id)
-      name = masterfile_variant(id).masterfile_table
+      name = masterfile_variant(id).variant_code
       repo.transaction do
         repo.delete_masterfile_variant(id)
         log_status(:masterfile_variants, id, 'DELETED')
@@ -48,12 +49,32 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def selected_masterfile(table_name, id)
-      rec = repo.selected_masterfile(table_name, id)
-      if rec.empty?
-        failed_response('Could not find masterfile record')
-      else
-        success_response('Lookup successful', rec)
+    def masterfile_variant_grid
+      row_defs = []
+      repo.select_values(:masterfile_variants, :id).each do |row_data_id|
+        row_defs << repo.find_masterfile_variant_flat(row_data_id).to_h
+      end
+      {
+        columnDefs: col_defs_for_masterfile_variant_grid,
+        rowDefs: row_defs
+      }.to_json
+    end
+
+    def col_defs_for_masterfile_variant_grid
+      Crossbeams::DataGrid::ColumnDefiner.new.make_columns do |mk|
+        mk.action_column do |act|
+          act.popup_view_link '/masterfiles/general/masterfile_variants/$id$', id: 'id'
+          act.popup_edit_link '/masterfiles/general/masterfile_variants/$id$/edit', id: 'id'
+          act.popup_delete_link '/masterfiles/general/masterfile_variants/$id$', id: 'id'
+        end
+        mk.integer 'id', nil, hide: true
+        mk.integer 'masterfile_id', nil, hide: true
+        mk.col 'variant', 'Variant', width: 200
+        mk.col 'masterfile_table', 'Masterfile table', width: 200
+        mk.col 'masterfile_code', 'Masterfile code', width: 200
+        mk.col 'variant_code', 'Variant code', width: 200
+        mk.col 'created_at', 'Created at', data_type: :datetime
+        mk.col 'updated_at', 'Updated at', data_type: :datetime
       end
     end
 

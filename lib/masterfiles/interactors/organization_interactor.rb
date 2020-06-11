@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-# rubocop#:disable Metrics/ClassLength
-# rubocop:disable Metrics/AbcSize
-
 module MasterfilesApp
   class OrganizationInteractor < BaseInteractor
-    def create_organization(params)
+    def create_organization(params) # rubocop:disable Metrics/AbcSize
       res = validate_organization_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -40,6 +37,8 @@ module MasterfilesApp
         repo.delete_organization(id)
       end
       success_response("Deleted organization #{instance.party_name}")
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete organization. Still referenced #{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -59,5 +58,3 @@ module MasterfilesApp
     end
   end
 end
-# rubocop#:enable Metrics/ClassLength
-# rubocop:enable Metrics/AbcSize

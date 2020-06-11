@@ -3,13 +3,12 @@
 :sql: "SELECT\r\n    organizations.id,\r\n    organizations.party_id,\r\n    organizations.parent_id,\r\n
   \   parent.medium_description AS parent,\r\n    fn_party_name(organizations.party_id)
   AS organization_code,\r\n    organizations.short_description,\r\n    organizations.long_description,\r\n
-  \   organizations.vat_number,\r\n    organizations.variants,\r\n    array_agg(roles.name
-  order by roles.name) AS roles,\r\n    organizations.active,\r\n    organizations.created_at,\r\n
-  \   organizations.updated_at\r\nFROM\r\n    organizations\r\n        LEFT JOIN organizations
-  parent ON parent.id = organizations.parent_id\r\n        LEFT JOIN party_roles ON
-  organizations.id = party_roles.organization_id\r\n        LEFT JOIN roles ON party_roles.role_id
-  = roles.id\r\nGROUP BY organizations.id,\r\n         parent.id\r\nORDER BY parent.medium_description,
-  organizations.medium_description\r\n\r\n"
+  \   organizations.vat_number,\r\n    array_agg(roles.name order by roles.name) AS
+  roles,\r\n    organizations.active,\r\n    organizations.created_at,\r\n    organizations.updated_at\r\nFROM\r\n
+  \   organizations\r\n        LEFT JOIN organizations parent ON parent.id = organizations.parent_id\r\n
+  \       LEFT JOIN party_roles ON organizations.id = party_roles.organization_id\r\n
+  \       LEFT JOIN roles ON party_roles.role_id = roles.id\r\nGROUP BY organizations.id,\r\n
+  \        parent.id\r\nORDER BY parent.medium_description, organizations.medium_description\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -142,25 +141,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  variants:
-    :name: variants
-    :sequence_no: 9
-    :caption: Variants
-    :namespaced_name: organizations.variants
-    :data_type: :string
-    :width: 300
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   roles:
     :name: roles
-    :sequence_no: 10
+    :sequence_no: 9
     :caption: Roles
     :namespaced_name: 
     :data_type: :string
@@ -176,7 +159,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 11
+    :sequence_no: 10
     :caption: Active
     :namespaced_name: organizations.active
     :data_type: :boolean
@@ -192,7 +175,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: Created at
     :namespaced_name: organizations.created_at
     :data_type: :datetime
@@ -208,7 +191,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 13
+    :sequence_no: 12
     :caption: Updated at
     :namespaced_name: organizations.updated_at
     :data_type: :datetime
@@ -251,15 +234,15 @@
   :caption: Short description
   :data_type: :string
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 4
-  :list_def:
+  :list_def: 
 - :column: organizations.long_description
   :caption: Long description
   :data_type: :string
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 5
-  :list_def:
+  :list_def: 

@@ -23,7 +23,6 @@ module Masterfiles
                             css_classes: 'orange b'
               form.add_field :long_description
               form.add_field :vat_number
-              # form.add_field :variants
               form.add_field :role_names
               form.add_address addresses
               form.add_contact_method contact_methods

@@ -18,8 +18,8 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :masterfile_table
-              form.add_field :code
               form.add_field :masterfile_id
+              form.add_field :variant_code
             end
           end
 

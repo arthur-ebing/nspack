@@ -14,9 +14,8 @@ module Masterfiles
               # form.caption 'Masterfile Variant'
               form.view_only!
               form.add_field :masterfile_table
-              form.add_field :code
-              form.add_field :masterfile_id
               form.add_field :masterfile_code
+              form.add_field :variant_code
             end
           end
 
