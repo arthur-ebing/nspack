@@ -59,8 +59,7 @@ module FinishedGoodsApp
     end
 
     def unallocate_pallet
-      pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
-      repo.unallocate_pallets(pallet_id, user)
+      repo.unallocate_pallets(pallet_number, user)
     end
 
     def repo

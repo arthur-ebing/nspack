@@ -24,8 +24,8 @@ module EdiApp
     end
 
     def log_edi_in_complete(id, message, edi_result)
-      changeset = edi_result.to_h.merge(complete: true, error_message: message)
-      update_edi_in_transaction(id, changeset)
+      change_set = edi_result.to_h.merge(complete: true, error_message: message)
+      update_edi_in_transaction(id, change_set)
     end
 
     def log_edi_in_failed(id, message, instance, edi_result)
@@ -34,13 +34,13 @@ module EdiApp
             else
               "#{message}\n#{instance}"
             end
-      changeset = edi_result.to_h.merge(error_message: msg)
-      update_edi_in_transaction(id, changeset)
+      change_set = edi_result.to_h.merge(error_message: msg)
+      update_edi_in_transaction(id, change_set)
     end
 
     def log_edi_in_error(id, exception, edi_result)
-      changeset = edi_result.to_h.merge(error_message: exception.message, backtrace: exception.backtrace.join("\n"))
-      update_edi_in_transaction(id, changeset)
+      change_set = edi_result.to_h.merge(error_message: exception.message, backtrace: exception.backtrace.join("\n"))
+      update_edi_in_transaction(id, change_set)
     end
 
     def match_data_on(id, flow_type, match_data)
@@ -69,8 +69,8 @@ module EdiApp
       DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
     end
 
-    def get_variant_id(table_name, code)
-      DB[:masterfile_variants].where(masterfile_table: table_name.to_s, code: code).get(:masterfile_id)
+    def get_variant_id(table_name, variant_code)
+      DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: variant_code).get(:masterfile_id)
     end
 
     def get_case_insensitive_match(table_name, args)

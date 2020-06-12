@@ -28,10 +28,11 @@ module EdiApp
         return failed_response('Missing masterfiles', notes)
       end
 
+      check_pallets(:allocate, pallet_numbers)
       business_validation_passed
 
       repo.transaction do
-        find_load
+        create_load
 
         update_voyage
 
@@ -41,7 +42,7 @@ module EdiApp
 
       success_response('ok')
     rescue Crossbeams::InfoError => e
-      discrepancies_detected(e.message)
+      # discrepancies_detected(e.message)
       failed_response(e.message)
     end
 
@@ -56,62 +57,63 @@ module EdiApp
 
       unless unallocate_pallet_numbers.empty?
         check_pallets(:not_shipped, unallocate_pallet_numbers)
-        unallocate_ids = repo.select_values(:pallets, :id, pallets_number: unallocate_pallet_numbers)
-        load_repo.unallocate_pallets(unallocate_ids, @user)
+        load_repo.unallocate_pallets(unallocate_pallet_numbers, @user)
       end
 
       unless allocate_pallet_numbers.empty?
         check_pallets(:allocate, pallet_numbers, load_id)
-        allocate_ids = repo.select_values(:pallets, :id, pallets_number: allocate_pallet_numbers)
-        load_repo.allocate_pallets(load_id, allocate_ids, @user)
+        load_repo.allocate_pallets(load_id, allocate_pallet_numbers, @user)
       end
       success_response("Allocation applied to load: #{load_id}")
     end
 
-    def update_voyage
-      # instance = load_repo.find_load_flat(load_id)
-      # voyage_id = instance.voyage_id
-      # pol_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pol_port_id], voyage_id: voyage_id)
+    def update_voyage # rubocop:disable Metrics/AbcSize
+      instance = load_repo.find_load_flat(load_id)
+      voyage_id = instance.voyage_id
+      pol_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pol_port_id], voyage_id: voyage_id)
       # repo.get(:voyage_ports, pol_voyage_port_id, [:atd, :etd] )
-      # # repo.update(:voyage_ports, pol_voyage_port_id, atd: attrs[:atd], etd: attrs[:etd])
-      #
-      # pod_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pod_port_id], voyage_id: voyage_id)
+      repo.update(:voyage_ports, pol_voyage_port_id, atd: attrs[:atd], etd: attrs[:etd])
+
+      pod_voyage_port_id = repo.get_id(:voyage_ports, port_id: attrs[:pod_port_id], voyage_id: voyage_id)
       # repo.get(:voyage_ports, pod_voyage_port_id, [:ata, :eta])
-      # # repo.update(:voyage_ports, pod_voyage_port_id, ata: attrs[:ata], eta: attrs[:eta])
+      repo.update(:voyage_ports, pod_voyage_port_id, ata: attrs[:ata], eta: attrs[:eta])
     end
 
     def create_load
       res = FinishedGoodsApp::LoadServiceSchema.call(attrs)
       raise Crossbeams::InfoError, res.messages unless res.messages.empty?
 
-      load_res = FinishedGoodsApp::CreateLoad.call(res, user)
+      load_res = FinishedGoodsApp::CreateLoad.call(res, @user)
       raise Crossbeams::InfoError, load_res.message unless load_res.success
 
       @load_id = load_res.instance.id
     end
 
-    def find_load # rubocop:disable Metrics/AbcSize
-      # find load by pallet_numbers
-      load_ids = repo.select_values(:pallets, :load_id, pallet_number: pallet_numbers).uniq
-      raise Crossbeams::InfoError, "Pallets allocated to multiple loads #{load_ids.join(', ')}"  if load_ids.length > 1
-
-      @load_id = load_ids.first
-      return create_load if load_id.nil?
-
-      instance = load_repo.find_load_flat(load_id).to_h
-      check = %i[exporter_party_role_id
-                 consignee_party_role_id
-                 final_receiver_party_role_id
-                 exporter_party_role_id
-                 billing_client_party_role_id
-                 voyage_number]
-      check.each do |k|
-        raise Crossbeams::InfoError, "Load mismatch on #{k}" unless instance[k] == attrs[k]
-      end
-      return unless load_id.nil?
-
-      create_load
-    end
+    # def find_load
+    #   # find load by pallet_numbers
+    #   load_ids = repo.select_values(:pallets, :load_id, pallet_number: pallet_numbers).uniq
+    #   raise Crossbeams::InfoError, "Pallets allocated to multiple loads #{load_ids.join(', ')}"  if load_ids.length > 1
+    #
+    #   @load_id = load_ids.first
+    #   if load_id.nil?
+    #     create_load
+    #   else
+    #     raise Crossbeams::InfoError, "Pallets allocated load: #{load_ids.join(', ')}"
+    #   end
+    #   instance = load_repo.find_load_flat(load_id).to_h
+    #   check = %i[exporter_party_role_id
+    #              consignee_party_role_id
+    #              final_receiver_party_role_id
+    #              exporter_party_role_id
+    #              billing_client_party_role_id
+    #              voyage_number]
+    #   check.each do |k|
+    #     raise Crossbeams::InfoError, "Load mismatch on #{k}" unless instance[k] == attrs[k]
+    #   end
+    #   return unless load_id.nil?
+    #
+    #   create_load
+    # end
 
     def parse_voyage_edi # rubocop:disable Metrics/AbcSize
       voyage = @edi_records['load_instruction']['voyage']
@@ -121,10 +123,10 @@ module EdiApp
       attrs[:vessel_type_id] = repo.get(:vessels,  attrs[:vessel_id], :vessel_type_id)
       attrs[:voyage_type_id] = repo.get(:vessel_types, attrs[:vessel_type_id], :voyage_type_id)
 
-      args = { voyage_code: voyage['voyage_code'],
-               vessel_id: attrs[:vessel_id],
-               completed: false }
-      attrs[:voyage_id] = get_case_insensitive_match_or_variant(:voyages, args)
+      # args = { voyage_code: voyage['voyage_code'],
+      #          vessel_id: attrs[:vessel_id],
+      #          completed: false }
+      # attrs[:voyage_id] = get_case_insensitive_match_or_variant(:voyages, args)
       attrs[:voyage_number] = voyage['voyage_number']
       attrs[:year] = voyage['year']
 
@@ -149,6 +151,7 @@ module EdiApp
       attrs[:depot_id] = get_case_insensitive_match_or_variant(:depots, depot_code: load['depot_code'])
       attrs[:transfer_load] = false
       attrs[:customer_order_number] = load['customer_order_number']
+      attrs[:requires_temp_tail] = false
       @match_data = load['load_instruction_code']
     end
 
@@ -164,8 +167,9 @@ module EdiApp
       raise Crossbeams::InfoError, "There is no role #{role_name}" if role_id.nil?
 
       org_id ||= repo.get_case_insensitive_match(:organizations, medium_description: party_role_name)
+      org_id ||= repo.get_case_insensitive_match(:organizations, short_description: party_role_name)
       org_id ||= repo.get_case_insensitive_match(:organizations, long_description: party_role_name)
-      org_id ||= repo.get_id(:organizations, Sequel.lit("'#{party_role_name}' ilike ANY(variants)"))
+      org_id ||= repo.get_variant_id(:organizations, party_role_name)
 
       id = repo.get_id(:party_roles, role_id: role_id, organization_id: org_id)
       return id unless id.nil?
@@ -186,7 +190,7 @@ module EdiApp
 
     def check_pallets(check, pallet_numbers, load_id = nil)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
-      raise Crossbeams::InfoError, res.messsage unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
     end
   end
 end

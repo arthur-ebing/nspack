@@ -86,11 +86,10 @@ module FinishedGoodsApp
         return res unless res.success
       end
 
-      new_allocation = repo.select_values(:pallets, :id, pallet_number: pallet_numbers).uniq
-      current_allocation = repo.select_values(:pallets, :id, load_id: load_id)
+      new_allocation = pallet_numbers
+      current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
 
       unless initial_pallet_numbers.nil?
-        initial_pallet_numbers = repo.select_values(:pallets, :id, pallet_number: initial_pallet_numbers).uniq
         return failed_response('Allocation mismatch') unless current_allocation.sort == initial_pallet_numbers.sort
       end
 
@@ -105,7 +104,7 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def allocate_list(load_id, pallets_string) # rubocop:disable Metrics/AbcSize
+    def allocate_list(load_id, pallets_string)
       res = MesscadaApp::ParseString.call(pallets_string)
       return res unless res.success
 
@@ -113,9 +112,8 @@ module FinishedGoodsApp
       res = check_pallets(:allocate, pallet_numbers, load_id)
       return res unless res.success
 
-      pallet_ids = repo.select_values(:pallets, :id, pallet_number: pallet_numbers)
       repo.transaction do
-        repo.allocate_pallets(load_id, pallet_ids, @user)
+        repo.allocate_pallets(load_id, pallet_numbers, @user)
 
         log_transaction
       end
