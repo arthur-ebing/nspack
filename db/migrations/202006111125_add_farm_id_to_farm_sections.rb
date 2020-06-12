@@ -9,8 +9,8 @@ Sequel.migration do
 
   down do
     alter_table(:farm_sections) do
-      drop_foreign_key :farm_id
       drop_constraint [:farm_id, :farm_section_name], name: :farm_farm_section_name_unique_code
+      drop_foreign_key :farm_id
     end
   end
 
