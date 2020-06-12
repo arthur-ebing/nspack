@@ -84,6 +84,7 @@ module Crossbeams
       farm_groups
       farms
       farms_pucs
+      farm_sections
       rmt_container_types
       rmt_container_material_types
       orchards
@@ -155,6 +156,7 @@ module Crossbeams
       puc_id: { subquery: 'SELECT id FROM pucs WHERE puc_code = ?', values: 'SELECT puc_code FROM pucs WHERE id = ?' },
       farm_id: { subquery: 'SELECT id FROM farms WHERE farm_code = ?', values: 'SELECT farm_code FROM farms WHERE id = ?' },
       farm_group_id: { subquery: 'SELECT id FROM farm_groups WHERE farm_group_code = ?', values: 'SELECT farm_group_code FROM farm_groups WHERE id = ?' },
+      farm_section_id: { subquery: 'SELECT id FROM farm_sections WHERE farm_section_name = ? AND farm_id = (SELECT id FROM farms WHERE farm_code = ?)', values: 'SELECT s.farm_section_name, f.farm_code FROM farm_sections s JOIN farms f ON f.id = s.farm_id WHERE s.id = ?' },
       rmt_container_type_id: { subquery: 'SELECT id FROM rmt_container_types WHERE container_type_code = ?', values: 'SELECT container_type_code FROM rmt_container_types WHERE id = ?' },
       rmt_inner_container_type_id: { subquery: 'SELECT id FROM rmt_container_types WHERE container_type_code = ?', values: 'SELECT container_type_code FROM rmt_container_types WHERE id = ?' },
       std_fruit_size_count_id: { subquery: 'SELECT id FROM std_fruit_size_counts WHERE size_count_value = ? AND commodity_id = (SELECT id FROM commodities WHERE code = ?)', values: 'SELECT s.size_count_value, c.code FROM std_fruit_size_counts s JOIN commodities c ON c.id = s.commodity_id WHERE s.id = ?' },
@@ -175,6 +177,7 @@ module Crossbeams
 
     MF_LKP_PARTY_ROLES = %i[
       owner_party_role_id
+      farm_manager_party_role_id
       rmt_material_owner_party_role_id
     ].freeze
   end
