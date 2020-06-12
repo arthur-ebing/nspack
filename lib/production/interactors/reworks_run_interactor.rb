@@ -1221,6 +1221,9 @@ module ProductionApp
       missing_pallet_numbers = (pallet_numbers - existing_pallet_numbers)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{missing_pallet_numbers.join(', ')} doesn't exist"] }, pallets_selected: pallet_numbers) unless missing_pallet_numbers.nil_or_empty?
 
+      repacked_pallets = repo.repacked_pallets?(pallet_numbers)
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{repacked_pallets.join(', ')} have been repacked."] }, pallets_selected: pallet_numbers) unless repacked_pallets.nil_or_empty?
+
       scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
 
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type

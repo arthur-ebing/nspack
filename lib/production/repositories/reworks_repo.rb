@@ -109,6 +109,10 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, scrapped: true).select_map(:pallet_number)
     end
 
+    def repacked_pallets?(pallet_numbers)
+      DB[:pallets].where(pallet_number: pallet_numbers, exit_ref:  AppConst::PALLET_EXIT_REF_REPACKED).select_map(:pallet_number)
+    end
+
     def production_run_pallets?(pallet_numbers, production_run_id)
       DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
     end
@@ -194,11 +198,20 @@ module ProductionApp
       DB[:pallet_sequences].where(id: sequence_ids).where(attrs).map { |p| p[:id] }
     end
 
-    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans)
+    def scrapping_reworks_run(pallet_numbers, attrs, reworks_run_booleans, user_name)  # rubocop:disable Metrics/AbcSize
+      pallet_ids = find_pallet_ids_from_pallet_number(pallet_numbers)
+      pallet_sequence_ids = find_sequence_ids_from_pallet_number(pallet_numbers)
+      status = reworks_run_booleans[:scrap_pallets] ? AppConst::PALLET_SCRAPPED : AppConst::PALLET_UNSCRAPPED
       DB[:pallets].where(pallet_number: pallet_numbers).update(attrs)
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = pallet_id, pallet_id = null, scrapped_at = '#{Time.now}', exit_ref = '#{AppConst::PALLET_EXIT_REF_SCRAPPED}' WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:scrap_pallets]
       upd = "UPDATE pallet_sequences SET scrapped_from_pallet_id = null, pallet_id = scrapped_from_pallet_id, scrapped_at = null, exit_ref = null WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}');" if reworks_run_booleans[:unscrap_pallets]
       DB[upd].update
+      log_pallet_statuses(pallet_ids, pallet_sequence_ids, status, user_name)
+    end
+
+    def log_pallet_statuses(pallet_ids, pallet_sequence_ids, status, user_name)
+      log_multiple_statuses(:pallets, pallet_ids, status, user_name: user_name)  unless pallet_ids.nil_or_empty?
+      log_multiple_statuses(:pallet_sequences, pallet_sequence_ids, status, user_name: user_name) unless pallet_sequence_ids.nil_or_empty?
     end
 
     def existing_records_batch_update(pallet_numbers, pallet_sequence_ids, pallet_sequence_attrs)

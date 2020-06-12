@@ -82,7 +82,7 @@ module ProductionApp
       id = repo.create_reworks_run(reworks_run_attrs.to_h)
       attrs = pallet_update_attrs
       repo.repacking_reworks_run(pallets_affected, attrs) if reworks_run_booleans[:repack_pallets]
-      repo.scrapping_reworks_run(pallets_affected, attrs, reworks_run_booleans) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
+      repo.scrapping_reworks_run(pallets_affected, attrs, reworks_run_booleans, user_name) if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
       repo.update_pallets_pallet_format(pallets_affected.first) if make_changes && reworks_run_booleans[:single_edit]
       # repo.existing_records_batch_update(pallets_affected, affected_pallet_sequences, changes[:after]) if make_changes && reworks_run_booleans[:batch_edit]
       repo.update_pallets_recalc_nett_weight(pallets_affected, user_name) if reworks_run_booleans[:recalc_nett_weight]
