@@ -62,3 +62,6 @@ pdf_documentation/*.png
 /app_reports/
 /sys_prepared_reports/
 /app_prepared_reports/
+/ftp_transfer/
+/edi/
+/edi_filedrop/
