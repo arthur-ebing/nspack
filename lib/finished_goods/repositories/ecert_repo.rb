@@ -60,8 +60,9 @@ module FinishedGoodsApp
       preverify_pallets = []
       Array(pallet_numbers).each do |pallet_number|
         pallet = where_hash(:pallets, pallet_number: pallet_number) || {}
+        consignment_note_number = select_values(:vw_pallet_sequence_flat, :addendum_manifest, pallet_number: pallet_number).first
         preverify_pallets << { TrackingUnitID: pallet_number,
-                               Reference1: nil,
+                               Reference1: consignment_note_number,
                                Reference2: nil,
                                ExportDate: nil,
                                Weight: pallet[:nett_weight].to_f.round(2),
