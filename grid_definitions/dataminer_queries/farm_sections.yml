@@ -99,7 +99,7 @@
   :ui_priority: 1
   :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
     id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
-- :column: orchards.farm_id
+- :column: farm_sections.farm_id
   :caption: Farm
   :data_type: :integer
   :control_type: :list

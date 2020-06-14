@@ -169,7 +169,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'list_farm_sections' do
         check_auth!('farms', 'edit')
-        r.redirect "/list/farm_sections/with_params?key=standard&orchards.farm_id=#{id}"
+        r.redirect "/list/farm_sections/with_params?key=standard&farm_sections.farm_id=#{id}"
       end
 
       r.on 'link_farm_pucs' do

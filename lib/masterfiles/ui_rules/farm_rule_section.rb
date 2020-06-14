@@ -34,7 +34,7 @@ module UiRules
                                       prompt: 'Select Farm Manager',
                                       caption: 'Farm Manager', required: true },
         description: {},
-        orchard_ids: { renderer: :multi, options: @repo.for_select_orchards(where: { farm_id: @options[:farm_id] }), caption: 'Orchards', selected: @form_object.orchard_ids, required: true  }
+        orchard_ids: { renderer: :multi, options: @repo.for_select_orchards(where: { farm_id: @options[:farm_id], farm_section_id: nil }) + @repo.for_select_orchards(where: { id: @form_object.orchard_ids }), caption: 'Orchards', selected: @form_object.orchard_ids, required: true  }
       }
     end
 

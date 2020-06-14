@@ -18,12 +18,12 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/farms/farm_sections/$:orchards.farm_id$/new"
+  :url: "/masterfiles/farms/farm_sections/$:farm_sections.farm_id$/new"
   :text: New Farm Section
   :style: :button
   :behaviour: :popup
 :conditions:
   :standard:
-    - :col: orchards.farm_id
+    - :col: farm_sections.farm_id
       :op: =
-      :val: $:orchards.farm_id$
+      :val: $:farm_sections.farm_id$
