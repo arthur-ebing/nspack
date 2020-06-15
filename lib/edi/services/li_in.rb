@@ -182,9 +182,9 @@ module EdiApp
       id = repo.get_case_insensitive_match(table_name, args)
       return id unless id.nil?
 
-      arg = args.first
-      id = repo.get_variant_id(table_name, arg[1])
-      missing_masterfiles << ["#{arg[0]}: #{arg[1]}"] if id.nil?
+      col, val = args.first
+      id = repo.get_variant_id(table_name, val)
+      missing_masterfiles << ["#{col}: #{val}"] if id.nil?
       nil
     end
 
