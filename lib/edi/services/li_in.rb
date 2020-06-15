@@ -38,8 +38,6 @@ module EdiApp
 
         allocate_pallets
       end
-      log('LI IN processed')
-
       success_response('ok')
     rescue Crossbeams::InfoError => e
       # discrepancies_detected(e.message)
