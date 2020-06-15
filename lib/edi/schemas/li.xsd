@@ -8,7 +8,7 @@
               <xs:element type="xs:short" name="year"/>
               <xs:element type="xs:string" name="vessel_code"/>
               <xs:element type="xs:string" name="shipping_line"/>
-              <xs:element type="xs:int" name="booking_reference"/>
+              <xs:element type="xs:string" name="booking_reference"/>
               <xs:element type="xs:string" name="voyage_code"/>
               <xs:element type="xs:string" name="shipper"/>
               <xs:element type="xs:string" name="voyage_number"/>

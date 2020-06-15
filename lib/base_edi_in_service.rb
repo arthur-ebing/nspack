@@ -71,6 +71,7 @@ class BaseEdiInService < BaseService
     else
       @edi_result.schema_valid = false
       @edi_result.notes = "Schema validation error:\n\n#{res.instance.join("\n")}"
+      log_err(@edi_result.notes)
       raise Crossbeams::InfoError, 'Invalid Schema'
     end
     @edi_records = @xml_file_repo.records_from_file(file_path)
