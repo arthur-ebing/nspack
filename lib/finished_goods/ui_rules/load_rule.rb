@@ -6,8 +6,11 @@ module UiRules
       @repo = FinishedGoodsApp::LoadRepo.new
       @party_repo = MasterfilesApp::PartyRepo.new
       make_form_object
-      make_progress_step
+
       apply_form_values
+
+      add_progress_step
+      add_buttons
       add_behaviours
 
       common_values_for_fields common_fields
@@ -250,47 +253,78 @@ module UiRules
                                     transfer_load: nil)
     end
 
-    def make_progress_step # rubocop:disable Metrics/AbcSize
-      id = @options[:id]
+    private
+
+    def add_progress_step
       steps = ['Allocate Pallets', 'Truck Arrival', 'Load Truck', 'Ship', 'Finished']
-      actions = ['/list/loads',
-                 '/list/loads',
-                 "/finished_goods/dispatch/loads/#{id}/load_truck",
-                 "/finished_goods/dispatch/loads/#{id}/ship",
-                 '/list/loads']
-      captions = ['Close', 'Close', 'Load Truck', 'Ship', 'Close']
-
-      back_actions = [nil,
-                      nil,
-                      "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
-                      "/finished_goods/dispatch/loads/#{id}/unload_truck",
-                      "/finished_goods/dispatch/loads/#{id}/unship"]
-
-      back_prompts = [nil,
-                      nil,
-                      'Are you sure, you want to delete the vehicle from this load?',
-                      'Are you sure, you want to unload this load?',
-                      'Are you sure, you want to unship this load?']
-
-      back_captions = ['Edit', 'Edit', 'Delete Truck', 'Unload Truck', 'Unship']
-
       step = 0
       step = 1 if @form_object.allocated
       step = 2 if @form_object.vehicle
-      step = 3 if @form_object.loaded
+      step = 3 if @form_object.loaded || @form_object.temp_tail
       step = 4 if @form_object.shipped
 
-      form_object = @form_object.to_h.merge(steps: steps,
-                                            step: step,
-                                            action: actions[step],
-                                            caption: captions[step],
-                                            back_action: back_actions[step],
-                                            back_prompt: back_prompts[step],
-                                            back_caption: back_captions[step])
-      @form_object = OpenStruct.new(form_object)
+      @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
     end
 
-    private
+    def add_buttons # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      id = @options[:id]
+      edit = { text: 'Edit',
+               url: "/finished_goods/dispatch/loads/#{id}/edit",
+               prompt: 'Are you sure, you want to edit this load?',
+               icon: :edit }
+      delete = { text: 'Delete',
+                 url: "/finished_goods/dispatch/loads/#{id}/delete",
+                 prompt: 'Are you sure, you want to delete this load?',
+                 icon: :checkoff }
+      allocate = { text: 'Allocate Pallets',
+                   url: "/finished_goods/dispatch/loads/#{id}/allocate" }
+      truck_arrival = { text: 'Truck Arrival',
+                        url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
+                        behaviour: :popup }
+      delete_truck_arrival = { text: 'Delete Truck Arrival',
+                               url: "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
+                               prompt: 'Are you sure, you want to delete the vehicle from this load?',
+                               icon: :checkoff }
+      load_truck = { text: 'Load Truck',
+                     url: "/finished_goods/dispatch/loads/#{id}/load_truck" }
+      unload_truck = { text: 'Unload Truck',
+                       url: "/finished_goods/dispatch/loads/#{id}/unload_truck",
+                       prompt: 'Are you sure, you want to unload this load?' }
+      tail = { text: 'Temp Tail',
+               url: "/finished_goods/dispatch/loads/#{id}/temp_tail",
+               behaviour: :popup }
+      delete_tail = { text: 'Delete Temp Tail',
+                      url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
+                      prompt: 'Are you sure, you want to delete the temp tail on this load?',
+                      icon: :checkoff }
+      ship = { text: 'Ship',
+               url: "/finished_goods/dispatch/loads/#{id}/ship" }
+      unship = { text: 'Unship',
+                 url: "/finished_goods/dispatch/loads/#{id}/unship",
+                 prompt: 'Are you sure, you want to unship this load?' }
+      actions = []
+      back_actions = [edit]
+
+      case @form_object.step
+      when 0
+        actions << allocate
+        back_actions << delete
+      when 1
+        actions = [allocate, truck_arrival]
+      when 2
+        actions = [delete_truck_arrival, load_truck]
+      when 3
+        actions << unload_truck if @form_object.loaded
+        actions << delete_tail if @form_object.temp_tail
+        actions << tail
+        actions << ship
+      when 4
+        actions << unship
+      end
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions,
+                                                            back_actions: back_actions))
+    end
 
     def add_behaviours
       behaviours do |behaviour|

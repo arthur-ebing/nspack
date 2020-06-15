@@ -16,33 +16,15 @@ module FinishedGoods
                                   text: 'Back',
                                   url: '/list/loads',
                                   style: :back_button)
-              section.add_control(control_type: :link,
-                                  text: ui_rule.form_object.back_caption,
-                                  icon: :edit,
-                                  url: ui_rule.form_object.back_action,
-                                  prompt: ui_rule.form_object.back_prompt,
-                                  visible: !ui_rule.form_object.back_action.nil?,
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Edit',
-                                  icon: :edit,
-                                  url: "/finished_goods/dispatch/loads/#{id}/edit",
-                                  prompt: 'Are you sure, you want to edit this load?',
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Delete',
-                                  icon: :checkoff,
-                                  url: "/finished_goods/dispatch/loads/#{id}/delete",
-                                  prompt: 'Are you sure, you want to delete this load?',
-                                  visible: !ui_rule.form_object.allocated,
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Delete Temp Tail',
-                                  url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
-                                  prompt: 'Are you sure, you want to delete the temp tail on this load?',
-                                  icon: :checkoff,
-                                  visible: !ui_rule.form_object.shipped & !ui_rule.form_object.temp_tail.nil?,
-                                  style: :action_button)
+              ui_rule.form_object.back_actions.each do |action|
+                action ||= {}
+                section.add_control(control_type: :link,
+                                    text: action[:text],
+                                    url: action[:url],
+                                    icon: action[:icon],
+                                    behaviour: action[:popup],
+                                    style: :action_button)
+              end
               if ui_rule.form_object.allocated
                 section.add_control(control_type: :link,
                                     text: 'Dispatch Note',
@@ -74,8 +56,7 @@ module FinishedGoods
             end
 
             page.form do |form|
-              form.action ui_rule.form_object.action
-              form.submit_captions ui_rule.form_object.caption
+              form.no_submit!
               form.fold_up do |fold|
                 fold.caption 'Parties'
                 fold.open!
@@ -234,27 +215,21 @@ module FinishedGoods
             page.section do |section|
               section.add_progress_step ui_rule.form_object.steps, position: ui_rule.form_object.step
               section.show_border!
+              ui_rule.form_object.actions.each do |action|
+                action ||= {}
+                section.add_control(control_type: :link,
+                                    text: action[:text],
+                                    url: action[:url],
+                                    icon: action[:icon],
+                                    behaviour: action[:behaviour],
+                                    style: :action_button)
+              end
+            end
+            page.form do |form|
+              form.action '/list/loads'
+              form.submit_captions 'Close'
             end
             page.section do |section|
-              section.add_control(control_type: :link,
-                                  text: 'Allocate Pallets',
-                                  url: "/finished_goods/dispatch/loads/#{id}/allocate",
-                                  visible: !ui_rule.form_object.vehicle,
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Truck Arrival',
-                                  url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
-                                  icon: :edit,
-                                  visible: ui_rule.form_object.allocated & !ui_rule.form_object.vehicle,
-                                  behaviour: :popup,
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Temp Tail',
-                                  url: "/finished_goods/dispatch/loads/#{id}/temp_tail",
-                                  icon: :edit,
-                                  visible: ui_rule.form_object.loaded & !ui_rule.form_object.shipped,
-                                  behaviour: :popup,
-                                  style: :action_button)
               section.add_grid('stock_pallets',
                                "/list/stock_pallets/grid?key=on_load&load_id=#{id}",
                                caption: 'Load Pallets',
