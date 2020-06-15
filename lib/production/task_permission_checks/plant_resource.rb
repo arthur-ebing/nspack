@@ -15,9 +15,9 @@ module ProductionApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check,
-        add_child: :add_child_check
-        # approve: :approve_check,
-        # reopen: :reopen_check
+        add_child: :add_child_check,
+        bulk_add_clm: :bulk_add_clm_check,
+        bulk_add_ptm: :bulk_add_ptm_check
       }.freeze
 
       def call
@@ -36,14 +36,10 @@ module ProductionApp
       end
 
       def edit_check
-        # return failed_response 'Resource has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'Resource has been completed' if completed?
-
         all_ok
       end
 
@@ -55,32 +51,21 @@ module ProductionApp
         end
       end
 
-      # def complete_check
-      #   return failed_response 'Resource has already been completed' if completed?
+      def bulk_add_clm_check
+        if Crossbeams::Config::ResourceDefinitions.can_have_children_of_type?(@repo.plant_resource_type_code_for(@id), Crossbeams::Config::ResourceDefinitions::CLM_ROBOT)
+          all_ok
+        else
+          failed_response 'This plant resource cannot have CLM sub-resources'
+        end
+      end
 
-      #   all_ok
-      # end
-
-      # def approve_check
-      #   return failed_response 'Resource has not been completed' unless completed?
-      #   return failed_response 'Resource has already been approved' if approved?
-
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'Resource has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
+      def bulk_add_ptm_check
+        if Crossbeams::Config::ResourceDefinitions.can_have_children_of_type?(@repo.plant_resource_type_code_for(@id), Crossbeams::Config::ResourceDefinitions::PALLETIZING_ROBOT)
+          all_ok
+        else
+          failed_response 'This plant resource cannot have PTM sub-resources'
+        end
+      end
     end
   end
 end

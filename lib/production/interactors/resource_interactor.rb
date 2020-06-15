@@ -115,6 +115,19 @@ module ProductionApp
                        peripherals: ProductionApp::BuildPeripheralsXml.call.instance)
     end
 
+    def bulk_add_ptms(id, params)
+      res = validate_plant_resource_ptm_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      srv_res = nil
+      repo.transaction do
+        srv_res = BulkAddPalletizerRobot.call(id, res)
+      end
+      return srv_res unless srv_res.success
+
+      success_response('Added Palletizing robots')
+    end
+
     private
 
     def repo
@@ -127,6 +140,10 @@ module ProductionApp
 
     def validate_plant_resource_params(params)
       PlantResourceSchema.call(params)
+    end
+
+    def validate_plant_resource_ptm_params(params)
+      PlantResourceBulkPtmSchema.call(params)
     end
   end
 end

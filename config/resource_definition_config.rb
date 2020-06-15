@@ -439,6 +439,10 @@ module Crossbeams
         !PLANT_RESOURCE_RULES[plant_resource_type_code][:allowed_children].empty?
       end
 
+      def self.can_have_children_of_type?(plant_resource_type_code, child_type)
+        PLANT_RESOURCE_RULES[plant_resource_type_code][:allowed_children].include?(child_type)
+      end
+
       def self.peripheral_type_codes
         PLANT_RESOURCE_RULES.select { |_, v| v[:create_with_system_resource] == PERIPHERAL }.keys
       end

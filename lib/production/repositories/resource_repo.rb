@@ -117,6 +117,14 @@ module ProductionApp
       DB[:plant_resource_types].where(id: plant_resource_type_id).get(:plant_resource_type_code)
     end
 
+    def plant_resource_type_id_from_code(plant_resource_type_code)
+      get_value(:plant_resource_types, :id, plant_resource_type_code: plant_resource_type_code)
+    end
+
+    def plant_resource_type_id_for_resource(plant_resource_id)
+      DB[:plant_resource_types].where(id: get_value(:plant_resources, :plant_resource_type_id, id: plant_resource_id)).get(:id)
+    end
+
     def system_resource_type_id_from_code(system_resource_type)
       DB[:system_resource_types].where(system_resource_type_code: system_resource_type).get(:id)
     end
@@ -154,9 +162,10 @@ module ProductionApp
       failed_response("GLN #{gln} has already been used")
     end
 
-    def delete_plant_resource(id)
+    def delete_plant_resource(id) # rubocop:disable Metrics/AbcSize
       DB[:tree_plant_resources].where(ancestor_plant_resource_id: id).or(descendant_plant_resource_id: id).delete
       system_resource_id = find_plant_resource(id)&.system_resource_id
+      DB[:palletizing_bay_states].where(palletizing_bay_resource_id: id).delete
       DB[:plant_resources].where(id: id).delete
       DB[:system_resources].where(id: system_resource_id).delete if system_resource_id
     end
@@ -287,6 +296,15 @@ module ProductionApp
           AND s.active
       SQL
       DB[query].all
+    end
+
+    def max_plant_resource_code_for_type(plant_resource_type_id)
+      DB[:plant_resources].where(plant_resource_type_id: plant_resource_type_id).max(:plant_resource_code)
+    end
+
+    def max_sys_resource_code_for_plant_type(plant_resource_type_code)
+      type_id = plant_resource_type_id_from_code(plant_resource_type_code)
+      DB[:system_resources].where(plant_resource_type_id: type_id).max(:system_resource_code)
     end
 
     private

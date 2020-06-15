@@ -123,6 +123,40 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'bulk_add' do
+        r.on 'clm' do
+          r.get do
+            interactor.assert_permission!(:bulk_add_clm, id)
+            show_partial { Production::Resources::PlantResource::BulkAddClm.call(id: id) }
+          end
+          r.post do
+            res = interactor.bulk_add_clms(id, params[:resource])
+            if res.success
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            else
+              re_show_form(r, res) { Production::Resources::PlantResource::BulkAddClm.call(id: id, form_values: params[:resource], form_errors: res.errors) }
+            end
+          end
+        end
+
+        r.on 'ptm' do
+          r.get do
+            interactor.assert_permission!(:bulk_add_ptm, id)
+            show_partial { Production::Resources::PlantResource::BulkAddPtm.call(id: id) }
+          end
+          r.post do
+            res = interactor.bulk_add_ptms(id, params[:resource])
+            if res.success
+              flash[:notice] = res.message
+              redirect_to_last_grid(r)
+            else
+              re_show_form(r, res) { Production::Resources::PlantResource::BulkAddPtm.call(id: id, form_values: params[:resource], form_errors: res.errors) }
+            end
+          end
+        end
+      end
+
       r.on 'link_peripherals' do
         r.post do
           res = interactor.link_peripherals(id, multiselect_grid_choices(params))

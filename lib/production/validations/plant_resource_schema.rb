@@ -12,4 +12,13 @@ module ProductionApp
     optional(:location_id, :integer).maybe(:int?)
     optional(:resource_properties, :hash).maybe(:hash?)
   end
+
+  PlantResourceBulkPtmSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:no_robots, :integer).maybe(:int?)
+    required(:plant_resource_prefix, Types::StrippedString).filled(:str?)
+    required(:starting_no, :integer).filled(:int?)
+    required(:bays_per_robot, :integer).filled(:int?)
+  end
 end
