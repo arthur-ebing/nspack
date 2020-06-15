@@ -8,8 +8,10 @@ module FinishedGoodsApp
         @task = task
         @repo = LoadRepo.new
         @id = load_id
-        @entity = @id ? @repo.find_load_flat(@id) : nil
         @pallet_number = pallet_number
+        return if @id.to_i > AppConst::MAX_DB_INT
+
+        @entity = @repo.find_load_flat(@id)
       end
 
       CHECKS = {
@@ -28,7 +30,6 @@ module FinishedGoodsApp
 
       def call
         return failed_response "Value #{id} is too big to be a load. Perhaps you scanned a pallet number?" if id.to_i > AppConst::MAX_DB_INT
-
         return failed_response 'Record not found' unless @entity || task == :create
 
         check = CHECKS[task]
