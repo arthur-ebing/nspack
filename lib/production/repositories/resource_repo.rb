@@ -233,8 +233,8 @@ module ProductionApp
     def system_modules
       query = <<~SQL
         SELECT s.system_resource_code as name,
-        'TODO: type' as module_type,
-        'TODO: function' as function,
+        'robot-nspi' as module_type, -- May need to vary...
+        'TODO: function' as function, -- Could add to resource_types
         p.plant_resource_code as alias,
         'TODO: ip' as network_interface,
         'TODO: port' as port,
@@ -266,6 +266,7 @@ module ProductionApp
         LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
         WHERE t.system_resource_type_code = 'MODULE'
           AND s.active
+        ORDER BY s.system_resource_code
       SQL
       DB[query].all
     end
@@ -273,7 +274,7 @@ module ProductionApp
     def system_peripherals
       query = <<~SQL
         SELECT s.system_resource_code as name,
-        'TODO: function' as function,
+        'NSLD-Printing' as function,
         p.plant_resource_code as alias,
         'TODO: type' as type,
         'TODO: model' as model,
@@ -298,6 +299,7 @@ module ProductionApp
         WHERE t.system_resource_type_code = 'PERIPHERAL'
           AND e.plant_resource_type_code = 'PRINTER'
           AND s.active
+        ORDER BY s.system_resource_code
       SQL
       DB[query].all
     end

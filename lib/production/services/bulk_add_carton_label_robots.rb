@@ -51,7 +51,7 @@ module ProductionApp
 
     def printers
       # Range should be decreased if > 1 robot/printer
-      @printers ||= range.map { |r| "PRN-#{r.to_s.rjust(2, '0')} #{r}" }
+      @printers ||= range.map { |r| "PRN-#{r.to_s.rjust(2, '0')}" }
     end
 
     def build_resources(pname, sname, printer) # rubocop:disable Metrics/AbcSize
@@ -67,10 +67,14 @@ module ProductionApp
                                          plant_resource_code: "#{sname}-B#{no + 1}",
                                          description: "#{sname}-B#{no + 1}")
       end
+      prn_attrs = {
+        plant_resource_type_id: printer_type_id,
+        plant_resource_code: printer,
+        description: printer
+      }
       prt_id = repo.create_child_plant_resource(id,
-                                                plant_resource_type_id: printer_type_id,
-                                                plant_resource_code: printer,
-                                                description: printer)
+                                                prn_attrs,
+                                                sys_code: printer)
       prt_sys_id = repo.get_value(:plant_resources, :system_resource_id, id: prt_id)
       repo.link_a_peripheral(plant_id, prt_sys_id)
     end

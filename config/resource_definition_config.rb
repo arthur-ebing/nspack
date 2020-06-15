@@ -179,6 +179,7 @@ module Crossbeams
       PALLET_FORKLIFT_ROBOT = 'PALLET_FORKLIFT_ROBOT'
       PALLETIZING_ROBOT = 'PALLETIZING_ROBOT'
       BIN_TIPPING_ROBOT = 'BINTIPPING_ROBOT'
+      STAGING_TIPPING_ROBOT = 'STAGING_TIPPING_ROBOT'
       BIN_FORKLIFT = 'BIN_FORKLIFT'
       PALLET_FORKLIFT = 'PALLET_FORKLIFT'
       CARTON_VERIFICATION_STATION = 'CARTON_VERIFICATION_STATION'
@@ -220,7 +221,8 @@ module Crossbeams
                                               BIN_FORKLIFT_ROBOT,
                                               PALLET_FORKLIFT_ROBOT,
                                               PALLETIZING_ROBOT,
-                                              BIN_TIPPING_ROBOT] } },
+                                              BIN_TIPPING_ROBOT,
+                                              STAGING_TIPPING_ROBOT] } },
         MODULE_BUTTON => { description: 'Module button',
                            computing_device: true,
                            attributes: { ip_address: :string,
@@ -322,6 +324,11 @@ module Crossbeams
                                icon: { file: 'server3', colour: CLR_Q },
                                create_with_system_resource: 'MODULE',
                                code_prefix: 'BTM-' },
+        STAGING_TIPPING_ROBOT => { description: 'Staging Bintipping Robot',
+                                   allowed_children: [],
+                                   icon: { file: 'server3', colour: CLR_F },
+                                   create_with_system_resource: 'MODULE',
+                                   code_prefix: 'STM-' },
         BIN_FORKLIFT => { description: 'Bin Forklift',
                           allowed_children: [BIN_FORKLIFT_ROBOT],
                           icon: { file: 'forkishlift', colour: CLR_M } },
@@ -361,7 +368,7 @@ module Crossbeams
                                        create_with_system_resource: 'MODULE',
                                        code_prefix: 'CVM-' },
         BIN_TIPPING_STATION => { description: 'Bin-tipping station',
-                                 allowed_children: [BIN_TIPPING_ROBOT, SCALE],
+                                 allowed_children: [BIN_TIPPING_ROBOT, STAGING_TIPPING_ROBOT, SCALE],
                                  icon: { file: 'cog', colour: CLR_U } },
         BIN_VERIFICATION_STATION => { description: 'Bin-verification station',
                                       allowed_children: [BIN_VERIFICATION_ROBOT, PRINTER],

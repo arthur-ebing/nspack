@@ -43,7 +43,7 @@ module UiRules
       return unless @mode == :clm
 
       @form_object = OpenStruct.new(no_clms: 2,
-                                    no_buttons: 4,
+                                    no_buttons: 6,
                                     no_clms_per_printer: 1,
                                     plant_resource_prefix: 'CLM',
                                     starting_no: starting_no(:clm))

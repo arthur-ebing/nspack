@@ -28,21 +28,21 @@
   :title: New sub-resource
   :popup: true
   :hide_if_true: peripheral
-# - :submenu:
-#     :text: Bulk add
-#     :items:
-#       - :url: "/production/resources/plant_resources/$:id$/bulk_add/clm"
-#         :text: Carton Labeling Robots
-#         :icon: add-solid
-#         :title: Bulk add Carton Labeling Robots
-#         :popup: true
-#         :hide_if_true: peripheral
-#       - :url: "/production/resources/plant_resources/$:id$/bulk_add/ptm"
-#         :text: Palletizing Robots
-#         :icon: add-solid
-#         :title: Bulk add Palletizing Robots
-#         :popup: true
-#         :hide_if_true: peripheral
+- :submenu:
+    :text: Bulk add
+    :items:
+      - :url: "/production/resources/plant_resources/$:id$/bulk_add/clm"
+        :text: Carton Labeling Robots
+        :icon: add-solid
+        :title: Bulk add Carton Labeling Robots
+        :popup: true
+        :hide_if_true: peripheral
+      - :url: "/production/resources/plant_resources/$:id$/bulk_add/ptm"
+        :text: Palletizing Robots
+        :icon: add-solid
+        :title: Bulk add Palletizing Robots
+        :popup: true
+        :hide_if_true: peripheral
 - :url: "/list/peripherals_for_select/multi?key=standard&id=$:id$"
   :text: Link peripherals
   :icon: list
@@ -55,3 +55,7 @@
   :text: New Resource
   :style: :button
   :behaviour: :popup
+# - :control_type: :link
+#   :url: "/production/resources/system_resources"
+#   :text: Resource XML
+#   :style: :button
