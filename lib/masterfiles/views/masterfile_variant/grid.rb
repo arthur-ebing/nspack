@@ -13,6 +13,7 @@ module Masterfiles
               section.add_control(control_type: :link,
                                   text: 'New Masterfile Variant',
                                   url: '/masterfiles/general/masterfile_variants/new',
+                                  grid_id: 'masterfile_variants',
                                   behaviour: :popup,
                                   style: :button)
             end
