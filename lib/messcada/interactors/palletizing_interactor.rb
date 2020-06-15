@@ -149,7 +149,7 @@ module MesscadaApp
     end
 
     def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize
-      return failed_response("Cannot create pallet in #{state_machine.current_state} state", current_bay_attributes(state_machine)) if state_machine.cannot?(:create_pallet)
+      return failed_response("Cannot create pallet in #{state_machine.current} state", current_bay_attributes(state_machine)) if state_machine.cannot?(:create_pallet)
 
       carton_id = params[:carton_number]
 

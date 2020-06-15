@@ -5,7 +5,7 @@ link:/developer_documentation/start.adoc[Back to documentation home]
 
 == EDI-IN process
 
-The EDI-IN process receives an edi file (typically from ftp, but sometimes also dropped in a folder from and email attachment), validates and processes it.
+The EDI-IN process receives an edi file (typically from ftp, but sometimes also dropped in a folder from an email attachment), validates and processes it.
 
 A lot of infrastructure is provided by the framework so that transformations can be written to mostly concentrate on applying business logic.
 
@@ -72,7 +72,7 @@ The service is named from the flow type -- so a `PO` file will be handled by `Ed
 
 === EDI-IN Service
 
-The service to process a file inherit from `BaseEdiInService`.
+The service to process a file inherits from `BaseEdiInService`.
 
 The `initialize` method **must** implement the following at a minimum:
 [source,ruby]
