@@ -7,12 +7,23 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields clm_fields if @mode == :clm
+      common_values_for_fields ptm_fields if @mode == :ptm
 
       form_name 'resource'
     end
 
-    def common_fields
+    def clm_fields
+      {
+        no_clms: { renderer: :integer, required: true },
+        no_clms_per_printer: { renderer: :integer, required: true },
+        no_buttons: { renderer: :integer, required: true },
+        plant_resource_prefix: { required: true },
+        starting_no: { renderer: :integer, required: true }
+      }
+    end
+
+    def ptm_fields
       {
         no_robots: { renderer: :integer, required: true },
         plant_resource_prefix: { required: true },
@@ -31,10 +42,11 @@ module UiRules
 
       return unless @mode == :clm
 
-      @form_object = OpenStruct.new(no_robots: 2,
+      @form_object = OpenStruct.new(no_clms: 2,
+                                    no_buttons: 4,
+                                    no_clms_per_printer: 1,
                                     plant_resource_prefix: 'CLM',
-                                    starting_no: 3,
-                                    bays_per_robot: 2)
+                                    starting_no: starting_no(:clm))
     end
 
     def starting_no(module_type)

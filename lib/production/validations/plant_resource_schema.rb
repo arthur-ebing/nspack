@@ -16,9 +16,19 @@ module ProductionApp
   PlantResourceBulkPtmSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
-    required(:no_robots, :integer).maybe(:int?)
+    required(:no_robots, :integer).filled(:int?)
     required(:plant_resource_prefix, Types::StrippedString).filled(:str?)
     required(:starting_no, :integer).filled(:int?)
     required(:bays_per_robot, :integer).filled(:int?)
+  end
+
+  PlantResourceBulkClmSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:no_clms, :integer).filled(:int?)
+    required(:no_buttons, :integer).filled(:int?)
+    required(:no_clms_per_printer, :integer).filled(:int?)
+    required(:plant_resource_prefix, Types::StrippedString).filled(:str?)
+    required(:starting_no, :integer).filled(:int?)
   end
 end

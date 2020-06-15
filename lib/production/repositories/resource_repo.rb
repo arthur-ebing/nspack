@@ -184,6 +184,10 @@ module ProductionApp
       resolve_system_code(nil, rules[:code_prefix], plant_resource_type_id, rules[:sequence_without_zero_padding])
     end
 
+    def link_a_peripheral(plant_resource_id, peripheral_id)
+      DB[:plant_resources_system_resources].insert(plant_resource_id: plant_resource_id, system_resource_id: peripheral_id)
+    end
+
     def link_peripherals(plant_resource_id, peripheral_ids)
       existing_ids = existing_system_resource_ids_for_plant_resource(plant_resource_id)
       old_ids = existing_ids - peripheral_ids

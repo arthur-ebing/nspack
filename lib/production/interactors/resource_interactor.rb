@@ -123,9 +123,19 @@ module ProductionApp
       repo.transaction do
         srv_res = BulkAddPalletizerRobot.call(id, res)
       end
-      return srv_res unless srv_res.success
+      srv_res
+    end
 
-      success_response('Added Palletizing robots')
+    def bulk_add_clms(id, params)
+      res = validate_plant_resource_clm_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_message_response(no_clms_per_printer: ['Not yet implemented - must be "1" for now']) if res[:no_clms_per_printer] != 1
+
+      srv_res = nil
+      repo.transaction do
+        srv_res = BulkAddCartonLabelRobot.call(id, res)
+      end
+      srv_res
     end
 
     private
@@ -144,6 +154,10 @@ module ProductionApp
 
     def validate_plant_resource_ptm_params(params)
       PlantResourceBulkPtmSchema.call(params)
+    end
+
+    def validate_plant_resource_clm_params(params)
+      PlantResourceBulkClmSchema.call(params)
     end
   end
 end
