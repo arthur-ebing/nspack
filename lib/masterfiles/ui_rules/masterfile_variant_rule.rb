@@ -35,6 +35,7 @@ module UiRules
       {
         masterfile_table: { renderer: @mode == :edit ? :label : :select,
                             caption: 'Variant',
+                            remove_search_for_small_list: false,
                             options: @repo.for_select_mf_variant,
                             with_value: @form_object.variant,
                             min_charwidth: 30,
@@ -42,14 +43,15 @@ module UiRules
                             required: true },
         masterfile_id: { renderer: @mode == :edit ? :label : :select,
                          caption: 'Masterfile Code',
+                         remove_search_for_small_list: false,
                          options: options_array,
                          with_value: @form_object.masterfile_code,
                          prompt: true,
                          required: true,
-                         hide_on_load: @form_object.masterfile_id.nil? },
+                         hide_on_load: @form_object.masterfile_table.nil? },
         variant_code: { caption: 'Variant Code',
                         required: true,
-                        hide_on_load: @form_object.variant_code.nil? }
+                        hide_on_load: @form_object.masterfile_table.nil? }
       }
     end
 

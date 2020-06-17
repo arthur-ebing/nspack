@@ -48,10 +48,11 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def masterfile_variant_grid
+    def masterfile_variant_grid(params = nil)
+      rows = repo.select_values(:masterfile_variants, :id, params)
       row_defs = []
-      repo.select_values(:masterfile_variants, :id).each do |row_data_id|
-        row_defs << repo.find_masterfile_variant_flat(row_data_id).to_h
+      rows.each do |row_id|
+        row_defs << repo.find_masterfile_variant_flat(row_id).to_h
       end
       {
         columnDefs: col_defs_for_masterfile_variant_grid,
@@ -66,12 +67,12 @@ module MasterfilesApp
           act.popup_edit_link '/masterfiles/general/masterfile_variants/$id$/edit', id: 'id'
           act.popup_delete_link '/masterfiles/general/masterfile_variants/$id$', id: 'id'
         end
-        mk.integer 'id', nil, hide: true
-        mk.integer 'masterfile_id', nil, hide: true
-        mk.col 'variant', 'Variant', width: 200
+        mk.integer 'id', 'id', hide: true
+        mk.integer 'masterfile_id', 'masterfile_id', hide: true
+        mk.col 'variant', 'Variant', width: 120
+        mk.col 'masterfile_code', 'Masterfile code', width: 300
+        mk.col 'variant_code', 'Variant code', width: 300
         mk.col 'masterfile_table', 'Masterfile table', width: 200
-        mk.col 'masterfile_code', 'Masterfile code', width: 200
-        mk.col 'variant_code', 'Variant code', width: 200
         mk.col 'created_at', 'Created at', data_type: :datetime
         mk.col 'updated_at', 'Updated at', data_type: :datetime
       end

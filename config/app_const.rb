@@ -431,23 +431,23 @@ class AppConst # rubocop:disable Metrics/ClassLength
     }
   }.freeze
 
-  MF_VARIANT_RULES = { standard_pack_codes: { table_name: 'standard_pack_codes',
+  MF_VARIANT_RULES = { Standard_Pack_Codes: { table_name: 'standard_pack_codes',
                                               column: 'standard_pack_code' },
-                       pucs: { table_name: 'pucs',
+                       Pucs: { table_name: 'pucs',
                                column: 'puc_code' },
-                       marketing_varieties: { table_name: 'marketing_varieties',
+                       Marketing_Varieties: { table_name: 'marketing_varieties',
                                               column: 'marketing_variety_code' },
-                       fruit_size_references: { table_name: 'fruit_size_references',
+                       Fruit_Size_References: { table_name: 'fruit_size_references',
                                                 column: 'size_reference' },
-                       marks: { table_name: 'marks',
+                       Marks: { table_name: 'marks',
                                 column: 'mark_code' },
-                       inventory_codes: { table_name: 'inventory_codes',
+                       Inventory_Codes: { table_name: 'inventory_codes',
                                           column: 'inventory_code' },
-                       grades: { table_name: 'grades',
+                       Grades: { table_name: 'grades',
                                  column: 'grade_code' },
-                       packed_tm_group: { table_name: 'target_market_groups',
+                       Packed_TM_Group: { table_name: 'target_market_groups',
                                           column: 'target_market_group_name' },
-                       organizations: { table_name: 'organizations',
+                       Organizations: { table_name: 'organizations',
                                         column: 'medium_description' } }.freeze
 
   SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
