@@ -53,6 +53,7 @@ module MasterfilesApp
       hash = add_party_name(hash)
       hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
+      hash[:variant_codes] = select_values(:masterfile_variants, :variant_code, masterfile_id: id, masterfile_table: 'organizations')
       Organization.new(hash)
     end
 

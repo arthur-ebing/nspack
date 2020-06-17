@@ -16,6 +16,7 @@ module Masterfiles
               form.view_only!
               form.add_field :parent_organization
               form.add_field :medium_description
+              form.add_field :variant_codes
               form.add_field :short_description
               form.add_text 'Note: The short description should be limited to 2 characters for use with EDIs',
                             dom_id: 'short_desc_warn',
