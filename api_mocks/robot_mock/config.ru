@@ -121,6 +121,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               <div id="url_sent">&nbsp;</div>
               <select id="sel_urls"></select>
               <label><input type="checkbox" id="short_lines" name="short_lines" /> Simulate 22-character lines</label>
+              <label><input type="checkbox" id="split_lines" name="split_lines" /> Simulate 34-character lines</label>
               <table>
               <tr>
                 <th style="min-width:15em;text-align:right">Host</th><td><input type="text" id="url_host" value="localhost" /></td>
@@ -168,6 +169,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             const urlSent = document.getElementById('url_sent');
             const selUrls = document.getElementById('sel_urls');
             const shortLines = document.getElementById('short_lines');
+            const splitLines = document.getElementById('split_lines');
             const lP1 = document.getElementById('l_p1');
             const p1 = document.getElementById('p1');
             const lP2 = document.getElementById('l_p2');
@@ -197,6 +199,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             const setText = function setText(txt) {
               if (shortLines.checked) {
                 return txt.substring(0, 22);
+              } else if (splitLines.checked) {
+                return txt.substring(0, 34);
               } else {
                 return txt;
               }
