@@ -3,7 +3,7 @@
 module EdiApp
   class LiIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
     attr_accessor :attrs, :load_id, :pallet_numbers, :missing_masterfiles, :match_data
-    attr_reader :org_code, :po_repo, :tot_cartons, :records, :user, :repo, :load_repo
+    attr_reader :org_code, :po_repo, :tot_cartons, :records, :user, :repo, :load_repo, :file_name
 
     def initialize(edi_in_transaction_id, file_path, logger, edi_in_result)
       super(edi_in_transaction_id, file_path, logger, edi_in_result)
@@ -13,6 +13,7 @@ module EdiApp
       @missing_masterfiles = []
       @repo = EdiApp::EdiInRepo.new
       @load_repo = FinishedGoodsApp::LoadRepo.new
+      @file_name = @repo.get(:edi_in_transactions, edi_in_transaction_id, :file_name)
     end
 
     def call # rubocop:disable Metrics/AbcSize
@@ -22,14 +23,9 @@ module EdiApp
 
       match_data_on(match_data)
 
-      unless missing_masterfiles.empty?
-        notes = missing_masterfiles.join(" \n")
-        missing_masterfiles_detected(notes)
-        return failed_response('Missing masterfiles', notes)
-      end
+      check_missing_masterfiles
 
-      check_pallets(:allocate, pallet_numbers)
-      business_validation_passed
+      business_validation
 
       repo.transaction do
         create_load
@@ -38,13 +34,41 @@ module EdiApp
 
         allocate_pallets
       end
-      success_response('ok')
+      success_response(nil)
     rescue Crossbeams::InfoError => e
-      # discrepancies_detected(e.message)
       failed_response(e.message)
+    rescue Crossbeams::TaskNotPermittedError => e
+      discrepancies_detected(e.message)
+      failed_response('EDI Has discrepancies.')
     end
 
     private
+
+    def business_validation
+      check_pallets(:allocate, pallet_numbers)
+      raise Crossbeams::TaskNotPermittedError, "POL and POD shouldn't be the same" if attrs[:pol_port_id] == attrs[:pod_port_id]
+
+      business_validation_passed
+    end
+
+    def check_load_service_schema
+      res = FinishedGoodsApp::LoadServiceSchema.call(attrs)
+      res.messages.each do |k, v|
+        col = k.to_s.gsub('_id', '')
+        col.slice!('_party_role')
+        val = v.first
+        missing_masterfiles << ["#{col}: #{val}"]
+      end
+      check_missing_masterfiles
+    end
+
+    def check_missing_masterfiles
+      return if missing_masterfiles.empty?
+
+      notes = missing_masterfiles.join(", \n")
+      missing_masterfiles_detected(notes)
+      raise Crossbeams::InfoError, 'Missing masterfiles'
+    end
 
     def allocate_pallets # rubocop:disable Metrics/AbcSize
       current_pallet_numbers = repo.select_values(:pallets, :pallet_number, load_id: load_id)
@@ -81,7 +105,7 @@ module EdiApp
       res = FinishedGoodsApp::LoadServiceSchema.call(attrs)
       raise Crossbeams::InfoError, res.messages unless res.messages.empty?
 
-      load_res = FinishedGoodsApp::CreateLoad.call(res, @user)
+      load_res = FinishedGoodsApp::CreateLoad.call(res, @user, comment: "Created from EDI File: #{file_name}")
       raise Crossbeams::InfoError, load_res.message unless load_res.success
 
       @load_id = load_res.instance.id
@@ -144,8 +168,7 @@ module EdiApp
       attrs[:consignee_party_role_id] = get_party_role_id(load['consignee'], AppConst::ROLE_CONSIGNEE)
       attrs[:customer_party_role_id] = get_party_role_id(load['customer'], AppConst::ROLE_CUSTOMER)
       attrs[:final_receiver_party_role_id] = get_party_role_id(load['final_receiver'], AppConst::ROLE_FINAL_RECEIVER)
-      final_destination_id = get_case_insensitive_match_or_variant(:ports, port_code: load['final_destination'])
-      attrs[:final_destination_id] = repo.get(:ports, final_destination_id, :city_id)
+      attrs[:final_destination_id] = get_case_insensitive_match_or_variant(:destination_cities, city_name: load['final_destination'])
       attrs[:depot_id] = get_case_insensitive_match_or_variant(:depots, depot_code: load['depot_code'])
       attrs[:transfer_load] = false
       attrs[:customer_order_number] = load['customer_order_number']
@@ -161,19 +184,18 @@ module EdiApp
     end
 
     def get_party_role_id(party_role_name, role_name) # rubocop:disable Metrics/AbcSize
+      return nil if party_role_name.nil_or_empty?
+
       role_id = repo.get_id(:roles, name: role_name)
       raise Crossbeams::InfoError, "There is no role #{role_name}" if role_id.nil?
 
-      org_id ||= repo.get_case_insensitive_match(:organizations, medium_description: party_role_name)
-      org_id ||= repo.get_case_insensitive_match(:organizations, short_description: party_role_name)
-      org_id ||= repo.get_case_insensitive_match(:organizations, long_description: party_role_name)
+      org_id = repo.get_case_insensitive_match(:organizations, medium_description: party_role_name)
       org_id ||= repo.get_variant_id(:organizations, party_role_name)
-
       id = repo.get_id(:party_roles, role_id: role_id, organization_id: org_id)
       return id unless id.nil?
 
-      missing_masterfiles << ["#{role_name}: #{party_role_name}"] if id.nil?
-      nil
+      missing_masterfiles << ["Organization: #{role_name.capitalize} - #{party_role_name}"]
+      id
     end
 
     def get_case_insensitive_match_or_variant(table_name, args)
@@ -182,13 +204,15 @@ module EdiApp
 
       col, val = args.first
       id = repo.get_variant_id(table_name, val)
-      missing_masterfiles << ["#{col}: #{val}"] if id.nil?
-      nil
+      return id unless id.nil?
+
+      missing_masterfiles << ["#{table_name.capitalize}: #{col.capitalize} - #{val}"]
+      id
     end
 
     def check_pallets(check, pallet_numbers, load_id = nil)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
-      raise Crossbeams::InfoError, res.message unless res.success
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
   end
 end

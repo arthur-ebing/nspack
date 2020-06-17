@@ -3,13 +3,14 @@
 module FinishedGoodsApp
   class CreateLoad < BaseService
     include FindOrCreateVoyage
-    attr_reader :load_id, :load_voyage_id
+    attr_reader :load_id, :load_voyage_id, :comment
     attr_accessor :params
 
-    def initialize(params, user)
+    def initialize(params, user, comment: nil)
       @params = params.to_h
       @load_id = @params[:load_id]
       @user = user
+      @comment = comment
     end
 
     def call
@@ -35,7 +36,7 @@ module FinishedGoodsApp
 
       @load_id = repo.create(:loads, res)
       @params[:load_id] = load_id
-      repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name)
+      repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name, comment: comment)
 
       ok_response
     end
@@ -45,7 +46,7 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       load_voyage_id = repo.create(:load_voyages, res)
-      repo.log_status(:load_voyages, load_voyage_id, 'CREATED', user_name: @user.user_name)
+      repo.log_status(:load_voyages, load_voyage_id, 'CREATED', user_name: @user.user_name, comment: comment)
 
       ok_response
     end
