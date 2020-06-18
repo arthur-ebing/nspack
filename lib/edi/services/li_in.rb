@@ -24,6 +24,7 @@ module EdiApp
       match_data_on(match_data)
 
       check_missing_masterfiles
+      check_load_service_schema
 
       business_validation
 
