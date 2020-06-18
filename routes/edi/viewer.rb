@@ -54,7 +54,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         flow_type = res.instance[:flow_type]
         file_path = res.instance[:file_path]
         if UtilityFunctions.xml_file?(file_path)
-          show_partial_or_page(r) { Edi::Viewer::File::XML.call(flow_type, file_path) }
+          show_partial_or_page(r) { Edi::Viewer::File::XML.call(flow_type, file_path, back_url: request.referer) }
         else
           @page = interactor.build_grids_for(flow_type, file_path)
           view('edi/show_in_grids')

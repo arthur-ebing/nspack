@@ -21,6 +21,10 @@ module UiRules
                                        caption: 'Parent' }
       fields[:medium_description] = { renderer: :label,
                                       caption: 'Organization Code' }
+      fields[:variant_codes] = { renderer: :list,
+                                 caption: 'Variant Codes',
+                                 items: @form_object.variant_codes,
+                                 hide_on_load: @form_object.variant_codes.empty? }
       fields[:short_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }

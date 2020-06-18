@@ -135,7 +135,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'allocate' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:allocate, load_id)
+          check = interactor.check(:allocate, load_id)
+          unless check.success
+            store_locally(:flash_notice, rmd_error_message(check.message))
+            r.redirect('/rmd/finished_goods/dispatch/allocate/load')
+          end
+
           r.on 'complete_allocation' do
             allocated = interactor.stepper(:allocate).allocated
             initial_allocated = interactor.stepper(:allocate).initial_allocated
@@ -251,18 +256,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'truck_arrival' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:truck_arrival, load_id)
+          check = interactor.check(:truck_arrival, load_id)
+          unless check.success
+            store_locally(:flash_notice, rmd_error_message(check.message))
+            r.redirect('/rmd/finished_goods/dispatch/truck_arrival/load')
+          end
+
           r.on 'vehicle_type_changed' do
-            if params[:changed_value].nil_or_empty?
-              blank_json_response
-            else
-              value = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(params[:changed_value])&.has_container
-              UiRules::ChangeRenderer.render_json(:rmd_load,
-                                                  self,
-                                                  :change_container_use,
-                                                  use_container: value,
-                                                  load_id: load_id)
-            end
+            value = MasterfilesApp::VehicleTypeRepo.new.find_vehicle_type(params[:changed_value])&.has_container
+            UiRules::ChangeRenderer.render_json(:rmd_load,
+                                                self,
+                                                :change_container_use,
+                                                use_container: value,
+                                                load_id: load_id)
           end
 
           r.on 'container_changed' do
@@ -476,9 +482,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'load_truck' do
         # --------------------------------------------------------------------------
         r.on 'load', Integer do |load_id|
-          interactor.assert_permission!(:load_truck, load_id)
-
           r.get do
+            check = interactor.check(:load_truck, load_id)
+            unless check.success
+              store_locally(:flash_notice, rmd_error_message(check.message))
+              r.redirect('/rmd/finished_goods/dispatch/load_truck/load')
+            end
+
             form_state = interactor.stepper(:load_truck).form_state
             r.redirect('/rmd/finished_goods/dispatch/load_truck/load') if form_state.empty?
 

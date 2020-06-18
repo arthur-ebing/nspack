@@ -24,8 +24,8 @@ module EdiApp
     end
 
     def log_edi_in_complete(id, message, edi_result)
-      change_set = edi_result.to_h.merge(complete: true, error_message: message)
-      update_edi_in_transaction(id, change_set)
+      changeset = edi_result.to_h.merge(complete: true, error_message: message)
+      update_edi_in_transaction(id, changeset)
     end
 
     def log_edi_in_failed(id, message, instance, edi_result)
@@ -34,13 +34,13 @@ module EdiApp
             else
               "#{message}\n#{instance}"
             end
-      change_set = edi_result.to_h.merge(error_message: msg)
-      update_edi_in_transaction(id, change_set)
+      changeset = edi_result.to_h.merge(error_message: msg)
+      update_edi_in_transaction(id, changeset)
     end
 
     def log_edi_in_error(id, exception, edi_result)
-      change_set = edi_result.to_h.merge(error_message: exception.message, backtrace: exception.backtrace.join("\n"))
-      update_edi_in_transaction(id, change_set)
+      changeset = edi_result.to_h.merge(error_message: exception.message, backtrace: exception.backtrace.join("\n"))
+      update_edi_in_transaction(id, changeset)
     end
 
     def match_data_on(id, flow_type, match_data)

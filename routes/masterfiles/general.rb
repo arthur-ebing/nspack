@@ -183,11 +183,11 @@ class Nspack < Roda
       interactor = MasterfilesApp::MasterfileVariantInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'list_masterfile_variants' do
-        show_page { Masterfiles::General::MasterfileVariant::Grid.call }
+        show_page { Masterfiles::General::MasterfileVariant::Grid.call(form_values: params) }
       end
 
       r.on 'grid' do
-        interactor.masterfile_variant_grid
+        interactor.masterfile_variant_grid(params)
       rescue StandardError => e
         show_json_exception(e)
       end
@@ -206,7 +206,7 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('general', 'new')
-        show_partial_or_page(r) { Masterfiles::General::MasterfileVariant::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Masterfiles::General::MasterfileVariant::New.call(form_values: params, remote: fetch?(r)) }
       end
 
       r.post do        # CREATE
