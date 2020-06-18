@@ -13,9 +13,8 @@ class FixPalletNettWeights < BaseScript
     query = <<~SQL
       SELECT id, pallet_number, fn_calculate_pallet_nett_weight(id, gross_weight) AS calculated_nett_weight, nett_weight,
              carton_quantity AS plt_carton_quantity
-      FROM pallets WHERE in_stock
-                    AND id IN ( SELECT id FROM pallets
-                                WHERE (fn_calculate_pallet_nett_weight(id, gross_weight)-nett_weight) <>  0
+      FROM pallets WHERE id IN ( SELECT id FROM pallets
+                                 WHERE (fn_calculate_pallet_nett_weight(id, gross_weight)-nett_weight) <>  0
       );
     SQL
     pallets = DB[query].all
