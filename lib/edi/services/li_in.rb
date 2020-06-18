@@ -34,7 +34,7 @@ module EdiApp
 
         allocate_pallets
       end
-      success_response(nil)
+      success_response('LI processed')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Crossbeams::TaskNotPermittedError => e
