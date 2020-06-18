@@ -65,10 +65,12 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(masterfile_table: nil,
-                                    code: nil,
-                                    masterfile_id: nil,
-                                    masterfile_code: nil)
+      form_values = @options[:form_values] || {}
+      @form_object = OpenStruct.new(variant: @repo.lookup_mf_variant(form_values[:masterfile_table])[:variant],
+                                    masterfile_table: form_values[:masterfile_table],
+                                    masterfile_id: form_values[:masterfile_id],
+                                    masterfile_code: nil,
+                                    variant_code: nil)
     end
 
     private

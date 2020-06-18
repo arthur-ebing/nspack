@@ -25,6 +25,8 @@ module MasterfilesApp
     end
 
     def lookup_mf_variant(table_name)
+      return {} if table_name.nil_or_empty?
+
       variant = AppConst::MF_VARIANT_RULES.select { |_, hash| hash.key(table_name) }
       { variant: variant.keys.first.to_s.gsub('_', ' '),
         table_name: table_name,

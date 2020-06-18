@@ -20,7 +20,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: 'New Masterfile Variant',
+                                  text: "New #{ui_rule.form_object.variant} Variant",
                                   url: new_url,
                                   grid_id: 'masterfile_variants',
                                   behaviour: :popup,
