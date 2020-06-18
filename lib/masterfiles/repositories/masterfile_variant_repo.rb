@@ -10,7 +10,7 @@ module MasterfilesApp
 
       variant = lookup_mf_variant(hash[:masterfile_table])
       hash[:variant] = variant[:variant]
-      hash[:masterfile_column] = variant[:column]
+      hash[:masterfile_column] = variant[:column_name]
       hash[:masterfile_code] = get(hash[:masterfile_table].to_sym, hash[:masterfile_id], hash[:masterfile_column].to_sym)
 
       MasterfileVariantFlat.new(hash)
@@ -30,7 +30,7 @@ module MasterfilesApp
       variant = AppConst::MF_VARIANT_RULES.select { |_, hash| hash.key(table_name) }
       { variant: variant.keys.first.to_s.gsub('_', ' '),
         table_name: table_name,
-        column: variant.values.first[:column] }
+        column_name: variant.values.first[:column_name] }
     end
   end
 end

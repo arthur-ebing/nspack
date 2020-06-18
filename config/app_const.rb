@@ -432,23 +432,31 @@ class AppConst # rubocop:disable Metrics/ClassLength
   }.freeze
 
   MF_VARIANT_RULES = { Standard_Pack_Codes: { table_name: 'standard_pack_codes',
-                                              column: 'standard_pack_code' },
-                       Pucs: { table_name: 'pucs',
-                               column: 'puc_code' },
+                                              column_name: 'standard_pack_code' },
+                       PUCs: { table_name: 'pucs',
+                               column_name: 'puc_code' },
                        Marketing_Varieties: { table_name: 'marketing_varieties',
-                                              column: 'marketing_variety_code' },
+                                              column_name: 'marketing_variety_code' },
                        Fruit_Size_References: { table_name: 'fruit_size_references',
-                                                column: 'size_reference' },
+                                                column_name: 'size_reference' },
                        Marks: { table_name: 'marks',
-                                column: 'mark_code' },
+                                column_name: 'mark_code' },
                        Inventory_Codes: { table_name: 'inventory_codes',
-                                          column: 'inventory_code' },
+                                          column_name: 'inventory_code' },
                        Grades: { table_name: 'grades',
-                                 column: 'grade_code' },
+                                 column_name: 'grade_code' },
                        Packed_TM_Group: { table_name: 'target_market_groups',
-                                          column: 'target_market_group_name' },
+                                          column_name: 'target_market_group_name' },
                        Organizations: { table_name: 'organizations',
-                                        column: 'medium_description' } }.freeze
+                                        column_name: 'medium_description' },
+                       Depots: { table_name: 'depots',
+                                 column_name: 'depot_code' },
+                       Cities: { table_name: 'destination_cities',
+                                 column_name: 'city_name' },
+                       Ports: { table_name: 'ports',
+                                column_name: 'port_code' },
+                       Vessels: { table_name: 'vessels',
+                                  column_name: 'vessel_code' } }.freeze
 
   SOLAS_VERIFICATION_METHOD = ENV['SOLAS_VERIFICATION_METHOD']
   SAMSA_ACCREDITATION = ENV['SAMSA_ACCREDITATION']

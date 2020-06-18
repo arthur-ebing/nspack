@@ -1,9 +1,10 @@
 ---
 :caption: Depots
-:sql: "SELECT\r\n    depots.id,\r\n    depots.city_id,\r\n    depots.depot_code,\r\n
-  \   depots.description,\r\n    destination_cities.city_name,\r\n    depots.bin_depot,\r\n
-  \   depots.active,\r\n    depots.created_at,\r\n    depots.updated_at\r\n\r\nFROM
-  depots\r\nLEFT JOIN destination_cities ON destination_cities.id = city_id"
+:sql: "SELECT\r\n    depots.id,\r\n    depots.depot_code,\r\n    depots.description,\r\n
+  \   depots.city_id,\r\n    destination_cities.city_name,\r\n    depots.bin_depot,\r\n
+  \   fn_masterfile_variants('depots', depots.id) AS variant_codes,\r\n    depots.active,\r\n
+  \   depots.created_at,\r\n    depots.updated_at\r\n\r\nFROM depots\r\nLEFT JOIN
+  destination_cities ON destination_cities.id = city_id\r\nORDER BY depots.depot_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -24,29 +25,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  city_id:
-    :name: city_id
-    :sequence_no: 2
-    :caption: City
-    :namespaced_name: depots.city_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   depot_code:
     :name: depot_code
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Depot code
     :namespaced_name: depots.depot_code
     :data_type: :string
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -58,7 +43,7 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Description
     :namespaced_name: depots.description
     :data_type: :string
@@ -67,6 +52,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  city_id:
+    :name: city_id
+    :sequence_no: 4
+    :caption: City
+    :namespaced_name: depots.city_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -104,9 +105,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 7
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: depots.active
     :data_type: :boolean
@@ -122,13 +139,13 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: depots.created_at
     :data_type: :datetime
     :width: 
-    :format: 
-    :hide: false
+    :format: :datetime_with_secs
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -138,13 +155,13 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: depots.updated_at
     :data_type: :datetime
     :width: 
-    :format: 
-    :hide: false
+    :format: :datetime_with_secs
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

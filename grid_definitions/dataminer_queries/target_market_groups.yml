@@ -1,16 +1,17 @@
 ---
 :caption: Target Market Groups
-:sql: "SELECT\r\n  \"target_market_groups\".\"id\",\r\n  \"target_market_groups\".\"target_market_group_type_id\",\r\n
-  \ \"target_market_groups\".\"target_market_group_name\",\r\n  \"target_market_groups\".\"description\",\r\n
-  \ \"target_market_groups\".\"created_at\",\r\n  \"target_market_groups\".\"updated_at\",\r\n
-  \ \"target_market_group_types\".\"target_market_group_type_code\",\r\n(\r\n    SELECT\r\n
-  \     string_agg(destination_region_name, '; ')\r\n    FROM (\r\n      SELECT\r\n
-  \       r.destination_region_name\r\n      FROM\r\n        destination_regions r\r\n
-  \       JOIN destination_regions_tm_groups t ON t.destination_region_id = r.id\r\n
-  \         AND t.target_market_group_id = target_market_groups.id\r\n          AND
-  r.active) AS tab) AS regions\r\nFROM\r\n  \"target_market_groups\"\r\n  JOIN \"target_market_group_types\"
-  ON \"target_market_group_types\".\"id\" = \"target_market_groups\".\"target_market_group_type_id\"\r\nORDER
-  BY\r\n  \"target_market_groups\".\"target_market_group_name\""
+:sql: "SELECT\r\n    target_market_groups.id,\r\n    target_market_groups.target_market_group_type_id,\r\n
+  \   target_market_groups.target_market_group_name,\r\n    target_market_groups.description,\r\n
+  \   fn_masterfile_variants('target_market_groups', target_market_groups.id) AS variant_codes,\r\n
+  \   target_market_group_types.target_market_group_type_code,\r\n    array_agg(distinct
+  destination_region_name order by destination_region_name) filter (where destination_region_name
+  is not null) AS regions,\r\n    target_market_groups.created_at,\r\n    target_market_groups.updated_at\r\n\r\nFROM
+  target_market_groups\r\n         JOIN target_market_group_types ON target_market_group_types.id
+  = target_market_groups.target_market_group_type_id\r\n         LEFT JOIN destination_regions_tm_groups
+  drtmg ON  drtmg.target_market_group_id = target_market_groups.id\r\n         LEFT
+  JOIN destination_regions dr ON drtmg.destination_region_id = dr.id\r\n\r\nGROUP
+  BY\r\n    target_market_groups.id,\r\n    target_market_group_types.id\r\nORDER
+  BY\r\n    target_market_group_name"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -34,10 +35,10 @@
   target_market_group_type_id:
     :name: target_market_group_type_id
     :sequence_no: 2
-    :caption: Target market group type
+    :caption: TM group type
     :namespaced_name: target_market_groups.target_market_group_type_id
     :data_type: :integer
-    :width: 
+    :width: 150
     :format: 
     :hide: true
     :pinned: 
@@ -50,10 +51,10 @@
   target_market_group_name:
     :name: target_market_group_name
     :sequence_no: 3
-    :caption: Target market group name
+    :caption: TM group name
     :namespaced_name: target_market_groups.target_market_group_name
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -79,31 +80,15 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  created_at:
-    :name: created_at
+  variant_codes:
+    :name: variant_codes
     :sequence_no: 5
-    :caption: Created at
-    :namespaced_name: target_market_groups.created_at
-    :data_type: :datetime
-    :width: 
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 200
     :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 6
-    :caption: Updated at
-    :namespaced_name: target_market_groups.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -113,11 +98,11 @@
     :group_max: false
   target_market_group_type_code:
     :name: target_market_group_type_code
-    :sequence_no: 7
-    :caption: Target market group type code
+    :sequence_no: 6
+    :caption: TM group type
     :namespaced_name: target_market_group_types.target_market_group_type_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -129,15 +114,47 @@
     :group_max: false
   regions:
     :name: regions
-    :sequence_no: 8
+    :sequence_no: 7
     :caption: Regions
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 8
+    :caption: Created at
+    :namespaced_name: target_market_groups.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 9
+    :caption: Updated at
+    :namespaced_name: target_market_groups.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

@@ -16,6 +16,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: "/masterfiles/general/masterfile_variants/list_masterfile_variants?masterfile_table=vessels&masterfile_id=$:id$"
+  :text: manage variants
+  :icon: edit
+  :title: Manage Variants
+  :popup: false
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/shipping/vessels/new"

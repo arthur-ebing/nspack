@@ -1,10 +1,11 @@
 ---
 :caption: Vessels
-:sql: "SELECT \r\n    vessels.id,\r\n    vessels.vessel_type_id,\r\n    vessels.vessel_code,\r\n
-  \   vessels.description,\r\n    vessels.active,\r\n    vessels.created_at,\r\n    vessels.updated_at,\r\n
-  \   vessel_types.vessel_type_code,\r\n    voyage_types.voyage_type_code\r\nFROM
-  vessels\r\nJOIN vessel_types ON vessel_types.id = vessels.vessel_type_id\r\nJOIN
-  voyage_types ON voyage_types.id = vessel_types.voyage_type_id"
+:sql: "SELECT\r\n    vessels.id,\r\n    vessels.vessel_code,\r\n    vessels.vessel_type_id,\r\n
+  \   vessel_types.vessel_type_code,\r\n    voyage_types.voyage_type_code,\r\n    vessels.description,\r\n
+  \   fn_masterfile_variants('vessels', vessels.id) AS variant_codes,\r\n    vessels.active,\r\n
+  \   vessels.created_at,\r\n    vessels.updated_at\r\n\r\nFROM vessels\r\nJOIN vessel_types
+  ON vessel_types.id = vessels.vessel_type_id\r\nJOIN voyage_types ON voyage_types.id
+  = vessel_types.voyage_type_id\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -18,6 +19,22 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  vessel_code:
+    :name: vessel_code
+    :sequence_no: 2
+    :caption: Vessel code
+    :namespaced_name: vessels.vessel_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
     :pinned: 
     :groupable: true
     :group_by_seq: 
@@ -41,17 +58,33 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  vessel_code:
-    :name: vessel_code
-    :sequence_no: 5
-    :caption: Vessel code
-    :namespaced_name: vessels.vessel_code
+  vessel_type_code:
+    :name: vessel_type_code
+    :sequence_no: 4
+    :caption: Vessel type code
+    :namespaced_name: vessel_types.vessel_type_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  voyage_type_code:
+    :name: voyage_type_code
+    :sequence_no: 5
+    :caption: Voyage type code
+    :namespaced_name: voyage_types.voyage_type_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -63,7 +96,7 @@
     :caption: Description
     :namespaced_name: vessels.description
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -73,9 +106,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 7
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: vessels.active
     :data_type: :boolean
@@ -91,12 +140,12 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: vessels.created_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: true
     :pinned: 
     :groupable: false
@@ -107,45 +156,13 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: vessels.updated_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  vessel_type_code:
-    :name: vessel_type_code
-    :sequence_no: 4
-    :caption: Vessel type code
-    :namespaced_name: vessel_types.vessel_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  voyage_type_code:
-    :name: voyage_type_code
-    :sequence_no: 2
-    :caption: Voyage type code
-    :namespaced_name: voyage_types.voyage_type_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
