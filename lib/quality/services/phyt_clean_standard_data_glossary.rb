@@ -12,11 +12,8 @@ module QualityApp
       @glossary = {}
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call
       raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
-
-      res = api.auth_token_call
-      return failed_response(res.message) unless res.success
 
       res = api.request_phyt_clean_glossary(season_id)
       return failed_response(res.message) unless res.success
