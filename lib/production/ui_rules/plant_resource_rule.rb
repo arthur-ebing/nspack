@@ -60,6 +60,7 @@ module UiRules
                         { renderer: :select,
                           options: @repo.for_select_plant_resource_types(parent_type),
                           disabled_options: @repo.for_select_inactive_plant_resource_types,
+                          min_charwidth: 40,
                           caption: 'plant resource type', required: true }
                       else
                         plant_resource_type_id_label = @repo.find_plant_resource_type(@form_object.plant_resource_type_id)&.plant_resource_type_code
