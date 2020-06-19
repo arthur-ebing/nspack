@@ -2,7 +2,7 @@
 :toc:
 // For a good description of how to write documentation: https://www.divio.com/en/blog/documentation/
 
-== Crossbeams framework
+= Crossbeams framework
 
 == Running the app
 
