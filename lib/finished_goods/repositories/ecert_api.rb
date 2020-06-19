@@ -2,30 +2,28 @@
 
 module FinishedGoodsApp
   class ECertApi < BaseRepo
-    attr_reader :headers
+    attr_reader :header
 
     def auth_token_call
       http = Crossbeams::HTTPCalls.new(false)
       url = 'http://uas.ecert.co.za/oauth2/token'
-      params = { client_id: AppConst::E_CERT_API_CLIENT_ID, client_secret: AppConst::E_CERT_API_CLIENT_SECRET, grant_type: 'client_credentials' }
+      raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ecert.co.za')
 
+      params = { client_id: AppConst::E_CERT_API_CLIENT_ID, client_secret: AppConst::E_CERT_API_CLIENT_SECRET, grant_type: 'client_credentials' }
       res = http.request_post(url, params)
-      return failed_response(res.message) unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
 
       instance = JSON.parse(res.instance.body)
-      header = { Authorization: "Bearer #{instance['access_token']}" }
-      success_response(instance['message'], header)
+      @header = { Authorization: "Bearer #{instance['access_token']}" }
     end
 
-    def tracking_unit_status(pallet_number) # rubocop:disable Metrics/AbcSize
-      res = auth_token_call
-      return failed_response(res.message) unless res.success
+    def tracking_unit_status(pallet_number)
+      auth_token_call if header.nil?
 
-      headers = res.instance
-      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'))
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: 15, read_timeout: 30)
 
-      res = http.request_get(url, headers)
+      res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
@@ -33,14 +31,11 @@ module FinishedGoodsApp
     end
 
     def elot(params, body) # rubocop:disable Metrics/AbcSize
-      res = auth_token_call
-      return failed_response(res.message) unless res.success
+      auth_token_call if header.nil?
 
-      headers = res.instance
-      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'), open_timeout: 30, read_timeout: 60)
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
-
-      res = http.json_post(url, body, headers)
+      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: 30, read_timeout: 60)
+      res = http.json_post(url, body, header)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
@@ -50,8 +45,10 @@ module FinishedGoodsApp
     end
 
     def update_agreements # rubocop:disable Metrics/AbcSize
-      http = Crossbeams::HTTPCalls.new(AppConst::E_CERT_ENVIRONMENT.include?('https'))
       url = "#{AppConst::E_CERT_ENVIRONMENT}ecert.co.za/api/v1/Agreement/Get"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      return failed_response('Service Unavailable: Failed to connect to remote server.') unless http.can_ping?('ecert.co.za')
+
       res = http.request_get(url)
       return failed_response(res.message) unless res.success
 

@@ -2,25 +2,25 @@
 
 module QualityApp
   class PhytCleanApi < BaseRepo
-    attr_reader :header
+    attr_reader :http, :header
 
-    def auth_token_call
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
+    def auth_token_call # rubocop:disable Metrics/AbcSize
+      @http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/oauth2/token"
-      params = { username: AppConst::PHYT_CLEAN_API_USERNAME, password: AppConst::PHYT_CLEAN_API_PASSWORD, grant_type: 'password' }
+      raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?(url)
 
+      params = { username: AppConst::PHYT_CLEAN_API_USERNAME, password: AppConst::PHYT_CLEAN_API_PASSWORD, grant_type: 'password' }
       res = http.request_post(url, params)
-      return failed_response(res.message) unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
 
       instance = JSON.parse(res.instance.body)
       @header = { Authorization: "bearer #{instance['access_token']}" }
-      success_response(instance['message'], header)
     end
 
     def request_phyt_clean_seasons
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
-      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/seasons"
+      auth_token_call if header.nil?
 
+      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/seasons"
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
 
@@ -29,9 +29,9 @@ module QualityApp
     end
 
     def request_phyt_clean_glossary(season_id)
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
-      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/glossary?seasonID=#{season_id}"
+      auth_token_call if header.nil?
 
+      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/glossary?seasonID=#{season_id}"
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
 
@@ -40,7 +40,7 @@ module QualityApp
     end
 
     def request_phyt_clean_standard_data(season_id, puc_id)
-      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
+      auth_token_call if header.nil?
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
 
       fbo_xml = "<?xml version=\"1.0\"?><Request><Fbo>
