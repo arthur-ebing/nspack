@@ -329,6 +329,51 @@ module RawMaterialsApp
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_BIN_BARCODE, instance, params)
     end
 
+    def preprint_bin_barcodes(bin_asset_numbers, params) # rubocop:disable Metrics/AbcSize
+      label_name = params[:bin_label]
+      print_params = { no_of_prints: 1, printer: params[:printer] }
+      bin_asset_numbers.each do |bin_asset_number|
+        instance = { farm_code: repo.get(:farms, params[:farm_id], :farm_code),
+                     puc_code: repo.get(:pucs, params[:puc_id], :puc_code),
+                     orchard_code: repo.get(:orchards, params[:orchard_id], :orchard_code),
+                     cultivar_name: repo.get(:cultivars, params[:cultivar_id], :cultivar_name),
+                     bin_asset_number: bin_asset_number }
+        LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+      end
+    end
+
+    def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
+      res = validate_bin_label_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:no_of_prints])
+      return failed_response("Couldn't find #{params[:no_of_prints]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:no_of_prints].to_i
+
+      preprint_bin_barcodes(bin_asset_numbers.map { |b| b[1] }, params)
+      # ok_response
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def create_bin_labels(params) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:no_of_prints])
+        bin_asset_numbers.each do |bin_asset_number|
+          params.delete_if { |k| %i[no_of_prints printer bin_label].include?(k) }
+          params[:bin_asset_number] = bin_asset_number[1]
+          repo.create_rmt_bin_label(params)
+        end
+        repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
+      end
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize
@@ -377,6 +422,10 @@ module RawMaterialsApp
 
     def validate_rmt_rebin_params(params)
       RmtRebinBinSchema.call(params)
+    end
+
+    def validate_bin_label_params(params)
+      BinLabelSchema.call(params)
     end
   end
 end

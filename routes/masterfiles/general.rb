@@ -197,7 +197,7 @@ class Nspack < Roda
         action = params[:changed_value].empty? ? :hide_element : :show_element
         actions = []
         hash = repo.lookup_mf_variant(params[:changed_value])
-        options_array = repo.select_values(hash[:table_name].to_sym, [hash[:column].to_sym, :id])
+        options_array = repo.select_values(hash[:table_name].to_sym, [hash[:column_name].to_sym, :id])
         actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_variant_code_field_wrapper')
         actions << OpenStruct.new(type: action, dom_id: 'masterfile_variant_masterfile_id_field_wrapper')
         actions << OpenStruct.new(type: :replace_select_options, dom_id: 'masterfile_variant_masterfile_id', options_array: options_array)

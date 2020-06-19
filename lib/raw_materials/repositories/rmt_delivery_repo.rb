@@ -22,6 +22,7 @@ module RawMaterialsApp
 
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
+    crud_calls_for :rmt_bin_labels, name: :rmt_bin_label, wrapper: RmtBinLabel
 
     def delivery_bin_count(id)
       DB[:rmt_bins].where(rmt_delivery_id: id).count

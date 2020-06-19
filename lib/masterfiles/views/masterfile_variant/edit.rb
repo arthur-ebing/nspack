@@ -17,8 +17,8 @@ module Masterfiles
               form.action "/masterfiles/general/masterfile_variants/#{id}"
               form.remote!
               form.method :update
-              form.add_field :masterfile_table
-              form.add_field :masterfile_id
+              form.add_field :variant
+              form.add_field :masterfile_code
               form.add_field :variant_code
             end
           end

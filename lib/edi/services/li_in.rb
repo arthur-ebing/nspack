@@ -174,7 +174,6 @@ module EdiApp
       attrs[:transfer_load] = false
       attrs[:customer_order_number] = load['customer_order_number']
       attrs[:requires_temp_tail] = false
-      @match_data = load['load_instruction_code']
     end
 
     def parse_pallets_edi
@@ -182,6 +181,8 @@ module EdiApp
       pallets.each do |hash|
         pallet_numbers << hash['pallet_number']
       end
+      @match_data = pallet_numbers.join(',')
+      @match_data = "#{@match_data}," if pallet_numbers.length == 1
     end
 
     def get_party_role_id(party_role_name, role_name) # rubocop:disable Metrics/AbcSize

@@ -1,7 +1,8 @@
 ---
 :caption: Marks
-:sql: SELECT "marks"."id", "marks"."mark_code", "marks"."description", "marks"."active",
-  "marks"."created_at", "marks"."updated_at" FROM "marks"
+:sql: "SELECT\r\n    marks.id,\r\n    marks.mark_code,\r\n    marks.description,\r\n
+  \   fn_masterfile_variants('marks', marks.id) AS variant_codes,\r\n    marks.active,\r\n
+  \   marks.created_at,\r\n    marks.updated_at\r\nFROM marks\r\nORDER BY\r\n    mark_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -54,9 +55,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 4
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Active
     :namespaced_name: marks.active
     :data_type: :boolean
@@ -72,7 +89,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: marks.created_at
     :data_type: :datetime
@@ -88,7 +105,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: marks.updated_at
     :data_type: :datetime

@@ -1,0 +1,274 @@
+---
+:caption: Rmt Bin Labels
+:sql: SELECT "rmt_bin_labels"."id", "rmt_bin_labels"."cultivar_id", "rmt_bin_labels"."farm_id",
+  "rmt_bin_labels"."puc_id", "rmt_bin_labels"."orchard_id", "rmt_bin_labels"."created_at",
+  "rmt_bin_labels"."bin_received_at", "rmt_bin_labels"."bin_asset_number", "cultivars"."cultivar_name",
+  "farms"."farm_code", "orchards"."orchard_code", "pucs"."puc_code", fn_current_status('rmt_bin_labels',"rmt_bin_labels"."id") AS status
+  , CASE WHEN bin_received_at is not null THEN 'green'  END AS colour_rule
+  FROM "rmt_bin_labels"
+  JOIN "cultivars" ON "cultivars"."id" = "rmt_bin_labels"."cultivar_id"
+  JOIN "farms" ON "farms"."id" = "rmt_bin_labels"."farm_id"
+  JOIN "orchards" ON "orchards"."id" = "rmt_bin_labels"."orchard_id"
+  JOIN "pucs" ON "pucs"."id" = "rmt_bin_labels"."puc_id"
+  order by id desc
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: rmt_bin_labels.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_id:
+    :name: cultivar_id
+    :sequence_no: 2
+    :caption: Cultivar
+    :namespaced_name: rmt_bin_labels.cultivar_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 3
+    :caption: Farm
+    :namespaced_name: rmt_bin_labels.farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_id:
+    :name: puc_id
+    :sequence_no: 4
+    :caption: Puc
+    :namespaced_name: rmt_bin_labels.puc_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_id:
+    :name: orchard_id
+    :sequence_no: 5
+    :caption: Orchard
+    :namespaced_name: rmt_bin_labels.orchard_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 6
+    :caption: Created at
+    :namespaced_name: rmt_bin_labels.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_received_at:
+    :name: bin_received_at
+    :sequence_no: 7
+    :caption: Bin received at
+    :namespaced_name: rmt_bin_labels.bin_received_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bin_asset_number:
+    :name: bin_asset_number
+    :sequence_no: 8
+    :caption: Bin asset number
+    :namespaced_name: rmt_bin_labels.bin_asset_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_name:
+    :name: cultivar_name
+    :sequence_no: 9
+    :caption: Cultivar name
+    :namespaced_name: cultivars.cultivar_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 10
+    :caption: Farm code
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 11
+    :caption: Orchard code
+    :namespaced_name: orchards.orchard_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 12
+    :caption: Puc code
+    :namespaced_name: pucs.puc_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 13
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 14
+    :caption: Colour rule
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: rmt_bin_labels.cultivar_id
+  :caption: Cultivar
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT cultivar_name, id FROM cultivars ORDER BY cultivar_name
+- :column: rmt_bin_labels.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: rmt_bin_labels.puc_id
+  :caption: Puc
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
+- :column: rmt_bin_labels.orchard_id
+  :caption: Orchard
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT orchard_code, id FROM orchards ORDER BY orchard_code

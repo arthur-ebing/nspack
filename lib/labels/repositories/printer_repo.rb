@@ -175,5 +175,9 @@ module LabelApp
     def print_to_robot?(ip_address)
       DB[:mes_modules].where(ip_address: ip_address).count.positive?
     end
+
+    def find_bin_labels
+      MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_BIN }).map { |nm, _| nm }
+    end
   end
 end

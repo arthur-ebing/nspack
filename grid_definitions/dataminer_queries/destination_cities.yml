@@ -1,13 +1,15 @@
 ---
 :caption: Destination Cities
-:sql: "SELECT \"destination_cities\".\"id\",\r\n  \"destination_cities\".\"city_name\",\r\n
-  \ \"destination_countries\".\"country_name\",\r\n  \"destination_regions\".\"destination_region_name\",\r\n
-  \ \"destination_cities\".\"updated_at\", \"destination_cities\".\"created_at\"\r\nFROM
-  \"destination_cities\"\r\nJOIN \"destination_countries\" ON \"destination_countries\".\"id\"
-  = \"destination_cities\".\"destination_country_id\"\r\nJOIN \"destination_regions\"
-  ON \"destination_regions\".\"id\" = \"destination_countries\".\"destination_region_id\""
+:sql: "SELECT\r\n    destination_cities.id,\r\n    destination_cities.city_name,\r\n
+  \   destination_countries.country_name,\r\n    destination_regions.destination_region_name
+  AS region_name,\r\n    fn_masterfile_variants('destination_cities', destination_cities.id)
+  AS variant_codes,\r\n    destination_cities.updated_at, destination_cities.created_at\r\n\r\nFROM
+  destination_cities\r\nJOIN destination_countries ON destination_countries.id = destination_cities.destination_country_id\r\nJOIN
+  destination_regions ON destination_regions.id = destination_countries.destination_region_id\r\n\r\nORDER
+  BY destination_cities.city_name"
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -18,6 +20,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -33,6 +36,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -48,21 +52,39 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_region_name:
-    :name: destination_region_name
+  region_name:
+    :name: region_name
     :sequence_no: 4
-    :caption: Destination region name
+    :caption: Region name
     :namespaced_name: destination_regions.destination_region_name
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 5
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -71,13 +93,14 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Updated at
     :namespaced_name: destination_cities.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -86,13 +109,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Created at
     :namespaced_name: destination_cities.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false

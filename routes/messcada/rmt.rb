@@ -58,6 +58,9 @@ class Nspack < Roda
                    end
         Crossbeams::RobotResponder.new(feedback).render
       end
+
+      r.on 'multi_bin_weighing' do
+      end
     end
   end
 

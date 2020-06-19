@@ -553,5 +553,63 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    r.on 'pre_print_bin_labels' do
+      r.get do
+        show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::PrePrintBinLabels.call(remote: fetch?(r)) }
+      end
+
+      r.post do
+        interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        res = interactor.pre_print_bin_labels(params[:rmt_delivery])
+        if res.success
+          show_partial_or_page(r) do
+            RawMaterials::Deliveries::RmtBin::LabelsPrintedConfirm.call(form_values: params[:rmt_delivery], notice: 'have labels printed out successfully?')
+          end
+        else
+          re_show_form(r, res, url: '/raw_materials/deliveries/pre_print_bin_labels') do
+            RawMaterials::Deliveries::RmtBin::PrePrintBinLabels.call(form_values: params[:rmt_delivery],
+                                                                     form_errors: res.errors,
+                                                                     remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    r.on 'pre_printing_cancelled' do
+      flash[:error] = 'Labels Printing Cancelled'
+      r.redirect('/raw_materials/deliveries/pre_print_bin_labels')
+    end
+
+    r.on 'create_bin_labels' do
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.create_bin_labels(params)
+      if res.success
+        flash[:notice] = 'Labels Printed Successfully'
+        r.redirect('/raw_materials/deliveries/pre_print_bin_labels')
+      else
+        re_show_form(r, res, url: '/raw_materials/deliveries/pre_print_bin_labels') do
+          RawMaterials::Deliveries::RmtBin::PrePrintBinLabels.call(form_values: params,
+                                                                   form_errors: res.errors,
+                                                                   remote: fetch?(r))
+        end
+      end
+    end
+    r.on 'preprint_orchard_combo_changed' do
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      if !params[:rmt_delivery_orchard_id].to_s.empty?
+        cultivars = interactor.lookup_orchard_cultivars(params[:rmt_delivery_orchard_id])
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'rmt_delivery_cultivar_id',
+                                     options_array: cultivars)])
+      else
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'rmt_delivery_cultivar_id',
+                                     options_array: [])])
+      end
+    end
   end
 end

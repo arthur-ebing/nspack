@@ -30,28 +30,35 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       if @form_object.masterfile_table
         hash = @repo.lookup_mf_variant(@form_object.masterfile_table)
-        options_array = @repo.select_values(hash[:table_name].to_sym, [hash[:column].to_sym, :id])
+        options_array = @repo.select_values(hash[:table_name].to_sym, [hash[:column_name].to_sym, :id])
       end
       {
-        masterfile_table: { renderer: @mode == :edit ? :label : :select,
+        variant: { renderer: :label,
+                   caption: 'Variant',
+                   with_value: @form_object.variant,
+                   hide_on_load: @form_object.variant.nil? },
+        masterfile_table: { renderer: :select,
                             caption: 'Variant',
                             remove_search_for_small_list: false,
                             options: @repo.for_select_mf_variant,
-                            with_value: @form_object.variant,
                             min_charwidth: 30,
                             prompt: true,
-                            required: true },
-        masterfile_id: { renderer: @mode == :edit ? :label : :select,
+                            required: true,
+                            hide_on_load: !@form_object.masterfile_table.nil? },
+        masterfile_id: { renderer: :select,
                          caption: 'Masterfile Code',
                          remove_search_for_small_list: false,
                          options: options_array,
-                         with_value: @form_object.masterfile_code,
                          prompt: true,
                          required: true,
-                         hide_on_load: @form_object.masterfile_table.nil? },
+                         hide_on_load: @form_object.variant_code.nil? },
+        masterfile_code: { renderer: :label,
+                           caption: 'Masterfile Code',
+                           with_value: @form_object.masterfile_code,
+                           hide_on_load: @form_object.variant.nil? },
         variant_code: { caption: 'Variant Code',
                         required: true,
-                        hide_on_load: @form_object.masterfile_table.nil? }
+                        hide_on_load: @form_object.variant.nil? }
       }
     end
 
@@ -66,10 +73,12 @@ module UiRules
 
     def make_new_form_object
       form_values = @options[:form_values] || {}
-      @form_object = OpenStruct.new(variant: @repo.lookup_mf_variant(form_values[:masterfile_table])[:variant],
+      hash = @repo.lookup_mf_variant(form_values[:masterfile_table])
+      masterfile_code = @repo.get(hash[:table_name].to_sym, form_values[:masterfile_id], hash[:column_name].to_sym) unless hash.empty?
+      @form_object = OpenStruct.new(variant: hash[:variant],
                                     masterfile_table: form_values[:masterfile_table],
                                     masterfile_id: form_values[:masterfile_id],
-                                    masterfile_code: nil,
+                                    masterfile_code: masterfile_code,
                                     variant_code: nil)
     end
 
