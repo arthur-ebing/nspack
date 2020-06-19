@@ -22,9 +22,7 @@ module QualityApp
       res = QualityApp::CreateOrchardTestResults.call(nil, @user)
       return failed_response(res.message) unless res.success
 
-      res = api.auth_token_call
-      return failed_response(res.message) unless res.success
-
+      res = nil
       puc_ids.each do |puc_id|
         res = api.request_phyt_clean_standard_data(season_id, puc_id)
         return failed_response(res.message) unless res.success
