@@ -15,10 +15,11 @@ module Crossbeams
 
     # See if a host is reachable via ping.
     #
-    # @param host [string] the hostname or ip address to check.
+    # @param url_or_host [string] the url, hostname or ip address to check.
     # @return [boolean] True if the ping succeeded.
-    def can_ping?(host)
-      pe = Net::Ping::External.new(host)
+    def can_ping?(url_or_host)
+      uri = URI.parse(url_or_host)
+      pe = Net::Ping::External.new(uri.host || uri.path)
       pe.timeout = 1
       pe.ping?
     end
