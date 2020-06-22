@@ -182,6 +182,9 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           r.on 'weighing' do
             respond(request.path, params)
           end
+          r.on 'multi_bin_weighing' do
+            respond(request.path, params)
+          end
           respond(request.path, params)
         end
       end

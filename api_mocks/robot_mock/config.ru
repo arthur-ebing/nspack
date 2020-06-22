@@ -374,6 +374,16 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 dp4: 'kg',
               },
               {
+                url: '/messcada/rmt/bin_tipping/multi_bin_weighing?',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: 'gross_weight',
+                p4: 'measurement_unit',
+                p5: null,
+                p6: null,
+                dp4: 'kg',
+              },
+              {
                 url: '/messcada/production/carton_labeling?',
                 p1: 'device',
                 p2: 'card_reader',
