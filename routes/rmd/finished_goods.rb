@@ -558,9 +558,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.get do
             form_state = {}
             current_load = interactor.stepper(:load_truck)
-            r.redirect("/rmd/finished_goods/dispatch/load_truck/load/#{current_load.id}") unless current_load&.id.nil?
+            r.redirect("/rmd/finished_goods/dispatch/load_truck/load/#{current_load.id}") unless current_load.id.nil_or_empty?
 
-            form_state = current_load.form_state if current_load&.error?
+            form_state = current_load.form_state if current_load.error?
             form = Crossbeams::RMDForm.new(form_state,
                                            form_name: :load,
                                            scan_with_camera: @rmd_scan_with_camera,
