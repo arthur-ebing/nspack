@@ -332,14 +332,17 @@ module RawMaterialsApp
     def preprint_bin_barcodes(bin_asset_numbers, params) # rubocop:disable Metrics/AbcSize
       label_name = params[:bin_label]
       print_params = { no_of_prints: 1, printer: params[:printer] }
+      res = nil
       bin_asset_numbers.each do |bin_asset_number|
         instance = { farm_code: repo.get(:farms, params[:farm_id], :farm_code),
                      puc_code: repo.get(:pucs, params[:puc_id], :puc_code),
                      orchard_code: repo.get(:orchards, params[:orchard_id], :orchard_code),
                      cultivar_name: repo.get(:cultivars, params[:cultivar_id], :cultivar_name),
                      bin_asset_number: bin_asset_number }
-        LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+        res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+        return res unless res.success
       end
+      res
     end
 
     def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize

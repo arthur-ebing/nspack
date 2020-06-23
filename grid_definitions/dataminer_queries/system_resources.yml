@@ -1,0 +1,508 @@
+---
+:caption: System resources
+:sql: "SELECT \r\n(SELECT string_agg(cc.plant_resource_code, ' / ') as path\r\n  FROM
+  (SELECT c.plant_resource_code\r\n         FROM plant_resources AS c \r\n        JOIN
+  tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id\r\n       WHERE
+  t1.descendant_plant_resource_id = plant_resources.id\r\n       ORDER BY t1.path_length
+  DESC) AS cc) AS hierarchy,\r\nplant_resource_types.icon,\r\nsystem_resources.system_resource_code,
+  \r\nplant_resources.plant_resource_code, plant_resources.description,\r\n(SELECT
+  string_agg(system_resource_code, '; ') FROM (SELECT pr.system_resource_code \r\n
+  \ FROM plant_resources_system_resources prs\r\n  JOIN system_resources pr ON pr.id
+  = prs.system_resource_id\r\n  WHERE prs.plant_resource_id = plant_resources.id)
+  sub) AS linked_resources,\r\nplant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
+  AS type_description,\r\nsystem_resource_types.peripheral,\r\nsystem_resources.equipment_type,\r\nsystem_resources.module_function,\r\nsystem_resources.mac_address,\r\nsystem_resources.ip_address,\r\nsystem_resources.port,\r\nsystem_resources.ttl,\r\nsystem_resources.cycle_time,\r\nsystem_resources.publishing,\r\nsystem_resources.login,\r\nsystem_resources.logoff,\r\nsystem_resources.module_action,\r\nsystem_resources.peripheral_model,\r\nsystem_resources.connection_type,\r\nsystem_resources.printer_language,\r\nsystem_resources.print_username,\r\nsystem_resources.print_password,\r\nsystem_resources.pixels_mm,\r\nplant_resources.system_resource_id
+  AS id,\r\nplant_resources.id AS plant_resource_id,\r\nplant_resources.plant_resource_type_id\r\nFROM
+  plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nJOIN
+  system_resources ON system_resources.id = plant_resources.system_resource_id\r\nJOIN
+  system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE
+  EXISTS(SELECT ancestor_plant_resource_id FROM tree_plant_resources WHERE descendant_plant_resource_id
+  = plant_resources.id)\r\nORDER BY (SELECT string_agg(\"cc\".\"plant_resource_code\",
+  ';') AS path \r\n    FROM (SELECT \"c\".\"plant_resource_code\" FROM \"plant_resources\"
+  c JOIN \"tree_plant_resources\" t1 ON \"t1\".\"ancestor_plant_resource_id\" = \"c\".\"id\"
+  \r\n    WHERE \"t1\".\"descendant_plant_resource_id\" = \"plant_resources\".\"id\"
+  \r\n    ORDER BY \"t1\".\"path_length\" DESC) cc)\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  hierarchy:
+    :name: hierarchy
+    :sequence_no: 1
+    :caption: Hierarchy
+    :namespaced_name: 
+    :data_type: :string
+    :width: 400
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  icon:
+    :name: icon
+    :sequence_no: 2
+    :caption: I
+    :namespaced_name: plant_resource_types.icon
+    :data_type: :string
+    :width: 50
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_code:
+    :name: system_resource_code
+    :sequence_no: 3
+    :caption: System resource code
+    :namespaced_name: system_resources.system_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 4
+    :caption: Plant resource code
+    :namespaced_name: plant_resources.plant_resource_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 5
+    :caption: Description
+    :namespaced_name: plant_resources.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  linked_resources:
+    :name: linked_resources
+    :sequence_no: 6
+    :caption: Linked resources
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 7
+    :caption: Active
+    :namespaced_name: plant_resources.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_type_code:
+    :name: plant_resource_type_code
+    :sequence_no: 8
+    :caption: Plant resource type code
+    :namespaced_name: plant_resource_types.plant_resource_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  type_description:
+    :name: type_description
+    :sequence_no: 9
+    :caption: Type description
+    :namespaced_name: plant_resource_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  peripheral:
+    :name: peripheral
+    :sequence_no: 10
+    :caption: Peripheral
+    :namespaced_name: system_resource_types.peripheral
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  equipment_type:
+    :name: equipment_type
+    :sequence_no: 11
+    :caption: Equipment type
+    :namespaced_name: system_resources.equipment_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  module_function:
+    :name: module_function
+    :sequence_no: 12
+    :caption: Module function
+    :namespaced_name: system_resources.module_function
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  mac_address:
+    :name: mac_address
+    :sequence_no: 13
+    :caption: Mac address
+    :namespaced_name: system_resources.mac_address
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ip_address:
+    :name: ip_address
+    :sequence_no: 14
+    :caption: Ip address
+    :namespaced_name: system_resources.ip_address
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  port:
+    :name: port
+    :sequence_no: 15
+    :caption: Port
+    :namespaced_name: system_resources.port
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ttl:
+    :name: ttl
+    :sequence_no: 16
+    :caption: Ttl
+    :namespaced_name: system_resources.ttl
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cycle_time:
+    :name: cycle_time
+    :sequence_no: 17
+    :caption: Cycle time
+    :namespaced_name: system_resources.cycle_time
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  publishing:
+    :name: publishing
+    :sequence_no: 18
+    :caption: Publishing
+    :namespaced_name: system_resources.publishing
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  login:
+    :name: login
+    :sequence_no: 19
+    :caption: Login
+    :namespaced_name: system_resources.login
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  logoff:
+    :name: logoff
+    :sequence_no: 20
+    :caption: Logoff
+    :namespaced_name: system_resources.logoff
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  module_action:
+    :name: module_action
+    :sequence_no: 21
+    :caption: Module action
+    :namespaced_name: system_resources.module_action
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  peripheral_model:
+    :name: peripheral_model
+    :sequence_no: 22
+    :caption: Peripheral model
+    :namespaced_name: system_resources.peripheral_model
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  connection_type:
+    :name: connection_type
+    :sequence_no: 23
+    :caption: Connection type
+    :namespaced_name: system_resources.connection_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_language:
+    :name: printer_language
+    :sequence_no: 24
+    :caption: Printer language
+    :namespaced_name: system_resources.printer_language
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  print_username:
+    :name: print_username
+    :sequence_no: 25
+    :caption: Print username
+    :namespaced_name: system_resources.print_username
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  print_password:
+    :name: print_password
+    :sequence_no: 26
+    :caption: Print password
+    :namespaced_name: system_resources.print_password
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pixels_mm:
+    :name: pixels_mm
+    :sequence_no: 27
+    :caption: Pixels mm
+    :namespaced_name: system_resources.pixels_mm
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 28
+    :caption: Id
+    :namespaced_name: plant_resources.system_resource_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_id:
+    :name: plant_resource_id
+    :sequence_no: 29
+    :caption: Plant resource
+    :namespaced_name: plant_resources.id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_type_id:
+    :name: plant_resource_type_id
+    :sequence_no: 30
+    :caption: Plant resource type
+    :namespaced_name: plant_resources.plant_resource_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

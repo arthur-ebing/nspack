@@ -233,17 +233,18 @@ module ProductionApp
     def system_modules
       query = <<~SQL
         SELECT s.system_resource_code as name,
-        'robot-nspi' as module_type, -- May need to vary...
-        'TODO: function' as function, -- Could add to resource_types
+        s.equipment_type as module_type,
+        s.module_function as function, -- Could add to resource_types
         p.plant_resource_code as alias,
-        'TODO: ip' as network_interface,
-        'TODO: port' as port,
-        'TODO: MACaddr' as mac_address,
-        'TODO: TTL' as ttl,
-        'TODO: cycle time' as cycle_time,
-        'TODO: Publishing' as publishing,
-        'TODO: Login' as login,
-        'TODO: Logoff' as logoff,
+        s.ip_address as network_interface,
+        s.port as port,
+        s.mac_address as mac_address,
+        s.ttl as ttl,
+        s.cycle_time as cycle_time,
+        s.publishing as publishing, -- true/false..
+        s.login as login,
+        s.logoff as logoff,
+        s.module_action,
         'TODO: URL' as url,
         'TODO: Par1' as par1,
         'TODO: Par2' as par2,
@@ -253,8 +254,18 @@ module ProductionApp
         'TODO: ReaderID' as readerid,
         'TODO: ContainerType' as container_type,
         'TODO: WeightUnits' as weight_units,
-        'TODO: Printer' as printer,
-        'TODO: PrinterTypes' as printer_types,
+        (SELECT string_agg("system_resource_code", ',')
+        FROM (SELECT "pr"."system_resource_code"
+        FROM "plant_resources_system_resources" prs
+        JOIN "system_resources" pr ON "pr"."id" = "prs"."system_resource_id"
+        WHERE "prs"."plant_resource_id" = p.id
+          AND pr.plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'PRINTER')) sub) AS printer,
+        (SELECT string_agg("equipment_type", ',')
+        FROM (SELECT DISTINCT "sr"."equipment_type"
+        FROM "plant_resources_system_resources" prs
+        JOIN "system_resources" sr ON "sr"."id" = "prs"."system_resource_id"
+        WHERE "prs"."plant_resource_id" = p.id
+          AND sr.plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'PRINTER')) sub) AS printer_types,
 
         s.id, s.plant_resource_type_id, s.system_resource_type_id,
                s.description, s.active,
@@ -274,19 +285,19 @@ module ProductionApp
     def system_peripherals
       query = <<~SQL
         SELECT s.system_resource_code as name,
-        'NSLD-Printing' as function,
+        s.module_function as function,
         p.plant_resource_code as alias,
-        'TODO: type' as type,
-        'TODO: model' as model,
-        'TODO: conn type' AS connection_type,
-        'TODO: ip' as network_interface,
-        'TODO: port' as port,
-        'TODO: TTL:' as ttl,
-        'TODO: cycle time' as cycle_time,
-        'TODO: Lang' as language,
-        'TODO: User' as username,
-        'TODO: Pass' as password,
-        'TODO: Pixel/mm' as pixels_mm
+        s.equipment_type as type,
+        s.peripheral_model as model,
+        s.connection_type AS connection_type,
+        s.ip_address as network_interface,
+        s.port as port,
+        s.ttl as ttl,
+        s.cycle_time as cycle_time,
+        s.printer_language as language,
+        s.print_username as username,
+        s.print_password as password,
+        s.pixels_mm as pixels_mm
         ,
          s.id, s.plant_resource_type_id, s.system_resource_type_id,
                s.description, s.active,

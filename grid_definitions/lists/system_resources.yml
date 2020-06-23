@@ -1,0 +1,25 @@
+---
+:dataminer_definition: system_resources
+:actions:
+- :url: "/production/resources/plant_resources/$:plant_resource_id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/resources/system_resources/$:id$/set_module"
+  :text: edit module
+  :icon: edit
+  :title: Module settings
+  :popup: true
+  :hide_if_true: peripheral
+- :url: "/production/resources/system_resources/$:id$/set_peripheral"
+  :text: edit peripheral
+  :icon: edit
+  :title: Peripheral settings
+  :popup: true
+  :hide_if_false: peripheral
+:page_controls:
+- :control_type: :link
+  :url: "/production/resources/system_resources"
+  :text: Resource XML
+  :style: :button

@@ -20,8 +20,8 @@ Sequel.migration do
   end
 
   down do
-    drop_table(:rmt_bin_labels)
     drop_trigger(:rmt_bin_labels, :set_created_at)
     drop_function(:rmt_bin_labels_set_created_at)
+    drop_table(:rmt_bin_labels)
   end
 end

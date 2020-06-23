@@ -391,6 +391,182 @@ module Crossbeams
                                  code_prefix: 'PSM-' }
       }.freeze
 
+      MODULE_ACTIONS = {
+        carton_palletizing: {
+          url: '',
+          Par1: '',
+          Par2: '',
+          Par3: '',
+          Par4: '',
+          Par5: '',
+          ReaderID: '',
+          ContainerType: '',
+          WeightUnits: ''
+        },
+        pallet_movement: {
+          url: '',
+          Par1: '',
+          Par2: '',
+          Par3: '',
+          Par4: '',
+          Par5: '',
+          ReaderID: '',
+          ContainerType: '',
+          WeightUnits: ''
+        },
+        bin_tipping: {
+          url: '/messcada/rmt/bin_tipping?',
+          Par1: 'device',
+          Par2: 'bin_number',
+          Par3: 'identifier',
+          Par4: 'gross_weight',
+          Par5: 'measurement_unit',
+          ReaderID: '',
+          ContainerType: 'bin',
+          WeightUnits: 'Kg'
+        },
+        bin_tipping_weighing: {
+          url: '/messcada/rmt/bin_tipping/weighing?',
+          Par1: 'device',
+          Par2: 'bin_number',
+          Par3: 'identifier',
+          Par4: 'gross_weight',
+          Par5: 'measurement_unit',
+          ReaderID: '',
+          ContainerType: 'bin',
+          WeightUnits: 'Kg'
+        },
+        multi_bin_tipping_weighing: {
+          url: '/messcada/rmt/bin_tipping/multi_bin_weighing?',
+          Par1: 'device',
+          Par2: 'bin_number',
+          Par3: 'identifier',
+          Par4: 'gross_weight',
+          Par5: 'measurement_unit',
+          ReaderID: '',
+          ContainerType: 'bin',
+          WeightUnits: 'Kg'
+        },
+        carton_labeling: {
+          url: '/messcada/production/carton_labeling?',
+          Par1: 'device',
+          Par2: 'card_reader',
+          Par3: 'identifier',
+          Par4: '',
+          Par5: '',
+          ReaderID: '',
+          ContainerType: 'carton',
+          WeightUnits: 'Kg'
+        },
+        carton_verification: {
+          url: '/messcada/production/carton_verification?',
+          Par1: 'device',
+          Par2: 'carton_number',
+          Par3: '',
+          Par4: '',
+          Par5: '',
+          ReaderID: '',
+          ContainerType: 'carton',
+          WeightUnits: 'Kg'
+        },
+        carton_verification_weighing_labeling: {
+          url: '/messcada/production/carton_verification/weighing/labeling?',
+          Par1: 'device',
+          Par2: 'carton_number',
+          Par3: 'gross_weight',
+          Par4: 'measurement_unit',
+          Par5: 'card_reader',
+          Par6: 'identifier',
+          ReaderID: '',
+          ContainerType: 'carton',
+          WeightUnits: 'Kg'
+        },
+        pallet_weighing: {
+          url: '/messcada/fg/pallet_weighing?',
+          Par1: 'device',
+          Par2: 'bin_number',
+          Par3: 'gross_weight',
+          Par4: 'measurement_unit',
+          Par5: '',
+          ReaderID: '',
+          ContainerType: 'bin',
+          WeightUnits: 'Kg'
+        }
+      }.freeze
+      #   {
+      #     url: '/messcada/hr/register_id?',
+      #     p1: 'device',
+      #     p2: 'card_reader',
+      #     p3: 'value',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/hr/logon?',
+      #     p1: 'device',
+      #     p2: 'card_reader',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/hr/logoff?',
+      #     p1: 'device',
+      #     p2: 'card_reader',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/carton_palletizing/scan_carton?',
+      #     p1: 'device',
+      #     p2: 'reader_id',
+      #     p3: 'identifier',
+      #     p4: 'carton_number',
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/carton_palletizing/qc_out?',
+      #     p1: 'device',
+      #     p2: 'reader_id',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/carton_palletizing/return_to_bay?',
+      #     p1: 'device',
+      #     p2: 'reader_id',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/carton_palletizing/refresh?',
+      #     p1: 'device',
+      #     p2: 'reader_id',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      #   {
+      #     url: '/messcada/carton_palletizing/complete?',
+      #     p1: 'device',
+      #     p2: 'reader_id',
+      #     p3: 'identifier',
+      #     p4: null,
+      #     p5: null,
+      #     p6: null,
+      #   },
+      # ];
+
       # FTP..
       # add module with robot, use prefix for mod only & check db for next value
       # What happens if XML config has srv-01:clm-01 and srv-02:clm-04 and clm-01 is renamed to clm-03 and clm-04 becomes clm-01 ?

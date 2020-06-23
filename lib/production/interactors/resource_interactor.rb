@@ -85,6 +85,36 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def set_module_resource(id, params)
+      res = validate_system_resource_module_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def set_peripheral_resource(id, params)
+      res = validate_system_resource_peripheral_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_system_resource(id, res)
+        log_transaction
+      end
+      instance = system_resource(id)
+      success_response("Updated system resource #{instance.system_resource_code}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::PlantResource.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
@@ -148,6 +178,10 @@ module ProductionApp
       repo.find_plant_resource(id)
     end
 
+    def system_resource(id)
+      repo.find_system_resource(id)
+    end
+
     def validate_plant_resource_params(params)
       PlantResourceSchema.call(params)
     end
@@ -158,6 +192,14 @@ module ProductionApp
 
     def validate_plant_resource_clm_params(params)
       PlantResourceBulkClmSchema.call(params)
+    end
+
+    def validate_system_resource_module_params(params)
+      SystemResourceModuleSchema.call(params)
+    end
+
+    def validate_system_resource_peripheral_params(params)
+      SystemResourcePeripheralSchema.call(params)
     end
   end
 end

@@ -275,9 +275,75 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # SYSTEM RESOURCES
     # --------------------------------------------------------------------------
+    r.on 'system_resources', Integer do |id|
+      interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:system_resources, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'set_module' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetModule.call(id) }
+        end
+        r.post do
+          res = interactor.set_module_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              equipment_type
+              module_function
+              mac_address
+              ip_address
+              port
+              ttl
+              cycle_time
+              publishing
+              login
+              logoff
+              module_action
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetModule.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'set_peripheral' do
+        r.get do
+          check_auth!('resources', 'edit')
+          show_partial { Production::Resources::SystemResource::SetPeripheral.call(id) }
+        end
+        r.post do
+          res = interactor.set_peripheral_resource(id, params[:system_resource])
+          if res.success
+            row_keys = %i[
+              equipment_type
+              ip_address
+              port
+              ttl
+              cycle_time
+              peripheral_model
+              connection_type
+              printer_language
+              print_username
+              print_password
+              pixels_mm
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Production::Resources::SystemResource::SetModule.call(id, form_values: params[:system_resource], form_errors: res.errors) }
+          end
+        end
+      end
+    end
+
     r.on 'system_resources' do
       interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+      check_auth!('resources', 'read')
       res = interactor.system_resource_xml
       show_page { Production::Resources::SystemResource::ShowXml.call(res) }
       # view(inline: res.instance[:modules].to_s)

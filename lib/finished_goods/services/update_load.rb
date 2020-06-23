@@ -31,11 +31,14 @@ module FinishedGoodsApp
 
     private
 
-    def update_load
+    def update_load # rubocop:disable Metrics/AbcSize
       res = LoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      repo.update(:loads, load_id, res)
+      attrs = res.to_h
+      attrs[:requires_temp_tail] = AppConst::TEMP_TAIL_REQUIRED_TO_SHIP unless attrs[:requires_temp_tail]
+
+      repo.update(:loads, load_id, attrs)
       repo.log_status(:loads, load_id, 'UPDATED', user_name: @user.user_name)
 
       ok_response

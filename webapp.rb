@@ -12,7 +12,7 @@ class Nspack < Roda
   include DataminerHelpers
   include RmdHelpers
 
-  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session'
+  use Rack::Session::Cookie, secret: 'some_other_nice_long_random_string_DSKJH4378EYR7EGKUFH', key: '_myapp_session', same_site: :lax
   use Rack::MethodOverride # Use with all_verbs plugin to allow 'r.delete' etc.
   use Crossbeams::RackMiddleware::Banner, template: 'views/_page_banner.erb' # , session: request.session
 

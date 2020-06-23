@@ -230,7 +230,6 @@ module UiRules
     end
 
     def make_new_form_object
-      last_id = @repo.select_values(:loads, :id).max
       @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
@@ -249,7 +248,7 @@ module UiRules
                                     shipped_at: nil,
                                     shipped: false,
                                     loaded: false,
-                                    requires_temp_tail: @repo.get(:loads, last_id, :requires_temp_tail),
+                                    requires_temp_tail: AppConst::TEMP_TAIL_REQUIRED_TO_SHIP,
                                     transfer_load: nil)
     end
 

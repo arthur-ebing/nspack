@@ -30,11 +30,14 @@ module FinishedGoodsApp
 
     private
 
-    def create_load
+    def create_load # rubocop:disable Metrics/AbcSize
       res = LoadSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      @load_id = repo.create(:loads, res)
+      attrs = res.to_h
+      attrs[:requires_temp_tail] = AppConst::TEMP_TAIL_REQUIRED_TO_SHIP unless attrs[:requires_temp_tail]
+
+      @load_id = repo.create(:loads, attrs)
       @params[:load_id] = load_id
       repo.log_status(:loads, load_id, 'CREATED', user_name: @user.user_name, comment: comment)
 
