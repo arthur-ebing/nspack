@@ -12,7 +12,6 @@ Sequel.migration do
     alter_table(:govt_inspection_sheets) do
       drop_column :packed_tm_group_id
       drop_column :destination_region_id
-      set_column_not_null :destination_country_id
     end
   end
 end
