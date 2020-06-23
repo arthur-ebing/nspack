@@ -18,6 +18,10 @@
   :title: Peripheral settings
   :popup: true
   :hide_if_false: peripheral
+- :url: "/production/resources/system_resources/$:id$/view_xml_config"
+  :text: view XML config
+  :icon: code
+  :hide_if_true: peripheral
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/system_resources"

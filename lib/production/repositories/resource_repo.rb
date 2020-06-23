@@ -78,6 +78,19 @@ module ProductionApp
                             wrapper: PlantResourceFlat)
     end
 
+    def find_system_resource_flat(id)
+      find_with_association(:system_resources,
+                            id,
+                            parent_tables: [{ parent_table: :plant_resource_types,
+                                              columns: [:plant_resource_type_code],
+                                              flatten_columns: { plant_resource_type_code: :plant_resource_type_code } },
+                                            { parent_table: :system_resource_types,
+                                              columns: [:system_resource_type_code],
+                                              flatten_columns: { system_resource_type_code: :system_resource_type_code } }],
+                            sub_tables: [{ sub_table: :plant_resources, one_to_one: { plant_resource_code: :plant_resource_code } }],
+                            wrapper: SystemResourceFlat)
+    end
+
     def create_plant_resource_type(attrs)
       new_attrs = attrs.to_h
       new_attrs[:attribute_rules] = hash_for_jsonb_col(attrs[:attribute_rules])

@@ -23,8 +23,7 @@ module ProductionApp
 
     optional(:id, :integer).filled(:int?)
     required(:equipment_type, Types::StrippedString).maybe(:str?)
-    # required(:module_function, Types::StrippedString).maybe(:str?)
-    # required(:mac_address, Types::StrippedString).maybe(:str?)
+    required(:module_function, Types::StrippedString).maybe(:str?)
     required(:ip_address, Types::StrippedString).maybe(:str?)
     required(:port, :integer).maybe(:int?)
     required(:ttl, :integer).maybe(:int?)

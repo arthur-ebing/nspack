@@ -283,8 +283,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
+      r.on 'view_xml_config' do
+        check_auth!('resources', 'read')
+        res = interactor.system_resource_xml_for(id)
+        show_page { Production::Resources::SystemResource::ShowXml.call(res) }
+      end
+
       r.on 'set_module' do
         r.get do
+          # TODO: fail for robot buttons
           check_auth!('resources', 'edit')
           show_partial { Production::Resources::SystemResource::SetModule.call(id) }
         end

@@ -110,6 +110,8 @@ module UiRules
              'pallet-movement'
            when /^PWM/
              'pallet-weighing'
+           when /^PRN/
+             'NSLD-Printing'
            end
       @form_object = OpenStruct.new(@form_object.to_h.merge(module_function: mf)) unless mf.nil?
     end

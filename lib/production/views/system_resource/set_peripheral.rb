@@ -33,6 +33,7 @@ module Production
                   col.add_field :cycle_time
                 end
                 row.column do |col|
+                  col.add_field :module_function
                   col.add_field :connection_type
                   col.add_field :printer_language
                   col.add_field :print_username

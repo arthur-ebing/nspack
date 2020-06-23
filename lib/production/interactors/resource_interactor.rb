@@ -139,6 +139,11 @@ module ProductionApp
       success_response('ok', MasterfilesApp::LocationRepo.new.find_location(location_id))
     end
 
+    def system_resource_xml_for(id)
+      success_response('ok',
+                       config: ProductionApp::BuildModuleConfigXml.call(id).instance)
+    end
+
     def system_resource_xml
       success_response('ok',
                        modules: ProductionApp::BuildModulesXml.call.instance,
