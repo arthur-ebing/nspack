@@ -39,4 +39,21 @@ module MesscadaApp
     required(:gross_weight, :decimal).filled(:decimal?)
     required(:measurement_unit, Types::StrippedString).filled(:str?)
   end
+
+  CartonPalletizingScanSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:device, Types::StrippedString).filled(:str?)
+    required(:reader_id, Types::StrippedString).filled(:str?)
+    required(:identifier, Types::StrippedString).filled(:str?)
+    required(:carton_number, Types::StrippedString).filled(:str?)
+  end
+
+  CartonPalletizingSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:device, Types::StrippedString).filled(:str?)
+    required(:reader_id, Types::StrippedString).filled(:str?)
+    required(:identifier, Types::StrippedString).filled(:str?)
+  end
 end

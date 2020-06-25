@@ -35,15 +35,21 @@ module MesscadaApp
 
     def pallet_sequence_carton_params
       carton_rejected_fields = %i[id resource_id label_name fruit_sticker_pm_product_id carton_label_id gross_weight nett_weight
-                                  phc pallet_label_name active created_at updated_at packing_method_id]
+                                  phc pallet_label_name active created_at updated_at packing_method_id palletizer_identifier_id pallet_sequence_id]
       carton_rejected_fields << :pallet_number unless AppConst::CARTON_EQUALS_PALLET
       repo.find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
     end
 
     def pallet_sequence_pallet_params
+      quantity = if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
+                   carton_quantity
+                 else
+                   carton_quantity.nil? ? cartons_per_pallet : carton_quantity
+                 end
+
       {
         scanned_from_carton_id: carton_id,
-        carton_quantity: carton_quantity.nil? ? cartons_per_pallet : carton_quantity,
+        carton_quantity: quantity,
         pick_ref: UtilityFunctions.calculate_pick_ref(packhouse_no)
       }
     end

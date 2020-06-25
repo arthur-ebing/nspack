@@ -51,6 +51,33 @@ class Nspack < Roda
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end
+
+    # --------------------------------------------------------------------------
+    # COMPLETE PALLET - Complete the current pallet and empty the bay
+    # --------------------------------------------------------------------------
+    r.on 'complete_pallet' do
+      res = interactor.complete_pallet(params)
+      feedback = interactor.palletizing_robot_feedback(params[:device], res)
+      Crossbeams::RobotResponder.new(feedback).render
+    end
+
+    # --------------------------------------------------------------------------
+    # TRANSFER CARTON - Transfer carton to the current bay from an empty bay
+    # --------------------------------------------------------------------------
+    r.on 'empty_bay_carton_transfer' do
+      res = interactor.empty_bay_carton_transfer(params)
+      feedback = interactor.palletizing_robot_feedback(params[:device], res)
+      Crossbeams::RobotResponder.new(feedback).render
+    end
+
+    # --------------------------------------------------------------------------
+    # TRANSFER CARTON - Transfer carton to the current bay
+    # --------------------------------------------------------------------------
+    r.on 'transfer_carton' do
+      res = interactor.transfer_carton(params)
+      feedback = interactor.palletizing_robot_feedback(params[:device], res)
+      Crossbeams::RobotResponder.new(feedback).render
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

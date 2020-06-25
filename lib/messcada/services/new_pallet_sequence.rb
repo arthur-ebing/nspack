@@ -12,7 +12,7 @@ module MesscadaApp
       @user_name = user_name
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       res = NewPalletSequenceObject.call(user_name, carton_id, carton_quantity)
       return res unless res.success
 
@@ -20,6 +20,7 @@ module MesscadaApp
       return validations unless validations.success
 
       id = repo.create_sequences(res.instance, pallet_id)
+      repo.update_carton(carton_id, { pallet_sequence_id: id }) if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
 
       success_response('ok', pallet_sequence_id: id)
     end

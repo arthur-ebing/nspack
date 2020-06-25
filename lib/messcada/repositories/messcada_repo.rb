@@ -43,6 +43,10 @@ module MesscadaApp
       exists?(:pallets, pallet_number: pallet_number)
     end
 
+    def pallet_id_for_pallet_number(pallet_number)
+      DB[:pallets].where(pallet_number: pallet_number.to_s).get(:id)
+    end
+
     def resource_code_exists?(resource_code)
       exists?(:system_resources, system_resource_code: resource_code)
     end
@@ -273,6 +277,42 @@ module MesscadaApp
               .where(module_code: device, server_ip: server_ip)
               .get(:module_type)
       mtype == 'robot-T200' ? 4 : 6
+    end
+
+    def find_personnel_identifiers_by_palletizer_identifier(palletizer_identifier)
+      DB[:personnel_identifiers].where(identifier: palletizer_identifier).get(:id)
+    end
+
+    def carton_attributes(carton_id)
+      query = <<~SQL
+        SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference,
+               sp.standard_pack_code, sf.size_count_value ,clt.cultivar_name, cg.cultivar_group_code, c.*
+        FROM cartons c
+        JOIN inventory_codes i ON i.id = c.inventory_code_id
+        JOIN target_market_groups tm on tm.id = c.packed_tm_group_id
+        JOIN fruit_size_references fs on fs.id = c.fruit_size_reference_id
+        JOIN standard_pack_codes sp on sp.id = c.standard_pack_code_id
+        JOIN std_fruit_size_counts sf on sf.id = c.std_fruit_size_count_id
+        JOIN grades g on g.id = c.grade_id
+        JOIN marks m on m.id = c.mark_id
+        JOIN cultivars clt on clt.id = c.cultivar_id
+        JOIN cultivar_groups cg on cg.id = c.cultivar_group_id
+        WHERE c.id = ?
+      SQL
+      DB[query, carton_id].first
+    end
+
+    def new_sequence?(carton_id, pallet_id)
+      matching_sequences = matching_sequence_for_carton(carton_id, pallet_id)
+      matching_sequences.nil? ? true : false
+    end
+
+    def matching_sequence_for_carton(carton_id, pallet_id)
+      carton_rejected_fields = %i[id carton_label_id pallet_number product_resource_allocation_id fruit_sticker_pm_product_id
+                                  gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id
+                                  palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id]
+      attrs = find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
+      DB[:pallet_sequences].where(pallet_id: pallet_id).where(attrs).get(:id)
     end
   end
 end

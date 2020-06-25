@@ -2,11 +2,12 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user
+    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user, :palletizer_identifier
 
-    def initialize(user, params)
+    def initialize(user, params, palletizer_identifier = nil)
       @carton_label_id = params[:carton_number]
       @user = user
+      @palletizer_identifier = palletizer_identifier
     end
 
     def call
@@ -26,7 +27,9 @@ module MesscadaApp
       # return failed_response("#{@container_type} #{carton_label_id} already verified") if carton_label_carton_exists?
 
       unless carton_label_carton_exists?
-        carton_params = carton_label_carton_params.to_h.merge(carton_label_id: carton_label_id)
+        palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
+        attrs = { carton_label_id: carton_label_id, palletizer_identifier_id: palletizer_identifier_id }
+        carton_params = carton_label_carton_params.to_h.merge(attrs)
 
         id = DB[:cartons].insert(carton_params)
         MesscadaApp::CreatePalletFromCarton.new(user, id, carton_quantity).call if carton_is_pallet
@@ -43,6 +46,10 @@ module MesscadaApp
 
     def carton_label_carton_params
       repo.find_hash(:carton_labels, carton_label_id).reject { |k, _| %i[id resource_id label_name carton_equals_pallet active created_at updated_at].include?(k) }
+    end
+
+    def find_personnel_identifier
+      repo.find_personnel_identifiers_by_palletizer_identifier(palletizer_identifier)
     end
   end
 end

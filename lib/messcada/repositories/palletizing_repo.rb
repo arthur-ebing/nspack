@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  class PalletizingRepo < BaseRepo
+  class PalletizingRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :palletizing_bay_states,
                      label: :palletizing_robot_code,
                      value: :id,
@@ -29,6 +29,17 @@ module MesscadaApp
       find_palletizing_bay_state(id)
     end
 
+    def find_palletizing_bay_state(id)
+      hash = find_with_association(:palletizing_bay_states,
+                                   id,
+                                   parent_tables: [{ parent_table: :pallet_sequences,
+                                                     columns: [:pallet_id],
+                                                     flatten_columns: { pallet_id: :pallet_id } }])
+      return nil if hash.nil?
+
+      PalletizingBayStateFlat.new(hash)
+    end
+
     def current_palletizing_bay_attributes(palletizing_bay_state_id, external_attributes = {})
       query = <<~SQL
         SELECT COALESCE(plant_resources.plant_resource_code, palletizing_robot_code || ': ' || scanner_code) AS bay_name,
@@ -44,6 +55,83 @@ module MesscadaApp
         WHERE palletizing_bay_states.id = ?
       SQL
       DB[query, palletizing_bay_state_id].first.merge(external_attributes)
+    end
+
+    def completed_pallet?(carton_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT pallets.id FROM pallets
+          JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
+          JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
+          WHERE cartons.id = #{carton_id}
+          AND (pallets.in_stock OR pallets.build_status = '#{AppConst::PALLET_FULL_BUILD_STATUS}')
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def closed_production_run?(carton_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT production_runs.id FROM production_runs
+          JOIN cartons on cartons.production_run_id = production_runs.id
+          WHERE cartons.id = #{carton_id}
+          AND production_runs.closed
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def carton_of_other_bay?(carton_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT pallet_sequence_id FROM cartons
+          WHERE id = #{carton_id}
+            AND	pallet_sequence_id IN (SELECT DISTINCT pallet_sequence_id FROM palletizing_bay_states)
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def carton_palletizing_bay_state(carton_id)
+      DB[:palletizing_bay_states]
+        .where(pallet_sequence_id: DB[:cartons]
+                                       .where(id: carton_id)
+                                       .select(:pallet_sequence_id))
+        .get(:id)
+    end
+
+    def valid_pallet_carton?(carton_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT pallets.id FROM pallets
+          JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
+          JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
+          WHERE cartons.id = #{carton_id}
+          AND pallets.palletized
+          --AND cartons.scrapped
+          AND (NOT pallets.shipped OR NOT pallets.scrapped)
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def find_pallet_by_carton_id(carton_id)
+      DB[:pallet_sequences]
+        .join(:cartons, pallet_sequence_id: :id)
+        .where(Sequel[:cartons][:id] => carton_id)
+        .get(:pallet_id)
+    end
+
+    def pallet_oldest_carton(pallet_id)
+      query = <<~SQL
+        SELECT cartons.pallet_sequence_id, cartons.id AS carton_id
+        FROM pallet_sequences
+        JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
+        WHERE pallet_sequences.pallet_id = ?
+        ORDER BY pallet_sequences.id, pallet_sequences.pallet_sequence_number ASC
+      SQL
+      DB[query, pallet_id].first
     end
   end
 end
