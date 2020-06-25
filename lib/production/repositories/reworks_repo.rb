@@ -182,9 +182,9 @@ module ProductionApp
       bin_asset_number
     end
 
-    # def find_pallet_ids_from_pallet_number(pallet_numbers)
-    #   select_values(:pallets, :id, pallet_number: pallet_numbers)
-    # end
+    def find_pallet_ids_from_pallet_number(pallet_numbers)
+      select_values(:pallets, :id, pallet_number: pallet_numbers)
+    end
 
     def find_sequence_ids_from_pallet_number(pallet_numbers)
       DB["SELECT id FROM pallet_sequences WHERE pallet_number IN ('#{pallet_numbers.join('\',\'')}') AND pallet_id IS NOT NULL"].map { |r| r[:id] } unless pallet_numbers.nil_or_empty?
