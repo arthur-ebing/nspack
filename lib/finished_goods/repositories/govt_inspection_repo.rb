@@ -104,7 +104,7 @@ module FinishedGoodsApp
       ds = ds.join(:pallets, id: Sequel[:govt_inspection_pallets][:pallet_id])
       ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
       ds = ds.where(cancelled: false, pallet_number: pallet_numbers)
-      ds.select_map(:pallet_number)
+      ds.select_map(%i[pallet_number govt_inspection_sheet_id])
     end
 
     def selected_pallets(pallet_sequence_ids)

@@ -35,7 +35,7 @@ module FinishedGoods
                   row.column do |col|
                     col.add_field :consignment_note_number
                     col.add_field :inspection_point
-                    col.add_field :packed_tm_group_id
+                    # col.add_field :packed_tm_group_id
                     col.add_field :destination_region_id
                     col.add_field :completed
                     col.add_field :inspected
