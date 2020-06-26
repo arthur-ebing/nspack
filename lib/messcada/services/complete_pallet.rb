@@ -25,7 +25,7 @@ module MesscadaApp
     end
 
     def complete_pallet
-      repo.update_pallet(pallet_id, { palletized: true, palletized_at: Time.now, status: AppConst::PALLETIZING })
+      repo.update_pallet(pallet_id, { status: AppConst::PALLETIZING })
       repo.log_status('pallets', pallet_id, AppConst::PALLET_COMPLETED_ON_BAY)
 
       ok_response

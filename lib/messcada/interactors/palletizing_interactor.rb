@@ -271,16 +271,17 @@ module MesscadaApp
       carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
       if carton_belongs_to_another_bay
         carton_bay_name = palletizing_bay_attributes(repo.carton_palletizing_bay_state(carton_id))[:bay_name]
-        confirm = {
-          confirm_text: "Carton of bay: #{carton_bay_name}.Transfer carton?",
-          confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/empty_bay_carton_transfer?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
-          cancel_url: 'noop'
-        }
-        repo.transaction do
-          changeset = { last_carton_id: carton_id }
-          repo.update_palletizing_bay_state(state_machine.target.id, changeset)
-          log_transaction
-        end
+        return failed_response("Carton of bay #{carton_bay_name}", current_bay_attributes(state_machine))
+        # confirm = {
+        #   confirm_text: "Carton of bay: #{carton_bay_name}.Transfer carton?",
+        #   confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/empty_bay_carton_transfer?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+        #   cancel_url: 'noop'
+        # }
+        # repo.transaction do
+        #   changeset = { last_carton_id: carton_id }
+        #   repo.update_palletizing_bay_state(state_machine.target.id, changeset)
+        #   log_transaction
+        # end
 
       else
         confirm = {}

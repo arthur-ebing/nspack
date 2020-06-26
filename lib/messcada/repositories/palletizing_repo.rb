@@ -108,7 +108,7 @@ module MesscadaApp
           JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
           JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
           WHERE cartons.id = #{carton_id}
-          AND pallets.palletized
+          --AND pallets.palletized
           --AND cartons.scrapped
           AND (NOT pallets.shipped OR NOT pallets.scrapped)
         )
