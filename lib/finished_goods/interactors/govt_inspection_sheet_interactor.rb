@@ -65,7 +65,7 @@ module FinishedGoodsApp
       res = repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
       return failed_response('Inspection sheet must have at least one pallet attached.') unless res
 
-      repo.update_govt_inspection_sheet(id, completed: true)
+      repo.update_govt_inspection_sheet(id, completed: true, completed_at: Time.now)
       log_status(:govt_inspection_sheets, id, 'COMPLETED')
 
       success_response('Completed sheet.')

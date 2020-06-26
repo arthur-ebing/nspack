@@ -7,41 +7,39 @@
   \      fn_party_role_name(inspection_billing_party_role_id)                     AS
   inspection_billing,\r\n       fn_consignment_note_number(govt_inspection_sheets.id)
   \                   AS consignment_note_number,\r\n       booking_reference,\r\n
-  \      inspection_point,\r\n       country_name ||  ' - (' || destination_region_name
-  || ')' AS destination_country,\r\n       results_captured,\r\n       results_captured_at,\r\n
-  \      api_results_received,\r\n       completed,\r\n       completed_at,\r\n       govt_inspection_sheets.inspected,\r\n
+  \      inspection_point,\r\n       destination_region_name AS destination_region,\r\n
+  \      results_captured,\r\n       results_captured_at,\r\n       api_results_received,\r\n
+  \      completed,\r\n       completed_at,\r\n       govt_inspection_sheets.inspected,\r\n
   \      reinspection,\r\n       awaiting_inspection_results,\r\n       cancelled_id,\r\n
-  \      cancelled,\r\n       cancelled_at,\r\n       govt_inspection_sheets.active,\r\n
-  \      govt_inspection_sheets.created_at,\r\n       govt_inspection_sheets.updated_at,\r\n
-
-  \      govt_inspection_sheets.tripsheet_created,\r\n       govt_inspection_sheets.tripsheet_loaded,\r\n
-  \      govt_inspection_sheets.tripsheet_loaded_at,\r\n       govt_inspection_sheets.tripsheet_offloaded,\r\n
-  \      govt_inspection_sheets.tripsheet_affloaded_at,\r\n
-
-  \      govt_inspection_api_results.upn_number AS upn_number,\r\n       created_by,\r\n
-  \      string_agg(pallets.pallet_number::text, ', '::text) AS pallet_numbers,\r\n
-  \      CASE\r\n      WHEN tripsheet_offloaded THEN 'ready'      WHEN cancelled THEN 'warning'\r\n           WHEN govt_inspection_sheets.inspected
-  AND NOT bool_and(govt_inspection_pallets.passed) THEN 'error'\r\n           WHEN
-  govt_inspection_sheets.inspected AND bool_and(govt_inspection_pallets.passed) THEN
-  'ok'\r\n           WHEN awaiting_inspection_results THEN 'inprogress'\r\n           WHEN
-  completed THEN 'yellow'\r\n           END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\nJOIN
-  destination_countries ON destination_countries.id = destination_country_id\r\nJOIN
-  destination_regions on destination_countries.destination_region_id = destination_regions.id\r\nLEFT
-  JOIN govt_inspection_api_results ON govt_inspection_api_results.id = govt_inspection_api_result_id\r\nJOIN
-  inspectors ON inspectors.id = inspector_id\r\nLEFT JOIN govt_inspection_pallets
+  \      cancelled,\r\n       cancelled_at,\r\n\r\n       govt_inspection_sheets.tripsheet_created,\r\n
+  \      govt_inspection_sheets.tripsheet_loaded,\r\n       govt_inspection_sheets.tripsheet_loaded_at,\r\n
+  \      govt_inspection_sheets.tripsheet_offloaded,\r\n       govt_inspection_sheets.tripsheet_affloaded_at,\r\n
+  \      govt_inspection_api_results.upn_number AS upn_number,\r\n\r\n       created_by,\r\n
+  \      string_agg(pallets.pallet_number::text, ', '::text) AS pallet_numbers,\r\n\r\n
+  \      govt_inspection_sheets.active,\r\n       govt_inspection_sheets.created_at,\r\n
+  \      govt_inspection_sheets.updated_at,\r\n\r\n       CASE\r\n           WHEN
+  tripsheet_offloaded THEN 'ready'      WHEN cancelled THEN 'warning'\r\n           WHEN
+  govt_inspection_sheets.inspected AND NOT bool_and(govt_inspection_pallets.passed)
+  THEN 'error'\r\n           WHEN govt_inspection_sheets.inspected AND bool_and(govt_inspection_pallets.passed)
+  THEN 'ok'\r\n           WHEN awaiting_inspection_results THEN 'inprogress'\r\n           WHEN
+  completed THEN 'yellow'\r\n       END AS colour_rule\r\n\r\nFROM govt_inspection_sheets\r\nJOIN
+  destination_regions on govt_inspection_sheets.destination_region_id = destination_regions.id\r\nLEFT
+  JOIN govt_inspection_api_results ON govt_inspection_api_results.id = govt_inspection_api_result_id\r\nLEFT
+  JOIN inspectors ON inspectors.id = inspector_id\r\nLEFT JOIN govt_inspection_pallets
   ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
   JOIN pallets ON govt_inspection_pallets.pallet_id = pallets.id\r\n\r\nGROUP BY govt_inspection_sheets.id,\r\n
-  \        inspectors.id,\r\n         destination_countries.id,\r\n         destination_regions.id,\r\n
-  \        govt_inspection_api_results.id\r\nORDER BY govt_inspection_sheets.id DESC"
+  \        inspectors.id,\r\n         destination_regions.id,\r\n         govt_inspection_api_results.id\r\nORDER
+  BY govt_inspection_sheets.id DESC"
 :limit: 
 :offset: 
 :external_settings:
   :colour_key:
+    ready: ready
     warning: cancelled
     error: failed pallet
     ok: passed pallets
     inprogress: awaiting results
-    ready: ready
+    yellow: No description
 :columns:
   id:
     :name: id
@@ -49,7 +47,7 @@
     :caption: Id
     :namespaced_name: govt_inspection_sheets.id
     :data_type: :integer
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -65,7 +63,7 @@
     :caption: Status
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -81,7 +79,7 @@
     :caption: Exporter
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -97,7 +95,7 @@
     :caption: Inspector
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -113,7 +111,7 @@
     :caption: Inspector code
     :namespaced_name: inspectors.inspector_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -129,7 +127,7 @@
     :caption: Inspection billing
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -145,7 +143,7 @@
     :caption: Consignment note number
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 180
     :format: 
     :hide: false
     :pinned: 
@@ -161,7 +159,7 @@
     :caption: Booking reference
     :namespaced_name: booking_reference
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -177,7 +175,7 @@
     :caption: Inspection point
     :namespaced_name: inspection_point
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -187,13 +185,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  destination_country:
-    :name: destination_country
+  destination_region:
+    :name: destination_region
     :sequence_no: 10
-    :caption: Destination country
-    :namespaced_name: 
+    :caption: Destination region
+    :namespaced_name: destination_region_name
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -209,7 +207,7 @@
     :caption: Results captured
     :namespaced_name: results_captured
     :data_type: :boolean
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -226,7 +224,7 @@
     :namespaced_name: results_captured_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -238,10 +236,10 @@
   api_results_received:
     :name: api_results_received
     :sequence_no: 13
-    :caption: Api results received
+    :caption: Api results
     :namespaced_name: api_results_received
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -257,7 +255,7 @@
     :caption: Completed
     :namespaced_name: completed
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -274,7 +272,7 @@
     :namespaced_name: completed_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -289,7 +287,7 @@
     :caption: Inspected
     :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -305,7 +303,7 @@
     :caption: Reinspection
     :namespaced_name: reinspection
     :data_type: :boolean
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -321,7 +319,7 @@
     :caption: Awaiting inspection results
     :namespaced_name: awaiting_inspection_results
     :data_type: :boolean
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -337,7 +335,7 @@
     :caption: Cancelled Id
     :namespaced_name: cancelled_id
     :data_type: :integer
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -353,7 +351,7 @@
     :caption: Cancelled
     :namespaced_name: cancelled
     :data_type: :boolean
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -370,7 +368,7 @@
     :namespaced_name: cancelled_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -379,31 +377,31 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  tripsheet_created:
+    :name: tripsheet_created
     :sequence_no: 22
-    :caption: Active
-    :namespaced_name: govt_inspection_sheets.active
+    :caption: Tripsheet created
+    :namespaced_name: govt_inspection_sheets.tripsheet_created
     :data_type: :boolean
     :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false
     :group_max: false
-  created_at:
-    :name: created_at
+  tripsheet_loaded:
+    :name: tripsheet_loaded
     :sequence_no: 23
-    :caption: Created at
-    :namespaced_name: govt_inspection_sheets.created_at
-    :data_type: :datetime
-    :width: 
+    :caption: Tripsheet loaded
+    :namespaced_name: govt_inspection_sheets.tripsheet_loaded
+    :data_type: :boolean
+    :width: 120
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -411,15 +409,47 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  updated_at:
-    :name: updated_at
+  tripsheet_loaded_at:
+    :name: tripsheet_loaded_at
     :sequence_no: 24
-    :caption: Updated at
-    :namespaced_name: govt_inspection_sheets.updated_at
+    :caption: Tripsheet loaded at
+    :namespaced_name: govt_inspection_sheets.tripsheet_loaded_at
     :data_type: :datetime
     :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tripsheet_offloaded:
+    :name: tripsheet_offloaded
+    :sequence_no: 25
+    :caption: Tripsheet offloaded
+    :namespaced_name: govt_inspection_sheets.tripsheet_offloaded
+    :data_type: :boolean
+    :width: 120
     :format: 
-    :hide: true
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tripsheet_affloaded_at:
+    :name: tripsheet_affloaded_at
+    :sequence_no: 26
+    :caption: Tripsheet affloaded at
+    :namespaced_name: govt_inspection_sheets.tripsheet_affloaded_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -429,11 +459,11 @@
     :group_max: false
   upn_number:
     :name: upn_number
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Upn number
     :namespaced_name: govt_inspection_api_results.upn_number
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -445,11 +475,11 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 26
+    :sequence_no: 28
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -461,11 +491,11 @@
     :group_max: false
   pallet_numbers:
     :name: pallet_numbers
-    :sequence_no: 27
+    :sequence_no: 29
     :caption: Pallet Numbers
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -475,9 +505,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  active:
+    :name: active
+    :sequence_no: 30
+    :caption: Active
+    :namespaced_name: govt_inspection_sheets.active
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 31
+    :caption: Created at
+    :namespaced_name: govt_inspection_sheets.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 32
+    :caption: Updated at
+    :namespaced_name: govt_inspection_sheets.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 28
+    :sequence_no: 33
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
