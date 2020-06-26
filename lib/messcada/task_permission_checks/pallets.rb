@@ -118,7 +118,7 @@ module MesscadaApp
 
       def not_on_inspection_sheet_check
         errors, sheet = @inspection_repo.exists_on_inspection_sheet(pallet_numbers).first
-        return failed_response "Pallet: #{errors} is already on inspection sheet #{sheet}." unless errors.empty?
+        return failed_response "Pallet: #{errors} is already on inspection sheet #{sheet}." unless errors.nil_or_empty?
 
         all_ok
       end
