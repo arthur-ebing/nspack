@@ -12,8 +12,8 @@ Sequel.migration do
     end
 
     run <<~SQL
-      DROP TRIGGER cartons_update_pallet_sequence_id ON cartons;
-      DROP FUNCTION fn_cartons_carton_quantity_calc();
+      -- DROP TRIGGER cartons_update_pallet_sequence_id ON cartons;
+      -- DROP FUNCTION fn_cartons_carton_quantity_calc();
 
       CREATE OR REPLACE FUNCTION public.fn_cartons_carton_quantity_calc()
       RETURNS trigger AS $BODY$
