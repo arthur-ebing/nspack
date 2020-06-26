@@ -48,6 +48,7 @@ module FinishedGoodsApp
     end
 
     def add_pallets_govt_inspection_sheet(params)
+      p params
       res = validate_add_pallet_govt_inspection_params(params)
       return res unless res.success
 
@@ -115,7 +116,7 @@ module FinishedGoodsApp
                             :exporter_party_role_id,
                             :booking_reference,
                             :inspection_point,
-                            :destination_country_id)
+                            :destination_region_id)
         attrs[:cancelled_id] = id
         clone_id = repo.create_govt_inspection_sheet(attrs)
         log_status(:govt_inspection_sheets, clone_id, 'CREATED FROM CANCELLED')
