@@ -5,13 +5,20 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :inspector_id, Types::Integer
     attribute :inspection_billing_party_role_id, Types::Integer
+    attribute? :inspection_billing, Types::String
     attribute :exporter_party_role_id, Types::Integer
+    attribute? :exporter, Types::String
     attribute :booking_reference, Types::String
     attribute :results_captured, Types::Bool
     attribute :results_captured_at, Types::DateTime
     attribute :api_results_received, Types::Bool
+    attribute? :allocated, Types::Bool
+    attribute? :passed_pallets, Types::Bool
+    attribute? :failed_pallets, Types::Bool
     attribute :completed, Types::Bool
     attribute :completed_at, Types::DateTime
+    attribute :cancelled, Types::Bool
+    attribute :cancelled_at, Types::DateTime
     attribute :inspected, Types::Bool
     attribute :inspection_point, Types::String
     attribute :awaiting_inspection_results, Types::Bool
@@ -29,5 +36,6 @@ module FinishedGoodsApp
     attribute? :tripsheet_loaded, Types::Bool
     attribute :tripsheet_loaded_at, Types::DateTime
     attribute? :tripsheet_offloaded, Types::Bool
+    attribute? :status, Types::String
   end
 end

@@ -12,6 +12,12 @@ module FinishedGoods
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
+            page.section do |section|
+              section.add_control(control_type: :link,
+                                  text: 'Back',
+                                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}",
+                                  style: :back_button)
+            end
             page.form do |form|
               form.caption 'Edit Govt Inspection Sheet'
               form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}"

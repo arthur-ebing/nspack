@@ -61,6 +61,8 @@ module UiRules
     end
 
     def make_new_form_object
+      pallet_ids = @repo.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:govt_inspection_sheet_id])
+      pallet_list = @repo.select_values(:pallets, :pallet_number, id: pallet_ids).join("\n")
       @form_object = OpenStruct.new(pallet_id: nil,
                                     ecert_agreement_id: @repo.select_values_in_order(:ecert_tracking_units, :ecert_agreement_id, order: :id).last,
                                     business_id: nil,
@@ -70,7 +72,7 @@ module UiRules
                                     passed: nil,
                                     process_result: nil,
                                     rejection_reasons: nil,
-                                    pallet_list: nil,
+                                    pallet_list: pallet_list,
                                     pallet_number: nil)
     end
   end

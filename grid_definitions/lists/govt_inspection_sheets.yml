@@ -1,50 +1,15 @@
 ---
 :dataminer_definition: govt_inspection_sheets
 :actions:
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/add_pallet"
-  :text: add pallets
-  :icon: document-add
-  :hide_if_true: completed
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
-  :text: view
-  :icon: view-show
-  :title: View
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/edit"
-  :text: edit
+  :text: manage inspection
   :icon: edit
-  :title: Edit
-  :hide_if_true: inspected
-  :popup: true
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/pre_verify"
-  :text: eCert pre-verify
+  :title: Manage Inspection
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/preverify"
+  :text: eCert preverify
   :icon: check-square
   :hide_if_false: completed
   :hide_if_true: inspected
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
-  :text: delete
-  :icon: delete
-  :hide_if_true: completed
-  :is_delete: true
-  :popup: true
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/capture"
-  :text: capture results
-  :icon: edit
-  :hide_if_false: completed
-  :hide_if_true: inspected
-  :auth:
-    :function: Finished Goods
-    :program: inspection
-    :permission: edit
-- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/reopen"
-  :text: reopen sheet
-  :icon: edit-pencil
-  :hide_if_false: completed
-  :hide_if_true: inspected
-  :prompt: 'Are you sure you want to reopen this Inspection Sheet?'
-  :auth:
-    :function: Finished Goods
-    :program: inspection
-    :permission: reopen
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/cancel"
   :text: cancel sheet
   :icon: edit-pencil
@@ -66,7 +31,9 @@
   :url: "/finished_goods/inspection/govt_inspection_sheets/new"
   :text: New Govt Inspection Sheet
   :style: :button
+  :behaviour: :popup
 - :control_type: :link
   :url: "/finished_goods/inspection/govt_inspection_sheets/new/reinspection"
   :text: New Govt Reinspection Sheet
   :style: :button
+  :behaviour: :popup

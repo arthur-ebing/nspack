@@ -8,37 +8,8 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'govt_inspection_sheets', Integer do |id|
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      repo = BaseRepo.new
       r.on !interactor.exists?(:govt_inspection_sheets, id) do
         handle_not_found(r)
-      end
-
-      r.on 'add_pallet' do   # ADD_PALLETS
-        r.get do
-          check_auth!('inspection', 'edit')
-          interactor.assert_permission!(:edit, id)
-          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::AddPallet.call(id) }
-        end
-
-        r.post do
-          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:govt_inspection_sheet][:pallet_number]).pallet_number
-          res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id: id, pallet_number: pallet_number)
-          if res.success
-            flash[:notice] = res.message
-            r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
-          else
-            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet") do
-              FinishedGoods::Inspection::GovtInspectionSheet::AddPallet.call(id)
-            end
-          end
-        end
-      end
-
-      r.on 'pre_verify' do
-        check_auth!('inspection', 'edit')
-        pallet_ids = repo.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
-        pallet_list = repo.select_values(:pallets, :pallet_number, id: pallet_ids).join("\n")
-        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r), form_values: { pallet_list: pallet_list }) }
       end
 
       r.on 'create_intake_tripsheet' do
@@ -140,53 +111,70 @@ class Nspack < Roda
         show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::Edit.call(id) }
       end
 
+      r.on 'add_pallet' do   # ADD_PALLETS
+        r.get do
+          check_auth!('inspection', 'edit')
+          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::AddPallet.call(id) }
+        end
+
+        r.post do
+          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:govt_inspection_sheet][:pallet_number]).pallet_number
+          res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id: id, pallet_number: pallet_number)
+          if res.success
+            flash[:notice] = res.message
+            r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+          else
+            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}") do
+              FinishedGoods::Inspection::GovtInspectionSheet::Show.call(id)
+            end
+          end
+        end
+      end
+
       r.on 'complete' do
         check_auth!('inspection', 'edit')
-        interactor.assert_permission!(:complete, id)
         res = interactor.complete_govt_inspection_sheet(id)
-        if res.success
-          flash[:notice] = res.message
-          r.redirect '/list/govt_inspection_sheets'
-        else
-          flash[:error] = res.message
-          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
-        end
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end
 
       r.on 'reopen' do
         check_auth!('inspection', 'edit')
-        interactor.assert_permission!(:reopen, id)
         res = interactor.reopen_govt_inspection_sheet(id)
         flash[res.success ? :notice : :error] = res.message
-        r.redirect '/list/govt_inspection_sheets'
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+      end
+
+      r.on 'finish' do
+        check_auth!('inspection', 'edit')
+        res = interactor.finish_govt_inspection_sheet(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end
 
       r.on 'cancel' do
         check_auth!('inspection', 'edit')
-        interactor.assert_permission!(:cancel, id)
         res = interactor.cancel_govt_inspection_sheet(id)
         flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/govt_inspection_sheets'
       end
 
-      r.on 'capture' do   # COMPLETE
-        r.get do
-          check_auth!('inspection', 'edit')
-          interactor.assert_permission!(:capture, id)
-          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::Capture.call(id, request.referer) }
+      r.on 'delete' do    # DELETE
+        check_auth!('inspection', 'delete')
+        interactor.assert_permission!(:delete, id)
+        res = interactor.delete_govt_inspection_sheet(id)
+        if res.success
+          flash[:notice] = res.message
+          r.redirect '/list/govt_inspection_sheets'
+        else
+          flash[:error] = res.message
+          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
         end
+      end
 
-        r.post do
-          res = interactor.finish_govt_inspection_sheet(id)
-          if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-          else
-            re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/capture") do
-              FinishedGoods::Inspection::GovtInspectionSheet::Capture.call(id, request.referer)
-            end
-          end
-        end
+      r.on 'preverify' do
+        check_auth!('inspection', 'edit')
+        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(id, remote: fetch?(r)) }
       end
 
       r.is do
@@ -198,19 +186,9 @@ class Nspack < Roda
           res = interactor.update_govt_inspection_sheet(id, params[:govt_inspection_sheet])
           if res.success
             flash[:notice] = res.message
-            redirect_to_last_grid(r)
+            redirect_via_json "/finished_goods/inspection/govt_inspection_sheets/#{id}"
           else
             re_show_form(r, res) { FinishedGoods::Inspection::GovtInspectionSheet::Edit.call(id, form_values: params[:govt_inspection_sheet], form_errors: res.errors) }
-          end
-        end
-        r.delete do    # DELETE
-          check_auth!('inspection', 'delete')
-          interactor.assert_permission!(:delete, id)
-          res = interactor.delete_govt_inspection_sheet(id)
-          if res.success
-            delete_grid_row(id, notice: res.message)
-          else
-            show_json_error(res.message, status: 200)
           end
         end
       end
@@ -218,15 +196,15 @@ class Nspack < Roda
 
     r.on 'govt_inspection_sheets' do
       r.on 'packed_tm_group_changed' do
-        if params[:changed_value].nil_or_empty?
-          blank_json_response
-        else
-          region_list = FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
-          actions = []
-          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_region_id', options_array: region_list)
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_region_id', value: region_list.first.last) if region_list.length == 1
-          json_actions(actions)
-        end
+        actions = []
+        region_list = if params[:changed_value].nil_or_empty?
+                        []
+                      else
+                        FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
+                      end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_region_id', options_array: region_list)
+        actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_region_id', value: region_list.first.last) if region_list.length == 1
+        json_actions(actions)
       end
 
       interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -242,7 +220,7 @@ class Nspack < Roda
         res = interactor.create_govt_inspection_sheet(params[:govt_inspection_sheet])
         if res.success
           flash[:notice] = res.message
-          r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{res.instance.id}/add_pallet"
+          redirect_via_json "/finished_goods/inspection/govt_inspection_sheets/#{res.instance.id}"
         else
           re_show_form(r, res, url: '/finished_goods/inspection/govt_inspection_sheets/new') do
             FinishedGoods::Inspection::GovtInspectionSheet::New.call(form_values: params[:govt_inspection_sheet], form_errors: res.errors)
@@ -320,7 +298,8 @@ class Nspack < Roda
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_govt_inspection_pallet(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            flash[:notice] = res.message
+            redirect_via_json "/finished_goods/inspection/govt_inspection_sheets/#{res.instance.govt_inspection_sheet_id}"
           else
             show_json_error(res.message, status: 200)
           end

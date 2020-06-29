@@ -2,18 +2,18 @@
 :caption: Govt Inspection Pallets
 :sql: "SELECT DISTINCT\r\n    fn_current_status('pallets', p.id) AS status,\r\n    p.pallet_number,\r\n
   \   govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n    govt_inspection_pallets.govt_inspection_sheet_id,\r\n
-  \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
-  \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
-  \   inspection_failure_reasons.failure_reason,\r\n    govt_inspection_pallets.failure_remarks,\r\n
-  \   govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
-  \   govt_inspection_pallets.updated_at,\r\n    govt_inspection_sheets.completed,\r\n
-  \   govt_inspection_sheets.inspected AS sheet_inspected,\r\n    p.gross_weight,\r\n
-  \   p.carton_quantity,\r\n    marketing_varieties.marketing_variety_code AS marketing_variety,\r\n
-  \   target_market_groups.target_market_group_name AS  packed_tm_group,\r\n    pallet_bases.pallet_base_code
-  AS pallet_base,\r\n    CASE\r\n        WHEN govt_inspection_pallets.inspected AND
-  NOT govt_inspection_pallets.passed THEN 'error'\r\n        WHEN govt_inspection_pallets.passed
-  THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM govt_inspection_pallets\r\nJOIN
-  govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
+  \   govt_inspection_sheets.completed,\r\n    govt_inspection_pallets.passed,\r\n
+  \   govt_inspection_pallets.inspected,\r\n    govt_inspection_pallets.inspected_at,\r\n
+  \   govt_inspection_pallets.failure_reason_id,\r\n    inspection_failure_reasons.failure_reason,\r\n
+  \   govt_inspection_pallets.failure_remarks,\r\n    govt_inspection_sheets.inspected
+  AS sheet_inspected,\r\n    p.gross_weight,\r\n    p.carton_quantity,\r\n    marketing_varieties.marketing_variety_code
+  AS marketing_variety,\r\n    target_market_groups.target_market_group_name AS  packed_tm_group,\r\n
+  \   pallet_bases.pallet_base_code AS pallet_base,\r\n    govt_inspection_pallets.active,\r\n
+  \   govt_inspection_pallets.created_at,\r\n    govt_inspection_pallets.updated_at,\r\n
+  \   CASE\r\n        WHEN govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed
+  THEN 'error'\r\n        WHEN govt_inspection_pallets.passed THEN 'ok'\r\n    END
+  AS colour_rule\r\n\r\nFROM govt_inspection_pallets\r\nJOIN govt_inspection_sheets
+  ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\nLEFT
   JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\nLEFT
   JOIN pallets p ON p.id = govt_inspection_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
   ps ON p.id = ps.pallet_id\r\nLEFT JOIN marketing_varieties ON marketing_varieties.id
@@ -107,9 +107,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 6
+    :caption: Completed
+    :namespaced_name: govt_inspection_sheets.completed
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   passed:
     :name: passed
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Passed
     :namespaced_name: govt_inspection_pallets.passed
     :data_type: :boolean
@@ -125,7 +141,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Inspected
     :namespaced_name: govt_inspection_pallets.inspected
     :data_type: :boolean
@@ -141,7 +157,7 @@
     :group_max: false
   inspected_at:
     :name: inspected_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Inspected at
     :namespaced_name: govt_inspection_pallets.inspected_at
     :data_type: :datetime
@@ -157,7 +173,7 @@
     :group_max: false
   failure_reason_id:
     :name: failure_reason_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Failure reason
     :namespaced_name: govt_inspection_pallets.failure_reason_id
     :data_type: :integer
@@ -173,7 +189,7 @@
     :group_max: false
   failure_reason:
     :name: failure_reason
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Failure reason
     :namespaced_name: inspection_failure_reasons.failure_reason
     :data_type: :string
@@ -189,7 +205,7 @@
     :group_max: false
   failure_remarks:
     :name: failure_remarks
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Failure remarks
     :namespaced_name: govt_inspection_pallets.failure_remarks
     :data_type: :string
@@ -203,73 +219,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
-    :sequence_no: 12
-    :caption: Active
-    :namespaced_name: govt_inspection_pallets.active
-    :data_type: :boolean
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 13
-    :caption: Created at
-    :namespaced_name: govt_inspection_pallets.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 14
-    :caption: Updated at
-    :namespaced_name: govt_inspection_pallets.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  completed:
-    :name: completed
-    :sequence_no: 15
-    :caption: Completed
-    :namespaced_name: govt_inspection_sheets.completed
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   sheet_inspected:
     :name: sheet_inspected
-    :sequence_no: 16
+    :sequence_no: 13
     :caption: Sheet inspected
     :namespaced_name: govt_inspection_sheets.inspected
     :data_type: :string
@@ -285,7 +237,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 17
+    :sequence_no: 14
     :caption: Gross weight
     :namespaced_name: p.gross_weight
     :data_type: :number
@@ -301,7 +253,7 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 18
+    :sequence_no: 15
     :caption: Carton quantity
     :namespaced_name: p.carton_quantity
     :data_type: :string
@@ -317,7 +269,7 @@
     :group_max: false
   marketing_variety:
     :name: marketing_variety
-    :sequence_no: 19
+    :sequence_no: 16
     :caption: Marketing variety
     :namespaced_name: marketing_varieties.marketing_variety_code
     :data_type: :string
@@ -333,7 +285,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 20
+    :sequence_no: 17
     :caption: Packed tm group
     :namespaced_name: target_market_groups.target_market_group_name
     :data_type: :string
@@ -349,13 +301,61 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 21
+    :sequence_no: 18
     :caption: Pallet base
     :namespaced_name: pallet_bases.pallet_base_code
     :data_type: :string
     :width: 
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 19
+    :caption: Active
+    :namespaced_name: govt_inspection_pallets.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 20
+    :caption: Created at
+    :namespaced_name: govt_inspection_pallets.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 21
+    :caption: Updated at
+    :namespaced_name: govt_inspection_pallets.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

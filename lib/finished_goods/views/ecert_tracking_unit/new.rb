@@ -4,8 +4,8 @@ module FinishedGoods
   module Ecert
     module EcertTrackingUnit
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
-          ui_rule = UiRules::Compiler.new(:ecert_tracking_unit, :new, form_values: form_values)
+        def self.call(govt_inspection_sheet_id, form_values: nil, form_errors: nil, remote: true)
+          ui_rule = UiRules::Compiler.new(:ecert_tracking_unit, :new, govt_inspection_sheet_id: govt_inspection_sheet_id, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|

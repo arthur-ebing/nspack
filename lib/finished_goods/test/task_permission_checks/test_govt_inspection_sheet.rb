@@ -30,6 +30,8 @@ module FinishedGoodsApp
         reinspection: false,
         created_by: 1,
         consignment_note_number: '00000001',
+        cancelled: false,
+        cancelled_at: nil,
         active: true
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))
