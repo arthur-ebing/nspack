@@ -5,8 +5,10 @@ module UiRules
     def generate_rules
       set_repo
       make_form_object
-      make_progress_step
       apply_form_values
+
+      add_progress_step
+      add_buttons
 
       common_values_for_fields common_fields
 
@@ -88,23 +90,8 @@ module UiRules
                                     completed: nil)
     end
 
-    def make_progress_step # rubocop:disable Metrics/AbcSize
-      id = @options[:id]
+    def add_progress_step
       steps = ['Add Products', 'Complete', 'Allocate Bins', 'Ship', 'Finished']
-
-      actions = ['/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{id}/complete",
-                 '/list/bin_loads',
-                 "/raw_materials/dispatch/bin_loads/#{id}/ship",
-                 '/list/bin_loads']
-      captions = %w[Close Complete Close Ship Close]
-
-      back_actions = ["/raw_materials/dispatch/bin_loads/#{id}/edit",
-                      "/raw_materials/dispatch/bin_loads/#{id}/edit",
-                      "/raw_materials/dispatch/bin_loads/#{id}/reopen",
-                      "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
-                      "/raw_materials/dispatch/bin_loads/#{id}/unship"]
-      back_captions = %w[Edit Edit Reopen Unallocate Unship]
 
       step = 0
       step = 1 if @form_object.products
@@ -112,13 +99,59 @@ module UiRules
       step = 3 if @form_object.allocated
       step = 4 if @form_object.shipped
 
-      form_object = @form_object.to_h.merge(steps: steps,
-                                            step: step,
-                                            action: actions[step],
-                                            caption: captions[step],
-                                            back_action: back_actions[step],
-                                            back_caption: back_captions[step])
-      @form_object = OpenStruct.new(form_object)
+      @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
+    end
+
+    def add_buttons # rubocop:disable Metrics/AbcSize
+      id = @options[:id]
+      edit = { text: 'Edit',
+               url: "/raw_materials/dispatch/bin_loads/#{id}/edit",
+               prompt: 'Are you sure, you want to edit this load?',
+               icon: :edit }
+      delete = { text: 'Delete',
+                 url: "/raw_materials/dispatch/bin_loads/#{id}/delete",
+                 prompt: 'Are you sure, you want to delete this load?',
+                 icon: :checkoff }
+      product = { text: 'Add Product',
+                  url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
+                  grid_id: 'bin_load_products',
+                  icon: :checkon,
+                  behaviour: :popup }
+      complete = { text: 'Complete adding products',
+                   url: "/raw_materials/dispatch/bin_loads/#{id}/complete",
+                   icon: :checkon }
+      reopen = { text: 'Reopen',
+                 url: "/raw_materials/dispatch/bin_loads/#{id}/reopen",
+                 icon: :back }
+      unallocate = { text: 'Unallocate',
+                     url: "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
+                     icon: :back }
+      ship = { text: 'Ship',
+               url: "/raw_materials/dispatch/bin_loads/#{id}/ship",
+               icon: :checkon }
+      unship = { text: 'Unship',
+                 url: "/raw_materials/dispatch/bin_loads/#{id}/unship",
+                 icon: :back }
+
+      actions = []
+      back_actions = [edit]
+
+      case @form_object.step
+      when 0
+        actions << product
+        back_actions << delete
+      when 1
+        actions = [product, complete]
+      when 2
+        actions << reopen
+      when 3
+        actions = [unallocate, ship]
+      when 4
+        actions << unship
+      end
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions,
+                                                            back_actions: back_actions))
     end
 
     def set_repo
