@@ -104,34 +104,50 @@ module UiRules
 
     def add_buttons # rubocop:disable Metrics/AbcSize
       id = @options[:id]
-      edit = { text: 'Edit',
+      edit = { control_type: :link,
+               style: :action_button,
+               text: 'Edit',
                url: "/raw_materials/dispatch/bin_loads/#{id}/edit",
                prompt: 'Are you sure, you want to edit this load?',
                icon: :edit }
-      delete = { text: 'Delete',
+      delete = { control_type: :link,
+                 style: :action_button,
+                 text: 'Delete',
                  url: "/raw_materials/dispatch/bin_loads/#{id}/delete",
                  prompt: 'Are you sure, you want to delete this load?',
                  icon: :checkoff }
-      product = { text: 'Add Product',
+      product = { control_type: :link,
+                  style: :action_button,
+                  text: 'Add Product',
                   url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
                   grid_id: 'bin_load_products',
                   icon: :checkon,
                   behaviour: :popup }
-      complete = { text: 'Complete adding products',
+      complete = { control_type: :link,
+                   style: :action_button,
+                   text: 'Complete adding products',
                    url: "/raw_materials/dispatch/bin_loads/#{id}/complete",
                    icon: :checkon }
-      reopen = { text: 'Reopen',
+      reopen = { control_type: :link,
+                 style: :action_button,
+                 text: 'Reopen',
                  url: "/raw_materials/dispatch/bin_loads/#{id}/reopen",
                  prompt: 'Are you sure, you want to reopen this load?',
                  icon: :back }
-      unallocate = { text: 'Unallocate',
+      unallocate = { control_type: :link,
+                     style: :action_button,
+                     text: 'Unallocate',
                      url: "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
                      prompt: 'Are you sure, you want to remove the pallets from this load?',
                      icon: :back }
-      ship = { text: 'Ship',
+      ship = { control_type: :link,
+               style: :action_button,
+               text: 'Ship',
                url: "/raw_materials/dispatch/bin_loads/#{id}/ship",
                icon: :checkon }
-      unship = { text: 'Unship',
+      unship = { control_type: :link,
+                 style: :action_button,
+                 text: 'Unship',
                  url: "/raw_materials/dispatch/bin_loads/#{id}/unship",
                  prompt: 'Are you sure, you want to unship this load?',
                  icon: :back }

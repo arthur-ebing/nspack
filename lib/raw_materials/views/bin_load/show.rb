@@ -18,14 +18,7 @@ module RawMaterials
                                   style: :back_button)
               ui_rule.form_object.back_actions.each do |action|
                 action ||= {}
-                section.add_control(control_type: :link,
-                                    text: action[:text],
-                                    url: action[:url],
-                                    icon: action[:icon],
-                                    visible: action.fetch(:visible, true),
-                                    prompt: action[:prompt],
-                                    behaviour: action[:popup],
-                                    style: :action_button)
+                section.add_control(action)
               end
               section.add_control(control_type: :link,
                                   text: 'Print Bin Load',
@@ -58,14 +51,7 @@ module RawMaterials
               section.show_border!
               ui_rule.form_object.actions.each do |action|
                 action ||= {}
-                section.add_control(control_type: :link,
-                                    text: action[:text],
-                                    url: action[:url],
-                                    icon: action[:icon],
-                                    visible: action.fetch(:visible, true),
-                                    prompt: action[:prompt],
-                                    behaviour: action[:behaviour],
-                                    style: :action_button)
+                section.add_control(action)
               end
             end
             page.form do |form|
