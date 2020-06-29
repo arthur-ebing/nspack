@@ -6,6 +6,14 @@ class Nspack < Roda
     # palletizing interactor...
     interactor = MesscadaApp::PalletizingInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+    unless !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING
+      feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: false,
+                                                line1: 'Application not available',
+                                                line2: 'Please contact support')
+      return Crossbeams::RobotResponder.new(feedback).render
+    end
+
     # --------------------------------------------------------------------------
     # SCAN CARTON - either to add to a pallet, as a QC carton or to return to bay
     # messcada/palletize/scan_carton
