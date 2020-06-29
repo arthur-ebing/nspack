@@ -33,9 +33,7 @@ module RawMaterials
                                   style: :button)
             end
             page.form do |form|
-              form.action '/list/bin_loads'
-              form.submit_captions 'Close'
-
+              form.no_submit!
               form.row do |row|
                 row.column do |col|
                   col.add_field :id
@@ -66,6 +64,10 @@ module RawMaterials
                                     behaviour: action[:behaviour],
                                     style: :action_button)
               end
+            end
+            page.form do |form|
+              form.action '/list/bin_loads'
+              form.submit_captions 'Close'
             end
             page.section do |section|
               section.add_grid('bin_load_products',
