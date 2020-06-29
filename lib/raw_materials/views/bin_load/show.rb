@@ -16,9 +16,8 @@ module RawMaterials
                                   text: 'Back',
                                   url: '/list/bin_loads',
                                   style: :back_button)
-              ui_rule.form_object.back_actions.each do |action|
-                action ||= {}
-                section.add_control(action)
+              ui_rule.form_object.instance_controls.each do |control|
+                section.add_control(control)
               end
               section.add_control(control_type: :link,
                                   text: 'Print Bin Load',
@@ -49,9 +48,8 @@ module RawMaterials
             page.section do |section|
               section.add_progress_step ui_rule.form_object.steps, position: ui_rule.form_object.step
               section.show_border!
-              ui_rule.form_object.actions.each do |action|
-                action ||= {}
-                section.add_control(action)
+              ui_rule.form_object.progress_controls.each do |control|
+                section.add_control(control)
               end
             end
             page.form do |form|

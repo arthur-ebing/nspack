@@ -8,7 +8,7 @@ module UiRules
       apply_form_values
 
       add_progress_step
-      add_buttons
+      add_controls
 
       common_values_for_fields common_fields
 
@@ -102,7 +102,7 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
     end
 
-    def add_buttons # rubocop:disable Metrics/AbcSize
+    def add_controls # rubocop:disable Metrics/AbcSize
       id = @options[:id]
       edit = { control_type: :link,
                style: :action_button,
@@ -154,26 +154,26 @@ module UiRules
 
       case @form_object.step
       when 0
-        actions = [product]
-        back_actions = [edit, delete]
+        progress_controls = [product]
+        instance_controls = [edit, delete]
       when 1
-        actions = [product, complete]
-        back_actions = [edit]
+        progress_controls = [product, complete]
+        instance_controls = [edit]
       when 2
-        actions = [reopen]
-        back_actions = [edit]
+        progress_controls = [reopen]
+        instance_controls = [edit]
       when 3
-        actions = [unallocate, ship]
-        back_actions = [edit]
+        progress_controls = [unallocate, ship]
+        instance_controls = [edit]
       when 4
-        actions = [unship]
-        back_actions = [edit]
+        progress_controls = [unship]
+        instance_controls = [edit]
       else
-        actions = []
-        back_actions = []
+        progress_controls = []
+        instance_controls = []
       end
 
-      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions, back_actions: back_actions))
+      @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls, instance_controls: instance_controls))
     end
 
     def set_repo
