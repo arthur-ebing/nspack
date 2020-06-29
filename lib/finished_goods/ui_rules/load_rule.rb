@@ -265,7 +265,7 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
     end
 
-    def add_buttons # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def add_buttons # rubocop:disable Metrics/AbcSize
       id = @options[:id]
       edit = { text: 'Edit',
                url: "/finished_goods/dispatch/loads/#{id}/edit",
@@ -292,6 +292,7 @@ module UiRules
       unload_truck = { text: 'Unload Truck',
                        url: "/finished_goods/dispatch/loads/#{id}/unload_truck",
                        prompt: 'Are you sure, you want to unload this load?',
+                       visible: @form_object.loaded,
                        icon: :back }
       tail = { text: 'Temp Tail',
                url: "/finished_goods/dispatch/loads/#{id}/temp_tail",
@@ -300,6 +301,7 @@ module UiRules
       delete_tail = { text: 'Delete Temp Tail',
                       url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
                       prompt: 'Are you sure, you want to delete the temp tail on this load?',
+                      visible: @form_object.temp_tail,
                       icon: :back }
       ship = { text: 'Ship',
                url: "/finished_goods/dispatch/loads/#{id}/ship",
@@ -308,28 +310,29 @@ module UiRules
                  url: "/finished_goods/dispatch/loads/#{id}/unship",
                  prompt: 'Are you sure, you want to unship this load?',
                  icon: :back }
-      actions = []
-      back_actions = [edit]
 
       case @form_object.step
       when 0
-        actions << allocate
-        back_actions << delete
+        actions = [allocate]
+        back_actions = [edit, delete]
       when 1
         actions = [allocate, truck_arrival]
+        back_actions = [edit]
       when 2
         actions = [delete_truck_arrival, load_truck]
+        back_actions = [edit]
       when 3
-        actions << unload_truck if @form_object.loaded
-        actions << delete_tail if @form_object.temp_tail
-        actions << tail
-        actions << ship
+        actions = [unload_truck, delete_tail, tail, ship]
+        back_actions = [edit]
       when 4
-        actions << unship
+        actions = [unship]
+        back_actions = [edit]
+      else
+        actions = []
+        back_actions = []
       end
 
-      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions,
-                                                            back_actions: back_actions))
+      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions, back_actions: back_actions))
     end
 
     def add_behaviours

@@ -122,36 +122,42 @@ module UiRules
                    icon: :checkon }
       reopen = { text: 'Reopen',
                  url: "/raw_materials/dispatch/bin_loads/#{id}/reopen",
+                 prompt: 'Are you sure, you want to reopen this load?',
                  icon: :back }
       unallocate = { text: 'Unallocate',
                      url: "/raw_materials/dispatch/bin_loads/#{id}/unallocate",
+                     prompt: 'Are you sure, you want to remove the pallets from this load?',
                      icon: :back }
       ship = { text: 'Ship',
                url: "/raw_materials/dispatch/bin_loads/#{id}/ship",
                icon: :checkon }
       unship = { text: 'Unship',
                  url: "/raw_materials/dispatch/bin_loads/#{id}/unship",
+                 prompt: 'Are you sure, you want to unship this load?',
                  icon: :back }
-
-      actions = []
-      back_actions = [edit]
 
       case @form_object.step
       when 0
-        actions << product
-        back_actions << delete
+        actions = [product]
+        back_actions = [edit, delete]
       when 1
         actions = [product, complete]
+        back_actions = [edit]
       when 2
-        actions << reopen
+        actions = [reopen]
+        back_actions = [edit]
       when 3
         actions = [unallocate, ship]
+        back_actions = [edit]
       when 4
-        actions << unship
+        actions = [unship]
+        back_actions = [edit]
+      else
+        actions = []
+        back_actions = []
       end
 
-      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions,
-                                                            back_actions: back_actions))
+      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions, back_actions: back_actions))
     end
 
     def set_repo

@@ -22,6 +22,8 @@ module RawMaterials
                                     text: action[:text],
                                     url: action[:url],
                                     icon: action[:icon],
+                                    visible: action.fetch(:visible, true),
+                                    prompt: action[:prompt],
                                     behaviour: action[:popup],
                                     style: :action_button)
               end
@@ -60,7 +62,8 @@ module RawMaterials
                                     text: action[:text],
                                     url: action[:url],
                                     icon: action[:icon],
-                                    grid_id: action[:grid_id],
+                                    visible: action.fetch(:visible, true),
+                                    prompt: action[:prompt],
                                     behaviour: action[:behaviour],
                                     style: :action_button)
               end
