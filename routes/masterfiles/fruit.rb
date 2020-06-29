@@ -1103,6 +1103,7 @@ class Nspack < Roda
           if res.success
             update_grid_row(id, changes: { inventory_code: res.instance[:inventory_code],
                                            description: res.instance[:description],
+                                           fruit_item_incentive_rate: res.instance[:fruit_item_incentive_rate],
                                            edi_out_inventory_code: res.instance[:edi_out_inventory_code] },
                                 notice: res.message)
           else
@@ -1136,6 +1137,7 @@ class Nspack < Roda
             inventory_code
             description
             edi_out_inventory_code
+            fruit_item_incentive_rate
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

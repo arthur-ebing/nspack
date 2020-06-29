@@ -3,8 +3,8 @@
 :sql: "SELECT\r\n    inventory_codes.id,\r\n    inventory_codes.inventory_code,\r\n
   \   inventory_codes.description,\r\n    inventory_codes.edi_out_inventory_code,\r\n
   \   fn_masterfile_variants('inventory_codes', inventory_codes.id) AS variant_codes,\r\n
-  \   inventory_codes.active,\r\n    inventory_codes.created_at,\r\n    inventory_codes.updated_at\r\nFROM\r\n
-  \   inventory_codes\r\n"
+  \   inventory_codes.fruit_item_incentive_rate,\r\n    inventory_codes.active,\r\n
+  \   inventory_codes.created_at,\r\n    inventory_codes.updated_at\r\nFROM\r\n    inventory_codes\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -89,9 +89,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  fruit_item_incentive_rate:
+    :name: fruit_item_incentive_rate
+    :sequence_no: 6
+    :caption: Fruit item incentive rate
+    :namespaced_name: inventory_codes.fruit_item_incentive_rate
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: inventory_codes.active
     :data_type: :boolean
@@ -107,7 +123,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: inventory_codes.created_at
     :data_type: :datetime
@@ -123,7 +139,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: inventory_codes.updated_at
     :data_type: :datetime

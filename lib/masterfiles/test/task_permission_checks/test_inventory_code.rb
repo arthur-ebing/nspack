@@ -12,6 +12,7 @@ module MasterfilesApp
         inventory_code: Faker::Lorem.unique.word,
         description: 'ABC',
         edi_out_inventory_code: 'ABC',
+        fruit_item_incentive_rate: 1.0,
         active: true
       }
       MasterfilesApp::InventoryCode.new(base_attrs.merge(attrs))
