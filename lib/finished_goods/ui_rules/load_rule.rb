@@ -276,31 +276,38 @@ module UiRules
                  prompt: 'Are you sure, you want to delete this load?',
                  icon: :checkoff }
       allocate = { text: 'Allocate Pallets',
-                   url: "/finished_goods/dispatch/loads/#{id}/allocate" }
+                   url: "/finished_goods/dispatch/loads/#{id}/allocate",
+                   icon: :checkon }
       truck_arrival = { text: 'Truck Arrival',
                         url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
+                        icon: :checkon,
                         behaviour: :popup }
       delete_truck_arrival = { text: 'Delete Truck Arrival',
                                url: "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
                                prompt: 'Are you sure, you want to delete the vehicle from this load?',
-                               icon: :checkoff }
+                               icon: :back }
       load_truck = { text: 'Load Truck',
-                     url: "/finished_goods/dispatch/loads/#{id}/load_truck" }
+                     url: "/finished_goods/dispatch/loads/#{id}/load_truck",
+                     icon: :checkon }
       unload_truck = { text: 'Unload Truck',
                        url: "/finished_goods/dispatch/loads/#{id}/unload_truck",
-                       prompt: 'Are you sure, you want to unload this load?' }
+                       prompt: 'Are you sure, you want to unload this load?',
+                       icon: :back }
       tail = { text: 'Temp Tail',
                url: "/finished_goods/dispatch/loads/#{id}/temp_tail",
+               icon: :checkon,
                behaviour: :popup }
       delete_tail = { text: 'Delete Temp Tail',
                       url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
                       prompt: 'Are you sure, you want to delete the temp tail on this load?',
-                      icon: :checkoff }
+                      icon: :back }
       ship = { text: 'Ship',
-               url: "/finished_goods/dispatch/loads/#{id}/ship" }
+               url: "/finished_goods/dispatch/loads/#{id}/ship",
+               icon: :checkon }
       unship = { text: 'Unship',
                  url: "/finished_goods/dispatch/loads/#{id}/unship",
-                 prompt: 'Are you sure, you want to unship this load?' }
+                 prompt: 'Are you sure, you want to unship this load?',
+                 icon: :back }
       actions = []
       back_actions = [edit]
 
