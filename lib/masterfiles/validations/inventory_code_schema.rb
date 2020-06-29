@@ -8,5 +8,6 @@ module MasterfilesApp
     required(:inventory_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
     required(:edi_out_inventory_code, Types::StrippedString).maybe(:str?)
+    required(:fruit_item_incentive_rate, :decimal).maybe(:decimal?)
   end
 end

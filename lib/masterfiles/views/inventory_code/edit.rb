@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :inventory_code
               form.add_field :description
               form.add_field :edi_out_inventory_code
+              form.add_field :fruit_item_incentive_rate
             end
           end
 

@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module InventoryCode
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:inventory_code, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.add_field :inventory_code
               form.add_field :description
               form.add_field :edi_out_inventory_code
+              form.add_field :fruit_item_incentive_rate
             end
           end
 
