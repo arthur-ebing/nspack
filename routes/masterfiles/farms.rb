@@ -674,7 +674,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
-      r.on !interactor.exists?(:farms, id) do
+      r.on !interactor.exists?(:farm_sections, id) do
         handle_not_found(r)
       end
 
@@ -710,7 +710,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'edit' do   # EDIT
         check_auth!('farms', 'edit')
-        interactor.assert_permission!(:edit, id)
+        # interactor.assert_permission!(:edit, id)
         show_partial { Masterfiles::Farms::FarmSection::Edit.call(id) }
       end
 
