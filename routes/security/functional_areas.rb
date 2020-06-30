@@ -328,6 +328,22 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      # r.on 'delay' do
+      #   layout = Crossbeams::Layout::Page.build({}) do |page|
+      #     page.callback_section do |section|
+      #       section.caption = 'Test delay'
+      #       section.url = "/security/functional_areas/security_permissions/#{id}/callback_for_delay"
+      #     end
+      #   end
+      #   show_partial { layout }
+      #
+      #   # show in dialog
+      # end
+      # r.on 'callback_for_delay' do
+      #   sleep 1
+      #   'DELAYED'
+      # end
+
       r.on 'edit' do   # EDIT
         check_auth!('menu', 'edit')
         show_partial { Security::FunctionalAreas::SecurityPermission::Edit.call(id) }

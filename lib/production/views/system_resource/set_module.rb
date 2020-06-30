@@ -28,6 +28,7 @@ module Production
               form.row do |row|
                 row.column do |col|
                   col.add_field :module_function
+                  col.add_field :robot_function
                   col.add_field :mac_address
                   col.add_field :ip_address
                   col.add_field :port

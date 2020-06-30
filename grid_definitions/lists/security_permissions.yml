@@ -1,6 +1,11 @@
 ---
 :dataminer_definition: security_permissions
 :actions:
+  # - :url: /security/functional_areas/security_permissions/$:id$/delay
+  #   :text: delay
+  #   :icon: view-show
+  #   :title: delay
+  #   :popup: true
   - :url: /security/functional_areas/security_permissions/$:id$
     :text: view
     :icon: view-show

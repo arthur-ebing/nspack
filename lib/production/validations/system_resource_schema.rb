@@ -16,6 +16,7 @@ module ProductionApp
     required(:login, :bool).maybe(:bool?)
     required(:logoff, :bool).maybe(:bool?)
     required(:module_action, Types::StrippedString).maybe(:str?)
+    required(:robot_function, Types::StrippedString).maybe(:str?)
   end
 
   SystemResourcePeripheralSchema = Dry::Validation.Params do
