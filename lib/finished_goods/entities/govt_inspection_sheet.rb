@@ -4,6 +4,7 @@ module FinishedGoodsApp
   class GovtInspectionSheet < Dry::Struct
     attribute :id, Types::Integer
     attribute :inspector_id, Types::Integer
+    attribute? :inspector, Types::String
     attribute :inspection_billing_party_role_id, Types::Integer
     attribute? :inspection_billing, Types::String
     attribute :exporter_party_role_id, Types::Integer

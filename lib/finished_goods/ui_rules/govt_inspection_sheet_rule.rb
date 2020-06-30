@@ -10,7 +10,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen add_pallet capture].include? @mode
+      set_show_fields if %i[show].include? @mode
       add_progress_step
       add_controls
       add_rules
@@ -20,10 +20,9 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      inspector_id_label = MasterfilesApp::InspectorRepo.new.find_inspector_flat(@form_object.inspector_id)&.inspector
       govt_inspection_api_result_id_label = @repo.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
-                                with_value: inspector_id_label,
+                                with_value: @form_object.inspector,
                                 caption: 'Inspector' }
       fields[:inspection_billing_party_role_id] = { renderer: :label,
                                                     with_value: @form_object.inspection_billing,
@@ -217,7 +216,6 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.input_change(:completed, notify: [{ url: "/finished_goods/inspection/govt_inspection_sheets/#{@options[:id]}/add_pallets" }]) if @mode == :add_pallets
         behaviour.dropdown_change(:packed_tm_group_id, notify: [{ url: '/finished_goods/inspection/govt_inspection_sheets/packed_tm_group_changed' }]) if %i[new edit].include? @mode
       end
     end
