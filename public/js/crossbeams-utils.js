@@ -489,10 +489,10 @@ const crossbeamsUtils = {
     action.replace_options.options.forEach((item) => {
       if (item.constructor === Array) {
         nVal = (item[1] || item[0]);
-        nText = item[0];
+        nText = String(item[0]);
       } else {
         nVal = item;
-        nText = item;
+        nText = String(item);
       }
       newItems.push({
         value: nVal,
