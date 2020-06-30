@@ -16,20 +16,9 @@ module RawMaterials
                                   text: 'Back',
                                   url: '/list/bin_loads',
                                   style: :back_button)
-              section.add_control(control_type: :link,
-                                  text: ui_rule.form_object.back_caption,
-                                  icon: :edit,
-                                  url: ui_rule.form_object.back_action,
-                                  prompt: "Are you sure, you want to #{ui_rule.form_object.back_caption.downcase} this load?",
-                                  visible: !ui_rule.form_object.back_action.nil?,
-                                  style: :action_button)
-              section.add_control(control_type: :link,
-                                  text: 'Delete',
-                                  icon: :checkoff,
-                                  url: "/raw_materials/dispatch/bin_loads/#{id}/delete",
-                                  prompt: 'Are you sure, you want to delete this load?',
-                                  visible: !ui_rule.form_object.completed,
-                                  style: :action_button)
+              ui_rule.form_object.instance_controls.each do |control|
+                section.add_control(control)
+              end
               section.add_control(control_type: :link,
                                   text: 'Print Bin Load',
                                   url: "/raw_materials/reports/bin_load/#{id}",
@@ -38,9 +27,7 @@ module RawMaterials
                                   style: :button)
             end
             page.form do |form|
-              form.action ui_rule.form_object.action
-              form.submit_captions ui_rule.form_object.caption
-
+              form.no_submit!
               form.row do |row|
                 row.column do |col|
                   col.add_field :id
@@ -61,16 +48,15 @@ module RawMaterials
             page.section do |section|
               section.add_progress_step ui_rule.form_object.steps, position: ui_rule.form_object.step
               section.show_border!
+              ui_rule.form_object.progress_controls.each do |control|
+                section.add_control(control)
+              end
+            end
+            page.form do |form|
+              form.action '/list/bin_loads'
+              form.submit_captions 'Close'
             end
             page.section do |section|
-              unless ui_rule.form_object.completed
-                section.add_control(control_type: :link,
-                                    text: 'Add Product',
-                                    url: "/raw_materials/dispatch/bin_loads/#{id}/bin_load_products/new",
-                                    grid_id: 'bin_load_products',
-                                    behaviour: :popup,
-                                    style: :action_button)
-              end
               section.add_grid('bin_load_products',
                                "/list/bin_load_products/grid?key=standard&bin_load_id=#{id}",
                                caption: 'Bin Load Products',

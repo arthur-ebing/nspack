@@ -78,10 +78,11 @@ module FinishedGoodsApp
     end
 
     def delete_govt_inspection_pallet(id)
+      instance = govt_inspection_pallet(id)
       repo.transaction do
         repo.delete_govt_inspection_pallet(id)
       end
-      success_response('Deleted govt inspection pallet')
+      success_response('Deleted govt inspection pallet', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

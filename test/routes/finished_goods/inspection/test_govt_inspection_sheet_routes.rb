@@ -61,16 +61,16 @@ class TestGovtInspectionSheetRoutes < RouteTester
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_govt_inspection_sheet).returns(ok_response)
-    delete_as_fetch 'finished_goods/inspection/govt_inspection_sheets/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_delete_from_grid
+    patch_as_fetch 'finished_goods/inspection/govt_inspection_sheets/1/delete', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_flash_notice
   end
 
   def test_delete_fail
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::GovtInspectionSheet
     ensure_exists!(INTERACTOR)
     INTERACTOR.any_instance.stubs(:delete_govt_inspection_sheet).returns(bad_response)
-    delete_as_fetch 'finished_goods/inspection/govt_inspection_sheets/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_error
+    patch_as_fetch 'finished_goods/inspection/govt_inspection_sheets/1/delete', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
+    expect_flash_error
   end
 
   def test_new

@@ -95,7 +95,7 @@
     :caption: Fruit item incentive rate
     :namespaced_name: inventory_codes.fruit_item_incentive_rate
     :data_type: :number
-    :width: 
+    :width: 200
     :format: :delimited_1000
     :hide: false
     :pinned: 

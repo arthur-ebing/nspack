@@ -11,6 +11,8 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen add_pallet capture].include? @mode
+      add_progress_step
+      add_controls
       add_rules
       add_behaviours
 
@@ -19,17 +21,15 @@ module UiRules
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
       inspector_id_label = MasterfilesApp::InspectorRepo.new.find_inspector_flat(@form_object.inspector_id)&.inspector
-      inspection_billing_party_role_id_label = @party_repo.find_party_role(@form_object.inspection_billing_party_role_id)&.party_name
-      exporter_party_role_id_label = @party_repo.find_party_role(@form_object.exporter_party_role_id)&.party_name
       govt_inspection_api_result_id_label = @repo.find_govt_inspection_api_result(@form_object.govt_inspection_api_result_id)&.upn_number
       fields[:inspector_id] = { renderer: :label,
                                 with_value: inspector_id_label,
                                 caption: 'Inspector' }
       fields[:inspection_billing_party_role_id] = { renderer: :label,
-                                                    with_value: inspection_billing_party_role_id_label,
+                                                    with_value: @form_object.inspection_billing,
                                                     caption: 'Inspection Billing' }
       fields[:exporter_party_role_id] = { renderer: :label,
-                                          with_value: exporter_party_role_id_label,
+                                          with_value: @form_object.exporter,
                                           caption: 'Exporter' }
       fields[:booking_reference] = { renderer: :label }
       fields[:results_captured] = { renderer: :label,
@@ -61,6 +61,7 @@ module UiRules
                                 as_boolean: true }
       fields[:created_by] = { renderer: :label }
       fields[:consignment_note_number] = { renderer: :label }
+      fields[:status] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -108,12 +109,14 @@ module UiRules
                                          disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
                                          caption: 'Govt Inspection Api Result' },
         pallet_number: { renderer: :input,
-                         subtype: :numeric },
+                         subtype: :numeric,
+                         hide_on_load: @form_object.completed },
         reinspection: { renderer: :checkbox,
                         hide_on_load: !@form_object.reinspection,
                         disable: @mode != :reinspection },
         created_by: { disabled: true },
-        consignment_note_number: { disabled: true }
+        consignment_note_number: { disabled: true },
+        status: { disabled: true }
       }
     end
 
@@ -146,6 +149,72 @@ module UiRules
 
     private
 
+    def add_progress_step
+      steps = ['Add Pallets', 'Capture Results', 'Finished']
+      step = 0
+      step = 1 if @form_object.completed
+      step = 2 if @form_object.inspected
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
+    end
+
+    def add_controls # rubocop:disable Metrics/AbcSize
+      id = @options[:id]
+      edit = { control_type: :link,
+               style: :action_button,
+               text: 'Edit',
+               url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/edit",
+               prompt: 'Are you sure, you want to edit this inspection?',
+               icon: :edit }
+      delete = { control_type: :link,
+                 style: :action_button,
+                 text: 'Delete',
+                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/delete",
+                 prompt: 'Are you sure, you want to delete this inspection?',
+                 visible: !@form_object.allocated,
+                 icon: :checkoff }
+      complete = { control_type: :link,
+                   style: :action_button,
+                   text: 'Complete adding pallets',
+                   url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete",
+                   prompt: 'Are you sure, you want to complete this inspection?',
+                   icon: :checkon }
+      reopen = { control_type: :link,
+                 style: :action_button,
+                 text: 'Reopen',
+                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
+                 prompt: 'Are you sure you want to reopen this inspection?',
+                 icon: :back }
+      preverify = { control_type: :link,
+                    style: :action_button,
+                    text: 'eCert preverify',
+                    url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/preverify",
+                    icon: :checkon }
+      finish = { control_type: :link,
+                 style: :action_button,
+                 text: 'Finish Inspection',
+                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/finish",
+                 icon: :checkon }
+
+      case @form_object.step
+      when 0
+        progress_controls = [complete]
+        instance_controls = [edit, delete]
+      when 1
+        progress_controls = [preverify, finish]
+        instance_controls = [edit]
+      when 2
+        progress_controls = [reopen]
+        instance_controls = []
+      else
+        progress_controls = []
+        instance_controls = []
+      end
+
+      @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls,
+                                                            instance_controls: instance_controls))
+    end
+
     def add_behaviours
       behaviours do |behaviour|
         behaviour.input_change(:completed, notify: [{ url: "/finished_goods/inspection/govt_inspection_sheets/#{@options[:id]}/add_pallets" }]) if @mode == :add_pallets
@@ -155,8 +224,6 @@ module UiRules
 
     def add_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       rules[:inspected] = @form_object.inspected
-      # rules[:pallets_allocated] = !@repo.get_value(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: @options[:id]).nil?
-      rules[:pallets_allocated] = @repo.exists?(:govt_inspection_pallets, govt_inspection_sheet_id: @options[:id])
       rules[:create_intake_tripsheet] = @form_object.inspected && !@form_object.tripsheet_created
       rules[:load_vehicle] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
       rules[:vehicle_loaded] = @form_object.tripsheet_loaded

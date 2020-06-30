@@ -22,9 +22,9 @@
   :icon: list
   :popup: true
 - :url: "/masterfiles/general/masterfile_variants/list_masterfile_variants?masterfile_table=target_market_groups&masterfile_id=$:id$"
-  :text: manage variants
-  :icon: edit
-  :title: Manage Variants
+  :text: variants
+  :icon: list
+  :title: Variants
   :popup: false
 :page_controls:
 - :control_type: :link

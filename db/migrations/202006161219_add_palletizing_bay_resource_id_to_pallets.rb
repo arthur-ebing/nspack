@@ -723,20 +723,10 @@ Sequel.migration do
   end
 
   down do
-    alter_table(:cartons) do
-      drop_foreign_key :palletizer_identifier_id
-      drop_foreign_key :pallet_sequence_id
-    end
-
-    alter_table(:pallets) do
-      drop_foreign_key :palletizing_bay_resource_id
-      drop_column status
-    end
-
-    run <<~SQL
-      DROP TRIGGER cartons_update_pallet_sequence_id ON cartons;
-      DROP FUNCTION fn_cartons_carton_quantity_calc();
-    SQL
+    # run <<~SQL
+    #   DROP TRIGGER cartons_update_pallet_sequence_id ON cartons;
+    #   DROP FUNCTION fn_cartons_carton_quantity_calc();
+    # SQL
 
     run <<~SQL
       DROP VIEW public.vw_pallet_sequence_flat;
@@ -1405,8 +1395,17 @@ Sequel.migration do
       
       ALTER TABLE public.vw_repacked_pallet_sequence_flat
           OWNER TO postgres;
-
     SQL
+
+    alter_table(:cartons) do
+      drop_foreign_key :palletizer_identifier_id
+      drop_foreign_key :pallet_sequence_id
+    end
+
+    alter_table(:pallets) do
+      drop_foreign_key :palletizing_bay_resource_id
+      drop_column :status
+    end
   end
 
 end

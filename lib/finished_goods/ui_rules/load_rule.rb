@@ -10,7 +10,7 @@ module UiRules
       apply_form_values
 
       add_progress_step
-      add_buttons
+      add_controls
       add_behaviours
 
       common_values_for_fields common_fields
@@ -265,64 +265,96 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(steps: steps, step: step))
     end
 
-    def add_buttons # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def add_controls # rubocop:disable Metrics/AbcSize
       id = @options[:id]
-      edit = { text: 'Edit',
+      edit = { control_type: :link,
+               style: :action_button,
+               text: 'Edit',
                url: "/finished_goods/dispatch/loads/#{id}/edit",
                prompt: 'Are you sure, you want to edit this load?',
                icon: :edit }
-      delete = { text: 'Delete',
+      delete = { control_type: :link,
+                 style: :action_button,
+                 text: 'Delete',
                  url: "/finished_goods/dispatch/loads/#{id}/delete",
                  prompt: 'Are you sure, you want to delete this load?',
                  icon: :checkoff }
-      allocate = { text: 'Allocate Pallets',
-                   url: "/finished_goods/dispatch/loads/#{id}/allocate" }
-      truck_arrival = { text: 'Truck Arrival',
+      allocate = { control_type: :link,
+                   style: :action_button,
+                   text: 'Allocate Pallets',
+                   url: "/finished_goods/dispatch/loads/#{id}/allocate",
+                   icon: :checkon }
+      truck_arrival = { control_type: :link,
+                        style: :action_button,
+                        text: 'Truck Arrival',
                         url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
+                        icon: :checkon,
                         behaviour: :popup }
-      delete_truck_arrival = { text: 'Delete Truck Arrival',
+      delete_truck_arrival = { control_type: :link,
+                               style: :action_button,
+                               text: 'Delete Truck Arrival',
                                url: "/finished_goods/dispatch/loads/#{id}/delete_load_vehicle",
                                prompt: 'Are you sure, you want to delete the vehicle from this load?',
-                               icon: :checkoff }
-      load_truck = { text: 'Load Truck',
-                     url: "/finished_goods/dispatch/loads/#{id}/load_truck" }
-      unload_truck = { text: 'Unload Truck',
+                               icon: :back }
+      load_truck = { control_type: :link,
+                     style: :action_button,
+                     text: 'Load Truck',
+                     url: "/finished_goods/dispatch/loads/#{id}/load_truck",
+                     icon: :checkon }
+      unload_truck = { control_type: :link,
+                       style: :action_button,
+                       text: 'Unload Truck',
                        url: "/finished_goods/dispatch/loads/#{id}/unload_truck",
-                       prompt: 'Are you sure, you want to unload this load?' }
-      tail = { text: 'Temp Tail',
+                       prompt: 'Are you sure, you want to unload this load?',
+                       visible: @form_object.loaded,
+                       icon: :back }
+      tail = { control_type: :link,
+               style: :action_button,
+               text: 'Temp Tail',
                url: "/finished_goods/dispatch/loads/#{id}/temp_tail",
+               icon: :checkon,
                behaviour: :popup }
-      delete_tail = { text: 'Delete Temp Tail',
+      delete_tail = { control_type: :link,
+                      style: :action_button,
+                      text: 'Delete Temp Tail',
                       url: "/finished_goods/dispatch/loads/#{id}/delete_temp_tail",
                       prompt: 'Are you sure, you want to delete the temp tail on this load?',
-                      icon: :checkoff }
-      ship = { text: 'Ship',
-               url: "/finished_goods/dispatch/loads/#{id}/ship" }
-      unship = { text: 'Unship',
+                      visible: @form_object.temp_tail,
+                      icon: :back }
+      ship = { control_type: :link,
+               style: :action_button,
+               text: 'Ship',
+               url: "/finished_goods/dispatch/loads/#{id}/ship",
+               icon: :checkon }
+      unship = { control_type: :link,
+                 style: :action_button,
+                 text: 'Unship',
                  url: "/finished_goods/dispatch/loads/#{id}/unship",
-                 prompt: 'Are you sure, you want to unship this load?' }
-      actions = []
-      back_actions = [edit]
+                 prompt: 'Are you sure, you want to unship this load?',
+                 icon: :back }
 
       case @form_object.step
       when 0
-        actions << allocate
-        back_actions << delete
+        progress_controls = [allocate]
+        instance_controls = [edit, delete]
       when 1
-        actions = [allocate, truck_arrival]
+        progress_controls = [allocate, truck_arrival]
+        instance_controls = [edit]
       when 2
-        actions = [delete_truck_arrival, load_truck]
+        progress_controls = [delete_truck_arrival, load_truck]
+        instance_controls = [edit]
       when 3
-        actions << unload_truck if @form_object.loaded
-        actions << delete_tail if @form_object.temp_tail
-        actions << tail
-        actions << ship
+        progress_controls = [unload_truck, delete_tail, tail, ship]
+        instance_controls = [edit]
       when 4
-        actions << unship
+        progress_controls = [unship]
+        instance_controls = [edit]
+      else
+        progress_controls = []
+        instance_controls = []
       end
 
-      @form_object = OpenStruct.new(@form_object.to_h.merge(actions: actions,
-                                                            back_actions: back_actions))
+      @form_object = OpenStruct.new(@form_object.to_h.merge(progress_controls: progress_controls, instance_controls: instance_controls))
     end
 
     def add_behaviours

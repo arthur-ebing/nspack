@@ -2,39 +2,15 @@
 
 module FinishedGoodsApp
   class GovtInspectionRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :govt_inspection_sheets,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_for_select :govt_inspection_pallets,
-                     label: :failure_remarks,
-                     value: :id,
-                     order_by: :failure_remarks
-    build_for_select :govt_inspection_api_results,
-                     label: :upn_number,
-                     value: :id,
-                     order_by: :upn_number
-    build_for_select :govt_inspection_pallet_api_results,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
+    build_for_select :govt_inspection_sheets, label: :id, value: :id, order_by: :id
+    build_for_select :govt_inspection_pallets, label: :failure_remarks, value: :id, order_by: :failure_remarks
+    build_for_select :govt_inspection_api_results, label: :upn_number, value: :id, order_by: :upn_number
+    build_for_select :govt_inspection_pallet_api_results, label: :id, value: :id, order_by: :id
 
-    build_inactive_select :govt_inspection_sheets,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
-    build_inactive_select :govt_inspection_pallets,
-                          label: :failure_remarks,
-                          value: :id,
-                          order_by: :failure_remarks
-    build_inactive_select :govt_inspection_api_results,
-                          label: :upn_number,
-                          value: :id,
-                          order_by: :upn_number
-    build_inactive_select :govt_inspection_pallet_api_results,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
+    build_inactive_select :govt_inspection_sheets, label: :id, value: :id, order_by: :id
+    build_inactive_select :govt_inspection_pallets, label: :failure_remarks, value: :id, order_by: :failure_remarks
+    build_inactive_select :govt_inspection_api_results, label: :upn_number, value: :id, order_by: :upn_number
+    build_inactive_select :govt_inspection_pallet_api_results, label: :id, value: :id, order_by: :id
 
     crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet, wrapper: GovtInspectionSheet
     crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, wrapper: GovtInspectionPallet
@@ -43,21 +19,28 @@ module FinishedGoodsApp
     crud_calls_for :vehicle_jobs, name: :vehicle_job, wrapper: VehicleJob
     crud_calls_for :vehicle_job_units, name: :vehicle_job_unit, wrapper: VehicleJobUnit
 
-    def find_govt_inspection_sheet(id)
-      find_with_association(:govt_inspection_sheets,
-                            id,
-                            parent_tables: [{ parent_table: :target_market_groups,
-                                              columns: %i[target_market_group_name],
-                                              foreign_key: :packed_tm_group_id,
-                                              flatten_columns: { target_market_group_name: :packed_tm_group } },
-                                            { parent_table: :destination_regions,
-                                              columns: %i[destination_region_name],
-                                              foreign_key: :destination_region_id,
-                                              flatten_columns: { destination_region_name: :region_name } }],
-                            lookup_functions: [{ function: :fn_consignment_note_number,
-                                                 args: [id],
-                                                 col_name: :consignment_note_number }],
-                            wrapper: GovtInspectionSheet)
+    def find_govt_inspection_sheet(id) # rubocop:disable Metrics/AbcSize
+      hash = find_with_association(:govt_inspection_sheets,
+                                   id,
+                                   parent_tables: [{ parent_table: :target_market_groups,
+                                                     columns: %i[target_market_group_name],
+                                                     foreign_key: :packed_tm_group_id,
+                                                     flatten_columns: { target_market_group_name: :packed_tm_group } },
+                                                   { parent_table: :destination_regions,
+                                                     columns: %i[destination_region_name],
+                                                     foreign_key: :destination_region_id,
+                                                     flatten_columns: { destination_region_name: :region_name } }])
+      return nil unless hash
+
+      hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
+      hash[:passed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: true)
+      hash[:failed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: false)
+      hash[:consignment_note_number] = DB.get(Sequel.function(:fn_consignment_note_number, id))
+      hash[:inspection_billing] =      DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
+      hash[:exporter] = DB.get(Sequel.function(:fn_party_role_name, hash[:exporter_party_role_id]))
+      hash[:status] =   DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
+
+      GovtInspectionSheet.new(hash)
     end
 
     def for_select_destination_regions(active = true, where: nil)
@@ -77,6 +60,85 @@ module FinishedGoodsApp
       return failed_response("Pallet: #{pallet_numbers}, results not captured.") unless pallet_numbers.empty?
 
       ok_response
+    end
+
+    def clone_govt_inspection_sheet(id, user)
+      attrs = where_hash(:govt_inspection_sheets, id: id) || {}
+      attrs = attrs.slice(:inspector_id,
+                          :inspection_billing_party_role_id,
+                          :exporter_party_role_id,
+                          :booking_reference,
+                          :inspection_point,
+                          :destination_region_id)
+      attrs[:cancelled_id] = id
+      clone_id = create_govt_inspection_sheet(attrs)
+      log_status(:govt_inspection_sheets, clone_id, 'CREATED FROM CANCELLED', user_name: user.user_name)
+
+      all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
+        params = { pallet_id: govt_inspection_pallet[:pallet_id],  govt_inspection_sheet_id: clone_id }
+        create_govt_inspection_pallet(params)
+      end
+    end
+
+    def cancel_govt_inspection_sheet(id, user)
+      clone_govt_inspection_sheet(id, user)
+
+      attrs = { cancelled: true, cancelled_at: Time.now }
+      update_govt_inspection_sheet(id, attrs)
+      log_status(:govt_inspection_sheets, id, 'CANCELLED', user_name: user.user_name)
+
+      govt_inspection_pallets = all_hash(:govt_inspection_pallets,  govt_inspection_sheet_id: id)
+      govt_inspection_pallets.each do |govt_inspection_pallet|
+        attrs = { inspected: nil, govt_inspection_passed: nil, last_govt_inspection_pallet_id: nil, in_stock: nil, stock_created_at: nil }
+        update(:pallets, govt_inspection_pallet[:pallet_id], attrs)
+        log_status(:pallets, govt_inspection_pallet[:pallet_id], 'INSPECTION CANCELLED', user_name: user.user_name)
+      end
+    end
+
+    def finish_govt_inspection_sheet(id, user) # rubocop:disable Metrics/AbcSize
+      reinspection = get(:govt_inspection_sheets, id, :reinspection)
+      status = reinspection ? 'MANUALLY REINSPECTED BY GOVT' : 'MANUALLY INSPECTED BY GOVT'
+
+      attrs = { inspected: true, results_captured: true, results_captured_at: Time.now }
+      update_govt_inspection_sheet(id, attrs)
+      log_status(:govt_inspection_sheets, id, status, user_name: user.user_name)
+
+      all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
+        pallet_id = govt_inspection_pallet[:pallet_id]
+        pallet = find_hash(:pallets, pallet_id)
+
+        params = { inspected: true,
+                   govt_inspection_passed: govt_inspection_pallet[:passed],
+                   last_govt_inspection_pallet_id: govt_inspection_pallet[:id] }
+        params[:govt_first_inspection_at] = Time.now if pallet[:govt_first_inspection_at].nil?
+        if govt_inspection_pallet[:passed]
+          params[:in_stock] = true
+          params[:stock_created_at] = Time.now
+        end
+
+        update(:pallets, pallet_id, params)
+        log_status(:pallets, pallet_id, status, user_name: user.user_name)
+      end
+    end
+
+    def reopen_govt_inspection_sheet(id, user)
+      attrs = { inspected: false, results_captured: false, results_captured_at: nil }
+      update_govt_inspection_sheet(id, attrs)
+      log_status(:govt_inspection_sheets, id, 'REOPENED', user_name: user.user_name)
+
+      all_hash(:govt_inspection_pallets, govt_inspection_sheet_id: id).each do |govt_inspection_pallet|
+        pallet_id = govt_inspection_pallet[:pallet_id]
+        next unless govt_inspection_pallet[:id] == get(:pallets, pallet_id, :last_govt_inspection_pallet_id)
+
+        params = { inspected: false,
+                   govt_inspection_passed: nil,
+                   last_govt_inspection_pallet_id: nil,
+                   in_stock: nil,
+                   stock_created_at: nil }
+
+        update(:pallets, pallet_id, params)
+        log_status(:pallets, pallet_id, 'INSPECTION REOPENED', user_name: user.user_name)
+      end
     end
 
     def get_last(table_name, column)

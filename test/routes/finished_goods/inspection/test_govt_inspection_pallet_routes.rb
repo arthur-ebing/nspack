@@ -60,9 +60,10 @@ class TestGovtInspectionPalletRoutes < RouteTester
   def test_delete
     authorise_pass! permission_check: FinishedGoodsApp::TaskPermissionCheck::GovtInspectionPallet
     ensure_exists!(INTERACTOR)
-    INTERACTOR.any_instance.stubs(:delete_govt_inspection_pallet).returns(ok_response)
+    row_vals = { govt_inspection_sheet_id: 1}
+    INTERACTOR.any_instance.stubs(:delete_govt_inspection_pallet).returns(ok_response(instance: row_vals))
     delete_as_fetch 'finished_goods/inspection/govt_inspection_pallets/1', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_delete_from_grid
+    expect_flash_notice
   end
 
   def test_delete_fail
