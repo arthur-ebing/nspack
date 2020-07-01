@@ -54,6 +54,7 @@ module UiRules
         description: { renderer: :label },
         equipment_type: { renderer: :select, options: equipment_types, sort_items: false },
         module_function: {},
+        robot_function: { renderer: :select, options: robot_functions, sort_items: false, prompt: true },
         mac_address: {},
         ip_address: {},
         port: { renderer: :integer },
@@ -114,6 +115,10 @@ module UiRules
              'NSLD-Printing'
            end
       @form_object = OpenStruct.new(@form_object.to_h.merge(module_function: mf)) unless mf.nil?
+    end
+
+    def robot_functions
+      %w[HTTP-CartonLabel HTTP-BinTip HTTP-RmtBinWeighing HTTP-PalletBuildup-SplitScreen]
     end
 
     def peripheral_models

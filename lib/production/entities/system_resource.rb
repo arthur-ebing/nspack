@@ -24,6 +24,7 @@ module ProductionApp
     attribute :print_username, Types::String
     attribute :print_password, Types::String
     attribute :pixels_mm, Types::Integer
+    attribute :robot_function, Types::String
     attribute? :active, Types::Bool
   end
 
@@ -53,6 +54,7 @@ module ProductionApp
     attribute :print_username, Types::String
     attribute :print_password, Types::String
     attribute :pixels_mm, Types::Integer
+    attribute :robot_function, Types::String
     attribute? :active, Types::Bool
   end
 end

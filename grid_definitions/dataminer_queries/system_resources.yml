@@ -10,7 +10,7 @@
   \ FROM plant_resources_system_resources prs\r\n  JOIN system_resources pr ON pr.id
   = prs.system_resource_id\r\n  WHERE prs.plant_resource_id = plant_resources.id)
   sub) AS linked_resources,\r\nplant_resources.active,\r\nplant_resource_types.plant_resource_type_code,\r\nplant_resource_types.description
-  AS type_description,\r\nsystem_resource_types.peripheral,\r\nsystem_resources.equipment_type,\r\nsystem_resources.module_function,\r\nsystem_resources.mac_address,\r\nsystem_resources.ip_address,\r\nsystem_resources.port,\r\nsystem_resources.ttl,\r\nsystem_resources.cycle_time,\r\nsystem_resources.publishing,\r\nsystem_resources.login,\r\nsystem_resources.logoff,\r\nsystem_resources.module_action,\r\nsystem_resources.peripheral_model,\r\nsystem_resources.connection_type,\r\nsystem_resources.printer_language,\r\nsystem_resources.print_username,\r\nsystem_resources.print_password,\r\nsystem_resources.pixels_mm,\r\nplant_resources.system_resource_id
+  AS type_description,\r\nsystem_resource_types.peripheral,\r\nsystem_resources.equipment_type,\r\nsystem_resources.module_function,\r\nsystem_resources.robot_function,\r\nsystem_resources.mac_address,\r\nsystem_resources.ip_address,\r\nsystem_resources.port,\r\nsystem_resources.ttl,\r\nsystem_resources.cycle_time,\r\nsystem_resources.publishing,\r\nsystem_resources.login,\r\nsystem_resources.logoff,\r\nsystem_resources.module_action,\r\nsystem_resources.peripheral_model,\r\nsystem_resources.connection_type,\r\nsystem_resources.printer_language,\r\nsystem_resources.print_username,\r\nsystem_resources.print_password,\r\nsystem_resources.pixels_mm,\r\nplant_resources.system_resource_id
   AS id,\r\nplant_resources.id AS plant_resource_id,\r\nplant_resources.plant_resource_type_id\r\nFROM
   plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nJOIN
   system_resources ON system_resources.id = plant_resources.system_resource_id\r\nJOIN
@@ -217,9 +217,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  robot_function:
+    :name: robot_function
+    :sequence_no: 13
+    :caption: Robot function
+    :namespaced_name: system_resources.robot_function
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mac_address:
     :name: mac_address
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Mac address
     :namespaced_name: system_resources.mac_address
     :data_type: :string
@@ -235,7 +251,7 @@
     :group_max: false
   ip_address:
     :name: ip_address
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Ip address
     :namespaced_name: system_resources.ip_address
     :data_type: :string
@@ -251,7 +267,7 @@
     :group_max: false
   port:
     :name: port
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Port
     :namespaced_name: system_resources.port
     :data_type: :integer
@@ -267,7 +283,7 @@
     :group_max: false
   ttl:
     :name: ttl
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Ttl
     :namespaced_name: system_resources.ttl
     :data_type: :integer
@@ -283,7 +299,7 @@
     :group_max: false
   cycle_time:
     :name: cycle_time
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Cycle time
     :namespaced_name: system_resources.cycle_time
     :data_type: :integer
@@ -299,7 +315,7 @@
     :group_max: false
   publishing:
     :name: publishing
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Publishing
     :namespaced_name: system_resources.publishing
     :data_type: :boolean
@@ -315,7 +331,7 @@
     :group_max: false
   login:
     :name: login
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Login
     :namespaced_name: system_resources.login
     :data_type: :boolean
@@ -331,7 +347,7 @@
     :group_max: false
   logoff:
     :name: logoff
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Logoff
     :namespaced_name: system_resources.logoff
     :data_type: :boolean
@@ -347,7 +363,7 @@
     :group_max: false
   module_action:
     :name: module_action
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Module action
     :namespaced_name: system_resources.module_action
     :data_type: :string
@@ -363,7 +379,7 @@
     :group_max: false
   peripheral_model:
     :name: peripheral_model
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Peripheral model
     :namespaced_name: system_resources.peripheral_model
     :data_type: :string
@@ -379,7 +395,7 @@
     :group_max: false
   connection_type:
     :name: connection_type
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Connection type
     :namespaced_name: system_resources.connection_type
     :data_type: :string
@@ -395,7 +411,7 @@
     :group_max: false
   printer_language:
     :name: printer_language
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Printer language
     :namespaced_name: system_resources.printer_language
     :data_type: :string
@@ -411,7 +427,7 @@
     :group_max: false
   print_username:
     :name: print_username
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Print username
     :namespaced_name: system_resources.print_username
     :data_type: :string
@@ -427,7 +443,7 @@
     :group_max: false
   print_password:
     :name: print_password
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Print password
     :namespaced_name: system_resources.print_password
     :data_type: :string
@@ -443,7 +459,7 @@
     :group_max: false
   pixels_mm:
     :name: pixels_mm
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Pixels mm
     :namespaced_name: system_resources.pixels_mm
     :data_type: :integer
@@ -459,7 +475,7 @@
     :group_max: false
   id:
     :name: id
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Id
     :namespaced_name: plant_resources.system_resource_id
     :data_type: :integer
@@ -475,7 +491,7 @@
     :group_max: false
   plant_resource_id:
     :name: plant_resource_id
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Plant resource
     :namespaced_name: plant_resources.id
     :data_type: :string
@@ -491,7 +507,7 @@
     :group_max: false
   plant_resource_type_id:
     :name: plant_resource_type_id
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Plant resource type
     :namespaced_name: plant_resources.plant_resource_type_id
     :data_type: :integer

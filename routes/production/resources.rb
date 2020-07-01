@@ -310,6 +310,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               login
               logoff
               module_action
+              robot_function
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

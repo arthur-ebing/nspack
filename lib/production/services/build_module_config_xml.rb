@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class BuildModuleConfigXml < BaseService
+  class BuildModuleConfigXml < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :id, :repo
 
     def initialize(id)
@@ -18,6 +18,8 @@ module ProductionApp
     def build_xml(sys_mod) # rubocop:disable Metrics/AbcSize
       builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.SystemSchema do # rubocop:disable Metrics/BlockLength
+          xml.comment "\n  (C) 2020, NoSoft MesServer XML Setup File\n  "
+
           xml.Messages do
             xml.MsgQueLength 3500
           end
@@ -54,7 +56,26 @@ module ProductionApp
             xml.Ethernet(Name: 'Eth04', Function: 'httpserver', NetworkInterface: '', Port: 2080, NetMask: '255.255.255.0', GateWay: '', TTL: 15_000)
           end
 
-          xml.Peripherals do
+          xml.Peripherals do # rubocop:disable Metrics/BlockLength
+            # What does this depend on? Does it matter if it is present in all configs? (e.g. Not at Loftus)
+            # Perhaps we need scanner defs
+            # and modules can choose to include one.
+            xml.Scanner(Name: 'RID-01',
+                        Type: 'RDM630',
+                        Model: 'RDM630',
+                        DeviceName: '/dev/ttyS0',
+                        ReaderId: 1,
+                        ConnectionType: 'RS232',
+                        BaudRate: '9600',
+                        Parity: 'N',
+                        FlowControl: 'N',
+                        DataBits: 8,
+                        StopBits: 1,
+                        BufferSize: 256,
+                        StartOfInput: 'STX',
+                        EndOfInput: 'ETX',
+                        StripStartOfInput: false,
+                        StripEndOfInput: true)
             peripherals.each do |p|
               if p.plant_resource_type_code == 'PRINTER'
                 xml.Printer(Name: p.system_resource_code,
@@ -73,7 +94,7 @@ module ProductionApp
                             PixelsMM: p.pixels_mm)
               else
                 xml.comment "Not yet implemented for #{p.plant_resource_type_code}"
-                xml.OtherNotYetDefined
+                xml.OtherNotYetDefined p.system_resource_code
               end
             end
           end
@@ -95,7 +116,7 @@ module ProductionApp
           xml.Robots do
             xml.Robot(Name: sys_mod.system_resource_code,
                       Alias: sys_mod.plant_resource_code,
-                      Function: sys_mod.module_function,
+                      Function: sys_mod.robot_function,
                       ServerInterface: '',
                       Port: sys_mod.port,
                       RFID: '',
