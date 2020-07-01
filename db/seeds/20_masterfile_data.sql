@@ -95,6 +95,17 @@ INSERT INTO location_assignments (assignment_code) VALUES('TRANSIT') ON CONFLICT
 INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
 VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'), (SELECT id FROM location_assignments WHERE assignment_code = 'TRANSIT'), 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', 'IN_TRANSIT_EX_PACKHSE', true, true) ON CONFLICT DO NOTHING;
 
+-- SCRAP LOCATION
+INSERT INTO location_assignments (assignment_code) VALUES('APPLICATION') ON CONFLICT DO NOTHING;
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'),
+(SELECT id FROM location_assignments WHERE assignment_code = 'APPLICATION'), 'SCRAP_PACKHSE', 'SCRAP_PACKHSE', 'SCRAP_PACKHSE', true, true) ON CONFLICT DO NOTHING;
+
+-- UNSCRAP LOCATION
+INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description, location_short_code, can_be_moved, can_store_stock)
+VALUES ((SELECT id FROM location_storage_types WHERE storage_type_code = 'PALLETS'), (SELECT id FROM location_types WHERE location_type_code = 'IN_TRANSIT'),
+(SELECT id FROM location_assignments WHERE assignment_code = 'APPLICATION'), 'UNSCRAP_PACKHSE', 'UNSCRAP_PACKHSE', 'UNSCRAP_PACKHSE', true, true) ON CONFLICT DO NOTHING;
+
 -- BUSINESS PROCESSES
 INSERT INTO business_processes(process, description) VALUES('MOVE_PALLET', 'ADHOC individual FG Pallet movements') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('MOVE_BIN', 'ADHOC RMT individual Bin movements') ON CONFLICT DO NOTHING;
@@ -105,6 +116,7 @@ INSERT INTO business_processes(process, description) VALUES('FIRST_INTAKE', 'Int
 INSERT INTO business_processes(process, description) VALUES('RECEIVE_EMPTY_BINS', 'Receive Empty Bins') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('ISSUE_EMPTY_BINS', 'Issue Empty Bins') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('ADHOC_TRANSACTIONS', 'Adhoc Transactions') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('REWORKS_MOVE_PALLET', 'Reworks Pallet movements') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;

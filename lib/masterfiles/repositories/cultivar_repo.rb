@@ -58,11 +58,13 @@ module MasterfilesApp
     end
 
     def find_cultivar(id)
-      hash = find_hash(:cultivars, id)
+      hash = find_with_association(:cultivars,
+                                   id,
+                                   parent_tables: [{ parent_table: :cultivar_groups,
+                                                     columns: [:cultivar_group_code],
+                                                     flatten_columns: { cultivar_group_code: :cultivar_group_code } }])
       return nil if hash.nil?
 
-      cg_hash = find_hash(:cultivar_groups, hash[:cultivar_group_id])
-      hash[:cultivar_group_code] = cg_hash[:cultivar_group_code]
       Cultivar.new(hash)
     end
 
