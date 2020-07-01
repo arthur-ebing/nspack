@@ -28,11 +28,14 @@ module FinishedGoodsApp
       repo.pallet(pallet_id)
     end
 
-    def repack_pallet
+    def repack_pallet  # rubocop:disable Metrics/AbcSize
       res = repo.repack_pallet(pallet_id)
       return res unless res.success
 
       new_pallet_id = res.instance[:new_pallet_id]
+      res = move_stock_pallet
+      return res unless res.success
+
       unless multiple_pallets
         res = create_reworks_run
         return res unless res.success
@@ -40,6 +43,18 @@ module FinishedGoodsApp
 
       success_response('ok',
                        new_pallet_id: new_pallet_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def move_stock_pallet
+      location_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet_id, location_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil).call
+      return res unless res.success
+
+      ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -32,6 +32,10 @@ module ProductionApp
       res = create_reworks_run
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
+      if reworks_run_booleans[:scrap_pallets] || reworks_run_booleans[:unscrap_pallets]
+        res = move_stock_pallet
+        return res unless res.success
+      end
       success_response('ok', reworks_run_id: res.instance[:reworks_run_id])
     end
 
@@ -155,6 +159,26 @@ module ProductionApp
 
     def reworks_run(id)
       repo.find_reworks_run(id)
+    end
+
+    def move_stock_pallet  # rubocop:disable Metrics/AbcSize
+      location_long_code = if reworks_run_booleans[:scrap_pallets]
+                             AppConst::SCRAP_LOCATION
+                           elsif reworks_run_booleans[:unscrap_pallets]
+                             AppConst::UNSCRAP_LOCATION
+                           end
+      location_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(location_long_code)&.id
+      return failed_response('Location does not exist') if location_id.nil_or_empty?
+
+      pallet_ids = repo.find_pallet_ids_from_pallet_number(pallets_affected)
+      pallet_ids.each  do |pallet_id|
+        res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet_id, location_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil).call
+        return res unless res.success
+      end
+
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
   end
 end

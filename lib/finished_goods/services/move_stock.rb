@@ -138,7 +138,10 @@ module FinishedGoodsApp
       @stock_item = repo.find_stock_item(stock_item_id, stock_type)
 
       return failed_response("#{stock_type} does not exist") unless @stock_item
-      return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
+
+      unless business_process == AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS
+        return failed_response("#{stock_type} has been scrapped") if @stock_item[:scrapped]
+      end
 
       unless business_process == AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS
         return failed_response("#{stock_type} has been shipped") if @stock_item[:shipped]
