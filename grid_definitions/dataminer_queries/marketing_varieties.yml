@@ -2,12 +2,13 @@
 :caption: Marketing Varieties
 :sql: "SELECT\r\n    marketing_varieties.id,\r\n    marketing_varieties.marketing_variety_code,\r\n
   \   marketing_varieties.description,\r\n    fn_masterfile_variants('marketing_varieties',
-  marketing_varieties.id) AS variant_codes,\r\n    cultivars.cultivar_group_id,\r\n
-  \   cultivars.cultivar_code,\r\n    marketing_varieties.active,\r\n    marketing_varieties.created_at,\r\n
-  \   marketing_varieties.updated_at\r\nFROM marketing_varieties\r\nJOIN marketing_varieties_for_cultivars
-  ON marketing_varieties.id = marketing_varieties_for_cultivars.marketing_variety_id\r\nJOIN
-  cultivars ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id\r\nORDER
-  BY marketing_varieties.marketing_variety_code"
+  marketing_varieties.id) AS variant_codes,\r\n    array_agg(distinct cultivars.cultivar_group_id)
+  AS cultivar_group_ids,\r\n    array_agg(distinct cultivars.cultivar_code) AS cultivar_code,\r\n
+  \   marketing_varieties.active,\r\n    marketing_varieties.created_at,\r\n    marketing_varieties.updated_at\r\nFROM
+  marketing_varieties\r\n         JOIN marketing_varieties_for_cultivars ON marketing_varieties.id
+  = marketing_varieties_for_cultivars.marketing_variety_id\r\n         JOIN cultivars
+  ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id\r\n\r\nGROUP BY
+  marketing_varieties.id\r\nORDER BY marketing_varieties.marketing_variety_code"
 :limit: 
 :offset: 
 :external_settings:
@@ -77,12 +78,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  cultivar_group_id:
-    :name: cultivar_group_id
+  cultivar_group_ids:
+    :name: cultivar_group_ids
     :sequence_no: 5
-    :caption: Cultivar group
-    :namespaced_name: cultivars.cultivar_group_id
-    :data_type: :integer
+    :caption: Cultivar group ids
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
     :hide: true
@@ -97,7 +98,7 @@
     :name: cultivar_code
     :sequence_no: 6
     :caption: Cultivar code
-    :namespaced_name: cultivars.cultivar_code
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 
