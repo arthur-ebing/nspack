@@ -7,9 +7,10 @@ module EdiApp
 
     def load_config
       @load_config ||= begin
-                         raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_out_config.yml"' unless File.exist?('config/edi_out_config.yml')
+                         config_path = File.expand_path('../../../config/edi_out_config.yml', __dir__)
+                         raise Crossbeams::FrameworkError, 'There is no EDI config file named "config/edi_out_config.yml"' unless File.exist?(config_path)
 
-                         YAML.load_file('config/edi_out_config.yml')
+                         YAML.load_file(config_path)
                        end
     end
 
