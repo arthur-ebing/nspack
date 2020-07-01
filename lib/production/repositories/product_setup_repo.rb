@@ -123,7 +123,7 @@ module ProductionApp
           Sequel[:commodities][:code]
         )
         .order(:code)
-        .first[:id]
+        .map { |p| p[:id] }.first
     end
 
     def for_select_template_commodity_marketing_varieties(product_setup_template_id, commodity_id)  # rubocop:disable Metrics/AbcSize
