@@ -48,10 +48,10 @@ module FinishedGoodsApp
     end
 
     def move_stock_pallet
-      location_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id
-      return failed_response('Location does not exist') if location_id.nil_or_empty?
+      location_to_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::SCRAP_LOCATION)&.id
+      return failed_response('Location does not exist') if location_to_id.nil_or_empty?
 
-      res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet_id, location_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil).call
+      res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
       return res unless res.success
 
       ok_response

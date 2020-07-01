@@ -167,12 +167,12 @@ module ProductionApp
                            elsif reworks_run_booleans[:unscrap_pallets]
                              AppConst::UNSCRAP_LOCATION
                            end
-      location_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(location_long_code)&.id
-      return failed_response('Location does not exist') if location_id.nil_or_empty?
+      location_to_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(location_long_code)&.id
+      return failed_response('Location does not exist') if location_to_id.nil_or_empty?
 
       pallet_ids = repo.find_pallet_ids_from_pallet_number(pallets_affected)
       pallet_ids.each  do |pallet_id|
-        res = FinishedGoodsApp::MoveStockService.new(AppConst::PALLET_STOCK_TYPE, pallet_id, location_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil).call
+        res = FinishedGoodsApp::MoveStockService.call(AppConst::PALLET_STOCK_TYPE, pallet_id, location_to_id, AppConst::REWORKS_MOVE_PALLET_BUSINESS_PROCESS, nil)
         return res unless res.success
       end
 
