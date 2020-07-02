@@ -334,10 +334,10 @@ module RawMaterialsApp
       print_params = { no_of_prints: 1, printer: params[:printer] }
       res = nil
       bin_asset_numbers.each do |bin_asset_number|
-        instance = { farm_code: repo.get(:farms, params[:farm_id], :farm_code),
-                     puc_code: repo.get(:pucs, params[:puc_id], :puc_code),
-                     orchard_code: repo.get(:orchards, params[:orchard_id], :orchard_code),
-                     cultivar_name: repo.get(:cultivars, params[:cultivar_id], :cultivar_name),
+        instance = { farm_code: !params[:farm_id].nil_or_empty? ? repo.get(:farms, params[:farm_id], :farm_code) : nil,
+                     puc_code: !params[:puc_id].nil_or_empty? ? repo.get(:pucs, params[:puc_id], :puc_code) : nil,
+                     orchard_code: !params[:orchard_id].nil_or_empty? ? repo.get(:orchards, params[:orchard_id], :orchard_code) : nil,
+                     cultivar_name: !params[:cultivar_id].nil_or_empty? ? repo.get(:cultivars, params[:cultivar_id], :cultivar_name) : nil,
                      bin_asset_number: bin_asset_number }
         res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
         return res unless res.success
@@ -353,7 +353,6 @@ module RawMaterialsApp
       return failed_response("Couldn't find #{params[:no_of_prints]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:no_of_prints].to_i
 
       preprint_bin_barcodes(bin_asset_numbers.map { |b| b[1] }, params)
-      # ok_response
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e

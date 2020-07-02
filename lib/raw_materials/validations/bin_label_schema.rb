@@ -5,10 +5,11 @@ module RawMaterialsApp
     configure { config.type_specs = true }
 
     optional(:id, :integer).filled(:int?)
-    required(:orchard_id, :integer).filled(:int?)
-    required(:cultivar_id, :integer).filled(:int?)
-    required(:farm_id, :integer).filled(:int?)
-    required(:puc_id, :integer).filled(:int?)
+    # required(:orchard_id, :integer).filled(:int?)
+    # required(:cultivar_id, :integer).filled(:int?)
+    # required(:farm_id, :integer).filled(:int?)
+    # required(:puc_id, :integer).filled(:int?)
+    required(:printer, Types::StrippedString).filled(:str?)
     required(:bin_label, Types::StrippedString).filled(:str?)
   end
 end
