@@ -581,6 +581,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: actual_counts)])
       end
 
+      r.on 'std_fruit_size_count_changed' do
+        basic_pack_code_id = params[:reworks_run_sequence_basic_pack_code_id]
+        if basic_pack_code_id.blank? || params[:changed_value].blank?
+          actual_counts = []
+        else
+          std_fruit_size_count_id = params[:changed_value]
+          actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
+                                     options_array: actual_counts)])
+      end
+
       r.on 'actual_count_changed' do
         if params[:changed_value].blank?
           standard_pack_codes = []

@@ -28,6 +28,8 @@ module Production
                 row.column do |col|
                   col.add_field :product_setup_template
                   col.add_field :product_setup_template_id
+                  col.add_field :cultivar_group
+                  col.add_field :cultivar
                 end
               end
               form.row do |row|

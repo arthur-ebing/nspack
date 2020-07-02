@@ -43,7 +43,13 @@ module UiRules
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
       pm_type_id_label = MasterfilesApp::BomsRepo.new.find_pm_type(@form_object.pm_type_id)&.pm_type_code
       pm_subtype_id_label = MasterfilesApp::BomsRepo.new.find_pm_subtype(@form_object.pm_subtype_id)&.subtype_code
+      product_setup_template = @repo.find_product_setup_template(@form_object.product_setup_template_id)
+      cultivar_group_id_label = product_setup_template&.cultivar_group_code
+      cultivar_id_label = product_setup_template&.cultivar_name
+
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
+      fields[:cultivar_group] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
+      fields[:cultivar] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
@@ -82,7 +88,9 @@ module UiRules
       product_setup_template = @repo.find_product_setup_template(product_setup_template_id)
       product_setup_template_id_label = product_setup_template&.template_name
       cultivar_group_id = product_setup_template&.cultivar_group_id
+      cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id = product_setup_template&.cultivar_id
+      cultivar_id_label = product_setup_template&.cultivar_name
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
 
@@ -97,9 +105,18 @@ module UiRules
                 else
                   MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id)
                 end
+
+      actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
+                        []
+                      else
+                        MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
+                                                                                                            std_fruit_size_count_id: @form_object.std_fruit_size_count_id })
+                      end
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
+        cultivar_group: { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group', readonly: true },
+        cultivar: { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar', readonly: true },
         commodity_id: { renderer: :select,
                         options: @repo.for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id),
                         disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
@@ -140,7 +157,7 @@ module UiRules
                                  remove_search_for_small_list: false,
                                  hide_on_load: @rules[:hide_some_fields] ? true : false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
-                                           options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs,
+                                           options: actual_counts,
                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_actual_counts_for_packs,
                                            caption: 'Actual Count',
                                            prompt: 'Select Actual Count',
@@ -329,6 +346,9 @@ module UiRules
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: '/production/product_setups/product_setups/basic_pack_code_changed',
                                              param_keys: %i[product_setup_std_fruit_size_count_id] }]
+        behaviour.dropdown_change :std_fruit_size_count_id,
+                                  notify: [{ url: '/production/product_setups/product_setups/std_fruit_size_count_changed',
+                                             param_keys: %i[product_setup_basic_pack_code_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
                                   notify: [{ url: '/production/product_setups/product_setups/actual_count_changed' }]
         behaviour.dropdown_change :marketing_variety_id,
