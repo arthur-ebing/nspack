@@ -2,9 +2,14 @@
 :dataminer_definition: govt_inspection_sheets
 :actions:
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
-  :text: manage inspection
+  :text: view
+  :icon: view-show
+  :hide_if_false: inspected
+- :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$"
+  :text: manage
   :icon: edit
-  :title: Manage Inspection
+  :hide_if_true: inspected
+- :separator: true
 - :url: "/finished_goods/inspection/govt_inspection_sheets/$:id$/preverify"
   :text: eCert preverify
   :icon: check-square
