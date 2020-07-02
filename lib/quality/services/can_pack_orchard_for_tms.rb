@@ -5,6 +5,8 @@ module QualityApp
     attr_reader :repo, :api, :season_id, :puc_id, :orchard_id, :cultivar_id, :tm_group_id
 
     def initialize(orchard_id:, cultivar_id:, tm_group_ids:)
+      return if AppConst::BYPASS_QUALITY_TEST_PRE_RUN_CHECK
+
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
