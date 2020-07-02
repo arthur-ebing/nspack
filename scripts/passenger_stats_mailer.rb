@@ -9,8 +9,9 @@ class PassengerStatsMailer < BaseScript
   def run
     status = check_status
     memory = check_memory
+    top = check_top
 
-    send_error_email(subject: 'INFO: Passenger-stats', message: "#{status}\n\n\n#{memory}", recipients: 'james@nosoft.biz,hans@nosoft.biz')
+    send_error_email(subject: 'INFO: Passenger-stats', message: "#{status}\n\n\n#{memory}\n\n\n#{top}", recipients: 'james@nosoft.biz,hans@nosoft.biz')
     success_response('Mail sent')
   end
 
@@ -22,5 +23,9 @@ class PassengerStatsMailer < BaseScript
 
   def check_memory
     `echo "#{ENV['NSPACKSUDO']}" | sudo -S passenger-memory-stats` # rubocop:disable Lint/Env
+  end
+
+  def check_top
+    `top -b -n 1 -o +%CPU`
   end
 end
