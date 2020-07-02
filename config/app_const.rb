@@ -378,8 +378,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # * mark_code
   # * marketing_variety_code
   # * org_code
+  # * product_chars
   # * size_count_value
   # * size_reference
+  # * size_ref_or_count
   # * standard_pack_code
   # * target_market_group_name
   CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
