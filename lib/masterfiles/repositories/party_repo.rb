@@ -61,6 +61,10 @@ module MasterfilesApp
       DB.get(Sequel.function(:fn_party_role_org_code, id))
     end
 
+    def fn_party_name(id)
+      DB.get(Sequel.function(:fn_party_name, id))
+    end
+
     def fn_party_role_name(id)
       DB.get(Sequel.function(:fn_party_role_name, id))
     end
@@ -170,7 +174,8 @@ module MasterfilesApp
 
       DB[:party_addresses].where(party_id: party_id).where(address_id: old_ids).delete
       new_ids.each do |prog_id|
-        DB[:party_addresses].insert(party_id: party_id, address_id: prog_id)
+        address_type_id = get(:addresses, prog_id, :address_type_id)
+        DB[:party_addresses].insert(party_id: party_id, address_id: prog_id, address_type_id: address_type_id)
       end
     end
 
