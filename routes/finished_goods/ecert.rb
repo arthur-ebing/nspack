@@ -98,7 +98,7 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('ecert', 'new')
-        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(nil, remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.elot_preverify(params[:ecert_tracking_unit])
