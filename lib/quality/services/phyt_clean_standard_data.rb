@@ -95,7 +95,7 @@ module QualityApp
     end
 
     def save_to_yaml(payload, file_name)
-      File.open("tmp/#{file_name}.yml", 'w') { |f| f << payload.to_yaml }
+      File.open(File.join(ENV['ROOT'], 'tmp', "#{file_name}.yml"), 'w') { |f| f << payload.to_yaml }
     end
   end
 end
