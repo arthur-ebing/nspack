@@ -372,14 +372,17 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # The possible fruitspec tokens are:
   # HBL: 'COUNT: $:actual_count_for_pack$'
   # UM : 'SIZE: $:size_reference$'
+  # SR : '$:size_ref_or_count$ $:product_chars$ $:target_market_group_name$'
   # * actual_count_for_pack
   # * basic_pack_code
   # * commodity_code
   # * mark_code
   # * marketing_variety_code
   # * org_code
+  # * product_chars
   # * size_count_value
   # * size_reference
+  # * size_ref_or_count
   # * standard_pack_code
   # * target_market_group_name
   CLM_BUTTON_CAPTION_FORMAT = ENV['CLM_BUTTON_CAPTION_FORMAT']
