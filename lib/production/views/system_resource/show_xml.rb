@@ -8,6 +8,10 @@ module Production
           rules = {}
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
+            page.section do |section|
+              section.add_control control_type: :link, text: 'Back', url: '/list/system_resources', style: :back_button
+            end
+
             if res.instance[:config]
               page.add_text 'MODULE CONFIG', wrapper: :h2
               page.add_text res.instance[:config], syntax: :xml

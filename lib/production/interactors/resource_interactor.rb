@@ -150,6 +150,14 @@ module ProductionApp
                        peripherals: ProductionApp::BuildPeripheralsXml.call.instance)
     end
 
+    def download_modules_xml
+      success_response('ok', ProductionApp::BuildModulesXml.call.instance)
+    end
+
+    def download_peripherals_xml
+      success_response('ok', ProductionApp::BuildPeripheralsXml.call.instance)
+    end
+
     def bulk_add_ptms(id, params)
       res = validate_plant_resource_ptm_params(params)
       return validation_failed_response(res) unless res.messages.empty?

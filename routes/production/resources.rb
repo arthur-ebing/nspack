@@ -352,9 +352,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = ProductionApp::ResourceInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       check_auth!('resources', 'read')
+
+      r.on 'download_modules' do
+        res = interactor.download_modules_xml
+        response.headers['content_type'] = 'text/xml'
+        response.headers['Content-Disposition'] = 'attachment; filename="modules_config.xml"'
+
+        response.write(res.instance)
+      end
+
+      r.on 'download_peripherals' do
+        res = interactor.download_peripherals_xml
+        response.headers['content_type'] = 'text/xml'
+        response.headers['Content-Disposition'] = 'attachment; filename="peripherals_config.xml"'
+
+        response.write(res.instance)
+      end
+
       res = interactor.system_resource_xml
       show_page { Production::Resources::SystemResource::ShowXml.call(res) }
-      # view(inline: res.instance[:modules].to_s)
     end
   end
 end
