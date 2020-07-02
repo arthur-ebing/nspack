@@ -25,5 +25,16 @@
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/system_resources"
-  :text: Resource XML
+  :text: View Resource XML
+  :icon: :show
+  :style: :button
+- :control_type: :link
+  :url: "/production/resources/system_resources/download_modules"
+  :text: Download Modules XML
+  :icon: :download
+  :style: :button
+- :control_type: :link
+  :url: "/production/resources/system_resources/download_peripherals"
+  :text: Download Peripherals XML
+  :icon: :download
   :style: :button
