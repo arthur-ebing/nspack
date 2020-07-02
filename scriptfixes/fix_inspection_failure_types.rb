@@ -41,7 +41,7 @@ class FixInspectionFailureTypes < BaseScript
             UPDATE inspection_failure_reasons SET inspection_failure_type_id = #{inspection_failure_type_id}
             WHERE inspection_failure_type_id IN (#{ids.join(',')});
           SQL
-          DB.execute(query)
+          DB.execute(query) unless ids.nil_or_empty?
           DB[:inspection_failure_types].where(failure_type_code: failure_type_code).exclude(id: inspection_failure_type_id).delete
         end
       end
