@@ -117,6 +117,13 @@ module UiRules
                 else
                   MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id)
                 end
+
+      actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
+                        []
+                      else
+                        @fruit_size_repo.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
+                                                                                           std_fruit_size_count_id: @form_object.std_fruit_size_count_id })
+                      end
       fields[:pallet_number] =  { renderer: :label,
                                   with_value: @form_object[:pallet_number],
                                   caption: 'Pallet Number',
@@ -161,7 +168,7 @@ module UiRules
                                           remove_search_for_small_list: false,
                                           hide_on_load: @rules[:hide_some_fields] ? true : false }
       fields[:fruit_actual_counts_for_pack_id] =  { renderer: :select,
-                                                    options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs,
+                                                    options: actual_counts,
                                                     disabled_options: @fruit_size_repo.for_select_inactive_fruit_actual_counts_for_packs,
                                                     caption: 'Actual Count',
                                                     prompt: 'Select Actual Count',
@@ -362,10 +369,13 @@ module UiRules
     end
 
     def edit_sequence_behaviours  # rubocop:disable Metrics/AbcSize
-      behaviours do |behaviour|
+      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/basic_pack_code_changed",
                                              param_keys: %i[reworks_run_sequence_std_fruit_size_count_id] }]
+        behaviour.dropdown_change :std_fruit_size_count_id,
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/std_fruit_size_count_changed",
+                                             param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/actual_count_changed" }]
         behaviour.dropdown_change :marketing_variety_id,
