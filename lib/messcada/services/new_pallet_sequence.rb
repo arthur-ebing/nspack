@@ -2,18 +2,19 @@
 
 module MesscadaApp
   class NewPalletSequence < BaseService
-    attr_reader :repo, :carton_id, :carton_quantity, :pallet_id, :user_name
+    attr_reader :repo, :carton_id, :carton_quantity, :pallet_id, :user_name, :carton_palletizing
 
-    def initialize(user_name, carton_id, pallet_id, carton_quantity)
+    def initialize(user_name, carton_id, pallet_id, carton_quantity, carton_palletizing = false)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
       @pallet_id = pallet_id
       @repo = MesscadaApp::MesscadaRepo.new
       @user_name = user_name
+      @carton_palletizing = carton_palletizing
     end
 
     def call  # rubocop:disable Metrics/AbcSize
-      res = NewPalletSequenceObject.call(user_name, carton_id, carton_quantity)
+      res = NewPalletSequenceObject.call(user_name, carton_id, carton_quantity, carton_palletizing)
       return res unless res.success
 
       validations = validate_pallet_mix_rules(res.instance)

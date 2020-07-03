@@ -46,7 +46,7 @@ module MesscadaApp
     optional(:pm_type_id, :integer).maybe(:int?)
     optional(:pm_subtype_id, :integer).maybe(:int?)
     required(:carton_quantity, :integer).filled(:int?)
-    required(:scanned_from_carton_id, :integer).filled(:int?)
+    required(:scanned_from_carton_id, :integer).maybe(:int?)
     optional(:exit_ref, Types::StrippedString).maybe(:str?)
     optional(:scrapped_at, %i[nil time]).maybe(:time?)
     optional(:verification_result, Types::StrippedString).maybe(:str?)

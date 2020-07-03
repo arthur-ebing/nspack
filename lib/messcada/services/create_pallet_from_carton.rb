@@ -3,13 +3,14 @@
 module MesscadaApp
   class CreatePalletFromCarton < BaseService
     attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet_id, :pallet_sequence_id,
-                :user_name, :palletizing_bay_resource_id
+                :user_name, :palletizing_bay_resource_id, :carton_palletizing
 
-    def initialize(user, carton_id, carton_quantity, palletizing_bay_resource_id = nil)
+    def initialize(user, carton_id, carton_quantity, palletizing_bay_resource_id = nil, carton_palletizing = false)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
       @user_name = user&.user_name
       @palletizing_bay_resource_id = palletizing_bay_resource_id
+      @carton_palletizing = carton_palletizing
     end
 
     def call
@@ -89,7 +90,7 @@ module MesscadaApp
     end
 
     def create_pallet_sequence
-      res = NewPalletSequence.call(user_name, carton_id, pallet_id, carton_quantity)
+      res = NewPalletSequence.call(user_name, carton_id, pallet_id, carton_quantity, carton_palletizing)
       return res unless res.success
 
       @pallet_sequence_id = res.instance[:pallet_sequence_id]
