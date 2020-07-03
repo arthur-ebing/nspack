@@ -2,13 +2,14 @@
 
 module MesscadaApp
   class NewPalletSequenceObject < BaseService
-    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet, :user_name
+    attr_reader :repo, :carton_id, :carton, :carton_quantity, :cartons_per_pallet, :user_name, :carton_palletizing
 
-    def initialize(user_name, carton_id, carton_quantity)
+    def initialize(user_name, carton_id, carton_quantity, carton_palletizing = false)
       @carton_id = carton_id
       @carton_quantity = carton_quantity
       @repo = MesscadaApp::MesscadaRepo.new
       @user_name = user_name
+      @carton_palletizing = carton_palletizing
     end
 
     def call
@@ -47,8 +48,9 @@ module MesscadaApp
                    carton_quantity.nil? ? cartons_per_pallet : carton_quantity
                  end
 
+      scanned_from_carton_id = carton_palletizing ? nil : carton_id
       {
-        scanned_from_carton_id: carton_id,
+        scanned_from_carton_id: scanned_from_carton_id,
         carton_quantity: quantity,
         pick_ref: UtilityFunctions.calculate_pick_ref(packhouse_no)
       }

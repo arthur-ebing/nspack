@@ -293,7 +293,7 @@ module MesscadaApp
         confirm = {}
         res = nil
         repo.transaction do
-          res = MesscadaApp::CreatePalletFromCarton.call(@user, carton_id, 1, palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
+          res = MesscadaApp::CreatePalletFromCarton.call(@user, carton_id, 1, palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id, true)
           # UPDATE carton with pallet_sequence_id & pallet_sequence with incentive contract_worker....
 
           changeset = { current_state: state_machine.current.to_s,

@@ -33,9 +33,9 @@ module MesscadaApp
     end
 
     def add_carton_to_pallet  # rubocop:disable Metrics/AbcSize
-      new_sequence = NewSequence.new(pallet_id, carton_id).call
+      new_sequence = NewSequence.call(pallet_id, carton_id)
       if new_sequence
-        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1)
+        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true)
         return res unless res.success
 
         @pallet_sequence_id = res.instance[:pallet_sequence_id]
