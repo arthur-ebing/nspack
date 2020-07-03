@@ -2,12 +2,13 @@
 
 module MesscadaApp
   class AddCartonToPallet < BaseService
-    attr_reader :repo, :carton_id, :pallet_id, :pallet_sequence_id
+    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id
 
     def initialize(carton_id, pallet_id)
       @carton_id = carton_id
       @pallet_id = pallet_id
       @repo = MesscadaApp::MesscadaRepo.new
+      @prod_repo = ProductionApp::ProductionRunRepo.new
     end
 
     def call
@@ -41,6 +42,7 @@ module MesscadaApp
       else
         @pallet_sequence_id = repo.matching_sequence_for_carton(carton_id, pallet_id)
         repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
+        prod_repo.increment_sequence(pallet_sequence_id)
       end
 
       ok_response

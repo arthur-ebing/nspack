@@ -44,6 +44,5 @@ module MesscadaApp
     optional(:load_id, :integer).maybe(:int?)
     optional(:cooled, :bool).maybe(:bool?)
     optional(:palletizing_bay_resource_id, :integer).maybe(:int?)
-    optional(:status, Types::StrippedString).maybe(:str?)
   end
 end
