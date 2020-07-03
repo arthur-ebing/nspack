@@ -26,6 +26,7 @@ class PassengerStatsMailer < BaseScript
   end
 
   def check_top
+    # `top -b -n 1 -o +%CPU -E g` # per-gig option only from 20.04 on...
     `top -b -n 1 -o +%CPU`
   end
 end
