@@ -26,7 +26,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { EDIT_BIN_RECEIVED_DATE: 'Allow a user to able to edit received_date_time' },
     { REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION: 'optional. Show field if fruit sticker is required.' },
     { CAPTURE_PALLET_WEIGHT_AT_VERIFICATION: 'optional. Fill in the gross weight at pallet verification,' },
-    { EDI_OUT_RULES_TEMPLATE: 'list of rules for edi flow types' },
     { PALLET_WEIGHT_REQUIRED_FOR_INSPECTION: 'optional. Bool to set if weight is required' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
@@ -147,6 +146,24 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
 
   def list_keys # rubocop:disable Metrics/AbcSize
     (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort.join("\n")
+  end
+
+  def client_settings # rubocop:disable Metrics/AbcSize
+    one_hash = {}
+    NO_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    CAN_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    MUST_OVERRIDE.each { |h| one_hash[h.keys.first] = h.values.first }
+    OPTIONAL.each { |h| one_hash[h.keys.first] = h.values.first }
+    keys = (NO_OVERRIDE.map { |a| a.keys.first } + CAN_OVERRIDE.map { |a| a.keys.first } + MUST_OVERRIDE.map { |a| a.keys.first } + OPTIONAL.map { |a| a.keys.first }).sort
+    ar = []
+    keys.each do |key|
+      hs = { key: key, env_val: ENV[key.to_s] } # rubocop:disable Lint/Env
+      description = one_hash[key]
+      hs[:key] = %(<span class="fw5 near-black">#{key}</span><br><span class="f6">#{description}</span>)
+      hs[:const_val] = AppConst.const_defined?(key) ? AppConst.const_get(key) : nil
+      ar << hs
+    end
+    ar
   end
 
   def root_path

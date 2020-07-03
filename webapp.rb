@@ -307,6 +307,19 @@ class Nspack < Roda
       view('crossbeams_layout_page')
     end
 
+    r.is 'client_settings' do
+      require './config/env_var_rules'
+      en = EnvVarRules.new
+      settings = en.client_settings
+      @layout = Crossbeams::Layout::Page.build do |page, _|
+        page.section do |section|
+          section.add_text('Client Settings', wrapper: :h2)
+          section.add_table(settings, %i[key env_val const_val], header_captions: { env_val: 'Environment variable value', const_val: 'Value in AppConst' })
+        end
+      end
+      view('crossbeams_layout_page')
+    end
+
     r.is 'not_found' do
       response.status = 404
       view(inline: '<div class="crossbeams-error-note"><strong>Error</strong><br>The requested resource was not found.</div>')
