@@ -44,7 +44,7 @@ module MesscadaApp
     end
 
     def pallet_id_for_pallet_number(pallet_number)
-      DB[:pallets].where(pallet_number: pallet_number.to_s).get(:id)
+      DB[:pallets].where(pallet_number: pallet_number).get(:id)
     end
 
     def resource_code_exists?(resource_code)

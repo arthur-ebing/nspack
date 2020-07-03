@@ -110,7 +110,18 @@ module MesscadaApp
           WHERE cartons.id = #{carton_id}
           --AND pallets.palletized
           --AND cartons.scrapped
-          AND (NOT pallets.shipped OR NOT pallets.scrapped)
+          AND (NOT pallets.shipped AND NOT pallets.scrapped)
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def current_bay_carton?(carton_id, palletizing_bay_state_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT pallet_sequence_id FROM cartons
+          WHERE id = #{carton_id}
+            AND	pallet_sequence_id IN (SELECT DISTINCT pallet_sequence_id FROM palletizing_bay_states WHERE id = #{palletizing_bay_state_id})
         )
       SQL
       DB[query].single_value
@@ -132,6 +143,32 @@ module MesscadaApp
         ORDER BY pallet_sequences.id, pallet_sequences.pallet_sequence_number ASC
       SQL
       DB[query, pallet_id].first
+    end
+
+    def palletizing_bay_resource(palletizing_bay_state_id)
+      query = <<~SQL
+        SELECT p.id AS resource_id
+        FROM system_resources s
+        JOIN system_resource_types t ON t.id = s.system_resource_type_id
+        LEFT OUTER JOIN plant_resource_types e ON e.id = s.plant_resource_type_id
+        LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
+        JOIN palletizing_bay_states pbs ON s.system_resource_code = pbs.palletizing_robot_code
+        WHERE pbs.id = #{palletizing_bay_state_id}
+        AND s.active
+      SQL
+      DB[query].single_value
+    end
+
+    def find_palletizing_bay_resource_printer(palletizing_bay_resource_id)
+      DB[:printers]
+        .where(printer_code: DB[:plant_resources_system_resources]
+                                 .join(:system_resources, id: :system_resource_id)
+                                 .where(plant_resource_id: palletizing_bay_resource_id)
+                                 .where(plant_resource_type_id: DB[:plant_resource_types]
+                                                                    .where(plant_resource_type_code: 'PRINTER')
+                                                                    .get(:id))
+                                 .get(:system_resource_code))
+        .get(:id)
     end
   end
 end

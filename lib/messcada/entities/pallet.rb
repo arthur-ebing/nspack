@@ -43,7 +43,6 @@ module MesscadaApp
     attribute :load_id, Types::Integer
     attribute? :cooled, Types::Bool
     attribute :palletizing_bay_resource_id, Types::Integer
-    attribute :status, Types::String
   end
 
   class ScannedPalletNumber < Dry::Struct
