@@ -82,7 +82,7 @@ module FinishedGoodsApp
     end
 
     def progress_count
-      current_step[:allocated].length
+      allocated.length
     end
 
     def allocation_progress
