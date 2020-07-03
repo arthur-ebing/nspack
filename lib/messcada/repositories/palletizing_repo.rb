@@ -101,6 +101,12 @@ module MesscadaApp
         .get(:id)
     end
 
+    def pallet_sequence_palletizing_bay_state(pallet_sequence_id)
+      DB[:palletizing_bay_states]
+        .where(pallet_sequence_id: pallet_sequence_id)
+        .get(:id)
+    end
+
     def valid_pallet_carton?(carton_id)
       query = <<~SQL
         SELECT EXISTS(

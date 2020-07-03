@@ -412,8 +412,11 @@ module MesscadaApp
       success_response('ok', current_bay_attributes(state_machine, confirm))
     end
 
-    def remove_pallet_sequence(pallet_sequence_id)
+    def remove_pallet_sequence(pallet_sequence_id)  # rubocop:disable Metrics/AbcSize
       pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      res = palletizing_bay_state(sequence_palletizing_bay_state(pallet_sequence_id))
+      params = { device: res[:palletizing_robot_code], reader_id: res[:scanner_code] }
+
       attrs = { removed_from_pallet: true,
                 removed_from_pallet_at: Time.now,
                 pallet_id: nil,
@@ -424,16 +427,34 @@ module MesscadaApp
         reworks_repo.update_pallet_sequence(pallet_sequence_id, attrs)
         repo.log_status('pallets', pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
         repo.log_status('pallet_sequences', pallet_sequence_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+        scrap_carton_pallet(pallet_id, params) if scrap_carton_pallet?(pallet_id)
       end
-      scrap_carton_pallet(pallet_id) if scrap_carton_pallet?(pallet_id)
     end
 
-    def scrap_carton_pallet(pallet_id)
+    def sequence_palletizing_bay_state(pallet_sequence_id)
+      repo.pallet_sequence_palletizing_bay_state(pallet_sequence_id)
+    end
+
+    def scrap_carton_pallet(pallet_id, params)
       attrs = { scrapped: true,
                 scrapped_at: Time.now,
                 exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED }
       reworks_repo.update_pallet(pallet_id, attrs)
       repo.log_status('pallets', pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
+      update_scrapped_pallet_palletizing_bay_state(params)
+    end
+
+    def update_scrapped_pallet_palletizing_bay_state(params)
+      state_machine = state_machine(params)
+      state_machine.complete
+
+      changeset = { current_state: state_machine.current.to_s,
+                    pallet_sequence_id: nil,
+                    determining_carton_id: nil,
+                    last_carton_id: nil }
+
+      repo.update_palletizing_bay_state(state_machine.target.id, changeset)
+      log_transaction
     end
 
     def return_pallet_to_bay(state_machine, params)  # rubocop:disable Metrics/AbcSize
