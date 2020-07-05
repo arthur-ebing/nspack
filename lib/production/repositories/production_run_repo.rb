@@ -349,6 +349,7 @@ module ProductionApp
       query = <<~SQL
         SELECT
         "sysres"."system_resource_code" AS module,
+        "parent"."plant_resource_code" AS alias,
         REPLACE("btns"."system_resource_code", "sysres"."system_resource_code" || '-', '') AS button,
         "a"."product_setup_id", "a"."label_template_id",
         "commodities"."code" AS commodity_code,
@@ -412,7 +413,8 @@ module ProductionApp
       return {} if buttons.empty?
 
       query = <<~SQL
-        SELECT "sysres"."system_resource_code" AS module
+        SELECT "sysres"."system_resource_code" AS module,
+        "p"."plant_resource_code" AS alias
         FROM "production_runs" r
         JOIN "tree_plant_resources" t ON "t"."ancestor_plant_resource_id" = "r"."packhouse_resource_id"
         JOIN "plant_resources" p ON "p"."id" = "t"."descendant_plant_resource_id"
@@ -423,7 +425,7 @@ module ProductionApp
         WHERE r.id = ?
         ORDER BY "sysres"."system_resource_code"
       SQL
-      modules = DB[query, production_run_id].select_map(:module)
+      modules = DB[query, production_run_id].select_map(%i[module alias])
       return {} if modules.empty?
 
       grp = {}

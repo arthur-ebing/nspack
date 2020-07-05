@@ -8,10 +8,20 @@ class PassengerStatsMailer < BaseScript
 
   def run
     status = check_status
+    procs = status[/^Processes.+$/].split(':').last.strip.to_i
+    curr = if procs == 30
+             'OVER'
+           elsif procs > 25
+             'HIGH'
+           elsif procs > 20
+             'BUSY'
+           else
+             'INFO'
+           end
     memory = check_memory
     top = check_top
 
-    send_error_email(subject: 'INFO: Passenger-stats', message: "#{status}\n\n\n#{memory}\n\n\n#{top}", recipients: 'james@nosoft.biz,hans@nosoft.biz')
+    send_error_email(subject: "#{curr}: Passenger-stats", message: "#{status}\n\n\n#{memory}\n\n\n#{top}", recipients: 'james@nosoft.biz,hans@nosoft.biz')
     success_response('Mail sent')
   end
 

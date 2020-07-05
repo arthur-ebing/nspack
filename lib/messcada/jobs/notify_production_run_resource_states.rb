@@ -48,7 +48,8 @@ module MesscadaApp
               unless modules_for_lbl.empty?
                 modules_for_lbl.each do |mod, buttons|
                   xml.module do
-                    xml.name mod
+                    xml.name mod.first
+                    xml.alias mod.last
                     xml.buttons do
                       buttons.each do |rec|
                         xml.button do
@@ -64,7 +65,8 @@ module MesscadaApp
               unless modules_for_bvm.empty?
                 modules_for_bvm.each do |mod, buttons|
                   xml.module do
-                    xml.name mod
+                    xml.name mod.first
+                    xml.alias mod.last
                     xml.buttons do
                       buttons.each do |name, tare|
                         xml.button do
@@ -87,7 +89,7 @@ module MesscadaApp
         return {} unless AppConst::CLM_BUTTON_CAPTION_FORMAT
 
         lbl_modules = repo.button_allocations(production_run_id)
-        lbl_modules.group_by { |r| r[:module] }
+        lbl_modules.group_by { |r| [r[:module], r[:alias]] }
       end
 
       def bvm_modules
