@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module PartyFactory
+  module PartyFactory # rubocop:disable Metrics/ModuleLength
     def create_party(opts = {})
       default = {
         party_type: 'O', # || 'P'
@@ -64,16 +64,19 @@ module MasterfilesApp
     end
 
     def create_address(opts = {})
-      type_id = DB[:address_types].insert(address_type: Faker::Lorem.unique.word)
+      address_type_id = create_address_type
+
       default = {
-        address_type_id: type_id,
-        address_line_1: Faker::Lorem.word,
+        address_type_id: address_type_id,
+        address_line_1: Faker::Lorem.unique.word,
         address_line_2: Faker::Lorem.word,
         address_line_3: Faker::Lorem.word,
         city: Faker::Lorem.word,
-        postal_code: Faker::Number.number(4),
+        postal_code: Faker::Lorem.word,
         country: Faker::Lorem.word,
-        active: true
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
       }
       DB[:addresses].insert(default.merge(opts))
     end
@@ -89,11 +92,28 @@ module MasterfilesApp
     end
 
     def create_party_address(opts = {})
+      address_id = create_address
+      party_id = create_party
+      address_type_id = create_address_type
+
       default = {
-        party_id: create_party,
-        address_id: create_address
+        address_id: address_id,
+        party_id: party_id,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00',
+        address_type_id: address_type_id
       }
       DB[:party_addresses].insert(default.merge(opts))
+    end
+
+    def create_address_type(opts = {})
+      default = {
+        address_type: Faker::Lorem.unique.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:address_types].insert(default.merge(opts))
     end
 
     def create_party_contact_method(opts = {})
