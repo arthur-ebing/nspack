@@ -176,6 +176,7 @@ module Crossbeams
       BIN_FORKLIFT_ROBOT = 'BIN_FORKLIFT_ROBOT'
       PALLETIZING_STATION = 'PALLETIZING_STATION'
       PALLETIZING_BAY = 'PALLETIZING_BAY'
+      AUTOPACK_PALLET_BAY = 'AUTOPACK_PALLET_BAY'
       PALLET_FORKLIFT_ROBOT = 'PALLET_FORKLIFT_ROBOT'
       PALLETIZING_ROBOT = 'PALLETIZING_ROBOT'
       BIN_TIPPING_ROBOT = 'BINTIPPING_ROBOT'
@@ -246,6 +247,7 @@ module Crossbeams
                                           QC_ROBOT,
                                           PALLETIZING_STATION,
                                           PALLETIZING_BAY,
+                                          AUTOPACK_PALLET_BAY,
                                           SCALE,
                                           PRINTER,
                                           CARTON_VERIFICATION_STATION,
@@ -256,7 +258,7 @@ module Crossbeams
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
-                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
+                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
                   icon: { file: 'packline', colour: CLR_S } },
         DROP => { description: 'Drop',
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
@@ -315,7 +317,7 @@ module Crossbeams
                                    create_with_system_resource: 'MODULE',
                                    code_prefix: 'PMM-' },
         PALLETIZING_ROBOT => { description: 'Palletizing Robot',
-                               allowed_children: [PALLETIZING_BAY],
+                               allowed_children: [AUTOPACK_PALLET_BAY, PALLETIZING_BAY],
                                icon: { file: 'server3', colour: CLR_T },
                                create_with_system_resource: 'MODULE',
                                code_prefix: 'PTM-' },
@@ -336,11 +338,14 @@ module Crossbeams
                              allowed_children: [PALLET_FORKLIFT_ROBOT],
                              icon: { file: 'forkishlift', colour: CLR_M } },
         PALLETIZING_STATION => { description: 'Palletizing Station',
-                                 allowed_children: [PALLETIZING_BAY, PALLETIZING_ROBOT],
+                                 allowed_children: [AUTOPACK_PALLET_BAY, PALLETIZING_BAY, PALLETIZING_ROBOT],
                                  icon: { file: 'cubes', colour: CLR_W } },
         PALLETIZING_BAY => { description: 'Palletizing Bay',
                              allowed_children: [PALLETIZING_ROBOT, SCALE, PRINTER],
                              icon: { file: 'cube', colour: CLR_G } },
+        AUTOPACK_PALLET_BAY => { description: 'Palletizing Bay',
+                                 allowed_children: [PALLETIZING_ROBOT, SCALE, PRINTER],
+                                 icon: { file: 'cube', colour: CLR_V } },
         SCALE => { description: 'Scale',
                    allowed_children: [],
                    create_with_system_resource: PERIPHERAL,
