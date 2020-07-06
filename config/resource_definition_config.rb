@@ -191,6 +191,8 @@ module Crossbeams
       PRINT_STATION = 'PRINT_STATION'
       PRINT_STATION_ROBOT = 'PRINT_STATION_ROBOT'
       WEIGHING_STATION = 'WEIGHING_STATION'
+      MES_SERVER = 'MES_SERVER'
+      CMS_SERVER = 'CMS_SERVER'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -208,7 +210,9 @@ module Crossbeams
 
       SYSTEM_RESOURCE_RULES = {
         SERVER => { description: 'Server',
-                    attributes: { ip_address: :string } },
+                    computing_device: true,
+                    attributes: { ip_address: :string,
+                                  sub_types: [MES_SERVER, CMS_SERVER] } },
         MODULE => { description: 'Module',
                     computing_device: true,
                     attributes: { ip_address: :string,
@@ -235,8 +239,18 @@ module Crossbeams
 
       PLANT_RESOURCE_RULES = {
         SITE => { description: 'Site',
-                  allowed_children: [PACKHOUSE, ROOM],
+                  allowed_children: [PACKHOUSE, ROOM, MES_SERVER, CMS_SERVER],
                   icon: { file: 'globe', colour: CLR_H } },
+        MES_SERVER => { description: 'MES Server',
+                        allowed_children: [],
+                        icon: { file: 'servers', colour: CLR_J },
+                        create_with_system_resource: SERVER,
+                        code_prefix: 'SRV-' },
+        CMS_SERVER => { description: 'CMS Server',
+                        allowed_children: [],
+                        icon: { file: 'servers', colour: CLR_P },
+                        create_with_system_resource: SERVER,
+                        code_prefix: 'SRV-' },
         PACKHOUSE => { description: 'Packhouse',
                        allowed_children: [ROOM,
                                           LINE,
@@ -397,6 +411,7 @@ module Crossbeams
       }.freeze
 
       MODULE_ACTIONS = {
+        server: {},
         carton_palletizing: {
           url: '',
           Par1: '',

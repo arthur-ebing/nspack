@@ -243,6 +243,39 @@ module ProductionApp
       success_response('ok', id)
     end
 
+    def system_servers
+      query = <<~SQL
+        SELECT s.system_resource_code as name,
+        s.equipment_type as module_type,
+        s.module_function as function, -- Could add to resource_types
+        p.plant_resource_code as alias,
+        s.ip_address as network_interface,
+        s.port as port,
+        s.mac_address as mac_address,
+        s.ttl as ttl,
+        -- s.cycle_time as cycle_time,
+        s.publishing as publishing, -- true/false..
+        (SELECT string_agg("equipment_type", ',')
+        FROM (SELECT DISTINCT "sr"."equipment_type"
+        FROM "plant_resources_system_resources" prs
+        JOIN "system_resources" sr ON "sr"."id" = "prs"."system_resource_id"
+        WHERE sr.plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'PRINTER')) sub) AS printer_types,
+
+        s.id, s.plant_resource_type_id, s.system_resource_type_id,
+               s.description, s.active,
+               t.system_resource_type_code, t.peripheral,
+               e.plant_resource_type_code
+        FROM public.system_resources s
+        JOIN system_resource_types t ON t.id = s.system_resource_type_id
+        LEFT OUTER JOIN plant_resource_types e ON e.id = s.plant_resource_type_id
+        LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
+        WHERE t.system_resource_type_code = 'SERVER'
+          AND s.active
+        ORDER BY s.system_resource_code
+      SQL
+      DB[query].all
+    end
+
     def system_modules
       query = <<~SQL
         SELECT s.system_resource_code as name,

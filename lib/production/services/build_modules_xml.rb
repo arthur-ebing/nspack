@@ -10,14 +10,30 @@ module ProductionApp
 
     def call
       modules = repo.system_modules
-      xml = build_xml(modules)
+      servers = repo.system_servers
+      xml = build_xml(modules, servers)
       success_response('BuildModulesXml was successful', xml)
     end
 
-    def build_xml(modules) # rubocop:disable Metrics/AbcSize
+    def build_xml(modules, servers) # rubocop:disable Metrics/AbcSize
       builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.SystemSchema do # rubocop:disable Metrics/BlockLength
           xml.Modules do # rubocop:disable Metrics/BlockLength
+            unless servers.empty?
+              servers.each do |srv|
+                xml.Module(Name: srv[:name],
+                           Type: srv[:module_type],
+                           Function: srv[:function],
+                           Alias: srv[:alias],
+                           NetworkInterface: srv[:network_interface],
+                           Port: srv[:port],
+                           MacAddress: srv[:mac_address],
+                           TTL: srv[:ttl],
+                           # CycleTime: srv[:cycle_time],
+                           Publishing: srv[:publishing],
+                           PrinterTypes: srv[:printer_types])
+              end
+            end
             unless modules.empty?
               modules.each do |mod| # rubocop:disable Metrics/BlockLength
                 key = mod[:module_action]
