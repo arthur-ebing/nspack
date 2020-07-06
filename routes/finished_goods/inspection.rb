@@ -402,6 +402,44 @@ class Nspack < Roda
       end
     end
   end
+
+  route 'buildups', 'finished_goods' do |r|
+    # VEHICLE JOBS
+    # --------------------------------------------------------------------------
+    r.on 'completed' do
+      r.is do
+        r.get do
+          r.redirect('/list/pallet_buildups/with_params?key=standard&completed=true')
+        end
+      end
+    end
+
+    r.on 'uncompleted' do
+      r.is do
+        r.get do
+          r.redirect('/list/pallet_buildups/with_params?key=standard&completed=false')
+        end
+      end
+    end
+
+    r.on 'buildup_cancel', Integer do |id|    # DELETE
+      interactor = RmdApp::BuildupsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      res = interactor.delete_pallet_buildup(id)
+      if res.success
+        delete_grid_row(id, notice: res.message)
+      else
+        show_json_error(res.message, status: 200)
+      end
+    end
+
+    r.on 'pallet_buildups', Integer do |id|
+      r.is do
+        r.get do       # SHOW
+          show_partial { FinishedGoods::PalletBuildup::Show.call(id) }
+        end
+      end
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength
 # rubocop:enable Metrics/ClassLength

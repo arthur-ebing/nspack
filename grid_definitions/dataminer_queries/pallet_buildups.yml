@@ -1,0 +1,178 @@
+---
+:caption: Pallet Buildups
+:sql: SELECT "pallet_buildups"."id", "pallet_buildups"."destination_pallet_number",
+  "pallet_buildups"."source_pallets", "pallet_buildups"."qty_cartons_to_move", "pallet_buildups"."created_by",
+  "pallet_buildups"."completed_at", "pallet_buildups"."cartons_moved", "pallet_buildups"."completed",
+  CASE  WHEN pallet_buildups.completed is true THEN 'gray' END AS colour_rule,
+  fn_current_status('pallet_buildups', "pallet_buildups"."id") AS status FROM "pallet_buildups"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: pallet_buildups.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination_pallet_number:
+    :name: destination_pallet_number
+    :sequence_no: 2
+    :caption: Destination pallet number
+    :namespaced_name: pallet_buildups.destination_pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  source_pallets:
+    :name: source_pallets
+    :sequence_no: 3
+    :caption: Source pallets
+    :namespaced_name: pallet_buildups.source_pallets
+    :data_type: :string_array
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  qty_cartons_to_move:
+    :name: qty_cartons_to_move
+    :sequence_no: 4
+    :caption: Qty cartons to move
+    :namespaced_name: pallet_buildups.qty_cartons_to_move
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_by:
+    :name: created_by
+    :sequence_no: 5
+    :caption: Created by
+    :namespaced_name: pallet_buildups.created_by
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed_at:
+    :name: completed_at
+    :sequence_no: 6
+    :caption: Completed at
+    :namespaced_name: pallet_buildups.completed_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cartons_moved:
+    :name: cartons_moved
+    :sequence_no: 7
+    :caption: Cartons moved
+    :namespaced_name: pallet_buildups.cartons_moved
+    :data_type: :jsonb
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  completed:
+    :name: completed
+    :sequence_no: 8
+    :caption: Completed
+    :namespaced_name: pallet_buildups.completed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 9
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 10
+    :caption: Colour rule
+    :namespaced_name:
+    :data_type: :string
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+  - :column: pallet_buildups.completed
+    :caption: Completed
+    :data_type: :boolean
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:

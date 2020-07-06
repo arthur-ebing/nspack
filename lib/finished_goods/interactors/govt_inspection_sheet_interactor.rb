@@ -271,7 +271,7 @@ module FinishedGoodsApp
     def complete_offload_vehicle(vehicle_job_id) # rubocop:disable Metrics/AbcSize
       govt_inspection_sheet_id = repo.get(:vehicle_jobs, vehicle_job_id, :govt_inspection_sheet_id)
       repo.update(:vehicle_jobs, vehicle_job_id, offloaded_at: Time.now)
-      repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_offloaded: true, tripsheet_affloaded_at: Time.now)
+      repo.update(:govt_inspection_sheets, govt_inspection_sheet_id, tripsheet_offloaded: true, tripsheet_offloaded_at: Time.now)
       location_to_id = repo.get(:vehicle_jobs, vehicle_job_id, :planned_location_to_id)
       tripsheet_pallets = repo.get_vehicle_job_units(vehicle_job_id)
       tripsheet_pallets.each do |p|

@@ -1,0 +1,20 @@
+---
+:dataminer_definition: pallet_buildups
+:actions:
+- :url: "/finished_goods/buildups/pallet_buildups/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+#  :hide_if_false: completed
+  :popup: true
+- :url: "/finished_goods/buildups/buildup_cancel/$:id$"
+  :text: cancel
+  :icon: delete
+  :is_delete: true
+  :hide_if_true: completed
+  :popup: true
+:conditions:
+  :standard:
+    - :col: pallet_buildups.completed
+      :op: =
+      :val: $:completed$
