@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RmdApp
+module FinishedGoodsApp
   class BuildupsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def buildup_pallet(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       params.delete_if { |k, v| v.nil_or_empty? || k.to_s.include?('_scan_field') }
@@ -52,7 +52,7 @@ module RmdApp
         pallet_buildup.cartons_moved.delete(pallet[0]) if pallet_buildup.cartons_moved[pallet[0]].to_a.empty?
       else
         # Add Carton
-        pallet_number = repo.find_pallet_by_carton_number(params[:carton_number])
+        pallet_number = repo.find_pallet_by_carton_label_id(params[:carton_number])
         pallet_buildup.cartons_moved.store(pallet_number, []) unless pallet_buildup.cartons_moved[pallet_number]
         pallet_buildup.cartons_moved[pallet_number].push(params[:carton_number])
       end

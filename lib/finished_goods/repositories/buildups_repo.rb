@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RmdApp
+module FinishedGoodsApp
   class BuildupsRepo < BaseRepo
     build_for_select :pallet_buildups,
                      label: :destination_pallet_number,
@@ -52,7 +52,7 @@ module RmdApp
       !DB[query, pallet_buildup_id, carton_number].first.nil?
     end
 
-    def find_pallet_by_carton_number(carton_label_id)
+    def find_pallet_by_carton_label_id(carton_label_id)
       query = <<~SQL
         SELECT pallet_sequences.pallet_number
         FROM pallet_sequences

@@ -3,7 +3,7 @@
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'buildups', 'rmd' do |r|
-    interactor = RmdApp::BuildupsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    interactor = FinishedGoodsApp::BuildupsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
     # --------------------------------------------------------------------------
     # PALLET BUILDUP

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RmdApp
+module FinishedGoodsApp
   class PalletBuildup < Dry::Struct
     attribute :id, Types::Integer
     attribute :destination_pallet_number, Types::String
