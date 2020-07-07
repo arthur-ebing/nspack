@@ -60,8 +60,10 @@ module ProductionApp
       res = validate_plant_resource_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      current = plant_resource(id)
+      name_changed = current.plant_resource_code != res[:plant_resource_code]
       repo.transaction do
-        repo.update_plant_resource(id, res)
+        repo.update_plant_resource(id, res, name_changed)
         log_transaction
       end
       instance = plant_resource(id)

@@ -41,7 +41,7 @@ module ProductionApp
             # xml.Gateway '255.255.255.0'
             xml.comment "\n        When to use true for lbl store (nspi CLM?)\n        LineProdUnit???\n        Why sys pwd?\n    "
             xml.CentralLableStore false # nspi CLM
-            xml.LineProductionUnit false # ???
+            xml.LineProductionUnit false # ??? CLM?
             xml.SystemPassword 'e=mc22' # ????
             xml.Cms false
             xml.Mqtt false

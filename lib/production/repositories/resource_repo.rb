@@ -161,12 +161,25 @@ module ProductionApp
       create(:plant_resources, new_attrs)
     end
 
-    def update_plant_resource(id, attrs)
+    def update_plant_resource(id, attrs, name_changed = false)
       new_attrs = attrs.to_h
       properties_present = new_attrs.keys.include?(:resource_properties)
       check_or_create_gln_sequence(new_attrs[:resource_properties][:gln]) if properties_present && new_attrs[:resource_properties][:gln]
       new_attrs[:resource_properties] = hash_for_jsonb_col(attrs[:resource_properties]) if properties_present
       update(:plant_resources, id, new_attrs)
+      update_button_names(id, attrs) if name_changed
+    end
+
+    def update_button_names(plant_resource_id, attrs)
+      # has button children?
+      ids = select_values(:tree_plant_resources, :descendant_plant_resource_id, ancestor_plant_resource_id: plant_resource_id, path_length: 1)
+      ids.each do |id|
+        next unless plant_resource_type_code_for(id) == Crossbeams::Config::ResourceDefinitions::ROBOT_BUTTON
+
+        old_code = get_value(:plant_resources, :plant_resource_code, id: id)
+        new_code = old_code.sub(/.+(B\d+)$/, "#{attrs[:plant_resource_code]} \\1")
+        DB[:plant_resources].where(id: id).update(plant_resource_code: new_code, description: new_code)
+      end
     end
 
     def check_for_duplicate_gln(id, gln)
