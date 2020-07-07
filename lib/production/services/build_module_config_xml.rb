@@ -11,14 +11,17 @@ module ProductionApp
 
     def call
       sys_mod = repo.find_system_resource_flat(id)
-      xml = build_xml(sys_mod)
-      success_response('BuildModuleConfigXml was successful', xml)
+      server = repo.find_mes_server
+      no_buttons = repo.no_of_direct_descendants(sys_mod.plant_resource_id)
+      xml = build_xml(sys_mod, no_buttons, server)
+      success_response('BuildModuleConfigXml was successful', xml: xml, module: sys_mod.system_resource_code)
     end
 
-    def build_xml(sys_mod) # rubocop:disable Metrics/AbcSize
+    def build_xml(sys_mod, no_buttons, server) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      action = Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS[sys_mod.module_action.to_sym]
       builder = Nokogiri::XML::Builder.new do |xml| # rubocop:disable Metrics/BlockLength
         xml.SystemSchema do # rubocop:disable Metrics/BlockLength
-          xml.comment "\n  (C) 2020, NoSoft MesServer XML Setup File\n  "
+          xml.comment "\n  (C) #{Time.now.year}, NoSoft MesServer XML Setup File\n  "
 
           xml.Messages do
             xml.MsgQueLength 3500
@@ -31,12 +34,12 @@ module ProductionApp
           xml.System do
             xml.Company AppConst::IMPLEMENTATION_OWNER
             xml.LocalInterface sys_mod.ip_address
-            xml.comment 'Need ip address for ServerInterface'
-            # xml.ServerInterface sys_mod.ip_address
+            xml.ServerInterface server.ip_address
             xml.ServerPort 2080
             xml.NetMask '255.255.255.0'
-            xml.comment 'Need ip address for Gateway'
+            xml.comment 'Need ip address for Gateway (store on server system resource? or could it differ for some robots - separate VLANs)'
             # xml.Gateway '255.255.255.0'
+            xml.comment "\n        When to use true for lbl store (nspi CLM?)\n        LineProdUnit???\n        Why sys pwd?\n    "
             xml.CentralLableStore false # nspi CLM
             xml.LineProductionUnit false # ???
             xml.SystemPassword 'e=mc22' # ????
@@ -113,7 +116,7 @@ module ProductionApp
           # 	Printer=""
           # 	TransactionTrigger="Button"
           # 	>
-          xml.Robots do
+          xml.Robots do # rubocop:disable Metrics/BlockLength
             xml.Robot(Name: sys_mod.system_resource_code,
                       Alias: sys_mod.plant_resource_code,
                       Function: sys_mod.robot_function,
@@ -125,7 +128,25 @@ module ProductionApp
                       Scanner: '',
                       Scale: '',
                       Printer: '',
-                      TransactionTrigger: '')
+                      TransactionTrigger: '') do
+              if sys_mod.module_action == 'carton_labeling'
+                no_buttons.times do |index|
+                  hs = {
+                    Name: "B#{index + 1}",
+                    Enable: true,
+                    Caption: "Button #{index + 1}",
+                    URL: action[:url],
+                    Par1: action[:Par1]
+                  }
+                  hs[:Par2] = action[:Par2] if action[:Par2]
+                  hs[:Par3] = action[:Par3] if action[:Par3]
+                  hs[:Par4] = action[:Par4] if action[:Par4]
+                  hs[:Par5] = action[:Par5] if action[:Par5]
+                  xml.Button(hs)
+                  # <Button Name="B1" Enable="true" Caption="Button 1" URL="/messcada/production/carton_labeling?" Par1="device" Par2="identifier" />
+                end
+              end
+            end
             # buttons - specified by resource tree - or implied by module_action...
           end
 

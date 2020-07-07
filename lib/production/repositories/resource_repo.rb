@@ -87,8 +87,16 @@ module ProductionApp
                                             { parent_table: :system_resource_types,
                                               columns: [:system_resource_type_code],
                                               flatten_columns: { system_resource_type_code: :system_resource_type_code } }],
-                            sub_tables: [{ sub_table: :plant_resources, one_to_one: { plant_resource_code: :plant_resource_code } }],
+                            sub_tables: [{ sub_table: :plant_resources, one_to_one: { plant_resource_code: :plant_resource_code,
+                                                                                      id: :plant_resource_id } }],
                             wrapper: SystemResourceFlat)
+    end
+
+    def find_mes_server
+      type_id = get_id(:plant_resource_types, plant_resource_type_code: Crossbeams::Config::ResourceDefinitions::MES_SERVER)
+      id = get_value(:plant_resources, :system_resource_id, plant_resource_type_id: type_id)
+
+      find_system_resource_flat(id)
     end
 
     def create_plant_resource_type(attrs)
@@ -359,6 +367,10 @@ module ProductionApp
         ORDER BY s.system_resource_code
       SQL
       DB[query].all
+    end
+
+    def no_of_direct_descendants(plant_resource_id)
+      DB[:tree_plant_resources].where(ancestor_plant_resource_id: plant_resource_id, path_length: 1).count
     end
 
     def max_plant_resource_code_for_type(plant_resource_type_id)

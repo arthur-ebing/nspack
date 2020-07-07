@@ -286,7 +286,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'view_xml_config' do
         check_auth!('resources', 'read')
         res = interactor.system_resource_xml_for(id)
-        show_page { Production::Resources::SystemResource::ShowXml.call(res) }
+        show_page { Production::Resources::SystemResource::ShowXml.call(res, id) }
+      end
+
+      r.on 'download_xml_config' do
+        check_auth!('resources', 'read')
+        res = interactor.system_resource_xml_for(id)
+        response.headers['content_type'] = 'text/xml'
+        response.headers['Content-Disposition'] = 'attachment; filename="config.xml"'
+
+        response.write(res.instance[:config][:xml])
       end
 
       r.on 'set_module' do

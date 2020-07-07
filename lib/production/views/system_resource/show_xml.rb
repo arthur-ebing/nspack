@@ -4,17 +4,18 @@ module Production
   module Resources
     module SystemResource
       class ShowXml
-        def self.call(res) # rubocop:disable Metrics/AbcSize
+        def self.call(res, id = nil) # rubocop:disable Metrics/AbcSize
           rules = {}
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.section do |section|
               section.add_control control_type: :link, text: 'Back', url: '/list/system_resources', style: :back_button
+              section.add_control control_type: :link, text: 'Download', url: "/production/resources/system_resources/#{id}/download_xml_config", style: :button, icon: :download if res.instance[:config]
             end
 
             if res.instance[:config]
-              page.add_text 'MODULE CONFIG', wrapper: :h2
-              page.add_text res.instance[:config], syntax: :xml
+              page.add_text "#{res.instance[:config][:module]} config.xml", wrapper: :h2
+              page.add_text res.instance[:config][:xml], syntax: :xml
             end
 
             if res.instance[:modules]

@@ -36,6 +36,7 @@ module ProductionApp
     attribute :system_resource_type_code, Types::String
     attribute :system_resource_code, Types::String
     attribute :plant_resource_code, Types::String
+    attribute :plant_resource_id, Types::Integer
     attribute :description, Types::String
     attribute :equipment_type, Types::String
     attribute :module_function, Types::String

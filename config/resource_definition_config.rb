@@ -472,8 +472,6 @@ module Crossbeams
           Par1: 'device',
           Par2: 'card_reader',
           Par3: 'identifier',
-          Par4: '',
-          Par5: '',
           ReaderID: '',
           ContainerType: 'carton',
           WeightUnits: 'Kg'
