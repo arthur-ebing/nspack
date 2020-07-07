@@ -1,0 +1,374 @@
+---
+:caption: Palletizing Bay States
+:sql: "SELECT palletizing_bay_states.id, \r\n            COALESCE(plant_resources.plant_resource_code,
+  palletizing_bay_states.palletizing_robot_code || ': ' || palletizing_bay_states.scanner_code)
+  AS bay_name,\r\n            palletizing_bay_states.current_state,\r\n            palletizing_bay_states.palletizing_robot_code,
+  \r\n            palletizing_bay_states.scanner_code,\r\n            personnel_identifiers.identifier
+  AS palletizer_identifier,\r\n            palletizing_bay_states.palletizing_bay_resource_id,
+  \r\n            palletizing_bay_states.pallet_sequence_id,\r\n            palletizing_bay_states.determining_carton_id,\r\n
+  \           palletizing_bay_states.last_carton_id,\r\n            pallet_sequences.pallet_id,\r\n
+  \           pallet_sequences.pallet_number,\r\n            pallets.carton_quantity,\r\n
+  \           cartons_per_pallet.cartons_per_pallet,\r\n            pallets.build_status
+  AS pallet_status,\r\n            pallets.carton_quantity || ' / ' || cartons_per_pallet.cartons_per_pallet
+  AS pallet_state,\r\n            palletizing_bay_states.created_at,\r\n            palletizing_bay_states.updated_at,\r\n
+  \           fn_current_status('palletizing_bay_states', palletizing_bay_states.id)
+  AS status,\r\n           CASE\r\n                WHEN palletizing_bay_states.current_state
+  = 'empty' THEN 'inactive'::text\r\n                WHEN palletizing_bay_states.current_state
+  = 'palletizing' THEN 'ok'::text\r\n                ELSE 'warning'::text\r\n            END
+  AS colour_rule\r\nFROM palletizing_bay_states\r\nLEFT JOIN plant_resources ON plant_resources.id
+  = palletizing_bay_states.palletizing_bay_resource_id\r\nLEFT JOIN pallet_sequences
+  ON pallet_sequences.id = palletizing_bay_states.pallet_sequence_id\r\nLEFT JOIN
+  pallets ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN cartons ON cartons.id
+  = palletizing_bay_states.determining_carton_id\r\nLEFT JOIN cartons_per_pallet ON
+  cartons_per_pallet.id = cartons.cartons_per_pallet_id\r\nLEFT JOIN personnel_identifiers
+  ON personnel_identifiers.id = cartons.palletizer_identifier_id\r\nORDER BY 2 ASC"
+:limit: 
+:offset: 
+:external_settings:
+  :colour_key: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: palletizing_bay_states.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  bay_name:
+    :name: bay_name
+    :sequence_no: 2
+    :caption: Bay name
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  current_state:
+    :name: current_state
+    :sequence_no: 3
+    :caption: Current state
+    :namespaced_name: palletizing_bay_states.current_state
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizing_robot_code:
+    :name: palletizing_robot_code
+    :sequence_no: 4
+    :caption: Robot
+    :namespaced_name: palletizing_bay_states.palletizing_robot_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  scanner_code:
+    :name: scanner_code
+    :sequence_no: 5
+    :caption: Scanner
+    :namespaced_name: palletizing_bay_states.scanner_code
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizer_identifier:
+    :name: palletizer_identifier
+    :sequence_no: 6
+    :caption: Palletizer
+    :namespaced_name: personnel_identifiers.identifier
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizing_bay_resource_id:
+    :name: palletizing_bay_resource_id
+    :sequence_no: 7
+    :caption: Palletizing bay resource
+    :namespaced_name: palletizing_bay_states.palletizing_bay_resource_id
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_sequence_id:
+    :name: pallet_sequence_id
+    :sequence_no: 8
+    :caption: Pallet sequence
+    :namespaced_name: palletizing_bay_states.pallet_sequence_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  determining_carton_id:
+    :name: determining_carton_id
+    :sequence_no: 9
+    :caption: Determining carton
+    :namespaced_name: palletizing_bay_states.determining_carton_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  last_carton_id:
+    :name: last_carton_id
+    :sequence_no: 10
+    :caption: Last carton
+    :namespaced_name: palletizing_bay_states.last_carton_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 11
+    :caption: Pallet
+    :namespaced_name: pallet_sequences.pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 12
+    :caption: Pallet number
+    :namespaced_name: pallet_sequences.pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  carton_quantity:
+    :name: carton_quantity
+    :sequence_no: 13
+    :caption: Carton quantity
+    :namespaced_name: pallets.carton_quantity
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cartons_per_pallet:
+    :name: cartons_per_pallet
+    :sequence_no: 14
+    :caption: Cartons per pallet
+    :namespaced_name: cartons_per_pallet.cartons_per_pallet
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_status:
+    :name: pallet_status
+    :sequence_no: 15
+    :caption: Pallet status
+    :namespaced_name: pallets.build_status
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_state:
+    :name: pallet_state
+    :sequence_no: 16
+    :caption: State
+    :namespaced_name: 
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 17
+    :caption: Created at
+    :namespaced_name: palletizing_bay_states.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 18
+    :caption: Updated at
+    :namespaced_name: palletizing_bay_states.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 19
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 20
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: palletizing_bay_resource_id
+  :caption: Palletizing bay resource
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT plant_resource_code, id FROM plant_resources ORDER BY plant_resource_code
+- :column: pallet_sequence_id
+  :caption: Pallet sequence
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 2
+  :list_def: SELECT pallet_number, id FROM pallet_sequences ORDER BY pallet_number
+- :column: determining_carton_id
+  :caption: Determining carton
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 

@@ -2,12 +2,14 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user, :palletizer_identifier
+    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user,
+                :palletizer_identifier, :palletizing_bay_resource_id
 
-    def initialize(user, params, palletizer_identifier = nil)
+    def initialize(user, params, palletizer_identifier = nil, palletizing_bay_resource_id = nil)
       @carton_label_id = params[:carton_number]
       @user = user
       @palletizer_identifier = palletizer_identifier
+      @palletizing_bay_resource_id = palletizing_bay_resource_id
     end
 
     def call
@@ -28,7 +30,9 @@ module MesscadaApp
 
       unless carton_label_carton_exists?
         palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
-        attrs = { carton_label_id: carton_label_id, palletizer_identifier_id: palletizer_identifier_id }
+        attrs = { carton_label_id: carton_label_id,
+                  palletizer_identifier_id: palletizer_identifier_id,
+                  palletizing_bay_resource_id: palletizing_bay_resource_id }
         carton_params = carton_label_carton_params.to_h.merge(attrs)
 
         id = DB[:cartons].insert(carton_params)

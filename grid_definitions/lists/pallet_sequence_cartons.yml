@@ -1,0 +1,15 @@
+---
+:dataminer_definition: pallet_sequence_cartons
+:captions:
+  :conditions:
+    :standard: Palletizing Bay Carton
+    :production_run_cartons: Pallet Sequence Cartons
+:conditions:
+  :standard:
+    - :col: cartons.id
+      :op: =
+      :val: $:carton_id$
+  :pallet_sequence_cartons:
+    - :col: cartons.pallet_sequence_id
+      :op: =
+      :val: $:pallet_sequence_id$

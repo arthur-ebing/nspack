@@ -120,7 +120,7 @@ module MesscadaApp
 
       confirm = {
         confirm_text: "Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
         cancel_url: 'noop'
       }
 
@@ -138,9 +138,12 @@ module MesscadaApp
 
       return failed_response("Cannot complete in #{state_machine.current} state.", current_bay_attributes(state_machine)) unless state_machine.target.action == :complete_pallet
 
-      pallet_id = palletizing_bay_state(state_machine.target.id)&.pallet_id
+      palletizing_bay_state = palletizing_bay_state(state_machine.target.id)
+      pallet_id = palletizing_bay_state&.pallet_id
+      autopack = params[:autopack] == 'true'
       res = nil
       repo.transaction do
+        res = MesscadaApp::CloneAutopackPalletCarton.call(palletizing_bay_state&.determining_carton_id, pallet_id, params[:identifier], palletizing_bay_state&.palletizing_bay_resource_id) if autopack
         res = MesscadaApp::CompletePallet.call(pallet_id)
 
         changeset = { current_state: state_machine.current.to_s,
@@ -155,6 +158,32 @@ module MesscadaApp
       success_response('ok', current_bay_attributes(state_machine))
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete_pallet\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message, current_bay_attributes(state_machine))
+    end
+
+    def complete_autopack_pallet(params) # rubocop:disable Metrics/AbcSize
+      res = CartonPalletizingSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      check_res = validate_params_input(params)
+      return check_res unless check_res.success
+
+      state_machine = state_machine(params)
+      state_machine.complete
+
+      return failed_response("Cannot complete in #{state_machine.current} state.", current_bay_attributes(state_machine)) unless state_machine.target.action == :complete_pallet
+
+      confirm = {
+        confirm_text: "Complete Autopack pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
+        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=true"),
+        cancel_url: 'noop'
+      }
+
+      success_response('ok', current_bay_attributes(state_machine, confirm))
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete_autopack_pallet\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message, current_bay_attributes(state_machine))
@@ -269,7 +298,7 @@ module MesscadaApp
       carton_number = params[:carton_number]
       return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine)) unless carton_number_exists?(carton_number)
 
-      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier])
+      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
       return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine)) if completed_pallet?(carton_id)
 
       return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine)) if closed_production_run?(carton_id)
@@ -313,7 +342,7 @@ module MesscadaApp
       carton_number = params[:carton_number]
       return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine)) unless carton_number_exists?(carton_number)
 
-      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier])
+      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
       return failed_response('Carton already on a completed pallet', current_bay_attributes(state_machine)) if completed_pallet?(carton_id)
 
       return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine)) if closed_production_run?(carton_id)
@@ -350,7 +379,7 @@ module MesscadaApp
         confirm = if last_carton
                     {
                       confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-                      confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+                      confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
                       cancel_url: 'noop'
                     }
                   else
@@ -402,7 +431,7 @@ module MesscadaApp
       confirm = if last_carton
                   {
                     confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-                    confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+                    confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
                     cancel_url: 'noop'
                   }
                 else
@@ -565,8 +594,8 @@ module MesscadaApp
       repo.find_palletizing_bay_state(id)
     end
 
-    def get_palletizing_carton(carton_number, _bay_state, palletizer_identifier)
-      MesscadaApp::CartonVerification.call(@user, { carton_number: carton_number }, palletizer_identifier) unless verified_carton_number?(carton_number)
+    def get_palletizing_carton(carton_number, _bay_state, palletizer_identifier, palletizing_bay_resource_id)
+      MesscadaApp::CartonVerification.call(@user, { carton_number: carton_number }, palletizer_identifier, palletizing_bay_resource_id) unless verified_carton_number?(carton_number)
       carton_number_carton_id(carton_number)
     end
 

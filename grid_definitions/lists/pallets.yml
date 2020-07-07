@@ -17,6 +17,7 @@
     :scrapped: Scrapped Pallets
     :failed_inspections: Failed Inspections Pallets
     :failed_verifications: Failed Verifications Pallets
+    :palletizing_bay_pallet: Palletizing Bay Pallet
 :conditions:
   :standard:
     - :col: id
@@ -67,3 +68,7 @@
     - :col: pallet_verification_failed
       :op: =
       :val: $:pallet_verification_failed$
+  :palletizing_bay_pallet:
+    - :col: pallet_id
+      :op: =
+      :val: $:pallet_id$

@@ -72,6 +72,15 @@ class Nspack < Roda
     end
 
     # --------------------------------------------------------------------------
+    # COMPLETE AUTOPACK_PALLET
+    # --------------------------------------------------------------------------
+    r.on 'complete_autopack_pallet' do
+      res = interactor.complete_autopack_pallet(params)
+      feedback = interactor.palletizing_robot_feedback(params[:device], res)
+      Crossbeams::RobotResponder.new(feedback).render
+    end
+
+    # --------------------------------------------------------------------------
     # TRANSFER CARTON - Transfer carton to the current bay from an empty bay
     # --------------------------------------------------------------------------
     r.on 'empty_bay_carton_transfer' do

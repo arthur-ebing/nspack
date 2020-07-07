@@ -45,11 +45,12 @@ module MesscadaApp
         SELECT COALESCE(plant_resources.plant_resource_code, palletizing_robot_code || ': ' || scanner_code) AS bay_name,
         current_state,
         pallet_sequences.pallet_number,
-        pallet_sequences.carton_quantity,
+        pallets.carton_quantity,
         cartons_per_pallet.cartons_per_pallet
         FROM palletizing_bay_states
         LEFT JOIN plant_resources ON plant_resources.id = palletizing_bay_resource_id
         LEFT JOIN pallet_sequences ON pallet_sequences.id = pallet_sequence_id
+        LEFT JOIN pallets ON pallets.id = pallet_id
         LEFT JOIN cartons ON cartons.id = determining_carton_id
         LEFT JOIN cartons_per_pallet ON cartons_per_pallet.id = cartons.cartons_per_pallet_id
         WHERE palletizing_bay_states.id = ?

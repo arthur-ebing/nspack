@@ -45,5 +45,8 @@ module MesscadaApp
     attribute :phc, Types::String
     attribute :packing_method_id, Types::Integer
     attribute :palletizer_identifier_id, Types::Integer
+    attribute :pallet_sequence_id, Types::Integer
+    attribute :palletizing_bay_resource_id, Types::Integer
+    attribute? :is_virtual, Types::Bool
   end
 end
