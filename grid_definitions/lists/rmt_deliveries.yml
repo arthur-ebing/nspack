@@ -13,7 +13,8 @@
   :popup: false
   :hide_if_true: delivery_tipped
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_receive_date"
-  :text: set_receive_date
+  :text: set receive date
+  :icon: edit
   :popup: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
   :text: delete
@@ -24,11 +25,11 @@
   :hide_if_true: recalc_nett_weight
 - :separator: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/recalc_nett_weight"
-  :text: recalc_nett_weight
+  :text: recalc nett weight
   :icon: play
   :popup: false
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_current_delivery"
-  :text: set_current
+  :text: set current
   :icon: play
   :popup: false
   :hide_if_true: delivery_tipped

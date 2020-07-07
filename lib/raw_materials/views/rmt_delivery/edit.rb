@@ -53,7 +53,7 @@ module RawMaterials
                     col.add_field :date_picked
                     col.add_field :quantity_bins_with_fruit
                     col.add_field :truck_registration_number if rules[:show_truck_registration_number]
-                    col.add_field :rmt_delivery_destination_id
+                    # col.add_field :rmt_delivery_destination_id
                   end
                 end
               end

@@ -56,7 +56,7 @@ module RawMaterials
                     col.add_field :active
                     col.add_field :keep_open
                     col.add_field :auto_allocate_asset_number
-                    col.add_field :rmt_delivery_destination_id
+                    # col.add_field :rmt_delivery_destination_id
                   end
                 end
               end
