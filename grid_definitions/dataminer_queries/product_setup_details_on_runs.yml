@@ -14,8 +14,8 @@
   \            pm_boms.bom_code,\r\n             product_setups.id,\r\n             product_setups.product_setup_template_id,\r\n
   \            product_setups.extended_columns,\r\n             product_setups.client_size_reference,\r\n
   \            product_setups.client_product_code,\r\n             product_setups.marketing_order_number,\r\n
-  \            product_setups.sell_by_code,\r\n             product_setups.pallet_label_name,\r\n
-  \            product_setups.active,\r\n             product_setups.created_at,\r\n
+  \            product_setups.sell_by_code,\r\n             label_templates.label_template_name
+  AS pallet_label_name,\r\n             product_setups.active,\r\n             product_setups.created_at,\r\n
   \            product_setups.updated_at,\r\n             CASE WHEN fn_product_setup_in_production
   (product_setups.id) THEN 'warning'\r\n             WHEN NOT product_setups.active
   THEN 'inactive'\r\n             ELSE NULL\r\n             END AS colour_rule,\r\n
@@ -42,7 +42,8 @@
   ON pallet_formats.id = product_setups.pallet_format_id\r\nJOIN cartons_per_pallet
   ON cartons_per_pallet.id = product_setups.cartons_per_pallet_id\r\nLEFT JOIN pm_boms
   ON pm_boms.id = product_setups.pm_bom_id\r\nJOIN production_runs ON production_runs.product_setup_template_id
-  = product_setup_templates.id"
+  = product_setup_templates.id\r\nLEFT JOIN label_templates ON label_templates.id
+  = product_setups.pallet_label_name::int"
 :limit: 
 :offset: 
 :external_settings:
@@ -455,7 +456,7 @@
     :name: pallet_label_name
     :sequence_no: 26
     :caption: Pallet label name
-    :namespaced_name: product_setups.pallet_label_name
+    :namespaced_name: label_templates.label_template_name
     :data_type: :string
     :width: 120
     :format: 

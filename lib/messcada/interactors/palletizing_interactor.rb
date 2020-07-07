@@ -654,7 +654,7 @@ module MesscadaApp
 
     def print_pallet_label(pallet_id, palletizing_bay_state_id)
       instance = pallet_label_data(pallet_id)
-      pallet_label_name = pallet_label_template(pallet_id)
+      pallet_label_name = palletizing_label_name(pallet_id)
       printer_id = palletizing_bay_printer(palletizing_bay_state_id)
       LabelPrintingApp::PrintLabel.call(pallet_label_name, instance, no_of_prints: AppConst::PLT_LABEL_QTY_TO_PRINT, printer: printer_id)
     rescue Crossbeams::InfoError => e
@@ -668,10 +668,10 @@ module MesscadaApp
       prod_repo.get_pallet_label_data(pallet_id)
     end
 
-    def pallet_label_template(pallet_id)
+    def palletizing_label_name(pallet_id)
       oldest_carton_id = pallet_oldest_carton(pallet_id)[:carton_id]
-      label_template_id = repo.get(:cartons, oldest_carton_id, :pallet_label_name)
-      label_repo.find_label_template(label_template_id)&.label_template_name
+      label_name = repo.find_palletizing_bay_carton_label_name(oldest_carton_id)
+      label_name.nil_or_empty? ? AppConst::DEFAULT_PALLET_LABEL_NAME : label_name
     end
 
     def palletizing_bay_printer(palletizing_bay_state_id)

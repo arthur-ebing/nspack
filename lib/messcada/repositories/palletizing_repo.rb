@@ -177,5 +177,15 @@ module MesscadaApp
                                  .get(:system_resource_code))
         .get(:id)
     end
+
+    def find_palletizing_bay_carton_label_name(carton_id)
+      DB[:label_templates]
+        .where(id: DB[:cartons]
+                       .join(:product_resource_allocations, id: :product_resource_allocation_id)
+                       .join(:product_setups, id: :product_setup_id)
+                       .where(Sequel[:cartons][:id] => carton_id)
+                       .get(Sequel[:product_setups][:pallet_label_name]).to_i)
+        .get(:label_template_name)
+    end
   end
 end
