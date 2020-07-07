@@ -292,7 +292,7 @@ module MesscadaApp
       repo.current_palletizing_bay_attributes(id, options)
     end
 
-    def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize
+    def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return failed_response("Cannot create pallet in #{state_machine.current} state", current_bay_attributes(state_machine)) unless state_machine.target.action == :create_pallet
 
       carton_number = params[:carton_number]
@@ -300,6 +300,8 @@ module MesscadaApp
 
       carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
       return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine)) if completed_pallet?(carton_id)
+
+      return failed_response('Carton already on a pallet', current_bay_attributes(state_machine)) if carton_on_pallet?(carton_id)
 
       return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine)) if closed_production_run?(carton_id)
 
@@ -498,7 +500,7 @@ module MesscadaApp
       pallet_id = carton_pallet(carton_id)
       return failed_response('No valid carton pallet', current_bay_attributes(state_machine)) if pallet_id.nil?
 
-      return failed_response('Incomplete plt.Cannot return to bay', current_bay_attributes(state_machine)) unless carton_of_other_bay?(carton_id)
+      return failed_response('Incomplete plt.Cannot return to bay', current_bay_attributes(state_machine)) if carton_of_other_bay?(carton_id)
 
       oldest_carton = pallet_oldest_carton(pallet_id)
 
@@ -609,6 +611,10 @@ module MesscadaApp
 
     def completed_pallet?(carton_id)
       repo.completed_pallet?(carton_id)
+    end
+
+    def carton_on_pallet?(carton_id)
+      repo.carton_on_pallet?(carton_id)
     end
 
     def closed_production_run?(carton_id)

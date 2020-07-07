@@ -11,9 +11,9 @@
         :title: Pallet
         :popup: true
         :hide_if_null: pallet_sequence_id
-      - :url: "/list/pallet_sequence_cartons/with_params?key=standard&carton_id=$:determining_carton_id$"
-        :text: Carton
+      - :url: "/list/pallet_sequence_cartons/with_params?key=pallet_sequence_cartons&pallet_sequence_id=$:pallet_sequence_id$"
+        :text: Cartons
         :icon: list
-        :title: Carton
+        :title: Cartons
         :popup: true
-        :hide_if_null: determining_carton_id
+        :hide_if_null: pallet_sequence_id

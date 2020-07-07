@@ -187,5 +187,17 @@ module MesscadaApp
                        .get(Sequel[:product_setups][:pallet_label_name]).to_i)
         .get(:label_template_name)
     end
+
+    def carton_on_pallet?(carton_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT pallets.id FROM pallets
+          JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
+          JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
+          WHERE cartons.id = #{carton_id}
+        )
+      SQL
+      DB[query].single_value
+    end
   end
 end
