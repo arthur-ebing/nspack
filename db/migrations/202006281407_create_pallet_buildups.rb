@@ -24,9 +24,16 @@ Sequel.migration do
                    :updated_at,
                    function_name: :pallet_buildups_set_updated_at,
                    trigger_name: :set_updated_at)
+
+    # Log changes to this table. Exclude changes to the updated_at column.
+    run "SELECT audit.audit_table('pallet_buildups', true, true, '{updated_at}'::text[]);"
   end
 
   down do
+    # Drop logging for this table.
+    drop_trigger(:pallet_buildups, :audit_trigger_row)
+    drop_trigger(:pallet_buildups, :audit_trigger_stm)
+
     drop_trigger(:pallet_buildups, :set_created_at)
     drop_function(:pallet_buildups_set_created_at)
     drop_trigger(:pallet_buildups, :set_updated_at)
