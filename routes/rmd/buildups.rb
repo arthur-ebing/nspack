@@ -83,7 +83,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         form.add_button('Cancel', "/rmd/buildups/buildup_cancel_confirm/#{id}")
-        form.add_button('Complete', "/rmd/buildups/buildup_complete/#{id}")
+        form.add_button('Complete', "/rmd/buildups/buildup_complete/#{id}") unless pallet_buildup.cartons_moved.empty?
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
