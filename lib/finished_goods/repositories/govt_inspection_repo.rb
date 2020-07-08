@@ -112,7 +112,7 @@ module FinishedGoodsApp
                    govt_inspection_passed: govt_inspection_pallet[:passed],
                    last_govt_inspection_pallet_id: govt_inspection_pallet[:id] }
         params[:govt_first_inspection_at] = Time.now if pallet[:govt_first_inspection_at].nil?
-        if govt_inspection_pallet[:passed]
+        if govt_inspection_pallet[:passed] && !AppConst::CREATE_STOCK_AT_FIRST_INTAKE
           params[:in_stock] = true
           params[:stock_created_at] = Time.now
         end
