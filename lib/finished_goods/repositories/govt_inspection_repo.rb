@@ -133,9 +133,12 @@ module FinishedGoodsApp
 
         params = { inspected: false,
                    govt_inspection_passed: nil,
-                   last_govt_inspection_pallet_id: nil,
-                   in_stock: nil,
-                   stock_created_at: nil }
+                   last_govt_inspection_pallet_id: nil }
+
+        unless AppConst::CREATE_STOCK_AT_FIRST_INTAKE
+          params[:in_stock] = nil
+          params[:stock_created_at] = nil
+        end
 
         update(:pallets, pallet_id, params)
         log_status(:pallets, pallet_id, 'INSPECTION REOPENED', user_name: user.user_name)
