@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda # rubocop:disable Metrics/ClassLength
+class Nspack < Roda
   route 'ecert', 'finished_goods' do |r|
     # ECERT AGREEMENTS
     # --------------------------------------------------------------------------
