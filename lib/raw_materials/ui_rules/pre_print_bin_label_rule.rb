@@ -23,8 +23,8 @@ module UiRules
         orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: false, prompt: true  },
         cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: false, prompt: true },
         no_of_prints: { required: true },
-        printer: { renderer: :select, options: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_BIN), required: false, prompt: true },
-        bin_label: { renderer: :select, options: LabelApp::PrinterRepo.new.find_bin_labels, required: false, prompt: true }
+        printer: { renderer: :select, options: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_BIN), required: true, prompt: true },
+        bin_label: { renderer: :select, options: LabelApp::PrinterRepo.new.find_bin_labels, required: true, prompt: true }
       }
 
       fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?
