@@ -4,7 +4,7 @@ module FinishedGoods
   module Ecert
     module EcertTrackingUnit
       class New
-        def self.call(govt_inspection_sheet_id, form_values: nil, form_errors: nil, remote: true)
+        def self.call(govt_inspection_sheet_id: nil, form_values: nil, form_errors: nil, remote: true)
           ui_rule = UiRules::Compiler.new(:ecert_tracking_unit, :new, govt_inspection_sheet_id: govt_inspection_sheet_id, form_values: form_values)
           rules   = ui_rule.compile
 

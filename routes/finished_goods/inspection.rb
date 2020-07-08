@@ -174,7 +174,7 @@ class Nspack < Roda
 
       r.on 'preverify' do
         check_auth!('inspection', 'edit')
-        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(id, remote: fetch?(r)) }
+        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(govt_inspection_sheet_id: id, remote: fetch?(r)) }
       end
 
       r.is do

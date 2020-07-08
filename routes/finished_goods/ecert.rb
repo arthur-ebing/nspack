@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'ecert', 'finished_goods' do |r|
     # ECERT AGREEMENTS
     # --------------------------------------------------------------------------
@@ -84,11 +84,14 @@ class Nspack < Roda
         r.post do # FIND
           res = interactor.ecert_tracking_unit_status(params[:ecert_tracking_unit_status][:pallet_number])
           if res.success
-            form_values = params[:ecert_tracking_unit_status]
-            show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::Status.call(res: res.instance.first, form_values: form_values, remote: fetch?(r)) }
+            show_partial_or_page(r) do
+              FinishedGoods::Ecert::EcertTrackingUnit::Status.call(res: res.instance.first,
+                                                                   form_values: params[:ecert_tracking_unit_status],
+                                                                   remote: fetch?(r))
+            end
           else
             re_show_form(r, res, url: '/finished_goods/ecert/ecert_tracking_units/status') do
-              FinishedGoods::Ecert::EcertTrackingUnit::Status.call(form_values: params[:ecert_tracking_unit],
+              FinishedGoods::Ecert::EcertTrackingUnit::Status.call(form_values: params[:ecert_tracking_unit_status],
                                                                    form_errors: res.errors,
                                                                    remote: fetch?(r))
             end
@@ -98,7 +101,7 @@ class Nspack < Roda
 
       r.on 'new' do    # NEW
         check_auth!('ecert', 'new')
-        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(nil, remote: fetch?(r)) }
+        show_partial_or_page(r) { FinishedGoods::Ecert::EcertTrackingUnit::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
         res = interactor.elot_preverify(params[:ecert_tracking_unit])
