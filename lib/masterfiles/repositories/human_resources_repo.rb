@@ -50,8 +50,8 @@ module MasterfilesApp
     def for_select_unallocated_contract_workers
       DB[:contract_workers]
         .where(active: true, personnel_identifier_id: nil)
-        .select(Sequel.function(:fn_contract_worker_name, :id), :id)
-        .map { |rec| [rec[:fn_contract_worker_name], rec[:id]] }
+        .select(Sequel.function(:fn_contract_worker_name, :id), :personnel_number, :id)
+        .map { |rec| ["#{rec[:personnel_number]} : #{rec[:fn_contract_worker_name]}", rec[:id]] }
     end
 
     def find_contract_worker(id)

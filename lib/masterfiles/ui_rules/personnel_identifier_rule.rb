@@ -18,7 +18,10 @@ module UiRules
 
     def set_link_fields
       fields[:identifier] = { renderer: :label }
-      fields[:contract_worker_id] = { renderer: :select, options: @repo.for_select_unallocated_contract_workers, required: true }
+      fields[:contract_worker_id] = { renderer: :select,
+                                      options: @repo.for_select_unallocated_contract_workers,
+                                      required: true,
+                                      searchable: true }
     end
 
     def set_de_link_fields
