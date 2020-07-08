@@ -12,7 +12,8 @@
   THEN 'ok' \r\n             ELSE NULL \r\n             END AS colour_rule,\r\n             personnel_identifiers.identifier
   AS personnel_identifier,\r\n             contract_workers.personnel_number,\r\n
   \            packing_methods.packing_method_code,\r\n             palletizers.identifier
-  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             cartons.is_virtual\r\nFROM
+  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             cartons.is_virtual,\r\n
+  \            cartons.created_at AS verified_at,\r\n             cartons.updated_at\r\nFROM
   cartons\r\nJOIN carton_labels ON carton_labels.id = cartons.carton_label_id\r\nJOIN
   pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN pallets
   ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
@@ -381,6 +382,38 @@
     :namespaced_name: cartons.is_virtual
     :data_type: :boolean
     :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_at:
+    :name: verified_at
+    :sequence_no: 23
+    :caption: Verified at
+    :namespaced_name: cartons.created_at
+    :data_type: :date
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 24
+    :caption: Updated at
+    :namespaced_name: cartons.updated_at
+    :data_type: :date
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
