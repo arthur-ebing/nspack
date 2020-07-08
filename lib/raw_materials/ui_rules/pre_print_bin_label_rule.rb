@@ -18,13 +18,13 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       fields = {
         farm_id: { renderer: :select, options: MasterfilesApp::FarmRepo.new.for_select_farms, disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms, caption: 'Farm',
-                   required: true, prompt: true },
-        puc_id: { renderer: :select, options: [], caption: 'Puc', required: true, prompt: true },
-        orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: true, prompt: true  },
-        cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: true, prompt: true },
+                   required: false, prompt: true },
+        puc_id: { renderer: :select, options: [], caption: 'Puc', required: false, prompt: true },
+        orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: false, prompt: true  },
+        cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: false, prompt: true },
         no_of_prints: { required: true },
-        printer: { renderer: :select, options: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_BIN), required: true, prompt: true },
-        bin_label: { renderer: :select, options: LabelApp::PrinterRepo.new.find_bin_labels, required: true, prompt: true }
+        printer: { renderer: :select, options: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_BIN), required: false, prompt: true },
+        bin_label: { renderer: :select, options: LabelApp::PrinterRepo.new.find_bin_labels, required: false, prompt: true }
       }
 
       fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?
