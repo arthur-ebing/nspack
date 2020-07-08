@@ -35,6 +35,10 @@ module MesscadaApp
       DB[:cartons].where(carton_label_id: carton_label_id).get(:id)
     end
 
+    def carton_carton_label(carton_id)
+      DB[:cartons].where(id: carton_id).get(:carton_label_id)
+    end
+
     def carton_label_id_for_pallet_no(pallet_no)
       DB[:carton_labels].where(pallet_number: pallet_no.to_s).get(:id)
     end

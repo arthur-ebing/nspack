@@ -243,7 +243,8 @@ module MesscadaApp
                   res.instance[:pallet_number]
                 end
         line3 = orange ? '' : current_state
-        line4 = last_carton?(res.instance) && !orange ? 'Press Complete Btn to finish buildup' : ''
+        line4 = res.instance[:carton_number] || nil
+        line5 = last_carton?(res.instance) && !orange ? 'Press Complete Btn to finish buildup' : ''
 
         feedback = {
           device: device,
@@ -252,7 +253,8 @@ module MesscadaApp
           line1: line1,
           line2: line2,
           line3: line3,
-          line4: line4
+          line4: line4,
+          line5: line5
         }
         if res.instance[:confirm_text]
           feedback[:confirm_text] = res.instance[:confirm_text]
@@ -265,12 +267,14 @@ module MesscadaApp
         line1 = mix_rule_error ? "MIXING: #{res.instance[:rule_column]} NOT ALLOWED" : res.instance[:bay_name]
         line2 = mix_rule_error ? "PLT: #{res.instance[:old_value]}" : unwrap_failed_response(res)
         line3 = mix_rule_error ? "CTN: #{res.instance[:new_value]}" : current_state
+        line4 = res.instance[:carton_number] || nil
 
         MesscadaApp::RobotFeedback.new(device: device,
                                        status: false,
                                        line1: line1,
                                        line2: line2,
-                                       line3: line3)
+                                       line3: line3,
+                                       line4: line4)
       end
     end
 
@@ -293,22 +297,22 @@ module MesscadaApp
     end
 
     def start_new_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      return failed_response("Cannot create pallet in #{state_machine.current} state", current_bay_attributes(state_machine)) unless state_machine.target.action == :create_pallet
-
       carton_number = params[:carton_number]
-      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine)) unless carton_number_exists?(carton_number)
+      return failed_response("Cannot create pallet in #{state_machine.current} state", current_bay_attributes(state_machine, { carton_number: carton_number })) unless state_machine.target.action == :create_pallet
+
+      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine, { carton_number: carton_number })) unless carton_number_exists?(carton_number)
 
       carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
-      return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine)) if completed_pallet?(carton_id)
+      return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
 
-      return failed_response('Carton already on a pallet', current_bay_attributes(state_machine)) if carton_on_pallet?(carton_id)
+      return failed_response('Carton already on a pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if carton_on_pallet?(carton_id)
 
-      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine)) if closed_production_run?(carton_id)
+      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
 
       carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
       if carton_belongs_to_another_bay
         carton_bay_name = palletizing_bay_attributes(repo.carton_palletizing_bay_state(carton_id))[:bay_name]
-        return failed_response("Carton of bay #{carton_bay_name}", current_bay_attributes(state_machine))
+        return failed_response("Carton of bay #{carton_bay_name}", current_bay_attributes(state_machine, { carton_number: carton_number }))
         # confirm = {
         #   confirm_text: "Carton of bay: #{carton_bay_name}.Transfer carton?",
         #   confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/empty_bay_carton_transfer?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
@@ -321,7 +325,7 @@ module MesscadaApp
         # end
 
       else
-        confirm = {}
+        confirm = { carton_number: carton_number }
         res = nil
         repo.transaction do
           res = MesscadaApp::CreatePalletFromCarton.call(@user, carton_id, 1, palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id, true)
@@ -339,17 +343,17 @@ module MesscadaApp
     end
 
     def add_to_pallet(state_machine, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      return failed_response("Cannot add carton to pallet in #{state_machine.current} state", current_bay_attributes(state_machine)) unless state_machine.target.action == :add_carton
-
       carton_number = params[:carton_number]
-      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine)) unless carton_number_exists?(carton_number)
+      return failed_response("Cannot add carton to pallet in #{state_machine.current} state", current_bay_attributes(state_machine, { carton_number: carton_number })) unless state_machine.target.action == :add_carton
+
+      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine, { carton_number: carton_number })) unless carton_number_exists?(carton_number)
 
       carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
-      return failed_response('Carton already on a completed pallet', current_bay_attributes(state_machine)) if completed_pallet?(carton_id)
+      return failed_response('Carton already on a completed pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
 
-      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine)) if closed_production_run?(carton_id)
+      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
 
-      return failed_response('Carton already on pallet', current_bay_attributes(state_machine)) if current_bay_carton?(carton_id, state_machine.target.id)
+      return failed_response('Carton already on pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if current_bay_carton?(carton_id, state_machine.target.id)
 
       res = validate_pallet_mix_rules(state_machine, carton_id)
       return res unless res.success
@@ -385,7 +389,7 @@ module MesscadaApp
                       cancel_url: 'noop'
                     }
                   else
-                    {}
+                    { carton_number: carton_carton_label(carton_id) }
                   end
       end
 
@@ -395,20 +399,20 @@ module MesscadaApp
     def validate_pallet_mix_rules(state_machine, carton_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       carton = mesc_repo.carton_attributes(carton_id)
       oldest_carton = mesc_repo.carton_attributes(palletizing_bay_state(state_machine.target.id)&.determining_carton_id)
-      return success_response('ok', current_bay_attributes(state_machine)) unless oldest_carton
+      return success_response('ok', current_bay_attributes(state_machine, { carton_number: carton[:carton_label_id].to_s })) unless oldest_carton
 
       rule = prod_repo.find_pallet_mix_rules_by_scope(AppConst::GLOBAL_PALLET_MIX)
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'TM GROUPS', new_value: carton[:target_market_group_name], old_value: oldest_carton[:target_market_group_name] }) if !rule[:allow_tm_mix] && (carton[:packed_tm_group_id] != oldest_carton[:packed_tm_group_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'GRADES', new_value: carton[:grade_code], old_value: oldest_carton[:grade_code] }) if !rule[:allow_grade_mix] && (carton[:grade_id] != oldest_carton[:grade_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'MARKS', new_value: carton[:mark_code], old_value: oldest_carton[:mark_code] }) if !rule[:allow_mark_mix] && (carton[:mark_id] != oldest_carton[:mark_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'SIZE REFS', new_value: carton[:size_reference], old_value: oldest_carton[:size_reference] }) if !rule[:allow_size_ref_mix] && (carton[:fruit_size_reference_id] != oldest_carton[:fruit_size_reference_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'PACKS', new_value: carton[:standard_pack_code], old_value: oldest_carton[:standard_pack_code] }) if !rule[:allow_pack_mix] && (carton[:standard_pack_code_id] != oldest_carton[:standard_pack_code_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'STD COUNTS', new_value: carton[:size_count_value], old_value: oldest_carton[:size_count_value] }) if !rule[:allow_std_count_mix] && (carton[:std_fruit_size_count_id] != oldest_carton[:std_fruit_size_count_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'INVENTORIES', new_value: carton[:inventory_code], old_value: oldest_carton[:inventory_code] }) if !rule[:allow_inventory_code_mix] && (carton[:inventory_code_id] != oldest_carton[:inventory_code_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'CULTIVARS', new_value: carton[:cultivar_name], old_value: oldest_carton[:cultivar_name] }) if !rule[:allow_cultivar_mix] && (carton[:cultivar_id] != oldest_carton[:cultivar_id])
-      return failed_response('mix_rule error', { mix_rule_error: true, rule_column: 'CULTIVAR GROUPS', new_value: carton[:cultivar_group_code], old_value: oldest_carton[:cultivar_group_code] }) if !rule[:allow_cultivar_group_mix] && (carton[:cultivar_group_id] != oldest_carton[:cultivar_group_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'TM GROUPS', new_value: carton[:target_market_group_name], old_value: oldest_carton[:target_market_group_name] }) if !rule[:allow_tm_mix] && (carton[:packed_tm_group_id] != oldest_carton[:packed_tm_group_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'GRADES', new_value: carton[:grade_code], old_value: oldest_carton[:grade_code] }) if !rule[:allow_grade_mix] && (carton[:grade_id] != oldest_carton[:grade_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'MARKS', new_value: carton[:mark_code], old_value: oldest_carton[:mark_code] }) if !rule[:allow_mark_mix] && (carton[:mark_id] != oldest_carton[:mark_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'SIZE REFS', new_value: carton[:size_reference], old_value: oldest_carton[:size_reference] }) if !rule[:allow_size_ref_mix] && (carton[:fruit_size_reference_id] != oldest_carton[:fruit_size_reference_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'PACKS', new_value: carton[:standard_pack_code], old_value: oldest_carton[:standard_pack_code] }) if !rule[:allow_pack_mix] && (carton[:standard_pack_code_id] != oldest_carton[:standard_pack_code_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'STD COUNTS', new_value: carton[:size_count_value], old_value: oldest_carton[:size_count_value] }) if !rule[:allow_std_count_mix] && (carton[:std_fruit_size_count_id] != oldest_carton[:std_fruit_size_count_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'INVENTORIES', new_value: carton[:inventory_code], old_value: oldest_carton[:inventory_code] }) if !rule[:allow_inventory_code_mix] && (carton[:inventory_code_id] != oldest_carton[:inventory_code_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'CULTIVARS', new_value: carton[:cultivar_name], old_value: oldest_carton[:cultivar_name] }) if !rule[:allow_cultivar_mix] && (carton[:cultivar_id] != oldest_carton[:cultivar_id])
+      return failed_response('mix_rule error', { mix_rule_error: true, carton_number: carton[:carton_label_id].to_s, rule_column: 'CULTIVAR GROUPS', new_value: carton[:cultivar_group_code], old_value: oldest_carton[:cultivar_group_code] }) if !rule[:allow_cultivar_group_mix] && (carton[:cultivar_group_id] != oldest_carton[:cultivar_group_id])
 
-      success_response('ok', current_bay_attributes(state_machine))
+      success_response('ok', current_bay_attributes(state_machine, { carton_number: carton[:carton_label_id].to_s }))
     end
 
     def transfer_bay_carton(state_machine, params) # rubocop:disable Metrics/AbcSize
@@ -437,7 +441,7 @@ module MesscadaApp
                     cancel_url: 'noop'
                   }
                 else
-                  {}
+                  { carton_number: carton_carton_label(carton_id) }
                 end
 
       success_response('ok', current_bay_attributes(state_machine, confirm))
@@ -489,18 +493,18 @@ module MesscadaApp
     end
 
     def return_pallet_to_bay(state_machine, params)  # rubocop:disable Metrics/AbcSize
-      return failed_response("Cannot return pallet to bay. #{state_machine.current} state", current_bay_attributes(state_machine)) unless state_machine.target.action == :return_to_bay
-
       carton_number = params[:carton_number]
-      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine)) unless carton_number_exists?(carton_number)
+      return failed_response("Cannot return pallet to bay. #{state_machine.current} state", current_bay_attributes(state_machine, { carton_number: carton_number })) unless state_machine.target.action == :return_to_bay
+
+      return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine, { carton_number: carton_number })) unless carton_number_exists?(carton_number)
 
       carton_id = carton_number_carton_id(carton_number)
-      return failed_response("Carton:#{carton_number} is not valid", current_bay_attributes(state_machine)) unless valid_pallet_carton?(carton_id)
+      return failed_response("Carton:#{carton_number} is not valid", current_bay_attributes(state_machine, { carton_number: carton_number })) unless valid_pallet_carton?(carton_id)
 
       pallet_id = carton_pallet(carton_id)
-      return failed_response('No valid carton pallet', current_bay_attributes(state_machine)) if pallet_id.nil?
+      return failed_response('No valid carton pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if pallet_id.nil?
 
-      return failed_response('Incomplete plt.Cannot return to bay', current_bay_attributes(state_machine)) if carton_of_other_bay?(carton_id)
+      return failed_response('Incomplete plt.Cannot return to bay', current_bay_attributes(state_machine, { carton_number: carton_number })) if carton_of_other_bay?(carton_id)
 
       oldest_carton = pallet_oldest_carton(pallet_id)
 
@@ -513,7 +517,7 @@ module MesscadaApp
         repo.update_palletizing_bay_state(state_machine.target.id, changeset)
         log_transaction
       end
-      success_response('ok', current_bay_attributes(state_machine))
+      success_response('ok', current_bay_attributes(state_machine, { carton_number: carton_number }))
     end
 
     def mark_carton_for_qc(state_machine, params)
@@ -683,6 +687,10 @@ module MesscadaApp
     def palletizing_bay_printer(palletizing_bay_state_id)
       bay_resource_id = repo.palletizing_bay_resource(palletizing_bay_state_id)
       repo.find_palletizing_bay_resource_printer(bay_resource_id)
+    end
+
+    def carton_carton_label(carton_id)
+      mesc_repo.carton_carton_label(carton_id).to_s
     end
   end
 end
