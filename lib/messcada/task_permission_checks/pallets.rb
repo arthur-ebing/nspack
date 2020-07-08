@@ -21,6 +21,7 @@ module MesscadaApp
         has_gross_weight: :gross_weight_check,
         not_on_load: :not_on_load_check,
         not_on_inspection_sheet: :not_on_inspection_sheet_check,
+        inspected: :inspected_check,
         not_inspected: :not_inspected_check,
         not_failed_otmc: :not_failed_otmc_check,
         verification_passed: :verification_passed_check,
@@ -32,7 +33,7 @@ module MesscadaApp
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
 
-        raise ArgumentError, 'Validation empty.' if pallet_numbers.nil_or_empty?
+        return failed_response 'Pallet number not given.' if pallet_numbers.nil_or_empty?
 
         res = exists_check
         return failed_response res.message unless res.success
@@ -44,7 +45,6 @@ module MesscadaApp
 
       def exists_check
         pallets_exists = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers)
-
         errors = pallet_numbers - pallets_exists
         return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
 
@@ -52,25 +52,21 @@ module MesscadaApp
       end
 
       def not_shipped_check
-        pallets_shipped = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: true)
-        errors = pallets_shipped
+        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: true)
         return failed_response "Pallet: #{errors.join(', ')} already shipped." unless errors.empty?
 
         all_ok
       end
 
       def shipped_check
-        pallets_not_shipped = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: false)
-        errors = pallets_not_shipped
+        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, shipped: false)
         return failed_response "Pallet: #{errors.join(', ')} not shipped." unless errors.empty?
 
         all_ok
       end
 
       def in_stock_check
-        pallets_not_in_stock = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, in_stock: false)
-        errors = pallets_not_in_stock
-
+        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, in_stock: false)
         return failed_response "Pallet: #{errors.join(', ')} not in stock." unless errors.empty?
 
         all_ok
@@ -123,9 +119,16 @@ module MesscadaApp
         all_ok
       end
 
-      def not_inspected_check
+      def inspected_check
         errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: false).uniq
         return failed_response "Pallet: #{errors.join(', ')}, not previously inspected." unless errors.empty?
+
+        all_ok
+      end
+
+      def not_inspected_check
+        errors = @repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, inspected: true).uniq
+        return failed_response "Pallet: #{errors.join(', ')}, has already been inspected." unless errors.empty?
 
         all_ok
       end

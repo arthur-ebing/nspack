@@ -336,7 +336,7 @@ module FinishedGoodsApp
       check_pallet(:verification_passed, pallet_number)
       check_pallet(:pallet_weight, pallet_number)
       if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
-        check_pallet(:not_inspected, pallet_number)
+        check_pallet(:inspected, pallet_number)
       else
         check_pallet(:not_on_inspection_sheet, pallet_number)
       end
