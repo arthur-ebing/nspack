@@ -40,6 +40,50 @@ module MesscadaApp
       repo.find_pallet_sequences_by_pallet_number(pallet_number)
     end
 
+    def update_bin_weights_and_tip_bin(params) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        res = update_rmt_bin_weights(params)
+        if res.success
+          res = tip_rmt_bin(params)
+          if res.success
+            succ = bin_tipping_response(res, params)
+            Crossbeams::RobotResponder.new(succ).render
+          else
+            err = bin_tipping_response(res, params)
+            raise Crossbeams::RobotResponder.new(err).render
+          end
+        else
+          err = MesscadaApp::RobotFeedback.new(device: params[:device],
+                                               status: false,
+                                               line1: unwrap_failed_response(res))
+          raise Crossbeams::RobotResponder.new(err).render
+        end
+      end
+    rescue StandardError => e
+      e.message
+    end
+
+    def bin_tipping_response(res, params) # rubocop:disable Metrics/AbcSize
+      if res.success
+        MesscadaApp::RobotFeedback.new(device: params[:device],
+                                       status: true,
+                                       line1: "#{res.message} - run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
+                                       line2: "farm:#{res.instance[:farm_code]}",
+                                       line3: "puc:#{res.instance[:puc_code]}",
+                                       line4: "orch:#{res.instance[:orchard_code]}",
+                                       line5: "cult group: #{res.instance[:cultivar_group_code]}",
+                                       line6: "cult:#{res.instance[:cultivar_name]}",
+                                       short1: res.message,
+                                       short2: "run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
+                                       short3: "farm:#{res.instance[:farm_code]}, puc:#{res.instance[:puc_code]}, orch:#{res.instance[:orchard_code]}",
+                                       short4: "cult: #{res.instance[:cultivar_group_code]}, / #{res.instance[:cultivar_name]}")
+      else
+        MesscadaApp::RobotFeedback.new(device: params[:device],
+                                       status: false,
+                                       line1: unwrap_failed_response(res))
+      end
+    end
+
     def update_rmt_bin_weights(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_rmt_bin_weights_params(params)
       return validation_failed_response(res) unless res.messages.empty?

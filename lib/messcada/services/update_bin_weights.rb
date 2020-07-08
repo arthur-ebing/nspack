@@ -33,9 +33,7 @@ module MesscadaApp
     private
 
     def update_rmt_bin_weights(id, updates)
-      repo.transaction do
-        repo.update_rmt_bin(id, updates)
-      end
+      repo.update_rmt_bin(id, updates)
     end
 
     def find_rmt_bin
