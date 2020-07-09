@@ -154,7 +154,7 @@ module MesscadaApp
         repo.update_palletizing_bay_state(state_machine.target.id, changeset)
         log_transaction
       end
-      print_pallet_label(pallet_id, state_machine.target.id)
+      print_pallet_label(pallet_id, state_machine.target.id) if AppConst::AUTO_PRINT_PALLET_LABEL_ON_BAY
       success_response('ok', current_bay_attributes(state_machine))
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message("complete_pallet\nParams: #{params.inspect}\nState: #{state_machine&.target.inspect}"))

@@ -46,6 +46,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # carton palletizing
   USE_CARTON_PALLETIZING = make_boolean('USE_CARTON_PALLETIZING')
   DEFAULT_PALLET_LABEL_NAME = ENV['DEFAULT_PALLET_LABEL_NAME']
+  AUTO_PRINT_PALLET_LABEL_ON_BAY = make_boolean('AUTO_PRINT_PALLET_LABEL_ON_BAY')
 
   # General
   DEFAULT_KEY = 'DEFAULT'

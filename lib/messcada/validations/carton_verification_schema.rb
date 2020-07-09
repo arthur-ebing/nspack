@@ -46,7 +46,7 @@ module MesscadaApp
     required(:device, Types::StrippedString).filled(:str?)
     required(:reader_id, Types::StrippedString).filled(:str?)
     required(:identifier, Types::StrippedString).filled(:str?)
-    required(:carton_number, Types::StrippedString).filled(:str?)
+    required(:carton_number, :integer).filled(:int?)
   end
 
   CartonPalletizingSchema = Dry::Validation.Params do
