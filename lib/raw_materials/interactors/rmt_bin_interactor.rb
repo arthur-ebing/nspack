@@ -340,6 +340,7 @@ module RawMaterialsApp
                      cultivar_name: !params[:cultivar_id].nil_or_empty? ? repo.get(:cultivars, params[:cultivar_id], :cultivar_name) : nil,
                      bin_asset_number: bin_asset_number }
         res = LabelPrintingApp::PrintLabel.call(label_name, instance, print_params)
+        sleep(1)
         return res unless res.success
       end
 
