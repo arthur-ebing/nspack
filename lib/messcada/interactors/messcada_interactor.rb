@@ -63,6 +63,37 @@ module MesscadaApp
       e.message
     end
 
+    def multi_update_bin_weights_and_tip_bin(params) # rubocop:disable Metrics/AbcSize
+      bin_numbers = params[:bin_number].split(',')
+      gross_weight = (params[:gross_weight].to_f / bin_numbers.size)
+      repo.transaction do
+        succ = nil
+        bin_numbers.each do |bin_number|
+          bin_params = { bin_number: bin_number, gross_weight: gross_weight, measurement_unit: params[:measurement_unit], device: params[:device] }
+          res = update_rmt_bin_weights(bin_params)
+          unless res.success
+            err = MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                 status: false,
+                                                 line1: unwrap_failed_response(res))
+            raise Crossbeams::RobotResponder.new(err).render
+          end
+
+          res = tip_rmt_bin(bin_params)
+          unless res.success
+            err = bin_tipping_response(res, bin_params)
+            raise Crossbeams::RobotResponder.new(err).render
+          end
+
+          succ = MesscadaApp::RobotFeedback.new(device: params[:device], status: true,
+                                                line1: "#{res.message} - run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}")
+        end
+
+        Crossbeams::RobotResponder.new(succ).render
+      end
+    rescue StandardError => e
+      e.message
+    end
+
     def bin_tipping_response(res, params) # rubocop:disable Metrics/AbcSize
       if res.success
         MesscadaApp::RobotFeedback.new(device: params[:device],

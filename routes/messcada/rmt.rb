@@ -50,30 +50,14 @@ class Nspack < Roda
         interactor.update_bin_weights_and_tip_bin(params)
       end
 
+      # --------------------------------------------------------------------------
+      # RMT BIN TIPPING/WEIGHING
+      # view-source:http://192.168.43.254:9296/messcada/rmt/bin_tipping/multi_bin_weighing?bin_number=11111803,11111804&gross_weight=600.23&measurement_unit=kg&device=CLM-0226
+      # --------------------------------------------------------------------------
       r.on 'multi_bin_weighing' do
+        interactor.multi_update_bin_weights_and_tip_bin(params)
       end
     end
   end
-
-  # def bin_tipping_response(res)
-  #   if res.success
-  #     MesscadaApp::RobotFeedback.new(device: params[:device],
-  #                                    status: true,
-  #                                    line1: "#{res.message} - run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
-  #                                    line2: "farm:#{res.instance[:farm_code]}",
-  #                                    line3: "puc:#{res.instance[:puc_code]}",
-  #                                    line4: "orch:#{res.instance[:orchard_code]}",
-  #                                    line5: "cult group: #{res.instance[:cultivar_group_code]}",
-  #                                    line6: "cult:#{res.instance[:cultivar_name]}",
-  #                                    short1: res.message,
-  #                                    short2: "run:#{res.instance[:run_id]}, tipped: #{res.instance[:bins_tipped]}",
-  #                                    short3: "farm:#{res.instance[:farm_code]}, puc:#{res.instance[:puc_code]}, orch:#{res.instance[:orchard_code]}",
-  #                                    short4: "cult: #{res.instance[:cultivar_group_code]}, / #{res.instance[:cultivar_name]}")
-  #   else
-  #     MesscadaApp::RobotFeedback.new(device: params[:device],
-  #                                    status: false,
-  #                                    line1: unwrap_failed_response(res))
-  #   end
-  # end
 end
 # rubocop:enable Metrics/BlockLength
