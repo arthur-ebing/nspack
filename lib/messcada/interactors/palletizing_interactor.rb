@@ -2,11 +2,14 @@
 
 module MesscadaApp
   class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonPalletizingScanSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       check_res = validate_params_input(params)
+      return check_res unless check_res.success
+
+      check_res = check_carton_number_length(params[:carton_number])
       return check_res unless check_res.success
 
       state_machine = state_machine(params)
@@ -230,7 +233,7 @@ module MesscadaApp
     end
 
     def palletizing_robot_feedback(device, res) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      current_state = current_state_string(res.instance)
+      current_state = res.instance.nil_or_empty? ? '' : current_state_string(res.instance)
       if res.success
         orange = %w[empty qc_out return_to_bay].include?(res.instance[:current_state])
 
@@ -590,6 +593,12 @@ module MesscadaApp
 
     def identifier_exists?(identifier)
       mesc_repo.identifier_exists?(identifier)
+    end
+
+    def check_carton_number_length(carton_number)
+      return failed_response('Invalid barcode. Perhaps a pallet.', { carton_number: carton_number }) if carton_number.to_i > AppConst::MAX_DB_INT
+
+      ok_response
     end
 
     def carton_number_exists?(carton_number)
