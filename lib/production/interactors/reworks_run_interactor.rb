@@ -331,6 +331,8 @@ module ProductionApp
 
       return bulk_weigh_bins(attrs) if AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type
 
+      return bulk_update_pallet_dates(attrs) if AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type
+
       rw_res = failed_response('create_reworks_run_record')
       repo.transaction do
         rw_res = create_reworks_run_record(attrs, nil, nil)
@@ -896,6 +898,36 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def bulk_update_pallet_dates(attrs)  # rubocop:disable Metrics/AbcSize
+      attrs = attrs.to_h
+      instance = pallet(attrs[:pallets_selected].first)
+      before_state = { first_cold_storage_at: instance[:first_cold_storage_at] }
+
+      pallet_ids = repo.find_pallet_ids_from_pallet_number(attrs[:pallets_selected])
+      change_attrs = { first_cold_storage_at: attrs[:first_cold_storage_at] }
+
+      repo.transaction do
+        repo.update_pallet(pallet_ids, change_attrs)
+        reworks_run_attrs = { user: @user.user_name,
+                              reworks_run_type_id: attrs[:reworks_run_type_id],
+                              pallets_selected: "{ #{attrs[:pallets_selected].join(',')} }",
+                              pallets_affected: "{ #{attrs[:pallets_selected].join(',')} }",
+                              changes_made: resolve_changes_made(before: before_state.sort.to_h,
+                                                                 after: change_attrs.sort.to_h) }
+        reworks_run_id = repo.create_reworks_run(reworks_run_attrs)
+        log_multiple_statuses(:pallets, pallet_ids, AppConst::REWORKS_BULK_UPDATE_PALLET_DATES)
+        log_status(:reworks_runs, reworks_run_id, 'CREATED')
+        log_transaction
+      end
+      success_response('Bulk pallet dates update was successfully', pallet_number: attrs[:pallets_selected])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('bulk_update_pallet_dates'))
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def manually_weigh_rmt_bin(params)  # rubocop:disable Metrics/AbcSize
       res = validate_manually_weigh_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -1181,11 +1213,12 @@ module ProductionApp
       when AppConst::RUN_TYPE_SCRAP_PALLET,
            AppConst::RUN_TYPE_SCRAP_BIN,
            AppConst::RUN_TYPE_UNSCRAP_PALLET,
-          AppConst::RUN_TYPE_UNSCRAP_BIN,
+           AppConst::RUN_TYPE_UNSCRAP_BIN,
            AppConst::RUN_TYPE_REPACK,
            AppConst::RUN_TYPE_TIP_BINS,
            AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
-          AppConst::RUN_TYPE_BULK_WEIGH_BINS
+           AppConst::RUN_TYPE_BULK_WEIGH_BINS,
+           AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES
         false
       else
         true
@@ -1339,6 +1372,8 @@ module ProductionApp
         ReworksRunBulkProductionRunUpdateSchema.call(params)
       when AppConst::RUN_TYPE_BULK_WEIGH_BINS
         ReworksBulkWeighBinsSchema.call(params)
+      when AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES
+        ReworksBulkUpdatePalletDatesSchema.call(params)
       else
         ReworksRunNewSchema.call(params)
       end

@@ -214,4 +214,13 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:allow_cultivar_mixing, :bool).maybe(:bool?)
     required(:ignore_runs_that_allow_mixing, :bool).maybe(:bool?)
   end
+
+  ReworksBulkUpdatePalletDatesSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:reworks_run_type_id, :integer).filled(:int?)
+    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
+    required(:first_cold_storage_at, :date).filled(:date?)
+    optional(:make_changes, :bool).maybe(:bool?)
+  end
 end

@@ -80,6 +80,7 @@ INSERT INTO reworks_run_types (run_type, description) VALUES('BULK PRODUCTION RU
 INSERT INTO reworks_run_types (run_type, description) VALUES('BULK BIN RUN UPDATE', 'Bulk Bin Run Update') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('DELIVERY DELETE', 'Delete Delivery') ON CONFLICT DO NOTHING;
 INSERT INTO reworks_run_types (run_type, description) VALUES('BULK WEIGH BINS', 'Bulk Weigh Bins') ON CONFLICT DO NOTHING;
+INSERT INTO reworks_run_types (run_type, description) VALUES('BULK UPDATE PALLET DATES', 'Bulk Update Pallet Dates') ON CONFLICT DO NOTHING;
 
 -- LOCATION TYPES
 INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('EMPTY_BIN', 'EMPTY_BIN', 'f') ON CONFLICT DO NOTHING;

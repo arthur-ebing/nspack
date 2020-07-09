@@ -88,6 +88,14 @@ module Production
                   col.add_field :spacer
                 end
               end
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :first_cold_storage_at
+                end
+                row.column do |col|
+                  col.add_field :spacer
+                end
+              end
             end
           end
 

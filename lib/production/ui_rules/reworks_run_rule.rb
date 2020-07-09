@@ -42,6 +42,7 @@ module UiRules
       @rules[:bulk_production_run_update] = @rules[:bulk_pallet_run_update] || @rules[:bulk_bin_run_update]
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
+      @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
 
       text_area_caption = @rules[:bin_run_type] ? 'Bins' : 'Pallets'
 
@@ -136,6 +137,7 @@ module UiRules
       @rules[:bulk_weigh_bins] = AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type_id_label
       @rules[:bin_run_type] = bin_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
+      @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
@@ -191,7 +193,11 @@ module UiRules
         avg_gross_weight: { renderer: :checkbox,
                             hide_on_load: @rules[:bulk_weigh_bins] ? false : true },
         allow_cultivar_group_mixing: { renderer: :checkbox,
-                                       hide_on_load: @rules[:show_allow_cultivar_group_mixing] ? false : true }
+                                       hide_on_load: @rules[:show_allow_cultivar_group_mixing] ? false : true },
+        first_cold_storage_at: { renderer: :input,
+                                 subtype: :date,
+                                 required: true,
+                                 hide_on_load: @rules[:bulk_update_pallet_dates] ? false : true }
       }
     end
 
