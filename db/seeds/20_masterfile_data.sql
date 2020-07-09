@@ -1,3 +1,17 @@
+-- -- SITE LOCATION
+-- INSERT INTO location_types (location_type_code, short_code, hierarchical) VALUES('SITE', 'SITE', 'f') ON CONFLICT DO NOTHING;
+-- INSERT INTO location_storage_types (storage_type_code) VALUES('SITE') ON CONFLICT DO NOTHING;
+-- INSERT INTO location_assignments (assignment_code) VALUES('SITE') ON CONFLICT DO NOTHING;
+-- INSERT INTO locations (primary_storage_type_id, location_type_id, primary_assignment_id, location_long_code, location_description,
+--                        virtual_location, location_short_code, print_code, units_in_location)
+-- VALUES((SELECT id FROM location_storage_types WHERE storage_type_code = 'SITE'),
+--        (SELECT id FROM location_types WHERE location_type_code = 'SITE'),
+--        (SELECT id FROM location_assignments WHERE assignment_code = 'SITE'),
+--        'NEW_SITE_NAME', 'NEW_SITE_NAME', true, 'SR', 'SR', 0) ON CONFLICT DO NOTHING;
+-- INSERT INTO tree_locations (ancestor_location_id, descendant_location_id, path_length)
+-- VALUES ((SELECT id FROM locations WHERE locations.location_long_code = 'NEW_SITE_NAME'),
+--         (SELECT id FROM locations WHERE locations.location_long_code = 'NEW_SITE_NAME'), 0);
+
 -- ADDRESS TYPES
 INSERT INTO public.address_types(address_type) VALUES ('Delivery Address') ON CONFLICT DO NOTHING;
 
