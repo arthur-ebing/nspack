@@ -28,6 +28,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_PALLET_WEIGHT_AT_VERIFICATION: 'optional. Fill in the gross weight at pallet verification,' },
     { PALLET_WEIGHT_REQUIRED_FOR_INSPECTION: 'optional. Bool to set if weight is required' },
     { COMBINE_CARTON_AND_PALLET_VERIFICATION: 'optional. The system presents a screen prompting the user to scan either a pallet number or a carton number.' },
+    { PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION: 'optional. The shows print label fields at pallet verification.' },
     { EMAIL_REQUIRES_REPLY_TO: 'Set to Y if user cannot send email directly. i.e. FROM must be system email, and REPLY-TO will be set to user email.' },
     { DEFAULT_MARKETING_ORG: 'Default marketing organization party_role_name for Product Setups' },
     { DEFAULT_FG_PACKAGING_TYPE: 'Default fg packaging type pm_type_code for Product Setups. Habata will be BIN while Matrooz will be CARTON' },
