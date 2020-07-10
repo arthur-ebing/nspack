@@ -23,10 +23,10 @@
   etd) AS departure_date,\r\n    active,\r\n    created_by,\r\n    verified_by,\r\n
   \   edi_size_count,\r\n    target_customer_party_role_id,\r\n    target_customer,\r\n
   \   consignment_note_number,\r\n    dispatch_note,\r\n    order_number,\r\n    customer_order_number,\r\n
-  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    CASE WHEN fn_pallet_verification_failed
-  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
-  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER BY pallet_id DESC,
-  pallet_sequence_number ASC"
+  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    has_individual_cartons,\r\n
+  \   CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n
+  \   ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat\r\nORDER
+  BY pallet_id DESC, pallet_sequence_number ASC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1671,9 +1671,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_individual_cartons:
+    :name: has_individual_cartons
+    :sequence_no: 103
+    :caption: Indiv cartons?
+    :namespaced_name: has_individual_cartons
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 103
+    :sequence_no: 104
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1826,7 +1842,7 @@
   :caption: Pallet Id
   :data_type: :integer
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 12
-  :list_def:
+  :list_def: 

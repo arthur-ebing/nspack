@@ -35,9 +35,9 @@
   \   failed_otmc_results,\r\n    failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n
   \   edi_size_count,\r\n    target_customer_party_role_id,\r\n    target_customer,\r\n
   \   consignment_note_number,\r\n    dispatch_note,\r\n    customer_order_number,\r\n
-  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    CASE WHEN fn_pallet_verification_failed
-  (pallet_id) THEN\r\n        'error'\r\n    ELSE\r\n        colour_rule\r\n    END
-  AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
+  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    has_individual_cartons,\r\n
+  \   CASE WHEN fn_pallet_verification_failed (pallet_id) THEN\r\n        'error'\r\n
+  \   ELSE\r\n        colour_rule\r\n    END AS colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2402,9 +2402,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_individual_cartons:
+    :name: has_individual_cartons
+    :sequence_no: 148
+    :caption: Indiv cartons?
+    :namespaced_name: has_individual_cartons
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 148
+    :sequence_no: 149
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

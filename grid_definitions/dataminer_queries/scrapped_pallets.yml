@@ -1,23 +1,32 @@
 ---
 :caption: Scrapped Pallets
-:sql: SELECT DISTINCT ON (pallet_id) id, pallet_id, pallet_number, pallet_sequence_number,
-  scrap_reason, scrapped_remarks, scrapped_by, location, carton_quantity, pallet_carton_quantity,
-  pallet_size, pallet_age, stock_age, cold_age, ambient_age, created_at, palletized_at,
-  govt_first_inspection_at, shipped_at, govt_reinspection_at, allocated_at, verified_at,
-  allocated, shipped, in_stock, inspected, palletized, production_run_id, farm, puc,
-  orchard, commodity, cultivar, marketing_variety, grade, std_size, actual_count,
-  size_ref, count_group, std_pack, packed_tm_group, mark, inventory_code, fruit_sticker,
-  fruit_sticker_2, marketing_org, pallet_base, stack_type, gross_weight, nett_weight,
-  sequence_nett_weight, basic_pack, packhouse, line, palletizing_bay, pick_ref, phc,
-  verification_result, scrapped_at, scrapped, partially_palletized, reinspected, verified,
-  verification_passed, status, build_status, load_id, vessel, voyage, container, internal_container,
-  temp_code, vehicle_number, cooled, pol, pod, final_destination, customer, consignee,
-  final_receiver, exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd,
-  etd) AS departure_date, active, exit_ref, created_by, verified_by, edi_size_count,
-  target_customer_party_role_id, target_customer, consignment_note_number, dispatch_note,
-  order_number, depot, po_file_name, repacked_from_pallet_number, repacked_to_pallet_number,
-  colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER BY pallet_id DESC, pallet_sequence_number
-  ASC
+:sql: "SELECT DISTINCT ON (pallet_id) \r\n    id, \r\n    pallet_id, \r\n    pallet_number,
+  \r\n    pallet_sequence_number, \r\n    scrap_reason, \r\n    scrapped_remarks,
+  \r\n    scrapped_by, \r\n    location, \r\n    carton_quantity, \r\n    pallet_carton_quantity,
+  \r\n    pallet_size, \r\n    pallet_age, \r\n    stock_age, \r\n    cold_age, \r\n
+  \   ambient_age, \r\n    created_at, \r\n    palletized_at, \r\n    govt_first_inspection_at,
+  \r\n    shipped_at, \r\n    govt_reinspection_at, \r\n    allocated_at, \r\n    verified_at,
+  \r\n    allocated, \r\n    shipped, \r\n    in_stock, \r\n    inspected, \r\n    palletized,
+  \r\n    production_run_id, \r\n    farm, \r\n    puc, \r\n    orchard, \r\n    commodity,
+  \r\n    cultivar, \r\n    marketing_variety, \r\n    grade, \r\n    std_size, \r\n
+  \   actual_count, \r\n    size_ref, \r\n    count_group, \r\n    std_pack, \r\n
+  \   packed_tm_group, \r\n    mark, \r\n    inventory_code, \r\n    fruit_sticker,
+  \r\n    fruit_sticker_2, \r\n    marketing_org, \r\n    pallet_base, \r\n    stack_type,
+  \r\n    gross_weight, \r\n    nett_weight, \r\n    sequence_nett_weight, \r\n    basic_pack,
+  \r\n    packhouse, \r\n    line, \r\n    palletizing_bay, \r\n    pick_ref, \r\n
+  \   phc, \r\n    verification_result, \r\n    scrapped_at, \r\n    scrapped, \r\n
+  \   partially_palletized, \r\n    reinspected, \r\n    verified, \r\n    verification_passed,
+  \r\n    status, \r\n    build_status, \r\n    load_id, \r\n    vessel, \r\n    voyage,
+  \r\n    container, \r\n    internal_container, \r\n    temp_code, \r\n    vehicle_number,
+  \r\n    cooled, \r\n    pol, \r\n    pod, \r\n    final_destination, \r\n    customer,
+  \r\n    consignee, \r\n    final_receiver, \r\n    exporter, \r\n    country, \r\n
+  \   region, \r\n    COALESCE(ata, eta) AS arrival_date, \r\n    COALESCE(atd, etd)
+  AS departure_date, \r\n    active, \r\n    exit_ref, \r\n    created_by, \r\n    verified_by,
+  \r\n    edi_size_count, \r\n    target_customer_party_role_id, \r\n    target_customer,
+  \r\n    consignment_note_number, \r\n    dispatch_note, \r\n    order_number, \r\n
+  \   depot, \r\n    po_file_name, \r\n    repacked_from_pallet_number, \r\n    repacked_to_pallet_number,\r\n
+  \   has_individual_cartons,\r\n    colour_rule \r\nFROM vw_scrapped_pallet_sequence_flat\r\nORDER
+  BY pallet_id DESC, pallet_sequence_number ASC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1614,9 +1623,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_individual_cartons:
+    :name: has_individual_cartons
+    :sequence_no: 100
+    :caption: Indiv cartons?
+    :namespaced_name: has_individual_cartons
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 100
+    :sequence_no: 101
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

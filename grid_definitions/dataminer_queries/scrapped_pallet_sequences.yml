@@ -1,27 +1,39 @@
 ---
 :caption: Scrapped Pallet Sequences
-:sql: SELECT id, pallet_id, pallet_number, pallet_sequence_number, scrap_reason, scrapped_remarks,
-  scrapped_by, carton_quantity, pallet_carton_quantity, pallet_size, pallet_age, stock_age,
-  cold_age, ambient_age, allocated, shipped, in_stock, inspected, palletized, production_run_id,
-  farm, puc, orchard, commodity, cultivar, marketing_variety, grade, std_size, actual_count,
-  size_ref, count_group, std_pack, packed_tm_group, mark, inventory_code, marketing_org,
-  created_at, palletized_at, govt_first_inspection_at, shipped_at, govt_reinspection_at,
-  allocated_at, verified_at, pallet_base, stack_type, gross_weight, nett_weight, sequence_nett_weight,
-  basic_pack, packhouse, line, palletizing_bay, pick_ref, phc, verification_result,
-  scrapped_at, scrapped, partially_palletized, reinspected, verified, verification_passed,
-  status, build_status, load_id, vessel, voyage, container, internal_container, temp_code,
-  vehicle_number, cooled, pol, pod, final_destination, customer, consignee, final_receiver,
-  exporter, country, region, COALESCE(ata, eta) AS arrival_date, COALESCE(atd, etd)
-  AS departure_date, pallet_verification_failed, verification_failure_reason, scanned_carton,
-  cpp, bom, client_size_ref, treatments, order_number, pm_type, pm_subtype, fruit_sticker,
-  fruit_sticker_2, cultivar_group, season, customer_variety, plt_packhouse, plt_line,
-  exit_ref, seq_exit_ref, gross_weight_measured_at, partially_palletized_at, govt_inspection_passed,
-  internal_inspection_passed, inspection_age, internal_inspection_at, internal_reinspection_at,
-  stock_created_at, intake_created_at, first_cold_storage_at, active, extended_columns,
-  seq_scrapped_at, created_by, verified_by, edi_size_count, target_customer_party_role_id,
-  target_customer, consignment_note_number, dispatch_note, depot, po_file_name, repacked_from_pallet_number,
-  repacked_to_pallet_number, colour_rule FROM vw_scrapped_pallet_sequence_flat ORDER
-  BY pallet_id DESC, pallet_sequence_number ASC
+:sql: "SELECT id, \r\n    pallet_id, \r\n    pallet_number, \r\n    pallet_sequence_number,
+  \r\n    scrap_reason, \r\n    scrapped_remarks, \r\n    scrapped_by, \r\n    carton_quantity,
+  \r\n    pallet_carton_quantity, \r\n    pallet_size, \r\n    pallet_age, \r\n    stock_age,
+  \r\n    cold_age, \r\n    ambient_age, \r\n    allocated, \r\n    shipped, \r\n
+  \   in_stock, inspected, \r\n    palletized, \r\n    production_run_id, \r\n    farm,
+  puc, \r\n    orchard, \r\n    commodity, \r\n    cultivar, \r\n    marketing_variety,
+  \r\n    grade, \r\n    std_size, \r\n    actual_count, \r\n    size_ref, \r\n    count_group,
+  \r\n    std_pack, \r\n    packed_tm_group, \r\n    mark, \r\n    inventory_code,
+  \r\n    marketing_org, \r\n    created_at, \r\n    palletized_at, \r\n    govt_first_inspection_at,
+  \r\n    shipped_at, \r\n    govt_reinspection_at, \r\n    allocated_at, \r\n    verified_at,
+  \r\n    pallet_base, \r\n    stack_type, \r\n    gross_weight, \r\n    nett_weight,
+  \r\n    sequence_nett_weight, \r\n    basic_pack, \r\n    packhouse, \r\n    line,
+  \r\n    palletizing_bay, \r\n    pick_ref, \r\n    phc, \r\n    verification_result,
+  \r\n    scrapped_at, \r\n    scrapped, \r\n    partially_palletized, \r\n    reinspected,
+  \r\n    verified, \r\n    verification_passed, \r\n    status, \r\n    build_status,
+  \r\n    load_id, \r\n    vessel, \r\n    voyage, \r\n    container, \r\n    internal_container,
+  \r\n    temp_code, \r\n    vehicle_number, \r\n    cooled, \r\n    pol, \r\n    pod,
+  \r\n    final_destination, \r\n    customer, \r\n    consignee, \r\n    final_receiver,
+  \r\n    exporter, \r\n    country, \r\n    region, \r\n    COALESCE(ata, eta) AS
+  arrival_date, \r\n    COALESCE(atd, etd) AS departure_date, \r\n    pallet_verification_failed,
+  \r\n    verification_failure_reason, \r\n    scanned_carton, \r\n    cpp, \r\n    bom,
+  \r\n    client_size_ref, \r\n    treatments, \r\n    order_number, \r\n    pm_type,
+  \r\n    pm_subtype, \r\n    fruit_sticker, \r\n    fruit_sticker_2, \r\n    cultivar_group,
+  \r\n    season, \r\n    customer_variety, \r\n    plt_packhouse, \r\n    plt_line,
+  \r\n    exit_ref, \r\n    seq_exit_ref, \r\n    gross_weight_measured_at, \r\n    partially_palletized_at,
+  \r\n    govt_inspection_passed, \r\n    internal_inspection_passed, \r\n    inspection_age,
+  \r\n    internal_inspection_at, \r\n    internal_reinspection_at, \r\n    stock_created_at,
+  \r\n    intake_created_at, \r\n    first_cold_storage_at, \r\n    active, \r\n    extended_columns,
+  \r\n    seq_scrapped_at, \r\n    created_by, \r\n    verified_by, \r\n    edi_size_count,
+  \r\n    target_customer_party_role_id, \r\n    target_customer, \r\n    consignment_note_number,
+  \r\n    dispatch_note, \r\n    depot, \r\n    po_file_name, \r\n    repacked_from_pallet_number,
+  \r\n    repacked_to_pallet_number, \r\n    has_individual_cartons, \r\n    colour_rule
+  \r\nFROM vw_scrapped_pallet_sequence_flat\r\nORDER BY pallet_id DESC, pallet_sequence_number
+  ASC"
 :limit: 
 :offset: 
 :external_settings:
@@ -2034,9 +2046,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_individual_cartons:
+    :name: has_individual_cartons
+    :sequence_no: 126
+    :caption: Indiv cartons?
+    :namespaced_name: has_individual_cartons
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 126
+    :sequence_no: 127
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string

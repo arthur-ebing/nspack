@@ -33,8 +33,8 @@
   \   repacked_at,\r\n    repacked_date,\r\n    repacked_from_pallet_id,\r\n    created_by,\r\n
   \   verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
   \   target_customer,\r\n    consignment_note_number,\r\n    dispatch_note,\r\n    customer_order_number,\r\n
-  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    colour_rule\r\nFROM\r\n
-  \   vw_pallet_sequence_flat"
+  \   customer_reference, \r\n    depot,\r\n    po_file_name,\r\n    has_individual_cartons,\r\n
+  \   colour_rule\r\nFROM\r\n    vw_pallet_sequence_flat"
 :limit: 
 :offset: 
 :external_settings:
@@ -2239,9 +2239,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  has_individual_cartons:
+    :name: has_individual_cartons
+    :sequence_no: 138
+    :caption: Indiv cartons?
+    :namespaced_name: has_individual_cartons
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 138
+    :sequence_no: 139
     :caption: Colour rule
     :namespaced_name: colour_rule
     :data_type: :string
@@ -2404,7 +2420,7 @@
   :caption: Id
   :data_type: :integer
   :control_type: :text
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 14
-  :list_def:
+  :list_def: 
