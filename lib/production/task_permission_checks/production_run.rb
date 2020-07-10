@@ -2,7 +2,7 @@
 
 module ProductionApp
   module TaskPermissionCheck
-    class ProductionRun < BaseService # rubocop:disable Metrics/ClassLength
+    class ProductionRun < BaseService
       attr_reader :task, :entity, :repo
       def initialize(task, production_run_id = nil)
         @task = task
@@ -21,10 +21,7 @@ module ProductionApp
         complete_run_stage: :complete_run_stage_check,
         execute_run: :execute_check,
         re_execute_run: :re_execute_check,
-        close: :close_check,
-        create_new_pallet: :create_new_pallet_check,
-        add_sequence_to_pallet: :add_sequence_to_pallet_check,
-        edit_pallet: :edit_pallet_check
+        close: :close_check
       }.freeze
 
       def call
@@ -120,25 +117,6 @@ module ProductionApp
       def complete_tipping_stage_check
         running_id = repo.labeling_run_for_line(entity.production_line_id)
         return failed_response 'There is another run currently LABELING on this line' unless running_id.nil? || running_id == entity.id
-
-        all_ok
-      end
-
-      def create_new_pallet_check
-        return failed_response 'Carton Palletizing in use' if AppConst::USE_CARTON_PALLETIZING
-        return failed_response 'Carton equals Pallet in use' if AppConst::CARTON_EQUALS_PALLET
-
-        all_ok
-      end
-
-      def add_sequence_to_pallet_check
-        return failed_response 'Carton Palletizing in use' if AppConst::USE_CARTON_PALLETIZING
-
-        all_ok
-      end
-
-      def edit_pallet_check
-        return failed_response 'Carton Palletizing in use' if AppConst::USE_CARTON_PALLETIZING
 
         all_ok
       end

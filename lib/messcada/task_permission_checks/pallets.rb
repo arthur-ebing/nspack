@@ -3,9 +3,9 @@
 module MesscadaApp
   module TaskPermissionCheck
     class Pallets < BaseService # rubocop:disable Metrics/ClassLength
-      attr_reader :task, :pallet_numbers, :repo, :load_id
-      def initialize(task, pallet_numbers, load_id = nil)
-        @task = task
+      attr_reader :tasks, :pallet_numbers, :repo, :load_id
+      def initialize(tasks, pallet_numbers, load_id = nil)
+        @tasks = Array(tasks)
         @repo = MesscadaRepo.new
         @inspection_repo = FinishedGoodsApp::GovtInspectionRepo.new
         @pallet_numbers = Array(pallet_numbers)
@@ -27,19 +27,24 @@ module MesscadaApp
         not_failed_otmc: :not_failed_otmc_check,
         verification_passed: :verification_passed_check,
         pallet_weight: :pallet_weight_check,
-        allocate: :allocate_check
+        allocate: :allocate_check,
+        not_have_individual_cartons: :not_have_individual_cartons_check
       }.freeze
 
       def call
-        check = CHECKS[task]
-        raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
-
         return failed_response 'Pallet number not given.' if pallet_numbers.nil_or_empty?
 
         res = exists_check
-        return failed_response res.message unless res.success
+        return res unless res.success
 
-        send(check)
+        tasks.each do |task|
+          check = CHECKS[task]
+          raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}." if check.nil?
+
+          res = send(check)
+          return res unless res.success
+        end
+        all_ok
       end
 
       private
@@ -169,6 +174,13 @@ module MesscadaApp
 
         res = not_failed_otmc_check
         return res unless res.success
+
+        all_ok
+      end
+
+      def not_have_individual_cartons_check
+        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, has_individual_cartons: true)
+        return failed_response "Pallet: #{errors.join(', ')} has individual cartons, ." unless errors.empty?
 
         all_ok
       end

@@ -85,12 +85,11 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def edit_pallet_validations(pallet_number) # rubocop:disable Metrics/AbcSize
-      pallet = find_pallet_by_pallet_number(pallet_number)
-      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") unless pallet
-      return failed_response("Scanned Pallet:#{pallet_number} has been inspected") if pallet[:inspected]
-      return failed_response("Scanned Pallet:#{pallet_number} has been shipped") if pallet[:shipped]
-      return failed_response("Scanned Pallet:#{pallet_number} has been scrapped") if pallet[:scrapped]
+    def edit_pallet_validations(pallet_number)
+      check_pallet(:not_have_individual_cartons, pallet_number)
+      check_pallet(:not_scrapped, pallet_number)
+      check_pallet(:not_inspected, pallet_number)
+      check_pallet(:not_shipped, pallet_number)
 
       ok_response
     rescue Crossbeams::InfoError => e
@@ -503,6 +502,11 @@ module ProductionApp
 
     def find_pallet_mix_rules_by_scope(scope)
       repo.find_pallet_mix_rules_by_scope(scope)
+    end
+
+    def check_pallet(check, pallet_number)
+      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     private

@@ -64,7 +64,7 @@ module MesscadaApp
       failed_response(e.message)
     end
 
-    def get_pallet_sequence_id(params) # rubocop:disable Metrics/AbcSize
+    def scan_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
       params = parse_pallet_or_carton_number(params)
       if params[:carton_number]
         pallet_number = repo.get_pallet_by_carton_number(params[:carton_number])
@@ -73,10 +73,11 @@ module MesscadaApp
         pallet_number = params[:pallet_number]
       end
 
-      check_pallet(:not_scrapped, pallet_number)
       check_pallet(:exists, pallet_number)
-      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
-      success_response('Pallet found', pallet_sequence_id)
+
+      pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
+      instance = repo.find_pallet_flat(pallet_id)
+      success_response("Found Pallet #{pallet_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -430,6 +431,16 @@ module MesscadaApp
       reworks_repo.pallet_sequence_ids(pallet_id)
     end
 
+    def check_pallet(task, pallet_number)
+      res = TaskPermissionCheck::Pallets.call(task, pallet_number)
+      raise Crossbeams::InfoError, res.message unless res.success
+    end
+
+    def assert_permission!(task, pallet_number)
+      res = TaskPermissionCheck::Pallets.call(task, pallet_number)
+      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
     private
 
     def pallet_changes_on_verify(params)
@@ -448,11 +459,6 @@ module MesscadaApp
 
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)
       repo.update_pallet_sequence_verification_result(pallet_sequence_id, params)
-    end
-
-    def check_pallet(task, pallet_number)
-      res = TaskPermissionCheck::Pallets.call(task, pallet_number)
-      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def pallet_verified?(pallet_id)

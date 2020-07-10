@@ -37,9 +37,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.get_pallet_sequence_id(params[:pallet_inquiry])
+          res = interactor.scan_pallet_or_carton_number(params[:pallet_inquiry])
           if res.success
-            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance}")
+            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance.pallet_sequence_ids.first}")
           else
             store_locally(:error, res.message)
             r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
@@ -325,7 +325,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       messcada_interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'create_new_pallet' do
-        # interactor.assert_permission!(:create_new_pallet)
         r.get do
           notice = retrieve_from_local_store(:flash_notice)
           form_state = {}
@@ -526,7 +525,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'add_sequence_to_pallet' do
-        # interactor.assert_permission!(:add_sequence_to_pallet)
         r.get do
           form_state = {}
           if (current_state = retrieve_from_local_store(:current_form_state))
@@ -535,7 +533,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           error = retrieve_from_local_store(:errors)
           form_state.merge!(error_message: error, errors: { pallet_number: [''], carton_number: [''] }) unless error.nil?
           form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: :pallet,
+                                         form_name: :add_sequence_to_pallet,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: nil,
                                          caption: 'Add New Sequence To Pallet',
@@ -554,12 +552,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(params[:pallet][:pallet_number])
-          if !pallet.nil_or_empty?
-            # store_locally(:add_sequence_pallet_number, params[:pallet][:pallet_number])
-            r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{pallet[:id]}")
+          res = messcada_interactor.scan_pallet_or_carton_number(params[:add_sequence_to_pallet])
+          if res.success
+            pallet = res.instance
+            messcada_interactor.assert_permission!(:not_have_individual_cartons, pallet.pallet_number)
+            r.redirect("/rmd/production/palletizing/add_sequence_to_pallet_scan_carton/#{pallet.id}")
           else
-            store_locally(:errors, "Scanned Pallet:#{params[:pallet][:pallet_number]} doesn't exist")
+            store_locally(:errors, "Scanned Pallet:#{params[:add_sequence_to_pallet][:pallet_number]} doesn't exist")
             r.redirect('/rmd/production/palletizing/add_sequence_to_pallet')
           end
         end
@@ -760,13 +759,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'edit_pallet' do
-        # interactor.assert_permission!(:edit_pallet)
         r.get do
           form_state = {}
           error = retrieve_from_local_store(:errors)
           form_state.merge!(error_message: error.message, errors: error.errors) unless error.nil?
           form = Crossbeams::RMDForm.new(form_state,
-                                         form_name: :pallet,
+                                         form_name: :edit_pallet,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: nil,
                                          caption: 'Scan Pallet',
@@ -784,14 +782,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          res = interactor.edit_pallet_validations(params[:pallet][:pallet_number])
+          res = messcada_interactor.scan_pallet_or_carton_number(params[:edit_pallet])
           if res.success
-            pallet_sequences = messcada_interactor.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
-            r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{pallet_sequences.all.last[:id]}")
-          else
-            store_locally(:errors, res)
-            r.redirect('/rmd/production/palletizing/edit_pallet')
+            pallet = res.instance
+            res = interactor.edit_pallet_validations(pallet.pallet_number)
+            r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{pallet.pallet_sequence_ids.last}") if res.success
           end
+          store_locally(:errors, res)
+          r.redirect('/rmd/production/palletizing/edit_pallet')
         end
       end
     end
@@ -845,9 +843,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do
-        res = messcada_interactor.get_pallet_sequence_id(params[:reprint_pallet_label])
+        res = messcada_interactor.scan_pallet_or_carton_number(params[:reprint_pallet_label])
         if res.success
-          res = interactor.print_pallet_label_from_sequence(res.instance,
+          res = interactor.print_pallet_label_from_sequence(res.instance.pallet_sequence_ids.first,
                                                             pallet_label_name: params[:reprint_pallet_label][:pallet_label_name],
                                                             no_of_prints: params[:reprint_pallet_label][:qty_to_print],
                                                             printer: params[:reprint_pallet_label][:printer])

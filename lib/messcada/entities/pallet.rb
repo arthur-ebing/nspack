@@ -103,6 +103,7 @@ module MesscadaApp
     attribute :palletizing_bay_resource_id, Types::Integer
     attribute :has_individual_cartons, Types::Bool
     attribute :oldest_pallets_sequence_id, Types::Integer
+    attribute :pallet_sequence_ids, Types::IntArray
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end
