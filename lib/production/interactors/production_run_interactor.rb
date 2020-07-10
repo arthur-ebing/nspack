@@ -317,7 +317,7 @@ module ProductionApp
         log_status(:production_runs, id, 'RE-CONFiGURING')
         log_transaction
       end
-      success_response('Run can be re-configured')
+      success_response('Run can be re-configured', production_run_flat(id))
     end
 
     def prepare_to_complete_run(id)

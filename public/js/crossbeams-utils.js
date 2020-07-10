@@ -305,6 +305,9 @@ const crossbeamsUtils = {
           } else {
             crossbeamsUtils.showError(data.flash.error);
           }
+        } else if (data.actions) {
+          console.log('GOT ACTIONS WITH FLASH');
+          crossbeamsUtils.processActions(data.actions);
         } else {
           crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
         }
@@ -316,6 +319,8 @@ const crossbeamsUtils = {
             console.groupEnd(); // eslint-disable-line no-console
           }
         }
+      } else if (data.actions) {
+        crossbeamsUtils.processActions(data.actions);
       } else if (data.replaceDialog) {
         crossbeamsUtils.setDialogContent(data.replaceDialog.content);
       }
@@ -844,6 +849,9 @@ const crossbeamsUtils = {
       }
       if (action.removeGridRowInPlace) {
         crossbeamsUtils.deleteGridRow(action);
+      }
+      if (action.replace_dialog) {
+        crossbeamsUtils.setDialogContent(action.replace_dialog.content);
       }
     });
   },

@@ -221,8 +221,19 @@ class Nspack < Roda
         check_auth!('runs', 'execute')
         res = interactor.re_configure_run(id)
         if res.success
-          # This should be JSON actions - update grid row and replace_dialog by calling edit url...
-          r.redirect "/production/runs/production_runs/#{id}/edit"
+          row_keys = %i[
+            running
+            tipping
+            labeling
+            reconfiguring
+            setup_complete
+            active_run_stage
+            status
+          ]
+          acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance, row_keys))]
+          content = render_partial { Production::Runs::ProductionRun::Edit.call(id) }
+          acts << OpenStruct.new(type: :replace_dialog,  content: content)
+          json_actions(acts, res.message)
         else
           dialog_error(res.message, error: "Run cannot be re-configured - #{res.message}")
         end

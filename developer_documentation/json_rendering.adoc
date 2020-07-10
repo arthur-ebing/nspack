@@ -139,6 +139,14 @@ dom_id:: the value of the `id` attribute of the element in the page.
 
 value:: the value you want to change it to.
 
+==== Replace the contents of a dialog
+
+Works when loading a new popup dialog.
+
+type:: `:replace_dialog`.
+
+content:: the content for the dialog.
+
 ==== Replace the options in a multi element
 
 Works on `Multi.js` elements only.
