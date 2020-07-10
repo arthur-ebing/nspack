@@ -202,11 +202,8 @@ module MesscadaApp
     def get_pallet_by_carton_number(carton_number)
       return carton_number if AppConst::CARTON_EQUALS_PALLET
 
-      carton_id = get_id(:cartons, carton_label_id: carton_number)
-      values = select_values(:pallet_sequences, :pallet_number, scanned_from_carton_id: carton_id).uniq
-      raise Crossbeams::InfoError, "Carton: #{carton_number} is linked to multiple pallets." if values.length > 1
-
-      values.first
+      pallet_sequence_id = get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
+      get(:pallet_sequences, pallet_sequence_id, :pallet_number)
     end
 
     def production_run_stats(run_id)

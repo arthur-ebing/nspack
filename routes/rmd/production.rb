@@ -772,7 +772,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       printer_repo = LabelApp::PrinterRepo.new
 
       r.get do
-        form_state = { qty_to_print: 4,
+        form_state = { qty_to_print: 1,
                        error_message: retrieve_from_local_store(:error_message) }
 
         form = Crossbeams::RMDForm.new(form_state,

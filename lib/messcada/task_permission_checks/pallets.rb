@@ -14,6 +14,7 @@ module MesscadaApp
 
       CHECKS = {
         exists: :exists_check,
+        not_scrapped: :not_scrapped_check,
         not_shipped: :not_shipped_check,
         shipped: :shipped_check,
         in_stock: :in_stock_check,
@@ -47,6 +48,13 @@ module MesscadaApp
         pallets_exists = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers)
         errors = pallet_numbers - pallets_exists
         return failed_response "Pallet: #{errors.join(', ')} doesn't exist." unless errors.empty?
+
+        all_ok
+      end
+
+      def not_scrapped_check
+        errors = repo.select_values(:pallets, :pallet_number, pallet_number: pallet_numbers, scrapped: true)
+        return failed_response "Pallet: #{errors.join(', ')} has been scrapped." unless errors.empty?
 
         all_ok
       end

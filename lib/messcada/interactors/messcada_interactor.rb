@@ -42,6 +42,7 @@ module MesscadaApp
         pallet_number = params[:pallet_number]
       end
 
+      check_pallet(:not_scrapped, pallet_number)
       check_pallet(:not_inspected, pallet_number)
       pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
       success_response('Pallet found', pallet_sequence_id)
@@ -72,6 +73,7 @@ module MesscadaApp
         pallet_number = params[:pallet_number]
       end
 
+      check_pallet(:not_scrapped, pallet_number)
       check_pallet(:exists, pallet_number)
       pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
       success_response('Pallet found', pallet_sequence_id)
