@@ -28,7 +28,7 @@ module ProductionApp
       }.freeze
 
       def call
-        return failed_response 'Record not found' unless @entity || %i[create create_new_pallet add_sequence_to_pallet].include?(task)
+        return failed_response 'Record not found' unless @entity || %i[create create_new_pallet add_sequence_to_pallet edit_pallet].include?(task)
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

@@ -13,35 +13,36 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'scan_pallet' do
         r.get do
-          pallet = {}
-          error = retrieve_from_local_store(:scan_pallet_submit_error)
-          pallet = { error_message: error } unless error.nil?
-
-          form = Crossbeams::RMDForm.new(pallet,
-                                         form_name: :pallet,
+          form_state = { error_message: retrieve_from_local_store(:error) }
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet_inquiry,
                                          scan_with_camera: @rmd_scan_with_camera,
-                                         caption: 'Scan Pallet',
+                                         caption: 'Pallet Enquiry',
                                          action: '/rmd/production/pallet_inquiry/scan_pallet',
                                          button_caption: 'Submit')
-
-          form.add_field(:pallet_number,
-                         'Pallet Number',
+          attrs = if AppConst::USE_CARTON_PALLETIZING
+                    { name: :scanned_number, label: 'Pallet or Carton Number' }
+                  else
+                    { name: :pallet_number,  label: 'Pallet Number' }
+                  end
+          form.add_field(attrs[:name],
+                         attrs[:label],
+                         data_type: :number,
                          scan: 'key248_all',
                          scan_type: :pallet_number,
                          submit_form: true,
-                         data_type: :number,
                          required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
 
         r.post do
-          pallet_sequences = interactor.find_pallet_sequences_by_pallet_number(params[:pallet][:pallet_number])
-          if pallet_sequences.empty?
-            store_locally(:scan_pallet_submit_error, "Scanned Pallet:#{params[:pallet][:pallet_number]} doesn't exist")
-            r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
+          res = interactor.get_pallet_sequence_id(params[:pallet_inquiry])
+          if res.success
+            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance}")
           else
-            r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{pallet_sequences.first[:id]}")
+            store_locally(:error, res.message)
+            r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
           end
         end
       end
@@ -104,77 +105,86 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # PALLET/CARTON
       # --------------------------------------------------------------------------
       r.on 'scan_pallet_or_carton' do
+        r.redirect('/rmd/production/pallet_verification/combined_verification_scan_carton') if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
         r.get do
-          form_state = {}
-          notice = retrieve_from_local_store(:flash_notice)
+          form_state = { error_message: retrieve_from_local_store(:error_message) }
 
-          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
-            error = retrieve_from_local_store(:scan_carton_submit_error)
-            form_state = { error_message: error } unless error.nil?
-            form = Crossbeams::RMDForm.new(form_state,
-                                           form_name: :carton,
-                                           scan_with_camera: @rmd_scan_with_camera,
-                                           notes: notice,
-                                           caption: 'Scan Carton',
-                                           action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
-                                           button_caption: 'Submit')
-            form.add_field(:carton_number,
-                           'Carton Number',
-                           data_type: :number,
-                           scan: 'key248_all',
-                           scan_type: :carton_label_id,
-                           submit_form: true,
-                           required: true)
-          else
-            error = retrieve_from_local_store(:scan_pallet_submit_error)
-            form_state = { error_message: error, errors: { pallet_number: [''] } } unless error.nil?
-            form = Crossbeams::RMDForm.new(form_state,
-                                           form_name: :pallet,
-                                           scan_with_camera: @rmd_scan_with_camera,
-                                           notes: notice,
-                                           caption: 'Scan Pallet',
-                                           action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
-                                           button_caption: 'Submit')
-            form.add_field(:pallet_number,
-                           'Pallet Number',
-                           scan: 'key248_all',
-                           scan_type: :pallet_number,
-                           submit_form: true,
-                           data_type: :number,
-                           required: true)
-          end
-
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet_verification,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Pallet Verification',
+                                         action: '/rmd/production/pallet_verification/scan_pallet_or_carton',
+                                         button_caption: 'Submit')
+          attrs = if AppConst::USE_CARTON_PALLETIZING
+                    { name: :scanned_number, label: 'Pallet or Carton Number' }
+                  else
+                    { name: :pallet_number,  label: 'Pallet Number' }
+                  end
+          form.add_field(attrs[:name],
+                         attrs[:label],
+                         data_type: :number,
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: true,
+                         required: true)
           form.add_csrf_tag csrf_tag
           view(inline: form.render, layout: :layout_rmd)
         end
 
         r.post do
-          if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
-            pallet_number = params[:carton][:carton_number] if AppConst::CARTON_EQUALS_PALLET && interactor.pallet_exists?(params[:carton][:carton_number])
-
-            unless pallet_number
-              res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
-              pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
-              unless res.success
-                store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
-                r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
-              end
-            end
-          else
-            # pallet_number = params[:pallet][:pallet_number]
-            pallet_number = interactor.pallet_number_from_scan(params[:pallet][:pallet_number])
-          end
-
-          res = interactor.validate_pallet_to_be_verified(pallet_number)
+          res = interactor.pallet_to_be_verified(params[:pallet_verification])
           if res.success
-            r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
+            r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance}")
           else
-            if AppConst::COMBINE_CARTON_AND_PALLET_VERIFICATION
-              store_locally(:scan_carton_submit_error, unwrap_failed_response(res))
-            else
-              store_locally(:scan_pallet_submit_error, unwrap_failed_response(res))
-            end
+            store_locally(:error_message, res.message)
             r.redirect('/rmd/production/pallet_verification/scan_pallet_or_carton')
+          end
+        end
+      end
+
+      r.on 'combined_verification_scan_carton' do
+        r.get do
+          form_state = { error_message: retrieve_from_local_store(:error_message) }
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :combined_verification,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Pallet/Carton Verification',
+                                         action: '/rmd/production/pallet_verification/combined_verification_scan_carton',
+                                         button_caption: 'Submit')
+          form.add_field(:carton_number,
+                         'Carton Number',
+                         data_type: :number,
+                         scan: 'key248_all',
+                         scan_type: :carton_label_id,
+                         submit_form: true,
+                         required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          # # params[:carton][:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton][:carton_number]).carton_number
+          # pallet_number = params[:carton][:carton_number] if AppConst::CARTON_EQUALS_PALLET && interactor.pallet_exists?(params[:carton][:carton_number])
+          #
+          # unless pallet_number
+          #   res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
+          #   pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
+          #   unless res.success
+          #     store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
+          #     r.redirect('/rmd/production/pallet_verification/combined_verification_scan_carton')
+          #   end
+          # end
+
+          # res = interactor.validate_pallet_to_be_verified(pallet_number)
+          res = interactor.carton_to_be_verified(params[:combined_verification])
+          if res.success
+            # r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
+            r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance}")
+          else
+            store_locally(:error_message, res.message)
+            r.redirect('/rmd/production/pallet_verification/combined_verification_scan_carton')
           end
         end
       end
@@ -605,12 +615,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_select(:printer,
                         'Printer',
                         items: printer_repo.select_printers_for_application(AppConst::PRINT_APP_PALLET),
-                        required: false,
-                        value: printer_repo.default_printer_for_application(AppConst::PRINT_APP_PALLET))
+                        value: printer_repo.default_printer_for_application(AppConst::PRINT_APP_PALLET),
+                        required: false)
         form.add_select(:pallet_label_name,
                         'Pallet Label',
                         value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]),
-                        items: interactor.find_pallet_labels, required: false)
+                        items: interactor.find_pallet_labels,
+                        required: false)
         form.add_csrf_tag csrf_tag
         form.add_prev_next_nav('/rmd/production/palletizing/print_pallet_view/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
@@ -618,9 +629,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'edit_pallet_sequence_view', Integer do |id|
         pallet_sequence = messcada_interactor.find_pallet_sequence_attrs(id)
-
         ps_ids = messcada_interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
-
         printer_repo = LabelApp::PrinterRepo.new
 
         notice = retrieve_from_local_store(:flash_notice)
@@ -759,27 +768,34 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'reprint_pallet_label' do
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      messcada_interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       printer_repo = LabelApp::PrinterRepo.new
-      r.get do
-        pallet = {}
-        error = retrieve_from_local_store(:error)
-        pallet = { error_message: error[:error_message] } unless error.nil?
 
-        notice = retrieve_from_local_store(:flash_notice)
-        form = Crossbeams::RMDForm.new(pallet,
-                                       notes: notice,
-                                       form_name: :pallet,
+      r.get do
+        form_state = { qty_to_print: 4,
+                       error_message: retrieve_from_local_store(:error_message) }
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       notes: retrieve_from_local_store(:flash_notice),
+                                       form_name: :reprint_pallet_label,
                                        scan_with_camera: @rmd_scan_with_camera,
                                        caption: 'Reprint Pallet Label',
                                        action: '/rmd/production/reprint_pallet_label',
                                        button_caption: 'Submit')
-
-        form.add_field(:pallet_number,
-                       'Pallet Number',
+        attrs = if AppConst::USE_CARTON_PALLETIZING
+                  { name: :scanned_number,  label: 'Pallet or Carton Number' }
+                else
+                  { name: :pallet_number, label: 'Pallet Number' }
+                end
+        form.add_field(attrs[:name],
+                       attrs[:label],
+                       data_type: :number,
                        scan: 'key248_all',
                        scan_type: :pallet_number,
                        submit_form: true,
-                       data_type: :number, required: true)
+                       required: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
         form.add_field(:qty_to_print,
                        'Qty To Print',
                        required: false,
@@ -799,20 +815,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do
-        pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet][:pallet_number]).pallet_number
-        pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
-        if pallet.nil?
-          store_locally(:error, error_message: "Pallet #{pallet_number} not found")
+        res = messcada_interactor.get_pallet_sequence_id(params[:reprint_pallet_label])
+        if res.success
+          res = interactor.print_pallet_label_from_sequence(res.instance,
+                                                            pallet_label_name: params[:reprint_pallet_label][:pallet_label_name],
+                                                            no_of_prints: params[:reprint_pallet_label][:qty_to_print],
+                                                            printer: params[:reprint_pallet_label][:printer])
+        end
+        if res.success
+          store_locally(:flash_notice, 'Labels Printed Successfully')
         else
-          res = interactor.print_pallet_label(pallet[:id],
-                                              pallet_label_name: params[:pallet][:pallet_label_name],
-                                              no_of_prints: params[:pallet][:qty_to_print],
-                                              printer: params[:pallet][:printer])
-          if res.success
-            store_locally(:flash_notice, 'Labels Printed Successfully')
-          else
-            store_locally(:error, error_message: "Printing Error: #{unwrap_failed_response(res)}")
-          end
+          store_locally(:error_message, "Printing Error: #{unwrap_failed_response(res)}")
         end
         r.redirect('/rmd/production/reprint_pallet_label')
       end

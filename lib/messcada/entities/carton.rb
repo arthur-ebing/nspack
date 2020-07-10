@@ -53,9 +53,9 @@ module MesscadaApp
     attribute :scanned_carton_number, Types::String
 
     def carton_number
-      return nil if scanned_carton_number.nil_or_empty?
+      raise Crossbeams::InfoError, 'Carton not given' if scanned_carton_number.nil_or_empty?
 
-      raise Crossbeams::InfoError, "Carton #{scanned_carton_number} is not a recognised carton number length." unless scanned_carton_number.length < 8
+      raise Crossbeams::InfoError, "#{scanned_carton_number} is not a recognised carton number length." unless scanned_carton_number.length < 8
 
       scanned_carton_number
     end

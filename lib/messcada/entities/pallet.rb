@@ -71,7 +71,7 @@ module MesscadaApp
       when 20, 21, 23
         scanned_pallet_number[-18, 18]
       else
-        raise Crossbeams::InfoError, "Pallet #{scanned_pallet_number} is not a recognised pallet number length."
+        raise Crossbeams::InfoError, "Scan #{scanned_pallet_number} is not a recognised pallet number length."
       end
     end
   end

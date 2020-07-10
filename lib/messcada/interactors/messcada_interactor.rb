@@ -9,13 +9,74 @@ module MesscadaApp
       ScannedPalletNumber.new(scanned_pallet_number: scanned_pallet_number).pallet_number
     end
 
-    def validate_pallet_to_be_verified(scanned_pallet_number)
-      pallet_number = pallet_number_from_scan(scanned_pallet_number)
-      pallet_sequences = find_pallet_sequences_by_pallet_number(pallet_number)
-      return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") if pallet_sequences.empty?
-      return failed_response("Scanned Pallet:#{pallet_number} has already been inspected") if pallet_sequences.first[:inspected]
+    # def validate_pallet_to_be_verified(scanned_pallet_number)
+    #   pallet_number = pallet_number_from_scan(scanned_pallet_number)
+    #   pallet_sequences = find_pallet_sequences_by_pallet_number(pallet_number)
+    #   return failed_response("Scanned Pallet:#{pallet_number} doesn't exist") if pallet_sequences.empty?
+    #   return failed_response("Scanned Pallet:#{pallet_number} has already been inspected") if pallet_sequences.first[:inspected]
+    #
+    #   success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
+    # end
 
-      success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
+    def parse_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
+      if params[:pallet_number]
+        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
+        return params
+      end
+      raise Crossbeams::InfoError, 'scanned number not given' if params[:scanned_number].nil_or_empty?
+
+      if params[:scanned_number].length > 8
+        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:scanned_number]).pallet_number
+      else
+        params[:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:scanned_number]).carton_number
+      end
+      params
+    end
+
+    def pallet_to_be_verified(params) # rubocop:disable Metrics/AbcSize
+      params = parse_pallet_or_carton_number(params)
+      if params[:carton_number]
+        pallet_number = repo.get_pallet_by_carton_number(params[:carton_number])
+        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet_number.nil?
+      else
+        pallet_number = params[:pallet_number]
+      end
+
+      check_pallet(:not_inspected, pallet_number)
+      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
+      success_response('Pallet found', pallet_sequence_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def carton_to_be_verified(params) # rubocop:disable Metrics/AbcSize
+      scanned_carton_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton_number]).carton_number
+      return success_response('Carton found', scanned_carton_number) if AppConst::CARTON_EQUALS_PALLET && pallet_exists?(scanned_carton_number)
+
+      res = carton_verification(carton_number: scanned_carton_number)
+      return failed_response(res.message) unless res.success
+
+      pallet_number = repo.get_pallet_by_carton_number(scanned_carton_number)
+      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
+      success_response('Verified Carton', pallet_sequence_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def get_pallet_sequence_id(params) # rubocop:disable Metrics/AbcSize
+      params = parse_pallet_or_carton_number(params)
+      if params[:carton_number]
+        pallet_number = repo.get_pallet_by_carton_number(params[:carton_number])
+        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet_number.nil?
+      else
+        pallet_number = params[:pallet_number]
+      end
+
+      check_pallet(:exists, pallet_number)
+      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
+      success_response('Pallet found', pallet_sequence_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def get_deck_pallets(location, location_scan_field) # rubocop:disable Metrics/AbcSize
@@ -302,9 +363,9 @@ module MesscadaApp
       repo.get(:pallet_sequences, id, :pallet_id)
     end
 
-    def get_pallet_by_carton_label_id(carton_label_id)
-      repo.get_pallet_by_carton_label_id(carton_label_id)
-    end
+    # def get_pallet_by_carton_label_id(carton_label_id)
+    #   repo.get_pallet_by_carton_label_id(carton_label_id)
+    # end
 
     def pallet_exists?(pallet_number)
       repo.pallet_exists?(pallet_number)
@@ -322,7 +383,7 @@ module MesscadaApp
       fpw_res = nil
       repo.transaction do
         fpw_res = MesscadaApp::FgPalletWeighing.call(res)
-        log_status('pallets', fpw_res.instance[:pallet_id], AppConst::PALLET_WEIGHED)
+        log_status(:pallets, fpw_res.instance[:pallet_id], AppConst::PALLET_WEIGHED)
         log_transaction
       end
       fpw_res
@@ -343,10 +404,10 @@ module MesscadaApp
       res = nil
       repo.transaction do
         res = FinishedGoodsApp::RepackPallet.call(pallet_id, @user.user_name)
-        repo.log_status('pallets', pallet_id, AppConst::REWORKS_REPACK_PALLET_STATUS)
-        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(pallet_id), AppConst::REWORKS_REPACK_PALLET_STATUS)
-        repo.log_status('pallets', res.instance[:new_pallet_id], AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
-        repo.log_multiple_statuses('pallet_sequences', reworks_repo.pallet_sequence_ids(res.instance[:new_pallet_id]), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        log_status(:pallets, pallet_id, AppConst::REWORKS_REPACK_PALLET_STATUS)
+        log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(pallet_id), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        log_status(:pallets, res.instance[:new_pallet_id], AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
+        log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(res.instance[:new_pallet_id]), AppConst::REWORKS_REPACK_PALLET_STATUS)
       end
       res
     rescue Crossbeams::InfoError => e
@@ -380,6 +441,11 @@ module MesscadaApp
 
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)
       repo.update_pallet_sequence_verification_result(pallet_sequence_id, params)
+    end
+
+    def check_pallet(task, pallet_number)
+      res = TaskPermissionCheck::Pallets.call(task, pallet_number)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def pallet_verified?(pallet_id)

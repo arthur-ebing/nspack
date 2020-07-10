@@ -189,14 +189,24 @@ module MesscadaApp
       #   WHERE r.id = ?", run_id].first
     end
 
-    def get_pallet_by_carton_label_id(carton_label_id)
-      pallet = DB["select p.pallet_number
-          from pallets p
-          join pallet_sequences ps on p.id = ps.pallet_id
-          join cartons c on c.id = ps.scanned_from_carton_id
-          join carton_labels cl on cl.id = c.carton_label_id
-          where cl.id = ?", carton_label_id].first
-      return pallet[:pallet_number] unless pallet.nil?
+    # def get_pallet_by_carton_label_id(carton_label_id)
+    #   pallet = DB["select p.pallet_number
+    #       from pallets p
+    #       join pallet_sequences ps on p.id = ps.pallet_id
+    #       join cartons c on c.id = ps.scanned_from_carton_id
+    #       join carton_labels cl on cl.id = c.carton_label_id
+    #       where cl.id = ?", carton_label_id].first
+    #   return pallet[:pallet_number] unless pallet.nil?
+    # end
+
+    def get_pallet_by_carton_number(carton_number)
+      return carton_number if AppConst::CARTON_EQUALS_PALLET
+
+      carton_id = get_id(:cartons, carton_label_id: carton_number)
+      values = select_values(:pallet_sequences, :pallet_number, scanned_from_carton_id: carton_id).uniq
+      raise Crossbeams::InfoError, "Carton: #{carton_number} is linked to multiple pallets." if values.length > 1
+
+      values.first
     end
 
     def production_run_stats(run_id)
