@@ -11,6 +11,7 @@ module UiRules
       @rules[:provide_pack_type] = AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       @rules[:carton_equals_pallet] = AppConst::CARTON_EQUALS_PALLET
       @rules[:show_shipping_details] = @form_object[:shipped]
+      @rules[:has_individual_cartons] = @form_object[:has_individual_cartons]
 
       set_pallet_gross_weight_fields if @mode == :set_pallet_gross_weight
       set_edit_pallet_details_fields if @mode == :edit_pallet_details

@@ -117,6 +117,7 @@ module MesscadaApp
           WHERE cartons.id = #{carton_id}
           --AND pallets.palletized
           --AND cartons.scrapped
+          AND pallets.has_individual_cartons
           AND (NOT pallets.shipped AND NOT pallets.scrapped)
         )
       SQL
@@ -195,6 +196,18 @@ module MesscadaApp
           JOIN pallet_sequences ON pallets.id = pallet_sequences.pallet_id
           JOIN cartons ON cartons.pallet_sequence_id = pallet_sequences.id
           WHERE cartons.id = #{carton_id}
+        )
+      SQL
+      DB[query].single_value
+    end
+
+    def autopack_pallet_bay(palletizing_bay_resource_id)
+      query = <<~SQL
+        SELECT EXISTS(
+          SELECT plant_resources.id FROM plant_resources
+          JOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id
+          WHERE plant_resources.id = #{palletizing_bay_resource_id}
+          AND plant_resource_types.plant_resource_type_code = '#{Crossbeams::Config::ResourceDefinitions::AUTOPACK_PALLET_BAY}'
         )
       SQL
       DB[query].single_value

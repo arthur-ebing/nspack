@@ -42,10 +42,12 @@ module Production
                                   url: "/production/reworks/pallets/#{pallet_number}/set_gross_weight",
                                   behaviour: :popup,
                                   style: :button)
-                  col.add_control(control_type: :link,
-                                  text: 'Edit Carton quantities',
-                                  url: "/production/reworks/pallets/#{pallet_number}/edit_carton_quantities",
-                                  style: :button)
+                  unless rules[:has_individual_cartons]
+                    col.add_control(control_type: :link,
+                                    text: 'Edit Carton quantities',
+                                    url: "/production/reworks/pallets/#{pallet_number}/edit_carton_quantities",
+                                    style: :button)
+                  end
                 end
               end
             end

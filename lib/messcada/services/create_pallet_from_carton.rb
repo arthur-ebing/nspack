@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CreatePalletFromCarton < BaseService
-    attr_reader :repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet_id, :pallet_sequence_id,
+    attr_reader :repo, :palletizing_repo, :carton_id, :carton_quantity, :carton, :cartons_per_pallet, :pallet_id, :pallet_sequence_id,
                 :user_name, :palletizing_bay_resource_id, :carton_palletizing
 
     def initialize(user, carton_id, carton_quantity, palletizing_bay_resource_id = nil, carton_palletizing = false)
@@ -15,6 +15,7 @@ module MesscadaApp
 
     def call
       @repo = MesscadaApp::MesscadaRepo.new
+      @palletizing_repo = MesscadaApp::PalletizingRepo.new
       @carton = find_carton
 
       res = create_pallet_and_sequences
@@ -78,6 +79,7 @@ module MesscadaApp
         palletizing_bay_resource_id: palletizing_bay_resource_id
       }
       params[:pallet_number] = carton[:pallet_number] if AppConst::CARTON_EQUALS_PALLET
+      params[:has_individual_cartons] = individual_cartons?
       params
     end
 
@@ -95,6 +97,20 @@ module MesscadaApp
 
       @pallet_sequence_id = res.instance[:pallet_sequence_id]
       ok_response
+    end
+
+    def individual_cartons?
+      return false unless carton_palletizing
+
+      return false if autopack_pallet_bay?
+
+      true
+    end
+
+    def autopack_pallet_bay?
+      return false if palletizing_bay_resource_id.nil_or_empty?
+
+      palletizing_repo.autopack_pallet_bay(palletizing_bay_resource_id)
     end
   end
 end
