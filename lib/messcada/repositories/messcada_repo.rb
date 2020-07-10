@@ -7,6 +7,41 @@ module MesscadaApp
     crud_calls_for :pallets, name: :pallet, wrapper: Pallet
     crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
 
+    def find_pallet_flat(id) # rubocop:disable Metrics/AbcSize
+      hash = find_with_association(:pallets, id,
+                                   lookup_functions: [{ function: :fn_current_status, args: ['pallets', :id],  col_name: :status },
+                                                      { function: :fn_party_role_name, args: [:target_customer_party_role_id], col_name: :target_customer }])
+      return nil if hash.nil?
+
+      hash[:last_govt_inspection_sheet_id] = get(:govt_inspection_pallets, hash[:last_govt_inspection_pallet_id], :govt_inspection_sheet_id)
+      hash[:oldest_pallets_sequence_id] = DB[:pallet_sequences].where(pallet_id: id).order(:created_at).select_map(:id).first
+      hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
+      hash[:gross_weight] = hash[:gross_weight].to_f.round(2)
+
+      PalletFlat.new(hash)
+    end
+
+    def find_pallet_sequence_flat(id) # rubocop:disable Metrics/AbcSize
+      hash = find_with_association(:pallet_sequences, id,
+                                   parent_tables: [{ parent_table: :farms, columns: %i[farm_code pdn_region_id], foreign_key: :farm_id, flatten_columns: { farm_code: :farm_code, pdn_region_id: :production_region_id } },
+                                                   { parent_table: :production_regions, columns: %i[production_region_code], foreign_key: :production_region_id, flatten_columns: { production_region_code: :production_region_code } },
+                                                   { parent_table: :pucs, columns: %i[puc_code], foreign_key: :puc_id, flatten_columns: { puc_code: :puc_code } },
+                                                   { parent_table: :orchards, columns: %i[orchard_code], foreign_key: :orchard_id, flatten_columns: { orchard_code: :orchard_code } },
+                                                   { parent_table: :cultivars, columns: %i[cultivar_code cultivar_name commodity_id], foreign_key: :cultivar_id, flatten_columns: { cultivar_code: :cultivar_code, cultivar_name: :cultivar_name, commodity_id: :commodity_id } },
+                                                   { parent_table: :cultivar_groups, columns: %i[cultivar_group_code], foreign_key: :cultivar_group_id, flatten_columns: { cultivar_group_code: :cultivar_group_code } },
+                                                   { parent_table: :commodities, columns: %i[code description], foreign_key: :commodity_id, flatten_columns: { code: :commodity_code, description: :commodity_description } },
+                                                   { parent_table: :standard_pack_codes, columns: %i[standard_pack_code], foreign_key: :standard_pack_code_id, flatten_columns: { standard_pack_code: :standard_pack_code } },
+                                                   { parent_table: :marketing_varieties, columns: %i[marketing_variety_code], foreign_key: :marketing_variety_id, flatten_columns: { marketing_variety_code: :marketing_variety_code } },
+                                                   { parent_table: :grades, columns: %i[grade_code], foreign_key: :grade_id, flatten_columns: { grade_code: :grade_code } }],
+                                   lookup_functions: [{ function: :fn_current_status, args: ['pallet_sequences', :id],  col_name: :status }])
+      return nil if hash.nil?
+
+      hash[:pallet_carton_quantity] = get(:pallets, hash[:pallet_id], :carton_quantity) || 0
+      hash[:pallet_percentage] = hash[:pallet_carton_quantity].zero? ? 0 : (hash[:carton_quantity] / hash[:pallet_carton_quantity].to_f).round(3)
+      hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
+      PalletSequenceFlat.new(hash)
+    end
+
     def find_stock_item(stock_item_id, stock_type)
       return find_pallet(stock_item_id) if stock_type == AppConst::PALLET_STOCK_TYPE
 
