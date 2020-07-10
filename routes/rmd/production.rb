@@ -13,7 +13,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'scan_pallet' do
         r.get do
-          form_state = { error_message: retrieve_from_local_store(:error) }
+          form_state = { error_message: retrieve_from_local_store(:error_message) }
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :pallet_inquiry,
                                          scan_with_camera: @rmd_scan_with_camera,
@@ -41,7 +41,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance.pallet_sequence_ids.first}")
           else
-            store_locally(:error, res.message)
+            store_locally(:error_message, res.message)
             r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
           end
         end
@@ -197,7 +197,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         ps_ids = interactor.find_pallet_sequences_from_same_pallet(id) # => [1,2,3,4]
 
         form_state = { gross_weight: pallet_sequence[:gross_weight]&.to_f,
-                       print_pallet_label: AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION,
                        qty_to_print: 4 }
 
         notice = retrieve_from_local_store(:flash_notice)
@@ -218,8 +217,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.behaviours do |behaviour|
           behaviour.dropdown_change :verification_result,
                                     notify: [{ url: '/rmd/production/pallet_verification/verify_pallet_sequence/verification_result_changed' }]
-          behaviour.input_change :print_pallet_label,
-                                 notify: [{ url: '/rmd/production/pallet_verification/verify_pallet_sequence/print_pallet_label_changed' }]
         end
 
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
@@ -261,25 +258,22 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                        'Nett Weight',
                        pallet_sequence[:nett_weight]&.to_f)
         if AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
-          form.add_toggle(:print_pallet_label,
-                          'Print pallet label')
+          # form.add_button('Print Label',
+          #                 "/rmd/production/reprint_pallet_label/#{id}")
           form.add_field(:qty_to_print,
                          'Qty To Print',
                          data_type: :number,
                          required: false,
-                         prompt: true,
-                         hide_on_load: !form_state[:print_pallet_label])
+                         prompt: true)
           form.add_select(:printer,
                           'Printer',
                           items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET),
                           value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET),
-                          required: false,
-                          hide_on_load: !form_state[:print_pallet_label])
+                          required: false)
           form.add_select(:pallet_label_name,
                           'Pallet Label',
                           items: ProductionApp::ProductionRunRepo.new.find_pallet_labels,
-                          required: false,
-                          hide_on_load: !form_state[:print_pallet_label])
+                          required: false)
         end
         form.add_prev_next_nav('/rmd/production/pallet_verification/verify_pallet_sequence/$:id$', ps_ids, id)
         form.add_csrf_tag csrf_tag
@@ -287,13 +281,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'verify_pallet_sequence' do
-        r.on 'print_pallet_label_changed' do
-          UiRules::ChangeRenderer.render_json(:rmd_production,
-                                              self,
-                                              :change_print_pallet_label,
-                                              print_pallet_label: params[:changed_value] == 't')
-        end
-
         r.on 'verification_result_changed' do
           actions = [OpenStruct.new(type: params[:changed_value] == 'failed' ? :show_element : :hide_element, dom_id: 'verify_pallet_sequence_verification_failure_reason_row'),
                      OpenStruct.new(type: params[:changed_value] != 'unknown' ? :show_element : :hide_element, dom_id: 'SaveSeq')]
@@ -797,6 +784,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     # REPRINT PALLET LABEL
     # --------------------------------------------------------------------------
+    r.on 'reprint_pallet_label', Integer do |pallet_sequence_id|
+      pallet_number = BaseRepo.new.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      form_state = { pallet_number: pallet_number,
+                     scanned_number: pallet_number,
+                     qty_to_print: 4,
+                     back_url: request.referer }
+      store_locally(:reprint_pallet_label_form_state, form_state)
+      r.redirect('/rmd/production/reprint_pallet_label')
+    end
+
     r.on 'reprint_pallet_label' do
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       messcada_interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -804,12 +801,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.get do
         form_state = { qty_to_print: 1,
                        error_message: retrieve_from_local_store(:error_message) }
-
+        form_state.merge!(retrieve_from_local_store(:reprint_pallet_label_form_state).to_h)
         form = Crossbeams::RMDForm.new(form_state,
                                        notes: retrieve_from_local_store(:flash_notice),
                                        form_name: :reprint_pallet_label,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Reprint Pallet Label',
+                                       caption: 'Print pallet label',
                                        action: '/rmd/production/reprint_pallet_label',
                                        button_caption: 'Submit')
         attrs = if AppConst::USE_CARTON_PALLETIZING
@@ -838,6 +835,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                         'Pallet Label',
                         items: interactor.find_pallet_labels,
                         required: false)
+        form.add_button('Back', form_state[:back_url]) if form_state[:back_url]
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -855,6 +853,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           store_locally(:error_message, "Printing Error: #{unwrap_failed_response(res)}")
         end
+        store_locally(:reprint_pallet_label_form_state, params[:reprint_pallet_label])
         r.redirect('/rmd/production/reprint_pallet_label')
       end
     end
