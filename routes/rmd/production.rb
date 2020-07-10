@@ -288,7 +288,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       messcada_interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'create_new_pallet' do
-        interactor.assert_permission!(:create_new_pallet)
+        # interactor.assert_permission!(:create_new_pallet)
         r.get do
           notice = retrieve_from_local_store(:flash_notice)
           form_state = {}
@@ -489,7 +489,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'add_sequence_to_pallet' do
-        interactor.assert_permission!(:add_sequence_to_pallet)
+        # interactor.assert_permission!(:add_sequence_to_pallet)
         r.get do
           form_state = {}
           if (current_state = retrieve_from_local_store(:current_form_state))
@@ -727,7 +727,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'edit_pallet' do
-        interactor.assert_permission!(:edit_pallet)
+        # interactor.assert_permission!(:edit_pallet)
         r.get do
           form_state = {}
           error = retrieve_from_local_store(:errors)
