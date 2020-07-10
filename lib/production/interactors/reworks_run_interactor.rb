@@ -1257,6 +1257,9 @@ module ProductionApp
       repacked_pallets = repo.repacked_pallets?(pallet_numbers)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{repacked_pallets.join(', ')} have been repacked."] }, pallets_selected: pallet_numbers) unless repacked_pallets.nil_or_empty?
 
+      shipped_pallets = repo.shipped_pallets?(pallet_numbers)
+      return OpenStruct.new(success: false, messages: { pallets_selected: ["#{shipped_pallets.join(', ')} have been shipped."] }, pallets_selected: pallet_numbers) unless shipped_pallets.nil_or_empty?
+
       scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
 
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type
