@@ -354,8 +354,10 @@ module MesscadaApp
         log_transaction
       end
 
-      print_instance = repo.where_hash(:vw_pallet_label, id: pallet_sequence_id)
-      LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], print_instance, params)
+      if AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION
+        print_instance = repo.where_hash(:vw_pallet_label, id: pallet_sequence_id)
+        LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], print_instance, params)
+      end
 
       verification_completed = pallet_verified?(pallet_id)
       success_response('Pallet Sequence updated successfully', verification_completed: verification_completed)
