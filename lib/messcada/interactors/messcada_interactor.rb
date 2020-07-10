@@ -152,8 +152,6 @@ module MesscadaApp
         Crossbeams::RobotResponder.new(succ).render
       end
     rescue StandardError => e
-      puts 'Multi_bin_weighing error'
-      puts e.message
       e.message
     end
 
