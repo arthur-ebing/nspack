@@ -485,6 +485,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.get do
             check = interactor.check(:load_truck, load_id)
             unless check.success
+              interactor.stepper(:load_truck).clear
               store_locally(:flash_notice, rmd_error_message(check.message))
               r.redirect('/rmd/finished_goods/dispatch/load_truck/load')
             end
