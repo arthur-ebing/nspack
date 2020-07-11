@@ -355,7 +355,7 @@ module MesscadaApp
         log_transaction
       end
 
-      if AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION
+      if AppConst::PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION && params[:print_pallet_label] == 't'
         print_instance = repo.where_hash(:vw_pallet_label, id: pallet_sequence_id)
         LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], print_instance, params)
       end

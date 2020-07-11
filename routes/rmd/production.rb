@@ -13,7 +13,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       r.on 'scan_pallet' do
         r.get do
-          form_state = { error_message: retrieve_from_local_store(:error) }
+          form_state = { error_message: retrieve_from_local_store(:error_message) }
           form = Crossbeams::RMDForm.new(form_state,
                                          form_name: :pallet_inquiry,
                                          scan_with_camera: @rmd_scan_with_camera,
@@ -41,7 +41,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             r.redirect("/rmd/production/pallet_inquiry/scan_pallet_sequence/#{res.instance.pallet_sequence_ids.first}")
           else
-            store_locally(:error, res.message)
+            store_locally(:error_message, res.message)
             r.redirect('/rmd/production/pallet_inquiry/scan_pallet')
           end
         end
@@ -797,6 +797,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     # REPRINT PALLET LABEL
     # --------------------------------------------------------------------------
+    r.on 'reprint_pallet_label', Integer do |pallet_sequence_id|
+      pallet_number = BaseRepo.new.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      form_state = { pallet_number: pallet_number,
+                     scanned_number: pallet_number,
+                     qty_to_print: 4,
+                     back_url: request.referer }
+      store_locally(:reprint_pallet_label_form_state, form_state)
+      r.redirect('/rmd/production/reprint_pallet_label')
+    end
+
     r.on 'reprint_pallet_label' do
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       messcada_interactor = MesscadaApp::MesscadaInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -804,12 +814,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.get do
         form_state = { qty_to_print: 1,
                        error_message: retrieve_from_local_store(:error_message) }
-
+        form_state.merge!(retrieve_from_local_store(:reprint_pallet_label_form_state).to_h)
         form = Crossbeams::RMDForm.new(form_state,
                                        notes: retrieve_from_local_store(:flash_notice),
                                        form_name: :reprint_pallet_label,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Reprint Pallet Label',
+                                       caption: 'Print pallet label',
                                        action: '/rmd/production/reprint_pallet_label',
                                        button_caption: 'Submit')
         attrs = if AppConst::USE_CARTON_PALLETIZING
@@ -838,6 +848,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                         'Pallet Label',
                         items: interactor.find_pallet_labels,
                         required: false)
+        form.add_button('Back', form_state[:back_url]) if form_state[:back_url]
         form.add_csrf_tag csrf_tag
         view(inline: form.render, layout: :layout_rmd)
       end
@@ -855,6 +866,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           store_locally(:error_message, "Printing Error: #{unwrap_failed_response(res)}")
         end
+        store_locally(:reprint_pallet_label_form_state, params[:reprint_pallet_label])
         r.redirect('/rmd/production/reprint_pallet_label')
       end
     end
