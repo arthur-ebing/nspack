@@ -163,7 +163,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
       hs = { key: key, env_val: (ENV[key.to_s] || '').gsub(',', ', ') } # rubocop:disable Lint/Env
       description = one_hash[key]
       hs[:key] = %(<span class="fw5 near-black">#{key}</span><br><span class="f6">#{description}</span>)
-      hs[:const_val] = AppConst.const_defined?(key) ? (AppConst.const_get(key) || '').to_s.gsub(',', ', ') : nil
+      hs[:const_val] = AppConst.const_defined?(key) ? AppConst.const_get(key).to_s.gsub(',', ', ') : nil
       ar << hs
     end
     ar
