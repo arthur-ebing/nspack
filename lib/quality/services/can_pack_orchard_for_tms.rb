@@ -23,14 +23,20 @@ module QualityApp
     def call
       return success_response('CanPackOrchardForTms Check bypassed') if AppConst::BYPASS_QUALITY_TEST_PRE_RUN_CHECK
 
-      create_applicable_tests
+      if phyt_clean_available?
+        create_applicable_tests
 
-      update_applicable_tests
-
+        update_applicable_tests
+      end
       test_results
     end
 
     private
+
+    def phyt_clean_available?
+      http = Crossbeams::HTTPCalls.new(AppConst::PHYT_CLEAN_ENVIRONMENT.include?('https'), read_timeout: 30)
+      http.can_ping?(AppConst::PHYT_CLEAN_ENVIRONMENT)
+    end
 
     def test_results
       failed_test_types = repo.failed_otmc_tests(orchard_id: orchard_id, cultivar_id: cultivar_id, tm_group_id: tm_group_id)
