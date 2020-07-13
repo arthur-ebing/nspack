@@ -97,7 +97,8 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
                             seq: 22,
                             url: '/another/path/here',
                             group: 'Together',
-                            rename: 'Commodity Groups'
+                            rename: 'Commodity Groups',
+                            hide_if_const_true: 'PALLET_IS_IN_STOCK_WHEN_VERIFIED,PRINT_PALLET_LABEL_AT_PALLET_VERIFICATION'
   end
 
   down do
@@ -107,7 +108,8 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
                             seq: 1,
                             url: '/list/commodities',
                             group: nil,
-                            rename: 'Commodities'
+                            rename: 'Commodities',
+                            hide_if_const_true: nil
     change_functional_area 'Lookups', rename: 'Masterfiles'
     change_program 'Product Definitions',
                    functional_area: 'Masterfiles',
@@ -223,7 +225,7 @@ change_program(key, options = {})
 
 [source,ruby]
 ----
-add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false)
+add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, restricted: false, show_in_iframe: false, hide_if_const_true: nil, hide_if_const_false: nil)
 ----
 
 * `key` - the program function name (String, capitalised)
@@ -234,6 +236,8 @@ add_program_function(key, functional_area:, program:, seq: 1, group: nil, url:, 
 * `:url` - the URL to callfrom this menu item
 * `:restricted` - if true, specific users need to be linked to the item to see it
 * `:show_in_iframe` - if true, render the URL inside an iframe
+* `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden
+* `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden
 
 === drop_program_function
 
@@ -265,6 +269,8 @@ change_program_function(key, options = {})
 ** `:restricted` - if true, specific users need to be linked to the item to see it
 ** `:show_in_iframe` - if true, render the URL inside an iframe
 ** `:rename` (string) the new name for the program function
+** `:hide_if_const_true` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to true, the menu will be hidden. Set to nil to clear
+** `:hide_if_const_false` - (String of comma-separated AppConst constants) If any of the AppConsts evaluate to false, the menu will be hidden. Set to nil to clear
 
 === move_program_function
 
