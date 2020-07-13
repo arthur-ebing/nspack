@@ -61,7 +61,6 @@ namespace :jobs do
     part2 = "cd #{__dir__} && screen -dmS #{session_name} bash -c 'source /usr/local/share/chruby/chruby.sh && chruby #{ruby_ver} && RACK_ENV=production bundle exec que -q #{queue} ./app_loader.rb >> #{log_name} 2>&1'"
     # `#{part1} ; #{part2}`
     # `{ #{part1} ; #{part2} }`
-    puts part2
     `#{part1}`
     `#{part2}`
   end

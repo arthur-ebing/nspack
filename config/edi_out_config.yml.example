@@ -6,3 +6,4 @@
 :out_dirs:
   :paltrack: "$ROOT/edi_out/paltrack"
   :head_office: "$ROOT/edi_out/head_office"
+:mail_recipients: {}
