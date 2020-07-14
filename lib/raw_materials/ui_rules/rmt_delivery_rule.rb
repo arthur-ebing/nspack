@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class RmtDeliveryRule < Base
+  class RmtDeliveryRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object
@@ -15,6 +15,7 @@ module UiRules
       @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
       @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
       @rules[:auto_allocate_asset_number] = AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION
+      @rules[:scan_bulk_rmt_bin_asset_numbers] = AppConst::BULK_BIN_ASSET_NUMBER_ENTRY && !@form_object.auto_allocate_asset_number
       @rules[:is_auto_allocate_asset_number_delivery] = @form_object.auto_allocate_asset_number
       @rules[:print_bin_barcodes] = (%i[show edit].include? @mode)
 

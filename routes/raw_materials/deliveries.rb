@@ -194,6 +194,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                 rebin_created_at
                 scrapped
                 scrapped_at
+                status
+                asset_number
               ]
               actions = []
               res.instance.each do |instance|
@@ -205,6 +207,72 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                 RawMaterials::Deliveries::RmtBin::NewBinGroup.call(id, form_values: params[:rmt_bin],
                                                                        form_errors: res.errors,
                                                                        remote: fetch?(r))
+              end
+            end
+          end
+        end
+
+        r.on 'create_scanned_bin_groups' do # rubocop:disable Metrics/BlockLength
+          r.get do
+            check_auth!('deliveries', 'new')
+            show_partial_or_page(r) { RawMaterials::Deliveries::RmtBin::ScanBinGroup.call(id, remote: fetch?(r)) }
+          end
+
+          r.post do # rubocop:disable Metrics/BlockLength
+            res = interactor.create_scanned_bin_groups(id, params[:rmt_bin])
+            if res.success
+              row_keys = %i[
+                id
+                rmt_delivery_id
+                orchard_code
+                farm_code
+                puc_code
+                cultivar_name
+                season_code
+                season_id
+                cultivar_id
+                orchard_id
+                farm_id
+                rmt_class_id
+                rmt_material_owner_party_role_id
+                container_type_code
+                container_material_type_code
+                cultivar_group_id
+                location_long_code
+                puc_id
+                exit_ref
+                qty_bins
+                bin_asset_number
+                tipped_asset_number
+                rmt_inner_container_type_id
+                rmt_inner_container_material_id
+                qty_inner_bins
+                production_run_rebin_id
+                production_run_tipped_id
+                bin_tipping_plant_resource_id
+                bin_fullness
+                nett_weight
+                gross_weight
+                bin_tipped
+                bin_received_date_time
+                bin_tipped_date_time
+                exit_ref_date_time
+                rebin_created_at
+                scrapped
+                scrapped_at
+                status
+                asset_number
+              ]
+              actions = []
+              res.instance.each do |instance|
+                actions << OpenStruct.new(type: :add_grid_row, attrs: select_attributes(instance, row_keys))
+              end
+              json_actions(actions, res.message)
+            else
+              re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups") do
+                RawMaterials::Deliveries::RmtBin::ScanBinGroup.call(id, form_values: params[:rmt_bin],
+                                                                        form_errors: res.errors,
+                                                                        remote: fetch?(r))
               end
             end
           end

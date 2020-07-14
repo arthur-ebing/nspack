@@ -74,18 +74,24 @@ module RawMaterialsApp
     end
 
     def find_rmt_bin_flat(id)
-      find_with_association(:rmt_bins,
-                            id,
-                            parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } },
-                                            { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
-                                            { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
-                                            { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
-                                            { parent_table: :locations, columns: [:location_long_code], flatten_columns: { location_long_code: :location_long_code } },
-                                            { parent_table: :rmt_container_types, columns: [:container_type_code], flatten_columns: { container_type_code: :container_type_code } },
-                                            { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
-                                            # { parent_table: :party_roles, columns: [:container_material_owner_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
-                                            { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
-                            wrapper: RmtBinFlat)
+      hash = find_with_association(:rmt_bins,
+                                   id,
+                                   parent_tables: [{ parent_table: :orchards, columns: [:orchard_code], flatten_columns: { orchard_code: :orchard_code } },
+                                                   { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
+                                                   { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
+                                                   { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
+                                                   { parent_table: :locations, columns: [:location_long_code], flatten_columns: { location_long_code: :location_long_code } },
+                                                   { parent_table: :rmt_container_types, columns: [:container_type_code], flatten_columns: { container_type_code: :container_type_code } },
+                                                   { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
+                                                   # { parent_table: :party_roles, columns: [:container_material_owner_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
+                                                   { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
+                                   wrapper: RmtBinFlat).to_h
+
+      return nil if hash.empty?
+
+      hash[:asset_number] = hash[:bin_asset_number]
+      hash[:status] = DB.get(Sequel.function(:fn_current_status, 'rmt_bins', id))
+      RmtBinFlat.new(hash)
     end
 
     def farm_pucs(farm_id)

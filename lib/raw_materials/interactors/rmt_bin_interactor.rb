@@ -18,6 +18,22 @@ module RawMaterialsApp
       repo.update_rmt_bin_asset_level(bin_asset_number, bin_fullness)
     end
 
+    def create_scanned_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
+      bin_asset_numbers = params.delete(:scan_bin_numbers).split(' ')
+      params.merge!(qty_bins: bin_asset_numbers.length)
+
+      delivery = find_rmt_delivery(id)
+      params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
+      res = validate_rmt_bin_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      bin_asset_numbers.each do |bin_asset_number|
+        return validation_failed_response(OpenStruct.new(messages: { scan_bin_numbers: ["Bin #{bin_asset_number} already exists"] })) if RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_asset_number)
+      end
+
+      create_bins(params, bin_asset_numbers)
+    end
+
     def create_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
       delivery = find_rmt_delivery(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
@@ -25,22 +41,29 @@ module RawMaterialsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
-      return failed_response("Couldn't find #{params[:qty_bins_to_create]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
+      return validation_failed_response(OpenStruct.new(messages: { qty_bins_to_create: ["Couldn't find #{params[:qty_bins_to_create].to_i - bin_asset_numbers.length} available bin_asset_numbers in the system"] })) unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
 
+      create_bins(params, bin_asset_numbers.map(&:last), bin_asset_numbers.map(&:first))
+    end
+
+    def create_bins(params, bin_asset_numbers, bin_asset_number_ids = nil) # rubocop:disable Metrics/AbcSize
       created_bins = []
       repo.transaction do
         params.delete(:qty_bins_to_create)
         params[:location_id] = default_location_id unless params[:location_id]
-        bin_asset_numbers.map(&:last).each do |bin_asset_number|
+        params[:rmt_class_id] = nil if params[:rmt_class_id].nil_or_empty?
+        bin_asset_numbers.each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
           bin_id = repo.create_rmt_bin(params)
           log_status(:rmt_bins, bin_id, 'BIN RECEIVED')
           created_bins << rmt_bin(bin_id)
         end
-        repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
+        repo.update(:bin_asset_numbers, bin_asset_number_ids, last_used_at: Time.now) if bin_asset_number_ids
       end
 
       success_response('Bins Created Successfully', created_bins)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def create_rebin_groups(production_run_id, params) # rubocop:disable Metrics/AbcSize

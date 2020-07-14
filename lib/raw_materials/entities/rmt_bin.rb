@@ -82,6 +82,8 @@ module RawMaterialsApp
     attribute :container_material_type_code, Types::String
     attribute :scrapped_bin_asset_number, Types::String
     attribute :location_long_code, Types::String
+    attribute? :status, Types::String
+    attribute? :asset_number, Types::String
     # attribute :container_material_owner_code, Types::String
   end
 end

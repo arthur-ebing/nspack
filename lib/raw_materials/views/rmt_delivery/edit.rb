@@ -70,6 +70,14 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: :popup)
                   bin_type = 'asset_number_'
+                elsif rules[:scan_bulk_rmt_bin_asset_numbers]
+                  section.add_control(control_type: :link,
+                                      text: 'Scan Bin Groups',
+                                      url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups",
+                                      style: :button,
+                                      grid_id: 'rmt_bins_deliveries',
+                                      behaviour: :popup)
+                  bin_type = 'asset_number_'
                 elsif rules[:scan_rmt_bin_asset_numbers]
                   section.add_control(control_type: :link,
                                       text: 'New Rmt Bin',

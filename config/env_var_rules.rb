@@ -20,6 +20,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { PALLET_MIX_RULES_SCOPE: 'a list of scope values for pallet_mix_rules.' },
     { GLOBAL_PALLET_MIX: 'GLOBAL pallet_mix rule.' },
     { USE_PERMANENT_RMT_BIN_BARCODES: 'Capture deliveries with permanently barcoded bins.' },
+    { BULK_BIN_ASSET_NUMBER_ENTRY: 'create the bin group as per usual, but allocate bin asset numbers from the user provided list inside text area' },
     { CALCULATE_PALLET_DECK_POSITIONS: 'Works out deck position where pallet should go.' },
     { ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION: 'Determines if bins asset_numbers are auto generated or scanned in.' },
     { BIN_SCANNING_BATCH_SIZE: 'Can allow so many bins to be scanned at a time at bin reception' },
