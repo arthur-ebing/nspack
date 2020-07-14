@@ -18,7 +18,7 @@ module MesscadaApp
     #   success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     # end
 
-    def parse_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
+    def parse_pallet_or_carton_number(params = {}) # rubocop:disable Metrics/AbcSize
       if params[:pallet_number]
         params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
         return params
