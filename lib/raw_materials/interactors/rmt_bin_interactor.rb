@@ -19,16 +19,19 @@ module RawMaterialsApp
     end
 
     def create_scanned_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
-      bin_asset_numbers = params.delete(:scan_bin_numbers).split(' ')
-      params.merge!(qty_bins: bin_asset_numbers.length)
+      params.merge!(qty_bins: params[:scan_bin_numbers].length)
 
       delivery = find_rmt_delivery(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       res = validate_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      bin_asset_numbers = params.delete(:scan_bin_numbers).split(' ')
       bin_asset_numbers.each do |bin_asset_number|
-        return validation_failed_response(OpenStruct.new(messages: { scan_bin_numbers: ["Bin #{bin_asset_number} already exists"] })) if RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_asset_number)
+        if RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_asset_number)
+          bin_asset_numbers.delete(bin_asset_number)
+          return validation_failed_response(OpenStruct.new(messages: { scan_bin_numbers: ["Bin #{bin_asset_number} already exists"] }, scan_bin_numbers: bin_asset_numbers.join("\n")))
+        end
       end
 
       create_bins(params, bin_asset_numbers)

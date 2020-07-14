@@ -269,6 +269,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               end
               json_actions(actions, res.message)
             else
+              params[:rmt_bin][:scan_bin_numbers] = res.instance[:scan_bin_numbers] if res.instance[:scan_bin_numbers]
               re_show_form(r, res, url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups") do
                 RawMaterials::Deliveries::RmtBin::ScanBinGroup.call(id, form_values: params[:rmt_bin],
                                                                         form_errors: res.errors,
