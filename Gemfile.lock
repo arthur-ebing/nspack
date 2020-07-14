@@ -24,7 +24,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/crossbeams-menu_migrations.git
-  revision: cb5606cf2f363a44a08a791b03ab1cbf3479be74
+  revision: b12276340f241e4732bb1c46c87a1b905efa300b
   specs:
     crossbeams-menu_migrations (0.1.2)
 
