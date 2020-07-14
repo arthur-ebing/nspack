@@ -85,12 +85,13 @@ module RawMaterialsApp
                                                    { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
                                                    # { parent_table: :party_roles, columns: [:container_material_owner_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
                                                    { parent_table: :cultivars, columns: [:cultivar_name], flatten_columns: { cultivar_name: :cultivar_name } }],
-                                   wrapper: RmtBinFlat).to_h
+                                   lookup_functions: [{ function: :fn_current_status,
+                                                        args: ['rmt_bins', :id],
+                                                        col_name: :status }])
 
-      return nil if hash.empty?
+      return nil if hash.nil?
 
       hash[:asset_number] = hash[:bin_asset_number]
-      hash[:status] = DB.get(Sequel.function(:fn_current_status, 'rmt_bins', id))
       RmtBinFlat.new(hash)
     end
 
