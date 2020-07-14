@@ -19,7 +19,7 @@ module RawMaterialsApp
     end
 
     def create_scanned_bin_groups(id, params) # rubocop:disable Metrics/AbcSize
-      params.merge!(qty_bins: params[:scan_bin_numbers].length)
+      params.merge!(qty_bins: 1)
 
       delivery = find_rmt_delivery(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
