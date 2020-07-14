@@ -32,6 +32,13 @@
   :title: Mark setup as complete
   :popup: true
   :hide_if_true: setup_complete,reconfiguring
+- :url: "/production/runs/production_runs/$:id$/un_complete_setup"
+  :text: un-complete setup
+  :icon: toggle-off
+  :title: Un-complete setup
+  :popup: true
+  :hide_if_false: setup_complete
+  :hide_if_true: running,reconfiguring,completed
 - :url: "/production/runs/production_runs/$:id$/execute_run"
   :text: execute run
   :icon: play

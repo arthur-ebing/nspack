@@ -136,6 +136,24 @@ class Nspack < Roda
         end
       end
 
+      r.on 'un_complete_setup' do
+        r.get do
+          check_auth!('runs', 'edit')
+          interactor.assert_permission!(:complete_setup, id)
+          show_partial do
+            Production::Runs::ProductionRun::Confirm.call(id,
+                                                          url: "/production/runs/production_runs/#{id}/un_complete_setup",
+                                                          notice: 'Press the button to undo complete status of setups',
+                                                          button_captions: ['Undo complete', 'Undoing complete...'])
+          end
+        end
+
+        r.post do
+          interactor.mark_setup_as_incomplete(id)
+          update_grid_row(id, changes: { setup_complete: false, status: 'SETUP_UN-COMPLETED' }, notice: 'Production run setups are no longer marked as complete')
+        end
+      end
+
       r.on 'close' do
         r.get do
           check_auth!('runs', 'edit')

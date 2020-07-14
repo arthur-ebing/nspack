@@ -469,6 +469,14 @@ module ProductionApp
       end
     end
 
+    def mark_setup_as_incomplete(id)
+      repo.transaction do
+        repo.update_production_run(id, setup_complete: false)
+        log_status('production_runs', id, 'SETUP_UN-COMPLETED')
+        log_transaction
+      end
+    end
+
     def execute_run(id)
       ExecuteRun.call(id, @user.user_name)
     end
