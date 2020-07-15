@@ -55,6 +55,8 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
   def parse_csv(commit: false) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     @data = []
     @errors = []
+    @rmt_delivery_ids_created = []
+    @rmt_bin_ids_created = []
 
     table = CSV::Table.new(CSV.parse(File.read(@filename), headers: true).sort_by { |row| row['IN_NUMBER'] })
     in_numbers = table['IN_NUMBER'].uniq
@@ -67,15 +69,14 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       farm_id = DB[:farms_pucs].where(puc_id: puc_id).get(:farm_id)
       orchard_id = DB[:orchards].where(puc_id: puc_id, farm_id: farm_id, orchard_code: row['ORCHARD'].strip).get(:id)
       if orchard_id.nil?
-        @errors << "cultivar not linked to orchard - cultivar_name: #{row['VARIETY'].strip}, orchard_code: #{row['ORCHARD'].strip}, puc_code: #{row['FARM'].strip}"
+        @errors << "Orchard doesn't exist - orchard_code: #{row['ORCHARD'].strip}, puc_code: #{row['FARM'].strip}"
         next
       end
 
       cultivar_id = DB[:cultivars].where(cultivar_name: row['VARIETY']).get(:id)
       cultivar_ids = DB[:orchards].where(id: orchard_id).get(:cultivar_ids)
-
       unless cultivar_ids.include?(cultivar_id)
-        @errors << "cultivar not linked to orchard - cultivar_name: #{row['VARIETY'].strip}, orchard_code: #{row['ORCHARD'].strip}, puc_code: #{row['FARM'].strip}"
+        @errors << "Cultivar not linked to orchard - cultivar_name: #{row['VARIETY'].strip}, orchard_code: #{row['ORCHARD'].strip}, puc_code: #{row['FARM'].strip}"
         next
       end
 
@@ -91,7 +92,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       date_delivered = Date.parse(row['IN_DATE_TIME']).to_s
       season_id = DB["SELECT id FROM seasons WHERE commodity_id = #{commodity_id} AND start_date <= '#{date_picked}'::date AND end_date >= '#{date_picked}'::date"].get(:id)
       if season_id.nil?
-        @errors << "Check season setup #{row}"
+        @errors << "Check season setup: commodity_id = #{commodity_id} AND start_date <= '#{date_picked}'::date AND end_date >= '#{date_picked}'::date"
         next
       end
 
@@ -102,7 +103,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
         season_id: season_id,
         farm_id: farm_id,
         puc_id: puc_id,
-        delivery_tipped: true,
+        delivery_tipped: false,
         date_picked: date_picked,
         date_delivered: date_delivered
       }
@@ -111,13 +112,14 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       if rmt_delivery_id.nil? && commit
         rmt_delivery_id = DB[:rmt_deliveries].insert(rmt_delivery_attrs)
         log_status(:rmt_deliveries, rmt_delivery_id, status)
+        @rmt_delivery_ids_created << rmt_delivery_id
       end
 
       # create rmt_bins
       delivery_rows.each do |delivery_row| # rubocop:disable Metrics/BlockLength
-        tipped_asset_number = delivery_row['BINNUMBER'].strip
-        if tipped_asset_number.gsub('BJV', '').gsub('BVJ', '').gsub('BJ', '').gsub('SR', '').gsub('BV', '').gsub('JB', '').length != 8
-          @errors << "check BINNUMBER: #{tipped_asset_number}"
+        bin_asset_number = delivery_row['BINNUMBER'].strip
+        if bin_asset_number.gsub('BJV', '').gsub('BVJ', '').gsub('BJ', '').gsub('SR', '').gsub('BV', '').gsub('JB', '').length != 8
+          @errors << "check BINNUMBER: #{bin_asset_number}"
           next
         end
         rmt_container_type_id = DB[:rmt_container_types].where(container_type_code: 'BIN').get(:id)
@@ -125,6 +127,10 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
         role_id = DB[:roles].where(name: 'RMT_BIN_OWNER').get(:id)
         rmt_material_owner_party_role_id = DB[:party_roles].where(party_id: party_id, role_id: role_id).get(:id)
         rmt_container_material_type_id = DB[:rmt_container_material_types].where(container_material_type_code: delivery_row['BIN_TYPE']).get(:id)
+        if !delivery_row['BIN_TYPE'].nil_or_empty? && rmt_container_material_type_id.nil?
+          @errors << "Check container_material_type not found - BIN_TYPE: #{delivery_row['BIN_TYPE']}"
+          next
+        end
 
         rmt_bin_attrs = {
           rmt_delivery_id: rmt_delivery_id,
@@ -136,9 +142,9 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
           cultivar_group_id: cultivar_group_id,
           puc_id: puc_id,
           qty_bins: 1,
-          tipped_asset_number: tipped_asset_number,
+          bin_asset_number: bin_asset_number,
           bin_fullness: 'Full',
-          bin_tipped: true,
+          bin_tipped: false,
           bin_received_date_time: date_delivered,
           rmt_container_material_type_id: rmt_container_material_type_id,
           rmt_material_owner_party_role_id: rmt_material_owner_party_role_id
@@ -147,6 +153,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
         if rmt_bin_id.nil? && commit
           rmt_bin_id = DB[:rmt_bins].insert(rmt_bin_attrs)
           log_status(:rmt_bins, rmt_bin_id, status)
+          @rmt_bin_ids_created << rmt_bin_id
         end
         @data << delivery_row
       end
@@ -192,12 +199,17 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       errors:
       #{@errors.uniq.join("\n")}
 
+      output:
+      rmt_delivery_ids created = #{@rmt_delivery_ids_created}
+
+      rmt_bin_ids created = #{@rmt_bin_ids_created}
+
       data:
       #{CSV.parse(File.read(@filename), headers: true)}
     STR
     log_infodump(:data_import,
                  :rmt_bins_import,
-                 :change_description,
+                 :go_live,
                  infodump)
   end
 end
