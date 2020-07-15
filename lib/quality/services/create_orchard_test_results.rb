@@ -11,14 +11,15 @@ module QualityApp
     end
 
     def call
+      created_ids = []
       test_type_ids.each do |id|
         @orchard_test_type = repo.find_orchard_test_type_flat(id)
         delete_orchard_test_results
 
-        create_orchard_test_results
+        created_ids << create_orchard_test_results
       end
 
-      success_response('Created Tests')
+      success_response('Created Tests', created_ids.flatten)
     end
 
     private
@@ -51,6 +52,7 @@ module QualityApp
     end
 
     def create_orchard_test_results # rubocop:disable Metrics/AbcSize
+      created_ids = []
       test_groups.each do |puc_id, orchard_id, cultivar_ids|
         Array(cultivar_ids).each do |cultivar_id|
           attrs = { puc_id: puc_id, orchard_id: orchard_id, orchard_test_type_id: orchard_test_type.id }
@@ -68,9 +70,11 @@ module QualityApp
           end
 
           id = repo.create_orchard_test_result(attrs)
+          created_ids << id
           repo.log_status(:orchard_test_results, id, 'CREATED', user_name: @user&.user_name)
         end
       end
+      created_ids
     end
   end
 end

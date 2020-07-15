@@ -23,11 +23,10 @@ module QualityApp
     def call
       return success_response('CanPackOrchardForTms Check bypassed') if AppConst::BYPASS_QUALITY_TEST_PRE_RUN_CHECK
 
-      if phyt_clean_available?
-        create_applicable_tests
+      create_applicable_tests
 
-        update_applicable_tests
-      end
+      update_applicable_tests if @created_new_tests && phyt_clean_available?
+
       test_results
     end
 
@@ -52,12 +51,16 @@ module QualityApp
       ok_response
     end
 
-    def create_applicable_tests
+    def create_applicable_tests # rubocop:disable Metrics/AbcSize
       repo.select_values(:orchard_test_types, :id).each do |orchard_test_type_id|
-        args = { orchard_test_type_id: orchard_test_type_id, puc_id: puc_id, orchard_id: orchard_id, cultivar_id: cultivar_id }
+        args = { orchard_test_type_id: orchard_test_type_id,
+                 puc_id: puc_id,
+                 orchard_id: orchard_id,
+                 cultivar_id: cultivar_id }
         service_res = CreateOrchardTestResults.call(args, @user)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
       end
+      @created_new_tests = !service_res.instance.nil_or_empty?
 
       ok_response
     end
