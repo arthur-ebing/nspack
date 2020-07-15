@@ -45,7 +45,7 @@ module FinishedGoodsApp
     end
 
     def update_agreements # rubocop:disable Metrics/AbcSize
-      url = "#{AppConst::E_CERT_ENVIRONMENT}ecert.co.za/api/v1/Agreement/Get"
+      url = 'https://app.ecert.co.za/api/v1/Agreement/Get'
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
       return failed_response('Service Unavailable: Failed to connect to remote server.') unless http.can_ping?('ecert.co.za')
 
