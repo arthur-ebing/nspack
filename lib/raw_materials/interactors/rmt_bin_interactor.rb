@@ -26,7 +26,7 @@ module RawMaterialsApp
       res = validate_rmt_bin_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
-      bin_asset_numbers = params.delete(:scan_bin_numbers).split(' ')
+      bin_asset_numbers = UtilityFunctions.parse_string_to_array(params.delete(:scan_bin_numbers).gsub(' ', ','))
       bin_asset_numbers.each do |bin_asset_number|
         if RawMaterialsApp::RmtDeliveryRepo.new.find_bin_by_asset_number(bin_asset_number)
           bin_asset_numbers.delete(bin_asset_number)
