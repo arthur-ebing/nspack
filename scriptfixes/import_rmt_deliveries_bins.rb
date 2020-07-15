@@ -33,14 +33,12 @@
 class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
   def run # rubocop:disable Metrics/AbcSize
     @filename = args[0]
-    @commit = false
     @status = 'IMPORTED_FOR_GO_LIVE'
 
-    parse_csv
+    parse_csv(commit: false)
     if @errors.empty?
       DB.transaction do
-        @commit = true
-        parse_csv
+        parse_csv(commit: true)
         raise Crossbeams::InfoError, 'Debug mode' if debug_mode
       end
       infodump
@@ -54,7 +52,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def parse_csv # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def parse_csv(commit: false) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     @data = []
     @errors = []
 
@@ -110,7 +108,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
       }
 
       rmt_delivery_id = DB[:rmt_deliveries].where(rmt_delivery_attrs).get(:id)
-      if rmt_delivery_id.nil? && @commit
+      if rmt_delivery_id.nil? && commit
         rmt_delivery_id = DB[:rmt_deliveries].insert(rmt_delivery_attrs)
         log_status(:rmt_deliveries, rmt_delivery_id, status)
       end
@@ -146,7 +144,7 @@ class ImportRmtDeliveriesBins < BaseScript # rubocop:disable Metrics/ClassLength
           rmt_material_owner_party_role_id: rmt_material_owner_party_role_id
         }
         rmt_bin_id = DB[:rmt_bins].where(rmt_bin_attrs).get(:id)
-        if rmt_bin_id.nil? && @commit
+        if rmt_bin_id.nil? && commit
           rmt_bin_id = DB[:rmt_bins].insert(rmt_bin_attrs)
           log_status(:rmt_bins, rmt_bin_id, status)
         end
