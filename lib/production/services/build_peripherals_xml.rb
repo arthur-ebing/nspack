@@ -21,21 +21,24 @@ module ProductionApp
         xml.SystemSchema do
           xml.Peripherals do
             unless peripherals.empty?
-              peripherals.each do |prt|
-                xml.Printer(Name: prt[:name],
-                            Function: prt[:function],
-                            Alias: prt[:alias],
-                            Type: prt[:type],
-                            Model: prt[:model],
-                            ConnectionType: prt[:connection_type],
-                            NetworkInterface: prt[:network_interface],
-                            Port: prt[:port],
-                            TTL: prt[:ttl],
-                            CycleTime: prt[:cycle_time],
-                            Language: prt[:language],
-                            Username: prt[:username],
-                            Password: prt[:password],
-                            PixelsMM: prt[:pixels_mm])
+              peripherals.each do |ph, periphs|
+                xml.comment "\n      Packhouse #{ph}\n    "
+                periphs.each do |prt|
+                  xml.Printer(Name: prt[:name],
+                              Function: prt[:function],
+                              Alias: prt[:alias],
+                              Type: prt[:type],
+                              Model: prt[:model],
+                              ConnectionType: prt[:connection_type],
+                              NetworkInterface: prt[:network_interface],
+                              Port: prt[:port],
+                              TTL: prt[:ttl],
+                              CycleTime: prt[:cycle_time],
+                              Language: prt[:language],
+                              Username: prt[:username],
+                              Password: prt[:password],
+                              PixelsMM: prt[:pixels_mm])
+                end
               end
             end
           end

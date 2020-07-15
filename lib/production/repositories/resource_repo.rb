@@ -299,7 +299,13 @@ module ProductionApp
 
     def system_modules
       query = <<~SQL
-        SELECT s.system_resource_code as name,
+        SELECT (SELECT c.plant_resource_code
+                FROM plant_resources c
+                JOIN tree_plant_resources t1 ON t1.ancestor_plant_resource_id = c.id
+                WHERE t1.descendant_plant_resource_id = p.id
+                  AND c.plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'PACKHOUSE')
+                ) AS packhouse,
+        s.system_resource_code as name,
         s.equipment_type as module_type,
         s.module_function as function, -- Could add to resource_types
         p.plant_resource_code as alias,
@@ -344,14 +350,20 @@ module ProductionApp
         LEFT OUTER JOIN plant_resources p ON p.system_resource_id = s.id
         WHERE t.system_resource_type_code = 'MODULE'
           AND s.active
-        ORDER BY s.system_resource_code
+        ORDER BY 1, s.system_resource_code
       SQL
-      DB[query].all
+      DB[query].all.group_by { |rec| rec[:packhouse] }
     end
 
     def system_peripherals
       query = <<~SQL
-        SELECT s.system_resource_code as name,
+        SELECT (SELECT c.plant_resource_code
+                FROM plant_resources c
+                JOIN tree_plant_resources t1 ON t1.ancestor_plant_resource_id = c.id
+                WHERE t1.descendant_plant_resource_id = p.id
+                  AND c.plant_resource_type_id = (SELECT id FROM plant_resource_types WHERE plant_resource_type_code = 'PACKHOUSE')
+                ) AS packhouse,
+        s.system_resource_code as name,
         s.module_function as function,
         p.plant_resource_code as alias,
         s.equipment_type as type,
@@ -377,9 +389,9 @@ module ProductionApp
         WHERE t.system_resource_type_code = 'PERIPHERAL'
           AND e.plant_resource_type_code = 'PRINTER'
           AND s.active
-        ORDER BY s.system_resource_code
+        ORDER BY 1, s.system_resource_code
       SQL
-      DB[query].all
+      DB[query].all.group_by { |rec| rec[:packhouse] }
     end
 
     def no_of_direct_descendants(plant_resource_id)
