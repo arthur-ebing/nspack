@@ -5,7 +5,7 @@ module FinishedGoodsApp
     attr_reader :header
 
     def auth_token_call
-      http = Crossbeams::HTTPCalls.new(false)
+      http = Crossbeams::HTTPCalls.new(false, open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       url = 'http://uas.ecert.co.za/oauth2/token'
       raise Crossbeams::InfoError, 'Service Unavailable: Failed to connect to remote server.' unless http.can_ping?('ecert.co.za')
 
@@ -21,7 +21,7 @@ module FinishedGoodsApp
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/GetTrackingUnitStatus?trackingUnitId=#{pallet_number}"
-      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: 15, read_timeout: 30)
+      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
 
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
@@ -34,7 +34,7 @@ module FinishedGoodsApp
       auth_token_call if header.nil?
 
       url = "#{AppConst::E_CERT_ENVIRONMENT}tur.ecert.co.za/api/TrackingUnit/eLot?#{params}"
-      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: 30, read_timeout: 60)
+      http = Crossbeams::HTTPCalls.new(url.include?('https'), open_timeout: AppConst::E_CERT_OPEN_TIMEOUT, read_timeout: AppConst::E_CERT_READ_TIMEOUT)
       res = http.json_post(url, body, header)
       return failed_response(res.message) unless res.success
 
