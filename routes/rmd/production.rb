@@ -832,7 +832,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                        data_type: :number,
                        scan: 'key248_all',
                        scan_type: :pallet_number,
-                       submit_form: true,
+                       submit_form: false,
                        required: true)
         form.add_field(:qty_to_print,
                        'Qty To Print',
