@@ -3,13 +3,14 @@
 module MesscadaApp
   class CloneAutopackPalletCarton < BaseService
     attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :palletizer_identifier, :palletizing_bay_resource_id,
-                :carton, :diff, :carton_numbers
+                :carton, :diff, :carton_numbers, :no_of_clones
 
-    def initialize(carton_id, pallet_id, palletizer_identifier, palletizing_bay_resource_id)
-      @carton_id = carton_id
-      @pallet_id = pallet_id
-      @palletizer_identifier = palletizer_identifier
-      @palletizing_bay_resource_id = palletizing_bay_resource_id
+    def initialize(params)
+      @carton_id = params[:carton_id]
+      @pallet_id = params[:pallet_id]
+      @palletizer_identifier = params[:palletizer_identifier]
+      @palletizing_bay_resource_id = params[:palletizing_bay_resource_id]
+      @no_of_clones = params[:no_of_clones]
       @repo = MesscadaApp::MesscadaRepo.new
       @prod_repo = ProductionApp::ProductionRunRepo.new
     end
@@ -20,7 +21,7 @@ module MesscadaApp
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?
 
       @carton = find_carton
-      @diff = carton_cpp(carton[:cartons_per_pallet_id]) - pallet_carton_quantity(pallet_id)
+      @diff = no_of_clones.nil? ? carton_cpp(carton[:cartons_per_pallet_id]) - pallet_carton_quantity(pallet_id) : no_of_clones
       return failed_response("Pallet :#{pallet_id} already full") if diff < 1
 
       res = clone_autopack_pallet_carton

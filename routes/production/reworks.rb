@@ -781,6 +781,45 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      value: res[:id])],
                      '')
       end
+
+      r.on 'manage_sequence_cartons' do
+        show_partial_or_page(r) do
+          res = ProductionApp::ReworksRepo.new.where_hash(:pallet_sequences, id: id)
+          Production::Reworks::ReworksRun::ManageSequenceCartons.call(id,
+                                                                      back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res[:pallet_number]}/edit_pallet")
+        end
+      end
+    end
+
+    r.on 'cartons', Integer do |id|
+      reworks_run_type_id = retrieve_from_local_store(:reworks_run_type_id)
+      store_locally(:reworks_run_type_id, reworks_run_type_id)
+
+      r.on 'clone_carton' do
+        r.get do
+          show_partial { Production::Reworks::ReworksRun::CloneCarton.call(id) }
+        end
+        r.post do
+          res = interactor.clone_carton(params[:reworks_run_carton])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/pallet_sequences/#{res.instance[:pallet_sequence_id]}/manage_sequence_cartons"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::CloneCarton.call(id,
+                                                                form_values: params[:reworks_run_carton],
+                                                                form_errors: res.errors)
+            end
+          end
+        end
+      end
+
+      r.on 'scrap_carton' do
+        check_auth!('reworks', 'delete')
+        res = interactor.scrap_carton(id, reworks_run_type_id)
+        flash[:notice] = res.message
+        r.redirect "/production/reworks/pallet_sequences/#{res.instance[:pallet_sequence_id]}/manage_sequence_cartons"
+      end
     end
   end
 end

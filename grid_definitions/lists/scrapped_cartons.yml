@@ -1,5 +1,5 @@
 ---
-:dataminer_definition: cartons
+:dataminer_definition: scrapped_cartons
 :captions:
   :conditions:
     :production_run_cartons: Cartons on Production Run
@@ -8,7 +8,3 @@
     - :col: carton_labels.production_run_id
       :op: =
       :val: $:id$
-  :cloned_cartons:
-    - :col: cartons.is_virtual
-      :op: =
-      :val: true

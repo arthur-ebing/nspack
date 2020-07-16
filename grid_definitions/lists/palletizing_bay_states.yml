@@ -11,7 +11,7 @@
         :title: Pallet
         :popup: true
         :hide_if_null: pallet_sequence_id
-      - :url: "/list/pallet_sequence_cartons/with_params?key=pallet_sequence_cartons&pallet_sequence_id=$:pallet_sequence_id$"
+      - :url: "/list/pallet_sequence_cartons/with_params?key=pallet_cartons&pallet_id=$:pallet_id$"
         :text: Cartons
         :icon: list
         :title: Cartons

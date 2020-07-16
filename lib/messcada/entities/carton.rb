@@ -48,6 +48,9 @@ module MesscadaApp
     attribute :pallet_sequence_id, Types::Integer
     attribute :palletizing_bay_resource_id, Types::Integer
     attribute? :is_virtual, Types::Bool
+    attribute? :scrapped, Types::Bool
+    attribute :scrapped_at, Types::DateTime
+    attribute :scrapped_sequence_id, Types::Integer
   end
   class ScannedCartonNumber < Dry::Struct
     attribute :scanned_carton_number, Types::String

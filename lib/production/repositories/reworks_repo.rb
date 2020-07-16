@@ -302,6 +302,14 @@ module ProductionApp
       DB[upd].update
     end
 
+    def scrap_carton(id)
+      upd = "UPDATE cartons
+             SET scrapped = true, scrapped_at = '#{Time.now}', scrapped_reason = '#{AppConst::REWORKS_ACTION_SCRAP_CARTON}',
+                 scrapped_sequence_id = pallet_sequence_id, pallet_sequence_id = null
+             WHERE id = #{id};"
+      DB[upd].update
+    end
+
     def pallet(id)
       find_hash(:pallets, id)
     end
@@ -513,6 +521,10 @@ module ProductionApp
         WHERE pallet_id = #{pallet_id}
       SQL
       DB[query].single_value
+    end
+
+    def pallet_sequence_carton_quantity(pallet_sequence_id)
+      DB[:pallet_sequences].where(id: pallet_sequence_id).get(:carton_quantity)
     end
 
     def for_select_standard_pack_codes
@@ -857,6 +869,17 @@ module ProductionApp
         pallet_sequences: DB[pallet_sequences_query].single_value,
         shipped_pallet_sequences: DB[shipped_ps_query].single_value,
         inspected_pallet_sequences: DB[inspected_ps_query].single_value }
+    end
+
+    def carton_scrap_attributes(carton_id)
+      query = <<~SQL
+        SELECT cartons.scrapped,cartons.scrapped_at,cartons.scrapped_reason,cartons.scrapped_sequence_id,
+               cartons.pallet_sequence_id, pallet_sequences.pallet_number, pallet_sequences.pallet_id
+        FROM cartons
+        LEFT JOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id
+        WHERE cartons.id = ?
+      SQL
+      DB[query, carton_id].first
     end
   end
 end

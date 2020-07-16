@@ -965,6 +965,56 @@ module ProductionApp
         avg_gross_weight: instance[:avg_gross_weight] }
     end
 
+    def clone_carton(params)
+      res = validate_clone_carton_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      attrs = res.to_h
+
+      res = nil
+      repo.transaction do
+        res = MesscadaApp::CloneAutopackPalletCarton.call(attrs)
+        log_transaction
+      end
+      success_response('Carton cloned successfully', pallet_sequence_id: attrs[:pallet_sequence_id])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def scrap_carton(carton_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
+      before_attrs = scrap_carton_changes(carton_id)
+      return failed_response('Carton cannot be scrapped', pallet_number: before_attrs[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET || cannot_scrap_carton(before_attrs[:pallet_sequence_id])
+
+      repo.transaction do
+        repo.scrap_carton(carton_id)
+        after_attrs = scrap_carton_changes(carton_id)
+        reworks_run_attrs = { user: @user.user_name,
+                              reworks_run_type_id: reworks_run_type_id,
+                              pallets_selected: "{ #{before_attrs[:pallet_number]} }",
+                              pallets_affected: "{ #{before_attrs[:pallet_number]} }",
+                              changes_made: resolve_changes_made(before: before_attrs.sort.to_h,
+                                                                 after: after_attrs.sort.to_h) }
+        reworks_run_id = repo.create_reworks_run(reworks_run_attrs)
+        log_status(:cartons, carton_id, AppConst::REWORKS_ACTION_SCRAP_CARTON)
+        log_status(:reworks_runs, reworks_run_id, 'CREATED')
+        log_transaction
+      end
+      success_response('Carton scrapped successfully', pallet_sequence_id: before_attrs.to_h[:pallet_sequence_id])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def scrap_carton_changes(carton_id)
+      instance = carton_scrap_attributes(carton_id)
+      { scrapped: instance[:scrapped],
+        scrapped_at: instance[:scrapped_at],
+        scrapped_reason: instance[:scrapped_reason],
+        pallet_sequence_id: instance[:pallet_sequence_id],
+        scrapped_sequence_id: instance[:scrapped_sequence_id],
+        pallet_id: instance[:pallet_id],
+        pallet_number: instance[:pallet_number] }
+    end
+
     def production_run_details_table(production_run_id)
       Crossbeams::Layout::Table.new([], repo.production_run_details(production_run_id), [], pivot: true).render
     end
@@ -1115,6 +1165,10 @@ module ProductionApp
       repo.where_hash(:pallet_sequences, id: id)
     end
 
+    def carton_scrap_attributes(id)
+      repo.carton_scrap_attributes(id)
+    end
+
     def find_rmt_bin(bin_number)
       # return repo.rmt_bin_from_asset_number(bin_number) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
 
@@ -1170,6 +1224,10 @@ module ProductionApp
 
     def cannot_remove_sequence(pallet_id)
       repo.unscrapped_sequences_count(pallet_id).<= 1
+    end
+
+    def cannot_scrap_carton(pallet_sequence_id)
+      repo.pallet_sequence_carton_quantity(pallet_sequence_id).<= 1
     end
 
     def standard_pack(standard_pack_code_id)
@@ -1420,6 +1478,10 @@ module ProductionApp
 
     def validate_change_delivery_orchard_params(params)
       ChangeDeliveriesOrchardSchema.call(params)
+    end
+
+    def validate_clone_carton_params(params)
+      ReworksRunCloneCartonSchema.call(params)
     end
   end
 end

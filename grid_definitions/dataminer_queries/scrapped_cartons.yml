@@ -1,5 +1,5 @@
 ---
-:caption: Cartons
+:caption: Scrapped Cartons
 :sql: "SELECT carton_labels.id,\r\n             cartons.id as carton_id,\r\n             carton_labels.production_run_id,\r\n
   \            carton_labels.created_at AS label_created_at,\r\n             ABS(date_part('epoch',
   current_timestamp - carton_labels.created_at) / 3600)::int AS label_age_hrs,\r\n
@@ -33,15 +33,14 @@
   \            pm_types.pm_type_code,\r\n             cartons_per_pallet.cartons_per_pallet,\r\n
   \            pm_products.product_code,\r\n             cartons.gross_weight,\r\n
   \            cartons.nett_weight,\r\n             carton_labels.pick_ref,\r\n             CASE
-  WHEN EXISTS(SELECT id FROM cartons WHERE cartons.carton_label_id= carton_labels.id)
-  THEN 'ok' \r\n             ELSE NULL \r\n             END AS colour_rule,\r\n             cartons.carton_label_id,\r\n
-  \            COALESCE(carton_labels.pallet_number, pallet_sequences.pallet_number)
-  AS pallet_number,\r\n             personnel_identifiers.identifier AS personnel_identifier,\r\n
-  \            contract_workers.personnel_number,\r\n             packing_methods.packing_method_code,\r\n
-  \            palletizers.identifier AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n
-  \            pallet_sequences.pallet_sequence_number,\r\n             cartons.is_virtual\r\nFROM
-  carton_labels\r\nLEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\nJOIN
-  production_runs ON production_runs.id = carton_labels.production_run_id\r\nLEFT
+  WHEN cartons.scrapped THEN 'warning' \r\n             ELSE NULL \r\n             END
+  AS colour_rule,\r\n             cartons.carton_label_id,\r\n             COALESCE(carton_labels.pallet_number,
+  pallet_sequences.pallet_number) AS pallet_number,\r\n             personnel_identifiers.identifier
+  AS personnel_identifier,\r\n             contract_workers.personnel_number,\r\n
+  \            packing_methods.packing_method_code,\r\n             palletizers.identifier
+  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             pallet_sequences.pallet_sequence_number,\r\n
+  \            cartons.is_virtual\r\nFROM carton_labels\r\nJOIN cartons ON carton_labels.id
+  = cartons.carton_label_id\r\nJOIN production_runs ON production_runs.id = carton_labels.production_run_id\r\nLEFT
   JOIN product_resource_allocations ON product_resource_allocations.id = carton_labels.product_resource_allocation_id\r\nLEFT
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
   product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
@@ -73,15 +72,15 @@
   contract_workers ON contract_workers.id = carton_labels.contract_worker_id\r\nLEFT
   JOIN personnel_identifiers ON personnel_identifiers.id = carton_labels.personnel_identifier_id\r\nJOIN
   packing_methods ON packing_methods.id = carton_labels.packing_method_id\r\nLEFT
-  JOIN personnel_identifiers palletizers ON palletizers.id = cartons.palletizer_identifier_id\r\nLEFT
-  JOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nORDER
+  JOIN personnel_identifiers palletizers ON palletizers.id = cartons.palletizer_identifier_id\r\nJOIN
+  pallet_sequences ON pallet_sequences.id = cartons.scrapped_sequence_id\r\nORDER
   BY carton_labels.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
   :render_url: 
   :colour_key:
-    ok: carton verified
+    warning: Scrapped Cartons
 :columns:
   id:
     :name: id
@@ -1126,14 +1125,4 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def:
-- :column: cartons.is_virtual
-  :caption: Virtual?
-  :data_type: :boolean
-  :control_type: :list
-  :default_value:
-  :ordered_list: false
-  :ui_priority: 6
-  :list_def:
-    - true
-    - false
+  :list_def: 

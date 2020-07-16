@@ -1,6 +1,7 @@
 ---
 :caption: Pallet Sequence Cartons
 :sql: "SELECT cartons.id,\r\n             carton_labels.id AS label_id,\r\n             cartons.production_run_id,\r\n
+  \            pallet_sequences.pallet_number,\r\n             pallet_sequences.pallet_sequence_number,\r\n
   \            CONCAT(contract_workers.first_name, '_', contract_workers.surname)
   AS contract_worker,\r\n             packpoints.plant_resource_code AS packpoint,\r\n
   \            palletizing_bays.plant_resource_code AS palletizing_bay,\r\n             system_resources.system_resource_code
@@ -12,11 +13,11 @@
   THEN 'ok' \r\n             ELSE NULL \r\n             END AS colour_rule,\r\n             personnel_identifiers.identifier
   AS personnel_identifier,\r\n             contract_workers.personnel_number,\r\n
   \            packing_methods.packing_method_code,\r\n             palletizers.identifier
-  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             cartons.is_virtual,\r\n
-  \            cartons.created_at AS verified_at,\r\n             cartons.updated_at\r\nFROM
-  cartons\r\nJOIN carton_labels ON carton_labels.id = cartons.carton_label_id\r\nJOIN
-  pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN pallets
-  ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
+  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             pallet_sequences.pallet_id,\r\n
+  \            cartons.is_virtual,\r\n             cartons.created_at AS verified_at,\r\n
+  \            cartons.updated_at\r\nFROM cartons\r\nJOIN carton_labels ON carton_labels.id
+  = cartons.carton_label_id\r\nJOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN
+  pallets ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
   ON product_resource_allocations.id = carton_labels.product_resource_allocation_id\r\nLEFT
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
   product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
@@ -87,9 +88,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 4
+    :caption: Pallet number
+    :namespaced_name: pallet_sequences.pallet_number
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_sequence_number:
+    :name: pallet_sequence_number
+    :sequence_no: 5
+    :caption: Seq
+    :namespaced_name: pallet_sequences.pallet_sequence_number
+    :data_type: :string
+    :width: 70
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   contract_worker:
     :name: contract_worker
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Contract worker
     :namespaced_name: 
     :data_type: :string
@@ -105,7 +138,7 @@
     :group_max: false
   packpoint:
     :name: packpoint
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Packpoint
     :namespaced_name: packpoints.plant_resource_code
     :data_type: :string
@@ -121,7 +154,7 @@
     :group_max: false
   palletizing_bay:
     :name: palletizing_bay
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Palletizing bay
     :namespaced_name: palletizing_bays.plant_resource_code
     :data_type: :string
@@ -137,7 +170,7 @@
     :group_max: false
   print_device:
     :name: print_device
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Print device
     :namespaced_name: system_resources.system_resource_code
     :data_type: :string
@@ -153,7 +186,7 @@
     :group_max: false
   label:
     :name: label
-    :sequence_no: 8
+    :sequence_no: 10
     :caption: Label
     :namespaced_name: carton_labels.label_name
     :data_type: :string
@@ -169,7 +202,7 @@
     :group_max: false
   product_setup_template:
     :name: product_setup_template
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Product setup template
     :namespaced_name: product_setup_templates.template_name
     :data_type: :string
@@ -185,7 +218,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 10
+    :sequence_no: 12
     :caption: Season code
     :namespaced_name: seasons.season_code
     :data_type: :string
@@ -201,7 +234,7 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 11
+    :sequence_no: 13
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet.cartons_per_pallet
     :data_type: :integer
@@ -217,7 +250,7 @@
     :group_max: false
   product_code:
     :name: product_code
-    :sequence_no: 12
+    :sequence_no: 14
     :caption: Product code
     :namespaced_name: pm_products.product_code
     :data_type: :string
@@ -233,7 +266,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 13
+    :sequence_no: 15
     :caption: Gross weight
     :namespaced_name: cartons.gross_weight
     :data_type: :number
@@ -249,7 +282,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 14
+    :sequence_no: 16
     :caption: Nett weight
     :namespaced_name: cartons.nett_weight
     :data_type: :number
@@ -265,7 +298,7 @@
     :group_max: false
   pick_ref:
     :name: pick_ref
-    :sequence_no: 15
+    :sequence_no: 17
     :caption: Pick ref
     :namespaced_name: carton_labels.pick_ref
     :data_type: :string
@@ -281,7 +314,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 16
+    :sequence_no: 18
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -297,7 +330,7 @@
     :group_max: false
   personnel_identifier:
     :name: personnel_identifier
-    :sequence_no: 17
+    :sequence_no: 19
     :caption: Personnel ID
     :namespaced_name: personnel_identifiers.identifier
     :data_type: :string
@@ -313,7 +346,7 @@
     :group_max: false
   personnel_number:
     :name: personnel_number
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: Personnel No.
     :namespaced_name: contract_workers.personnel_number
     :data_type: :string
@@ -329,7 +362,7 @@
     :group_max: false
   packing_method_code:
     :name: packing_method_code
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: Packing method
     :namespaced_name: packing_methods.packing_method_code
     :data_type: :string
@@ -345,7 +378,7 @@
     :group_max: false
   palletizer_identifier:
     :name: palletizer_identifier
-    :sequence_no: 20
+    :sequence_no: 22
     :caption: Palletizer ID
     :namespaced_name: palletizers.identifier
     :data_type: :string
@@ -361,7 +394,7 @@
     :group_max: false
   pallet_sequence_id:
     :name: pallet_sequence_id
-    :sequence_no: 21
+    :sequence_no: 23
     :caption: Pallet sequence
     :namespaced_name: cartons.pallet_sequence_id
     :data_type: :integer
@@ -375,9 +408,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 24
+    :caption: Pallet
+    :namespaced_name: pallet_sequences.pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   is_virtual:
     :name: is_virtual
-    :sequence_no: 22
+    :sequence_no: 25
     :caption: Virtual
     :namespaced_name: cartons.is_virtual
     :data_type: :boolean
@@ -393,7 +442,7 @@
     :group_max: false
   verified_at:
     :name: verified_at
-    :sequence_no: 23
+    :sequence_no: 26
     :caption: Verified at
     :namespaced_name: cartons.created_at
     :data_type: :date
@@ -409,7 +458,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 24
+    :sequence_no: 27
     :caption: Updated at
     :namespaced_name: cartons.updated_at
     :data_type: :date
@@ -536,7 +585,7 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 5
+  :ui_priority: 14
   :list_def: 
 - :column: ABS(date_part('epoch', current_timestamp - cartons.created_at) / 3600)::int
   :caption: Carton age (hrs)
@@ -544,7 +593,7 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 5
+  :ui_priority: 15
   :list_def: 
 - :column: carton_labels.pallet_number
   :caption: Pallet number
@@ -552,13 +601,21 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 2
+  :ui_priority: 16
   :list_def: 
+- :column: pallet_sequences.pallet_id
+  :caption: pallet id
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 17
+  :list_def: SELECT id FROM pallets
 - :column: cartons.pallet_sequence_id
   :caption: pallet sequence id
   :data_type: :integer
   :control_type: :list
   :default_value: 
   :ordered_list: false
-  :ui_priority: 2
+  :ui_priority: 18
   :list_def: SELECT id FROM pallet_sequences

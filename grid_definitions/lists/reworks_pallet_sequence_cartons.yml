@@ -1,5 +1,15 @@
 ---
 :dataminer_definition: pallet_sequence_cartons
+:actions:
+- :url: "/production/reworks/cartons/$:id$/clone_carton"
+  :text: clone
+  :icon: copy
+  :title: Clone
+  :popup: true
+- :url: "/production/reworks/cartons/$:id$/scrap_carton"
+  :text: scrap
+  :icon: delete
+  :title: Scrap
 :captions:
   :conditions:
     :standard: Palletizing Bay Carton

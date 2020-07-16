@@ -84,7 +84,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { TEMP_TAIL_REQUIRED_TO_SHIP: 'optional. Makes temp tail required on all loads' },
     { USE_CARTON_PALLETIZING: 'Use carton palletizing application. Default false' },
     { DEFAULT_PALLET_LABEL_NAME: 'Default pallet label_name for Carton Palletizing.' },
-    { AUTO_PRINT_PALLET_LABEL_ON_BAY: 'Carton Palletizing - Print pallet labels on pallet complete only if true.' }
+    { AUTO_PRINT_PALLET_LABEL_ON_BAY: 'Carton Palletizing - Print pallet labels on pallet complete only if true.' },
+    { ALLOW_OVERFULL_PALLETIZING: 'Carton Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached.' }
   ].freeze
 
   NO_OVERRIDE = [

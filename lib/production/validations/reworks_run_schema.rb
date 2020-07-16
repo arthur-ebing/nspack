@@ -223,4 +223,12 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:first_cold_storage_at, :date).filled(:date?)
     optional(:make_changes, :bool).maybe(:bool?)
   end
+  ReworksRunCloneCartonSchema = Dry::Validation.Params do
+    configure { config.type_specs = true }
+
+    required(:carton_id, :integer).filled(:int?)
+    required(:pallet_id, :integer).filled(:int?)
+    required(:pallet_sequence_id, :integer).filled(:int?)
+    required(:no_of_clones, :integer).filled(:int?, gt?: 0)
+  end
 end

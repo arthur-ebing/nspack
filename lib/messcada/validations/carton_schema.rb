@@ -58,6 +58,9 @@ module MesscadaApp
     optional(:pallet_sequence_id, :integer).maybe(:int?)
     optional(:palletizing_bay_resource_id, :integer).maybe(:int?)
     optional(:is_virtual, :bool).maybe(:bool?)
+    optional(:scrapped, :bool).maybe(:bool?)
+    optional(:scrapped_at, %i[nil time]).maybe(:time?)
+    optional(:scrapped_sequence_id, :integer).maybe(:int?)
 
     validate(fruit_size_reference_or_fruit_actual_count: %i[fruit_size_reference_id fruit_actual_counts_for_pack_id]) do |fruit_size_reference_id, fruit_actual_counts_for_pack_id|
       fruit_size_reference_id || fruit_actual_counts_for_pack_id

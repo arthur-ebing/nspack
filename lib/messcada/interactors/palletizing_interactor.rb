@@ -144,9 +144,13 @@ module MesscadaApp
       palletizing_bay_state = palletizing_bay_state(state_machine.target.id)
       pallet_id = palletizing_bay_state&.pallet_id
       autopack = params[:autopack] == 'true'
+      attrs = { carton_id: palletizing_bay_state&.determining_carton_id,
+                pallet_id: pallet_id,
+                palletizer_identifier: params[:identifier],
+                palletizing_bay_resource_id: palletizing_bay_state&.palletizing_bay_resource_id }
       res = nil
       repo.transaction do
-        res = MesscadaApp::CloneAutopackPalletCarton.call(palletizing_bay_state&.determining_carton_id, pallet_id, params[:identifier], palletizing_bay_state&.palletizing_bay_resource_id) if autopack
+        res = MesscadaApp::CloneAutopackPalletCarton.call(attrs) if autopack
         res = MesscadaApp::CompletePallet.call(pallet_id)
 
         changeset = { current_state: state_machine.current.to_s,
@@ -385,15 +389,17 @@ module MesscadaApp
           log_transaction
         end
         last_carton = last_carton?(current_bay_attributes(state_machine))
-        confirm = if last_carton
-                    {
-                      confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-                      confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
-                      cancel_url: 'noop'
-                    }
-                  else
-                    { carton_number: carton_carton_label(carton_id) }
-                  end
+        if last_carton
+          return complete_pallet(params) unless AppConst::ALLOW_OVERFULL_PALLETIZING
+
+          confirm = {
+            confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
+            confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
+            cancel_url: 'noop'
+          }
+        else
+          confirm = { carton_number: carton_carton_label(carton_id) }
+        end
       end
 
       success_response('ok', current_bay_attributes(state_machine, confirm))
