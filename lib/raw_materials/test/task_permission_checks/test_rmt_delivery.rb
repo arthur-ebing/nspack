@@ -17,10 +17,12 @@ module RawMaterialsApp
         farm_id: 1, # farm_id,
         puc_id: 1, # puc_id,
         truck_registration_number: Faker::Lorem.unique.word,
+        reference_number: Faker::Lorem.unique.word,
         qty_damaged_bins: 1,
         qty_empty_bins: 1,
         delivery_tipped: false,
         date_picked: '2010-01-01',
+        intake_date: '2010-01-01 12:00',
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         active: true
