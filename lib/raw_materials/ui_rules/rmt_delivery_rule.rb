@@ -41,10 +41,12 @@ module UiRules
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
       fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
       fields[:truck_registration_number] = { renderer: :label }
+      fields[:reference_number] = { renderer: :label }
       fields[:qty_damaged_bins] = { renderer: :label }
       fields[:qty_empty_bins] = { renderer: :label }
       fields[:date_picked] = { renderer: :label }
       fields[:date_delivered] = { renderer: :label, format: :without_timezone_or_seconds }
+      fields[:intake_date] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:tipping_complete_date_time] = { renderer: :label }
       fields[:quantity_bins_with_fruit] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -65,10 +67,12 @@ module UiRules
                                        disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations, caption: 'Destination',
                                        required: true, prompt: true },
         truck_registration_number: {},
+        reference_number: {},
         qty_damaged_bins: {},
         qty_empty_bins: {},
         date_picked: { renderer: :date },
         date_delivered: { renderer: :date },
+        intake_date: { renderer: :date },
         current: { renderer: :checkbox, caption: 'Set As Current' },
         quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' },
         auto_allocate_asset_number: { renderer: :checkbox }

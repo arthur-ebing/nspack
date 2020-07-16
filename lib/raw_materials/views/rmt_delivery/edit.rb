@@ -44,6 +44,7 @@ module RawMaterials
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
+                    col.add_field :reference_number
                     col.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
                   end
 
@@ -51,6 +52,7 @@ module RawMaterials
                     col.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
                     col.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
                     col.add_field :date_picked
+                    col.add_field :intake_date
                     col.add_field :quantity_bins_with_fruit
                     col.add_field :truck_registration_number if rules[:show_truck_registration_number]
                     # col.add_field :rmt_delivery_destination_id

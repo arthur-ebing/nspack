@@ -40,6 +40,7 @@ module RawMaterials
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
+                    col.add_field :reference_number
                     col.add_field :rmt_delivery_destination_id
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
@@ -48,6 +49,7 @@ module RawMaterials
                   end
 
                   row.column do |col|
+                    col.add_field :intake_date
                     col.add_field :truck_registration_number
                     col.add_field :season_id
                     col.add_field :tipping_complete_date_time
