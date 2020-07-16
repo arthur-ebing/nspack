@@ -31,7 +31,6 @@ module RawMaterialsApp
         active: true,
         delivery_tipped: false,
         date_picked: '2010-01-01',
-        intake_date: '2010-01-01',
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         created_at: '2010-01-01 12:00',

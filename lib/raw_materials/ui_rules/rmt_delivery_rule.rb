@@ -46,7 +46,6 @@ module UiRules
       fields[:qty_empty_bins] = { renderer: :label }
       fields[:date_picked] = { renderer: :label }
       fields[:date_delivered] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:intake_date] = { renderer: :label, format: :without_timezone_or_seconds }
       fields[:tipping_complete_date_time] = { renderer: :label }
       fields[:quantity_bins_with_fruit] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -72,7 +71,6 @@ module UiRules
         qty_empty_bins: {},
         date_picked: { renderer: :date },
         date_delivered: { renderer: :date },
-        intake_date: { renderer: :date },
         current: { renderer: :checkbox, caption: 'Set As Current' },
         quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' },
         auto_allocate_asset_number: { renderer: :checkbox }

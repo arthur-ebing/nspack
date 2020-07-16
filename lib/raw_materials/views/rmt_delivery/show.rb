@@ -49,7 +49,6 @@ module RawMaterials
                   end
 
                   row.column do |col|
-                    col.add_field :intake_date
                     col.add_field :truck_registration_number
                     col.add_field :season_id
                     col.add_field :tipping_complete_date_time

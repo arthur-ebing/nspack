@@ -22,6 +22,5 @@ module RawMaterialsApp
     attribute? :active, Types::Bool
     attribute? :quantity_bins_with_fruit, Types::Integer
     attribute :reference_number, Types::String
-    attribute :intake_date, Types::DateTime
   end
 end
