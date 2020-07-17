@@ -2,46 +2,47 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_is_pallet, :carton_label_id, :resource_code, :user,
-                :palletizer_identifier, :palletizing_bay_resource_id
+    attr_reader :repo, :carton_quantity, :carton_label_id, :carton_id, :resource_code, :user, :palletizer_identifier, :palletizing_bay_resource_id
 
     def initialize(user, params, palletizer_identifier = nil, palletizing_bay_resource_id = nil)
       @carton_label_id = params[:carton_number]
       @user = user
       @palletizer_identifier = palletizer_identifier
       @palletizing_bay_resource_id = palletizing_bay_resource_id
+      @repo = MesscadaApp::MesscadaRepo.new
+      @carton_quantity = 1
+      @container_type = AppConst::CARTON_EQUALS_PALLET ? 'Bin' : 'Carton'
     end
 
     def call
-      @repo = MesscadaApp::MesscadaRepo.new
-      @carton_quantity = 1
-      @carton_is_pallet = AppConst::CARTON_EQUALS_PALLET
-      @container_type = @carton_is_pallet ? 'Bin' : 'Carton'
-      res = carton_verification
-      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
+      carton_verification
+
+      create_pallet_from_carton
 
       success_response("#{@container_type} verified")
     end
 
     private
 
-    def carton_verification  # rubocop:disable Metrics/AbcSize
-      # return failed_response("#{@container_type} #{carton_label_id} already verified") if carton_label_carton_exists?
+    def create_pallet_from_carton
+      has_pallet = repo.get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_label_id)
+      return if has_pallet
 
-      unless carton_label_carton_exists?
-        palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
-        attrs = { carton_label_id: carton_label_id,
-                  palletizer_identifier_id: palletizer_identifier_id,
-                  palletizing_bay_resource_id: palletizing_bay_resource_id }
-        carton_params = carton_label_carton_params.to_h.merge(attrs)
+      standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
+      is_bin = repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
+      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call if AppConst::CARTON_EQUALS_PALLET || is_bin
+    end
 
-        id = DB[:cartons].insert(carton_params)
-        MesscadaApp::CreatePalletFromCarton.new(user, id, carton_quantity).call if carton_is_pallet
-      end
+    def carton_verification
+      @carton_id = repo.get_id(:cartons, carton_label_id: carton_label_id)
+      return if carton_id
 
-      ok_response
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
+      palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
+      attrs = { carton_label_id: carton_label_id,
+                palletizer_identifier_id: palletizer_identifier_id,
+                palletizing_bay_resource_id: palletizing_bay_resource_id }
+      carton_params = carton_label_carton_params.to_h.merge(attrs)
+      @carton_id = DB[:cartons].insert(carton_params)
     end
 
     def carton_label_carton_exists?

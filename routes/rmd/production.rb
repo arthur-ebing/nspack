@@ -165,22 +165,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.post do
-          # # params[:carton][:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton][:carton_number]).carton_number
-          # pallet_number = params[:carton][:carton_number] if AppConst::CARTON_EQUALS_PALLET && interactor.pallet_exists?(params[:carton][:carton_number])
-          #
-          # unless pallet_number
-          #   res = interactor.carton_verification(carton_number: params[:carton][:carton_number])
-          #   pallet_number = AppConst::CARTON_EQUALS_PALLET ? params[:carton][:carton_number] : interactor.get_pallet_by_carton_label_id(params[:carton][:carton_number])
-          #   unless res.success
-          #     store_locally(:scan_carton_submit_error, "Error: #{unwrap_failed_response(res)}")
-          #     r.redirect('/rmd/production/pallet_verification/combined_verification_scan_carton')
-          #   end
-          # end
-
-          # res = interactor.validate_pallet_to_be_verified(pallet_number)
           res = interactor.carton_to_be_verified(params[:combined_verification])
           if res.success
-            # r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance[:oldest_pallet_sequence_id]}")
             r.redirect("/rmd/production/pallet_verification/verify_pallet_sequence/#{res.instance}")
           else
             store_locally(:error_message, res.message)
