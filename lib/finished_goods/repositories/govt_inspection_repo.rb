@@ -29,7 +29,7 @@ module FinishedGoodsApp
                                                    { parent_table: :destination_regions,
                                                      columns: %i[destination_region_name],
                                                      foreign_key: :destination_region_id,
-                                                     flatten_columns: { destination_region_name: :region_name } }])
+                                                     flatten_columns: { destination_region_name: :destination_region } }])
       return nil unless hash
 
       hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)

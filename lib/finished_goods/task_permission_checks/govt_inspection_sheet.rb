@@ -16,7 +16,9 @@ module FinishedGoodsApp
         edit: :edit_check,
         delete: :delete_check,
         capture: :capture_check,
+        add_pallets: :add_pallets_check,
         complete: :complete_check,
+        uncomplete: :uncomplete_check,
         finish: :finish_check,
         cancel: :cancel_check,
         reopen: :reopen_check
@@ -38,13 +40,19 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        return failed_response 'Govt Inspection Sheet has been completed' if inspected?
+        return failed_response 'Govt Inspection Sheet has been finished' if inspected?
 
         all_ok
       end
 
       def delete_check
         return failed_response 'Govt Inspection Sheet has been completed' if completed?
+
+        all_ok
+      end
+
+      def add_pallets_check
+        return failed_response 'Govt Inspection Sheet has already been completed' if completed?
 
         all_ok
       end
@@ -56,8 +64,14 @@ module FinishedGoodsApp
         all_ok
       end
 
+      def uncomplete_check
+        return failed_response 'Govt Inspection Sheet has not been completed' unless completed?
+
+        all_ok
+      end
+
       def reopen_check
-        return failed_response 'Govt Inspection Sheet is not completed' unless completed?
+        return failed_response 'Govt Inspection Sheet has not been inspected' unless inspected?
 
         all_ok
       end

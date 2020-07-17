@@ -25,7 +25,7 @@ module Crossbeams
     # @option options [Array] :step_and_total The step number and total no of steps. Optional - only prints if the caption is given.
     # @option options [Array] :links An array of hashes with { :caption, :url, :prompt (optional) } which provide links to navigate away.
     def initialize(form_state, options) # rubocop:disable Metrics/AbcSize
-      @form_state = form_state
+      @form_state = form_state.to_h
       @form_name = options.fetch(:form_name)
       @progress = options[:progress]
       @notes = options[:notes]
@@ -57,7 +57,7 @@ module Crossbeams
     # @option options [String] :data_type the input type. Defaults to 'text'.
     # @option options [Integer] :width the input with in rem. Defaults to 12.
     # @option options [Boolean] :allow_decimals can a data_type="number" input accept decimals?
-    # @option options [Boolean] :submit_form Should the form be submitted automatically after a scan result is placed in theis field?
+    # @option options [Boolean] :submit_form Should the form be submitted automatically after a scan result is placed in this field?
     # @option options [String] :scan The type of barcode symbology to accept. e.g. 'key248_all' for any symbology. Omit for input that does not receive a scan result.
     # Possible values are: key248_all (any symbology), key249_3o9 (309), key250_upc (UPC), key251_ean (EAN), key252_2d (2D - QR etc)
     # @option options [Symbol] :scan_type the type of barcode to expect in the field. This must have a matching entry in AppConst::BARCODE_PRINT_RULES.
@@ -76,7 +76,7 @@ module Crossbeams
       HTML
     end
 
-    # Add a toggle (checbox) field to the form.
+    # Add a toggle (checkbox) field to the form.
     # The field will render as a toggle with name = FORM_NAME[FIELD_NAME]
     # and id = FORM_NAME_FIELD_NAME.
     # The value returned in params is 't' or 'f'.

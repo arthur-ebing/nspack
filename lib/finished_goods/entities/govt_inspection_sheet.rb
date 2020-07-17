@@ -4,18 +4,18 @@ module FinishedGoodsApp
   class GovtInspectionSheet < Dry::Struct
     attribute :id, Types::Integer
     attribute :inspector_id, Types::Integer
-    attribute? :inspector, Types::String
+    attribute :inspector, Types::String
     attribute :inspection_billing_party_role_id, Types::Integer
-    attribute? :inspection_billing, Types::String
+    attribute :inspection_billing, Types::String
     attribute :exporter_party_role_id, Types::Integer
-    attribute? :exporter, Types::String
+    attribute :exporter, Types::String
     attribute :booking_reference, Types::String
     attribute :results_captured, Types::Bool
     attribute :results_captured_at, Types::DateTime
     attribute :api_results_received, Types::Bool
-    attribute? :allocated, Types::Bool
-    attribute? :passed_pallets, Types::Bool
-    attribute? :failed_pallets, Types::Bool
+    attribute :allocated, Types::Bool
+    attribute :passed_pallets, Types::Bool
+    attribute :failed_pallets, Types::Bool
     attribute :completed, Types::Bool
     attribute :completed_at, Types::DateTime
     attribute :cancelled, Types::Bool
@@ -24,19 +24,19 @@ module FinishedGoodsApp
     attribute :inspection_point, Types::String
     attribute :awaiting_inspection_results, Types::Bool
     attribute :packed_tm_group_id, Types::Integer
-    attribute? :packed_tm_group, Types::String
+    attribute :packed_tm_group, Types::String
     attribute :destination_region_id, Types::Integer
-    attribute? :region_name, Types::String
+    attribute :destination_region, Types::String
     attribute :govt_inspection_api_result_id, Types::Integer
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String
     attribute :consignment_note_number, Types::String
-    attribute? :active, Types::Bool
-    attribute? :tripsheet_created, Types::Bool
+    attribute :tripsheet_created, Types::Bool
     attribute :tripsheet_created_at, Types::DateTime
-    attribute? :tripsheet_loaded, Types::Bool
+    attribute :tripsheet_loaded, Types::Bool
     attribute :tripsheet_loaded_at, Types::DateTime
-    attribute? :tripsheet_offloaded, Types::Bool
+    attribute :tripsheet_offloaded, Types::Bool
     attribute? :status, Types::String
+    attribute? :active, Types::Bool
   end
 end

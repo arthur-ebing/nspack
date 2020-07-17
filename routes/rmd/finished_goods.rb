@@ -700,6 +700,109 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
       end
+
+      # # ALLOCATE PALLETS TO INSPECTION
+      # --------------------------------------------------------------------------
+      r.on 'inspection' do
+        interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+        # --------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------
+        r.on 'govt_inspection_sheets', Integer do |govt_inspection_sheet_id|
+          r.on 'complete' do
+            res = interactor.complete_govt_inspection_sheet(govt_inspection_sheet_id)
+            if res.success
+              store_locally(:flash_notice, rmd_success_message(res.message))
+              r.redirect('/rmd/home')
+            else
+              store_locally(:flash_notice, rmd_error_message(res.message))
+              r.redirect("/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}")
+            end
+          end
+
+          r.get do
+            check = interactor.check(:edit, govt_inspection_sheet_id)
+            unless check.success
+              store_locally(:error, { error_message: check.message })
+              r.redirect('/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets')
+            end
+
+            pallet_ids = BaseRepo.new.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: govt_inspection_sheet_id)
+            pallet_numbers = BaseRepo.new.select_values(:pallets, :pallet_number, id: pallet_ids)
+            progress = "Scanned Pallets<br>#{pallet_numbers.join('<br>')}"
+
+            form_state = interactor.find_govt_inspection_sheet(govt_inspection_sheet_id)
+            form = Crossbeams::RMDForm.new(form_state,
+                                           form_name: :add_pallets_govt_inspection_sheet,
+                                           progress: progress,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           links: [{ caption: 'Complete',
+                                                     url: "/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}/complete",
+                                                     prompt: 'Complete: Are you sure, you have finished adding pallets?' }],
+                                           notes: retrieve_from_local_store(:flash_notice),
+                                           caption: 'Dispatch: Consignment Note',
+                                           action: "/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}",
+                                           button_caption: 'Submit')
+            form.add_label(:govt_inspection_sheet_id, 'Govt Inspection Sheet Id', govt_inspection_sheet_id, govt_inspection_sheet_id, hide_on_load: true)
+            form.add_label(:consignment_note_number, 'Consignment Note Number', form_state[:consignment_note_number])
+            form.add_label(:inspection_point, 'Inspection Point', form_state[:inspection_point])
+            form.add_label(:destination_region, 'Destination Region', form_state[:destination_region])
+
+            form.add_field(:pallet_number,
+                           'Pallet Number',
+                           data_type: 'number',
+                           scan: 'key248_all',
+                           scan_type: :pallet_number,
+                           submit_form: true,
+                           required: true)
+            form.add_csrf_tag csrf_tag
+            view(inline: form.render, layout: :layout_rmd)
+          end
+
+          r.post do
+            res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id, params[:add_pallets_govt_inspection_sheet])
+            if res.success
+              store_locally(:flash_notice, rmd_success_message(res.message))
+            else
+              store_locally(:flash_notice, rmd_error_message(res.message))
+            end
+            r.redirect("/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}")
+          end
+        end
+
+        r.on 'govt_inspection_sheets' do
+          r.get do
+            form_state = retrieve_from_local_store(:error) || {}
+            form = Crossbeams::RMDForm.new(form_state,
+                                           form_name: :govt_inspection_sheet,
+                                           scan_with_camera: @rmd_scan_with_camera,
+                                           notes: retrieve_from_local_store(:flash_notice),
+                                           caption: 'Add Finding Sheet Pallets ',
+                                           action: '/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets',
+                                           button_caption: 'Submit')
+
+            form.add_field(:govt_inspection_sheet_id,
+                           'Govt Inspection Sheet',
+                           data_type: 'number',
+                           scan: 'key248_all',
+                           submit_form: true,
+                           required: true)
+            form.add_csrf_tag csrf_tag
+            view(inline: form.render, layout: :layout_rmd)
+          end
+
+          r.post do
+            govt_inspection_sheet_id = params[:govt_inspection_sheet][:govt_inspection_sheet_id]
+            res = interactor.check(:add_pallets, govt_inspection_sheet_id)
+            if res.success
+              r.redirect("/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}")
+            else
+              store_locally(:error, { error_message: res.message, errors: res.errors })
+              r.redirect('/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets')
+            end
+          end
+        end
+      end
     end
 
     # --------------------------------------------------------------------------

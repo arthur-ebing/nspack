@@ -13,7 +13,7 @@ module FinishedGoodsApp
         log_status(:govt_inspection_sheets, id, 'CREATED')
         log_transaction
       end
-      instance = govt_inspection_sheet(id)
+      instance = find_govt_inspection_sheet(id)
       success_response("Created govt inspection sheet #{instance.booking_reference}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { booking_reference: ['This govt inspection sheet already exists'] }))
@@ -21,7 +21,9 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_sheet(id, params)
+    def update_govt_inspection_sheet(id, params) # rubocop:disable Metrics/AbcSize
+      check!(:edit, id)
+
       res = validate_govt_inspection_sheet_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
@@ -29,14 +31,16 @@ module FinishedGoodsApp
         repo.update_govt_inspection_sheet(id, res)
         log_transaction
       end
-      instance = govt_inspection_sheet(id)
+      instance = find_govt_inspection_sheet(id)
       success_response("Updated govt inspection sheet #{instance.booking_reference}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def delete_govt_inspection_sheet(id)
-      name = govt_inspection_sheet(id).booking_reference
+      check!(:delete, id)
+
+      name = find_govt_inspection_sheet(id).consignment_note_number
       repo.transaction do
         repo.delete_govt_inspection_sheet(id)
         log_status(:govt_inspection_sheets, id, 'DELETED')
@@ -47,15 +51,26 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def add_pallets_govt_inspection_sheet(params)
-      res = validate_add_pallet_govt_inspection_params(params)
+    def add_pallets_govt_inspection_sheet(id, params) # rubocop:disable Metrics/AbcSize
+      check!(:add_pallets, id)
+
+      res = validate_add_pallet_govt_inspection_params(params.merge!(govt_inspection_sheet_id: id))
       return res unless res.success
 
-      repo.transaction do
-        repo.create_govt_inspection_pallet(res.instance)
-        log_transaction
+      govt_inspection_pallet_id = repo.get_id(:govt_inspection_pallets, res.instance)
+      if govt_inspection_pallet_id
+        repo.transaction do
+          repo.delete_govt_inspection_pallet(govt_inspection_pallet_id)
+          log_transaction
+        end
+        success_response('Deleted govt inspection pallet')
+      else
+        repo.transaction do
+          repo.create_govt_inspection_pallet(res.instance)
+          log_transaction
+        end
+        success_response('Added pallet to sheet.')
       end
-      success_response('Added pallet to sheet.')
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { failure_remarks: ['This govt inspection pallet already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -63,8 +78,7 @@ module FinishedGoodsApp
     end
 
     def complete_govt_inspection_sheet(id)
-      res = check(:complete, id)
-      return failed_response(res.message) unless res.success
+      check!(:complete, id)
 
       repo.transaction do
         repo.update_govt_inspection_sheet(id, completed: true, completed_at: Time.now)
@@ -77,9 +91,34 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def uncomplete_govt_inspection_sheet(id)
+      check!(:uncomplete, id)
+
+      repo.transaction do
+        repo.update_govt_inspection_sheet(id, completed: false, completed_at: nil)
+        log_status(:govt_inspection_sheets, id, 'UNCOMPLETED')
+        log_transaction
+      end
+
+      success_response('Uncompleted sheet.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def finish_govt_inspection_sheet(id)
+      check!(:finish, id)
+
+      repo.transaction do
+        repo.finish_govt_inspection_sheet(id, @user)
+        log_transaction
+      end
+      success_response('Finished Inspection')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def reopen_govt_inspection_sheet(id)
-      res = check(:reopen, id)
-      return failed_response(res.message) unless res.success
+      check!(:reopen, id)
 
       repo.transaction do
         repo.reopen_govt_inspection_sheet(id, @user)
@@ -91,22 +130,8 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def finish_govt_inspection_sheet(id)
-      res = check(:finish, id)
-      return failed_response(res.message) unless res.success
-
-      repo.transaction do
-        repo.finish_govt_inspection_sheet(id, @user)
-        log_transaction
-      end
-      success_response('Finished Inspection')
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
-    end
-
     def cancel_govt_inspection_sheet(id)
-      res = check(:cancel, id)
-      return failed_response(res.message) unless res.success
+      check!(:cancel, id)
 
       repo.transaction do
         repo.cancel_govt_inspection_sheet(id, @user)
@@ -288,9 +313,18 @@ module FinishedGoodsApp
       TaskPermissionCheck::GovtInspectionSheet.call(task, id)
     end
 
+    def check!(task, id = nil)
+      res = TaskPermissionCheck::GovtInspectionSheet.call(task, id)
+      raise Crossbeams::InfoError, res.message unless res.success
+    end
+
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::GovtInspectionSheet.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def find_govt_inspection_sheet(id)
+      repo.find_govt_inspection_sheet(id)
     end
 
     private
@@ -301,10 +335,6 @@ module FinishedGoodsApp
 
     def locn_repo
       MasterfilesApp::LocationRepo.new
-    end
-
-    def govt_inspection_sheet(id)
-      repo.find_govt_inspection_sheet(id)
     end
 
     def validate_vehicle_job_params(params)
@@ -319,9 +349,9 @@ module FinishedGoodsApp
       GovtInspectionSheetSchema.call(params)
     end
 
-    def check_pallet(check, pallet_numbers)
+    def check_pallet!(check, pallet_numbers)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
-      raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def validate_add_pallet_govt_inspection_params(params) # rubocop:disable Metrics/AbcSize
@@ -329,21 +359,21 @@ module FinishedGoodsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       attrs = res.to_h
-      pallet_number = attrs.delete(:pallet_number)
+      pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: attrs.delete(:pallet_number)).pallet_number
 
-      check_pallet(:not_shipped, pallet_number)
-      check_pallet(:not_failed_otmc, pallet_number)
-      check_pallet(:verification_passed, pallet_number)
-      check_pallet(:pallet_weight, pallet_number)
+      check_pallet!(:not_shipped, pallet_number)
+      check_pallet!(:not_failed_otmc, pallet_number)
+      check_pallet!(:verification_passed, pallet_number)
+      check_pallet!(:pallet_weight, pallet_number)
       if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
-        check_pallet(:inspected, pallet_number)
+        check_pallet!(:inspected, pallet_number)
       else
-        check_pallet(:not_on_inspection_sheet, pallet_number)
+        check_pallet!(:not_on_inspection_sheet, pallet_number)
       end
 
       attrs[:pallet_id] = repo.get_id(:pallets, pallet_number: pallet_number)
       success_response('Passed Validation', attrs)
-    rescue Crossbeams::TaskNotPermittedError => e
+    rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
   end

@@ -16,7 +16,7 @@ module FinishedGoodsApp
 
     def test_govt_inspection_sheet
       FinishedGoodsApp::GovtInspectionRepo.any_instance.stubs(:find_govt_inspection_sheet).returns(fake_govt_inspection_sheet)
-      entity = interactor.send(:govt_inspection_sheet, 1)
+      entity = interactor.send(:find_govt_inspection_sheet, 1)
       assert entity.is_a?(GovtInspectionSheet)
     end
 
@@ -74,27 +74,38 @@ module FinishedGoodsApp
       {
         id: 1,
         inspector_id: inspector_id,
+        inspector: Faker::Lorem.unique.word,
         inspection_billing_party_role_id: inspection_billing_party_role_id,
+        inspection_billing: Faker::Lorem.unique.word,
         exporter_party_role_id: exporter_party_role_id,
+        exporter: Faker::Lorem.unique.word,
         booking_reference: Faker::Lorem.unique.word,
         results_captured: false,
         results_captured_at: '2010-01-01 12:00',
         api_results_received: false,
+        allocated: false,
+        passed_pallets: false,
+        failed_pallets: false,
         completed: false,
         completed_at: '2010-01-01 12:00',
-        tripsheet_created_at: '2010-01-01 12:00',
-        tripsheet_loaded_at: '2010-01-01 12:00',
         inspected: false,
         inspection_point: 'ABC',
         awaiting_inspection_results: false,
         packed_tm_group_id: target_market_group_id,
+        packed_tm_group: Faker::Lorem.unique.word,
         destination_region_id: destination_region_id,
+        destination_region: Faker::Lorem.unique.word,
         govt_inspection_api_result_id: nil,
         reinspection: false,
         created_by: 'ABC',
         consignment_note_number: '00000001',
         cancelled: false,
         cancelled_at: nil,
+        tripsheet_created: false,
+        tripsheet_created_at: '2010-01-01 12:00',
+        tripsheet_loaded: false,
+        tripsheet_loaded_at: '2010-01-01 12:00',
+        tripsheet_offloaded: false,
         active: true
       }
     end

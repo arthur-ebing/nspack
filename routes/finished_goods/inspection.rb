@@ -32,11 +32,7 @@ class Nspack < Roda
       r.on 'load_vehicle' do
         r.get do
           res = interactor.load_vehicle(id)
-          if res.success
-            flash[:notice] = res.message
-          else
-            flash[:error] = res.message
-          end
+          flash[res.success ? :notice : :error] = res.message
           r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
         end
       end
@@ -66,11 +62,7 @@ class Nspack < Roda
 
       r.on 'cancel_tripsheet' do
         res = interactor.cancel_tripsheet(id)
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
+        flash[res.success ? :notice : :error] = res.message
 
         r.get do
           r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
@@ -96,11 +88,7 @@ class Nspack < Roda
       r.on 'refresh_tripsheet_confirmed' do
         r.get do
           res = interactor.refresh_tripsheet(id)
-          if res.success
-            flash[:notice] = res.message
-          else
-            flash[:error] = res.message
-          end
+          flash[res.success ? :notice : :error] = res.message
           r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
         end
       end
@@ -118,8 +106,7 @@ class Nspack < Roda
         end
 
         r.post do
-          pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:govt_inspection_sheet][:pallet_number]).pallet_number
-          res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id: id, pallet_number: pallet_number)
+          res = interactor.add_pallets_govt_inspection_sheet(id, params[:govt_inspection_sheet])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
@@ -138,9 +125,9 @@ class Nspack < Roda
         r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end
 
-      r.on 'reopen' do
+      r.on 'uncomplete' do
         check_auth!('inspection', 'edit')
-        res = interactor.reopen_govt_inspection_sheet(id)
+        res = interactor.uncomplete_govt_inspection_sheet(id)
         flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end
@@ -148,6 +135,13 @@ class Nspack < Roda
       r.on 'finish' do
         check_auth!('inspection', 'edit')
         res = interactor.finish_govt_inspection_sheet(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+      end
+
+      r.on 'reopen' do
+        check_auth!('inspection', 'edit')
+        res = interactor.reopen_govt_inspection_sheet(id)
         flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end

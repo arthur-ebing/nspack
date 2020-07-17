@@ -48,7 +48,7 @@ module UiRules
                                       with_value: @form_object.packed_tm_group,
                                       caption: 'Packed TM Group' }
       fields[:destination_region_id] = { renderer: :label,
-                                         with_value: @form_object.region_name,
+                                         with_value: @form_object.destination_region,
                                          caption: 'Destination Region' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
@@ -178,12 +178,12 @@ module UiRules
                    url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/complete",
                    prompt: 'Are you sure, you want to complete this inspection?',
                    icon: :checkon }
-      reopen = { control_type: :link,
-                 style: :action_button,
-                 text: 'Reopen',
-                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
-                 prompt: 'Are you sure you want to reopen this inspection?',
-                 icon: :back }
+      uncomplete = { control_type: :link,
+                     style: :action_button,
+                     text: 'Uncomplete',
+                     url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/uncomplete",
+                     prompt: 'Are you sure you want to uncomplete this inspection?',
+                     icon: :back }
       preverify = { control_type: :link,
                     style: :action_button,
                     text: 'eCert preverify',
@@ -194,13 +194,19 @@ module UiRules
                  text: 'Finish Inspection',
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/finish",
                  icon: :checkon }
+      reopen = { control_type: :link,
+                 style: :action_button,
+                 text: 'Reopen',
+                 url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
+                 prompt: 'Are you sure you want to reopen this inspection?',
+                 icon: :back }
 
       case @form_object.step
       when 0
         progress_controls = [complete]
         instance_controls = [edit, delete]
       when 1
-        progress_controls = [preverify, finish]
+        progress_controls = [uncomplete, preverify, finish]
         instance_controls = [edit]
       when 2
         progress_controls = [reopen]
