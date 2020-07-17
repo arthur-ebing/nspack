@@ -462,6 +462,7 @@ class Nspack < Roda
               std_pack_label_code
               basic_pack_code
               use_size_ref_for_edi
+              is_bin
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)

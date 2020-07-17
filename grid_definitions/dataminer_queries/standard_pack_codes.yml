@@ -4,8 +4,9 @@
   \   standard_pack_codes.description,\r\n    standard_pack_codes.std_pack_label_code,\r\n
   \   standard_pack_codes.material_mass,\r\n    standard_pack_codes.plant_resource_button_indicator,\r\n
   \   basic_pack_codes.basic_pack_code,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
-  \   fn_masterfile_variants('standard_pack_codes', standard_pack_codes.id) AS variant_codes,\r\n
-  \   standard_pack_codes.active,\r\n    standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at\r\nFROM
+  \   standard_pack_codes.is_bin,\r\n    fn_masterfile_variants('standard_pack_codes',
+  standard_pack_codes.id) AS variant_codes,\r\n    standard_pack_codes.active,\r\n
+  \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at\r\nFROM
   standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nORDER
   BY\r\n    standard_pack_codes.standard_pack_code"
 :limit: 
@@ -34,7 +35,7 @@
     :caption: Standard pack code
     :namespaced_name: standard_pack_codes.standard_pack_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -50,7 +51,7 @@
     :caption: Description
     :namespaced_name: standard_pack_codes.description
     :data_type: :string
-    :width: 
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -66,7 +67,7 @@
     :caption: Label code
     :namespaced_name: standard_pack_codes.std_pack_label_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -98,7 +99,7 @@
     :caption: Plant resource button indicator
     :namespaced_name: standard_pack_codes.plant_resource_button_indicator
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -114,7 +115,7 @@
     :caption: Basic pack code
     :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -130,7 +131,23 @@
     :caption: Use size ref for edi
     :namespaced_name: standard_pack_codes.use_size_ref_for_edi
     :data_type: :boolean
-    :width: 
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_bin:
+    :name: is_bin
+    :sequence_no: 9
+    :caption: Is bin
+    :namespaced_name: standard_pack_codes.is_bin
+    :data_type: :boolean
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -142,7 +159,7 @@
     :group_max: false
   variant_codes:
     :name: variant_codes
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Variant codes
     :namespaced_name: 
     :data_type: :string
@@ -158,7 +175,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: standard_pack_codes.active
     :data_type: :boolean
@@ -174,7 +191,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Created at
     :namespaced_name: standard_pack_codes.created_at
     :data_type: :datetime
@@ -190,7 +207,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Updated at
     :namespaced_name: standard_pack_codes.updated_at
     :data_type: :datetime

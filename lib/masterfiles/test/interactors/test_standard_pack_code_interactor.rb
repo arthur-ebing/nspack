@@ -81,7 +81,8 @@ module MasterfilesApp
         plant_resource_button_indicator: 'ABC',
         basic_pack_code_id: basic_pack_code_id,
         basic_pack_code: 'ABC',
-        use_size_ref_for_edi: false
+        use_size_ref_for_edi: false,
+        is_bin: false
       }
     end
 
