@@ -23,7 +23,7 @@ module MesscadaApp
     end
 
     def find_pallet_by_pallet_number(pallet_number)
-      id = repo.get_id(:pallets, pallet_number: pallet_number)
+      id = get_id(:pallets, pallet_number: pallet_number)
       find_pallet_flat(id)
     end
 
