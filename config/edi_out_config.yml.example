@@ -1,5 +1,6 @@
 ---
 :root: "$HOME/ftp_transfer"
+:email_dir: "$ROOT/edi_mail_out"
 :send_edi:
   :po: false
   :ps: false
