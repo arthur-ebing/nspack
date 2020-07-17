@@ -36,30 +36,35 @@ module MesscadaApp
     def pallet_to_be_verified(params) # rubocop:disable Metrics/AbcSize
       params = parse_pallet_or_carton_number(params)
       if params[:carton_number]
-        pallet_number = repo.get_pallet_by_carton_number(params[:carton_number])
-        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet_number.nil?
+        pallet = repo.find_pallet_by_carton_number(params[:carton_number])
+        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?
       else
-        pallet_number = params[:pallet_number]
+        pallet = repo.find_pallet_by_pallet_number(params[:pallet_number])
+        return failed_response("Pallet: #{params[:pallet_number]} not found.") if pallet.nil?
       end
 
-      check_pallet(:not_scrapped, pallet_number)
-      check_pallet(:not_inspected, pallet_number)
-      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
-      success_response('Pallet found', pallet_sequence_id)
+      check_pallet!(:not_scrapped, pallet.pallet_number)
+      check_pallet!(:not_inspected, pallet.pallet_number)
+      success_response('Pallet found', pallet.pallet_sequence_ids.first)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def carton_to_be_verified(params) # rubocop:disable Metrics/AbcSize
       scanned_carton_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton_number]).carton_number
-      return success_response('Carton found', scanned_carton_number) if AppConst::CARTON_EQUALS_PALLET && pallet_exists?(scanned_carton_number)
+
+      if AppConst::CARTON_EQUALS_PALLET
+        pallet = repo.find_pallet_by_pallet_number(scanned_carton_number)
+        return success_response('Carton found', pallet.pallet_sequence_ids.first) unless pallet.nil?
+      end
 
       res = carton_verification(carton_number: scanned_carton_number)
       return failed_response(res.message) unless res.success
 
-      pallet_number = repo.get_pallet_by_carton_number(scanned_carton_number)
-      pallet_sequence_id = find_pallet_sequences_by_pallet_number(pallet_number).first[:id]
-      success_response('Verified Carton', pallet_sequence_id)
+      pallet = repo.find_pallet_by_carton_number(scanned_carton_number)
+      return failed_response('Carton verification failed to create pallet.') if pallet.nil?
+
+      success_response('Verified Carton', pallet.pallet_sequence_ids.first)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -67,17 +72,14 @@ module MesscadaApp
     def scan_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
       params = parse_pallet_or_carton_number(params)
       if params[:carton_number]
-        pallet_number = repo.get_pallet_by_carton_number(params[:carton_number])
-        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet_number.nil?
+        pallet = repo.find_pallet_by_carton_number(params[:carton_number])
+        return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?
       else
-        pallet_number = params[:pallet_number]
+        pallet = repo.find_pallet_by_pallet_number(params[:pallet_number])
+        return failed_response("Pallet: #{params[:pallet_number]} not found.") if pallet.nil?
       end
 
-      check_pallet(:exists, pallet_number)
-
-      pallet_id = repo.get_id(:pallets, pallet_number: pallet_number)
-      instance = repo.find_pallet_flat(pallet_id)
-      success_response("Found Pallet #{pallet_number}", instance)
+      success_response("Found Pallet #{pallet.pallet_number}", pallet)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -431,7 +433,7 @@ module MesscadaApp
       reworks_repo.pallet_sequence_ids(pallet_id)
     end
 
-    def check_pallet(task, pallet_number)
+    def check_pallet!(task, pallet_number)
       res = TaskPermissionCheck::Pallets.call(task, pallet_number)
       raise Crossbeams::InfoError, res.message unless res.success
     end

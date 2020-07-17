@@ -22,6 +22,11 @@ module MesscadaApp
       PalletFlat.new(hash)
     end
 
+    def find_pallet_by_pallet_number(pallet_number)
+      id = repo.get_id(:pallets, pallet_number: pallet_number)
+      find_pallet_flat(id)
+    end
+
     def find_pallet_sequence_flat(id) # rubocop:disable Metrics/AbcSize
       hash = find_with_association(:pallet_sequences, id,
                                    parent_tables: [{ parent_table: :farms, columns: %i[farm_code pdn_region_id], foreign_key: :farm_id, flatten_columns: { farm_code: :farm_code, pdn_region_id: :production_region_id } },
@@ -235,11 +240,12 @@ module MesscadaApp
     #   return pallet[:pallet_number] unless pallet.nil?
     # end
 
-    def get_pallet_by_carton_number(carton_number)
+    def find_pallet_by_carton_number(carton_number)
       return carton_number if AppConst::CARTON_EQUALS_PALLET
 
       pallet_sequence_id = get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
-      get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+      pallet_id = get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      find_pallet_flat(pallet_id)
     end
 
     def production_run_stats(run_id)
