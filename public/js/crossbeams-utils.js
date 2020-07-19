@@ -306,7 +306,6 @@ const crossbeamsUtils = {
             crossbeamsUtils.showError(data.flash.error);
           }
         } else if (data.actions) {
-          console.log('GOT ACTIONS WITH FLASH');
           crossbeamsUtils.processActions(data.actions);
         } else {
           crossbeamsUtils.setDialogContent(`<div class="mt3"><div class="crossbeams-${noteStyle}-note"><p>${data.flash.error}</p></div></div>`);
@@ -785,7 +784,7 @@ const crossbeamsUtils = {
   },
 
   addGridRow: function addGridRow(action) {
-    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes);
+    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes, action.addRowToGrid.atStart);
   },
 
   updateGridRow: function updateGridRow(action) {

@@ -404,8 +404,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     res.to_json
   end
 
-  def action_add_grid_row(attrs:)
-    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+  def action_add_grid_row(attrs:, at_start: false)
+    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s), atStart: at_start } }
   end
 
   def action_update_grid_row(ids, changes:)
@@ -421,9 +421,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param attrs [Hash] the columns and their values.
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
-  def add_grid_row(attrs:, notice: nil)
+  def add_grid_row(attrs:, notice: nil, at_start: false)
     # res = { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
-    res = action_add_grid_row(attrs: attrs)
+    res = action_add_grid_row(attrs: attrs, at_start: at_start)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end

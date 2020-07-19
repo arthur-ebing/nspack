@@ -513,9 +513,9 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     dataset.select(value_name).map { |rec| rec[value_name] }
   end
 
-  def select_two(dataset, label_name, value_name)
+  def select_two(dataset, label_name, value_name, separator)
     if label_name.is_a?(Array)
-      dataset.select(*label_name, value_name).map { |rec| [label_name.map { |nm| rec[nm] }.join(' - '), rec[value_name]] }
+      dataset.select(*label_name, value_name).map { |rec| [label_name.map { |nm| rec[nm] }.join(separator || ' - '), rec[value_name]] }
     else
       dataset.select(label_name, value_name).map { |rec| [rec[label_name], rec[value_name]] }
     end
@@ -531,6 +531,8 @@ module MethodBuilder
   # - If present, will be named +for_select_alias+ instead of +for_select_table_name+.
   # label: String or Array
   # - The display column. Defaults to the value column. If an Array, will display each column separated by ' - '
+  # label_separator: String
+  # - for Array labels, the string between columns (defaults to ' - ')
   # value: String
   # - The value column. Required.
   # order_by: String
@@ -567,7 +569,7 @@ module MethodBuilder
       end
       lbl = options[:label] || options[:value]
       val = options[:value]
-      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val, options[:label_separator])
     end
   end
 
@@ -586,7 +588,7 @@ module MethodBuilder
       dataset = DB[table_name].exclude(:active)
       lbl = options[:label] || options[:value]
       val = options[:value]
-      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val)
+      lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val, options[:label_separator])
     end
   end
 

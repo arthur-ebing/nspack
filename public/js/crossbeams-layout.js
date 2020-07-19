@@ -353,7 +353,7 @@
                 crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
               });
             } else if (data.addRowToGrid) {
-              crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+              crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
             } else if (data.actions) {
               if (data.keep_dialog_open) {
                 closeDialog = false;

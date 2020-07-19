@@ -351,13 +351,18 @@ const crossbeamsGridEvents = {
   /**
    * Add a row to the end of a grid.
    * @param {object} row - the row to be aded to the grid.
+   * @param {boolean} atStart - should the row to be aded to the start of the grid.
    * @returns {void}
    */
-  addRowToGrid: function addRowToGrid(row) {
+  addRowToGrid: function addRowToGrid(row, atStart) {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
-      gridOptions.api.updateRowData({ add: [row] });
+      if (atStart) {
+        gridOptions.api.updateRowData({ add: [row], addIndex: 0 });
+      } else {
+        gridOptions.api.updateRowData({ add: [row] });
+      }
     } else {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
     }
@@ -450,7 +455,7 @@ const crossbeamsGridEvents = {
               this.updateGridInPlace(gridRow.id, gridRow.changes);
             });
           } else if (data.addRowToGrid) {
-            this.addRowToGrid(data.addRowToGrid.changes);
+            this.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
           } else if (data.actions) {
             if (data.keep_dialog_open) {
               closeDialog = false;
@@ -1820,7 +1825,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
                     });
                   } else if (data.addRowToGrid) {
-                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
                   } else if (data.actions) {
                     crossbeamsUtils.processActions(data.actions);
                   } else {

@@ -398,7 +398,7 @@ module MesscadaApp
       end
       fpw_res
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('fg_pallet_weighing'))
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('fg_pallet_weighing')) unless e.message.include?('pallet number length')
       failed_response(e.message)
     rescue StandardError => e
       ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('fg_pallet_weighing'))
