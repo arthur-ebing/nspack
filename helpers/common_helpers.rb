@@ -553,7 +553,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       set_readonly:           ->(act) { action_set_readonly(act) },
       hide_element:           ->(act) { action_hide_element(act) },
       show_element:           ->(act) { action_show_element(act) },
-      add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
+      add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs, at_start: act.at_start || false) },
       update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
       delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
