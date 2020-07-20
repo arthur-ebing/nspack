@@ -17,20 +17,32 @@ module MesscadaApp
     def call
       carton_verification
 
-      create_pallet_from_carton
+      # Temporary fix to handle UD & SR.
+      # TODO: redesign process for UD
+      unless AppConst::CARTON_VERIFICATION_REQUIRED
+        bin = check_if_bin?
+        create_pallet_from_bin if bin
+      end
 
       success_response("#{@container_type} verified")
     end
 
     private
 
-    def create_pallet_from_carton
+    def check_if_bin?
+      return true if AppConst::CARTON_EQUALS_PALLET
+
+      standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
+      repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
+    end
+
+    def create_pallet_from_bin
       has_pallet = repo.get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_label_id)
       return if has_pallet
 
-      standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
-      is_bin = repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
-      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call if AppConst::CARTON_EQUALS_PALLET || is_bin
+      # standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
+      # is_bin = repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
+      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call # if AppConst::CARTON_EQUALS_PALLET || is_bin
     end
 
     def carton_verification
