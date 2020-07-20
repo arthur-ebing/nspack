@@ -8,11 +8,11 @@ module FinishedGoodsApp
 
     def allocate_pallet(scanned_number)
       case scanned_number
-      when *current_step[:allocated]
-        current_step[:allocated].delete(scanned_number)
+      when *allocated
+        allocated.delete(scanned_number)
         message = "Removed: #{scanned_number}"
       else
-        current_step[:allocated] << scanned_number
+        allocated << scanned_number
         message = "Added: #{scanned_number}"
       end
       write(current_step)
@@ -21,12 +21,12 @@ module FinishedGoodsApp
 
     def load_pallet(scanned_number) # rubocop:disable Metrics/AbcSize
       case scanned_number
-      when *current_step[:allocated]
-        current_step[:scanned] << current_step[:allocated].delete(scanned_number)
+      when *allocated
+        scanned << allocated.delete(scanned_number)
         form_state[:error_message] = nil
         message = "Loaded: #{scanned_number}"
-      when *current_step[:scanned]
-        current_step[:allocated] << current_step[:scanned].delete(scanned_number)
+      when *scanned
+        allocated << scanned.delete(scanned_number)
         form_state[:error_message] = nil
         message = "Unloaded: #{scanned_number}"
       else
@@ -74,7 +74,7 @@ module FinishedGoodsApp
     end
 
     def ready_to_ship?
-      current_step[:allocated].empty?
+      allocated.empty?
     end
 
     def error?
@@ -86,16 +86,16 @@ module FinishedGoodsApp
     end
 
     def allocation_progress
-      current_step[:allocated].nil_or_empty? ? nil : "Pallets allocated: #{progress_count}<br>#{current_step[:allocated].join('<br>')}"
+      allocated.nil_or_empty? ? nil : "Pallets allocated: #{progress_count}<br>#{allocated.join('<br>')}"
     end
 
     def progress
       return '' if current_step.nil?
 
-      scanned = current_step[:scanned].nil_or_empty? ? '' : "<br>Scanned Pallets<br>#{current_step[:scanned].join('<br>')}"
+      scanned_progress = scanned.nil_or_empty? ? '' : "<br>Scanned Pallets<br>#{scanned.join('<br>')}"
       <<~HTML
-        Pallets to scan: #{progress_count}<br>#{current_step[:allocated].join('<br>')}<br>
-        #{scanned}
+        Pallets to scan: #{progress_count}<br>#{allocated.join('<br>')}<br>
+        #{scanned_progress}
       HTML
     end
 
