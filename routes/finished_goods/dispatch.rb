@@ -310,17 +310,18 @@ class Nspack < Roda
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
-      r.on 'unship' do
+      # Unship only pallet
+      r.on 'unship', String do |pallet_number|
+        p pallet_number
         check_auth!('dispatch', 'edit')
-        res = interactor.unship_load(id)
+        res = interactor.unship_load(id, pallet_number)
         flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
-      # Unship only pallet
-      r.on 'unship', String do |pallet_number|
+      r.on 'unship' do
         check_auth!('dispatch', 'edit')
-        res = interactor.unship_load(id, pallet_number)
+        res = interactor.unship_load(id)
         flash[res.success ? :notice : :error] = res.message
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
