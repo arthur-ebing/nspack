@@ -35,7 +35,7 @@ module MesscadaApp
 
     def carton_verification
       @carton_id = repo.get_id(:cartons, carton_label_id: carton_label_id)
-      return if carton_id
+      return if @carton_id
 
       palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
       attrs = { carton_label_id: carton_label_id,
