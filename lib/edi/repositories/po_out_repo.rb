@@ -127,10 +127,14 @@ module EdiApp
           pallets.pallet_number AS combo_sscc,
           pallets.phc AS packh_code,
           orchards.orchard_code AS orchard,
-          pallets.gross_weight AS pallet_gross_mass,
+          CASE WHEN pallet_sequences.pallet_sequence_number = 1 THEN
+            pallets.gross_weight
+          ELSE
+            0::numeric
+          END AS pallet_gross_mass,
           pallets.gross_weight_measured_at AS weighing_date,
           pallets.gross_weight_measured_at AS weighing_time,
-          pallets.nett_weight AS mass,
+          pallet_sequences.nett_weight AS mass,
           pallets.temp_tail AS temp_device_id,
           pallet_sequences.phyto_data
 
