@@ -471,8 +471,8 @@ module MesscadaApp
         reworks_repo.update_pallet_sequence(pallet_sequence_id, attrs)
         repo.log_status('pallets', pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
         repo.log_status('pallet_sequences', pallet_sequence_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
-        scrap_carton_pallet(pallet_id, params) if scrap_carton_pallet?(pallet_id)
       end
+      scrap_carton_pallet(pallet_id, params) if scrap_carton_pallet?(pallet_id)
     end
 
     def sequence_palletizing_bay_state(pallet_sequence_id)
@@ -483,9 +483,11 @@ module MesscadaApp
       attrs = { scrapped: true,
                 scrapped_at: Time.now,
                 exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED }
-      reworks_repo.update_pallet(pallet_id, attrs)
-      repo.log_status('pallets', pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
-      update_scrapped_pallet_palletizing_bay_state(params)
+      repo.transaction do
+        reworks_repo.update_pallet(pallet_id, attrs)
+        repo.log_status('pallets', pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
+        update_scrapped_pallet_palletizing_bay_state(params)
+      end
     end
 
     def update_scrapped_pallet_palletizing_bay_state(params)
