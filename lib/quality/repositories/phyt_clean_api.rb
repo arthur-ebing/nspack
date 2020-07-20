@@ -39,13 +39,15 @@ module QualityApp
       success_response('Received glossary', instance)
     end
 
-    def request_phyt_clean_standard_data(season_id, puc_id)
+    def request_phyt_clean_standard_data(season_id, puc_ids) # rubocop:disable Metrics/AbcSize
       auth_token_call if header.nil?
-      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
 
-      fbo_xml = "<?xml version=\"1.0\"?><Request><Fbo>
-                  <FboCode>#{get(:pucs, puc_id, :puc_code)}</FboCode>
-                </Fbo></Request>"
+      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
+      fbo_xml = "<?xml version=\"1.0\"?><Request>
+                   <Fbo><FboCode>
+                     #{select_values(:pucs, :puc_code, id: puc_ids).join('</FboCode></Fbo><Fbo><FboCode>')}
+                   </FboCode></Fbo>
+                 </Request>"
       params = { seasonID: season_id, outputType: 'json', fboXML: fbo_xml }
       res = http.request_post(url, params, header)
       return failed_response(res.message) unless res.success
