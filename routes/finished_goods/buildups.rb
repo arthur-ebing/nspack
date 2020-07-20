@@ -25,7 +25,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        button_caption: 'Next')
 
         form.add_field(:pallet_number, 'Destination Pallet', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
-        form.add_field(:qty_to_move, 'Qty Cartons To Move', scan: 'key248_all', data_type: :number, required: true)
+        form.add_field(:qty_to_move, 'Qty Cartons To Move', data_type: :number, required: true)
         form.add_field(:p1, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: true)
         form.add_field(:p2, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)
         form.add_field(:p3, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: false, data_type: :number, required: false)

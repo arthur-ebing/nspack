@@ -23,7 +23,7 @@ module FinishedGoodsApp
       return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
 
       to_pallet = params.delete(:pallet_number)
-      return failed_response("There's not enough cartons to move") unless repo.pallets_ctn_qty_sum(params.values) > qty_to_move
+      return failed_response("There's not enough cartons to move") if repo.pallets_ctn_qty_sum(params.values) < qty_to_move
 
       id = nil
       repo.transaction do
@@ -83,7 +83,7 @@ module FinishedGoodsApp
           dest_pallet = repo.get_value(:pallets, :id, pallet_number: pallet_buildup.destination_pallet_number)
           pallet_buildup.cartons_moved.each do |_k, v|
             v.each do |cl_id|
-              res = MesscadaApp::TransferBayCarton.call(ProductionApp::ProductionRunRepo.new.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet)
+              res = MesscadaApp::TransferCarton.call(ProductionApp::ProductionRunRepo.new.find_carton_by_carton_label_id(cl_id)[:id], dest_pallet)
               return res unless res.success
             end
           end

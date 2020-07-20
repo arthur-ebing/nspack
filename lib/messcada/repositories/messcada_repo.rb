@@ -368,5 +368,9 @@ module MesscadaApp
       attrs = find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
       DB[:pallet_sequences].where(pallet_id: pallet_id).where(attrs).get(:id)
     end
+
+    def sequence_has_cartons?(id)
+      !DB[:cartons].where(pallet_sequence_id: id).count.zero?
+    end
   end
 end
