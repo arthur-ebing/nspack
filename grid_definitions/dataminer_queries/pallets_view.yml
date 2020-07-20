@@ -1,85 +1,91 @@
 ---
-:caption: All Pallets with aggregated sequences
-:sql: "SELECT\r\n    vw_pallets.pallet_id AS pallet_id, vw_pallets.pallet_status,
-  vw_pallets.pallet_number, vw_pallets.target_customer_party_role_id, vw_pallets.target_customer,
-  vw_pallets.pallet_verification_failed,\r\n    vw_pallets.in_stock, vw_pallets.stock_created_at,
-  vw_pallets.exit_ref, vw_pallets.location_id, vw_pallets.location_long_code, vw_pallets.pallet_format_id,
-  vw_pallets.pallet_base_code,\r\n    vw_pallets.stack_type_code, vw_pallets.pallet_carton_quantity,
-  vw_pallets.build_status, vw_pallets.phc, vw_pallets.intake_created_at, vw_pallets.first_cold_storage_at,\r\n
-  \   vw_pallets.first_cold_storage_date, vw_pallets.plt_packhouse_resource_id, vw_pallets.plant_packhouse,
-  vw_pallets.plt_line_resource_id, vw_pallets.plant_line,\r\n    vw_pallets.nett_weight,
-  vw_pallets.gross_weight, vw_pallets.gross_weight_measured_at, vw_pallets.palletized,
-  vw_pallets.partially_palletized, vw_pallets.palletized_at,\r\n    vw_pallets.palletized_date,
-  vw_pallets.partially_palletized_at, vw_pallets.partially_palletized_date, vw_pallets.pallet_age,
-  vw_pallets.inspection_age, vw_pallets.stock_age,\r\n    vw_pallets.cold_age, vw_pallets.ambient_age,
-  vw_pallets.reinspection_age, vw_pallets.pack_to_inspect_age, vw_pallets.inspect_to_cold_age,\r\n
-  \   vw_pallets.inspect_to_exit_warm_age, vw_pallets.cooled, vw_pallets.temp_tail,
-  vw_pallets.depot_pallet, vw_pallets.fruit_sticker_pm_product_id, vw_pallets.fruit_sticker,\r\n
-  \   vw_pallets.fruit_sticker_pm_product_2_id, vw_pallets.fruit_sticker_2, vw_pallets.inspected,
-  vw_pallets.last_govt_inspection_pallet_id, vw_pallets.govt_inspection_sheet_id,
-  vw_pallets.inspection_point,\r\n    vw_pallets.inspected_dest_country, vw_pallets.govt_first_inspection_at,
-  vw_pallets.govt_first_inspection_date, vw_pallets.govt_reinspection_at,\r\n    vw_pallets.govt_reinspection_date,
-  vw_pallets.internal_inspection_at, vw_pallets.internal_reinspection_at, vw_pallets.govt_inspection_passed,\r\n
-  \   vw_pallets.internal_inspection_passed, vw_pallets.reinspected, vw_pallets.edi_in_transaction_id,
-  vw_pallets.edi_in_file,\r\n    vw_pallets.edi_in_consignment_note_number, vw_pallets.edi_in_inspection_point,
-  vw_pallets.inspection_date, vw_pallets.addendum_manifest, vw_pallets.pallet_repacked,\r\n
-  \   vw_pallets.pallet_repacked_at, vw_pallets.pallet_repacked_date, vw_pallets.scrapped,
-  vw_pallets.scrapped_at, vw_pallets.scrapped_date,\r\n----\r\n    aggregated.pallet_sequence_ids,
-  aggregated.sequence_statuses, aggregated.pallet_sequence_numbers, aggregated.packed_dates,
-  aggregated.packed_weeks,\r\n    aggregated.production_run_ids, aggregated.season_ids,
-  aggregated.season_codes, aggregated.farm_ids, aggregated.farm_codes, aggregated.farm_group_codes,\r\n
-  \   aggregated.production_region_codes, aggregated.puc_ids, aggregated.puc_codes,
-  aggregated.orchard_ids, aggregated.orchard_codes, aggregated.commodity_codes,\r\n
-  \   aggregated.cultivar_group_ids, aggregated.cultivar_group_codes, aggregated.cultivar_ids,
-  aggregated.cultivar_names, aggregated.cultivar_codes,\r\n    aggregated.resource_allocation_ids,
-  aggregated.packhouse_resource_ids, aggregated.packhouse_codes, aggregated.production_line_ids,
-  aggregated.line_codes,\r\n    aggregated.marketing_variety_ids, aggregated.marketing_variety_codes,
-  aggregated.customer_variety_ids, aggregated.variety_as_customer_variety_ids,\r\n
-  \   aggregated.customer_marketing_variety_codes, aggregated.std_fruit_size_count_ids,
-  aggregated.standard_sizes, aggregated.count_groups, aggregated.standard_counts,\r\n
-  \   aggregated.basic_pack_code_ids, aggregated.basic_pack_codes, aggregated.standard_pack_code_ids,
-  aggregated.standard_pack_codes,\r\n    aggregated.fruit_actual_counts_for_pack_ids,
-  aggregated.actual_counts, aggregated.edi_size_counts, aggregated.fruit_size_reference_ids,
-  aggregated.size_refs,\r\n    aggregated.marketing_org_party_role_ids, aggregated.marketing_orgs,
-  aggregated.packed_tm_group_ids, aggregated.packed_tm_groups, aggregated.mark_ids,
-  aggregated.marks,\r\n    aggregated.inventory_code_ids, aggregated.inventory_codes,
-  aggregated.pallet_format_ids, aggregated.pallet_formats, aggregated.cartons_per_pallet_ids,\r\n
-  \   aggregated.cartons_per_pallets, aggregated.pm_bom_ids, aggregated.bom_codes,
-  aggregated.extended_columns, aggregated.client_size_references, aggregated.client_product_codes,\r\n
-  \   aggregated.marketing_order_numbers, aggregated.pm_type_ids, aggregated.pm_type_codes,
-  aggregated.pm_subtype_ids, aggregated.subtype_codes, aggregated.sequence_carton_quantity,\r\n
-  \   aggregated.scanned_cartons, aggregated.seq_scrapped_at, aggregated.seq_exit_refs,
-  aggregated.verification_results,\r\n    aggregated.pallet_verification_failure_reason_ids,
-  aggregated.verification_failure_reasons, aggregated.verified, aggregated.verified_by,
-  aggregated.verified_at,\r\n    aggregated.verifications_passed, aggregated.pick_refs,
-  aggregated.grade_ids, aggregated.grade_codes, aggregated.scrapped_from_pallet_ids,\r\n
-  \   aggregated.removed_from_pallets, aggregated.removed_from_pallet_ids, aggregated.removed_from_pallet_at,
-  aggregated.sell_by_codes, aggregated.product_chars,\r\n    aggregated.depot_pallets,
-  aggregated.personnel_identifier_ids, aggregated.hardware_types, aggregated.identifiers,
-  aggregated.contract_worker_ids, aggregated.sequence_repacked, aggregated.sequence_repacked_at,\r\n
-  \   aggregated.repacked_from_pallet_ids, aggregated.phyto_data, aggregated.created_by,\r\n----\r\n
-  \   aggregated.failed_otmc_result_ids, aggregated.failed_otmc, aggregated.failed_otmc_results,\r\n
-  \   aggregated.treatment_ids, aggregated.treatment_codes,\r\n----\r\n    vw_loads.load_id,
-  vw_loads.load_status, vw_loads.customer_party_role_id, vw_loads.customer, vw_loads.consignee_party_role_id,
-  vw_loads.consignee,\r\n    vw_loads.billing_client_party_role_id, vw_loads.billing_client,
-  vw_loads.exporter_party_role_id, vw_loads.exporter,\r\n    vw_loads.final_receiver_party_role_id,
-  vw_loads.final_receiver, vw_loads.shipper_party_role_id, vw_loads.shipper, vw_loads.final_destination_id,\r\n
-  \   vw_loads.final_destination, vw_loads.country, vw_loads.region, vw_loads.depot_id,
-  vw_loads.depot_code, vw_loads.pol_voyage_port_id, vw_loads.pol, vw_loads.etd, vw_loads.atd,\r\n
-  \   vw_loads.departure_date, vw_loads.pod_voyage_port_id, vw_loads.pod, vw_loads.eta,
-  vw_loads.ata, vw_loads.arrival_date, vw_loads.internal_order_number, vw_loads.edi_file_name,\r\n
-  \   vw_loads.customer_order_number, vw_loads.customer_reference, vw_loads.exporter_certificate_code,
-  vw_loads.allocated, vw_loads.allocated_at, vw_loads.shipped_at,\r\n    vw_loads.shipped,
-  vw_loads.transfer_load, vw_loads.vessel, vw_loads.voyage, vw_loads.voyage_number,
-  vw_loads.vehicle_number, vw_loads.container, vw_loads.internal_container,\r\n    vw_loads.temp_code,
-  vw_loads.booking_reference,\r\n\r\n\r\n    CASE\r\n        WHEN vw_pallets.scrapped
-  THEN 'warning'\r\n        WHEN vw_pallets.shipped THEN 'inactive'\r\n        WHEN
-  vw_pallets.allocated THEN 'ready'\r\n        WHEN vw_pallets.in_stock THEN 'ok'\r\n
-  \       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized THEN 'inprogress'\r\n
-  \       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
-  'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
-  'error'\r\n        WHEN aggregated.verified AND NOT aggregated.verifications_passed
-  THEN 'error'\r\n        END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
+:caption: All Pallets - Grouped Sequences
+:sql: "SELECT DISTINCT\r\n   vw_pallets.pallet_id AS pallet_id,\r\n   vw_pallets.pallet_status,\r\n
+  \  vw_pallets.pallet_number,\r\n   vw_pallets.target_customer_party_role_id,\r\n
+  \  vw_pallets.target_customer,\r\n   vw_pallets.pallet_verification_failed,\r\n
+  \  vw_pallets.in_stock,\r\n   vw_pallets.stock_created_at,\r\n   vw_pallets.exit_ref,\r\n
+  \  vw_pallets.location_id,\r\n   vw_pallets.location_long_code,\r\n   vw_pallets.pallet_format_id,\r\n
+  \  vw_pallets.pallet_base_code,\r\n   vw_pallets.stack_type_code,\r\n   vw_pallets.pallet_carton_quantity,\r\n
+  \  vw_pallets.build_status,\r\n   vw_pallets.phc,\r\n   vw_pallets.intake_created_at,\r\n
+  \  vw_pallets.first_cold_storage_at,\r\n   vw_pallets.first_cold_storage_date,\r\n
+  \  vw_pallets.plt_packhouse_resource_id,\r\n   vw_pallets.plant_packhouse,\r\n   vw_pallets.plt_line_resource_id,\r\n
+  \  vw_pallets.plant_line,\r\n   vw_pallets.nett_weight,\r\n   vw_pallets.gross_weight,\r\n
+  \  vw_pallets.gross_weight_measured_at,\r\n   vw_pallets.palletized,\r\n   vw_pallets.partially_palletized,\r\n
+  \  vw_pallets.palletized_at,\r\n   vw_pallets.palletized_date,\r\n   vw_pallets.partially_palletized_at,\r\n
+  \  vw_pallets.partially_palletized_date,\r\n   vw_pallets.pallet_age,\r\n   vw_pallets.inspection_age,\r\n
+  \  vw_pallets.stock_age,\r\n   vw_pallets.cold_age,\r\n   vw_pallets.ambient_age,\r\n
+  \  vw_pallets.reinspection_age,\r\n   vw_pallets.pack_to_inspect_age,\r\n   vw_pallets.inspect_to_cold_age,\r\n
+  \  vw_pallets.inspect_to_exit_warm_age,\r\n   vw_pallets.cooled,\r\n   vw_pallets.temp_tail,\r\n
+  \  vw_pallets.depot_pallet,\r\n   vw_pallets.fruit_sticker_pm_product_id,\r\n   vw_pallets.fruit_sticker,\r\n
+  \  vw_pallets.fruit_sticker_pm_product_2_id,\r\n   vw_pallets.fruit_sticker_2,\r\n
+  \  vw_pallets.inspected,\r\n   vw_pallets.last_govt_inspection_pallet_id,\r\n   vw_pallets.govt_inspection_sheet_id,\r\n
+  \  vw_pallets.inspection_point,\r\n   vw_pallets.inspected_dest_country,\r\n   vw_pallets.govt_first_inspection_at,\r\n
+  \  vw_pallets.govt_first_inspection_date,\r\n   vw_pallets.govt_reinspection_at,\r\n
+  \  vw_pallets.govt_reinspection_date,\r\n   vw_pallets.internal_inspection_at,\r\n
+  \  vw_pallets.internal_reinspection_at,\r\n   vw_pallets.govt_inspection_passed,\r\n
+  \  vw_pallets.internal_inspection_passed,\r\n   vw_pallets.reinspected,\r\n   vw_pallets.edi_in_transaction_id,\r\n
+  \  vw_pallets.edi_in_file,\r\n   vw_pallets.edi_in_consignment_note_number,\r\n
+  \  vw_pallets.edi_in_inspection_point,\r\n   vw_pallets.inspection_date,\r\n   vw_pallets.addendum_manifest,\r\n
+  \  vw_pallets.pallet_repacked,\r\n   vw_pallets.pallet_repacked_at,\r\n   vw_pallets.pallet_repacked_date,\r\n
+  \  vw_pallets.scrapped,\r\n   vw_pallets.scrapped_at,\r\n   vw_pallets.scrapped_date,\r\n----\r\n
+  \  aggregated.pallet_sequence_ids,\r\n   aggregated.sequence_statuses,\r\n   aggregated.pallet_sequence_numbers,\r\n
+  \  aggregated.packed_dates,\r\n   aggregated.packed_weeks,\r\n   aggregated.production_run_ids,\r\n
+  \  aggregated.season_ids,\r\n   aggregated.season_codes,\r\n   aggregated.farm_ids,\r\n
+  \  aggregated.farm_codes,\r\n   aggregated.farm_group_codes,\r\n   aggregated.production_region_codes,\r\n
+  \  aggregated.puc_ids,\r\n   aggregated.puc_codes,\r\n   aggregated.orchard_ids,\r\n
+  \  aggregated.orchard_codes,\r\n   aggregated.commodity_codes,\r\n   aggregated.cultivar_group_ids,\r\n
+  \  aggregated.cultivar_group_codes,\r\n   aggregated.cultivar_ids,\r\n   aggregated.cultivar_names,\r\n
+  \  aggregated.cultivar_codes,\r\n   aggregated.resource_allocation_ids,\r\n   aggregated.packhouse_resource_ids,\r\n
+  \  aggregated.packhouse_codes,\r\n   aggregated.production_line_ids,\r\n   aggregated.line_codes,\r\n
+  \  aggregated.marketing_variety_ids,\r\n   aggregated.marketing_variety_codes,\r\n
+  \  aggregated.customer_variety_ids,\r\n   aggregated.variety_as_customer_variety_ids,\r\n
+  \  aggregated.customer_marketing_variety_codes,\r\n   aggregated.std_fruit_size_count_ids,\r\n
+  \  aggregated.standard_sizes,\r\n   aggregated.count_groups,\r\n   aggregated.standard_counts,\r\n
+  \  aggregated.basic_pack_code_ids,\r\n   aggregated.basic_pack_codes,\r\n   aggregated.standard_pack_code_ids,\r\n
+  \  aggregated.standard_pack_codes,\r\n   aggregated.fruit_actual_counts_for_pack_ids,\r\n
+  \  aggregated.actual_counts,\r\n   aggregated.edi_size_counts,\r\n   aggregated.fruit_size_reference_ids,\r\n
+  \  aggregated.size_refs,\r\n   aggregated.marketing_org_party_role_ids,\r\n   aggregated.marketing_orgs,\r\n
+  \  aggregated.packed_tm_group_ids,\r\n   aggregated.packed_tm_groups,\r\n   aggregated.mark_ids,\r\n
+  \  aggregated.marks,\r\n   aggregated.inventory_code_ids,\r\n   aggregated.inventory_codes,\r\n
+  \  aggregated.pallet_format_ids,\r\n   aggregated.pallet_formats,\r\n   aggregated.cartons_per_pallet_ids,\r\n
+  \  aggregated.cartons_per_pallets,\r\n   aggregated.pm_bom_ids,\r\n   aggregated.bom_codes,\r\n
+  \  aggregated.extended_columns,\r\n   aggregated.client_size_references,\r\n   aggregated.client_product_codes,\r\n
+  \  aggregated.marketing_order_numbers,\r\n   aggregated.pm_type_ids,\r\n   aggregated.pm_type_codes,\r\n
+  \  aggregated.pm_subtype_ids,\r\n   aggregated.subtype_codes,\r\n   aggregated.sequence_carton_quantity,\r\n
+  \  aggregated.scanned_cartons,\r\n   aggregated.seq_scrapped_at,\r\n   aggregated.seq_exit_refs,\r\n
+  \  aggregated.verification_results,\r\n   aggregated.pallet_verification_failure_reason_ids,\r\n
+  \  aggregated.verification_failure_reasons,\r\n   aggregated.verified,\r\n   aggregated.verified_by,\r\n
+  \  aggregated.verified_at,\r\n   aggregated.verifications_passed,\r\n   aggregated.pick_refs,\r\n
+  \  aggregated.grade_ids,\r\n   aggregated.grade_codes,\r\n   aggregated.scrapped_from_pallet_ids,\r\n
+  \  aggregated.removed_from_pallets,\r\n   aggregated.removed_from_pallet_ids,\r\n
+  \  aggregated.removed_from_pallet_at,\r\n   aggregated.sell_by_codes,\r\n   aggregated.product_chars,\r\n
+  \  aggregated.depot_pallets,\r\n   aggregated.personnel_identifier_ids,\r\n   aggregated.hardware_types,\r\n
+  \  aggregated.identifiers,\r\n   aggregated.contract_worker_ids,\r\n   aggregated.sequence_repacked,\r\n
+  \  aggregated.sequence_repacked_at,\r\n   aggregated.repacked_from_pallet_ids,\r\n
+  \  aggregated.phyto_data,\r\n   aggregated.created_by,\r\n----\r\n   aggregated.failed_otmc_result_ids,\r\n
+  \  aggregated.failed_otmc,\r\n   aggregated.failed_otmc_results,\r\n   aggregated.treatment_ids,\r\n
+  \  aggregated.treatment_codes,\r\n----\r\n   vw_loads.load_id,\r\n   vw_loads.load_status,\r\n
+  \  vw_loads.customer_party_role_id,\r\n   vw_loads.customer,\r\n   vw_loads.consignee_party_role_id,\r\n
+  \  vw_loads.consignee,\r\n   vw_loads.billing_client_party_role_id,\r\n   vw_loads.billing_client,\r\n
+  \  vw_loads.exporter_party_role_id,\r\n   vw_loads.exporter,\r\n   vw_loads.final_receiver_party_role_id,\r\n
+  \  vw_loads.final_receiver,\r\n   vw_loads.shipper_party_role_id,\r\n   vw_loads.shipper,\r\n
+  \  vw_loads.final_destination_id,\r\n   vw_loads.final_destination,\r\n   vw_loads.country,\r\n
+  \  vw_loads.region,\r\n   vw_loads.depot_id,\r\n   vw_loads.depot_code,\r\n   vw_loads.pol_voyage_port_id,\r\n
+  \  vw_loads.pol,\r\n   vw_loads.etd,\r\n   vw_loads.atd,\r\n   vw_loads.departure_date,\r\n
+  \  vw_loads.pod_voyage_port_id,\r\n   vw_loads.pod,\r\n   vw_loads.eta,\r\n   vw_loads.ata,\r\n
+  \  vw_loads.arrival_date,\r\n   vw_loads.internal_order_number,\r\n   vw_loads.edi_file_name,\r\n
+  \  vw_loads.customer_order_number,\r\n   vw_loads.customer_reference,\r\n   vw_loads.exporter_certificate_code,\r\n
+  \  vw_loads.allocated,\r\n   vw_loads.allocated_at,\r\n   vw_loads.shipped_at,\r\n
+  \  vw_loads.shipped,\r\n   vw_loads.transfer_load,\r\n   vw_loads.vessel,\r\n   vw_loads.voyage,\r\n
+  \  vw_loads.voyage_number,\r\n   vw_loads.vehicle_number,\r\n   vw_loads.container,\r\n
+  \  vw_loads.internal_container,\r\n   vw_loads.temp_code,\r\n   vw_loads.booking_reference,\r\n\r\n
+  \  CASE\r\n       WHEN vw_pallets.scrapped THEN 'warning'\r\n       WHEN vw_pallets.shipped
+  THEN 'inactive'\r\n       WHEN vw_pallets.allocated THEN 'ready'\r\n       WHEN
+  vw_pallets.in_stock THEN 'ok'\r\n       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
+  THEN 'inprogress'\r\n       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
+  THEN 'error'\r\n       WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
+  THEN 'error'\r\n       WHEN aggregated.verified AND NOT aggregated.verifications_passed
+  THEN 'error'\r\n   END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
   aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
   ON vw_pallets.pallet_id = pallet_sequences.pallet_id\r\nLEFT JOIN vw_loads ON vw_loads.load_id
   = vw_pallets.load_id"
@@ -3723,6 +3729,14 @@
 - :column: pallet_sequences.production_run_id
   :caption: Pallet Sequences Production Run Id
   :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: vw_pallets.pallet_number
+  :caption: Pallet Number
+  :data_type: :string
   :control_type: :text
   :default_value: 
   :ordered_list: false
