@@ -2,19 +2,24 @@
 
 module MesscadaApp
   class TransferBayCarton < BaseService
-    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id
+    attr_reader :repo, :prod_repo, :reworks_repo, :palletizing_repo, :carton_id, :pallet_id, :pallet_sequence_id, :original_pallet_id, :original_pallet_sequence_id
 
     def initialize(carton_id, pallet_id)
       @carton_id = carton_id
       @pallet_id = pallet_id
       @repo = MesscadaApp::MesscadaRepo.new
       @prod_repo = ProductionApp::ProductionRunRepo.new
+      @reworks_repo = ProductionApp::ReworksRepo.new
+      @palletizing_repo = MesscadaApp::PalletizingRepo.new
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       return failed_response("Pallet :#{pallet_id} does not exist") unless pallet_exists?
 
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?
+
+      @original_pallet_sequence_id = repo.get(:cartons, carton_id, :pallet_sequence_id)
+      @original_pallet_id = repo.get(:pallet_sequences, original_pallet_sequence_id, :pallet_id)
 
       res = transfer_carton
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
@@ -44,12 +49,57 @@ module MesscadaApp
         repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
         prod_repo.increment_sequence(pallet_sequence_id)
       end
+      remove_original_pallet_sequence if pallet_sequence_removed?
+      scrap_original_pallet if scrap_carton_pallet?
       repo.log_status('pallets', pallet_id, AppConst::CARTON_TRANSFER)
       repo.log_status('cartons', carton_id, AppConst::CARTON_TRANSFER)
 
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def pallet_sequence_removed?
+      carton_quantity = repo.get(:pallet_sequences, original_pallet_sequence_id, :carton_quantity)
+      carton_quantity.<= 1
+    end
+
+    def remove_original_pallet_sequence
+      attrs = { removed_from_pallet: true,
+                removed_from_pallet_at: Time.now,
+                pallet_id: nil,
+                removed_from_pallet_id: original_pallet_id,
+                exit_ref: AppConst::SEQ_REMOVED_BY_CTN_TRANSFER }
+
+      reworks_repo.update_pallet_sequence(original_pallet_sequence_id, attrs)
+      repo.log_status('pallets', original_pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+      repo.log_status('pallet_sequences', original_pallet_sequence_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+    end
+
+    def scrap_carton_pallet?
+      reworks_repo.unscrapped_sequences_count(original_pallet_id).<= 1
+    end
+
+    def scrap_original_pallet
+      attrs = { scrapped: true,
+                scrapped_at: Time.now,
+                exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED }
+      reworks_repo.update_pallet(original_pallet_id, attrs)
+      repo.log_status('pallets', original_pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
+      update_scrapped_pallet_palletizing_bay_state
+    end
+
+    def update_scrapped_pallet_palletizing_bay_state
+      changeset = { current_state: 'empty',
+                    pallet_sequence_id: nil,
+                    determining_carton_id: nil,
+                    last_carton_id: nil }
+
+      palletizing_repo.update_palletizing_bay_state(sequence_palletizing_bay_state, changeset)
+    end
+
+    def sequence_palletizing_bay_state
+      palletizing_repo.pallet_sequence_palletizing_bay_state(original_pallet_sequence_id)
     end
   end
 end

@@ -431,7 +431,6 @@ module MesscadaApp
       res = validate_pallet_mix_rules(state_machine, carton_id)
       return res unless res.success
 
-      original_carton_sequence_id = original_carton_sequence(carton_id)
       res = nil
       repo.transaction do
         res = MesscadaApp::TransferBayCarton.call(carton_id, palletizing_bay_state(state_machine.target.id)&.pallet_id)
@@ -441,7 +440,6 @@ module MesscadaApp
         repo.update_palletizing_bay_state(state_machine.target.id, changeset)
         log_transaction
       end
-      remove_pallet_sequence(original_carton_sequence_id) if pallet_sequence_removed?(original_carton_sequence_id)
       last_carton = last_carton?(current_bay_attributes(state_machine))
       confirm = if last_carton
                   {
@@ -454,53 +452,6 @@ module MesscadaApp
                 end
 
       success_response('ok', current_bay_attributes(state_machine, confirm))
-    end
-
-    def remove_pallet_sequence(pallet_sequence_id)  # rubocop:disable Metrics/AbcSize
-      pallet_id = repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
-      res = palletizing_bay_state(sequence_palletizing_bay_state(pallet_sequence_id))
-      params = { device: res[:palletizing_robot_code], reader_id: res[:scanner_code] }
-
-      attrs = { removed_from_pallet: true,
-                removed_from_pallet_at: Time.now,
-                pallet_id: nil,
-                removed_from_pallet_id: pallet_id,
-                exit_ref: AppConst::SEQ_REMOVED_BY_CTN_TRANSFER }
-
-      repo.transaction do
-        reworks_repo.update_pallet_sequence(pallet_sequence_id, attrs)
-        repo.log_status('pallets', pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
-        repo.log_status('pallet_sequences', pallet_sequence_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
-      end
-      scrap_carton_pallet(pallet_id, params) if scrap_carton_pallet?(pallet_id)
-    end
-
-    def sequence_palletizing_bay_state(pallet_sequence_id)
-      repo.pallet_sequence_palletizing_bay_state(pallet_sequence_id)
-    end
-
-    def scrap_carton_pallet(pallet_id, params)
-      attrs = { scrapped: true,
-                scrapped_at: Time.now,
-                exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED }
-      repo.transaction do
-        reworks_repo.update_pallet(pallet_id, attrs)
-        repo.log_status('pallets', pallet_id, AppConst::PALLET_SCRAPPED_BY_CTN_TRANSFER)
-        update_scrapped_pallet_palletizing_bay_state(params)
-      end
-    end
-
-    def update_scrapped_pallet_palletizing_bay_state(params)
-      state_machine = state_machine(params)
-      state_machine.complete
-
-      changeset = { current_state: state_machine.current.to_s,
-                    pallet_sequence_id: nil,
-                    determining_carton_id: nil,
-                    last_carton_id: nil }
-
-      repo.update_palletizing_bay_state(state_machine.target.id, changeset)
-      log_transaction
     end
 
     def return_pallet_to_bay(state_machine, params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
@@ -669,15 +620,6 @@ module MesscadaApp
 
     def original_carton_sequence(carton_id)
       repo.get(:cartons, carton_id, :pallet_sequence_id)
-    end
-
-    def pallet_sequence_removed?(pallet_sequence_id)
-      carton_quantity = repo.get(:pallet_sequences, pallet_sequence_id, :carton_quantity)
-      carton_quantity.zero?
-    end
-
-    def scrap_carton_pallet?(pallet_id)
-      reworks_repo.unscrapped_sequences_count(pallet_id).zero?
     end
 
     def print_pallet_label(pallet_id, palletizing_bay_state_id)
