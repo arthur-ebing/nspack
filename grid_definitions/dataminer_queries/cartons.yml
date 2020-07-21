@@ -38,7 +38,9 @@
   \            COALESCE(carton_labels.pallet_number, pallet_sequences.pallet_number)
   AS pallet_number,\r\n             personnel_identifiers.identifier AS personnel_identifier,\r\n
   \            contract_workers.personnel_number,\r\n             packing_methods.packing_method_code,\r\n
-  \            palletizers.identifier AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n
+  \            palletizers.identifier AS palletizer_identifier,\r\n             CONCAT(palletizer_contract_workers.first_name,
+  '_', palletizer_contract_workers.surname) AS palletizer_contract_worker,\r\n             palletizer_contract_workers.personnel_number
+  AS palletizer_personnel_number,\r\n             cartons.pallet_sequence_id,\r\n
   \            pallet_sequences.pallet_sequence_number,\r\n             cartons.is_virtual\r\nFROM
   carton_labels\r\nLEFT JOIN cartons ON carton_labels.id = cartons.carton_label_id\r\nJOIN
   production_runs ON production_runs.id = carton_labels.production_run_id\r\nLEFT
@@ -74,8 +76,9 @@
   JOIN personnel_identifiers ON personnel_identifiers.id = carton_labels.personnel_identifier_id\r\nJOIN
   packing_methods ON packing_methods.id = carton_labels.packing_method_id\r\nLEFT
   JOIN personnel_identifiers palletizers ON palletizers.id = cartons.palletizer_identifier_id\r\nLEFT
-  JOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nORDER
-  BY carton_labels.created_at DESC"
+  JOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nLEFT
+  JOIN contract_workers palletizer_contract_workers ON palletizer_contract_workers.personnel_identifier_id
+  = cartons.palletizer_identifier_id\r\nORDER BY carton_labels.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -947,9 +950,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  palletizer_contract_worker:
+    :name: palletizer_contract_worker
+    :sequence_no: 55
+    :caption: Palletizer contract worker
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizer_personnel_number:
+    :name: palletizer_personnel_number
+    :sequence_no: 56
+    :caption: Palletizer personnel number
+    :namespaced_name: palletizer_contract_workers.personnel_number
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pallet_sequence_id:
     :name: pallet_sequence_id
-    :sequence_no: 55
+    :sequence_no: 57
     :caption: Pallet sequence
     :namespaced_name: cartons.pallet_sequence_id
     :data_type: :integer
@@ -965,7 +1000,7 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 56
+    :sequence_no: 58
     :caption: Seq
     :namespaced_name: pallet_sequences.pallet_sequence_number
     :data_type: :string
@@ -981,7 +1016,7 @@
     :group_max: false
   is_virtual:
     :name: is_virtual
-    :sequence_no: 57
+    :sequence_no: 59
     :caption: Virtual
     :namespaced_name: cartons.is_virtual
     :data_type: :boolean
@@ -1126,14 +1161,14 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def:
+  :list_def: 
 - :column: cartons.is_virtual
   :caption: Virtual?
   :data_type: :boolean
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 6
   :list_def:
-    - true
-    - false
+  - true
+  - false

@@ -129,6 +129,10 @@
         :text: cartons
         :icon: list
         :hide_if_false: has_cartons
+      - :url: "/list/palletizer_pallets/with_params?key=production_run_pallets&production_run_id=$:id$"
+        :text: palletizer pallets
+        :icon: list
+        :hide_if_false: has_pallets
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/show_stats"
   :text: view run stats

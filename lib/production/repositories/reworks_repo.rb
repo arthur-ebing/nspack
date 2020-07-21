@@ -135,6 +135,10 @@ module ProductionApp
       DB[:rmt_bins].where(id: rmt_bins, bin_tipped: true).select_map(:id)
     end
 
+    def untipped_bins?(rmt_bins)
+      DB[:rmt_bins].where(id: rmt_bins, bin_tipped: false).select_map(:id)
+    end
+
     def rmt_bin_asset_number_tipped?(rmt_bins)
       bin_asset_number = DB[:rmt_bins].where(bin_asset_number: rmt_bins, bin_tipped: true).select_map(:bin_asset_number).compact
       return DB[:rmt_bins].where(tipped_asset_number: rmt_bins, bin_tipped: true).select_map(:tipped_asset_number).compact if bin_asset_number.nil_or_empty?

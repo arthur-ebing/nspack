@@ -201,7 +201,7 @@ module ProductionApp
 
       reworks_run_type = reworks_run_type(reworks_run_type_id)
       rmt_bins = case reworks_run_type
-                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
+                 when AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE, AppConst::RUN_TYPE_UNTIP_BINS
                    selected_bins(multiselect_list)
                  else
                    selected_rmt_bins(multiselect_list)
@@ -329,6 +329,8 @@ module ProductionApp
 
       return manually_tip_bins(attrs) if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
 
+      return manually_untip_bins(attrs) if AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type
+
       return bulk_weigh_bins(attrs) if AppConst::RUN_TYPE_BULK_WEIGH_BINS == reworks_run_type
 
       return bulk_update_pallet_dates(attrs) if AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type
@@ -356,7 +358,8 @@ module ProductionApp
            AppConst::RUN_TYPE_WEIGH_RMT_BINS,
            AppConst::RUN_TYPE_SCRAP_BIN,
           AppConst::RUN_TYPE_UNSCRAP_BIN,
-          AppConst::RUN_TYPE_BULK_WEIGH_BINS
+          AppConst::RUN_TYPE_BULK_WEIGH_BINS,
+          AppConst::RUN_TYPE_UNTIP_BINS
         validate_rmt_bins(reworks_run_type, params[:pallets_selected])
       when AppConst::RUN_TYPE_BULK_PRODUCTION_RUN_UPDATE,
           AppConst::RUN_TYPE_BULK_BIN_RUN_UPDATE
@@ -871,6 +874,67 @@ module ProductionApp
       defaults
     end
 
+    def manually_untip_bins(attrs)  # rubocop:disable Metrics/AbcSize
+      attrs = attrs.to_h
+      res = repo.where_hash(:rmt_bins, id: attrs[:pallets_selected].first)
+
+      change_attrs = { bin_tipped_date_time: nil,
+                       production_run_tipped_id: nil,
+                       exit_ref_date_time: nil,
+                       bin_tipped: false,
+                       exit_ref: nil,
+                       tipped_manually: false }
+      change_attrs = change_attrs.merge!(asset_number_attrs(res)) if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
+      rw_res = nil
+      repo.transaction do
+        repo.update_rmt_bin(attrs[:pallets_selected], change_attrs)
+        location_to_id = MasterfilesApp::LocationRepo.new.find_location_by_location_long_code(AppConst::UNTIP_LOCATION)&.id
+        return failed_response('Location does not exist') if location_to_id.nil_or_empty?
+
+        attrs[:pallets_selected].each do |bin_number|
+          res = FinishedGoodsApp::MoveStockService.call(AppConst::BIN_STOCK_TYPE, bin_number, location_to_id, AppConst::REWORKS_MOVE_BIN_BUSINESS_PROCESS, nil)
+          return res unless res.success
+        end
+
+        reworks_run_attrs = { user: @user.user_name, reworks_run_type_id: attrs[:reworks_run_type_id], pallets_selected: attrs[:pallets_selected],
+                              pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil, make_changes: true,
+                              allow_cultivar_mixing: false }
+        rw_res = create_reworks_run_record(reworks_run_attrs,
+                                           nil,
+                                           before: manually_untip_bin_before_state(res).sort.to_h, after: change_attrs.sort.to_h)
+        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
+
+        log_status(:reworks_runs, rw_res.instance[:reworks_run_id], AppConst::RMT_BIN_UNTIPPED_MANUALLY)
+      end
+      success_response('Rmt Bin untipped successfully', pallet_number: attrs[:pallets_selected])
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('manually_untip_bins'))
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
+    def asset_number_attrs(res)
+      { bin_asset_number: res[:tipped_asset_number],
+        tipped_asset_number: nil }
+    end
+
+    def manually_untip_bin_before_state(res)
+      attrs = { bin_tipped_date_time: res[:bin_tipped_date_time],
+                production_run_tipped_id: res[:production_run_tipped_id],
+                exit_ref_date_time: res[:exit_ref_date_time],
+                bin_tipped: true,
+                exit_ref: 'TIPPED',
+                tipped_manually: true }
+      if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+        attrs = attrs.merge!({ tipped_asset_number: res[:tipped_asset_number],
+                               bin_asset_number: res[:bin_asset_number] })
+      end
+      attrs
+    end
+
     def bulk_weigh_bins(attrs)  # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       before_state = manually_weigh_rmt_bin_state(attrs[:pallets_selected].first)
@@ -1274,7 +1338,8 @@ module ProductionApp
            AppConst::RUN_TYPE_UNSCRAP_BIN,
            AppConst::RUN_TYPE_REPACK,
            AppConst::RUN_TYPE_TIP_BINS,
-           AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
+          AppConst::RUN_TYPE_UNTIP_BINS,
+          AppConst::RUN_TYPE_RECALC_NETT_WEIGHT,
            AppConst::RUN_TYPE_BULK_WEIGH_BINS,
            AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES
         false
@@ -1352,6 +1417,11 @@ module ProductionApp
       if AppConst::RUN_TYPE_TIP_BINS == reworks_run_type
         tipped_bins = repo.tipped_bins?(rmt_bins)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{tipped_bins.join(', ')} already tipped"] }, pallets_selected: rmt_bins) unless tipped_bins.nil_or_empty?
+      end
+
+      if AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type
+        untipped_bins = repo.untipped_bins?(rmt_bins)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{untipped_bins.join(', ')} not tipped"] }, pallets_selected: rmt_bins) unless untipped_bins.nil_or_empty?
       end
 
       res = validate_scrapped_rmt_bins(reworks_run_type, rmt_bins)

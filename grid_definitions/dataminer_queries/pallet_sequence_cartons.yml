@@ -13,11 +13,14 @@
   THEN 'ok' \r\n             ELSE NULL \r\n             END AS colour_rule,\r\n             personnel_identifiers.identifier
   AS personnel_identifier,\r\n             contract_workers.personnel_number,\r\n
   \            packing_methods.packing_method_code,\r\n             palletizers.identifier
-  AS palletizer_identifier,\r\n             cartons.pallet_sequence_id,\r\n             pallet_sequences.pallet_id,\r\n
-  \            cartons.is_virtual,\r\n             cartons.created_at AS verified_at,\r\n
-  \            cartons.updated_at\r\nFROM cartons\r\nJOIN carton_labels ON carton_labels.id
-  = cartons.carton_label_id\r\nJOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN
-  pallets ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
+  AS palletizer_identifier,\r\n             CONCAT(palletizer_contract_workers.first_name,
+  '_', palletizer_contract_workers.surname) AS palletizer_contract_worker,\r\n             palletizer_contract_workers.personnel_number
+  AS palletizer_personnel_number,\r\n             cartons.pallet_sequence_id,\r\n
+  \            pallet_sequences.pallet_id,\r\n             cartons.is_virtual,\r\n
+  \            cartons.created_at AS verified_at,\r\n             cartons.updated_at\r\nFROM
+  cartons\r\nJOIN carton_labels ON carton_labels.id = cartons.carton_label_id\r\nJOIN
+  pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN pallets
+  ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
   ON product_resource_allocations.id = carton_labels.product_resource_allocation_id\r\nLEFT
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
   product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
@@ -31,8 +34,9 @@
   = carton_labels.personnel_identifier_id\r\nJOIN packing_methods ON packing_methods.id
   = carton_labels.packing_method_id\r\nLEFT JOIN personnel_identifiers palletizers
   ON palletizers.id = cartons.palletizer_identifier_id\r\nLEFT JOIN palletizing_bay_states
-  ON cartons.id = palletizing_bay_states.determining_carton_id\r\nORDER BY cartons.created_at
-  DESC"
+  ON cartons.id = palletizing_bay_states.determining_carton_id\r\nLEFT JOIN contract_workers
+  palletizer_contract_workers ON palletizer_contract_workers.personnel_identifier_id
+  = cartons.palletizer_identifier_id\r\nORDER BY cartons.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -392,9 +396,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  palletizer_contract_worker:
+    :name: palletizer_contract_worker
+    :sequence_no: 23
+    :caption: Palletizer contract worker
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizer_personnel_number:
+    :name: palletizer_personnel_number
+    :sequence_no: 24
+    :caption: Palletizer personnel number
+    :namespaced_name: palletizer_contract_workers.personnel_number
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pallet_sequence_id:
     :name: pallet_sequence_id
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Pallet sequence
     :namespaced_name: cartons.pallet_sequence_id
     :data_type: :integer
@@ -410,7 +446,7 @@
     :group_max: false
   pallet_id:
     :name: pallet_id
-    :sequence_no: 24
+    :sequence_no: 26
     :caption: Pallet
     :namespaced_name: pallet_sequences.pallet_id
     :data_type: :integer
@@ -426,7 +462,7 @@
     :group_max: false
   is_virtual:
     :name: is_virtual
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Virtual
     :namespaced_name: cartons.is_virtual
     :data_type: :boolean
@@ -442,7 +478,7 @@
     :group_max: false
   verified_at:
     :name: verified_at
-    :sequence_no: 26
+    :sequence_no: 28
     :caption: Verified at
     :namespaced_name: cartons.created_at
     :data_type: :date
@@ -458,7 +494,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 27
+    :sequence_no: 29
     :caption: Updated at
     :namespaced_name: cartons.updated_at
     :data_type: :date

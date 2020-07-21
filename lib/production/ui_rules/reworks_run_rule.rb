@@ -138,6 +138,7 @@ module UiRules
       @rules[:bin_run_type] = bin_run_type?
       @rules[:show_allow_cultivar_group_mixing] = @rules[:allow_cultivar_group_mixing] && @rules[:bulk_production_run_update]
       @rules[:bulk_update_pallet_dates] = AppConst::RUN_TYPE_BULK_UPDATE_PALLET_DATES == reworks_run_type_id_label
+      @rules[:untip_bins] = AppConst::RUN_TYPE_UNTIP_BINS == reworks_run_type_id_label
 
       text_caption = if @rules[:single_pallet_edit]
                        'Pallet Number'
@@ -221,8 +222,8 @@ module UiRules
                                     production_run_id: nil)
     end
 
-    def bin_run_type?
-      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins]
+    def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity
+      @rules[:tip_bins] || @rules[:weigh_rmt_bins] || @rules[:scrap_bin] || @rules[:unscrap_bin] || @rules[:bulk_bin_run_update] || @rules[:bulk_weigh_bins] || @rules[:untip_bins]
     end
 
     def make_compact_details(affected_deliveries)

@@ -14,6 +14,9 @@ module Production
           elsif rules[:tip_bins]
             grid = 'rmt_bins_reworks'
             grid_key = 'tip_bins_reworks'
+          elsif rules[:untip_bins]
+            grid = 'rmt_bins_reworks'
+            grid_key = 'untip_bins_reworks'
           elsif rules[:bulk_weigh_bins]
             grid = 'rmt_bins_reworks'
             grid_key = 'bulk_weigh_bins'

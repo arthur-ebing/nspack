@@ -26,7 +26,7 @@
   :text: clone
   :icon: copy
   :title: Clone
-  :hide_if_true: inspected
+  :hide_if_true: inspected,has_individual_cartons
   :auth:
     :function: production
     :program: reworks
@@ -36,6 +36,7 @@
   :icon: delete
   :is_delete: true
   :popup: true
+  :hide_if_true: has_individual_cartons
 - :separator: true
 - :url: "/production/reworks/pallet_sequences/$:id$/manage_sequence_cartons"
   :text: cartons

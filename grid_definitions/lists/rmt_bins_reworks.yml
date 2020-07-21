@@ -23,6 +23,10 @@
     - :col: scrapped
       :op: =
       :val: false
+  :untip_bins_reworks:
+    - :col: bin_tipped
+      :op: =
+      :val: true
 :multiselect:
   :tip_bins_reworks:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
@@ -46,3 +50,8 @@
     :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
     :multiselect_save_method: remote
     :conditions: bulk_weigh_bins
+  :untip_bins_reworks:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
+    :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: untip_bins_reworks
