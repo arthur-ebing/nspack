@@ -49,7 +49,7 @@ module MesscadaApp
 
       unless repo.sequence_has_cartons?(orig_seq)
         src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: orig_seq)
-        ProductionApp::ReworksRepo.new.update_pallet_sequence(orig_seq, { pallet_id: nil, scrapped: true, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED })
+        ProductionApp::ReworksRepo.new.update_pallet_sequence(orig_seq, { pallet_id: nil, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED })
         repo.log_status('pallets', src_pallet_id, AppConst::SEQUENCE_REMOVED_BY_CTN_TRANSFER)
       end
 
