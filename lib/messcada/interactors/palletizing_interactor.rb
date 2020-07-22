@@ -19,12 +19,16 @@ module MesscadaApp
       state_machine.scan
       case state_machine.target.action
       when :create_pallet
+        @context.context = 'create_pallet'
         start_new_pallet(state_machine, params)
       when :add_carton
+        @context.context = 'add_carton'
         add_to_pallet(state_machine, params)
       when :return_to_bay
+        @context.context = 'return_to_bay'
         return_pallet_to_bay(state_machine, params)
       when :mark_qc_carton
+        @context.context = 'mark_qc_carton'
         mark_carton_for_qc(state_machine, params)
       else
         raise Crossbeams::FrameworkError, 'No action returned from state machine'

@@ -2,7 +2,7 @@
 
 module UiRules
   class TransactionRule < Base
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = DevelopmentApp::LoggingRepo.new
 
       if @mode == :list
@@ -15,7 +15,8 @@ module UiRules
             caption: "#{rec1[:action_tstamp_tx].strftime('%Y-%m-%d %H:%M:%S')} (#{transaction_id})",
             transactions: { rows: tx_recs.map { |t| { action: t[:action], changed_fields: t[:changed_fields] } }, cols: %i[action changed_fields] }
           }
-          hs[:tx_detail] = "#{rec1[:request_ip]} - #{rec1[:route_url]} (#{rec1[:user_name] || 'User Not Logged'})" unless rec1[:route_url].nil?
+          context = rec1[:context] ? " [#{rec1[:context]}]" : ''
+          hs[:tx_detail] = "#{rec1[:request_ip]} - #{rec1[:route_url]}#{context} (#{rec1[:user_name] || 'User Not Logged'})" unless rec1[:route_url].nil?
           hs[:status] = st_recs.map { |s| "STATUS: #{s[:status]} #{s[:comment]} (#{s[:user_name] || 'User Not Logged'}, #{s[:table_name]}, id=#{s[:row_data_id]})" }.join('<br>') unless st_recs.empty?
           rules[:transaction_sets] << hs
         end
