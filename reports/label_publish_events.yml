@@ -1,0 +1,151 @@
+---
+:caption: Label Publish Events
+:sql: "SELECT labels.label_name, \r\n  label_publish_log_details.server_ip,\r\n  label_publish_log_details.destination,\r\n
+  \ label_publish_log_details.status,\r\n  label_publish_log_details.complete,\r\n
+  \ label_publish_log_details.created_at::timestamp(0) AS published_at,\r\n  label_publish_logs.user_name,\r\n
+  \ label_publish_logs.printer_type\r\nFROM label_publish_log_details\r\nJOIN labels
+  ON labels.id = label_publish_log_details.label_id\r\nJOIN label_publish_logs ON
+  label_publish_logs.id = label_publish_log_details.label_publish_log_id\r\nORDER
+  BY label_publish_log_details.created_at DESC"
+:limit: 1000
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  label_name:
+    :name: label_name
+    :sequence_no: 1
+    :caption: Label name
+    :namespaced_name: labels.label_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  server_ip:
+    :name: server_ip
+    :sequence_no: 2
+    :caption: Server ip
+    :namespaced_name: label_publish_log_details.server_ip
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  destination:
+    :name: destination
+    :sequence_no: 3
+    :caption: Destination
+    :namespaced_name: label_publish_log_details.destination
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 4
+    :caption: Status
+    :namespaced_name: label_publish_log_details.status
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  complete:
+    :name: complete
+    :sequence_no: 5
+    :caption: Complete
+    :namespaced_name: label_publish_log_details.complete
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  published_at:
+    :name: published_at
+    :sequence_no: 6
+    :caption: Published at
+    :namespaced_name: 
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user_name:
+    :name: user_name
+    :sequence_no: 7
+    :caption: User name
+    :namespaced_name: label_publish_logs.user_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  printer_type:
+    :name: printer_type
+    :sequence_no: 8
+    :caption: Printer type
+    :namespaced_name: label_publish_logs.printer_type
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: label_publish_log_details.created_at
+  :caption: Published at
+  :data_type: :datetime
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
