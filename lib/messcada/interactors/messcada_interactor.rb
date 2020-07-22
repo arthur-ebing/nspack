@@ -79,6 +79,7 @@ module MesscadaApp
         return failed_response("Pallet: #{params[:pallet_number]} not found.") if pallet.nil?
       end
 
+      check_pallet!(:not_scrapped, pallet.pallet_number)
       success_response("Found Pallet #{pallet.pallet_number}", pallet)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
