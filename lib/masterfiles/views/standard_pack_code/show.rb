@@ -21,6 +21,7 @@ module Masterfiles
               form.add_field :use_size_ref_for_edi
               form.add_field :is_bin
               form.add_field :active
+              form.add_field :palletizer_incentive_rate
             end
           end
 

@@ -31,6 +31,7 @@ module UiRules
                                         as_boolean: true }
       fields[:is_bin] = { renderer: :label,
                           as_boolean: true }
+      fields[:palletizer_incentive_rate] = { renderer: :label }
     end
 
     def common_fields
@@ -52,7 +53,9 @@ module UiRules
                               caption: 'Basic Pack Code',
                               invisible: AppConst::BASE_PACK_EQUALS_STD_PACK },
         use_size_ref_for_edi: { renderer: :checkbox },
-        is_bin: { renderer: :checkbox }
+        is_bin: { renderer: :checkbox },
+        palletizer_incentive_rate: { required: true,
+                                     renderer: :numeric }
       }
     end
 
@@ -70,7 +73,8 @@ module UiRules
                                     plant_resource_button_indicator: nil,
                                     basic_pack_code_id: nil,
                                     use_size_ref_for_edi: false,
-                                    is_bin: false)
+                                    is_bin: false,
+                                    palletizer_incentive_rate: 0.0)
     end
   end
 end

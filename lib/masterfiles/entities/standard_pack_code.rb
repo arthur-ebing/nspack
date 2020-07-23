@@ -12,6 +12,7 @@ module MasterfilesApp
     attribute :use_size_ref_for_edi, Types::Bool
     attribute :is_bin, Types::Bool
     attribute? :active, Types::Bool
+    attribute :palletizer_incentive_rate, Types::Decimal
   end
 
   class StandardPackCodeFlat < Dry::Struct
@@ -26,5 +27,6 @@ module MasterfilesApp
     attribute :use_size_ref_for_edi, Types::Bool
     attribute :is_bin, Types::Bool
     attribute? :active, Types::Bool
+    attribute :palletizer_incentive_rate, Types::Decimal
   end
 end

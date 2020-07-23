@@ -17,7 +17,8 @@ module MasterfilesApp
         basic_pack_code_id: 1,
         use_size_ref_for_edi: false,
         is_bin: false,
-        active: true
+        active: true,
+        palletizer_incentive_rate: 1.0
       }
       MasterfilesApp::StandardPackCode.new(base_attrs.merge(attrs))
     end

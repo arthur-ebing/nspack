@@ -464,6 +464,7 @@ class Nspack < Roda
               use_size_ref_for_edi
               is_bin
               active
+              palletizer_incentive_rate
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else

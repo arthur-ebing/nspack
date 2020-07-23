@@ -6,7 +6,7 @@
   \   basic_pack_codes.basic_pack_code,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
   \   standard_pack_codes.is_bin,\r\n    fn_masterfile_variants('standard_pack_codes',
   standard_pack_codes.id) AS variant_codes,\r\n    standard_pack_codes.active,\r\n
-  \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at\r\nFROM
+  \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    palletizer_incentive_rate\r\nFROM
   standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nORDER
   BY\r\n    standard_pack_codes.standard_pack_code"
 :limit: 
@@ -214,6 +214,22 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  palletizer_incentive_rate:
+    :name: palletizer_incentive_rate
+    :sequence_no: 14
+    :caption: Palletizer incentive rate
+    :namespaced_name: palletizer_incentive_rate
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
