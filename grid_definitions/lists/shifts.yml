@@ -18,10 +18,25 @@
         :text: PDF
         :icon: printer
         :loading_window: true
+        :hide_if_false: packer
       - :url: "/production/shifts/shifts/$:id$/incentive_report/with_params?key=excel"
         :text: Excel
         :icon: excel
         :loading_window: true
+        :hide_if_false: packer
+- :submenu:
+    :text: Incentive Palletizer Report
+    :items:
+      - :url: "/production/shifts/shifts/$:id$/incentive_palletizer_report"
+        :text: PDF
+        :icon: printer
+        :loading_window: true
+        :hide_if_true: packer
+      - :url: "/production/shifts/shifts/$:id$/incentive_palletizer_report/with_params?key=excel"
+        :text: Excel
+        :icon: excel
+        :loading_window: true
+        :hide_if_true: packer
 - :submenu:
     :text: Incentive Count Report
     :items:

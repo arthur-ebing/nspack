@@ -157,3 +157,7 @@ INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES 
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ADHOC_DESTROY', 'Adhoc Destroy Empty Bins') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('ISSUE_BINS', 'Issue Bins to Farms') ON CONFLICT DO NOTHING;
 INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES ('RECEIVE_BINS', 'Receive Bins Empty Bins') ON CONFLICT DO NOTHING;
+
+-- EMPLOYMENT TYPE CODE
+INSERT INTO employment_types (employment_type_code) VALUES ('PACKERS') ON CONFLICT DO NOTHING;
+INSERT INTO employment_types (employment_type_code) VALUES ('PALLETIZERS') ON CONFLICT DO NOTHING;

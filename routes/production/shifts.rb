@@ -111,6 +111,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_error(res.message, fetch?(r))
         end
       end
+      r.on 'incentive_palletizer_report' do
+        res = CreateJasperReport.call(report_name: 'incentive_plt',
+                                      user: current_user.login_name,
+                                      file: 'incentive_plt',
+                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
     end
 
     r.on 'shifts' do

@@ -4,9 +4,10 @@
   AS shift_type_code,\r\n       employment_types.employment_type_code,\r\n       \"shifts\".\"running_hours\",\r\n
   \      \"shifts\".\"start_date_time\",\r\n       \"shifts\".\"end_date_time\",\r\n
   \      fn_current_status('shifts', \"shifts\".\"id\") AS status,\r\n       \"shifts\".\"created_at\",\r\n
-  \      \"shifts\".\"updated_at\",\r\n       \"shifts\".\"active\"\r\nFROM \"shifts\"\r\n
-  \   JOIN shift_types ON shift_types.id = shifts.shift_type_id\r\n    JOIN employment_types
-  ON employment_types.id = shift_types.employment_type_id"
+  \      \"shifts\".\"updated_at\",\r\n       \"shifts\".\"active\",\r\ncase when
+  employment_types.employment_type_code = 'PACKERS' then true else false end as packer\r\nFROM
+  \"shifts\"\r\n    JOIN shift_types ON shift_types.id = shifts.shift_type_id\r\n
+  \   JOIN employment_types ON employment_types.id = shift_types.employment_type_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -182,6 +183,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packer:
+    :name: packer
+    :sequence_no: 12
+    :caption: Packer
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
