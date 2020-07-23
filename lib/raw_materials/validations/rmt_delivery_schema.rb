@@ -19,7 +19,7 @@ module RawMaterialsApp
     optional(:current, :bool).filled(:bool?)
     optional(:keep_open, :bool).filled(:bool?)
     optional(:auto_allocate_asset_number, :bool).filled(:bool?)
-    optional(:quantity_bins_with_fruit, :integer)
+    optional(:quantity_bins_with_fruit, :integer).maybe(:int?)
     optional(:reference_number, Types::StrippedString).maybe(:str?)
   end
 end
