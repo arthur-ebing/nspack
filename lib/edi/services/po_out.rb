@@ -35,6 +35,8 @@ module EdiApp
         prepare_ok if container
         prepare_oc
         details.each do |row|
+          raise "PO cannot be sent: pallet #{row[:sscc]} has zero carton quantity." if row[:ctn_qty].zero?
+
           prepare_op(row)
         end
       end

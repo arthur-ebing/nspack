@@ -178,7 +178,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     return if @mail_keys.empty?
 
     unconfig_mails = @mail_keys.select { |k| config[:mail_recipients][k].nil? }
-    raise Crossbeams::FrameworkError, "There is no :mail_recipients config with key(s) #{uconfig_emails.join(', ')}" unless unconfig_mails.nil_or_empty?
+    raise Crossbeams::FrameworkError, "There is no :mail_recipients config with key(s) #{unconfig_emails.join(', ')}" unless unconfig_mails.nil_or_empty?
   end
 
   def build_edi_out_paths(config, dir_keys)
