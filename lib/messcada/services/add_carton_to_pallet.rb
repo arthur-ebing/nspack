@@ -11,10 +11,12 @@ module MesscadaApp
       @prod_repo = ProductionApp::ProductionRunRepo.new
     end
 
-    def call
+    def call  # rubocop:disable Metrics/AbcSize
       return failed_response("Pallet :#{pallet_id} does not exist") unless pallet_exists?
 
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?
+
+      return failed_response("Carton :#{carton_id} already on a pallet") unless carton_already_on_sequence?
 
       res = add_carton_to_pallet
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
@@ -30,6 +32,10 @@ module MesscadaApp
 
     def carton_exists?
       repo.carton_exists?(carton_id)
+    end
+
+    def carton_already_on_sequence?
+      repo.carton_pallet_sequence(carton_id).nil? ? false : true
     end
 
     def add_carton_to_pallet  # rubocop:disable Metrics/AbcSize

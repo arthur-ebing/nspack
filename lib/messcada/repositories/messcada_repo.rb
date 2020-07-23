@@ -72,6 +72,10 @@ module MesscadaApp
       exists?(:cartons, id: carton_id)
     end
 
+    def carton_pallet_sequence(carton_id)
+      DB[:cartons].where(id: carton_id).get(:pallet_sequence_id)
+    end
+
     def carton_label_carton_id(carton_label_id)
       DB[:cartons].where(carton_label_id: carton_label_id).get(:id)
     end

@@ -340,6 +340,8 @@ module MesscadaApp
         res = nil
         repo.transaction do
           res = MesscadaApp::CreatePalletFromCarton.call(@user, carton_id, 1, palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id, true)
+          return res unless res.success
+
           # UPDATE carton with pallet_sequence_id & pallet_sequence with incentive contract_worker....
 
           changeset = { current_state: state_machine.current.to_s,
@@ -386,6 +388,7 @@ module MesscadaApp
         res = nil
         repo.transaction do
           res = MesscadaApp::AddCartonToPallet.call(carton_id, palletizing_bay_state(state_machine.target.id)&.pallet_id)
+          return res unless res.success
 
           changeset = { pallet_sequence_id: res.instance[:pallet_sequence_id],
                         last_carton_id: carton_id }
@@ -438,6 +441,7 @@ module MesscadaApp
       res = nil
       repo.transaction do
         res = MesscadaApp::TransferBayCarton.call(carton_id, palletizing_bay_state(state_machine.target.id)&.pallet_id)
+        return res unless res.success
 
         changeset = { pallet_sequence_id: res.instance[:pallet_sequence_id],
                       last_carton_id: carton_id }
