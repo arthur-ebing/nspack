@@ -16,6 +16,8 @@ module MasterfilesApp
       end
 
       def validate_shift_type(attrs) # rubocop:disable Metrics/AbcSize
+        return success_response('Valid shift type', attrs) if custom_shift_type?(attrs)
+
         start_hr = attrs[:start_hour]
         end_hr = attrs[:end_hour]
         similar_shift_type_hours = @repo.similar_shift_type_hours(attrs)
@@ -38,6 +40,10 @@ module MasterfilesApp
         end
 
         success_response('Valid shift type', attrs)
+      end
+
+      def custom_shift_type?(attrs)
+        attrs[:day_night_or_custom] == 'C'
       end
 
       def time_range(start_hr, end_hr)
