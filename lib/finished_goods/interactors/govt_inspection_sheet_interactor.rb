@@ -244,10 +244,7 @@ module FinishedGoodsApp
     end
 
     def validate_offload_vehicle(vehicle_job_id, location, location_scan_field) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      res = Dry::Validation.Params do
-        configure { config.type_specs = true }
-        required(:vehicle_job_id, :integer).filled(:int?, lt?: AppConst::MAX_DB_INT)
-      end.call(vehicle_job_id: vehicle_job_id)
+      res = UtilityFunctions.validate_integer_length(:vehicle_job_id, vehicle_job_id)
       return failed_response('Invalid barcode. Perhaps a pallet was scanned?') unless res.messages.empty?
 
       vehicle_job = repo.find_vehicle_job(vehicle_job_id)

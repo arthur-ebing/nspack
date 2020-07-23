@@ -166,6 +166,20 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Validate that an id is not longer than the maximum database integer value.
+  #
+  # @param colname [symbol] the name of the column.
+  # @param value [string] the id value.
+  # @return [Dry::Validation::Result] the validation result.
+  def validate_integer_length(colname, value)
+    raise ArgumentError, "#{self.class.name}: colname #{colname} must be a Symbol" unless colname.is_a?(Symbol)
+
+    Dry::Validation.Params do
+      configure { config.type_specs = true }
+      required(colname, :integer).filled(:int?, lt?: AppConst::MAX_DB_INT)
+    end.call(colname => value)
+  end
+
   # Calculate the 4-digit pick ref:
   #
   # 1: Second digit of the ISO week
