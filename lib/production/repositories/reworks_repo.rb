@@ -495,6 +495,28 @@ module ProductionApp
       DB[:rmt_bins].where(id: rmt_bin_id).update(attrs)
     end
 
+    def individual_cartons?(sequence_id)
+      DB[:pallets]
+        .join(:pallet_sequences, pallet_id: :id)
+        .where(Sequel[:pallet_sequences][:id] => sequence_id)
+        .get(:has_individual_cartons)
+    end
+
+    def update_carton_labels_and_cartons(sequence_id, attrs)
+      carton_ids = pallet_sequence_cartons(sequence_id)
+      carton_label_ids = carton_carton_label(carton_ids)
+      DB[:carton_labels].where(id: carton_label_ids).update(attrs)
+      DB[:cartons].where(id: carton_ids).update(attrs)
+    end
+
+    def pallet_sequence_cartons(sequence_id)
+      select_values(:cartons, :id, pallet_sequence_id: sequence_id)
+    end
+
+    def carton_carton_label(carton_ids)
+      select_values(:cartons, :carton_label_id, id: carton_ids)
+    end
+
     def oldest_sequence_id(pallet_number)
       pallet_sequence_number = oldest_sequence_number(pallet_number)
       DB[:pallet_sequences].where(pallet_number: pallet_number).where(pallet_sequence_number: pallet_sequence_number).get(:id) unless pallet_sequence_number.nil_or_empty?
