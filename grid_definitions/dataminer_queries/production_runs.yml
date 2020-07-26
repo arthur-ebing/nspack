@@ -836,10 +836,10 @@
     :sequence_no: 50
     :caption: Has cartons
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
-    :hide: false
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 
