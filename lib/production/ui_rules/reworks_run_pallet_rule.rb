@@ -98,7 +98,8 @@ module UiRules
                                        end
 
       fields[:gross_weight] = { renderer: :numeric,
-                                required: true }
+                                required: true,
+                                maxvalue: AppConst::MAX_PALLET_WEIGHT }
     end
 
     def set_edit_pallet_details_fields
