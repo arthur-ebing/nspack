@@ -61,5 +61,25 @@ module FinishedGoodsApp
       SQL
       DB[query, carton_label_id].select_map(:pallet_number).first
     end
+
+    def get_process_to_rejoin(dest, source, user)
+      src = source.join(',')
+      query = <<~SQL
+        SELECT id
+        FROM pallet_buildups
+        where created_by = ? AND completed = false AND destination_pallet_number = ? AND
+        (source_pallets <@ ARRAY[#{src}]::text[] AND
+         source_pallets @> ARRAY[#{src}]::text[]);
+      SQL
+      DB[query, user, dest].select_map(:id).first
+    end
+
+    def get_process_to_cancel(pallets, user)
+      cond = pallets.map { |p| "'#{p}' = ANY (b.source_pallets)" }.join(' or ')
+      query = "SELECT *
+               FROM pallet_buildups b
+               WHERE b.completed is false AND created_by = '#{user}' AND (b.destination_pallet_number IN ('#{pallets.join("','")}') OR #{cond})"
+      DB[query].first
+    end
   end
 end

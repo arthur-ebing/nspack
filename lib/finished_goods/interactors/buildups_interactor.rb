@@ -2,6 +2,21 @@
 
 module FinishedGoodsApp
   class BuildupsInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
+    def process_to_rejoin(params) # rubocop:disable Metrics/AbcSize
+      dest = params[:pallet_number]
+      source = params.select { |k, v| !v.nil_or_empty? && !k.to_s.include?('_scan_field') && !k.to_s.include?('qty_to_move') && !k.to_s.include?('pallet_number') }.values
+      repo.get_process_to_rejoin(dest, source, @user.user_name)
+    end
+
+    def process_to_cancel(params) # rubocop:disable Metrics/AbcSize
+      pallets = params.select { |k, v| !v.nil_or_empty? && !k.to_s.include?('_scan_field') && !k.to_s.include?('qty_to_move') }.values
+      if (uncompleted_process = repo.get_process_to_cancel(pallets, @user.user_name))
+        return success_response('', { process: uncompleted_process, pallets: (uncompleted_process[:source_pallets] + [uncompleted_process[:destination_pallet_number]]) & pallets })
+      end
+
+      failed_response('no uncompleted processes found')
+    end
+
     def buildup_pallet(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       params.delete_if { |k, v| v.nil_or_empty? || k.to_s.include?('_scan_field') }
       qty_to_move = params.delete(:qty_to_move).to_i
@@ -19,7 +34,7 @@ module FinishedGoodsApp
       error_msgs = !(err = validate_zero_qty(params)).empty? ? error_messages(params, err, 'has 0 ctn_qty') : {}
       return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
 
-      error_msgs = !(err = validate_pallets_not_busy(params)).empty? ? error_messages(params, err, 'belongs to another process') : {}
+      error_msgs = !(err = validate_pallets_not_busy(params)).empty? ? error_messages(params, err, 'is busy') : {}
       return validation_failed_response(messages: error_msgs) unless error_msgs.empty?
 
       to_pallet = params.delete(:pallet_number)

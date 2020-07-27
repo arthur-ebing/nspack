@@ -41,6 +41,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.post do
+        if (buildup_id = interactor.process_to_rejoin(params[:buildup]))
+          return rejoin_cancel_screen(interactor, buildup_id, 'An incompleted process was found.', true)
+        end
+
+        res = interactor.process_to_cancel(params[:buildup])
+        return rejoin_cancel_screen(interactor, res.instance[:process][:id], 'An incompleted process was found containing the following <br>pallets you have just scanned.', false, res.instance[:pallets]) if res.success
+
         res = interactor.buildup_pallet(params[:buildup])
         if res.success
           r.redirect("/rmd/buildups/move_cartons/#{res.instance[:id]}")
@@ -210,6 +217,46 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       form.add_csrf_tag csrf_tag
       view(inline: form.render, layout: :layout_rmd)
     end
+
+    r.on 'rejoin', Integer do |id|
+      r.redirect("/rmd/buildups/move_cartons/#{id}")
+    end
+  end
+
+  def rejoin_cancel_screen(interactor, id, err, rejoin = false, pallets = []) # rubocop:disable Metrics/AbcSize
+    pallet_buildup = interactor.pallet_buildup(id)
+    qty_cartons_remaining = pallet_buildup.qty_cartons_to_move - (pallet_buildup.cartons_moved ? pallet_buildup.cartons_moved.values.flatten.length : 0)
+
+    form = Crossbeams::RMDForm.new({},
+                                   form_name: :move_cartons,
+                                   notes: "<label class='b mid-gray'>#{err}</label>",
+                                   scan_with_camera: @rmd_scan_with_camera,
+                                   action: "/rmd/buildups/buildup_cancel/#{id}",
+                                   button_caption: 'Cancel')
+
+    form.add_label(:id, 'Buildup Id', id)
+    form.add_label(:created_at, 'Created At', pallet_buildup.created_at.strftime('%Y-%m-%d %H:%M:%S'))
+    form.add_label(:destination_pallet_number, 'Dest Pallet Number', pallet_buildup.destination_pallet_number, nil, value_class: 'b orange')
+    form.add_label(:qty_cartons_remaining, 'Cartons Remaining', qty_cartons_remaining.negative? ? 0 : qty_cartons_remaining)
+
+    pallet_buildup.cartons_moved.to_h.each do |k, v|
+      form.add_section_header('&nbsp;')
+      header = pallets.include?(k) ? "Scanned Ctns For Pallet:   <label class='orange'>#{k}</label>" : "Scanned Ctns For Pallet:   #{k}"
+      form.add_section_header(header)
+      v.each do |c|
+        form.add_label(:moved_ctn, '', c)
+      end
+    end
+
+    form.add_section_header('&nbsp;')
+    form.add_section_header('&nbsp;')
+    if rejoin
+      rejoin_label = 'Rejoin or'
+      form.add_button('Rejoin', "/rmd/buildups/rejoin/#{id}")
+    end
+    form.add_section_header("Do you want to #{rejoin_label} Cancel this process?")
+    form.add_csrf_tag csrf_tag
+    view(inline: form.render, layout: :layout_rmd)
   end
 end
 # rubocop:enable Metrics/BlockLength

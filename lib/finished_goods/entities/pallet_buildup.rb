@@ -8,6 +8,7 @@ module FinishedGoodsApp
     attribute :qty_cartons_to_move, Types::Integer
     attribute :created_by, Types::String
     attribute :completed_at, Types::DateTime
+    attribute :created_at, Types::DateTime
     attribute :cartons_moved, Types::Hash
     attribute :completed, Types::Bool
   end
