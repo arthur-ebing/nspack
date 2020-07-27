@@ -5,13 +5,27 @@ class Nspack < Roda
     # PALLETIZING BAY STATES
     # --------------------------------------------------------------------------
     r.on 'palletizing_bays' do
-      show_page { Production::Dashboards::Dashboard::PalletizingStates.call }
+      r.is do
+        show_page { Production::Dashboards::Dashboard::PalletizingStates.call }
+      end
+
+      r.on 'detail' do
+        content = render_partial { Production::Dashboards::Dashboard::PalletizingStatesDetail.call }
+        { updateMessage: { content: content, continuePolling: true } }.to_json
+      end
     end
 
     # PRODUCTION RUNS
     # --------------------------------------------------------------------------
     r.on 'production_runs' do
-      show_page { Production::Dashboards::Dashboard::ProductionRuns.call }
+      r.is do
+        show_page { Production::Dashboards::Dashboard::ProductionRuns.call }
+      end
+
+      r.on 'detail' do
+        content = render_partial { Production::Dashboards::Dashboard::ProductionRunsDetail.call }
+        { updateMessage: { content: content, continuePolling: true } }.to_json
+      end
     end
   end
 end

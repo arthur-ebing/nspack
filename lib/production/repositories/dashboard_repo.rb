@@ -50,7 +50,9 @@ module ProductionApp
         SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,
         production_runs.active_run_stage,
         production_runs.started_at,
-        production_run_stats.bins_tipped, production_run_stats.bins_tipped_weight, production_run_stats.carton_labels_printed,
+        production_run_stats.bins_tipped,
+        COALESCE(production_run_stats.bins_tipped_weight, 0) AS bins_tipped_weight,
+        production_run_stats.carton_labels_printed,
         production_run_stats.cartons_verified, production_run_stats.cartons_verified_weight,
         production_run_stats.pallets_palletized_full, production_run_stats.pallets_palletized_partial,
         production_run_stats.pallet_weight,
@@ -63,14 +65,14 @@ module ProductionApp
         production_runs.re_executed_at,
         plant_resources2.plant_resource_code AS line_code,
         (SELECT COUNT(DISTINCT pallet_id) FROM pallet_sequences WHERE production_run_id = production_runs.id AND verified) AS verified_pallets,
-        (SELECT SUM(COALESCE(standard_product_weights.nett_weight, 0))
+        COALESCE((SELECT SUM(COALESCE(standard_product_weights.nett_weight, 0))
              FROM cartons
              LEFT JOIN cultivars ON cultivars.id = cartons.cultivar_id
                  LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
              LEFT OUTER JOIN standard_product_weights ON standard_product_weights.commodity_id = commodities.id
                AND standard_product_weights.standard_pack_id = cartons.standard_pack_code_id
              WHERE production_run_id = production_runs.id
-            ) AS carton_weight
+            ), 0) AS carton_weight
         FROM production_runs
         LEFT JOIN cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id
         JOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id
