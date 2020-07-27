@@ -420,6 +420,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # The maximum weight of a pallet
   MAX_PALLET_WEIGHT = 2000
 
+  # The maximum weight of a bin
+  MAX_BIN_WEIGHT = 2000
+
   # ISO 2-character country codes
   ISO_COUNTRY_CODES = %w[
     AF AL DZ AS AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ

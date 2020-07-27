@@ -36,7 +36,8 @@ module UiRules
       fields[:bin_number] = { renderer: :hidden }
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:gross_weight] = { renderer: :numeric,
-                                required: true }
+                                required: true,
+                                maxvalue: AppConst::MAX_BIN_WEIGHT  }
       fields[:measurement_unit] = { renderer: :hidden }
     end
 
