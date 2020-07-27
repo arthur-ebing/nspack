@@ -7,7 +7,7 @@
   :standard:
     - :col: vw_pallets.pallet_id
       :op: =
-      :val: $:id$
+      :val: $:pallet_id$
   :production_run_sequences:
     - :col: vw_pallet_sequences.production_run_id
       :op: =

@@ -1,5 +1,10 @@
 ---
 :dataminer_definition: pallets_view
+:actions:
+  - :url: "/list/pallet_sequences_view/with_params?key=standard&pallet_id=$:pallet_id$"
+    :text: Sequences
+    :title: Pallet sequences for Pallet No $:pallet_number$
+    :icon: list
 :captions:
   :conditions:
     :production_run_pallets: Pallets for Production Run
