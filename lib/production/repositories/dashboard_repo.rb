@@ -5,6 +5,7 @@ module ProductionApp
     def palletizing_bay_states
       query = <<~SQL
         SELECT b.id, r.plant_resource_code,
+        r.description,
         b.palletizing_robot_code,
         b.scanner_code,
         b.palletizing_bay_resource_id,

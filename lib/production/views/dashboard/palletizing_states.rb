@@ -27,17 +27,19 @@ module Production
         # 	WHERE t.ancestor_plant_resource_id = (SELECT id FROM plant_resources WHERE system_resource_id = (
         # 		SELECT id FROM system_resources WHERE system_resource_code = palletizing_bay_states.palletizing_robot_code
         # 	))
+        # 	AND t.path_length = 1
         # 	ORDER BY id LIMIT 1
         # )
         # WHERE scanner_code = '1'
         #   AND palletizing_bay_resource_id IS NULL;
+        #
         # UPDATE palletizing_bay_states SET palletizing_bay_resource_id = (
         #   SELECT p.id FROM tree_plant_resources t
         # 	JOIN plant_resources p ON p.id = t.descendant_plant_resource_id
         # 	WHERE t.ancestor_plant_resource_id = (SELECT id FROM plant_resources WHERE system_resource_id = (
         # 		SELECT id FROM system_resources WHERE system_resource_code = palletizing_bay_states.palletizing_robot_code
         # 	))
-        # 	AND t.
+        # 	AND t.path_length = 1
         # 	ORDER BY id DESC LIMIT 1
         # )
         # WHERE scanner_code = '2'
@@ -45,7 +47,8 @@ module Production
 
         def self.pbay_items(recs) # rubocop:disable Metrics/AbcSize
           recs.map do |rec| # rubocop:disable Metrics/BlockLength
-            code = rec[:plant_resource_code] || "#{rec[:palletizing_robot_code]} - #{rec[:scanner_code]}"
+            # code = rec[:plant_resource_code] || "#{rec[:palletizing_robot_code]} - #{rec[:scanner_code]}"
+            code = rec[:description] || "#{rec[:palletizing_robot_code]} - #{rec[:scanner_code]}"
             if rec[:current_state] == 'empty'
               <<~HTML
                 <div class="outline pa2 mr2 mt2" style="min-width:230px">
