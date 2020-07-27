@@ -26,7 +26,7 @@ module Production
           recs.map do |rec|
             target_markets = ProductionApp::DashboardRepo.new.tm_for_run(rec[:id])
             tm_cartons = if target_markets.empty?
-                           '<tr><td collspan="2">None packed</td></tr>'
+                           ['<tr><td collspan="2">None packed</td></tr>']
                          else
                            target_markets.map do |tm|
                              %(<tr><td>#{tm[:packed_tm_group]}</td><td class="tr">#{tm[:no_cartons]}</td></tr>)
