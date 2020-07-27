@@ -93,18 +93,13 @@ class Nspack < Roda
         end
       end
 
-      r.on 'edit' do   # EDIT
+      r.on 'edit' do # EDIT
         check_auth!('inspection', 'edit')
         interactor.assert_permission!(:edit, id)
         show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::Edit.call(id) }
       end
 
-      r.on 'add_pallet' do   # ADD_PALLETS
-        r.get do
-          check_auth!('inspection', 'edit')
-          show_partial_or_page(r) { FinishedGoods::Inspection::GovtInspectionSheet::AddPallet.call(id) }
-        end
-
+      r.on 'add_pallet' do # ADD_PALLETS
         r.post do
           res = interactor.add_pallets_govt_inspection_sheet(id, params[:govt_inspection_sheet])
           if res.success
