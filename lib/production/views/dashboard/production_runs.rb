@@ -22,7 +22,7 @@ module Production
           HTML
         end
 
-        def self.runs(recs) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+        def self.runs(recs) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
           recs.map do |rec|
             target_markets = ProductionApp::DashboardRepo.new.tm_for_run(rec[:id])
             tm_cartons = if target_markets.empty?
@@ -38,7 +38,7 @@ module Production
                       else
                         %(<div class="pa2 mr2 mt2 fw8">Re-exec: #{rec[:re_executed_at].strftime('%H:%M')}</div>)
                       end
-            percentage = if rec[:carton_weight].zero? || rec[:bins_tipped_weight].zero?
+            percentage = if (rec[:carton_weight] || 0).zero? || (rec[:bins_tipped_weight] || 0).zero?
                            0
                          else
                            rec[:carton_weight] / rec[:bins_tipped_weight] * 100.0
