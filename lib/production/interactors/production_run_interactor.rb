@@ -82,10 +82,10 @@ module ProductionApp
     end
 
     def edit_pallet_validations(pallet_number)
-      check_pallet(:not_have_individual_cartons, pallet_number)
-      check_pallet(:not_scrapped, pallet_number)
-      check_pallet(:not_inspected, pallet_number)
-      check_pallet(:not_shipped, pallet_number)
+      check_pallet!(:not_have_individual_cartons, pallet_number)
+      check_pallet!(:not_scrapped, pallet_number)
+      check_pallet!(:not_inspected, pallet_number)
+      check_pallet!(:not_shipped, pallet_number)
 
       ok_response
     rescue Crossbeams::InfoError => e
@@ -508,7 +508,7 @@ module ProductionApp
       repo.find_pallet_mix_rules_by_scope(scope)
     end
 
-    def check_pallet(check, pallet_number)
+    def check_pallet!(check, pallet_number)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_number)
       raise Crossbeams::InfoError, res.message unless res.success
     end
