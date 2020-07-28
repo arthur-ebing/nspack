@@ -634,6 +634,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.pre_print_bin_labels(params[:rmt_delivery])
         if res.success
           show_partial_or_page(r) do
+            params[:rmt_delivery][:bin_asset_numbers] = res.instance
             RawMaterials::Deliveries::RmtBin::LabelsPrintedConfirm.call(form_values: params[:rmt_delivery], notice: 'have labels printed out successfully?')
           end
         else
@@ -646,8 +647,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pre_printing_cancelled' do
-      flash[:error] = 'Labels Printing Cancelled'
+    r.on 'pre_printing_unsuccessful' do
+      flash[:error] = 'Labels Printing Unsuccessful'
       r.redirect('/raw_materials/deliveries/pre_print_bin_labels')
     end
 

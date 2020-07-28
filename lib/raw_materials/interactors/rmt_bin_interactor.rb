@@ -371,7 +371,7 @@ module RawMaterialsApp
       end
 
       repo.update(:bin_asset_numbers, bin_asset_numbers.map { |b| b[0] }, last_used_at: Time.now)
-      res
+      success_response('Labels Printed Successfully', bin_asset_numbers.map { |b| b[1] }.join(','))
     end
 
     def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
@@ -388,15 +388,14 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_bin_labels(params) # rubocop:disable Metrics/AbcSize
+    def create_bin_labels(params)
       repo.transaction do
-        bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:no_of_prints])
+        bin_asset_numbers = params[:bin_asset_numbers].split(',')
         bin_asset_numbers.each do |bin_asset_number|
-          params.delete_if { |k| %i[no_of_prints printer bin_label].include?(k) }
-          params[:bin_asset_number] = bin_asset_number[1]
+          params.delete_if { |k| %i[no_of_prints printer bin_label bin_asset_numbers].include?(k) }
+          params[:bin_asset_number] = bin_asset_number
           repo.create_rmt_bin_label(params)
         end
-        repo.update(:bin_asset_numbers, bin_asset_numbers.map(&:first), last_used_at: Time.now)
       end
       ok_response
     rescue Crossbeams::InfoError => e

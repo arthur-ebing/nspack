@@ -26,7 +26,7 @@ module RawMaterials
                                   style: :button)
               section.add_control(control_type: :link,
                                   text: 'No',
-                                  url: '/raw_materials/deliveries/pre_printing_cancelled',
+                                  url: '/raw_materials/deliveries/pre_printing_unsuccessful',
                                   visible: true,
                                   style: :button)
             end
