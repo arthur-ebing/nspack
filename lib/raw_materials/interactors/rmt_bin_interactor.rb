@@ -375,7 +375,7 @@ module RawMaterialsApp
     end
 
     def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
-      res = validate_preprinting_input(params)
+      res = validate_bin_label_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:no_of_prints])
@@ -393,11 +393,7 @@ module RawMaterialsApp
         bin_asset_numbers = params[:bin_asset_numbers].split(',')
         bin_asset_numbers.each do |bin_asset_number|
           params[:bin_asset_number] = bin_asset_number
-
-          res = validate_bin_label_params(params)
-          return validation_failed_response(res) unless res.messages.empty?
-
-          params.delete_if { |k| %i[no_of_prints printer bin_label bin_asset_numbers].include?(k) }
+          params.delete_if { |k, v| %i[no_of_prints printer bin_label bin_asset_numbers].include?(k) || v.nil_or_empty? }
           repo.create_rmt_bin_label(params)
         end
       end
