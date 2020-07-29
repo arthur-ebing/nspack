@@ -15,8 +15,15 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     @hub_address = edi_out_transaction.hub_address
     @record_id = edi_out_transaction.record_id
     @edi_out_rule_id = edi_out_transaction.edi_out_rule_id
+
     @seq_no = @repo.new_sequence_for_flow(flow_type)
-    @formatted_seq = format('%<seq>03d', seq: @seq_no)
+    # PALTRACK REQUIREMENT: the sequence in EDI file name must be 3 characters.
+    # So we convert the sequence to base 36 and left-pad with "A" if shorter than 3 characters.
+    # The sequence will have to be reset after 46655.
+    # @formatted_seq = format('%<seq>03d', seq: @seq_no)
+    @formatted_seq = @seq_no.to_s(36).rjust(3, 'A')
+    raise Crossbeams::FrameworkError, "Formatted sequence number cannot be longer than 3 chars. Seq is: #{@seq_no}, formatted as: #{@formatted_seq}" if @formatted_seq.length > 3
+
     @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
     @record_entries = Hash.new { |h, k| h[k] = [] }
     @output_filename = "#{@flow_type.upcase}#{AppConst::EDI_NETWORK_ADDRESS}#{@formatted_seq}.#{hub_address}"
