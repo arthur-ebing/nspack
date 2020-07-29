@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  class DashboardRepo < BaseRepo
+  class DashboardRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def palletizing_bay_states
       query = <<~SQL
         SELECT b.id, r.plant_resource_code,
@@ -100,6 +100,80 @@ module ProductionApp
       SQL
 
       DB[query, id].all
+    end
+
+    def loads_per_week
+      query = <<~SQL
+        SELECT load_week, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped,
+               MIN(load_day) AS from_date, MAX(load_day) AS to_date
+        FROM (
+          SELECT
+          DISTINCT pallets.pallet_number,
+              pol_port.port_code AS pol,
+              pod_port.port_code AS pod,
+            target_market_groups.target_market_group_name AS packed_tm_group,
+            to_char(loads.created_at, 'IW'::text)::integer AS load_week,
+            loads.created_at::date AS load_day,
+            CASE WHEN pallets.allocated AND NOT pallets.shipped THEN
+              1
+            ELSE
+              0
+            END AS allocated,
+            CASE WHEN pallets.shipped THEN
+              1
+            ELSE
+              0
+            END AS shipped
+          FROM pallets
+          JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+          JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+          JOIN loads ON loads.id = pallets.load_id
+                   JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
+                   JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
+                   JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
+                   JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+        ) sub_pallets
+        GROUP BY load_week, pol, pod, packed_tm_group
+        ORDER BY load_week DESC, pol, pod, packed_tm_group
+      SQL
+
+      DB[query].all.group_by { |r| r[:load_week] }
+    end
+
+    def loads_per_day
+      query = <<~SQL
+        SELECT load_day, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped
+        FROM (
+        SELECT
+        DISTINCT pallets.pallet_number,
+            pol_port.port_code AS pol,
+            pod_port.port_code AS pod,
+          target_market_groups.target_market_group_name AS packed_tm_group,
+          loads.created_at::date AS load_day,
+          CASE WHEN pallets.allocated AND NOT pallets.shipped THEN
+            1
+          ELSE
+            0
+          END AS allocated,
+          CASE WHEN pallets.shipped THEN
+            1
+          ELSE
+            0
+          END AS shipped
+        FROM pallets
+        JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+        JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+        JOIN loads ON loads.id = pallets.load_id
+                 JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
+                 JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
+                 JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
+                 JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+        ) sub_pallets
+        GROUP BY load_day, pol, pod, packed_tm_group
+        ORDER BY load_day DESC, pol, pod, packed_tm_group
+      SQL
+
+      DB[query].all.group_by { |r| r[:load_day] }
     end
   end
 end
