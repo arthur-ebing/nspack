@@ -48,7 +48,7 @@ module Production
           recs.map do |rec|
             <<~HTML
               <div class="outline pa2 mr2 mt2 bg-washed-blue">
-                <p class="bt bb fw7">Pallets</p>
+                <p class="bt bb fw7">Loads: #{rec[:no_loads]}</p>
                 <table>
                   <tr><td class="pa1">POL:</td><td>#{rec[:pol]}</td></tr>
                   <tr><td class="pa1">POD:</td><td>#{rec[:pod]}</td></tr>

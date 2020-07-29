@@ -41,7 +41,7 @@ class Nspack < Roda
     # IN STOCK
     # --------------------------------------------------------------------------
     r.on 'in_stock' do
-      show_page_info('In-stock dashboard: Still to come')
+      show_page { Production::Dashboards::Dashboard::PalletsInStock.call }
     end
 
     # DELIVERIES

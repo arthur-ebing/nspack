@@ -105,15 +105,16 @@ module ProductionApp
     def loads_per_week
       query = <<~SQL
         SELECT load_week, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped,
-               MIN(load_day) AS from_date, MAX(load_day) AS to_date
+               MIN(load_day) AS from_date, MAX(load_day) AS to_date, COUNT(DISTINCT load_id) AS no_loads
         FROM (
           SELECT
           DISTINCT pallets.pallet_number,
               pol_port.port_code AS pol,
               pod_port.port_code AS pod,
             target_market_groups.target_market_group_name AS packed_tm_group,
-            to_char(loads.created_at, 'IW'::text)::integer AS load_week,
-            loads.created_at::date AS load_day,
+            to_char(COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at), 'IW'::text)::integer AS load_week,
+            COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at)::date AS load_day,
+            pallets.load_id,
             CASE WHEN pallets.allocated AND NOT pallets.shipped THEN
               1
             ELSE
@@ -128,10 +129,10 @@ module ProductionApp
           JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
           JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
           JOIN loads ON loads.id = pallets.load_id
-                   JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
-                   JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
-                   JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
-                   JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+          JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
+          JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
+          JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
+          JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
         ) sub_pallets
         GROUP BY load_week, pol, pod, packed_tm_group
         ORDER BY load_week DESC, pol, pod, packed_tm_group
@@ -142,38 +143,59 @@ module ProductionApp
 
     def loads_per_day
       query = <<~SQL
-        SELECT load_day, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped
+        SELECT load_day, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped, COUNT(DISTINCT load_id) AS no_loads
         FROM (
-        SELECT
-        DISTINCT pallets.pallet_number,
-            pol_port.port_code AS pol,
-            pod_port.port_code AS pod,
-          target_market_groups.target_market_group_name AS packed_tm_group,
-          loads.created_at::date AS load_day,
-          CASE WHEN pallets.allocated AND NOT pallets.shipped THEN
-            1
-          ELSE
-            0
-          END AS allocated,
-          CASE WHEN pallets.shipped THEN
-            1
-          ELSE
-            0
-          END AS shipped
-        FROM pallets
-        JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
-        JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
-        JOIN loads ON loads.id = pallets.load_id
-                 JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
-                 JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
-                 JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
-                 JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+          SELECT
+          DISTINCT pallets.pallet_number,
+              pol_port.port_code AS pol,
+              pod_port.port_code AS pod,
+            target_market_groups.target_market_group_name AS packed_tm_group,
+            COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at)::date AS load_day,
+            pallets.load_id,
+            CASE WHEN pallets.allocated AND NOT pallets.shipped THEN
+              1
+            ELSE
+              0
+            END AS allocated,
+            CASE WHEN pallets.shipped THEN
+              1
+            ELSE
+              0
+            END AS shipped
+          FROM pallets
+          JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+          JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+          JOIN loads ON loads.id = pallets.load_id
+          JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
+          JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
+          JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
+          JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
         ) sub_pallets
         GROUP BY load_day, pol, pod, packed_tm_group
         ORDER BY load_day DESC, pol, pod, packed_tm_group
       SQL
 
       DB[query].all.group_by { |r| r[:load_day] }
+    end
+
+    def pallets_in_stock
+      query = <<~SQL
+        SELECT
+          target_market_groups.target_market_group_name AS packed_tm_group,
+          cultivars.cultivar_name,
+          standard_pack_codes.standard_pack_code,
+          COUNT(*) AS pallet_count
+        FROM pallets
+        JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+        JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
+        JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
+        WHERE pallets.in_stock AND NOT pallets.allocated
+        GROUP BY target_market_groups.target_market_group_name, cultivars.cultivar_name, standard_pack_codes.standard_pack_code
+        ORDER BY target_market_groups.target_market_group_name, cultivars.cultivar_name, standard_pack_codes.standard_pack_code
+      SQL
+
+      DB[query].all
     end
   end
 end
