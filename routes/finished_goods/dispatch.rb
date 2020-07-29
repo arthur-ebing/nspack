@@ -312,7 +312,6 @@ class Nspack < Roda
 
       # Unship only pallet
       r.on 'unship', String do |pallet_number|
-        p pallet_number
         check_auth!('dispatch', 'edit')
         res = interactor.unship_load(id, pallet_number)
         flash[res.success ? :notice : :error] = res.message

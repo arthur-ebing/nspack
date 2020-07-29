@@ -47,11 +47,11 @@ class Nspack < Roda
     # DELIVERIES
     # --------------------------------------------------------------------------
     r.on 'delivery_weeks' do
-      show_page_info('Deliveries per week dashboard: Still to come')
+      show_page { Production::Dashboards::Dashboard::DeliveryWeeks.call }
     end
 
     r.on 'delivery_days' do
-      show_page_info('Deliveries per day dashboard: Still to come')
+      show_page { Production::Dashboards::Dashboard::DeliveryDays.call }
     end
   end
 end

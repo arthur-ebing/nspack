@@ -197,5 +197,71 @@ module ProductionApp
 
       DB[query].all
     end
+
+    def deliveries_per_week
+      query = <<~SQL
+        SELECT
+          -- rmt_deliveries.date_delivered,
+          to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer AS delivery_week,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name,
+          SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
+          SUM(rmt_bins.qty_bins) AS qty_bins,
+          COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
+        FROM rmt_bins
+        LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
+        LEFT JOIN farms ON farms.id = rmt_bins.farm_id
+        LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
+        LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
+        WHERE NOT rmt_bins.is_rebin
+        GROUP BY to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name
+        ORDER BY to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer DESC,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name
+      SQL
+
+      DB[query].all.group_by { |r| r[:delivery_week] }
+    end
+
+    def deliveries_per_day
+      query = <<~SQL
+        SELECT
+          -- rmt_deliveries.date_delivered,
+          rmt_bins.bin_received_date_time::date AS bin_received_date,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name,
+          SUM(CASE WHEN rmt_bins.bin_tipped THEN rmt_bins.qty_bins ELSE 0 END) AS qty_tipped,
+          SUM(rmt_bins.qty_bins) AS qty_bins,
+          COUNT(DISTINCT rmt_bins.rmt_delivery_id) AS no_deliveries
+        FROM rmt_bins
+        LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
+        LEFT JOIN farms ON farms.id = rmt_bins.farm_id
+        LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
+        LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
+        WHERE NOT rmt_bins.is_rebin
+        GROUP BY rmt_bins.bin_received_date_time::date,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name
+        ORDER BY rmt_bins.bin_received_date_time::date DESC,
+          farms.farm_code,
+          pucs.puc_code,
+          orchards.orchard_code,
+          cultivars.cultivar_name
+      SQL
+
+      DB[query].all.group_by { |r| r[:bin_received_date] }
+    end
   end
 end
