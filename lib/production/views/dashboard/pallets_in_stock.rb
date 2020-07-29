@@ -15,6 +15,8 @@ module Production
 
         def self.draw_boxes
           recs = ProductionApp::DashboardRepo.new.pallets_in_stock
+          return 'There are no pallets in stock' if recs.empty?
+
           <<~HTML
             <div class="flex flex-wrap pa3 bg-mid-gray">
               #{stock_items(recs).join("\n")}

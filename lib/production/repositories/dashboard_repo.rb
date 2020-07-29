@@ -104,7 +104,7 @@ module ProductionApp
 
     def loads_per_week
       query = <<~SQL
-        SELECT load_week, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped,
+        SELECT load_year, load_week, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped,
                MIN(load_day) AS from_date, MAX(load_day) AS to_date, COUNT(DISTINCT load_id) AS no_loads
         FROM (
           SELECT
@@ -112,6 +112,7 @@ module ProductionApp
               pol_port.port_code AS pol,
               pod_port.port_code AS pod,
             target_market_groups.target_market_group_name AS packed_tm_group,
+            to_char(COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at), 'YYYY'::text)::integer AS load_year,
             to_char(COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at), 'IW'::text)::integer AS load_week,
             COALESCE(pallets.shipped_at, pallets.allocated_at, loads.created_at)::date AS load_day,
             pallets.load_id,
@@ -134,8 +135,8 @@ module ProductionApp
           JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
           JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
         ) sub_pallets
-        GROUP BY load_week, pol, pod, packed_tm_group
-        ORDER BY load_week DESC, pol, pod, packed_tm_group
+        GROUP BY load_year, load_week, pol, pod, packed_tm_group
+        ORDER BY load_year DESC, load_week DESC, pol, pod, packed_tm_group
       SQL
 
       DB[query].all.group_by { |r| r[:load_week] }
@@ -202,6 +203,7 @@ module ProductionApp
       query = <<~SQL
         SELECT
           -- rmt_deliveries.date_delivered,
+          to_char(rmt_bins.bin_received_date_time, 'YYYY'::text)::integer AS delivery_year,
           to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer AS delivery_week,
           farms.farm_code,
           pucs.puc_code,
@@ -216,12 +218,14 @@ module ProductionApp
         LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
         LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
         WHERE NOT rmt_bins.is_rebin
-        GROUP BY to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer,
+        GROUP BY to_char(rmt_bins.bin_received_date_time, 'YYYY'::text)::integer,
+          to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer,
           farms.farm_code,
           pucs.puc_code,
           orchards.orchard_code,
           cultivars.cultivar_name
-        ORDER BY to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer DESC,
+        ORDER BY to_char(rmt_bins.bin_received_date_time, 'YYYY'::text)::integer DESC,
+          to_char(rmt_bins.bin_received_date_time, 'IW'::text)::integer DESC,
           farms.farm_code,
           pucs.puc_code,
           orchards.orchard_code,
