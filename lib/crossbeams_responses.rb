@@ -118,8 +118,19 @@ module Crossbeams
       if res.errors.empty?
         res.message
       else
-        "#{res.message} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.join(', ')}" }.join('; ')}"
+        "#{res.message} - #{res.errors.map { |fld, errs| "#{fld} #{unwrap_errors(errs)}" }.join('; ')}"
       end
+    end
+
+    # Take validation errors and unwrap Array or Hash.
+    # Do not call directly. Use +unwrap_failed_response+
+    #
+    # @param errs [array,hash] the validation errors for a particular field.
+    # @return [string] the list of validation errors for the field.
+    def unwrap_errors(errs)
+      return errs.join(', ') if errs.is_a?(Array)
+
+      errs.group_by { |_, v| v }.map { |k, v| ": #{v.length} item#{v.length == 1 ? '' : 's'} #{k.join(', ')}" }.join(', ')
     end
   end
 end
