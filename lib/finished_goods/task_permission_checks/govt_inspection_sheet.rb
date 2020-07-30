@@ -25,7 +25,7 @@ module FinishedGoodsApp
       }.freeze
 
       def call
-        return failed_response 'Govt Inspection Sheet record not found' unless @entity || task == :create
+        return failed_response 'Govt Inspection Sheet record not found.' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
@@ -40,44 +40,47 @@ module FinishedGoodsApp
       end
 
       def edit_check
-        return failed_response 'Govt Inspection Sheet has been finished' if inspected?
+        return failed_response 'Govt Inspection Sheet has been finished.' if inspected?
 
         all_ok
       end
 
       def delete_check
-        return failed_response 'Govt Inspection Sheet has been completed' if completed?
+        return failed_response 'Govt Inspection Sheet has been completed.' if completed?
 
         all_ok
       end
 
       def add_pallets_check
-        return failed_response 'Govt Inspection Sheet has already been completed' if completed?
+        return failed_response 'Govt Inspection Sheet has already been completed.' if completed?
 
         all_ok
       end
 
       def complete_check
-        return failed_response 'Govt Inspection Sheet has already been completed' if completed?
+        return failed_response 'Govt Inspection Sheet has already been completed.' if completed?
         return failed_response('Inspection sheet must have at least one pallet attached.') unless allocated?
 
         all_ok
       end
 
       def uncomplete_check
-        return failed_response 'Govt Inspection Sheet has not been completed' unless completed?
+        return failed_response 'Govt Inspection Sheet has not been completed.' unless completed?
 
         all_ok
       end
 
       def reopen_check
-        return failed_response 'Govt Inspection Sheet has not been inspected' unless inspected?
+        pallet_ids = @repo.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id)
+        shipped_pallets = @repo.exists?(:pallets, id: pallet_ids, shipped: true)
+        return failed_response "Govt Inspection Sheet can't be reopened, already shipped." if shipped_pallets
+        return failed_response 'Govt Inspection Sheet has not been inspected.' unless inspected?
 
         all_ok
       end
 
       def capture_check
-        return failed_response 'Govt Inspection Sheet has already been inspected' if inspected?
+        return failed_response 'Govt Inspection Sheet has already been inspected.' if inspected?
 
         all_ok
       end
@@ -91,7 +94,7 @@ module FinishedGoodsApp
       end
 
       def cancel_check
-        return failed_response 'Govt Inspection Sheet has not been inspected' unless inspected?
+        return failed_response 'Govt Inspection Sheet has not been inspected.' unless inspected?
 
         all_ok
       end
