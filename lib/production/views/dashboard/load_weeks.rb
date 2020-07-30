@@ -53,7 +53,7 @@ module Production
             pallets_shipped += rec[:shipped]
           end
           <<~HTML
-            <div class="outline pa2 mr2 mt2" style="background:#e6f4f1">
+            <div class="outline pa2 mr2 mt2" style="background-color:#e6f4f1">
               <p class="bt bb fw7 mb4">Shipped Loads</p>
               <table>
                 <tr><td class="pa1">Loads:</td><td class="fw7 f4 tr">#{loads_shipped}</td></tr>

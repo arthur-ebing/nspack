@@ -15,16 +15,17 @@ module Production
 
         def self.draw_boxes
           recs = ProductionApp::DashboardRepo.new.deliveries_per_day
+          tots = ProductionApp::DashboardRepo.new.delivery_cultivars_per_day
           return 'There are no deliveries to display' if recs.empty?
 
           <<~HTML
             <div class="flex flex-column">
-              #{deliveries(recs).join("\n")}
+              #{deliveries(recs, tots).join("\n")}
             </div>
           HTML
         end
 
-        def self.deliveries(groups)
+        def self.deliveries(groups, tots)
           cnt = 0
           groups.map do |day, recs|
             cnt += 1
@@ -37,8 +38,31 @@ module Production
                 </div>
 
                 <div class="flex flex-wrap">
+                  #{total_items(tots[day]).join("\n")}
                   #{day_items(recs).join("\n")}
                 </div>
+              </div>
+            HTML
+          end
+        end
+
+        def self.total_items(recs) # rubocop:disable Metrics/AbcSize
+          recs.map do |rec|
+            percentage = if rec[:qty_tipped].zero? || rec[:qty_bins].zero?
+                           0
+                         else
+                           rec[:qty_tipped] / rec[:qty_bins].to_f * 100.0
+                         end
+            <<~HTML
+              <div class="outline pa2 mr2 flex flex-column justify-center" style="background-color:#e6f4f1;min-width:12em">
+                <p class="bt bb fw7 f4 tc">#{rec[:cultivar_name]}</p>
+                <div class="tc pa2 mb2" style="background: linear-gradient(90deg, #8ABDEA #{percentage.to_i}%, white #{percentage.to_i}%);">
+                  <span class="fw6 f2 mid-gray ">#{percentage.to_i}%</span><br>
+                </div>
+                <table style="width:100%">
+                  <tr><td class="fw7 f4 tr">#{rec[:qty_bins] || 0}</td><td>bins</td></tr>
+                  <tr><td class="fw7 f4 tr">#{rec[:qty_tipped] || 0}</td><td>tipped</td></tr>
+                </table>
               </div>
             HTML
           end
