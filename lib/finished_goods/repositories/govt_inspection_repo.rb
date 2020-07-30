@@ -90,7 +90,7 @@ module FinishedGoodsApp
 
       govt_inspection_pallets = all_hash(:govt_inspection_pallets,  govt_inspection_sheet_id: id)
       govt_inspection_pallets.each do |govt_inspection_pallet|
-        attrs = { inspected: nil, govt_inspection_passed: nil, last_govt_inspection_pallet_id: nil, in_stock: nil, stock_created_at: nil }
+        attrs = { inspected: false, govt_inspection_passed: false, last_govt_inspection_pallet_id: nil, in_stock: false, stock_created_at: nil }
         update(:pallets, govt_inspection_pallet[:pallet_id], attrs)
         log_status(:pallets, govt_inspection_pallet[:pallet_id], 'INSPECTION CANCELLED', user_name: user.user_name)
       end
