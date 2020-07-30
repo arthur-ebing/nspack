@@ -102,6 +102,32 @@ module ProductionApp
       DB[query, id].all
     end
 
+    def shipped_loads_per_week
+      query = <<~SQL
+        SELECT
+          to_char(loads.shipped_at, 'IW'::text)::integer AS load_week,
+          COUNT(*)
+        FROM loads
+        WHERE shipped
+        GROUP BY 1
+      SQL
+
+      Hash[DB[query].select_map(%i[load_week no_shipped])]
+    end
+
+    def shipped_loads_per_day
+      query = <<~SQL
+        SELECT
+          loads.shipped_at::date AS load_day,
+          COUNT(*)
+        FROM loads
+        WHERE shipped
+        GROUP BY 1
+      SQL
+
+      Hash[DB[query].select_map(%i[load_day no_shipped])]
+    end
+
     def loads_per_week
       query = <<~SQL
         SELECT load_year, load_week, pol, pod, packed_tm_group, SUM(allocated) AS allocated, SUM(shipped) AS shipped,

@@ -25,11 +25,13 @@ module Production
         end
 
         def self.loads(groups)
+          shipped_lkp = ProductionApp::DashboardRepo.new.shipped_loads_per_day
           cnt = 0
           groups.map do |day, recs|
             cnt += 1
             next if cnt > 2
 
+            loads_shipped = shipped_lkp[day] || 0
             <<~HTML
               <div class="flex flex-column mv2 bg-mid-gray pt1 pl2 pb2 outline">
                 <div class="flex flex-wrap near-white">
@@ -37,11 +39,28 @@ module Production
                 </div>
 
                 <div class="flex flex-wrap">
+                  #{total_day(loads_shipped, recs)}
                   #{day_items(recs).join("\n")}
                 </div>
               </div>
             HTML
           end
+        end
+
+        def self.total_day(loads_shipped, recs)
+          pallets_shipped = 0
+          recs.each do |rec|
+            pallets_shipped += rec[:shipped]
+          end
+          <<~HTML
+            <div class="outline pa2 mr2 mt2" style="background:#e6f4f1">
+              <p class="bt bb fw7 mb4">Shipped Loads</p>
+              <table>
+                <tr><td class="pa1">Loads:</td><td class="fw7 f4 tr">#{loads_shipped}</td></tr>
+                <tr><td class="pa1">Pallets:</td><td class="fw7 f4 tr">#{pallets_shipped}</td></tr>
+              </table>
+            </div>
+          HTML
         end
 
         def self.day_items(recs)
