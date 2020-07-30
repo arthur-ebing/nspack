@@ -136,7 +136,7 @@ module FinishedGoodsApp
                    last_govt_inspection_pallet_id: nil }
 
         unless AppConst::CREATE_STOCK_AT_FIRST_INTAKE
-          params[:in_stock] = nil
+          params[:in_stock] = false
           params[:stock_created_at] = nil
         end
 
