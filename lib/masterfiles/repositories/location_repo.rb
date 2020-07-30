@@ -216,12 +216,12 @@ module MasterfilesApp
 
     def for_select_location_storage_types_for(id)
       dataset = DB[:location_storage_types_locations].join(:location_storage_types, id: :location_storage_type_id).where(Sequel[:location_storage_types_locations][:location_id] => id)
-      select_two(dataset, :storage_type_code, :id)
+      select_two(dataset, :storage_type_code, :id, nil)
     end
 
     def for_select_location_assignments_for(id)
       dataset = DB[:location_assignments_locations].join(:location_assignments, id: :location_assignment_id).where(Sequel[:location_assignments_locations][:location_id] => id)
-      select_two(dataset, :assignment_code, :id)
+      select_two(dataset, :assignment_code, :id, nil)
     end
 
     def get_locations_type_code(id)
