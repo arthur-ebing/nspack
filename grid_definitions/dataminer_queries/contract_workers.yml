@@ -369,4 +369,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-:query_parameter_definitions: []
+:query_parameter_definitions:
+  - :column: employment_type_id
+    :caption: Employment Type Id
+    :data_type: :integer
+    :control_type: :text
+    :default_value:
+    :ordered_list: false
+    :ui_priority: 1
+    :list_def:

@@ -22,3 +22,14 @@
   :text: New Contract Worker
   :style: :button
   :behaviour: :popup
+:conditions:
+  :employment_type:
+    - :col: employment_type_id
+      :op: =
+      :val: $:employment_type_id$
+:multiselect:
+  :employment_type:
+    :url: "/production/shifts/summary_reports/$:employment_type_code$/multiselect_contract_workers"
+    :multiselect_save_method: loading
+    :can_be_cleared: false
+    :conditions: employment_type

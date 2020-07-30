@@ -198,6 +198,47 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # CONTRACT WORKERS SUMMARY REPORTS
+    # --------------------------------------------------------------------------
+    r.on 'summary_reports', String do |employment_type|
+      r.on 'select_contract_workers' do
+        store_locally(:incentive_summary_params, params[:shift])
+        show_page do
+          Production::Production::Shift::SummaryReport.call(employment_type,
+                                                            params[:shift],
+                                                            back_url: back_button_url)
+        end
+      end
+
+      r.on 'incentive_summary_report' do
+        attrs = retrieve_from_local_store(:incentive_summary_params)
+        store_locally(:incentive_summary_params, attrs)
+
+        report_name =  case employment_type
+                       when 'packers'
+                         'packer_summary'
+                       when 'palletizer'
+                         'palletizer_summary'
+                       end
+        res = CreateJasperReport.call(report_name: report_name.to_s,
+                                      user: current_user.login_name,
+                                      file: report_name.to_s,
+                                      params: { FromDateTime: "#{attrs[:from_date]} 00:00:00|date",
+                                                ToDateTime: "#{attrs[:to_date]} 00:00:00|date",
+                                                WorkerIds: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                keep_file: false })
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.get do
+        show_page { Production::Production::Shift::Filter.call(employment_type) }
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
