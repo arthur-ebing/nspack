@@ -224,9 +224,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = CreateJasperReport.call(report_name: report_name.to_s,
                                       user: current_user.login_name,
                                       file: report_name.to_s,
+                                      debug_mode: true,
                                       params: { FromDateTime: "#{attrs[:from_date]} 00:00:00|date",
                                                 ToDateTime: "#{attrs[:to_date]} 00:00:00|date",
                                                 WorkerIds: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                OUT_FILE_TYPE: 'CSV',
                                                 keep_file: false })
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
