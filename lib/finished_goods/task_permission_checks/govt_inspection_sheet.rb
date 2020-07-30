@@ -88,7 +88,7 @@ module FinishedGoodsApp
       def finish_check
         pallet_ids = @repo.select_values(:govt_inspection_pallets, :pallet_id, govt_inspection_sheet_id: id, inspected: false)
         pallet_numbers = @repo.select_values(:pallets, :pallet_number, id: pallet_ids)
-        return failed_response("Pallet: #{pallet_numbers.first(3).join(', ')}, results not captured.") unless pallet_numbers.empty?
+        return failed_response "Pallet: #{pallet_numbers.first(3).join(', ')}, results not captured." unless pallet_numbers.empty?
 
         all_ok
       end
