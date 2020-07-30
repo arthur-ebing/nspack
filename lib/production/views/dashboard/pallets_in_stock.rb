@@ -19,9 +19,26 @@ module Production
 
           <<~HTML
             <div class="flex flex-wrap pa3 bg-mid-gray">
+              #{cultivar_totals(recs).join("\n")}
               #{stock_items(recs).join("\n")}
             </div>
           HTML
+        end
+
+        def self.cultivar_totals(recs)
+          lkp = {}
+          recs.each do |rec|
+            lkp[rec[:cultivar_name]] ||= 0
+            lkp[rec[:cultivar_name]] += rec[:pallet_count]
+          end
+          lkp.map do |cultivar, count|
+            <<~HTML
+              <div class="outline pa2 mr3 mt2 tc" style="min-width:230px;background:#e6f4f1;">
+                <p class="fw6 f4 mt0 pb1 bb">#{cultivar}</p>
+                <p class="fw7 f2 tc pt2 pb2 mt0 mb0" style="background-color:#8ABDEA">#{count}</p>
+              </div>
+            HTML
+          end
         end
 
         def self.stock_items(recs)
