@@ -4,6 +4,10 @@
   :conditions:
     :production_run_cartons: Cartons on Production Run
 :conditions:
+  :standard:
+    - :col: carton_labels.id
+      :op: =
+      :val: $:id$
   :production_run_cartons:
     - :col: carton_labels.production_run_id
       :op: =
