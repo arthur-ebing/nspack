@@ -96,5 +96,14 @@ module FinishedGoodsApp
         end
       end
     end
+
+    def local_non_stock_pallets
+      tm_id = MasterfilesApp::TargetMarketRepo.new.find_tm_group_id_from_code('LO', AppConst::PACKED_TM_GROUP)
+      DB[:pallet_sequences]
+        .join(:pallets, id: :pallet_id)
+        .where(in_stock: false, packed_tm_group_id: tm_id)
+        .distinct
+        .select_map([:pallet_id, Sequel[:pallets][:pallet_number]])
+    end
   end
 end

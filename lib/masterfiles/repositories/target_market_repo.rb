@@ -129,5 +129,14 @@ module MasterfilesApp
       DB[:target_market_groups].where(id: id).delete
       { success: true }
     end
+
+    def find_tm_group_id_from_code(code, type_code)
+      DB[:target_market_groups]
+        .where(target_market_group_name: code)
+        .where(target_market_group_type_id: DB[:target_market_group_types]
+          .where(target_market_group_type_code: type_code)
+          .get(:id))
+        .get(:id)
+    end
   end
 end
