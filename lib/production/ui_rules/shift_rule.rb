@@ -23,18 +23,22 @@ module UiRules
 
     def set_show_fields
       fields[:shift_type_id] = { renderer: :hidden }
-      fields[:shift_type_code] = { renderer: :label, with_value: @form_object.shift_type_code, caption: 'Shift Type' }
-      fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:shift_type_code] = { renderer: :label,
+                                   with_value: @form_object.shift_type_code,
+                                   caption: 'Shift Type' }
+      fields[:active] = { renderer: :label,
+                          as_boolean: true }
       fields[:running_hours] = { renderer: :label }
-      fields[:start_date_time] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:end_date_time] = { renderer: :label, format: :without_timezone_or_seconds }
+      fields[:start_date_time] = { renderer: :label,
+                                   format: :without_timezone_or_seconds }
+      fields[:end_date_time] = { renderer: :label,
+                                 format: :without_timezone_or_seconds }
     end
 
     def set_filter_fields
-      fields[:from_date] = { renderer: :date,
-                             required: true,
-                             width: 1 }
-      fields[:to_date] = { renderer: :date,
+      fields[:from_date] = { renderer: :datetime,
+                             required: true }
+      fields[:to_date] = { renderer: :datetime,
                            required: true }
       fields[:employment_type_id] = { renderer: :hidden }
       fields[:employment_type] = { renderer: :hidden }
@@ -42,13 +46,13 @@ module UiRules
     end
 
     def set_summary_report_fields
-      from_date_label = @form_object[:from_date]
-      to_date_label = @form_object[:to_date]
       fields[:from_date_label] = { renderer: :label,
-                                   with_value: from_date_label,
+                                   format: :without_timezone_or_seconds,
+                                   with_value: DateTime.parse(@form_object[:from_date]).strftime('%Y-%m-%d %H:%M:%S'),
                                    caption: 'From Date' }
       fields[:to_date_label] = { renderer: :label,
-                                 with_value: to_date_label,
+                                 format: :without_timezone_or_seconds,
+                                 with_value: DateTime.parse(@form_object[:to_date]).strftime('%Y-%m-%d %H:%M:%S'),
                                  caption: 'To Date' }
       fields[:from_date] = { renderer: :hidden }
       fields[:to_date] = { renderer: :hidden }
@@ -60,17 +64,29 @@ module UiRules
     def edit_fields
       {
         shift_type_id: { renderer: :hidden },
-        shift_type_code: { renderer: :label, options: @form_object.shift_type_code, caption: 'Shift Type', required: true },
+        shift_type_code: { renderer: :label,
+                           options: @form_object.shift_type_code,
+                           caption: 'Shift Type',
+                           required: true },
         running_hours: {},
-        start_date_time: { renderer: :label, format: :without_timezone_or_seconds },
-        end_date_time: { renderer: :label, format: :without_timezone_or_seconds }
+        start_date_time: { renderer: :label,
+                           format: :without_timezone_or_seconds },
+        end_date_time: { renderer: :label,
+                         format: :without_timezone_or_seconds }
       }
     end
 
     def new_fields
       {
-        shift_type_id: { renderer: :select, options: @mf_hr_repo.for_select_shift_types_with_codes, caption: 'Shift Type', required: true, prompt: true },
-        date: { renderer: :input, subtype: :date, caption: 'Please select', required: true }
+        shift_type_id: { renderer: :select,
+                         options: @mf_hr_repo.for_select_shift_types_with_codes,
+                         caption: 'Shift Type',
+                         required: true,
+                         prompt: true },
+        date: { renderer: :input,
+                subtype: :date,
+                caption: 'Please select',
+                required: true }
       }
     end
 
