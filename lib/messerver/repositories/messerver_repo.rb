@@ -170,7 +170,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nScreen or print is #{screen_or_print}\nVars: #{vars.inspect}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -193,7 +193,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nPrinter type is #{printer_type}\nTargets: #{targets.inspect}")
       failed_response("There was an error: #{e.message}")
     end
 
@@ -255,7 +255,7 @@ module MesserverApp
     rescue Errno::ECONNREFUSED
       failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}")
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: "URI is #{uri}\nLabel is #{label_template_name}\nVars: #{vars.inspect}\nOptions: #{options.inspect}")
       failed_response("There was an error: #{e.message}")
     end
 
