@@ -1410,7 +1410,9 @@ const crossbeamsUtils = {
       throw new HttpError(response);
     })
     .then((data) => {
-      if (data.content) {
+      if (data.redirect) {
+        window.location = data.redirect;
+      } else if (data.content) {
         contentDiv.classList.remove('content-loading');
         contentDiv.innerHTML = data.content;
 
