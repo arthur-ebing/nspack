@@ -277,6 +277,7 @@ module MesscadaApp
     end
 
     def find_pallet_sequences_by_pallet_number(pallet_number)
+      # FIXME: reads from view...
       # DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number)
       DB["SELECT *
           FROM vw_pallet_sequence_flat
@@ -293,6 +294,7 @@ module MesscadaApp
     end
 
     def find_pallet_sequence_attrs(id)
+      # FIXME: reads from view...
       DB["SELECT *
           FROM vw_pallet_sequence_flat
           WHERE id = ?", id].first

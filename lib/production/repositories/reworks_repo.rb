@@ -118,7 +118,7 @@ module ProductionApp
     end
 
     def production_run_pallets?(pallet_numbers, production_run_id)
-      DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
     end
 
     def production_run_bins?(bins, production_run_id)
@@ -336,6 +336,7 @@ module ProductionApp
     end
 
     def reworks_run_pallet_data(pallet_number)
+      # FIXME: reads from view...
       DB["SELECT *
           FROM vw_pallet_sequence_flat
           WHERE pallet_number = ?", pallet_number].first
@@ -351,6 +352,7 @@ module ProductionApp
     end
 
     def reworks_run_pallet_seq_data(id)
+      # FIXME: reads from view...
       DB["SELECT *
           FROM vw_pallet_sequence_flat
           WHERE id = ?", id].first
@@ -366,6 +368,7 @@ module ProductionApp
     end
 
     def sequence_setup_data(id)
+      # FIXME: reads from view...
       DB["SELECT marketing_variety, customer_variety, std_size, basic_pack, std_pack, actual_count, size_ref, marketing_org,
           packed_tm_group, mark, inventory_code, pallet_base, stack_type, cpp, bom, client_size_ref,
           client_product_code, treatments, order_number, sell_by_code, grade, product_chars, pm_type, pm_subtype
@@ -431,13 +434,14 @@ module ProductionApp
     end
 
     def reworks_run_pallet_quantities(pallet_number)
-      query = <<~SQL
-        SELECT pallet_sequence_number, carton_quantity
-        FROM vw_pallet_sequence_flat
-        WHERE pallet_number = '#{pallet_number}'
-        ORDER BY pallet_sequence_number
-      SQL
-      DB[query].order(:puc_code).select_map(%i[pallet_sequence_number carton_quantity])
+      DB[:pallet_sequences].where(pallet_number: pallet_number).order(:puc_id, :pallet_sequence_number).select_map(%i[pallet_sequence_number carton_quantity])
+      # query = <<~SQL
+      #   SELECT pallet_sequence_number, carton_quantity
+      #   FROM vw_pallet_sequence_flat
+      #   WHERE pallet_number = '#{pallet_number}'
+      #   ORDER BY pallet_sequence_number
+      # SQL
+      # DB[query].order(:puc_code).select_map(%i[pallet_sequence_number carton_quantity])
     end
 
     def edit_carton_quantities(id, carton_quantity)
@@ -909,4 +913,3 @@ module ProductionApp
     end
   end
 end
-# frozen_string_literal: true
