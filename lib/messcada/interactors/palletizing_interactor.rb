@@ -313,14 +313,17 @@ module MesscadaApp
 
       return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine, { carton_number: carton_number })) unless carton_number_exists?(carton_number)
 
-      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
-      return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
+      carton_id = carton_number_carton_id(carton_number)
+      unless carton_id.nil?
+        return failed_response('Carton already on a completed plt', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
 
-      return failed_response('Carton already on a pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if carton_on_pallet?(carton_id)
+        return failed_response('Carton already on a pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if carton_on_pallet?(carton_id)
 
-      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
+        return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
 
-      carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
+        carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
+      end
+
       if carton_belongs_to_another_bay
         carton_bay_name = palletizing_bay_attributes(repo.carton_palletizing_bay_state(carton_id))[:bay_name]
         return failed_response("Carton of bay #{carton_bay_name}", current_bay_attributes(state_machine, { carton_number: carton_number }))
@@ -339,6 +342,7 @@ module MesscadaApp
         confirm = { carton_number: carton_number }
         res = nil
         repo.transaction do
+          carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
           res = MesscadaApp::CreatePalletFromCarton.call(@user, carton_id, 1, palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id, true)
           return res unless res.success
 
@@ -361,17 +365,17 @@ module MesscadaApp
 
       return failed_response("Carton:#{carton_number} doesn't exist", current_bay_attributes(state_machine, { carton_number: carton_number })) unless carton_number_exists?(carton_number)
 
-      carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
-      return failed_response('Carton already on a completed pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
+      carton_id = carton_number_carton_id(carton_number)
+      unless carton_id.nil?
+        return failed_response('Carton already on a completed pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if completed_pallet?(carton_id)
 
-      return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
+        return failed_response('Carton belongs to a closed Run', current_bay_attributes(state_machine, { carton_number: carton_number })) if closed_production_run?(carton_id)
 
-      return failed_response('Carton already on pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if current_bay_carton?(carton_id, state_machine.target.id)
+        return failed_response('Carton already on pallet', current_bay_attributes(state_machine, { carton_number: carton_number })) if current_bay_carton?(carton_id, state_machine.target.id)
 
-      res = validate_pallet_mix_rules(state_machine, carton_id)
-      return res unless res.success
+        carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
+      end
 
-      carton_belongs_to_another_bay = carton_of_other_bay?(carton_id)
       if carton_belongs_to_another_bay
         carton_bay_name = palletizing_bay_attributes(repo.carton_palletizing_bay_state(carton_id))[:bay_name]
         confirm = {
@@ -387,6 +391,10 @@ module MesscadaApp
       else
         res = nil
         repo.transaction do
+          carton_id = get_palletizing_carton(carton_number, state_machine.current.to_s, params[:identifier], palletizing_bay_state(state_machine.target.id)&.palletizing_bay_resource_id)
+          res = validate_pallet_mix_rules(state_machine, carton_id)
+          return res unless res.success
+
           res = MesscadaApp::AddCartonToPallet.call(carton_id, palletizing_bay_state(state_machine.target.id)&.pallet_id)
           return res unless res.success
 
