@@ -60,7 +60,7 @@ class Nspack < Roda
     login_column :login_name
     accounts_table :vw_active_users # Only active users can login.
     account_password_hash_column :password_hash
-    template_opts(layout_opts: { path: 'views/layout_auth.erb' })
+    template_opts(layout_opts: { path: File.join(ENV['ROOT'], 'views/layout_auth.erb') })
     after_login do
       # On successful login, see if the user had given a specific path that required the login and redirect to it.
       path = request.cookies['pre_login_path']
