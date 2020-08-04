@@ -145,3 +145,19 @@ UtilityFunctions.wrapped_text(str, 80)
 UtilityFunctions.wrapped_sql(sql)
 UtilityFunctions.wrapped_sql(sql, 80)
 ----
+
+=== UI functions
+
+Render an icon in HTML
+[source,ruby]
+----
+UtilityFunctions.icon(:at)
+# => renders an SVG @ icon.
+----
+
+Render a loading message (glyph optionally with a message)
+[source,ruby]
+----
+UtilityFunctions.loading_message('Something is busy')
+# => renders a "loading" glyph and the text next to it.
+----

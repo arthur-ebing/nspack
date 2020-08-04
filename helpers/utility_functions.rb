@@ -247,4 +247,20 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   def cache_bust_url(path)
     "#{path}?seq=#{Time.now.nsec}"
   end
+
+  # Render HTML to display a loading graphic - optionally with message.
+  #
+  # @param message [string] optional message to display.
+  # @return [string] rendered HTML
+  def loading_message(message = nil)
+    Crossbeams::Layout::LoadingMessage.new(caption: message, wrap_for_centre: true).render
+  end
+
+  # Render an SVG icon.
+  #
+  # @param name [symbol] the name of the icon to render.
+  # @return [string] rendered SVG.
+  def icon(name, options = {})
+    Crossbeams::Layout::Icon.new(name, options).render
+  end
 end
