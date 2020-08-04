@@ -1,10 +1,11 @@
 ---
 :caption: Audit Pallets
-:sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    transaction_id,\r\n    user_name,\r\n
-  \   route_url,\r\n    request_ip,\r\n    status,\r\n    transaction_at,\r\n    action,\r\n
-  \   COALESCE(changed_fields, row_data) AS changed_fields,\r\n    pallet_number,\r\n
-  \   CONCAT(pallet_base_code, '_', stack_type_code) AS pallet_format,\r\n    location_long_code,\r\n
-  \   in_stock,\r\n    shipped,\r\n    shipped_at,\r\n    inspected,\r\n    govt_first_inspection_at,\r\n
+:sql: "SELECT\r\n    ROW_NUMBER() OVER (ORDER BY row_data_id DESC, event_id) AS id,\r\n
+  \   row_data_id,\r\n    event_id,\r\n    transaction_id,\r\n    user_name,\r\n    route_url,\r\n
+  \   request_ip,\r\n    status,\r\n    transaction_at,\r\n    action,\r\n    COALESCE(changed_fields,
+  row_data) AS changed_fields,\r\n    pallet_number,\r\n    CONCAT(pallet_base_code,
+  '_', stack_type_code) AS pallet_format,\r\n    location_long_code,\r\n    in_stock,\r\n
+  \   shipped,\r\n    shipped_at,\r\n    inspected,\r\n    govt_first_inspection_at,\r\n
   \   govt_reinspection_at,\r\n    stock_created_at,\r\n    first_cold_storage_at,\r\n
   \   build_status,\r\n    carton_quantity,\r\n    load_id,\r\n    gross_weight,\r\n
   \   nett_weight,\r\n    palletized_at,\r\n    temp_tail,\r\n    CASE WHEN action
@@ -40,7 +41,7 @@
   = 'pallets'\r\n           AND status_logs.table_name = 'pallets'\r\n\r\n         GROUP
   BY\r\n             logged_actions.transaction_id,\r\n             logged_actions.event_id,\r\n
   \            logged_action_details.id,\r\n             logged_actions.changed_fields\r\n
-  \        UNION\r\n         SELECT\r\n             id AS row_data_id,\r\n             999999999
+  \        UNION\r\n         SELECT\r\n             id AS row_data_id,\r\n             NULL
   AS event_id,\r\n             NULL AS transaction_id,\r\n             NULL AS user_name,\r\n
   \            NULL AS route_url,\r\n             NULL AS request_ip,\r\n             fn_current_status
   ('pallets', id) AS status,\r\n             NULL AS transaction_at,\r\n             NULL
@@ -68,12 +69,28 @@
     black: Currnent
   :render_url: 
 :columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Row Number
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   row_data_id:
     :name: row_data_id
-    :sequence_no: 1
+    :sequence_no: 2
     :caption: Row Id
     :namespaced_name: row_data_id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: true
@@ -86,10 +103,10 @@
     :group_max: false
   event_id:
     :name: event_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: " Event Id"
     :namespaced_name: event_id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: true
@@ -102,10 +119,10 @@
     :group_max: false
   transaction_id:
     :name: transaction_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Transaction Id
     :namespaced_name: transaction_id
-    :data_type: :string
+    :data_type: :integer
     :width: 120
     :format: 
     :hide: false
@@ -118,7 +135,7 @@
     :group_max: false
   user_name:
     :name: user_name
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: User
     :namespaced_name: user_name
     :data_type: :string
@@ -134,7 +151,7 @@
     :group_max: false
   route_url:
     :name: route_url
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Route url
     :namespaced_name: route_url
     :data_type: :string
@@ -150,7 +167,7 @@
     :group_max: false
   request_ip:
     :name: request_ip
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Request IP
     :namespaced_name: request_ip
     :data_type: :string
@@ -166,7 +183,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Status
     :namespaced_name: status
     :data_type: :string
@@ -182,7 +199,7 @@
     :group_max: false
   transaction_at:
     :name: transaction_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Transaction at
     :namespaced_name: transaction_at
     :data_type: :datetime
@@ -198,7 +215,7 @@
     :group_max: false
   action:
     :name: action
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Action
     :namespaced_name: action
     :data_type: :string
@@ -214,7 +231,7 @@
     :group_max: false
   changed_fields:
     :name: changed_fields
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Changed fields
     :namespaced_name: 
     :data_type: :string
@@ -230,7 +247,7 @@
     :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
@@ -246,7 +263,7 @@
     :group_max: false
   pallet_format:
     :name: pallet_format
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Pallet format
     :namespaced_name: 
     :data_type: :string
@@ -262,7 +279,7 @@
     :group_max: false
   location_long_code:
     :name: location_long_code
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Location long code
     :namespaced_name: location_long_code
     :data_type: :string
@@ -278,7 +295,7 @@
     :group_max: false
   in_stock:
     :name: in_stock
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: In stock
     :namespaced_name: in_stock
     :data_type: :boolean
@@ -294,7 +311,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Shipped
     :namespaced_name: shipped
     :data_type: :boolean
@@ -310,7 +327,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Shipped at
     :namespaced_name: shipped_at
     :data_type: :datetime
@@ -326,7 +343,7 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Inspected
     :namespaced_name: inspected
     :data_type: :boolean
@@ -342,7 +359,7 @@
     :group_max: false
   govt_first_inspection_at:
     :name: govt_first_inspection_at
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
     :data_type: :datetime
@@ -358,7 +375,7 @@
     :group_max: false
   govt_reinspection_at:
     :name: govt_reinspection_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Govt reinspection at
     :namespaced_name: govt_reinspection_at
     :data_type: :datetime
@@ -374,7 +391,7 @@
     :group_max: false
   stock_created_at:
     :name: stock_created_at
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Stock created at
     :namespaced_name: stock_created_at
     :data_type: :datetime
@@ -390,7 +407,7 @@
     :group_max: false
   first_cold_storage_at:
     :name: first_cold_storage_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: First cold storage at
     :namespaced_name: first_cold_storage_at
     :data_type: :datetime
@@ -406,7 +423,7 @@
     :group_max: false
   build_status:
     :name: build_status
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Build status
     :namespaced_name: build_status
     :data_type: :string
@@ -422,7 +439,7 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Carton qty
     :namespaced_name: carton_quantity
     :data_type: :string
@@ -438,7 +455,7 @@
     :group_max: false
   load_id:
     :name: load_id
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Load
     :namespaced_name: load_id
     :data_type: :string
@@ -454,7 +471,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :string
@@ -470,7 +487,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :string
@@ -486,7 +503,7 @@
     :group_max: false
   palletized_at:
     :name: palletized_at
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Palletized at
     :namespaced_name: palletized_at
     :data_type: :datetime
@@ -502,7 +519,7 @@
     :group_max: false
   temp_tail:
     :name: temp_tail
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Temp tail
     :namespaced_name: temp_tail
     :data_type: :string
@@ -518,7 +535,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

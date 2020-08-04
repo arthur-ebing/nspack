@@ -1,10 +1,11 @@
 ---
 :caption: Audit RMT Bins
-:sql: "SELECT\r\n    row_data_id,\r\n    event_id,\r\n    transaction_id,\r\n    user_name,\r\n
-  \   route_url,\r\n    request_ip,\r\n    status,\r\n    transaction_at,\r\n    action,\r\n
-  \   COALESCE(changed_fields, row_data) AS changed_fields,\r\n    bin_asset_number,\r\n
-  \   farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n
-  \   location_id,\r\n    bin_loads.id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
+:sql: "SELECT\r\n    ROW_NUMBER() OVER (ORDER BY row_data_id DESC, event_id) AS id,\r\n
+  \   row_data_id,\r\n    event_id,\r\n    transaction_id,\r\n    user_name,\r\n    route_url,\r\n
+  \   request_ip,\r\n    status,\r\n    transaction_at,\r\n    action,\r\n    COALESCE(changed_fields,
+  row_data) AS changed_fields,\r\n    bin_asset_number,\r\n    farm_code,\r\n    puc_code,\r\n
+  \   orchard_code,\r\n    cultivar_code,\r\n    bin_fullness,\r\n    location_id,\r\n
+  \   bin_loads.id AS bin_load_id,\r\n    bin_load_product_id,\r\n    rmt_container_material_types.container_material_type_code
   AS container_material_type,\r\n    fn_party_role_name (sq.rmt_material_owner_party_role_id::int)
   AS rmt_material_owner,\r\n    production_run_tipped_id,\r\n    gross_weight,\r\n
   \   nett_weight,\r\n    bin_tipped,\r\n    bin_received_date_time AS bin_received_at,\r\n
@@ -46,7 +47,7 @@
   = 'rmt_bins'\r\n\r\n         GROUP BY\r\n             logged_actions.transaction_id,\r\n
   \            logged_actions.event_id,\r\n             logged_action_details.id,\r\n
   \            logged_actions.changed_fields\r\n         UNION\r\n         SELECT\r\n
-  \            id AS row_data_id,\r\n             999999999 AS event_id,\r\n             NULL
+  \            id AS row_data_id,\r\n             NULL AS event_id,\r\n             NULL
   AS transaction_id,\r\n             NULL AS user_name,\r\n             NULL AS route_url,\r\n
   \            NULL AS request_ip,\r\n             fn_current_status ('rmt_bins',
   id) AS status,\r\n             NULL AS transaction_at,\r\n             NULL AS action,\r\n
@@ -78,13 +79,29 @@
     black: Current
   :render_url: 
 :columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Row Number
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   row_data_id:
     :name: row_data_id
-    :sequence_no: 1
+    :sequence_no: 2
     :caption: Row Id
     :namespaced_name: row_data_id
-    :data_type: :string
-    :width: 
+    :data_type: :integer
+    :width: 100
     :format: 
     :hide: true
     :pinned: 
@@ -96,10 +113,10 @@
     :group_max: false
   event_id:
     :name: event_id
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Event Id
     :namespaced_name: event_id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: true
@@ -112,10 +129,10 @@
     :group_max: false
   transaction_id:
     :name: transaction_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Transaction Id
     :namespaced_name: transaction_id
-    :data_type: :string
+    :data_type: :integer
     :width: 120
     :format: 
     :hide: false
@@ -128,7 +145,7 @@
     :group_max: false
   user_name:
     :name: user_name
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: User
     :namespaced_name: user_name
     :data_type: :string
@@ -144,7 +161,7 @@
     :group_max: false
   route_url:
     :name: route_url
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Route url
     :namespaced_name: route_url
     :data_type: :string
@@ -160,7 +177,7 @@
     :group_max: false
   request_ip:
     :name: request_ip
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Request IP
     :namespaced_name: request_ip
     :data_type: :string
@@ -176,7 +193,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Status
     :namespaced_name: status
     :data_type: :string
@@ -192,7 +209,7 @@
     :group_max: false
   transaction_at:
     :name: transaction_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Transaction at
     :namespaced_name: transaction_at
     :data_type: :datetime
@@ -208,7 +225,7 @@
     :group_max: false
   action:
     :name: action
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Action
     :namespaced_name: action
     :data_type: :string
@@ -224,7 +241,7 @@
     :group_max: false
   changed_fields:
     :name: changed_fields
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Changed fields
     :namespaced_name: 
     :data_type: :string
@@ -240,7 +257,7 @@
     :group_max: false
   bin_asset_number:
     :name: bin_asset_number
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Bin asset number
     :namespaced_name: bin_asset_number
     :data_type: :string
@@ -256,7 +273,7 @@
     :group_max: false
   farm_code:
     :name: farm_code
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Farm code
     :namespaced_name: farm_code
     :data_type: :string
@@ -272,7 +289,7 @@
     :group_max: false
   puc_code:
     :name: puc_code
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Puc code
     :namespaced_name: puc_code
     :data_type: :string
@@ -288,7 +305,7 @@
     :group_max: false
   orchard_code:
     :name: orchard_code
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Orchard code
     :namespaced_name: orchard_code
     :data_type: :string
@@ -304,7 +321,7 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Cultivar code
     :namespaced_name: cultivar_code
     :data_type: :string
@@ -320,7 +337,7 @@
     :group_max: false
   bin_fullness:
     :name: bin_fullness
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Bin fullness
     :namespaced_name: bin_fullness
     :data_type: :string
@@ -336,10 +353,10 @@
     :group_max: false
   location_id:
     :name: location_id
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Location
     :namespaced_name: location_id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: false
@@ -350,12 +367,12 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  id:
-    :name: id
-    :sequence_no: 18
-    :caption: Bin Load
+  bin_load_id:
+    :name: bin_load_id
+    :sequence_no: 19
+    :caption: Bin load
     :namespaced_name: bin_loads.id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: false
@@ -368,10 +385,10 @@
     :group_max: false
   bin_load_product_id:
     :name: bin_load_product_id
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Bin load product
     :namespaced_name: bin_load_product_id
-    :data_type: :string
+    :data_type: :integer
     :width: 100
     :format: 
     :hide: false
@@ -384,7 +401,7 @@
     :group_max: false
   container_material_type:
     :name: container_material_type
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Container material type
     :namespaced_name: rmt_container_material_types.container_material_type_code
     :data_type: :string
@@ -400,7 +417,7 @@
     :group_max: false
   rmt_material_owner:
     :name: rmt_material_owner
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Rmt material owner
     :namespaced_name: 
     :data_type: :string
@@ -416,7 +433,7 @@
     :group_max: false
   production_run_tipped_id:
     :name: production_run_tipped_id
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Production run tipped
     :namespaced_name: production_run_tipped_id
     :data_type: :string
@@ -432,7 +449,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :string
@@ -448,7 +465,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :string
@@ -464,7 +481,7 @@
     :group_max: false
   bin_tipped:
     :name: bin_tipped
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Bin tipped
     :namespaced_name: bin_tipped
     :data_type: :boolean
@@ -480,7 +497,7 @@
     :group_max: false
   bin_received_at:
     :name: bin_received_at
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Bin received at
     :namespaced_name: bin_received_date_time
     :data_type: :datetime
@@ -496,7 +513,7 @@
     :group_max: false
   exit_ref:
     :name: exit_ref
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Exit ref
     :namespaced_name: exit_ref
     :data_type: :string
@@ -512,7 +529,7 @@
     :group_max: false
   exit_ref_at:
     :name: exit_ref_at
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Exit ref at
     :namespaced_name: exit_ref_date_time
     :data_type: :datetime
@@ -528,7 +545,7 @@
     :group_max: false
   tipped_asset_number:
     :name: tipped_asset_number
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Tipped asset number
     :namespaced_name: tipped_asset_number
     :data_type: :string
@@ -544,7 +561,7 @@
     :group_max: false
   shipped_asset_number:
     :name: shipped_asset_number
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Shipped asset number
     :namespaced_name: shipped_asset_number
     :data_type: :string
@@ -560,7 +577,7 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -576,7 +593,7 @@
     :group_max: false
   unscrapped_at:
     :name: unscrapped_at
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Unscrapped at
     :namespaced_name: unscrapped_at
     :data_type: :datetime
@@ -592,7 +609,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Created at
     :namespaced_name: sq.created_at
     :data_type: :datetime
@@ -608,7 +625,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
