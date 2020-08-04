@@ -260,6 +260,14 @@ const crossbeamsUtils = {
     const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
     sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
                                                               elem.dataset.sortableGroup));
+
+    // Repeating request: Check if there are any areas in the content that should be modified by polling...
+    const pollsters = dlg.querySelectorAll('[data-poll-message-url]');
+    pollsters.forEach((pollable) => {
+      const pollUrl = pollable.dataset.pollMessageUrl;
+      const pollInterval = pollable.dataset.pollMessageInterval;
+      crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
+    });
   },
 
   /**
