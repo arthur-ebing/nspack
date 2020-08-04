@@ -413,6 +413,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ROBOT_DISPLAY_LINES = ENV.fetch('ROBOT_DISPLAY_LINES', 0).to_i
   ROBOT_MSG_SEP = '###'
 
+  # Max number of passenger instances - used for designating high, busy or over usage
+  MAX_PASSENGER_INSTANCES = ENV.fetch('MAX_PASSENGER_INSTANCES', 30)
+
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 
   BIG_ZERO = BigDecimal('0')
