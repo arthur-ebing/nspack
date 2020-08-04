@@ -1,0 +1,24 @@
+---
+:dataminer_definition: costs
+:actions:
+- :url: "/masterfiles/costs/costs/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/costs/costs/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/costs/costs/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/costs/costs/new"
+  :text: New Cost
+  :style: :button
+  :behaviour: :popup

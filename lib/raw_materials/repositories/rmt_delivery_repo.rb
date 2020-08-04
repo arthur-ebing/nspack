@@ -20,9 +20,24 @@ module RawMaterialsApp
                           value: :id,
                           order_by: :status
 
+    build_for_select :cost_types,
+                     label: :cost_type_code,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :id
+
+    build_for_select :costs,
+                     label: :cost_code,
+                     value: :id,
+                     no_active_check: true,
+                     order_by: :id
+
     crud_calls_for :rmt_deliveries, name: :rmt_delivery, wrapper: RmtDelivery
     crud_calls_for :rmt_bins, name: :rmt_bin, wrapper: RmtBin
     crud_calls_for :rmt_bin_labels, name: :rmt_bin_label, wrapper: RmtBinLabel
+    crud_calls_for :cost_types, name: :cost_type, wrapper: MasterfilesApp::CostType
+    crud_calls_for :costs, name: :cost, wrapper: MasterfilesApp::Cost
+    crud_calls_for :rmt_delivery_costs, name: :rmt_delivery_cost, wrapper: RmtDeliveryCost
 
     def delivery_bin_count(id)
       DB[:rmt_bins].where(rmt_delivery_id: id).count
@@ -71,6 +86,28 @@ module RawMaterialsApp
 
     def find_delivery_tipped_bins(id)
       DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: true).all
+    end
+
+    def find_cost_flat(id)
+      hash = find_with_association(:costs,
+                                   id,
+                                   parent_tables: [{ parent_table: :cost_types, columns: [:cost_type_code], flatten_columns: { cost_type_code: :cost_type_code } }])
+
+      return nil if hash.nil?
+
+      MasterfilesApp::CostFlat.new(hash)
+    end
+
+    def find_rmt_delivery_cost_flat(rmt_delivery_id, cost_id)
+      query = <<~SQL
+        SELECT rmt_delivery_costs.amount, costs.cost_code, costs.default_amount, costs.description
+        , cost_types.cost_unit, cost_types.cost_type_code, rmt_delivery_costs.rmt_delivery_id, rmt_delivery_costs.cost_id
+        FROM rmt_delivery_costs
+        JOIN costs ON costs.id = rmt_delivery_costs.cost_id
+        JOIN cost_types ON cost_types.id = costs.cost_type_id
+        WHERE rmt_delivery_costs.rmt_delivery_id = ? and rmt_delivery_costs.cost_id = ?
+      SQL
+      DB[query, rmt_delivery_id, cost_id].first
     end
 
     def find_rmt_bin_flat(id)
@@ -294,6 +331,14 @@ module RawMaterialsApp
         WHERE r.id = ?
       SQL
       DB[query, id].get(:location_id)
+    end
+
+    def update_rmt_delivery_cost(rmt_delivery_id, cost_id, attrs)
+      DB[:rmt_delivery_costs].where(rmt_delivery_id: rmt_delivery_id, cost_id: cost_id).update(attrs.to_h)
+    end
+
+    def delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
+      DB[:rmt_delivery_costs].where(rmt_delivery_id: rmt_delivery_id, cost_id: cost_id).delete
     end
   end
 end

@@ -32,6 +32,12 @@ module RawMaterials
                                   loading_window: true,
                                   style: :button)
 
+              section.add_control(control_type: :link,
+                                  text: 'Manage Costs',
+                                  url: "/list/rmt_delivery_costs/with_params?key=standard&rmt_delivery_costs.rmt_delivery_id=#{id}",
+                                  behaviour: :popup,
+                                  style: :button)
+
               section.form do |form|
                 form.caption 'Edit Rmt Delivery'
                 form.action "/raw_materials/deliveries/rmt_deliveries/#{id}"

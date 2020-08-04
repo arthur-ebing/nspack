@@ -456,6 +456,92 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'rmt_delivery_costs', Integer do |rmt_delivery_id| # rubocop:disable Metrics/BlockLength
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'edit', Integer do |cost_id|   # EDIT
+        show_partial { RawMaterials::Deliveries::RmtDeliveryCost::Edit.call(rmt_delivery_id, cost_id) }
+      end
+
+      r.on 'show', Integer do |cost_id|      # SHOW
+        show_partial { RawMaterials::Deliveries::RmtDeliveryCost::Show.call(rmt_delivery_id, cost_id) }
+      end
+
+      r.get do    # NEW
+        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDeliveryCost::New.call(rmt_delivery_id, remote: fetch?(r)) }
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_rmt_delivery_cost(rmt_delivery_id, params[:rmt_delivery_cost])
+        if res.success
+          res.instance[:id] = params[:rmt_delivery_cost][:cost_id]
+          row_keys = %i[
+            rmt_delivery_id
+            id
+            amount
+            cost_code
+            default_amount
+            description
+            cost_unit
+            cost_type_code
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: "/raw_materials/deliveries/rmt_delivery_costs/#{rmt_delivery_id}/new") do
+            RawMaterials::Deliveries::RmtDeliveryCost::New.call(rmt_delivery_id,
+                                                                form_values: params[:rmt_delivery_cost],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
+          end
+        end
+      end
+
+      r.patch do     # UPDATE
+        r.on 'update', Integer do |cost_id|
+          res = interactor.update_rmt_delivery_cost(rmt_delivery_id, cost_id, params[:rmt_delivery_cost])
+          if res.success
+            update_grid_row(cost_id, changes: { rmt_delivery_id: res.instance[:rmt_delivery_id], id: res.instance[:cost_id], amount: res.instance[:amount] },
+                                     notice: res.message)
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDeliveryCost::Edit.call(rmt_delivery_id, cost_id, form_values: params[:rmt_delivery_cost], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.delete do    # DELETE
+        r.on 'delete', Integer do |cost_id|
+          res = interactor.delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
+          if res.success
+            delete_grid_row(cost_id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'rmt_delivery_costs' do
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'cost_changed' do
+        type = :hide_element
+        unless params[:changed_value].nil_or_empty?
+          cost = interactor.cost(params[:changed_value])
+          descr = cost.description
+          amount = cost.default_amount.to_f
+          type = :show_element
+        end
+        json_actions([OpenStruct.new(type: type, dom_id: 'rmt_delivery_cost_description_field_wrapper'),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'rmt_delivery_cost_amount',
+                                     value: amount.to_s),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'rmt_delivery_cost_description',
+                                     value: descr.to_s)])
+      end
+    end
+
     # --------------------------------------------------------------------------
     # RMT BINS
     # --------------------------------------------------------------------------

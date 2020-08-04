@@ -1,0 +1,29 @@
+---
+:dataminer_definition: rmt_delivery_costs
+:actions:
+- :url: "/raw_materials/deliveries/rmt_delivery_costs/$:rmt_delivery_id$/show/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/raw_materials/deliveries/rmt_delivery_costs/$:rmt_delivery_id$/edit/$:id$"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/raw_materials/deliveries/rmt_delivery_costs/$:rmt_delivery_id$/delete/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/raw_materials/deliveries/rmt_delivery_costs/$:rmt_delivery_costs.rmt_delivery_id$/new"
+  :text: New Rmt Delivery Cost
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: rmt_delivery_costs.rmt_delivery_id
+      :op: =
+      :val: $:rmt_delivery_costs.rmt_delivery_id$

@@ -1,0 +1,30 @@
+---
+:dataminer_definition: cost_types
+:actions:
+- :url: "/masterfiles/costs/cost_types/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/costs/cost_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/costs/cost_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/cost_types/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/costs/cost_types/new"
+  :text: New Cost Type
+  :style: :button
+  :behaviour: :popup

@@ -168,6 +168,104 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def create_cost_type(params) # rubocop:disable Metrics/AbcSize
+      res = validate_cost_type_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_cost_type(res)
+        log_status(:cost_types, id, 'CREATED')
+        log_transaction
+      end
+      instance = cost_type(id)
+      success_response("Created cost type #{instance.cost_type_code}",
+                       instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { cost_type_code: ['This cost type already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_cost_type(id, params)
+      res = validate_cost_type_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_cost_type(id, res)
+        log_transaction
+      end
+      instance = cost_type(id)
+      success_response("Updated cost type #{instance.cost_type_code}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def delete_cost_type(id) # rubocop:disable Metrics/AbcSize
+      name = cost_type(id).cost_type_code
+      repo.transaction do
+        repo.delete_cost_type(id)
+        log_status(:cost_types, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted cost type #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete cost type. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def create_cost(params) # rubocop:disable Metrics/AbcSize
+      res = validate_cost_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      id = nil
+      repo.transaction do
+        id = repo.create_cost(res)
+        log_status(:costs, id, 'CREATED')
+        log_transaction
+      end
+      instance = cost(id)
+      success_response("Created cost #{instance.id}",
+                       instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { id: ['This cost already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_cost(id, params)
+      res = validate_cost_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_cost(id, res)
+        log_transaction
+      end
+      instance = cost(id)
+      success_response("Updated cost #{instance.id}",
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def delete_cost(id) # rubocop:disable Metrics/AbcSize
+      name = cost(id).id
+      repo.transaction do
+        repo.delete_cost(id)
+        log_status(:costs, id, 'DELETED')
+        log_transaction
+      end
+      success_response("Deleted cost #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete cost. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
     def lookup_farms_pucs(farm_id)
       repo.farm_pucs(farm_id)
     end
@@ -201,7 +299,66 @@ module RawMaterialsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def create_rmt_delivery_cost(id, params) # rubocop:disable Metrics/AbcSize
+      params[:rmt_delivery_id] = id
+      res = validate_rmt_delivery_cost_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.create_rmt_delivery_cost(res)
+        log_transaction
+      end
+      instance = rmt_delivery_cost(id, res[:cost_id])
+      success_response("Created rmt delivery cost #{instance[:id]}",
+                       instance)
+    rescue Sequel::UniqueConstraintViolation
+      validation_failed_response(OpenStruct.new(messages: { id: ['This rmt delivery cost already exists'] }))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_rmt_delivery_cost(rmt_delivery_id, cost_id, params)
+      params[:rmt_delivery_id] = rmt_delivery_id
+      res = validate_rmt_delivery_cost_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_rmt_delivery_cost(rmt_delivery_id, cost_id, res)
+        log_transaction
+      end
+      instance = rmt_delivery_cost(rmt_delivery_id, cost_id)
+      success_response('Updated rmt delivery cost',
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
+      repo.transaction do
+        repo.delete_rmt_delivery_cost(rmt_delivery_id, cost_id)
+        log_transaction
+      end
+      success_response('Deleted rmt delivery cost')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete rmt delivery cost. It is still referenced#{e.message.partition('referenced').last}")
+    end
+
+    def cost(id)
+      repo.find_cost_flat(id)
+    end
+
     private
+
+    def rmt_delivery_cost(rmt_delivery_id, cost_id)
+      repo.find_rmt_delivery_cost_flat(rmt_delivery_id, cost_id)
+    end
+
+    def validate_rmt_delivery_cost_params(params)
+      RmtDeliveryCostSchema.call(params)
+    end
 
     def repo
       @repo ||= RmtDeliveryRepo.new
@@ -217,6 +374,18 @@ module RawMaterialsApp
 
     def validate_reworks_run_params(params)
       ProductionApp::ReworksRunFlatSchema.call(params)
+    end
+
+    def cost_type(id)
+      repo.find_cost_type(id)
+    end
+
+    def validate_cost_type_params(params)
+      MasterfilesApp::CostTypeSchema.call(params)
+    end
+
+    def validate_cost_params(params)
+      MasterfilesApp::CostSchema.call(params)
     end
   end
 end
