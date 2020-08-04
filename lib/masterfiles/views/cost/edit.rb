@@ -17,6 +17,7 @@ module Masterfiles
               form.action "/masterfiles/costs/costs/#{id}"
               form.remote!
               form.method :update
+              form.add_field :cost_type_id
               form.add_field :cost_code
               form.add_field :default_amount
               form.add_field :description

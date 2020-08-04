@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Cost'
               form.view_only!
+              form.add_field :cost_type_id
               form.add_field :cost_code
               form.add_field :default_amount
               form.add_field :description
