@@ -4,7 +4,7 @@ module QualityApp
   class CreateOrchardTestResults < BaseService
     attr_reader :repo, :orchard_test_type, :orchard_test_type_id, :args
 
-    def initialize(args, user)
+    def initialize(user, args = nil)
       @repo = OrchardTestRepo.new
       @args = args.to_h
       @user = user
@@ -19,7 +19,7 @@ module QualityApp
         created_ids << create_orchard_test_results
       end
 
-      success_response('Created Tests', created_ids.flatten)
+      created_ids.flatten
     end
 
     private

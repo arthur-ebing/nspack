@@ -20,11 +20,10 @@ module QualityApp
     def call # rubocop:disable Metrics/AbcSize
       raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
 
-      res = QualityApp::CreateOrchardTestResults.call(nil, @user)
-      return failed_response(res.message) unless res.success
+      QualityApp::CreateOrchardTestResults.call(@user)
 
       res = api.request_phyt_clean_standard_data(season_id, puc_ids)
-      return failed_response(res.message) unless res.success
+      raise Crossbeams::InfoError, res.message unless res.success
 
       parse_standard_data(res)
 
@@ -90,8 +89,7 @@ module QualityApp
               next if repo.get(:orchard_test_results, result_id, :freeze_result)
 
               update_attrs[:api_result] = api_result
-              update_res = QualityApp::UpdateOrchardTestResult.call(result_id, update_attrs, @user)
-              raise Crossbeams::InfoError, update_res.message unless update_res.success
+              QualityApp::UpdateOrchardTestResult.call(result_id, update_attrs, @user)
             end
           end
         end

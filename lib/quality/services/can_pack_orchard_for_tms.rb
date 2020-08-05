@@ -45,22 +45,21 @@ module QualityApp
     end
 
     def update_applicable_tests
-      service_res = QualityApp::PhytCleanStandardData.call(puc_id)
-      raise Crossbeams::InfoError, service_res.message unless service_res.success
+      QualityApp::PhytCleanStandardData.call(puc_id)
 
       ok_response
     end
 
-    def create_applicable_tests # rubocop:disable Metrics/AbcSize
+    def create_applicable_tests
+      created_ids = []
       repo.select_values(:orchard_test_types, :id).each do |orchard_test_type_id|
         args = { orchard_test_type_id: orchard_test_type_id,
                  puc_id: puc_id,
                  orchard_id: orchard_id,
                  cultivar_id: cultivar_id }
-        service_res = CreateOrchardTestResults.call(args, @user)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
+        created_ids << CreateOrchardTestResults.call(@user, args)
       end
-      @created_new_tests = !service_res.instance.nil_or_empty?
+      @created_new_tests = !created_ids.flatten.empty?
 
       ok_response
     end

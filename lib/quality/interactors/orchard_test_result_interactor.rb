@@ -5,8 +5,6 @@ module QualityApp
     def phyt_clean_request(puc_ids = nil)
       repo.transaction do
         service_res = QualityApp::PhytCleanStandardData.call(puc_ids)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
         log_transaction
         service_res
       end
@@ -18,13 +16,12 @@ module QualityApp
       res = OrchardTestCreateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      ids = nil
       repo.transaction do
-        service_res = CreateOrchardTestResults.call(res, @user)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
+        ids = CreateOrchardTestResults.call(@user, res)
         log_transaction
-        service_res
       end
+      success_response('Created Tests', ids)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { orchard_test_type_id: ['This orchard test result already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -32,25 +29,22 @@ module QualityApp
     end
 
     def create_orchard_test_results
+      ids = nil
       repo.transaction do
-        service_res = CreateOrchardTestResults.call(nil, @user)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
+        ids = CreateOrchardTestResults.call(@user)
         log_transaction
-        service_res
       end
+      success_response('Created Tests', ids)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_orchard_test_result(id, params) # rubocop:disable Metrics/AbcSize
+    def update_orchard_test_result(id, params)
       res = OrchardTestUpdateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
-        service_res = QualityApp::UpdateOrchardTestResult.call(id, res, @user)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
-
+        QualityApp::UpdateOrchardTestResult.call(id, res, @user)
         log_transaction
       end
       instance = repo.find_orchard_test_result_flat(id)

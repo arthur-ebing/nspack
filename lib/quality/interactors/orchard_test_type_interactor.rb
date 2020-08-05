@@ -10,8 +10,7 @@ module QualityApp
       repo.transaction do
         id = repo.create_orchard_test_type(res)
         args = { orchard_test_type_id: id }
-        service_res = CreateOrchardTestResults.call(args, @user)
-        raise Crossbeams::InfoError, service_res.message unless service_res.success
+        CreateOrchardTestResults.call(@user, args)
 
         log_status(:orchard_test_types, id, 'CREATED')
         log_transaction
@@ -31,15 +30,13 @@ module QualityApp
       repo.transaction do
         repo.update_orchard_test_type(id, res)
         args = { orchard_test_type_id: id }
-        create_res = CreateOrchardTestResults.call(args, @user)
-        raise Crossbeams::InfoError, create_res.message unless create_res.success
+        CreateOrchardTestResults.call(@user, args)
 
         result_ids = repo.select_values(:orchard_test_results, :id, orchard_test_type_id: id)
         result_ids.each do |result_id|
           params = repo.find_hash(:orchard_test_results, result_id)
           params[:api_result] ||= res.to_h[:api_default_result]
-          update_res = QualityApp::UpdateOrchardTestResult.call(result_id, params, @user)
-          raise Crossbeams::InfoError, update_res.message unless update_res.success
+          QualityApp::UpdateOrchardTestResult.call(result_id, params, @user)
         end
 
         log_transaction
