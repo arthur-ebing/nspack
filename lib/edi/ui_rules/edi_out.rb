@@ -22,7 +22,7 @@ module UiRules
 
       depot_id_label = @repo.find(:depots, MasterfilesApp::Depot, @form_object.depot_id)&.depot_code
       party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.party_role_id)&.party_name
-      role_id_label = MasterfilesApp::PartyRepo.new.find_role_by_party_role(@form_object.party_role_id)[:name]
+      role_id_label = (MasterfilesApp::PartyRepo.new.find_role_by_party_role(@form_object.party_role_id) || {})[:name]
       fields[:flow_type] = { renderer: :label }
       fields[:depot_id] = { renderer: :label, with_value: depot_id_label, caption: 'Depot' } unless rules[:hide_depot_id]
       fields[:role_id] = { renderer: :label, with_value: role_id_label, caption: 'Role' } unless rules[:hide_role_id]
