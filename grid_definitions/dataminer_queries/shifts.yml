@@ -1,13 +1,14 @@
 ---
 :caption: Shifts
-:sql: "SELECT \"shifts\".\"id\",\r\n       \"shifts\".\"shift_type_id\",\r\n       fn_shift_type_code(shifts.shift_type_id)
-  AS shift_type_code,\r\n       employment_types.employment_type_code,\r\n       \"shifts\".\"running_hours\",\r\n
-  \      \"shifts\".\"start_date_time\",\r\n       \"shifts\".\"end_date_time\",\r\n
-  \      fn_current_status('shifts', \"shifts\".\"id\") AS status,\r\n       \"shifts\".\"created_at\",\r\n
-  \      \"shifts\".\"updated_at\",\r\n       \"shifts\".\"active\",\r\ncase when
-  employment_types.employment_type_code = 'PACKERS' then true else false end as packer\r\nFROM
-  \"shifts\"\r\n    JOIN shift_types ON shift_types.id = shifts.shift_type_id\r\n
-  \   JOIN employment_types ON employment_types.id = shift_types.employment_type_id"
+:sql: "SELECT\r\n    shifts.id,\r\n    shifts.shift_type_id,\r\n    fn_shift_type_code
+  (shifts.shift_type_id) AS shift_type_code,\r\n    employment_types.employment_type_code,\r\n
+  \   shifts.running_hours,\r\n    shifts.start_date_time,\r\n    shifts.end_date_time,\r\n
+  \   fn_current_status ('shifts', shifts.id) AS status,\r\n    shifts.created_at,\r\n
+  \   shifts.updated_at,\r\n    shifts.active,\r\n    CASE WHEN employment_types.employment_type_code
+  = 'PACKERS' THEN\r\n             TRUE\r\n         ELSE\r\n             FALSE\r\n
+  \   END AS packer\r\nFROM shifts\r\nJOIN shift_types ON shift_types.id = shifts.shift_type_id\r\nJOIN
+  employment_types ON employment_types.id = shift_types.employment_type_id\r\nORDER
+  BY\r\n    shifts.start_date_time DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -95,11 +96,11 @@
   start_date_time:
     :name: start_date_time
     :sequence_no: 6
-    :caption: Start date time
+    :caption: Start at
     :namespaced_name: shifts.start_date_time
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -111,11 +112,11 @@
   end_date_time:
     :name: end_date_time
     :sequence_no: 7
-    :caption: End date time
+    :caption: End at
     :namespaced_name: shifts.end_date_time
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -147,7 +148,7 @@
     :namespaced_name: shifts.created_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: true
     :pinned: 
     :groupable: false
@@ -163,7 +164,7 @@
     :namespaced_name: shifts.updated_at
     :data_type: :datetime
     :width: 
-    :format: 
+    :format: :datetime_with_secs
     :hide: true
     :pinned: 
     :groupable: false
@@ -193,7 +194,7 @@
     :sequence_no: 12
     :caption: Packer
     :namespaced_name: 
-    :data_type: :string
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: false
