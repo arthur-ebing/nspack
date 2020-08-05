@@ -49,8 +49,8 @@ module MesscadaApp
         repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
         prod_repo.increment_sequence(pallet_sequence_id)
       end
+      prod_repo.decrement_sequence(original_pallet_sequence_id) unless original_pallet_sequence_id.nil?
       remove_original_pallet_sequence if pallet_sequence_removed?
-      scrap_original_pallet if scrap_carton_pallet?
       repo.log_status('pallets', pallet_id, AppConst::CARTON_TRANSFER)
       repo.log_status('cartons', carton_id, AppConst::CARTON_TRANSFER)
 
@@ -60,8 +60,7 @@ module MesscadaApp
     end
 
     def pallet_sequence_removed?
-      carton_quantity = repo.get(:pallet_sequences, original_pallet_sequence_id, :carton_quantity)
-      carton_quantity.<= 1
+      reworks_repo.pallet_sequence_carton_quantity(original_pallet_sequence_id).<= 0
     end
 
     def remove_original_pallet_sequence
@@ -74,10 +73,11 @@ module MesscadaApp
       reworks_repo.update_pallet_sequence(original_pallet_sequence_id, attrs)
       repo.log_status('pallets', original_pallet_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
       repo.log_status('pallet_sequences', original_pallet_sequence_id, AppConst::SEQ_REMOVED_BY_CTN_TRANSFER)
+      scrap_original_pallet if scrap_carton_pallet?
     end
 
     def scrap_carton_pallet?
-      reworks_repo.unscrapped_sequences_count(original_pallet_id).<= 1
+      reworks_repo.unscrapped_sequences_count(original_pallet_id).<= 0
     end
 
     def scrap_original_pallet
