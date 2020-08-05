@@ -34,15 +34,15 @@
   :text: Create Tests
   :style: :button
 - :control_type: :link
-  :url: "/quality/test_results/orchard_test_results/phyt_clean_request"
+  :url: "/quality/test_results/orchard_test_results/phyt_clean_callback/phyt_clean_request"
   :text: Update Phyt Clean Results
   :style: :button
 - :control_type: :link
-  :url: "/quality/test_results/orchard_test_results/pallet_diff"
+  :url: "/quality/test_results/orchard_test_results/phyt_clean_callback/diff/pallet_sequences"
   :text: Phyt Clean Pallet Diff
   :style: :button
 - :control_type: :link
-  :url: "/quality/test_results/orchard_test_results/orchard_diff"
+  :url: "/quality/test_results/orchard_test_results/phyt_clean_callback/diff/orchards"
   :text: Phyt Clean Diff
   :style: :button
 :multiselect:

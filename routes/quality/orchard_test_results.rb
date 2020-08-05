@@ -87,12 +87,24 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       @repo = QualityApp::OrchardTestRepo.new
       @farm_repo = MasterfilesApp::FarmRepo.new
 
-      r.on 'pallet_diff' do
-        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::DiffTool.call(:pallet_sequences) }
+      r.on 'phyt_clean_callback' do
+        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::Callback.call(r.remaining_path) }
       end
 
-      r.on 'orchard_diff' do
-        show_partial_or_page(r) { Quality::TestResults::OrchardTestResult::DiffTool.call(:orchards) }
+      r.on 'diff', String do |mode|
+        res = interactor.phyt_clean_diff(mode)
+        if res.success
+          flash[:notice] = res.message
+          store_locally(:phyto_res, res.instance)
+          redirect_via_json "/quality/test_results/orchard_test_results/show_diff/#{mode}"
+        else
+          flash[:error] = res.message
+          redirect_via_json '/list/orchard_test_results'
+        end
+      end
+
+      r.on 'show_diff', String do |mode|
+        show_page { Quality::TestResults::OrchardTestResult::DiffTool.call(mode, retrieve_from_local_store(:phyto_res)) }
       end
 
       r.on 'phyt_clean_request' do
@@ -102,7 +114,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = "#{res.message} #{res.errors}"
         end
-        r.redirect '/list/orchard_test_results'
+        redirect_via_json '/list/orchard_test_results'
       end
 
       r.on 'bulk_edit_all' do

@@ -12,30 +12,22 @@ module UiRules
       form_name 'orchard_test_result_diff'
     end
 
-    def set_diff_fields # rubocop:disable Metrics/AbcSize
-      if @mode == :orchards
+    def set_diff_fields
+      if @mode == 'orchards'
         right_caption = 'Orchards'
-        puc_ids = @repo.select_values(:orchards, :puc_id).uniq
-        id_arrays = @repo.select_values(:orchards, %i[puc_id id cultivar_ids], puc_id: puc_ids).uniq
+        right_record = @repo.puc_orchard_cultivar('orchards')
       else
         right_caption = 'Pallet Sequences'
-        puc_ids = @repo.select_values(:pallet_sequences, :puc_id).uniq
-        id_arrays = @repo.select_values(:pallet_sequences, %i[puc_id orchard_id cultivar_id], puc_id: puc_ids).uniq
+        right_record = @repo.puc_orchard_cultivar('pallet_sequences')
       end
-
-      nspack = @repo.puc_orchard_cultivar(id_arrays)
-
-      res = QualityApp::PhytCleanOrchardDiff.call(puc_ids)
-      phyto = res.success ? res.instance.slice(*nspack.keys) : { 'error': res.message }
-
-      fields[:header] = { left_caption: 'Phyto Data',
-                          right_caption: right_caption,
-                          left_record: phyto,
-                          right_record: nspack }
+      fields[:diff] = { left_caption: 'Phyto Data',
+                        right_caption: right_caption,
+                        left_record: @options[:phyto_res],
+                        right_record: right_record }
     end
 
     def make_form_object
-      @form_object = OpenStruct.new(header: nil)
+      @form_object = OpenStruct.new(diff: nil)
     end
   end
 end

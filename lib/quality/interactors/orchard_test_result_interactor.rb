@@ -12,7 +12,13 @@ module QualityApp
       failed_response(e.message)
     end
 
-    def create_orchard_test_result(params) # rubocop:disable Metrics/AbcSize
+    def phyt_clean_diff(mode)
+      QualityApp::PhytCleanDiff.call(mode)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def create_orchard_test_result(params)
       res = OrchardTestCreateSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 

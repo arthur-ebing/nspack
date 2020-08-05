@@ -1,17 +1,21 @@
 # frozen_string_literal: true
 
 module QualityApp
-  class PhytCleanOrchardDiff < BaseService
+  class PhytCleanDiff < BaseService
     attr_reader :repo, :api, :season_id, :puc_ids
     attr_accessor :attrs, :puc_id
 
-    def initialize(puc_ids)
+    def initialize(mode)
+      @mode = mode.to_sym
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
       @season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @attrs = {}
-      @puc_ids = Array(puc_ids).uniq
-      @puc_id = nil
+      @puc_ids = if @mode == :orchards
+                   @repo.select_values(:orchards, :puc_id).uniq
+                 else
+                   @repo.select_values(:pallet_sequences, :puc_id).uniq
+                 end
     end
 
     def call # rubocop:disable Metrics/AbcSize

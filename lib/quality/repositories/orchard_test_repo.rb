@@ -150,7 +150,13 @@ module QualityApp
       DB[:orchard_test_results].where(id: id).update(attrs)
     end
 
-    def puc_orchard_cultivar(id_arrays)
+    def puc_orchard_cultivar(mode)
+      id_arrays = if mode == 'orchards'
+                    select_values(:orchards, %i[puc_id id cultivar_ids]).uniq
+                  else
+                    select_values(:pallet_sequences, %i[puc_id orchard_id cultivar_id]).uniq
+                  end
+
       hash = {}
       id_arrays.each do |puc_id, orchard_id, cultivar_ids|
         puc = get(:pucs, puc_id, :puc_code)
