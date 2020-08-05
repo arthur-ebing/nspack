@@ -17,15 +17,10 @@ module QualityApp
     def call # rubocop:disable Metrics/AbcSize
       raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
 
-      res = nil
-      puc_ids.each do |puc_id|
-        @puc_id = puc_id
-        res = api.request_phyt_clean_standard_data(season_id, puc_id)
-        return failed_response(res.message) unless res.success
+      res = api.request_phyt_clean_standard_data(season_id, puc_ids)
+      return failed_response(res.message) unless res.success
 
-        parse_standard_data(res)
-      end
-
+      parse_standard_data(res)
       success_response(res.message, Hash[attrs.sort])
     end
 
@@ -33,12 +28,15 @@ module QualityApp
 
     def parse_standard_data(res) # rubocop:disable Metrics/AbcSize
       head = res.instance['season']
-      puc = head['fbo'].first
-      orchards = puc['orchard']
-      orchards.each do |orchard|
-        next unless repo.exists?(:orchards, orchard_code: orchard['name'].downcase, puc_id: puc_id)
+      pucs = head['fbo']
+      pucs.each do |puc|
+        puc_id = repo.get_id(:pucs, puc_code: puc['code'])
+        orchards = puc['orchard']
+        orchards.each do |orchard|
+          next unless repo.exists?(:orchards, orchard_code: orchard['name'].downcase, puc_id: puc_id)
 
-        attrs["Puc #{puc['code']} - Orchard #{orchard['name']}"] = "Cultivar #{orchard['cultivarCode']}   "
+          attrs["PUC #{puc['code']} - Orchard #{orchard['name']}"] = "Cultivar #{orchard['cultivarCode']}   "
+        end
       end
     end
   end

@@ -96,8 +96,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'phyt_clean_request' do
-        puc_ids = @repo.select_values(:pallet_sequences, :puc_id).uniq
-        res = interactor.phyt_clean_request(puc_ids)
+        res = interactor.phyt_clean_request
         if res.success
           flash[:notice] = res.message
         else

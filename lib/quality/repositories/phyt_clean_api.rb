@@ -43,11 +43,7 @@ module QualityApp
       auth_token_call if header.nil?
 
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
-      fbo_xml = "<?xml version=\"1.0\"?><Request>
-                   <Fbo><FboCode>
-                     #{select_values(:pucs, :puc_code, id: puc_ids).join('</FboCode></Fbo><Fbo><FboCode>')}
-                   </FboCode></Fbo>
-                 </Request>"
+      fbo_xml = "<?xml version=\"1.0\"?><Request><Fbo><FboCode>#{select_values(:pucs, :puc_code, id: puc_ids).join('</FboCode></Fbo><Fbo><FboCode>')}</FboCode></Fbo></Request>"
       params = { seasonID: season_id, outputType: 'json', fboXML: fbo_xml }
       res = http.request_post(url, params, header)
       return failed_response(res.message) unless res.success
