@@ -74,10 +74,11 @@ module ProductionApp
                .where { start_date_time >= (args[:start_date_time] - (24 * 60 * 60)) }
                .select_map(%i[id start_date_time end_date_time])
       shifts.each do |id, start_date_time, end_date_time|
-        if args[:start_date_time].between?(start_date_time, end_date_time) || args[:end_date_time].between?(start_date_time, end_date_time)
-          message = "Shift Times overlaps with, #{find_shift(id).shift_type_code}"
-          raise Crossbeams::InfoError, message
-        end
+        next unless (args[:start_date_time] + 1).between?(start_date_time, end_date_time) || (args[:end_date_time] - 1).between?(start_date_time, end_date_time)
+
+        shift = find_shift(id)
+        message = "Shift Times overlaps with, #{shift.shift_type_code} starting at: #{shift.start_date_time}"
+        raise Crossbeams::InfoError, message
       end
     end
   end
