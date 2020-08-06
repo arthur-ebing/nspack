@@ -423,6 +423,16 @@ class Nspack < Roda
         end
       end
 
+      r.on 'refresh_pallet_data' do
+        res = interactor.refresh_pallet_data(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('runs', 'read')

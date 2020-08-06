@@ -173,6 +173,12 @@
       - :url: "/list/run_rebins/multi?key=standard&id=$:id$"
         :text: print barcodes
         :popup: true
+- :separator: true
+- :url: "/production/runs/production_runs/$:id$/refresh_pallet_data"
+  :text: refresh pallet data
+  :icon: play
+  :popup: false
+- :separator: true
 :page_controls:
 - :control_type: :link
   :url: "/production/runs/production_runs/new"

@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 module ProductionApp
   class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
@@ -442,6 +442,42 @@ module ProductionApp
       grp = {}
       modules.each { |mod| grp[mod] = buttons }
       grp
+    end
+
+    def refresh_pallet_data(id)
+      update_query = ''
+      AppConst::REFRESH_PALLET_DATA_TABLES.each do |table_name|
+        AppConst::REFRESH_PALLET_DATA_COLUMNS.each { |column_name| update_query << update_column_sql(table_name, column_name, id) }
+      end
+      DB[update_query].update
+    end
+
+    def update_column_sql(table_name, column_name, production_run_id)
+      # <<~SQL
+      #   UPDATE #{table_name}
+      #   SET #{column_name} = ps.#{column_name}
+      #   FROM #{table_name} AS c
+      #   JOIN product_resource_allocations prl ON c.product_resource_allocation_id = prl.id
+      #   JOIN product_setups ps ON prl.product_setup_id = ps.id
+      #     AND ps.#{column_name} IS NOT NULL
+      #   WHERE c.production_run_id = #{production_run_id}
+      #   AND #{table_name}.id = c.id
+      #   AND #{table_name}.#{column_name} IS NULL;
+      #
+      # SQL
+
+      <<~SQL
+        UPDATE #{table_name}
+        SET #{column_name} =
+            (SELECT product_setups.#{column_name}
+             FROM product_resource_allocations
+             LEFT JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
+             WHERE product_setups.#{column_name} IS NOT NULL
+              AND product_resource_allocations.id = #{table_name}.product_resource_allocation_id)
+        WHERE #{table_name}.production_run_id = #{production_run_id}
+         AND #{table_name}.#{column_name} IS NULL;
+
+      SQL
     end
   end
 end

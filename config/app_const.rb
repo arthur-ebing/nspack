@@ -556,4 +556,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Complete Pallet
   PLT_LABEL_QTY_TO_PRINT = 4
+
+  # Refresh pallet data
+  REFRESH_PALLET_DATA_TABLES = %w[carton_labels cartons pallet_sequences].freeze
+  REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id].freeze
 end

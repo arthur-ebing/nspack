@@ -513,6 +513,15 @@ module ProductionApp
       raise Crossbeams::InfoError, res.message unless res.success
     end
 
+    def refresh_pallet_data(id)
+      repo.transaction do
+        repo.refresh_pallet_data(id)
+      end
+      success_response('Pallet data refreshed successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
