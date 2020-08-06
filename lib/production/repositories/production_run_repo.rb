@@ -1,4 +1,4 @@
-# frozen_string_literal: false
+# frozen_string_literal: true
 
 module ProductionApp
   class ProductionRunRepo < BaseRepo # rubocop:disable Metrics/ClassLength
@@ -445,11 +445,11 @@ module ProductionApp
     end
 
     def refresh_pallet_data(id)
-      update_query = ''
+      update_query = []
       AppConst::REFRESH_PALLET_DATA_TABLES.each do |table_name|
         AppConst::REFRESH_PALLET_DATA_COLUMNS.each { |column_name| update_query << update_column_sql(table_name, column_name, id) }
       end
-      DB[update_query].update
+      DB[update_query.join].update
     end
 
     def update_column_sql(table_name, column_name, production_run_id)
