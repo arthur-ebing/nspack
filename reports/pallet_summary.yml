@@ -1,0 +1,280 @@
+---
+:caption: Pallet Summary
+:sql: "SELECT\r\n    ps.created_at::date AS date,\r\n    ps.packhouse_code,\r\n    ps.cultivar_code,\r\n
+  \   ps.standard_pack_code,\r\n\r\n    COUNT(DISTINCT CASE WHEN l.shipped THEN p.load_id
+  END) AS shipped_load_qty,\r\n    COUNT(DISTINCT CASE WHEN l.shipped THEN p.pallet_id
+  END) AS shipped_pallet_qty,\r\n    SUM(CASE WHEN l.shipped THEN ps.sequence_carton_quantity
+  ELSE 0 END) AS shipped_carton_qty,\r\n\r\n    COUNT(DISTINCT CASE WHEN NOT l.shipped
+  THEN p.load_id END) AS allocated_load_qty,\r\n    COUNT(DISTINCT CASE WHEN NOT l.shipped
+  THEN p.pallet_id END) AS allocated_pallet_qty,\r\n    SUM(CASE WHEN NOT l.shipped
+  THEN ps.sequence_carton_quantity ELSE 0 END) AS allocated_carton_qty,\r\n\r\n    COUNT(DISTINCT
+  CASE WHEN NOT p.load_id IS NULL AND ps.verified THEN p.pallet_id END) AS verified_pallet_qty,\r\n
+  \   SUM(CASE WHEN NOT p.load_id IS NULL AND ps.verified THEN ps.sequence_carton_quantity
+  ELSE 0 END) AS verified_carton_qty,\r\n\r\n    SUM(ps.sequence_carton_quantity)
+  AS total_carton_qty,\r\n    SUM(CASE WHEN ps.verified THEN ps.sequence_carton_quantity
+  ELSE 0 END) AS total_verified_carton_qty\r\n\r\nFROM vw_pallet_sequences ps\r\nJOIN
+  vw_pallets p ON p.pallet_id = ps.pallet_id\r\nLEFT JOIN vw_loads l ON p.load_id
+  = l.load_id\r\n\r\nGROUP BY\r\n    ps.created_at::date,\r\n    ps.packhouse_code,\r\n
+  \   ps.cultivar_code,\r\n    ps.standard_pack_code"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  date:
+    :name: date
+    :sequence_no: 1
+    :caption: Date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse_code:
+    :name: packhouse_code
+    :sequence_no: 2
+    :caption: Packhouse code
+    :namespaced_name: ps.packhouse_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_code:
+    :name: cultivar_code
+    :sequence_no: 3
+    :caption: Cultivar code
+    :namespaced_name: ps.cultivar_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_code:
+    :name: standard_pack_code
+    :sequence_no: 4
+    :caption: Standard pack code
+    :namespaced_name: ps.standard_pack_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_load_qty:
+    :name: shipped_load_qty
+    :sequence_no: 5
+    :caption: Shipped load qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_pallet_qty:
+    :name: shipped_pallet_qty
+    :sequence_no: 6
+    :caption: Shipped pallet qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  shipped_carton_qty:
+    :name: shipped_carton_qty
+    :sequence_no: 7
+    :caption: Shipped carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_load_qty:
+    :name: allocated_load_qty
+    :sequence_no: 8
+    :caption: Allocated load qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_pallet_qty:
+    :name: allocated_pallet_qty
+    :sequence_no: 9
+    :caption: Allocated pallet qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  allocated_carton_qty:
+    :name: allocated_carton_qty
+    :sequence_no: 10
+    :caption: Allocated carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_pallet_qty:
+    :name: verified_pallet_qty
+    :sequence_no: 11
+    :caption: Verified pallet qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  verified_carton_qty:
+    :name: verified_carton_qty
+    :sequence_no: 12
+    :caption: Verified carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_carton_qty:
+    :name: total_carton_qty
+    :sequence_no: 13
+    :caption: Total carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_verified_carton_qty:
+    :name: total_verified_carton_qty
+    :sequence_no: 14
+    :caption: Total verified carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 180
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: ps.created_at::date
+  :caption: Date
+  :data_type: :date
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT DISTINCT created_at::date from vw_pallet_sequences ORDER BY created_at::date
+- :column: ps.cultivar_code
+  :caption: Cultivar code
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 2
+  :list_def: SELECT DISTINCT cultivar_code from vw_pallet_sequences ORDER BY cultivar_code
+- :column: ps.packhouse_code
+  :caption: Packhouse code
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 3
+  :list_def: SELECT DISTINCT packhouse_code from vw_pallet_sequences ORDER BY packhouse_code
+- :column: ps.standard_pack_code
+  :caption: Standard pack code
+  :data_type: :string
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 4
+  :list_def: SELECT DISTINCT standard_pack_code from vw_pallet_sequences ORDER BY
+    standard_pack_code
