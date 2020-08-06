@@ -105,9 +105,7 @@ module MasterfilesApp
 
       descendant_ids = DB[:tree_plant_resources].where(ancestor_plant_resource_id: ph_pr_id).select_map(:descendant_plant_resource_id)
 
-      resource_repo = ProductionApp::ResourceRepo.new
-      lines = resource_repo.for_select_plant_resources(where: { id: descendant_ids, plant_resource_type_id: type[:id] })
-      [['Please choose', nil]] + lines
+      ProductionApp::ResourceRepo.new.for_select_plant_resources(where: { id: descendant_ids, plant_resource_type_id: type[:id] })
     end
 
     def create_shift_type(attrs)

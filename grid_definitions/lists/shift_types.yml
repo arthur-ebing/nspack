@@ -9,6 +9,7 @@
 - :url: "/masterfiles/human_resources/shift_types/$:id$"
   :text: delete
   :icon: delete
+  :hide_if_true: has_shifts
   :is_delete: true
   :popup: true
 - :url: "/list/shift_type_employees/multi?key=shift_types&id=$:id$"
@@ -21,8 +22,3 @@
   :text: New Shift Type
   :style: :button
   :behaviour: :popup
-#- :control_type: :link
-#  :url: "/help/app/masterfiles/shift_types"
-#  :text: Help
-#  :style: :button
-#  :behaviour: :popup

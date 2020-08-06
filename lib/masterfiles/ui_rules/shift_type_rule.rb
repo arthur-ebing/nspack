@@ -23,28 +23,55 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:employment_type_id] = { renderer: :label, with_value: @form_object.employment_type_code, caption: 'Employment Type' }
+      fields[:employment_type_id] = { renderer: :label,
+                                      with_value: @form_object.employment_type_code,
+                                      caption: 'Employment Type' }
       fields[:start_hour] = { renderer: :label }
       fields[:end_hour] = { renderer: :label }
       fields[:day_night_or_custom] = { renderer: :label }
-      fields[:shift_type_code] = { renderer: :label, with_value: @form_object.shift_type_code }
+      fields[:shift_type_code] = { renderer: :label,
+                                   with_value: @form_object.shift_type_code }
     end
 
     def swap_fields
       {
-        from_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true },
-        to_shift_type_id: { renderer: :select, options: @repo.for_select_shift_types_with_codes, required: true }
+        from_shift_type_id: { renderer: :select,
+                              options: @repo.for_select_shift_types_with_codes,
+                              required: true },
+        to_shift_type_id: { renderer: :select,
+                            options: @repo.for_select_shift_types_with_codes,
+                            required: true }
       }
     end
 
     def common_fields
       {
-        ph_plant_resource_id: { renderer: :select, options: packhouse_plant_resources, caption: 'PH Plant Resource', required: true, prompt: true },
-        line_plant_resource_id: { renderer: :select, options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::LINE), caption: 'Line Plant Resource', prompt: true },
-        employment_type_id: { renderer: :select, options: @repo.for_select_employment_types, caption: 'Employment Type', required: true },
-        start_hour: { renderer: :select, options: (0..23).step(1).to_a, required: true, sort_items: false },
-        end_hour: { renderer: :select, options: (0..23).step(1).to_a, required: true, sort_items: false },
-        day_night_or_custom: { renderer: :select, options: [%w[Day D], %w[Night N], %w[Custom C]], required: true, min_charwidth: 30 }
+        ph_plant_resource_id: { renderer: :select,
+                                options: packhouse_plant_resources,
+                                caption: 'PH Plant Resource',
+                                required: true,
+                                prompt: true },
+        line_plant_resource_id: { renderer: :select,
+                                  options: @resource_repo.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::LINE),
+                                  caption: 'Line Plant Resource',
+                                  required: true,
+                                  prompt: true },
+        employment_type_id: { renderer: :select,
+                              options: @repo.for_select_employment_types,
+                              caption: 'Employment Type',
+                              required: true },
+        start_hour: { renderer: :select,
+                      options: (0..23).step(1).to_a,
+                      required: true,
+                      sort_items: false },
+        end_hour: { renderer: :select,
+                    options: (0..23).step(1).to_a,
+                    required: true,
+                    sort_items: false },
+        day_night_or_custom: { renderer: :select,
+                               options: [%w[Day D], %w[Night N],  %w[Custom C]],
+                               required: true,
+                               min_charwidth: 30 }
       }
     end
 

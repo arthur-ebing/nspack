@@ -1,11 +1,12 @@
 ---
 :caption: Shift Types
-:sql: SELECT "shift_types"."id", "shift_types"."plant_resource_id", "shift_types"."employment_type_id",
-  fn_shift_type_code(shift_types.id) AS shift_type_code,  "shift_types"."start_hour",
-  "shift_types"."end_hour", "shift_types"."day_night_or_custom", "employment_types".employment_type_code,
-  "plant_resources"."plant_resource_code" FROM "shift_types" JOIN "employment_types"
-  ON "employment_types"."id" = "shift_types"."employment_type_id" JOIN "plant_resources"
-  ON "plant_resources"."id" = "shift_types"."plant_resource_id"
+:sql: "SELECT\r\n    shift_types.id,\r\n    shift_types.plant_resource_id,\r\n    shift_types.employment_type_id,\r\n
+  \   fn_shift_type_code (shift_types.id) AS shift_type_code,\r\n    shift_types.start_hour,\r\n
+  \   shift_types.end_hour,\r\n    shift_types.day_night_or_custom,\r\n    employment_types.employment_type_code,\r\n
+  \   plant_resources.plant_resource_code,\r\n    EXISTS(select id from shifts where
+  shift_type_id = shift_types.id) AS has_shifts\r\nFROM shift_types\r\nJOIN employment_types
+  ON employment_types.id = shift_types.employment_type_id\r\nJOIN plant_resources
+  ON plant_resources.id = shift_types.plant_resource_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -149,6 +150,22 @@
     :hide: false
     :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_shifts:
+    :name: has_shifts
+    :sequence_no: 10
+    :caption: Has shifts
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

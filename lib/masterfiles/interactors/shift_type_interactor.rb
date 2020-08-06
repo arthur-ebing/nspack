@@ -3,24 +3,24 @@
 module MasterfilesApp
   class ShiftTypeInteractor < BaseInteractor
     def create_shift_type(params) # rubocop:disable Metrics/AbcSize
-      res = HumanResources::Validator.new.validate_shift_type_params(params)
-      return res unless res.success
+      res = validate_shift_type_params(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
       repo.transaction do
-        id = repo.create_shift_type(res.instance)
+        id = repo.create_shift_type(res)
         log_status(:shift_types, id, 'CREATED')
         log_transaction
       end
       instance = shift_type(id)
       success_response("Created shift type #{instance.shift_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This shift type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { ph_plant_resource_id: ['This shift type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def delete_shift_type(id)
+    def delete_shift_type(id) # rubocop:disable Metrics/AbcSize
       name = shift_type(id).shift_type_code
       repo.transaction do
         repo.delete_shift_type(id)
@@ -30,11 +30,14 @@ module MasterfilesApp
       success_response("Deleted shift type #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete shift type. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def swap_employees(params) # rubocop:disable Metrics/AbcSize
-      res = HumanResources::Validator.new.validate_shift_type_ids(params)
-      return res unless res.messages.empty?
+      res = ShiftTypeIdsSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
       from_st = shift_type(params[:from_shift_type_id])
       to_st = shift_type(params[:to_shift_type_id])
@@ -48,8 +51,8 @@ module MasterfilesApp
     end
 
     def move_employees(params) # rubocop:disable Metrics/AbcSize
-      res = HumanResources::Validator.new.validate_shift_type_ids(params)
-      return res unless res.messages.empty?
+      res = ShiftTypeIdsSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
 
       from_st = shift_type(params[:from_shift_type_id])
       to_st = shift_type(params[:to_shift_type_id])
@@ -87,6 +90,10 @@ module MasterfilesApp
 
     def shift_type(id)
       repo.find_shift_type(id)
+    end
+
+    def validate_shift_type_params(params)
+      ShiftTypeSchema.call(params)
     end
   end
 end

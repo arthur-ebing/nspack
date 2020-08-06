@@ -348,6 +348,7 @@ class Nspack < Roda
           end
         end
       end
+
       r.on 'move_employees' do
         r.is do
           r.get do
@@ -362,17 +363,20 @@ class Nspack < Roda
           end
         end
       end
+
       r.on 'new' do    # NEW
         check_auth!('hr', 'new')
         set_last_grid_url('/list/shift_types', r)
         show_partial_or_page(r) { Masterfiles::HumanResources::ShiftType::New.call(remote: fetch?(r)) }
       end
+
       r.on 'ph_plant_resource_changed' do
         ph_pr_id = params[:changed_value].empty? ? nil : params[:changed_value]
         options_array = ph_pr_id ? interactor.line_plant_resources(ph_pr_id) : []
-        json_replace_select_options('shift_type_line_plant_resource_id', options_array, message: nil, keep_dialog_open: true)
+        json_replace_select_options('shift_type_line_plant_resource_id', options_array)
       end
-      r.post do        # CREATE
+
+      r.post do # CREATE
         res = interactor.create_shift_type(params[:shift_type])
         if res.success
           if fetch?(r)
