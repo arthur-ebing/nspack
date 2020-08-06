@@ -33,6 +33,7 @@ module MesscadaApp
     end
 
     def transfer_carton  # rubocop:disable Metrics/AbcSize
+      orig_seq = repo.get_value(:cartons, :pallet_sequence_id, id: carton_id)
       new_sequence = NewSequence.new(pallet_id, carton_id).call
       if new_sequence
         res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true)
@@ -41,11 +42,11 @@ module MesscadaApp
         @pallet_sequence_id = res.instance[:pallet_sequence_id]
       else
         @pallet_sequence_id = repo.matching_sequence_for_carton(carton_id, pallet_id)
+        prod_repo.increment_sequence(pallet_sequence_id)
       end
 
-      orig_seq = repo.get_value(:cartons, :pallet_sequence_id, id: carton_id)
       repo.update_carton(carton_id, { pallet_sequence_id: pallet_sequence_id })
-      prod_repo.increment_sequence(pallet_sequence_id)
+      prod_repo.decrement_sequence(orig_seq)
 
       unless repo.sequence_has_cartons?(orig_seq)
         src_pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: orig_seq)
