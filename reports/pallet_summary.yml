@@ -8,8 +8,8 @@
   THEN p.load_id END) AS allocated_load_qty,\r\n    COUNT(DISTINCT CASE WHEN NOT l.shipped
   THEN p.pallet_id END) AS allocated_pallet_qty,\r\n    SUM(CASE WHEN NOT l.shipped
   THEN ps.sequence_carton_quantity ELSE 0 END) AS allocated_carton_qty,\r\n\r\n    COUNT(DISTINCT
-  CASE WHEN NOT p.load_id IS NULL AND ps.verified THEN p.pallet_id END) AS verified_pallet_qty,\r\n
-  \   SUM(CASE WHEN NOT p.load_id IS NULL AND ps.verified THEN ps.sequence_carton_quantity
+  CASE WHEN p.load_id IS NULL AND ps.verified THEN p.pallet_id END) AS verified_pallet_qty,\r\n
+  \   SUM(CASE WHEN p.load_id IS NULL AND ps.verified THEN ps.sequence_carton_quantity
   ELSE 0 END) AS verified_carton_qty,\r\n\r\n    SUM(ps.sequence_carton_quantity)
   AS total_carton_qty,\r\n    SUM(CASE WHEN ps.verified THEN ps.sequence_carton_quantity
   ELSE 0 END) AS total_verified_carton_qty\r\n\r\nFROM vw_pallet_sequences ps\r\nJOIN
