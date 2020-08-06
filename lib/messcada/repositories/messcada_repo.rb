@@ -378,9 +378,5 @@ module MesscadaApp
     def sequence_has_cartons?(id)
       !DB[:cartons].where(pallet_sequence_id: id).count.zero?
     end
-
-    def pallet_has_sequence?(id)
-      !DB[:pallet_sequences].where(pallet_id: id).count.zero?
-    end
   end
 end

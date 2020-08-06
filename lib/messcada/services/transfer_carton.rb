@@ -53,7 +53,7 @@ module MesscadaApp
         ProductionApp::ReworksRepo.new.update_pallet_sequence(orig_seq, { pallet_id: nil, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED })
         repo.log_status('pallets', src_pallet_id, AppConst::SEQUENCE_REMOVED_BY_CTN_TRANSFER)
 
-        unless repo.pallet_has_sequence?(src_pallet_id)
+        if ProductionApp::ReworksRepo.new.unscrapped_sequences_count(src_pallet_id) <= 0
           ProductionApp::ReworksRepo.new.update_pallet(src_pallet_id, { scrapped_at: Time.now, scrapped: true, exit_ref: AppConst::PALLET_EXIT_REF_SCRAPPED_BY_BUILDUP })
           repo.log_status('pallets', src_pallet_id, AppConst::SCRAPPED_BY_BUILDUP)
         end
