@@ -277,12 +277,10 @@ module MesscadaApp
     end
 
     def find_pallet_sequences_by_pallet_number(pallet_number)
-      # FIXME: reads from view...
-      # DB[:vw_pallet_sequence_flat].where(pallet_number: pallet_number)
-      DB["SELECT *
-          FROM vw_pallet_sequence_flat
-          WHERE pallet_number = '#{pallet_number}'
-          order by pallet_sequence_number asc"]
+      filters = ['WHERE pallet_sequences.pallet_number = ?']
+      filters << 'ORDER BY pallet_sequences.pallet_sequence_number'
+      query = MesscadaApp::DatasetPalletSequence.call(filters)
+      DB[query, pallet_number]
     end
 
     def find_pallet_sequences_from_same_pallet(id)
@@ -294,10 +292,8 @@ module MesscadaApp
     end
 
     def find_pallet_sequence_attrs(id)
-      # FIXME: reads from view...
-      DB["SELECT *
-          FROM vw_pallet_sequence_flat
-          WHERE id = ?", id].first
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
+      DB[query, id].first
     end
 
     def update_pallet_sequence_verification_result(pallet_sequence_id, params)

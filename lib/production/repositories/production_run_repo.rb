@@ -74,20 +74,15 @@ module ProductionApp
     end
 
     def find_pallet_sequence_attrs_by_id(id)
-      # FIXME: reads from view...
-      qry = <<~SQL
-        SELECT *
-        FROM vw_pallet_sequence_flat
-        WHERE id = ?
-      SQL
-      DB[qry, id].first
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
+      DB[query, id].first
     end
 
     def find_pallet_sequence_attrs(pallet_id, seq_number)
-      # FIXME: reads from view...
-      DB["SELECT *
-          FROM vw_pallet_sequence_flat
-          WHERE pallet_id = #{pallet_id} and pallet_sequence_number = #{seq_number}"].first
+      filters = ['WHERE pallet_sequences.pallet_id = ?']
+      filters << '  AND pallet_sequences.pallet_sequence_number = ?'
+      query = MesscadaApp::DatasetPalletSequence.call(filters)
+      DB[query, pallet_id, seq_number].first
     end
 
     def find_carton_cpp(carton_id)

@@ -336,10 +336,8 @@ module ProductionApp
     end
 
     def reworks_run_pallet_data(pallet_number)
-      # FIXME: reads from view...
-      DB["SELECT *
-          FROM vw_pallet_sequence_flat
-          WHERE pallet_number = ?", pallet_number].first
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.pallet_number = ?')
+      DB[query, pallet_number].first
     end
 
     def reworks_run_pallet_seq_print_data(id)
@@ -352,10 +350,8 @@ module ProductionApp
     end
 
     def reworks_run_pallet_seq_data(id)
-      # FIXME: reads from view...
-      DB["SELECT *
-          FROM vw_pallet_sequence_flat
-          WHERE id = ?", id].first
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
+      DB[query, id].first
     end
 
     def sequence_setup_attrs(id)
@@ -368,12 +364,11 @@ module ProductionApp
     end
 
     def sequence_setup_data(id)
-      # FIXME: reads from view...
-      DB["SELECT marketing_variety, customer_variety, std_size, basic_pack, std_pack, actual_count, size_ref, marketing_org,
-          packed_tm_group, mark, inventory_code, pallet_base, stack_type, cpp, bom, client_size_ref,
-          client_product_code, treatments, order_number, sell_by_code, grade, product_chars, pm_type, pm_subtype
-          FROM vw_pallet_sequence_flat
-          WHERE id = ?", id].first
+      data_ar = %i[marketing_variety customer_variety std_size basic_pack std_pack actual_count size_ref marketing_org
+                   packed_tm_group mark inventory_code pallet_base stack_type cpp bom client_size_ref
+                   client_product_code treatments order_number sell_by_code grade product_chars pm_type pm_subtype]
+      query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
+      DB[query, id].first.select { |key, _| data_ar.include?(key) }
     end
 
     def sequence_edit_data(attrs)  # rubocop:disable Metrics/AbcSize
