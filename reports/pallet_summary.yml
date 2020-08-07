@@ -276,5 +276,4 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 4
-  :list_def: SELECT DISTINCT standard_pack_code from vw_pallet_sequences ORDER BY
-    standard_pack_code
+  :list_def: SELECT DISTINCT standard_pack_code from vw_pallet_sequences ORDER BY standard_pack_code

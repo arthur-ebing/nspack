@@ -1,0 +1,124 @@
+---
+:caption: Carton Summary
+:sql: "SELECT\r\n    c.carton_label_created_at::date AS date,\r\n    c.packhouse AS
+  packhouse_code,\r\n    c.cultivar_code,\r\n    c.standard_pack_code,\r\n\r\n    COUNT(DISTINCT
+  carton_id) AS total_verified_carton_qty\r\n\r\nFROM vw_cartons c\r\n\r\nGROUP BY\r\n
+  \   c.carton_label_created_at::date,\r\n    c.packhouse,\r\n    c.cultivar_code,\r\n
+  \   c.standard_pack_code"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  date:
+    :name: date
+    :sequence_no: 1
+    :caption: Date
+    :namespaced_name: 
+    :data_type: :date
+    :width: 110
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packhouse_code:
+    :name: packhouse_code
+    :sequence_no: 2
+    :caption: Packhouse code
+    :namespaced_name: c.packhouse
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_code:
+    :name: cultivar_code
+    :sequence_no: 3
+    :caption: Cultivar code
+    :namespaced_name: c.cultivar_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  standard_pack_code:
+    :name: standard_pack_code
+    :sequence_no: 4
+    :caption: Standard pack code
+    :namespaced_name: c.standard_pack_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  total_verified_carton_qty:
+    :name: total_verified_carton_qty
+    :sequence_no: 5
+    :caption: Total verified carton qty
+    :namespaced_name: 
+    :data_type: :integer
+    :width: 180
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: true
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+  - :column: c.carton_label_created_at::date
+    :caption: Date
+    :data_type: :date
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 1
+    :list_def: SELECT DISTINCT created_at::date from vw_pallet_sequences ORDER BY created_at::date
+  - :column: c.cultivar_code
+    :caption: Cultivar code
+    :data_type: :string
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 2
+    :list_def: SELECT DISTINCT cultivar_code from vw_pallet_sequences ORDER BY cultivar_code
+  - :column: c.packhouse
+    :caption: Packhouse code
+    :data_type: :string
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 3
+    :list_def: SELECT DISTINCT packhouse_code from vw_pallet_sequences ORDER BY packhouse_code
+  - :column: c.standard_pack_code
+    :caption: Standard pack code
+    :data_type: :string
+    :control_type: :list
+    :default_value:
+    :ordered_list: true
+    :ui_priority: 4
+    :list_def: SELECT DISTINCT standard_pack_code from vw_pallet_sequences ORDER BY standard_pack_code
