@@ -15,11 +15,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'phyt_clean_request', Integer do |puc_id|
         res = interactor.phyt_clean_request(puc_id)
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = "#{res.message} #{res.errors}"
-        end
+        flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/orchard_test_results'
       end
 
@@ -92,7 +88,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'diff', String do |mode|
-        res = interactor.phyt_clean_diff(mode)
+        res = interactor.phyt_clean_diff(mode.to_sym)
         if res.success
           flash[:notice] = res.message
           store_locally(:phyto_res, res.instance)
@@ -104,16 +100,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'show_diff', String do |mode|
-        show_page { Quality::TestResults::OrchardTestResult::DiffTool.call(mode, retrieve_from_local_store(:phyto_res)) }
+        show_page { Quality::TestResults::OrchardTestResult::DiffTool.call(mode.to_sym, retrieve_from_local_store(:phyto_res)) }
       end
 
       r.on 'phyt_clean_request' do
         res = interactor.phyt_clean_request
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = "#{res.message} #{res.errors}"
-        end
+        flash[res.success ? :notice : :error] = res.message
         redirect_via_json '/list/orchard_test_results'
       end
 
@@ -143,11 +135,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'create' do    # REFRESH
         check_auth!('test results', 'new')
         res = interactor.create_orchard_test_results
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = "#{res.message} #{res.errors}"
-        end
+        flash[res.success ? :notice : :error] = res.message
         r.redirect '/list/orchard_test_results'
       end
 

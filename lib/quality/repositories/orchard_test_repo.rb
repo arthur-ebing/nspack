@@ -151,7 +151,7 @@ module QualityApp
     end
 
     def puc_orchard_cultivar(mode)
-      id_arrays = if mode == 'orchards'
+      id_arrays = if mode == :orchards
                     select_values(:orchards, %i[puc_id id cultivar_ids]).uniq
                   else
                     select_values(:pallet_sequences, %i[puc_id orchard_id cultivar_id]).uniq

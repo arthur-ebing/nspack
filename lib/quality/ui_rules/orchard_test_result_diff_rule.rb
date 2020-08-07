@@ -13,12 +13,12 @@ module UiRules
     end
 
     def set_diff_fields
-      if @mode == 'orchards'
+      if @mode == :orchards
         right_caption = 'Orchards'
-        right_record = @repo.puc_orchard_cultivar('orchards')
+        right_record = @repo.puc_orchard_cultivar(:orchards)
       else
         right_caption = 'Pallet Sequences'
-        right_record = @repo.puc_orchard_cultivar('pallet_sequences')
+        right_record = @repo.puc_orchard_cultivar(:pallet_sequences)
       end
       fields[:diff] = { left_caption: 'Phyto Data',
                         right_caption: right_caption,
