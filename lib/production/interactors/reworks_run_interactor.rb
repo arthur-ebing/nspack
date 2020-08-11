@@ -1049,10 +1049,12 @@ module ProductionApp
 
     def scrap_carton(carton_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
       before_attrs = scrap_carton_changes(carton_id)
-      return failed_response('Carton cannot be scrapped', pallet_number: before_attrs[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET || cannot_scrap_carton(before_attrs[:pallet_sequence_id])
+      return failed_response('Carton cannot be scrapped', pallet_sequence_id: before_attrs[:pallet_sequence_id]) if AppConst::CARTON_EQUALS_PALLET || cannot_scrap_carton(before_attrs[:pallet_sequence_id])
 
       repo.transaction do
+        original_pallet_sequence_id = before_attrs[:pallet_sequence_id]
         repo.scrap_carton(carton_id)
+        prod_repo.decrement_sequence(original_pallet_sequence_id) unless original_pallet_sequence_id.nil?
         after_attrs = scrap_carton_changes(carton_id)
         reworks_run_attrs = { user: @user.user_name,
                               reworks_run_type_id: reworks_run_type_id,
@@ -1181,6 +1183,10 @@ module ProductionApp
 
     def repo
       @repo ||= ReworksRepo.new
+    end
+
+    def prod_repo
+      @prod_repo ||= ProductionApp::ProductionRunRepo.new
     end
 
     def reworks_run(id)
