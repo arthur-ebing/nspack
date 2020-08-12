@@ -332,6 +332,12 @@ module UiRules
                  url: "/finished_goods/dispatch/loads/#{id}/unship",
                  prompt: 'Are you sure, you want to unship this load?',
                  icon: :back }
+      update_otmc = { control_type: :link,
+                      style: :action_button,
+                      text: 'Update OTMC Results',
+                      url: "/finished_goods/dispatch/loads/#{id}/update_otmc",
+                      prompt: 'Are you sure, you want to update the OTMC Results for this load?',
+                      icon: :plus }
 
       case @form_object.step
       when 0
@@ -347,7 +353,7 @@ module UiRules
         progress_controls = [unload_truck, delete_tail, tail, ship]
         instance_controls = [edit]
       when 4
-        progress_controls = [unship]
+        progress_controls = [unship, update_otmc]
         instance_controls = [edit]
       else
         progress_controls = []

@@ -233,6 +233,19 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def update_otmc(id)
+      otmc_count = nil
+      phyto_count = nil
+      repo.transaction do
+        otmc_count = repo.update_load_otmc_results(id)
+        phyto_count = repo.update_load_phyto_data(id)
+        log_transaction
+      end
+      success_response("Updated #{[otmc_count, phyto_count].max} pallet sequences on this load.")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def stepper(step_key)
       @stepper ||= LoadStep.new(step_key, @user, @context.request_ip)
     end

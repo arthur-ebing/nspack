@@ -325,6 +325,12 @@ class Nspack < Roda
         r.redirect "/finished_goods/dispatch/loads/#{id}"
       end
 
+      r.on 'update_otmc' do
+        res = interactor.update_otmc(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/dispatch/loads/#{id}"
+      end
+
       r.on 'delete' do    # DELETE
         check_auth!('dispatch', 'edit')
         res = interactor.delete_load(id)
