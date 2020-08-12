@@ -56,6 +56,20 @@ module MesscadaApp
       success_response('Logged off', contract_worker: name)
     end
 
+    def logon_with_no(params)
+      name = repo.contract_worker_name_by_no(params[:identifier])
+      return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
+
+      success_response('Logged on', contract_worker: name)
+    end
+
+    def logoff_with_no(params)
+      name = repo.contract_worker_name_by_no(params[:identifier])
+      return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
+
+      success_response('Logged off', contract_worker: name)
+    end
+
     private
 
     def repo

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'hr', 'messcada' do |r|
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     # REGISTER PERSONNEL IDENTIFIERS
@@ -43,6 +43,40 @@ class Nspack < Roda
 
     r.on 'logoff' do
       res = interactor.logoff(params)
+
+      feedback = if res.success
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: true,
+                                                  line1: res.instance[:contract_worker],
+                                                  line4: 'Logged off')
+                 else
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: false,
+                                                  line1: 'Cannot logoff',
+                                                  line4: res.message)
+                 end
+      Crossbeams::RobotResponder.new(feedback).render
+    end
+
+    r.on 'logon_with_no' do
+      res = interactor.logon_with_no(params)
+
+      feedback = if res.success
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: true,
+                                                  line1: res.instance[:contract_worker],
+                                                  line4: 'Logged on')
+                 else
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: false,
+                                                  line1: 'Cannot logon',
+                                                  line4: res.message)
+                 end
+      Crossbeams::RobotResponder.new(feedback).render
+    end
+
+    r.on 'logoff_with_no' do
+      res = interactor.logoff_with_no(params)
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
