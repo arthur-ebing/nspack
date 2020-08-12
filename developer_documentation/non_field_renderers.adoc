@@ -537,6 +537,16 @@ end
 |Boolean - `true` or `false`.
 |`false`
 
+|max_pane_width
+|Max width in pixels for each pane. If set and the differences render wider than the max, horizontal scrollbars will show.
+|Boolean - `true` or `false`.
+|`false`
+
+|unnest_records
+|For nested hashes, show ancestor keys on each line. Both hashes are sorted by their keys.
+|Boolean - `true` or `false`.
+|`false`
+
 |===
 
 === ProgressStep
