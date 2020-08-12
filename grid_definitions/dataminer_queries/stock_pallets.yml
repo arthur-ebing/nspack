@@ -104,7 +104,7 @@
   has_individual_cartons:
     :name: has_individual_cartons
     :sequence_no: 5
-    :caption: Indiv cartons?
+    :caption: Individual Cartons?
     :namespaced_name: has_individual_cartons
     :data_type: :boolean
     :width: 100
