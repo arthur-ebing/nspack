@@ -310,6 +310,14 @@ module UiRules
       end
     end
 
+    def replace_url(actions)
+      actions.map do |act|
+        OpenStruct.new(type: :replace_url,
+                       dom_id: act[:dom_id],
+                       value: act[:value])
+      end
+    end
+
     def replace_inner_html(actions)
       actions.map do |act|
         OpenStruct.new(type: :replace_inner_html,

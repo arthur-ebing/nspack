@@ -600,6 +600,31 @@ const crossbeamsUtils = {
     }
   },
   /**
+   * Replace the url (href) of a DOM element.
+   * @param {object} action - the action object returned from the backend.
+   * @returns {void}
+   */
+  replaceURL: function replaceURL(action) {
+    const elem = document.getElementById(action.replace_url.id);
+    if (elem === null) {
+      this.alert({
+        prompt: `There is no DOM element with id: "${action.replace_url.id}"`,
+        title: 'Replace url: id missmatch',
+        type: 'error',
+      });
+      return;
+    }
+    if (!elem.hasAttribute('href')) {
+      this.alert({
+        prompt: `This DOM element with id: "${action.replace_url.id}" has no HREF attribute`,
+        title: 'Replace url: incorrect DOM element',
+        type: 'error',
+      });
+      return;
+    }
+    elem.href = action.replace_url.value;
+  },
+  /**
    * Replace the contents of a DOM element.
    * @param {object} action - the action object returned from the backend.
    * @returns {void}
@@ -823,6 +848,9 @@ const crossbeamsUtils = {
       }
       if (action.change_select_value) {
         crossbeamsUtils.changeSelectValue(action);
+      }
+      if (action.replace_url) {
+        crossbeamsUtils.replaceURL(action);
       }
       if (action.replace_inner_html) {
         crossbeamsUtils.replaceInnerHtml(action);
