@@ -223,7 +223,7 @@ module UiRules
                                     scrap_reason_id: nil,
                                     pallets_selected: nil,
                                     production_run_id: nil,
-                                    allow_cultivar_mixing: false)
+                                    allow_cultivar_mixing: true)
     end
 
     def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity
