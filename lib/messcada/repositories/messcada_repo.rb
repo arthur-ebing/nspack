@@ -345,9 +345,9 @@ module MesscadaApp
         FROM cartons c
         JOIN inventory_codes i ON i.id = c.inventory_code_id
         JOIN target_market_groups tm on tm.id = c.packed_tm_group_id
-        JOIN fruit_size_references fs on fs.id = c.fruit_size_reference_id
+        LEFT JOIN fruit_size_references fs on fs.id = c.fruit_size_reference_id
         JOIN standard_pack_codes sp on sp.id = c.standard_pack_code_id
-        JOIN std_fruit_size_counts sf on sf.id = c.std_fruit_size_count_id
+        LEFT JOIN std_fruit_size_counts sf on sf.id = c.std_fruit_size_count_id
         JOIN grades g on g.id = c.grade_id
         JOIN marks m on m.id = c.mark_id
         JOIN cultivars clt on clt.id = c.cultivar_id
