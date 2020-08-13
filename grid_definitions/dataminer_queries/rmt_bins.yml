@@ -1250,12 +1250,12 @@
   production_run_rebin_id:
     :name: production_run_rebin_id
     :sequence_no: 77
-    :caption: Production run rebin
+    :caption: Rebin Production run
     :namespaced_name: production_run_rebin_id
     :data_type: :integer
     :width: 100
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
