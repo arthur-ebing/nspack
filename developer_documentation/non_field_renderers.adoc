@@ -543,9 +543,14 @@ end
 |`false`
 
 |unnest_records
-|For nested hashes, show ancestor keys on each line. Both hashes are sorted by their keys.
+|For nested hashes, show ancestor keys on each line. Both hashes are sorted by their keys if `:sort_nested` is `true`.
 |Boolean - `true` or `false`.
 |`false`
+
+|sort_nested
+|For nested hashes, sort hashes by their keys.
+|Boolean - `true` or `false`.
+|`true`
 
 |===
 
