@@ -16,7 +16,7 @@ module UiRules
     end
 
     def common_fields
-      max_no_of_clones = AppConst::ALLOW_OVERFULL_PALLETIZING ? nil : @form_object[:no_of_clones]
+      max_no_of_clones = AppConst::ALLOW_OVERFULL_REWORKS_PALLETIZING ? nil : @form_object[:no_of_clones]
       {
         carton_id: { renderer: :hidden },
         pallet_id: { renderer: :hidden },
@@ -57,10 +57,12 @@ module UiRules
 
       carton = find_carton(@options[:id])
       pallet_id = sequence_pallet_id(carton[:pallet_sequence_id])
+      oldest_sequence_id = oldest_sequence_id(sequence_pallet_number(carton[:pallet_sequence_id]))
+      cartons_per_pallet_id = pallet_sequence_cartons_per_pallet_id(oldest_sequence_id)
       @form_object = @mesc_repo.carton_attributes(carton[:id]).to_h.merge(carton_id: carton[:id],
                                                                           pallet_id: pallet_id,
                                                                           pallet_sequence_id: carton[:pallet_sequence_id],
-                                                                          no_of_clones: default_no_of_clones(carton[:cartons_per_pallet_id], pallet_id))
+                                                                          no_of_clones: default_no_of_clones(cartons_per_pallet_id, pallet_id))
     end
 
     def find_sequence(sequence_id)
@@ -73,6 +75,18 @@ module UiRules
 
     def sequence_pallet_id(pallet_sequence_id)
       @repo.get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+    end
+
+    def sequence_pallet_number(pallet_sequence_id)
+      @repo.get(:pallet_sequences, pallet_sequence_id, :pallet_number)
+    end
+
+    def oldest_sequence_id(pallet_number)
+      @repo.oldest_sequence_id(pallet_number)
+    end
+
+    def pallet_sequence_cartons_per_pallet_id(pallet_sequence_id)
+      @repo.get(:pallet_sequences, pallet_sequence_id, :cartons_per_pallet_id)
     end
 
     def default_no_of_clones(cartons_per_pallet_id, pallet_id)
