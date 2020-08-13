@@ -204,6 +204,51 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
 
+        r.on 'display_reworks_multiselect_grid', String, String do |grid, grid_key|
+          r.redirect "/list/#{grid}/multi?key=#{grid_key}&id=#{id}"
+        end
+
+        r.on 'production_run_id_changed' do
+          allow_cultivar_mixing = params[:reworks_run_allow_cultivar_mixing] == 't'
+          production_run_id = params[:changed_value]
+          if allow_cultivar_mixing || production_run_id.nil_or_empty?
+            orchard_code = nil
+            grid_url = "/list/rmt_bins_reworks/multi?key=tip_bins_reworks&id=#{id}"
+          else
+            orchard_id = interactor.production_run_orchard(production_run_id)
+            orchard_code = "for Orchard #{MasterfilesApp::FarmRepo.new.find_orchard(orchard_id)&.orchard_code}"
+            grid_url = "/list/rmt_bins_reworks/multi?key=tip_bins_reworks_with_orchard_id&id=#{id}&orchard_id=#{orchard_id}"
+          end
+          json_actions([OpenStruct.new(type: :replace_url,
+                                       dom_id: 'reworks_run_select_button',
+                                       value: grid_url),
+                        OpenStruct.new(type: :replace_inner_html,
+                                       dom_id: 'reworks_run_select_button',
+                                       value: "Select Bins #{orchard_code}")])
+        end
+
+        r.on 'allow_cultivar_mixing_changed' do
+          allow_cultivar_mixing = params[:changed_value] == 't'
+          production_run_id = params[:reworks_run_production_run_id]
+          if allow_cultivar_mixing || production_run_id.nil_or_empty?
+            orchard_code = nil
+            grid_url = "/list/rmt_bins_reworks/multi?key=tip_bins_reworks&id=#{id}"
+          else
+            orchard_id = interactor.production_run_orchard(production_run_id)
+            orchard_code = "for Orchard #{MasterfilesApp::FarmRepo.new.find_orchard(orchard_id)&.orchard_code}"
+            grid_url = "/list/rmt_bins_reworks/multi?key=tip_bins_reworks_with_orchard_id&id=#{id}&orchard_id=#{orchard_id}"
+          end
+          json_actions([OpenStruct.new(type: :replace_input_value,
+                                       dom_id: 'reworks_run_allow_cultivar_mixing',
+                                       value: allow_cultivar_mixing ? 't' : 'f'),
+                        OpenStruct.new(type: :replace_url,
+                                       dom_id: 'reworks_run_select_button',
+                                       value: grid_url),
+                        OpenStruct.new(type: :replace_inner_html,
+                                       dom_id: 'reworks_run_select_button',
+                                       value: "Select Bins #{orchard_code}")])
+        end
+
         r.on 'multiselect_reworks_run_pallets' do
           check_auth!('reworks', 'new')
           res = interactor.resolve_pallet_numbers_from_multiselect(id, multiselect_grid_choices(params))

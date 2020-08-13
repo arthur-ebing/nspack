@@ -17,6 +17,8 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
+      add_behaviours if %i[new].include? @mode
+
       form_name 'reworks_run'
     end
 
@@ -220,7 +222,8 @@ module UiRules
                                     remarks: nil,
                                     scrap_reason_id: nil,
                                     pallets_selected: nil,
-                                    production_run_id: nil)
+                                    production_run_id: nil,
+                                    allow_cultivar_mixing: false)
     end
 
     def bin_run_type?  # rubocop:disable Metrics/CyclomaticComplexity
@@ -238,6 +241,17 @@ module UiRules
         pallet_sequences: res[:pallet_sequences],
         shipped_pallet_sequences: res[:shipped_pallet_sequences],
         inspected_pallet_sequences: res[:inspected_pallet_sequences] }
+    end
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.keyup :production_run_id,
+                        notify: [{ url: "/production/reworks/reworks_run_types/#{@options[:reworks_run_type_id]}/reworks_runs/production_run_id_changed",
+                                   param_keys: %i[reworks_run_allow_cultivar_mixing] }]
+        behaviour.input_change :allow_cultivar_mixing,
+                               notify: [{ url: "/production/reworks/reworks_run_types/#{@options[:reworks_run_type_id]}/reworks_runs/allow_cultivar_mixing_changed",
+                                          param_keys: %i[reworks_run_production_run_id] }]
+      end
     end
   end
 end

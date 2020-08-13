@@ -27,6 +27,13 @@
     - :col: bin_tipped
       :op: =
       :val: true
+  :tip_bins_reworks_with_orchard_id:
+    - :col: bin_tipped
+      :op: =
+      :val: false
+    - :col: orchard_id
+      :op: =
+      :val: $:orchard_id$
 :multiselect:
   :tip_bins_reworks:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
@@ -55,3 +62,8 @@
     :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
     :multiselect_save_method: remote
     :conditions: untip_bins_reworks
+  :tip_bins_reworks_with_orchard_id:
+    :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_rmt_bins"
+    :section_caption: "SELECT 'Select rmt bins for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :conditions: tip_bins_reworks_with_orchard_id

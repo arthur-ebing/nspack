@@ -1179,6 +1179,10 @@ module ProductionApp
       success_response('ok', message)
     end
 
+    def production_run_orchard(production_run_id)
+      repo.get(:production_runs, production_run_id, :orchard_id)
+    end
+
     private
 
     def repo

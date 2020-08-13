@@ -55,9 +55,10 @@ module Production
                 else
                   row.column do |col|
                     col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
-                    col.add_control(control_type: :link,
+                    col.add_control(id: 'reworks_run_select_button',
+                                    control_type: :link,
                                     text: "Select #{multi_select_caption}",
-                                    url: "/list/#{grid}/multi?key=#{grid_key}&id=#{reworks_run_type_id}",
+                                    url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/reworks_runs/display_reworks_multiselect_grid/#{grid}/#{grid_key}",
                                     behaviour: :popup,
                                     style: :button)
                   end
