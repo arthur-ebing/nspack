@@ -290,6 +290,12 @@ module UiRules
                         url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
                         icon: :checkon,
                         behaviour: :popup }
+      edit_truck_arrival = { control_type: :link,
+                             text: 'Edit Truck Arrival',
+                             url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
+                             icon: :edit,
+                             behaviour: :popup,
+                             style: :action_button }
       delete_truck_arrival = { control_type: :link,
                                style: :action_button,
                                text: 'Delete Truck Arrival',
@@ -334,7 +340,7 @@ module UiRules
                  icon: :back }
       update_otmc = { control_type: :link,
                       style: :action_button,
-                      text: 'Update OTMC Results',
+                      text: 'Update Phyto Data',
                       url: "/finished_goods/dispatch/loads/#{id}/update_otmc",
                       prompt: 'Are you sure, you want to update the OTMC Results for this load?',
                       icon: :plus }
@@ -347,7 +353,7 @@ module UiRules
         progress_controls = [allocate, truck_arrival]
         instance_controls = [edit]
       when 2
-        progress_controls = [delete_truck_arrival, load_truck]
+        progress_controls = [allocate, edit_truck_arrival, delete_truck_arrival, load_truck]
         instance_controls = [edit]
       when 3
         progress_controls = [unload_truck, delete_tail, tail, ship]

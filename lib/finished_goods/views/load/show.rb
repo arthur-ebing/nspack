@@ -155,12 +155,6 @@ module FinishedGoods
                       col.add_field :vehicle_number
                       col.add_field :driver
                       col.add_field :driver_number
-                      col.add_control(control_type: :link,
-                                      text: 'Edit Truck Arrival',
-                                      url: "/finished_goods/dispatch/loads/#{id}/truck_arrival",
-                                      icon: :edit,
-                                      behaviour: :popup,
-                                      style: :action_button)
                     end
                     row.column do |col|
                       col.add_field :vehicle_type
