@@ -72,6 +72,7 @@ module MasterfilesApp
         id: 1,
         grade_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        is_rmt_grade: false,
         active: true
       }
     end

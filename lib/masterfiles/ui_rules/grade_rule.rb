@@ -17,13 +17,16 @@ module UiRules
     def set_show_fields
       fields[:grade_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:is_rmt_grade] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         grade_code: { required: true },
-        description: {}
+        description: {},
+        is_rmt_grade: { renderer: :checkbox,
+                        caption: 'RMT Grade?' }
       }
     end
 
@@ -38,7 +41,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(grade_code: nil,
-                                    description: nil)
+                                    description: nil,
+                                    is_rmt_grade: nil)
     end
   end
 end

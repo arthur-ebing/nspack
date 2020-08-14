@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module Grade
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:grade, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :grade_code
               form.add_field :description
+              form.add_field :is_rmt_grade
             end
           end
 

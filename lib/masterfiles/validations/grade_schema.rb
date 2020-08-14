@@ -7,5 +7,6 @@ module MasterfilesApp
     optional(:id, :integer).filled(:int?)
     required(:grade_code, Types::StrippedString).filled(:str?)
     required(:description, Types::StrippedString).maybe(:str?)
+    required(:is_rmt_grade, :bool).maybe(:bool?)
   end
 end

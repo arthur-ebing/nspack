@@ -892,7 +892,8 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_grade(id, params[:grade])
           if res.success
-            update_grid_row(id, changes: { grade_code: res.instance[:grade_code], description: res.instance[:description] }, notice: res.message)
+            update_grid_row(id, changes: { grade_code: res.instance[:grade_code], description: res.instance[:description], is_rmt_grade: res.instance[:is_rmt_grade] },
+                                notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::Grade::Edit.call(id, form_values: params[:grade], form_errors: res.errors) }
           end
@@ -923,6 +924,7 @@ class Nspack < Roda
             id
             grade_code
             description
+            is_rmt_grade
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
