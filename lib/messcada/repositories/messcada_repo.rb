@@ -263,9 +263,9 @@ module MesscadaApp
         FROM pallet_sequences s
         JOIN inventory_codes i ON i.id = s.inventory_code_id
         JOIN target_market_groups tm on tm.id=s.packed_tm_group_id
-        JOIN fruit_size_references fs on fs.id=s.fruit_size_reference_id
+        LEFT JOIN fruit_size_references fs on fs.id=s.fruit_size_reference_id
         JOIN standard_pack_codes sp on sp.id=s.standard_pack_code_id
-        JOIN std_fruit_size_counts sf on sf.id=s.std_fruit_size_count_id
+        LEFT JOIN std_fruit_size_counts sf on sf.id=s.std_fruit_size_count_id
         JOIN grades g on g.id=s.grade_id
         JOIN marks m on m.id=s.mark_id
         JOIN cultivars c on c.id=s.cultivar_id
