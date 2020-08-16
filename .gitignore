@@ -16,6 +16,7 @@
 .sass-cache/
 lib/applets/.sass-cache/
 public/assets/*.*
+public/dashboard_images/*.*
 public/downloads/jasper/*.*
 public/js/ag-enterprise-activation.js
 public/tempfiles/*
@@ -56,6 +57,8 @@ config/mail_settings.rb
 config/dataminer_connections.yml
 config/edi_out_config.yml
 config/export_data_config.yml
+config/dashboards.yml
+config/dashboard_texts.yml
 prepared_reports/*.yml
 pdf_documentation/*.pdf
 pdf_documentation/*.png

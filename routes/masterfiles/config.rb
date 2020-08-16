@@ -114,6 +114,95 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # DASHBOARDS
+    # --------------------------------------------------------------------------
+    r.on 'dashboards' do
+      interactor = MasterfilesApp::DashboardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'list' do
+        show_page { Masterfiles::Config::Dashboard::GridPage.call }
+      end
+
+      r.on 'grid' do
+        interactor.dashboards_list_grid
+      rescue StandardError => e
+        show_json_exception(e)
+      end
+
+      r.on 'new' do
+        show_partial_or_page(r) { Masterfiles::Config::Dashboard::New.call }
+      end
+
+      r.is do
+        r.post do      # CREATE
+          res = interactor.create_dashboard(params[:dashboard])
+          flash[:notice] = res.message
+          redirect_via_json '/masterfiles/config/dashboards/list'
+        end
+      end
+
+      r.on String do |dash_key|
+        key, page = dash_key.split('_')
+
+        r.on 'dashboard_url' do
+          url_base = interactor.url_for(key, page.to_i)
+          url = url_base.start_with?('http') ? url_base : "#{request.base_url}#{url_base}"
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::URL.call(key, url) }
+        end
+
+        r.on 'new_page' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewPage.call(key) }
+        end
+
+        r.on 'save_page' do
+          res = interactor.create_dashboard_page(key, params[:dashboard])
+          flash[:notice] = res.message
+          redirect_via_json '/masterfiles/config/dashboards/list'
+        end
+
+        r.on 'edit_page' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::EditPage.call(key, page.to_i) }
+        end
+
+        r.on 'update_page' do
+          res = interactor.update_dashboard_page(key, page.to_i, params[:dashboard])
+          p dash_key
+          if res.success
+            p res
+            update_grid_row(dash_key, changes: { page: res.instance[:page], seconds: res.instance[:secs] }, notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Config::Dashboard::Edit.call(key, page.to_i) }
+          end
+        end
+
+        r.on 'edit' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::Edit.call(key) }
+        end
+
+        r.patch do     # UPDATE ... differntiate between dash + page..
+          res = interactor.update_dashboard(key, params[:dashboard])
+          if res.success
+            update_grid_row(res.instance[:ids], changes: { desc: res.instance[:description] }, notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Config::Dashboard::Edit.call(key) }
+          end
+        end
+
+        r.delete do    # DELETE
+          res = if page.nil?
+                  interactor.delete_dashboard(key)
+                else
+                  interactor.delete_dashboard_page(key, page.to_i)
+                end
+          if res.success
+            delete_grid_row(dash_key, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
   end
 end
 

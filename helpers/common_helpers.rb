@@ -7,10 +7,17 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     view('crossbeams_layout_page')
   end
 
-  def show_rmd_page(&block)
+  # Show a Crossbeams::Layout page rendered in a particular page layout
+  # - The block must return a Crossbeams::Layout::Page
+  def show_page_in_layout(layout, &block)
     @layout = block.yield
     @layout.add_csrf_tag(csrf_tag)
-    view('crossbeams_layout_page', layout: 'layout_rmd')
+    view('crossbeams_layout_page', layout: layout)
+  end
+
+  # RMD pages always render in layout_rmd.
+  def show_rmd_page(&block)
+    show_page_in_layout('layout_rmd', &block)
   end
 
   # Render a block of Crossbeams::Layout DSL as string.

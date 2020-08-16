@@ -237,7 +237,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',
-    '/messcada/.*'
+    '/messcada/.*',
+    '/dashboard/.*'
   ].freeze
 
   # Menu

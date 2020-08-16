@@ -1,0 +1,25 @@
+---
+ph1:
+  description: Pack house number 1
+  boards:
+    - url: /production/dashboards/production_runs?fullpage=y
+      secs: 5
+      desc: Production runs
+    - url: /production/dashboards/load_days?fullpage=y
+      secs: 5
+      desc: Load Days
+    - url: http://example.com
+      secs: 5
+      desc: An example external dashboard
+    - url: /dashboard/image/an_image.jpg
+      secs: 5
+      desc: An image (stored in public/dashbopard_images)
+    - url: /dashboard/text/notes
+      secs: 5
+      desc: An example of a text message
+ph2:
+  description: Pack house number 2
+  boards:
+    - url: /production/dashboards/production_runs?fullpage=y
+      secs: 5
+      desc: Production runs
