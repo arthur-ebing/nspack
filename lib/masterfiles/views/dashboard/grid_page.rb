@@ -6,6 +6,7 @@ module Masterfiles
       class GridPage
         def self.call
           layout = Crossbeams::Layout::Page.build({}) do |page|
+            page.add_help_link help_type: :system, path: %i[dashboards general]
             page.section do |section|
               section.add_control control_type: :link, text: 'New Dashboard', url: '/masterfiles/config/dashboards/new', style: :button, behaviour: :popup
             end

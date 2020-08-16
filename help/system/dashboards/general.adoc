@@ -1,0 +1,21 @@
+== Dashboard configuration
+
+Here you can create and modify dashboards - specifying the pages to cycle through and how long to spend on each one.
+
+=== Types of dashboard
+
+There are four types of dashboard pages:
+
+internal:: These are dashboard pages defined in the system (e.g. a page of active production runs)
+external:: These are pages  that are not defined in the system (e.g. an external BI summary page)
+image:: These pages display an uploaded image or pdf
+text:: These pages display a text message
+
+=== How to work with this grid
+
+* Each group of pages is a dashboard.
+* A dashboard has a **key** and a **description**, and pages are grouped within a dashboard.
+* Choose the _dashboard link_ option to get the link to paste into your browser to view the dashboard.
+* You can click on _preview this page_ to preview just the selected dashboard.
+* USe the add/edit/delete options as needed to add dashboards and pages.
+* The number of seconds is the time that each page will display before moving on to the next page in the list for the dashboard.
