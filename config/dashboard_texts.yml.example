@@ -1,8 +1,10 @@
 ---
 notes:
-  - text: PACKHOUSES
-    size: 6
-    colour: "#EC6E73"
-  - text: All shifts get <em>extra</em> 5 minutes smoke break <b>every</b> 2nd break
-    size: 3
-    colour: "#326699"
+  background: "bg-dark-green"
+  content:
+    - text: PACKHOUSES
+      size: 6
+      colour: "light-gray"
+    - text: All shifts get <em>extra</em> 5 minutes smoke break <b>every</b> 2nd break
+      size: 3
+      colour: "gold"

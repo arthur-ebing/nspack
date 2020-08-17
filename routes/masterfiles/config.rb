@@ -151,12 +151,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { Masterfiles::Config::Dashboard::URL.call(key, url) }
         end
 
+        r.on 'new_internal_page' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewPage.call(key, :new_internal) }
+        end
+
         r.on 'new_page' do
-          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewPage.call(key) }
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewPage.call(key, :new_page) }
+        end
+
+        r.on 'new_image_page' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewImagePage.call(key) }
         end
 
         r.on 'save_page' do
           res = interactor.create_dashboard_page(key, params[:dashboard])
+          flash[:notice] = res.message
+          redirect_via_json '/masterfiles/config/dashboards/list'
+        end
+
+        r.on 'save_image_page' do
+          res = interactor.create_dashboard_image_page(key, params[:dashboard])
           flash[:notice] = res.message
           redirect_via_json '/masterfiles/config/dashboards/list'
         end
@@ -167,10 +181,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.on 'update_page' do
           res = interactor.update_dashboard_page(key, page.to_i, params[:dashboard])
-          p dash_key
           if res.success
-            p res
-            update_grid_row(dash_key, changes: { page: res.instance[:page], seconds: res.instance[:secs] }, notice: res.message)
+            update_grid_row(dash_key, changes: { page: res.instance[:page], url: res.instance[:url], seconds: res.instance[:secs] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Config::Dashboard::Edit.call(key, page.to_i) }
           end

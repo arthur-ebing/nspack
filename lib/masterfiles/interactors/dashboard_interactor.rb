@@ -10,9 +10,16 @@ module MasterfilesApp
         out = []
         config.each_key do |key|
           desc = config[key]['description']
-          out << { id: key, key: key, desc: desc, page: nil, seconds: nil } if config[key]['boards'].length.zero?
+          out << { id: key, key: key, desc: desc, page: nil, url: nil, seconds: nil, text: false, image: false } if config[key]['boards'].length.zero?
           config[key]['boards'].each_with_index do |board, index|
-            out << { id: "#{key}_#{index}", key: key, desc: desc, page: board['desc'] || board['url'], seconds: board['secs'] }
+            out << { id: "#{key}_#{index}",
+                     key: key,
+                     desc: desc,
+                     page: board['desc'],
+                     url: board['url'],
+                     seconds: board['secs'],
+                     text: board['url'].start_with?('/dashboard/text/'),
+                     image: board['url'].start_with?('/dashboard/image/') }
           end
         end
         out
@@ -39,23 +46,53 @@ module MasterfilesApp
                    title_field: 'desc',
                    hide_if_null: 'page'
           act.separator
-          act.popup_link 'new page', '/masterfiles/config/dashboards/$col1$/new_page',
+          act.popup_link 'new internal page', '/masterfiles/config/dashboards/$col1$/new_internal_page',
                          icon: 'add-solid',
-                         title: 'New page',
+                         title: 'New internal page',
                          col1: 'id'
+          act.popup_link 'new external page', '/masterfiles/config/dashboards/$col1$/new_page',
+                         icon: 'add-outline',
+                         title: 'New external page',
+                         col1: 'id'
+          # act.popup_link 'new text page', '/masterfiles/config/dashboards/$col1$/new_text_page',
+          #                icon: 'document-add',
+          #                title: 'New text page',
+          #                col1: 'id'
+          act.popup_link 'new image page', '/masterfiles/config/dashboards/$col1$/new_image_page',
+                         icon: 'photo',
+                         title: 'New image page',
+                         col1: 'id'
+          act.separator
           act.popup_link 'edit page', '/masterfiles/config/dashboards/$col1$/edit_page',
                          icon: 'edit',
                          title: 'Edit page',
                          col1: 'id',
                          hide_if_null: 'page'
+          # act.popup_link 'change text', '/masterfiles/config/dashboards/$col1$/change_text',
+          #                icon: 'edit-pencil',
+          #                title: 'Change text',
+          #                col1: 'id',
+          #                hide_if_false: 'text'
+          # act.popup_link 'change image', '/masterfiles/config/dashboards/$col1$/change_image',
+          #                icon: 'play',
+          #                title: 'Change image',
+          #                col1: 'id',
+          #                hide_if_false: 'image'
+          # act.popup_link 're-sequence pages', '/masterfiles/config/dashboards/$col1$/re_sequence_pages',
+          #                icon: 'sort',
+          #                title: 'Re-sequence pages',
+          #                col1: 'id'
           act.popup_delete_link '/masterfiles/config/dashboards/$col1$',
                                 col1: 'id'
         end
         mk.col 'desc', 'Dashboard Description', width: 200, groupable: true, group_by_seq: 1
         mk.col 'key', 'Key', width: 100
-        mk.col 'page', 'Page description', width: 500
+        mk.col 'page', 'Page description', width: 300
         mk.integer 'seconds', 'Seconds'
-        mk.col 'id', 'ID', hide: true
+        mk.col 'url', 'URL', width: 500
+        mk.integer 'id', 'ID', hide: true
+        mk.boolean 'text', 'Text', hide: true
+        mk.boolean 'image', 'Image', hide: true
       end
       {
         columnDefs: col_defs,
@@ -86,11 +123,16 @@ module MasterfilesApp
       config = section_from_yml('dashboard_texts.yml', key)
       return nil if config.nil?
 
-      out = config.map do |section|
+      bg_class = config['background'] || 'bg-moon-gray'
+      out = config['content'].map do |section|
         styles = text_style(section)
-        "<p style='#{styles.join(';')}'>#{section['text']}</p>"
+        "<p #{styles}'>#{section['text']}</p>"
       end
-      out.join("\n")
+      <<~HTML
+        <div id="text-content" class="#{bg_class}">
+          #{out.join("\n")}
+        </div>
+      HTML
     end
 
     def create_dashboard(params)
@@ -127,13 +169,30 @@ module MasterfilesApp
       success_response("Added page #{params[:desc]} to dashboard #{key}")
     end
 
+    def create_dashboard_image_page(key, params) # rubocop:disable Metrics/AbcSize
+      tempfile = params[:image_file][:tempfile] if params[:image_file]
+
+      url = if tempfile
+              fn = params[:image_file][:filename].tr(' ', '_')
+              FileUtils.mv(tempfile.path, File.join(ENV['ROOT'], 'public/dashboard_images', fn))
+              "/dashboard/image/#{fn}"
+            else
+              "/dashboard/image/#{params[:select_image]}"
+            end
+
+      config = load_config('dashboards.yml')
+      config[key]['boards'] << { 'url' => url, 'desc' => params[:desc], 'secs' => params[:secs].to_i }
+      rewrite_config('dashboards.yml', config)
+      success_response("Added page #{params[:desc]} to dashboard #{key}")
+    end
+
     def update_dashboard_page(key, page, params) # rubocop:disable Metrics/AbcSize
       config = load_config('dashboards.yml')
       config[key]['boards'][page]['desc'] = params[:desc]
       config[key]['boards'][page]['url'] = params[:url]
       config[key]['boards'][page]['secs'] = params[:secs].to_i
       rewrite_config('dashboards.yml', config)
-      success_response('Saved change', { page: params[:desc], secs: params[:secs] })
+      success_response('Saved change', { page: params[:desc], url: params[:url], secs: params[:secs] })
     end
 
     def delete_dashboard_page(key, page)
@@ -148,9 +207,9 @@ module MasterfilesApp
     def text_style(section)
       styles = []
       size = section['size'] || 1
-      styles << "color:#{section['colour']}" if section['colour']
-      styles << "font-size:#{size}rem"
-      styles
+      styles << %(class="#{section['colour']}") if section['colour']
+      styles << %(style="font-size:#{size}rem")
+      styles.join(' ')
     end
 
     def section_from_yml(file, key)

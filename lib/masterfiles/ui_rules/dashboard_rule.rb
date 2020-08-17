@@ -2,7 +2,7 @@
 
 module UiRules
   class DashboardRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules
+    def generate_rules # rubocop:disable Metrics/CyclomaticComplexity
       make_form_object
       apply_form_values
 
@@ -13,7 +13,9 @@ module UiRules
                                  edit_fields
                                when :new
                                  new_fields
-                               when :new_page, :edit_page
+                               when :new_image_page
+                                 new_image_fields
+                               when :new_page, :edit_page, :new_internal
                                  page_fields
                                when :change_columns
                                  column_fields
@@ -44,32 +46,48 @@ module UiRules
     end
 
     def page_fields
+      url_renderer = if @mode == :new_internal || @mode == :edit_page && internal_url?
+                       { renderer: :select, options: AppConst::DASHBOARD_INTERNAL_PAGES, required: true, caption: 'URL' }
+                     elsif text_dashboard? || image_dashboard?
+                       { renderer: :hidden }
+                     else
+                       { required: true, caption: 'URL' }
+                     end
+
       {
         key: { renderer: :label },
         description: { renderer: :label },
         desc: { required: true, caption: 'Page description' },
-        url: { required: true, caption: 'URL' },
-        secs: { renderer: :integer, required: true, caption: 'No seconds to display' }
+        url: url_renderer,
+        secs: { renderer: :integer, required: true, caption: 'No seconds to display', minvalue: 1 }
       }
     end
 
-    def properties_fields
+    def new_image_fields
+      img_dir = File.join(ENV['ROOT'], 'public/dashboard_images')
+      FileUtils.mkdir_p(img_dir)
+      full_dir = Pathname.new(img_dir)
+      images = Dir.glob(File.join(full_dir, '*.*')).map { |f| f.delete_prefix("#{full_dir}/") }
       {
-        database: { readonly: true },
-        report_template: { readonly: true },
-        report_description: { renderer: :label },
-        id: { renderer: :label, caption: 'Report id' },
-        webquery_url: { readonly: true, copy_to_clipboard: true },
-        param_description: { renderer: :list, items: @options[:instance][:param_texts], caption: 'Parameters applied' }
+        key: { renderer: :label },
+        description: { renderer: :label },
+        desc: { required: true, caption: 'Page description' },
+        secs: { renderer: :integer, required: true, caption: 'No seconds to display', minvalue: 1 },
+        select_image: { renderer: :select, options: images },
+        image_file: { renderer: :file, accept: '.jpg,.png,.pdf,.gif,.jpeg' }
       }
     end
 
-    def column_fields
-      {
-        report_description: { renderer: :label },
-        column_sequence: { renderer: :sortable_list, caption: 'Column order', prefix: 'co' },
-        hidden_columns: { renderer: :sortable_list, caption: 'Hidden columns', prefix: 'hc' }
-      }
+    def internal_url?
+      AppConst::DASHBOARD_INTERNAL_PAGES.any? { |_, url| url == @form_object[:url] }
+    end
+
+    def text_dashboard?
+      (@form_object[:url] || '').start_with?('/dashboard/text/')
+    end
+
+    def image_dashboard?
+      (@form_object[:url] || '').start_with?('/dashboard/image/')
     end
 
     def make_form_object
@@ -77,7 +95,7 @@ module UiRules
                        read_form_object
                      elsif @mode == :url
                        { url: @options[:url] }
-                     elsif @mode == :new_page
+                     elsif %i[new_page new_internal new_image_page].include?(@mode)
                        new_page_object
                      elsif @mode == :edit_page
                        edit_page_object

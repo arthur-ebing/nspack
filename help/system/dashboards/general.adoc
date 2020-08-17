@@ -17,5 +17,5 @@ text:: These pages display a text message
 * A dashboard has a **key** and a **description**, and pages are grouped within a dashboard.
 * Choose the _dashboard link_ option to get the link to paste into your browser to view the dashboard.
 * You can click on _preview this page_ to preview just the selected dashboard.
-* USe the add/edit/delete options as needed to add dashboards and pages.
+* Use the add/edit/delete options as needed to add dashboards and pages.
 * The number of seconds is the time that each page will display before moving on to the next page in the list for the dashboard.

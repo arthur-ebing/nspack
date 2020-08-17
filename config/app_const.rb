@@ -447,6 +447,16 @@ class AppConst # rubocop:disable Metrics/ClassLength
     UG UA AE GB UM US UY UZ VU VE VN VG VI WF EH YE ZM ZW AX
   ].freeze
 
+  DASHBOARD_INTERNAL_PAGES = [
+    ['Production runs', '/production/dashboards/production_runs?fullpage=y'],
+    ['Palletizing bay states', '/production/dashboards/palletizing_bays?fullpage=y'],
+    ['Loads per week', '/production/dashboards/load_weeks?fullpage=y'],
+    ['Loads per day', '/production/dashboards/load_days?fullpage=y'],
+    ['Pallets in stock', '/production/dashboards/in_stock?fullpage=y'],
+    ['Delivieries per week', '/production/dashboards/delivery_weeks?fullpage=y'],
+    ['Delivieries per day', '/production/dashboards/delivery_days?fullpage=y']
+  ].freeze
+
   # Addendum: place of issue for export certificate
   ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
   raise Crossbeams::FrameworkError, "#{ADDENDUM_PLACE_OF_ISSUE} is not a valid code" unless ADDENDUM_PLACE_OF_ISSUE.match?(/cpt|dbn|plz|mpm|oth/i)

@@ -4,8 +4,8 @@ module Masterfiles
   module Config
     module Dashboard
       class NewPage
-        def self.call(key)
-          ui_rule = UiRules::Compiler.new(:dashboard, :new_page, key: key)
+        def self.call(key, mode)
+          ui_rule = UiRules::Compiler.new(:dashboard, mode, key: key)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
