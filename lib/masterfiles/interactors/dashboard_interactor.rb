@@ -54,10 +54,10 @@ module MasterfilesApp
                          icon: 'add-outline',
                          title: 'New external page',
                          col1: 'id'
-          # act.popup_link 'new text page', '/masterfiles/config/dashboards/$col1$/new_text_page',
-          #                icon: 'document-add',
-          #                title: 'New text page',
-          #                col1: 'id'
+          act.popup_link 'new text page', '/masterfiles/config/dashboards/$col1$/new_text_page',
+                         icon: 'document-add',
+                         title: 'New text page',
+                         col1: 'id'
           act.popup_link 'new image page', '/masterfiles/config/dashboards/$col1$/new_image_page',
                          icon: 'photo',
                          title: 'New image page',
@@ -179,6 +179,27 @@ module MasterfilesApp
             else
               "/dashboard/image/#{params[:select_image]}"
             end
+
+      config = load_config('dashboards.yml')
+      config[key]['boards'] << { 'url' => url, 'desc' => params[:desc], 'secs' => params[:secs].to_i }
+      rewrite_config('dashboards.yml', config)
+      success_response("Added page #{params[:desc]} to dashboard #{key}")
+    end
+
+    def create_dashboard_text_page(key, params) # rubocop:disable Metrics/AbcSize
+      url = "/dashboard/text/#{params[:text_page_key]}"
+
+      text_ar = []
+      params[:text].each_line do |line|
+        next if line.strip.chomp.empty?
+
+        ar = line.split(';').map(&:strip)
+        text_ar << { 'text' => ar.last, 'size' => ar[1], 'colour' => ar.first }
+      end
+
+      config = load_config('dashboard_texts.yml')
+      config[params[:text_page_key]] = { 'background' => params[:background_colour], 'content' => text_ar }
+      rewrite_config('dashboard_texts.yml', config)
 
       config = load_config('dashboards.yml')
       config[key]['boards'] << { 'url' => url, 'desc' => params[:desc], 'secs' => params[:secs].to_i }

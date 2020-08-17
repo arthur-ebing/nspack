@@ -163,6 +163,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewImagePage.call(key) }
         end
 
+        r.on 'new_text_page' do
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewTextPage.call(key) }
+        end
+
         r.on 'save_page' do
           res = interactor.create_dashboard_page(key, params[:dashboard])
           flash[:notice] = res.message
@@ -171,6 +175,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
         r.on 'save_image_page' do
           res = interactor.create_dashboard_image_page(key, params[:dashboard])
+          flash[:notice] = res.message
+          redirect_via_json '/masterfiles/config/dashboards/list'
+        end
+
+        r.on 'save_text_page' do
+          res = interactor.create_dashboard_text_page(key, params[:dashboard])
           flash[:notice] = res.message
           redirect_via_json '/masterfiles/config/dashboards/list'
         end

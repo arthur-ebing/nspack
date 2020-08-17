@@ -15,6 +15,8 @@ module UiRules
                                  new_fields
                                when :new_image_page
                                  new_image_fields
+                               when :new_text_page
+                                 new_text_fields
                                when :new_page, :edit_page, :new_internal
                                  page_fields
                                when :change_columns
@@ -78,6 +80,57 @@ module UiRules
       }
     end
 
+    COLOUR_CLASSES = %w[
+      black
+      near-black
+      dark-gray
+      mid-gray
+      gray
+      silver
+      light-silver
+      moon-gray
+      light-gray
+      near-white
+      white
+      dark-red
+      red
+      light-red
+      orange
+      gold
+      yellow
+      light-yellow
+      purple
+      light-purple
+      dark-pink
+      hot-pink
+      pink
+      light-pink
+      dark-green
+      green
+      light-green
+      navy
+      dark-blue
+      blue
+      light-blue
+      lightest-blue
+      washed-blue
+      washed-green
+      washed-yellow
+      washed-red
+    ].freeze
+
+    def new_text_fields
+      {
+        key: { renderer: :label },
+        description: { renderer: :label },
+        desc: { required: true, caption: 'Page description' },
+        secs: { renderer: :integer, required: true, caption: 'No seconds to display', minvalue: 1 },
+        background_colour: { renderer: :select, options: COLOUR_CLASSES.zip(COLOUR_CLASSES.map { |c| "bg-#{c}" }) },
+        text_page_key: { required: true, force_lowercase: true, pattern: :lowercase_underscore },
+        text: { renderer: :textarea, required: true }
+      }
+    end
+
     def internal_url?
       AppConst::DASHBOARD_INTERNAL_PAGES.any? { |_, url| url == @form_object[:url] }
     end
@@ -95,7 +148,7 @@ module UiRules
                        read_form_object
                      elsif @mode == :url
                        { url: @options[:url] }
-                     elsif %i[new_page new_internal new_image_page].include?(@mode)
+                     elsif %i[new_page new_internal new_text_page new_image_page].include?(@mode)
                        new_page_object
                      elsif @mode == :edit_page
                        edit_page_object
