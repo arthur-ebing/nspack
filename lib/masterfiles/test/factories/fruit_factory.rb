@@ -6,7 +6,7 @@ module MasterfilesApp
       default = {
         grade_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        is_rmt_grade: false,
+        rmt_grade: false,
         active: true
       }
       DB[:grades].insert(default.merge(opts))

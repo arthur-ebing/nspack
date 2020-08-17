@@ -18,7 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :grade_code
               form.add_field :description
-              form.add_field :is_rmt_grade
+              form.add_field :rmt_grade
             end
           end
 

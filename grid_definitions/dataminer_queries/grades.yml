@@ -1,7 +1,7 @@
 ---
 :caption: Grades
 :sql: "SELECT\r\n    grades.id,\r\n    grades.grade_code,\r\n    grades.description,\r\n
-  \   fn_masterfile_variants('grades', grades.id) AS variant_codes,\r\n    is_rmt_grade,\r\n
+  \   fn_masterfile_variants('grades', grades.id) AS variant_codes,\r\n    rmt_grade,\r\n
   \   grades.active,\r\n    grades.created_at,\r\n    grades.updated_at\r\nFROM grades\r\n"
 :limit: 
 :offset: 
@@ -71,11 +71,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  is_rmt_grade:
-    :name: is_rmt_grade
+  rmt_grade:
+    :name: rmt_grade
     :sequence_no: 5
     :caption: RMT grade
-    :namespaced_name: is_rmt_grade
+    :namespaced_name: rmt_grade
     :data_type: :boolean
     :width: 100
     :format: 
