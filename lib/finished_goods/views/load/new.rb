@@ -46,6 +46,7 @@ module FinishedGoods
                     col.add_field :customer_order_number
                     col.add_field :customer_reference
                     col.add_field :depot_id
+                    col.add_field :rmt_load
                   end
                   row.column do |col|
                     col.add_field :exporter_certificate_code

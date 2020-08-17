@@ -33,6 +33,7 @@ module UiRules
       fields[:id] = { renderer: :label, with_value: @form_object.id, caption: 'Load' }
       fields[:voyage_code] = { renderer: :label, with_value: voyage_code_label, caption: 'Voyage Code' }
       fields[:depot_id] = { renderer: :label, with_value: depot_label, caption: 'Depot' }
+      fields[:rmt_load] = { renderer: :label, as_boolean: true, caption: 'RMT Load' }
       fields[:order_number] = { renderer: :label }
       fields[:customer_order_number] = { renderer: :label }
       fields[:customer_reference] = { renderer: :label }
@@ -142,6 +143,7 @@ module UiRules
                     disabled_options: MasterfilesApp::DepotRepo.new.for_select_inactive_depots,
                     caption: 'Depot',
                     required: true },
+        rmt_load: { renderer: :checkbox, as_boolean: true },
         exporter_certificate_code: {},
         edi_file_name: { renderer: :label },
         shipped_at: { renderer: rules[:can_unship] ? :datetime : :label,
@@ -231,6 +233,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(depot_id: @repo.get_id(:depots, depot_code: AppConst::DEFAULT_DEPOT),
+                                    rmt_load: false,
                                     customer_party_role_id: nil,
                                     consignee_party_role_id: nil,
                                     billing_client_party_role_id: nil,

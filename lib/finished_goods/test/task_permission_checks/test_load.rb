@@ -52,6 +52,7 @@ module FinishedGoodsApp
         loaded: false,
         shipped: false,
         edi: false,
+        rmt_load: false,
         active: true,
         vehicle: false
       }

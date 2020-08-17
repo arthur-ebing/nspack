@@ -132,6 +132,7 @@ module FinishedGoodsApp
         container_code: Faker::Lorem.word,
         status: Faker::Lorem.word,
         edi: false,
+        rmt_load: false,
         vehicle: false,
         container: false,
         loaded: false,

@@ -105,6 +105,9 @@
     - :col: zero_load_id
       :op: IN
       :val: $:id$,0
+    - :col: rmt_grade
+      :op: =
+      :val: $:rmt_grade$
   :on_load:
     - :col: load_id
       :op: =

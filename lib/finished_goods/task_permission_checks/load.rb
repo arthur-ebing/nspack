@@ -65,9 +65,10 @@ module FinishedGoodsApp
         check_pallets!(:not_shipped, pallet_numbers)
         check_pallets!(:not_on_load, pallet_numbers, id)
         check_pallets!(:not_failed_otmc, pallet_numbers)
+        check_pallets!(:rmt_grade, pallet_numbers, id)
 
         all_ok
-      rescue Crossbeams::TaskNotPermittedError => e
+      rescue Crossbeams::InfoError => e
         failed_response(e.message)
       end
 
@@ -82,7 +83,7 @@ module FinishedGoodsApp
         check_pallets!(:not_failed_otmc, pallet_numbers)
 
         all_ok
-      rescue Crossbeams::TaskNotPermittedError => e
+      rescue Crossbeams::InfoError => e
         failed_response(e.message)
       end
 
@@ -157,7 +158,7 @@ module FinishedGoodsApp
 
       def check_pallets!(check, pallet_numbers, load_id = nil)
         res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
-        raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+        raise Crossbeams::InfoError, res.message unless res.success
       end
     end
   end

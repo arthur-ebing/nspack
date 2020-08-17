@@ -48,7 +48,8 @@ module FinishedGoods
                                height: 40,
                                multiselect_params: { key: 'allocate',
                                                      id: id,
-                                                     in_stock: true })
+                                                     in_stock: true,
+                                                     rmt_grade: ui_rule.form_object.rmt_load })
             end
           end
 

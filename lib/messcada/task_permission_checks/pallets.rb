@@ -27,6 +27,7 @@ module MesscadaApp
         not_failed_otmc: :not_failed_otmc_check,
         verification_passed: :verification_passed_check,
         pallet_weight: :pallet_weight_check,
+        rmt_grade: :rmt_grade_check,
         allocate: :allocate_check,
         not_have_individual_cartons: :not_have_individual_cartons_check
       }.freeze
@@ -115,6 +116,16 @@ module MesscadaApp
         all_ok
       end
 
+      def rmt_grade_check
+        return all_ok unless repo.get(:loads, load_id, :rmt_load)
+
+        not_rmt_grade_ids = repo.select_values(:grades, :id, rmt_grade: false)
+        errors = repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, grade_id: not_rmt_grade_ids).uniq
+        return failed_response "Pallet: #{errors.join(', ')} does not have a RMT grade." unless errors.empty?
+
+        all_ok
+      end
+
       def not_failed_otmc_check
         return success_response('failed otmc check bypassed') if AppConst::BYPASS_QUALITY_TEST_LOAD_CHECK
 
@@ -173,6 +184,9 @@ module MesscadaApp
         return res unless res.success
 
         res = not_failed_otmc_check
+        return res unless res.success
+
+        res = rmt_grade_check
         return res unless res.success
 
         all_ok

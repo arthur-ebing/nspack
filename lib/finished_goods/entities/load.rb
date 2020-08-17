@@ -23,6 +23,7 @@ module FinishedGoodsApp
     attribute :allocated, Types::Bool
     attribute :transfer_load, Types::Bool
     attribute :loaded, Types::Bool
+    attribute :rmt_load, Types::Bool
     attribute :requires_temp_tail, Types::Bool
     attribute? :active, Types::Bool
   end
@@ -79,6 +80,7 @@ module FinishedGoodsApp
     attribute :edi, Types::Bool
     attribute :vehicle, Types::Bool
     attribute :container, Types::Bool
+    attribute :rmt_load, Types::Bool
     attribute? :temp_tail, Types::String
     attribute? :temp_tail_pallet_number, Types::String
     attribute? :status, Types::String
