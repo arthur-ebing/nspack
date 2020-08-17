@@ -281,13 +281,14 @@ module ProductionApp
       new_pallet_id
     end
 
-    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids)
+    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids)  # rubocop:disable Metrics/AbcSize
       pallet = pallet(pallet_id)
       repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id, repacked_at: Time.now }
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number]
       sequence_ids.each do |sequence_id|
         attrs = find_hash(:pallet_sequences, sequence_id).to_h.reject { |k, _| ps_rejected_fields.include?(k) }
-        DB[:pallet_sequences].insert(attrs.merge(repack_attrs.to_h))
+        new_sequence_id = DB[:pallet_sequences].insert(attrs.merge(repack_attrs.to_h))
+        DB[:cartons].where(pallet_sequence_id: sequence_id).update({ pallet_sequence_id: new_sequence_id }) if pallet[:has_individual_cartons]
       end
     end
 
