@@ -418,7 +418,7 @@ module MesscadaApp
         log_status(:pallets, pallet_id, AppConst::REWORKS_REPACK_PALLET_STATUS)
         log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(pallet_id), AppConst::REWORKS_REPACK_PALLET_STATUS)
         log_status(:pallets, res.instance[:new_pallet_id], AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
-        log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(res.instance[:new_pallet_id]), AppConst::REWORKS_REPACK_PALLET_STATUS)
+        log_multiple_statuses(:pallet_sequences, reworks_repo.pallet_sequence_ids(res.instance[:new_pallet_id]), AppConst::REWORKS_REPACK_PALLET_NEW_STATUS)
       end
       res
     rescue Crossbeams::InfoError => e
