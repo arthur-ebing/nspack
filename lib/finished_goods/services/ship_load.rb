@@ -12,7 +12,8 @@ module FinishedGoodsApp
     end
 
     def call
-      raise Crossbeams::InfoError, "Load: #{load_id} already shipped." if instance.shipped
+      res = TaskPermissionCheck::Load.call(:ship, load_id)
+      raise Crossbeams::InfoError, res.message unless res.success
 
       ship_pallets
       ship_load

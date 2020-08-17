@@ -343,9 +343,9 @@ class Nspack < Roda
         end
       end
 
-      r.on 're_send_po_edi' do
+      r.on 're_send_edi' do
         check_auth!('dispatch', 'edit')
-        res = interactor.send_po_edi(id)
+        res = interactor.send_edi(id)
         update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
       end
 

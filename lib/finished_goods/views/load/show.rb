@@ -99,8 +99,8 @@ module FinishedGoods
                   fold.row do |row|
                     row.column do |col|
                       col.add_control(control_type: :link,
-                                      text: 'Re-Send PO',
-                                      url: "/finished_goods/dispatch/loads/#{id}/re_send_po_edi",
+                                      text: 'Re-Send EDI',
+                                      url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
                                       icon: :plus,
                                       behaviour: :popup,
                                       style: :action_button)

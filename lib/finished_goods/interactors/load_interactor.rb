@@ -35,8 +35,7 @@ module FinishedGoodsApp
     end
 
     def delete_load(id) # rubocop:disable Metrics/AbcSize
-      res = check(:delete, id)
-      return failed_response(res.message) unless res.success
+      check!(:delete, id)
 
       load_voyage_id = repo.get_id(:load_voyages, load_id: id)
       repo.transaction do
@@ -55,8 +54,7 @@ module FinishedGoodsApp
     end
 
     def delete_load_vehicle(id) # rubocop:disable Metrics/AbcSize
-      res = check(:delete_load_vehicle, id)
-      return failed_response(res.message) unless res.success
+      check!(:delete_load_vehicle, id)
 
       vehicle_id = repo.get_id(:load_vehicles, load_id: id)
       container_id = repo.get_id(:load_containers, load_id: id)
@@ -76,16 +74,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def send_po_edi(load_id)
-      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_PO, load_entity(load_id).customer_party_role_id, @user.user_name, load_id)
+    def send_edi(load_id)
+      load_entity = load_entity(load_id)
+      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_PO, load_entity.customer_party_role_id, @user.user_name, load_id) unless load_entity.rmt_load
     end
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize
-      unless pallet_numbers.empty?
-        res = check_pallets(:allocate, pallet_numbers, load_id)
-        return res unless res.success
-      end
-
+      check_pallets!(:allocate, pallet_numbers, load_id) unless pallet_numbers.empty?
       new_allocation = pallet_numbers
       current_allocation = repo.select_values(:pallets, :pallet_number, load_id: load_id)
 
@@ -109,8 +104,7 @@ module FinishedGoodsApp
       return res unless res.success
 
       pallet_numbers = res.instance
-      res = check_pallets(:allocate, pallet_numbers, load_id)
-      return res unless res.success
+      check_pallets!(:allocate, pallet_numbers, load_id)
 
       repo.transaction do
         repo.allocate_pallets(load_id, pallet_numbers, @user)
@@ -145,8 +139,7 @@ module FinishedGoodsApp
     end
 
     def load_truck(id)
-      res = check(:load_truck, id)
-      return failed_response(res.message) unless res.success
+      check!(:load_truck, id)
 
       repo.transaction do
         repo.update_load(id, loaded: true)
@@ -158,8 +151,7 @@ module FinishedGoodsApp
     end
 
     def unload_truck(id)
-      res = check(:unload_truck, id)
-      return failed_response(res.message) unless res.success
+      check!(:unload_truck, id)
 
       repo.transaction do
         repo.update_load(id, loaded: false)
@@ -189,8 +181,7 @@ module FinishedGoodsApp
     end
 
     def delete_temp_tail(id)
-      res = check(:unload_truck, id)
-      return failed_response(res.message) unless res.success
+      check!(:unload_truck, id)
 
       ids = repo.select_values(:pallets, :id, load_id: id)
       repo.transaction do
@@ -203,13 +194,10 @@ module FinishedGoodsApp
     end
 
     def ship_load(id)
-      res = check(:ship, id)
-      return failed_response(res.message) unless res.success
-
       res = nil
       repo.transaction do
         res = ShipLoad.call(id, @user)
-        send_po_edi(id)
+        send_edi(id)
 
         log_transaction
       end
@@ -219,9 +207,6 @@ module FinishedGoodsApp
     end
 
     def unship_load(id, pallet_number = nil)
-      res = check(:unship, id)
-      return failed_response(res.message) unless res.success
-
       res = nil
       repo.transaction do
         res = UnshipLoad.call(id, @user, pallet_number)
@@ -251,13 +236,14 @@ module FinishedGoodsApp
     end
 
     def stepper_allocate_pallet(step_key, load_id, pallet_number)
-      res = check_pallets(:allocate, pallet_number, load_id)
-      return res unless res.success
+      check_pallets!(:allocate, pallet_number, load_id)
 
       message = stepper(step_key).allocate_pallet(pallet_number)
       failed_response('error') if stepper(step_key).error?
 
       success_response(message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def stepper_load_pallet(step_key, load_id, pallet_number)
@@ -296,11 +282,17 @@ module FinishedGoodsApp
       TaskPermissionCheck::Load.call(task, id, pallet_number)
     end
 
-    def check_pallets(check, pallet_numbers, load_id = nil)
-      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
+    private
+
+    def check!(task, id = nil, pallet_number = nil)
+      res = TaskPermissionCheck::Load.call(task, id, pallet_number)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
 
-    private
+    def check_pallets!(check, pallet_numbers, load_id = nil)
+      res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
+      raise Crossbeams::InfoError, res.message unless res.success
+    end
 
     def repo
       @repo ||= LoadRepo.new

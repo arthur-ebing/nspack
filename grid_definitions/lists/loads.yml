@@ -13,7 +13,7 @@
 - :url: "/finished_goods/dispatch/loads/$:id$/copy"
   :text: copy
   :icon: copy
-- :url: "/finished_goods/dispatch/loads/$:id$/re_send_po_edi"
+- :url: "/finished_goods/dispatch/loads/$:id$/re_send_edi"
   :text: re-send PO EDI
   :icon: play
   :title: re-send PO EDI

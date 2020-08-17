@@ -111,15 +111,15 @@ module FinishedGoodsApp
       DB[:pallets].where(id: new_pallet_ids).update(target_customer_party_role_id: target_customer_id)
     end
 
-    def allocate_pallets(load_id, pallet_numbers, user) # rubocop:disable Metrics/AbcSize
+    def allocate_pallets(load_id, pallet_numbers, user)
       return if pallet_numbers.nil_or_empty?
 
       pallet_ids = select_values(:pallets, :id, pallet_number: pallet_numbers)
-      allocated_count = select_values(:pallets, :id, load_id: load_id).length
-      raise Crossbeams::InfoError, 'Allocation exceeded max pallets on load' if (allocated_count + pallet_ids.length) > AppConst::MAX_PALLETS_ON_LOAD
-
       update(:pallets, pallet_ids, load_id: load_id, allocated: true, allocated_at: Time.now)
       log_multiple_statuses(:pallets, pallet_ids, 'ALLOCATED', user_name: user.user_name)
+
+      allocated_count = select_values(:pallets, :id, load_id: load_id).length
+      raise Crossbeams::InfoError, 'Allocation exceeded max pallets on load' if allocated_count > AppConst::MAX_PALLETS_ON_LOAD
 
       # updates load status allocated
       update(:loads, load_id, allocated: true, allocated_at: Time.now)
@@ -136,10 +136,10 @@ module FinishedGoodsApp
 
       # log status for loads where all pallets have been unallocated
       load_ids.each do |load_id|
-        unless exists?(:pallets, load_id: load_id)
-          update(:loads, load_id, allocated: false)
-          log_status(:loads, load_id, 'UNALLOCATED', user_name: user.user_name)
-        end
+        next if exists?(:pallets, load_id: load_id)
+
+        update(:loads, load_id, allocated: false)
+        log_status(:loads, load_id, 'UNALLOCATED', user_name: user.user_name)
       end
     end
 

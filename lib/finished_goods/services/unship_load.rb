@@ -11,8 +11,9 @@ module FinishedGoodsApp
       @user = user
     end
 
-    def call
-      raise Crossbeams::InfoError, "Load: #{load_id} not shipped." unless instance.shipped
+    def call # rubocop:disable Metrics/AbcSize
+      res = TaskPermissionCheck::Load.call(:unship, load_id)
+      raise Crossbeams::InfoError, res.message unless res.success
 
       if pallet_number.nil?
         unship_load

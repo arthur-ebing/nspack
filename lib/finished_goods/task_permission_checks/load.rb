@@ -3,12 +3,12 @@
 module FinishedGoodsApp
   module TaskPermissionCheck
     class Load < BaseService # rubocop:disable Metrics/ClassLength
-      attr_reader :task, :entity, :id, :pallet_number
-      def initialize(task, load_id = nil, pallet_number = nil)
+      attr_reader :task, :entity, :repo, :id, :pallet_numbers
+      def initialize(task, load_id = nil, pallet_numbers = nil)
         @task = task
         @repo = LoadRepo.new
         @id = load_id
-        @pallet_number = pallet_number
+        @pallet_numbers = pallet_numbers || @repo.select_values(:pallets, :pallet_number, load_id: id)
         return if @id.to_i > AppConst::MAX_DB_INT
 
         @entity = @repo.find_load_flat(@id)
@@ -59,12 +59,12 @@ module FinishedGoodsApp
         return failed_response("Load: #{id} truck already here") if vehicle?
         return failed_response("Load: #{id} has already been shipped") if shipped?
 
-        check_pallets(:in_stock, pallet_number)
-        check_pallets(:has_nett_weight, pallet_number)
-        check_pallets(:has_gross_weight, pallet_number)
-        check_pallets(:not_shipped, pallet_number)
-        check_pallets(:not_on_load, pallet_number, id)
-        check_pallets(:not_failed_otmc, pallet_number)
+        check_pallets!(:in_stock, pallet_numbers)
+        check_pallets!(:has_nett_weight, pallet_numbers)
+        check_pallets!(:has_gross_weight, pallet_numbers)
+        check_pallets!(:not_shipped, pallet_numbers)
+        check_pallets!(:not_on_load, pallet_numbers, id)
+        check_pallets!(:not_failed_otmc, pallet_numbers)
 
         all_ok
       rescue Crossbeams::TaskNotPermittedError => e
@@ -75,12 +75,11 @@ module FinishedGoodsApp
         return failed_response("Load: #{id} has already been shipped") if shipped?
         return failed_response("Load: #{id} doesn't have pallets allocated") unless allocated?
 
-        pallet_numbers = @repo.select_values(:pallets, :pallet_number, load_id: id)
-        check_pallets(:in_stock, pallet_numbers)
-        check_pallets(:has_nett_weight, pallet_numbers)
-        check_pallets(:has_gross_weight, pallet_numbers)
-        check_pallets(:not_shipped, pallet_numbers)
-        check_pallets(:not_failed_otmc, pallet_numbers)
+        check_pallets!(:in_stock, pallet_numbers)
+        check_pallets!(:has_nett_weight, pallet_numbers)
+        check_pallets!(:has_gross_weight, pallet_numbers)
+        check_pallets!(:not_shipped, pallet_numbers)
+        check_pallets!(:not_failed_otmc, pallet_numbers)
 
         all_ok
       rescue Crossbeams::TaskNotPermittedError => e
@@ -132,11 +131,6 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def check_pallets(check, pallet_numbers, load_id = nil)
-        res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
-        raise Crossbeams::TaskNotPermittedError, res.message unless res.success
-      end
-
       def shipped?
         @entity.shipped
       end
@@ -159,6 +153,11 @@ module FinishedGoodsApp
         else
           true
         end
+      end
+
+      def check_pallets!(check, pallet_numbers, load_id = nil)
+        res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers, load_id)
+        raise Crossbeams::TaskNotPermittedError, res.message unless res.success
       end
     end
   end
