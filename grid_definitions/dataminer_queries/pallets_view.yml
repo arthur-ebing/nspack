@@ -56,35 +56,36 @@
   \  aggregated.verification_results,\r\n   aggregated.pallet_verification_failure_reason_ids,\r\n
   \  aggregated.verification_failure_reasons,\r\n   aggregated.verified,\r\n   aggregated.verified_by,\r\n
   \  aggregated.verified_at,\r\n   aggregated.verifications_passed,\r\n   aggregated.pick_refs,\r\n
-  \  aggregated.grade_ids,\r\n   aggregated.grade_codes,\r\n   aggregated.scrapped_from_pallet_ids,\r\n
-  \  aggregated.removed_from_pallets,\r\n   aggregated.removed_from_pallet_ids,\r\n
-  \  aggregated.removed_from_pallet_at,\r\n   aggregated.sell_by_codes,\r\n   aggregated.product_chars,\r\n
-  \  aggregated.depot_pallets,\r\n   aggregated.personnel_identifier_ids,\r\n   aggregated.hardware_types,\r\n
-  \  aggregated.identifiers,\r\n   aggregated.contract_worker_ids,\r\n   aggregated.sequence_repacked,\r\n
-  \  aggregated.sequence_repacked_at,\r\n   aggregated.repacked_from_pallet_ids,\r\n
-  \  aggregated.phyto_data,\r\n   aggregated.created_by,\r\n----\r\n   aggregated.failed_otmc_result_ids,\r\n
-  \  aggregated.failed_otmc,\r\n   aggregated.failed_otmc_results,\r\n   aggregated.treatment_ids,\r\n
-  \  aggregated.treatment_codes,\r\n----\r\n   vw_loads.load_id,\r\n   vw_loads.load_status,\r\n
-  \  vw_loads.customer_party_role_id,\r\n   vw_loads.customer,\r\n   vw_loads.consignee_party_role_id,\r\n
-  \  vw_loads.consignee,\r\n   vw_loads.billing_client_party_role_id,\r\n   vw_loads.billing_client,\r\n
-  \  vw_loads.exporter_party_role_id,\r\n   vw_loads.exporter,\r\n   vw_loads.final_receiver_party_role_id,\r\n
-  \  vw_loads.final_receiver,\r\n   vw_loads.shipper_party_role_id,\r\n   vw_loads.shipper,\r\n
-  \  vw_loads.final_destination_id,\r\n   vw_loads.final_destination,\r\n   vw_loads.country,\r\n
-  \  vw_loads.region,\r\n   vw_loads.depot_id,\r\n   vw_loads.depot_code,\r\n   vw_loads.pol_voyage_port_id,\r\n
-  \  vw_loads.pol,\r\n   vw_loads.etd,\r\n   vw_loads.atd,\r\n   vw_loads.departure_date,\r\n
-  \  vw_loads.pod_voyage_port_id,\r\n   vw_loads.pod,\r\n   vw_loads.eta,\r\n   vw_loads.ata,\r\n
-  \  vw_loads.arrival_date,\r\n   vw_loads.internal_order_number,\r\n   vw_loads.edi_file_name,\r\n
-  \  vw_loads.customer_order_number,\r\n   vw_loads.customer_reference,\r\n   vw_loads.exporter_certificate_code,\r\n
-  \  vw_loads.allocated,\r\n   vw_loads.allocated_at,\r\n   vw_loads.shipped_at,\r\n
-  \  vw_loads.shipped,\r\n   vw_loads.transfer_load,\r\n   vw_loads.vessel,\r\n   vw_loads.voyage,\r\n
-  \  vw_loads.voyage_number,\r\n   vw_loads.vehicle_number,\r\n   vw_loads.container,\r\n
-  \  vw_loads.internal_container,\r\n   vw_loads.temp_code,\r\n   vw_loads.booking_reference,\r\n\r\n
-  \  CASE\r\n       WHEN vw_pallets.scrapped THEN 'warning'\r\n       WHEN vw_pallets.shipped
-  THEN 'inactive'\r\n       WHEN vw_pallets.allocated THEN 'ready'\r\n       WHEN
-  vw_pallets.in_stock THEN 'ok'\r\n       WHEN vw_pallets.palletized OR vw_pallets.partially_palletized
-  THEN 'inprogress'\r\n       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed
-  THEN 'error'\r\n       WHEN fn_pallet_verification_failed(vw_pallets.pallet_id)
-  THEN 'error'\r\n       WHEN aggregated.verified AND NOT aggregated.verifications_passed
+  \  aggregated.grade_ids,\r\n   aggregated.grade_codes,\r\n   aggregated.rmt_grades,\r\n
+  \  aggregated.scrapped_from_pallet_ids,\r\n   aggregated.removed_from_pallets,\r\n
+  \  aggregated.removed_from_pallet_ids,\r\n   aggregated.removed_from_pallet_at,\r\n
+  \  aggregated.sell_by_codes,\r\n   aggregated.product_chars,\r\n   aggregated.depot_pallets,\r\n
+  \  aggregated.personnel_identifier_ids,\r\n   aggregated.hardware_types,\r\n   aggregated.identifiers,\r\n
+  \  aggregated.contract_worker_ids,\r\n   aggregated.sequence_repacked,\r\n   aggregated.sequence_repacked_at,\r\n
+  \  aggregated.repacked_from_pallet_ids,\r\n   aggregated.phyto_data,\r\n   aggregated.created_by,\r\n----\r\n
+  \  aggregated.failed_otmc_result_ids,\r\n   aggregated.failed_otmc,\r\n   aggregated.failed_otmc_results,\r\n
+  \  aggregated.treatment_ids,\r\n   aggregated.treatment_codes,\r\n----\r\n   vw_loads.load_id,\r\n
+  \  vw_loads.load_status,\r\n   vw_loads.customer_party_role_id,\r\n   vw_loads.customer,\r\n
+  \  vw_loads.consignee_party_role_id,\r\n   vw_loads.consignee,\r\n   vw_loads.billing_client_party_role_id,\r\n
+  \  vw_loads.billing_client,\r\n   vw_loads.exporter_party_role_id,\r\n   vw_loads.exporter,\r\n
+  \  vw_loads.final_receiver_party_role_id,\r\n   vw_loads.final_receiver,\r\n   vw_loads.shipper_party_role_id,\r\n
+  \  vw_loads.shipper,\r\n   vw_loads.final_destination_id,\r\n   vw_loads.final_destination,\r\n
+  \  vw_loads.country,\r\n   vw_loads.region,\r\n   vw_loads.depot_id,\r\n   vw_loads.depot_code,\r\n
+  \  vw_loads.pol_voyage_port_id,\r\n   vw_loads.pol,\r\n   vw_loads.etd,\r\n   vw_loads.atd,\r\n
+  \  vw_loads.departure_date,\r\n   vw_loads.pod_voyage_port_id,\r\n   vw_loads.pod,\r\n
+  \  vw_loads.eta,\r\n   vw_loads.ata,\r\n   vw_loads.arrival_date,\r\n   vw_loads.internal_order_number,\r\n
+  \  vw_loads.edi_file_name,\r\n   vw_loads.customer_order_number,\r\n   vw_loads.customer_reference,\r\n
+  \  vw_loads.exporter_certificate_code,\r\n   vw_loads.allocated,\r\n   vw_loads.allocated_at,\r\n
+  \  vw_loads.shipped_at,\r\n   vw_loads.shipped,\r\n   vw_loads.transfer_load,\r\n
+  \  vw_loads.vessel,\r\n   vw_loads.voyage,\r\n   vw_loads.voyage_number,\r\n   vw_loads.vehicle_number,\r\n
+  \  vw_loads.container,\r\n   vw_loads.internal_container,\r\n   vw_loads.temp_code,\r\n
+  \  vw_loads.booking_reference,\r\n\r\n   CASE\r\n       WHEN vw_pallets.scrapped
+  THEN 'warning'\r\n       WHEN vw_pallets.shipped THEN 'inactive'\r\n       WHEN
+  vw_pallets.allocated THEN 'ready'\r\n       WHEN vw_pallets.in_stock THEN 'ok'\r\n
+  \      WHEN vw_pallets.palletized OR vw_pallets.partially_palletized THEN 'inprogress'\r\n
+  \      WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
+  'error'\r\n       WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
+  'error'\r\n       WHEN aggregated.verified AND NOT aggregated.verifications_passed
   THEN 'error'\r\n   END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
   aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
   ON vw_pallets.pallet_id = pallet_sequences.pallet_id\r\nLEFT JOIN vw_loads ON vw_loads.load_id
@@ -2613,9 +2614,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  rmt_grades:
+    :name: rmt_grades
+    :sequence_no: 158
+    :caption: Rmt grades
+    :namespaced_name: aggregated.rmt_grades
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   scrapped_from_pallet_ids:
     :name: scrapped_from_pallet_ids
-    :sequence_no: 158
+    :sequence_no: 159
     :caption: Scrapped from pallet ids
     :namespaced_name: aggregated.scrapped_from_pallet_ids
     :data_type: :integer_array
@@ -2631,7 +2648,7 @@
     :group_max: false
   removed_from_pallets:
     :name: removed_from_pallets
-    :sequence_no: 159
+    :sequence_no: 160
     :caption: Removed from pallets
     :namespaced_name: aggregated.removed_from_pallets
     :data_type: :boolean
@@ -2647,7 +2664,7 @@
     :group_max: false
   removed_from_pallet_ids:
     :name: removed_from_pallet_ids
-    :sequence_no: 160
+    :sequence_no: 161
     :caption: Removed from pallet ids
     :namespaced_name: aggregated.removed_from_pallet_ids
     :data_type: :integer_array
@@ -2663,7 +2680,7 @@
     :group_max: false
   removed_from_pallet_at:
     :name: removed_from_pallet_at
-    :sequence_no: 161
+    :sequence_no: 162
     :caption: Removed from pallet at
     :namespaced_name: aggregated.removed_from_pallet_at
     :data_type: :string
@@ -2679,7 +2696,7 @@
     :group_max: false
   sell_by_codes:
     :name: sell_by_codes
-    :sequence_no: 162
+    :sequence_no: 163
     :caption: Sell by codes
     :namespaced_name: aggregated.sell_by_codes
     :data_type: :string
@@ -2695,7 +2712,7 @@
     :group_max: false
   product_chars:
     :name: product_chars
-    :sequence_no: 163
+    :sequence_no: 164
     :caption: Product chars
     :namespaced_name: aggregated.product_chars
     :data_type: :string
@@ -2711,7 +2728,7 @@
     :group_max: false
   depot_pallets:
     :name: depot_pallets
-    :sequence_no: 164
+    :sequence_no: 165
     :caption: Depot pallets
     :namespaced_name: aggregated.depot_pallets
     :data_type: :boolean
@@ -2727,7 +2744,7 @@
     :group_max: false
   personnel_identifier_ids:
     :name: personnel_identifier_ids
-    :sequence_no: 165
+    :sequence_no: 166
     :caption: Personnel identifier ids
     :namespaced_name: aggregated.personnel_identifier_ids
     :data_type: :integer_array
@@ -2743,7 +2760,7 @@
     :group_max: false
   hardware_types:
     :name: hardware_types
-    :sequence_no: 166
+    :sequence_no: 167
     :caption: Hardware types
     :namespaced_name: aggregated.hardware_types
     :data_type: :string
@@ -2759,7 +2776,7 @@
     :group_max: false
   identifiers:
     :name: identifiers
-    :sequence_no: 167
+    :sequence_no: 168
     :caption: Identifiers
     :namespaced_name: aggregated.identifiers
     :data_type: :string
@@ -2775,7 +2792,7 @@
     :group_max: false
   contract_worker_ids:
     :name: contract_worker_ids
-    :sequence_no: 168
+    :sequence_no: 169
     :caption: Contract worker ids
     :namespaced_name: aggregated.contract_worker_ids
     :data_type: :integer_array
@@ -2791,7 +2808,7 @@
     :group_max: false
   sequence_repacked:
     :name: sequence_repacked
-    :sequence_no: 169
+    :sequence_no: 170
     :caption: Sequence repacked
     :namespaced_name: aggregated.sequence_repacked
     :data_type: :boolean
@@ -2807,7 +2824,7 @@
     :group_max: false
   sequence_repacked_at:
     :name: sequence_repacked_at
-    :sequence_no: 170
+    :sequence_no: 171
     :caption: Sequence repacked at
     :namespaced_name: aggregated.sequence_repacked_at
     :data_type: :string
@@ -2823,7 +2840,7 @@
     :group_max: false
   repacked_from_pallet_ids:
     :name: repacked_from_pallet_ids
-    :sequence_no: 171
+    :sequence_no: 172
     :caption: Repacked from pallet ids
     :namespaced_name: aggregated.repacked_from_pallet_ids
     :data_type: :integer_array
@@ -2839,7 +2856,7 @@
     :group_max: false
   phyto_data:
     :name: phyto_data
-    :sequence_no: 172
+    :sequence_no: 173
     :caption: Phyto data
     :namespaced_name: aggregated.phyto_data
     :data_type: :string
@@ -2855,7 +2872,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 173
+    :sequence_no: 174
     :caption: Created by
     :namespaced_name: aggregated.created_by
     :data_type: :string
@@ -2871,7 +2888,7 @@
     :group_max: false
   failed_otmc_result_ids:
     :name: failed_otmc_result_ids
-    :sequence_no: 174
+    :sequence_no: 175
     :caption: Failed otmc result ids
     :namespaced_name: aggregated.failed_otmc_result_ids
     :data_type: :integer_array
@@ -2887,7 +2904,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 175
+    :sequence_no: 176
     :caption: Failed otmc
     :namespaced_name: aggregated.failed_otmc
     :data_type: :boolean
@@ -2903,7 +2920,7 @@
     :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 176
+    :sequence_no: 177
     :caption: Failed otmc results
     :namespaced_name: aggregated.failed_otmc_results
     :data_type: :string
@@ -2919,7 +2936,7 @@
     :group_max: false
   treatment_ids:
     :name: treatment_ids
-    :sequence_no: 177
+    :sequence_no: 178
     :caption: Treatment ids
     :namespaced_name: aggregated.treatment_ids
     :data_type: :integer_array
@@ -2935,7 +2952,7 @@
     :group_max: false
   treatment_codes:
     :name: treatment_codes
-    :sequence_no: 178
+    :sequence_no: 179
     :caption: Treatment codes
     :namespaced_name: aggregated.treatment_codes
     :data_type: :string
@@ -2951,7 +2968,7 @@
     :group_max: false
   load_id:
     :name: load_id
-    :sequence_no: 179
+    :sequence_no: 180
     :caption: Load
     :namespaced_name: vw_loads.load_id
     :data_type: :integer
@@ -2967,7 +2984,7 @@
     :group_max: false
   load_status:
     :name: load_status
-    :sequence_no: 180
+    :sequence_no: 181
     :caption: Load status
     :namespaced_name: vw_loads.load_status
     :data_type: :string
@@ -2983,7 +3000,7 @@
     :group_max: false
   customer_party_role_id:
     :name: customer_party_role_id
-    :sequence_no: 181
+    :sequence_no: 182
     :caption: Customer party role
     :namespaced_name: vw_loads.customer_party_role_id
     :data_type: :integer
@@ -2999,7 +3016,7 @@
     :group_max: false
   customer:
     :name: customer
-    :sequence_no: 182
+    :sequence_no: 183
     :caption: Customer
     :namespaced_name: vw_loads.customer
     :data_type: :string
@@ -3015,7 +3032,7 @@
     :group_max: false
   consignee_party_role_id:
     :name: consignee_party_role_id
-    :sequence_no: 183
+    :sequence_no: 184
     :caption: Consignee party role
     :namespaced_name: vw_loads.consignee_party_role_id
     :data_type: :integer
@@ -3031,7 +3048,7 @@
     :group_max: false
   consignee:
     :name: consignee
-    :sequence_no: 184
+    :sequence_no: 185
     :caption: Consignee
     :namespaced_name: vw_loads.consignee
     :data_type: :string
@@ -3047,7 +3064,7 @@
     :group_max: false
   billing_client_party_role_id:
     :name: billing_client_party_role_id
-    :sequence_no: 185
+    :sequence_no: 186
     :caption: Billing client party role
     :namespaced_name: vw_loads.billing_client_party_role_id
     :data_type: :integer
@@ -3063,7 +3080,7 @@
     :group_max: false
   billing_client:
     :name: billing_client
-    :sequence_no: 186
+    :sequence_no: 187
     :caption: Billing client
     :namespaced_name: vw_loads.billing_client
     :data_type: :string
@@ -3079,7 +3096,7 @@
     :group_max: false
   exporter_party_role_id:
     :name: exporter_party_role_id
-    :sequence_no: 187
+    :sequence_no: 188
     :caption: Exporter party role
     :namespaced_name: vw_loads.exporter_party_role_id
     :data_type: :integer
@@ -3095,7 +3112,7 @@
     :group_max: false
   exporter:
     :name: exporter
-    :sequence_no: 188
+    :sequence_no: 189
     :caption: Exporter
     :namespaced_name: vw_loads.exporter
     :data_type: :string
@@ -3111,7 +3128,7 @@
     :group_max: false
   final_receiver_party_role_id:
     :name: final_receiver_party_role_id
-    :sequence_no: 189
+    :sequence_no: 190
     :caption: Final receiver party role
     :namespaced_name: vw_loads.final_receiver_party_role_id
     :data_type: :integer
@@ -3127,7 +3144,7 @@
     :group_max: false
   final_receiver:
     :name: final_receiver
-    :sequence_no: 190
+    :sequence_no: 191
     :caption: Final receiver
     :namespaced_name: vw_loads.final_receiver
     :data_type: :string
@@ -3143,7 +3160,7 @@
     :group_max: false
   shipper_party_role_id:
     :name: shipper_party_role_id
-    :sequence_no: 191
+    :sequence_no: 192
     :caption: Shipper party role
     :namespaced_name: vw_loads.shipper_party_role_id
     :data_type: :integer
@@ -3159,7 +3176,7 @@
     :group_max: false
   shipper:
     :name: shipper
-    :sequence_no: 192
+    :sequence_no: 193
     :caption: Shipper
     :namespaced_name: vw_loads.shipper
     :data_type: :string
@@ -3175,7 +3192,7 @@
     :group_max: false
   final_destination_id:
     :name: final_destination_id
-    :sequence_no: 193
+    :sequence_no: 194
     :caption: Final destination
     :namespaced_name: vw_loads.final_destination_id
     :data_type: :integer
@@ -3191,7 +3208,7 @@
     :group_max: false
   final_destination:
     :name: final_destination
-    :sequence_no: 194
+    :sequence_no: 195
     :caption: Final destination
     :namespaced_name: vw_loads.final_destination
     :data_type: :string
@@ -3207,7 +3224,7 @@
     :group_max: false
   country:
     :name: country
-    :sequence_no: 195
+    :sequence_no: 196
     :caption: Country
     :namespaced_name: vw_loads.country
     :data_type: :string
@@ -3223,7 +3240,7 @@
     :group_max: false
   region:
     :name: region
-    :sequence_no: 196
+    :sequence_no: 197
     :caption: Region
     :namespaced_name: vw_loads.region
     :data_type: :string
@@ -3239,7 +3256,7 @@
     :group_max: false
   depot_id:
     :name: depot_id
-    :sequence_no: 197
+    :sequence_no: 198
     :caption: Depot
     :namespaced_name: vw_loads.depot_id
     :data_type: :integer
@@ -3255,7 +3272,7 @@
     :group_max: false
   depot_code:
     :name: depot_code
-    :sequence_no: 198
+    :sequence_no: 199
     :caption: Depot code
     :namespaced_name: vw_loads.depot_code
     :data_type: :string
@@ -3271,7 +3288,7 @@
     :group_max: false
   pol_voyage_port_id:
     :name: pol_voyage_port_id
-    :sequence_no: 199
+    :sequence_no: 200
     :caption: Pol voyage port
     :namespaced_name: vw_loads.pol_voyage_port_id
     :data_type: :integer
@@ -3287,7 +3304,7 @@
     :group_max: false
   pol:
     :name: pol
-    :sequence_no: 200
+    :sequence_no: 201
     :caption: POL
     :namespaced_name: vw_loads.pol
     :data_type: :string
@@ -3303,7 +3320,7 @@
     :group_max: false
   etd:
     :name: etd
-    :sequence_no: 201
+    :sequence_no: 202
     :caption: ETD
     :namespaced_name: vw_loads.etd
     :data_type: :date
@@ -3319,7 +3336,7 @@
     :group_max: false
   atd:
     :name: atd
-    :sequence_no: 202
+    :sequence_no: 203
     :caption: ATD
     :namespaced_name: vw_loads.atd
     :data_type: :date
@@ -3335,7 +3352,7 @@
     :group_max: false
   departure_date:
     :name: departure_date
-    :sequence_no: 203
+    :sequence_no: 204
     :caption: Departure date
     :namespaced_name: vw_loads.departure_date
     :data_type: :date
@@ -3351,7 +3368,7 @@
     :group_max: false
   pod_voyage_port_id:
     :name: pod_voyage_port_id
-    :sequence_no: 204
+    :sequence_no: 205
     :caption: Pod voyage port
     :namespaced_name: vw_loads.pod_voyage_port_id
     :data_type: :integer
@@ -3367,7 +3384,7 @@
     :group_max: false
   pod:
     :name: pod
-    :sequence_no: 205
+    :sequence_no: 206
     :caption: POD
     :namespaced_name: vw_loads.pod
     :data_type: :string
@@ -3383,7 +3400,7 @@
     :group_max: false
   eta:
     :name: eta
-    :sequence_no: 206
+    :sequence_no: 207
     :caption: ETA
     :namespaced_name: vw_loads.eta
     :data_type: :date
@@ -3399,7 +3416,7 @@
     :group_max: false
   ata:
     :name: ata
-    :sequence_no: 207
+    :sequence_no: 208
     :caption: ATA
     :namespaced_name: vw_loads.ata
     :data_type: :date
@@ -3415,7 +3432,7 @@
     :group_max: false
   arrival_date:
     :name: arrival_date
-    :sequence_no: 208
+    :sequence_no: 209
     :caption: Arrival date
     :namespaced_name: vw_loads.arrival_date
     :data_type: :date
@@ -3431,7 +3448,7 @@
     :group_max: false
   internal_order_number:
     :name: internal_order_number
-    :sequence_no: 209
+    :sequence_no: 210
     :caption: Internal order number
     :namespaced_name: vw_loads.internal_order_number
     :data_type: :string
@@ -3447,7 +3464,7 @@
     :group_max: false
   edi_file_name:
     :name: edi_file_name
-    :sequence_no: 210
+    :sequence_no: 211
     :caption: EDI file name
     :namespaced_name: vw_loads.edi_file_name
     :data_type: :string
@@ -3463,7 +3480,7 @@
     :group_max: false
   customer_order_number:
     :name: customer_order_number
-    :sequence_no: 211
+    :sequence_no: 212
     :caption: Customer order number
     :namespaced_name: vw_loads.customer_order_number
     :data_type: :string
@@ -3479,7 +3496,7 @@
     :group_max: false
   customer_reference:
     :name: customer_reference
-    :sequence_no: 212
+    :sequence_no: 213
     :caption: Customer reference
     :namespaced_name: vw_loads.customer_reference
     :data_type: :string
@@ -3495,7 +3512,7 @@
     :group_max: false
   exporter_certificate_code:
     :name: exporter_certificate_code
-    :sequence_no: 213
+    :sequence_no: 214
     :caption: Exporter certificate code
     :namespaced_name: vw_loads.exporter_certificate_code
     :data_type: :string
@@ -3511,7 +3528,7 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 214
+    :sequence_no: 215
     :caption: Allocated
     :namespaced_name: vw_loads.allocated
     :data_type: :boolean
@@ -3527,7 +3544,7 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 215
+    :sequence_no: 216
     :caption: Allocated at
     :namespaced_name: vw_loads.allocated_at
     :data_type: :datetime
@@ -3543,7 +3560,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 216
+    :sequence_no: 217
     :caption: Shipped at
     :namespaced_name: vw_loads.shipped_at
     :data_type: :datetime
@@ -3559,7 +3576,7 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 217
+    :sequence_no: 218
     :caption: Shipped
     :namespaced_name: vw_loads.shipped
     :data_type: :boolean
@@ -3575,7 +3592,7 @@
     :group_max: false
   transfer_load:
     :name: transfer_load
-    :sequence_no: 218
+    :sequence_no: 219
     :caption: Transfer load
     :namespaced_name: vw_loads.transfer_load
     :data_type: :boolean
@@ -3591,7 +3608,7 @@
     :group_max: false
   vessel:
     :name: vessel
-    :sequence_no: 219
+    :sequence_no: 220
     :caption: Vessel
     :namespaced_name: vw_loads.vessel
     :data_type: :string
@@ -3607,7 +3624,7 @@
     :group_max: false
   voyage:
     :name: voyage
-    :sequence_no: 220
+    :sequence_no: 221
     :caption: Voyage
     :namespaced_name: vw_loads.voyage
     :data_type: :string
@@ -3623,7 +3640,7 @@
     :group_max: false
   voyage_number:
     :name: voyage_number
-    :sequence_no: 221
+    :sequence_no: 222
     :caption: Voyage number
     :namespaced_name: vw_loads.voyage_number
     :data_type: :string
@@ -3639,7 +3656,7 @@
     :group_max: false
   vehicle_number:
     :name: vehicle_number
-    :sequence_no: 222
+    :sequence_no: 223
     :caption: Vehicle number
     :namespaced_name: vw_loads.vehicle_number
     :data_type: :string
@@ -3655,7 +3672,7 @@
     :group_max: false
   container:
     :name: container
-    :sequence_no: 223
+    :sequence_no: 224
     :caption: Container
     :namespaced_name: vw_loads.container
     :data_type: :string
@@ -3671,7 +3688,7 @@
     :group_max: false
   internal_container:
     :name: internal_container
-    :sequence_no: 224
+    :sequence_no: 225
     :caption: Internal container
     :namespaced_name: vw_loads.internal_container
     :data_type: :string
@@ -3687,7 +3704,7 @@
     :group_max: false
   temp_code:
     :name: temp_code
-    :sequence_no: 225
+    :sequence_no: 226
     :caption: Temp code
     :namespaced_name: vw_loads.temp_code
     :data_type: :string
@@ -3703,7 +3720,7 @@
     :group_max: false
   booking_reference:
     :name: booking_reference
-    :sequence_no: 226
+    :sequence_no: 227
     :caption: Booking reference
     :namespaced_name: vw_loads.booking_reference
     :data_type: :string
@@ -3719,7 +3736,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 227
+    :sequence_no: 228
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

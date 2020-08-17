@@ -1,7 +1,7 @@
 ---
 :caption: Stock Pallets
 :sql: "SELECT DISTINCT ON (pallet_number, zero_load_id)\r\n    id,\r\n    pallet_id,\r\n
-  \   pallet_number,\r\n    pallet_sequence_number,\r\n    has_individual_cartons,\r\n
+  \   status,\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n    has_individual_cartons,\r\n
   \   location,\r\n    cultivar,\r\n    carton_quantity,\r\n    pallet_carton_quantity,\r\n
   \   cpp AS cartons_per_pallet,\r\n    pallet_size,\r\n    pallet_age,\r\n    stock_age,\r\n
   \   cold_age,\r\n    ambient_age,\r\n    pack_to_inspect_age, \r\n    inspect_to_cold_age,\r\n
@@ -10,22 +10,22 @@
   \   govt_reinspection_at,\r\n    allocated_at,\r\n    verified_at,\r\n    allocated,\r\n
   \   load_id,\r\n    shipped,\r\n    in_stock,\r\n    inspected,\r\n    palletized,\r\n
   \   production_run_id,\r\n    farm_group,\r\n    farm,\r\n    puc,\r\n    orchard,\r\n
-  \   commodity,\r\n    marketing_variety,\r\n    grade,\r\n    std_size,\r\n    actual_count,\r\n
-  \   size_ref,\r\n    count_group,\r\n    std_pack,\r\n    packed_tm_group,\r\n    mark,\r\n
-  \   inventory_code,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n    marketing_org,\r\n
-  \   pallet_base,\r\n    stack_type,\r\n    gross_weight,\r\n    nett_weight,\r\n
-  \   sequence_nett_weight,\r\n    basic_pack,\r\n    packhouse,\r\n    line,\r\n
-  \   palletizing_bay,\r\n    pick_ref,\r\n    phc,\r\n    verification_result,\r\n
+  \   commodity,\r\n    marketing_variety,\r\n    grade,\r\n    rmt_grade,\r\n    std_size,\r\n
+  \   actual_count,\r\n    size_ref,\r\n    count_group,\r\n    std_pack,\r\n    packed_tm_group,\r\n
+  \   mark,\r\n    inventory_code,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
+  \   marketing_org,\r\n    pallet_base,\r\n    stack_type,\r\n    gross_weight,\r\n
+  \   nett_weight,\r\n    sequence_nett_weight,\r\n    basic_pack,\r\n    packhouse,\r\n
+  \   line,\r\n    palletizing_bay,\r\n    pick_ref,\r\n    phc,\r\n    verification_result,\r\n
   \   scrapped_at,\r\n    scrapped,\r\n    partially_palletized,\r\n    reinspected,\r\n
-  \   verified,\r\n    verification_passed,\r\n    status,\r\n    build_status,\r\n
-  \   active,\r\n    zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n
-  \   edi_in_consignment_note_number,\r\n    packed_at,\r\n    packed_date,\r\n    packed_week,\r\n
-  \   repacked,\r\n    repacked_at,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
-  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
-  \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
-  \   CASE\r\n      WHEN fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n
-  \     ELSE colour_rule\r\n    END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
-  BY zero_load_id DESC, pallet_number DESC"
+  \   verified,\r\n    verification_passed,\r\n    build_status,\r\n    zero_load_id,\r\n
+  \   temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n    edi_in_consignment_note_number,\r\n
+  \   packed_at,\r\n    packed_date,\r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n
+  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
+  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
+  \   target_customer,\r\n    consignment_note_number,\r\n    active,\r\n    CASE\r\n
+  \     WHEN fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n      ELSE colour_rule\r\n
+  \   END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER BY zero_load_id
+  DESC, pallet_number DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -65,9 +65,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  status:
+    :name: status
+    :sequence_no: 3
+    :caption: Status
+    :namespaced_name: status
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
@@ -83,11 +99,11 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Seq
     :namespaced_name: pallet_sequence_number
     :data_type: :integer
-    :width: 80
+    :width: 70
     :format: 
     :hide: false
     :pinned: left
@@ -99,7 +115,7 @@
     :group_max: false
   has_individual_cartons:
     :name: has_individual_cartons
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Individual Cartons?
     :namespaced_name: has_individual_cartons
     :data_type: :boolean
@@ -115,7 +131,7 @@
     :group_max: false
   location:
     :name: location
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Location
     :namespaced_name: location
     :data_type: :string
@@ -131,7 +147,7 @@
     :group_max: false
   cultivar:
     :name: cultivar
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Cultivar
     :namespaced_name: cultivar
     :data_type: :string
@@ -147,11 +163,11 @@
     :group_max: false
   carton_quantity:
     :name: carton_quantity
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Ctn Qty
     :namespaced_name: carton_quantity
     :data_type: :integer
-    :width: 100
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -163,11 +179,11 @@
     :group_max: false
   pallet_carton_quantity:
     :name: pallet_carton_quantity
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Plt Ctn Qty
     :namespaced_name: pallet_carton_quantity
     :data_type: :number
-    :width: 120
+    :width: 110
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -179,11 +195,11 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: CPP
     :namespaced_name: cpp
     :data_type: :number
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -195,11 +211,11 @@
     :group_max: false
   pallet_size:
     :name: pallet_size
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Plt size
     :namespaced_name: pallet_size
     :data_type: :number
-    :width: 90
+    :width: 100
     :format: :delimited_1000
     :hide: false
     :pinned: 
@@ -211,11 +227,11 @@
     :group_max: false
   pallet_age:
     :name: pallet_age
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Plt age
     :namespaced_name: pallet_age
     :data_type: :integer
-    :width: 90
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -227,7 +243,7 @@
     :group_max: false
   stock_age:
     :name: stock_age
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Stock age
     :namespaced_name: stock_age
     :data_type: :integer
@@ -243,11 +259,11 @@
     :group_max: false
   cold_age:
     :name: cold_age
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Cold age
     :namespaced_name: cold_age
     :data_type: :integer
-    :width: 90
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -259,7 +275,7 @@
     :group_max: false
   ambient_age:
     :name: ambient_age
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Ambient age
     :namespaced_name: ambient_age
     :data_type: :integer
@@ -275,11 +291,11 @@
     :group_max: false
   pack_to_inspect_age:
     :name: pack_to_inspect_age
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Pack to inspect age
     :namespaced_name: pack_to_inspect_age
     :data_type: :integer
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -291,11 +307,11 @@
     :group_max: false
   inspect_to_cold_age:
     :name: inspect_to_cold_age
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Inspect to cold age
     :namespaced_name: inspect_to_cold_age
     :data_type: :integer
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -307,11 +323,11 @@
     :group_max: false
   inspect_to_exit_warm_age:
     :name: inspect_to_exit_warm_age
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Inspect to exit warm age
     :namespaced_name: inspect_to_exit_warm_age
     :data_type: :integer
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -323,7 +339,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Created at
     :namespaced_name: created_at
     :data_type: :datetime
@@ -339,7 +355,7 @@
     :group_max: false
   palletized_at:
     :name: palletized_at
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Palletized at
     :namespaced_name: palletized_at
     :data_type: :datetime
@@ -355,7 +371,7 @@
     :group_max: false
   govt_first_inspection_at:
     :name: govt_first_inspection_at
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Govt first inspection at
     :namespaced_name: govt_first_inspection_at
     :data_type: :datetime
@@ -371,11 +387,11 @@
     :group_max: false
   govt_inspection_passed:
     :name: govt_inspection_passed
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Govt inspection passed
     :namespaced_name: govt_inspection_passed
     :data_type: :boolean
-    :width: 80
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -387,7 +403,7 @@
     :group_max: false
   inspected_dest_country:
     :name: inspected_dest_country
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Inspected dest country
     :namespaced_name: inspected_dest_country
     :data_type: :string
@@ -403,7 +419,7 @@
     :group_max: false
   shipped_at:
     :name: shipped_at
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Shipped at
     :namespaced_name: shipped_at
     :data_type: :datetime
@@ -419,7 +435,7 @@
     :group_max: false
   govt_reinspection_at:
     :name: govt_reinspection_at
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Govt reinspection at
     :namespaced_name: govt_reinspection_at
     :data_type: :datetime
@@ -435,7 +451,7 @@
     :group_max: false
   allocated_at:
     :name: allocated_at
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Allocated at
     :namespaced_name: allocated_at
     :data_type: :datetime
@@ -451,7 +467,7 @@
     :group_max: false
   verified_at:
     :name: verified_at
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Verified at
     :namespaced_name: verified_at
     :data_type: :datetime
@@ -467,11 +483,11 @@
     :group_max: false
   allocated:
     :name: allocated
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Allocated
     :namespaced_name: allocated
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -483,11 +499,11 @@
     :group_max: false
   load_id:
     :name: load_id
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Load
     :namespaced_name: load_id
     :data_type: :integer
-    :width: 70
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -499,11 +515,11 @@
     :group_max: false
   shipped:
     :name: shipped
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Shipped
     :namespaced_name: shipped
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -515,11 +531,11 @@
     :group_max: false
   in_stock:
     :name: in_stock
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: In stock
     :namespaced_name: in_stock
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -531,11 +547,11 @@
     :group_max: false
   inspected:
     :name: inspected
-    :sequence_no: 32
+    :sequence_no: 33
     :caption: Inspected
     :namespaced_name: inspected
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -547,11 +563,11 @@
     :group_max: false
   palletized:
     :name: palletized
-    :sequence_no: 33
+    :sequence_no: 34
     :caption: Palletized
     :namespaced_name: palletized
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -563,7 +579,7 @@
     :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 34
+    :sequence_no: 35
     :caption: Run
     :namespaced_name: production_run_id
     :data_type: :integer
@@ -579,7 +595,7 @@
     :group_max: false
   farm_group:
     :name: farm_group
-    :sequence_no: 35
+    :sequence_no: 36
     :caption: Farm group
     :namespaced_name: farm_group
     :data_type: :string
@@ -595,7 +611,7 @@
     :group_max: false
   farm:
     :name: farm
-    :sequence_no: 36
+    :sequence_no: 37
     :caption: Farm
     :namespaced_name: farm
     :data_type: :string
@@ -611,7 +627,7 @@
     :group_max: false
   puc:
     :name: puc
-    :sequence_no: 37
+    :sequence_no: 38
     :caption: PUC
     :namespaced_name: puc
     :data_type: :string
@@ -627,7 +643,7 @@
     :group_max: false
   orchard:
     :name: orchard
-    :sequence_no: 38
+    :sequence_no: 39
     :caption: Orch
     :namespaced_name: orchard
     :data_type: :string
@@ -643,7 +659,7 @@
     :group_max: false
   commodity:
     :name: commodity
-    :sequence_no: 39
+    :sequence_no: 40
     :caption: Comm
     :namespaced_name: commodity
     :data_type: :string
@@ -659,11 +675,11 @@
     :group_max: false
   marketing_variety:
     :name: marketing_variety
-    :sequence_no: 40
+    :sequence_no: 41
     :caption: Mkt Var
     :namespaced_name: marketing_variety
     :data_type: :string
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -675,11 +691,27 @@
     :group_max: false
   grade:
     :name: grade
-    :sequence_no: 41
+    :sequence_no: 42
     :caption: Grade
     :namespaced_name: grade
     :data_type: :string
-    :width: 60
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_grade:
+    :name: rmt_grade
+    :sequence_no: 43
+    :caption: Rmt grade
+    :namespaced_name: rmt_grade
+    :data_type: :boolean
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -691,7 +723,7 @@
     :group_max: false
   std_size:
     :name: std_size
-    :sequence_no: 42
+    :sequence_no: 44
     :caption: Std size
     :namespaced_name: std_size
     :data_type: :integer
@@ -707,7 +739,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 43
+    :sequence_no: 45
     :caption: Actual count
     :namespaced_name: actual_count
     :data_type: :integer
@@ -723,7 +755,7 @@
     :group_max: false
   size_ref:
     :name: size_ref
-    :sequence_no: 44
+    :sequence_no: 46
     :caption: Size ref
     :namespaced_name: size_ref
     :data_type: :string
@@ -739,7 +771,7 @@
     :group_max: false
   count_group:
     :name: count_group
-    :sequence_no: 45
+    :sequence_no: 47
     :caption: Count group
     :namespaced_name: count_group
     :data_type: :string
@@ -755,7 +787,7 @@
     :group_max: false
   std_pack:
     :name: std_pack
-    :sequence_no: 46
+    :sequence_no: 48
     :caption: Std pack
     :namespaced_name: std_pack
     :data_type: :string
@@ -771,7 +803,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 47
+    :sequence_no: 49
     :caption: Packed Tm
     :namespaced_name: packed_tm_group
     :data_type: :string
@@ -787,7 +819,7 @@
     :group_max: false
   mark:
     :name: mark
-    :sequence_no: 48
+    :sequence_no: 50
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
@@ -803,7 +835,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 49
+    :sequence_no: 51
     :caption: Inv Code
     :namespaced_name: inventory_code
     :data_type: :string
@@ -819,7 +851,7 @@
     :group_max: false
   fruit_sticker:
     :name: fruit_sticker
-    :sequence_no: 50
+    :sequence_no: 52
     :caption: Fruit sticker
     :namespaced_name: fruit_sticker
     :data_type: :string
@@ -835,7 +867,7 @@
     :group_max: false
   fruit_sticker_2:
     :name: fruit_sticker_2
-    :sequence_no: 51
+    :sequence_no: 53
     :caption: Fruit sticker 2
     :namespaced_name: fruit_sticker_2
     :data_type: :string
@@ -851,7 +883,7 @@
     :group_max: false
   marketing_org:
     :name: marketing_org
-    :sequence_no: 52
+    :sequence_no: 54
     :caption: Mkting Org
     :namespaced_name: marketing_org
     :data_type: :string
@@ -867,7 +899,7 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 53
+    :sequence_no: 55
     :caption: Base
     :namespaced_name: pallet_base
     :data_type: :string
@@ -883,7 +915,7 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 54
+    :sequence_no: 56
     :caption: Stack
     :namespaced_name: stack_type
     :data_type: :string
@@ -899,7 +931,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 55
+    :sequence_no: 57
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
@@ -915,7 +947,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 56
+    :sequence_no: 58
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -931,7 +963,7 @@
     :group_max: false
   sequence_nett_weight:
     :name: sequence_nett_weight
-    :sequence_no: 57
+    :sequence_no: 59
     :caption: Seq nett weight
     :namespaced_name: sequence_nett_weight
     :data_type: :number
@@ -947,7 +979,7 @@
     :group_max: false
   basic_pack:
     :name: basic_pack
-    :sequence_no: 58
+    :sequence_no: 60
     :caption: Basic pack
     :namespaced_name: basic_pack
     :data_type: :string
@@ -963,7 +995,7 @@
     :group_max: false
   packhouse:
     :name: packhouse
-    :sequence_no: 59
+    :sequence_no: 61
     :caption: Packhouse
     :namespaced_name: packhouse
     :data_type: :string
@@ -979,7 +1011,7 @@
     :group_max: false
   line:
     :name: line
-    :sequence_no: 60
+    :sequence_no: 62
     :caption: Line
     :namespaced_name: line
     :data_type: :string
@@ -995,7 +1027,7 @@
     :group_max: false
   palletizing_bay:
     :name: palletizing_bay
-    :sequence_no: 61
+    :sequence_no: 63
     :caption: Palletizing bay
     :namespaced_name: palletizing_bay
     :data_type: :string
@@ -1011,11 +1043,11 @@
     :group_max: false
   pick_ref:
     :name: pick_ref
-    :sequence_no: 62
+    :sequence_no: 64
     :caption: Pick ref
     :namespaced_name: pick_ref
     :data_type: :string
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -1027,7 +1059,7 @@
     :group_max: false
   phc:
     :name: phc
-    :sequence_no: 63
+    :sequence_no: 65
     :caption: PHC
     :namespaced_name: phc
     :data_type: :string
@@ -1043,7 +1075,7 @@
     :group_max: false
   verification_result:
     :name: verification_result
-    :sequence_no: 64
+    :sequence_no: 66
     :caption: Verification result
     :namespaced_name: verification_result
     :data_type: :string
@@ -1059,7 +1091,7 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 65
+    :sequence_no: 67
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -1075,11 +1107,11 @@
     :group_max: false
   scrapped:
     :name: scrapped
-    :sequence_no: 66
+    :sequence_no: 68
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: true
     :pinned: 
@@ -1091,11 +1123,11 @@
     :group_max: false
   partially_palletized:
     :name: partially_palletized
-    :sequence_no: 67
+    :sequence_no: 69
     :caption: Partially palletized
     :namespaced_name: partially_palletized
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -1107,11 +1139,11 @@
     :group_max: false
   reinspected:
     :name: reinspected
-    :sequence_no: 68
+    :sequence_no: 70
     :caption: Reinspected
     :namespaced_name: reinspected
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -1123,11 +1155,11 @@
     :group_max: false
   verified:
     :name: verified
-    :sequence_no: 69
+    :sequence_no: 71
     :caption: Verified
     :namespaced_name: verified
     :data_type: :boolean
-    :width: 80
+    :width: 90
     :format: 
     :hide: false
     :pinned: 
@@ -1139,27 +1171,11 @@
     :group_max: false
   verification_passed:
     :name: verification_passed
-    :sequence_no: 70
+    :sequence_no: 72
     :caption: Verification passed
     :namespaced_name: verification_passed
     :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  status:
-    :name: status
-    :sequence_no: 71
-    :caption: Status
-    :namespaced_name: status
-    :data_type: :string
-    :width: 120
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -1171,7 +1187,7 @@
     :group_max: false
   build_status:
     :name: build_status
-    :sequence_no: 72
+    :sequence_no: 73
     :caption: Build status
     :namespaced_name: build_status
     :data_type: :string
@@ -1180,22 +1196,6 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  active:
-    :name: active
-    :sequence_no: 73
-    :caption: Active
-    :namespaced_name: active
-    :data_type: :boolean
-    :width: 80
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -1505,9 +1505,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  active:
+    :name: active
+    :sequence_no: 93
+    :caption: Active
+    :namespaced_name: active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 93
+    :sequence_no: 94
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1717,4 +1733,12 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 21
+  :list_def: 
+- :column: rmt_grade
+  :caption: RMT Grade
+  :data_type: :boolean
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
   :list_def: 
