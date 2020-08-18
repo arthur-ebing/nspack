@@ -4,7 +4,7 @@
   \   standard_pack_codes.description,\r\n    standard_pack_codes.std_pack_label_code,\r\n
   \   standard_pack_codes.material_mass,\r\n    standard_pack_codes.plant_resource_button_indicator,\r\n
   \   basic_pack_codes.basic_pack_code,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
-  \   standard_pack_codes.is_bin,\r\n    fn_masterfile_variants('standard_pack_codes',
+  \   standard_pack_codes.bin,\r\n    fn_masterfile_variants('standard_pack_codes',
   standard_pack_codes.id) AS variant_codes,\r\n    standard_pack_codes.active,\r\n
   \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    palletizer_incentive_rate\r\nFROM
   standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nORDER
@@ -141,11 +141,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  is_bin:
-    :name: is_bin
+  bin:
+    :name: bin
     :sequence_no: 9
-    :caption: Is bin
-    :namespaced_name: standard_pack_codes.is_bin
+    :caption: Bin?
+    :namespaced_name: standard_pack_codes.bin
     :data_type: :boolean
     :width: 100
     :format: 

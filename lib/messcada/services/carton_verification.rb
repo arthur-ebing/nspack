@@ -33,7 +33,7 @@ module MesscadaApp
       return true if AppConst::CARTON_EQUALS_PALLET
 
       standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
-      repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
+      repo.get(:standard_pack_codes, standard_pack_code_id, :bin)
     end
 
     def create_pallet_from_bin
@@ -41,8 +41,8 @@ module MesscadaApp
       return if has_pallet
 
       # standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
-      # is_bin = repo.get(:standard_pack_codes, standard_pack_code_id, :is_bin)
-      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call # if AppConst::CARTON_EQUALS_PALLET || is_bin
+      # bin = repo.get(:standard_pack_codes, standard_pack_code_id, :bin)
+      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call # if AppConst::CARTON_EQUALS_PALLET || bin
     end
 
     def carton_verification

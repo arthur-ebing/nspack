@@ -462,7 +462,7 @@ class Nspack < Roda
               std_pack_label_code
               basic_pack_code
               use_size_ref_for_edi
-              is_bin
+              bin
               active
               palletizer_incentive_rate
             ]

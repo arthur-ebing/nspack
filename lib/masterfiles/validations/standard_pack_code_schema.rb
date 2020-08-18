@@ -12,7 +12,7 @@ module MasterfilesApp
     required(:std_pack_label_code, Types::StrippedString).maybe(:str?)
     optional(:basic_pack_code_id, :integer).filled(:int?)
     required(:use_size_ref_for_edi, :bool).maybe(:bool?)
-    required(:is_bin, :bool).maybe(:bool?)
+    required(:bin, :bool).maybe(:bool?)
     required(:palletizer_incentive_rate, :decimal).filled(:decimal?)
   end
 end

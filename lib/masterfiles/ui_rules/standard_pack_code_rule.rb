@@ -29,8 +29,9 @@ module UiRules
                                       caption: 'Basic Pack Code' }
       fields[:use_size_ref_for_edi] = { renderer: :label,
                                         as_boolean: true }
-      fields[:is_bin] = { renderer: :label,
-                          as_boolean: true }
+      fields[:bin] = { renderer: :label,
+                       caption: 'Bin?',
+                       as_boolean: true }
       fields[:palletizer_incentive_rate] = { renderer: :label }
     end
 
@@ -53,7 +54,9 @@ module UiRules
                               caption: 'Basic Pack Code',
                               invisible: AppConst::BASE_PACK_EQUALS_STD_PACK },
         use_size_ref_for_edi: { renderer: :checkbox },
-        is_bin: { renderer: :checkbox },
+        bin: { renderer: :checkbox,
+               caption: 'Bin?',
+               as_boolean: true  },
         palletizer_incentive_rate: { required: true,
                                      renderer: :numeric }
       }
@@ -73,7 +76,7 @@ module UiRules
                                     plant_resource_button_indicator: nil,
                                     basic_pack_code_id: nil,
                                     use_size_ref_for_edi: false,
-                                    is_bin: false,
+                                    bin: false,
                                     palletizer_incentive_rate: 0.0)
     end
   end
