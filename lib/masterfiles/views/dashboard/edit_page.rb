@@ -4,7 +4,7 @@ module Masterfiles
   module Config
     module Dashboard
       class EditPage
-        def self.call(key, index)
+        def self.call(key, index) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:dashboard, :edit_page, key: key, index: index)
           rules   = ui_rule.compile
 
@@ -21,11 +21,7 @@ module Masterfiles
               form.add_field :desc
               form.add_field :url
               form.add_field :secs
-              # image: choose/upload
-              # text: write content
-              # internal dashboards: choose and apply available params
-              # external dashboards: enter URL
-              # Could have new text, new image, new internal and new external actions as separate forms
+              form.add_field :select_image
             end
           end
 

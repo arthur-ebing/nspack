@@ -22,6 +22,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
     '/messcada/hr/register_id',
     '/messcada/hr/logon',
     '/messcada/hr/logoff',
+    '/messcada/hr/logon_with_no?',
+    '/messcada/hr/logoff_with_no?',
     '/messcada/carton_palletizing/scan_carton',
     '/messcada/carton_palletizing/qc_out',
     '/messcada/carton_palletizing/return_to_bay',

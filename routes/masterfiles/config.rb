@@ -146,7 +146,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         key, page = dash_key.split('_')
 
         r.on 'dashboard_url' do
-          url_base = interactor.url_for(key, page.to_i)
+          url_base = interactor.url_for(key, nil) # page.to_i)
           url = url_base.start_with?('http') ? url_base : "#{request.base_url}#{url_base}"
           show_partial_or_page(r) { Masterfiles::Config::Dashboard::URL.call(key, url) }
         end
@@ -160,7 +160,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'new_image_page' do
-          show_partial_or_page(r) { Masterfiles::Config::Dashboard::NewImagePage.call(key) }
+          show_partial_or_page(r) { Masterfiles::Config::Dashboard::ImagePage.call(key, :new_image_page) }
         end
 
         r.on 'new_text_page' do

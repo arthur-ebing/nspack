@@ -49,7 +49,7 @@ module UiRules
 
     def page_fields
       url_renderer = if @mode == :new_internal || @mode == :edit_page && internal_url?
-                       { renderer: :select, options: AppConst::DASHBOARD_INTERNAL_PAGES, required: true, caption: 'URL' }
+                       { renderer: :select, options: AppConst::DASHBOARD_INTERNAL_PAGES, required: true, caption: 'URL', min_charwidth: 40 }
                      elsif text_dashboard? || image_dashboard?
                        { renderer: :hidden }
                      else
@@ -61,15 +61,19 @@ module UiRules
         description: { renderer: :label },
         desc: { required: true, caption: 'Page description' },
         url: url_renderer,
+        select_image: { renderer: :select, options: images, invisible: !image_dashboard?, min_charwidth: 40 },
         secs: { renderer: :integer, required: true, caption: 'No seconds to display', minvalue: 1 }
       }
     end
 
-    def new_image_fields
+    def images
       img_dir = File.join(ENV['ROOT'], 'public/dashboard_images')
       FileUtils.mkdir_p(img_dir)
       full_dir = Pathname.new(img_dir)
-      images = Dir.glob(File.join(full_dir, '*.*')).map { |f| f.delete_prefix("#{full_dir}/") }
+      Dir.glob(File.join(full_dir, '*.*')).map { |f| f.delete_prefix("#{full_dir}/") }
+    end
+
+    def new_image_fields
       {
         key: { renderer: :label },
         description: { renderer: :label },
@@ -143,6 +147,10 @@ module UiRules
       (@form_object[:url] || '').start_with?('/dashboard/image/')
     end
 
+    def image_name(url)
+      url.delete_prefix('/dashboard/image/')
+    end
+
     def make_form_object
       @form_object = if @mode == :edit
                        read_form_object
@@ -189,6 +197,7 @@ module UiRules
                      description: dash['description'],
                      desc: dash['boards'][@options[:index]]['desc'],
                      url: dash['boards'][@options[:index]]['url'],
+                     select_image: image_name(dash['boards'][@options[:index]]['url']),
                      secs: dash['boards'][@options[:index]]['secs'])
     end
   end

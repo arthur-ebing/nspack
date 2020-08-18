@@ -38,12 +38,11 @@ module MasterfilesApp
           act.popup_link 'dashboard link', '/masterfiles/config/dashboards/$col1$/dashboard_url',
                          col1: 'id',
                          icon: 'link',
-                         title_field: 'description',
+                         title_field: 'desc',
                          hide_if_null: 'page'
           act.link 'preview this page', '/dashboard/preview_page/$col1$',
                    col1: 'id',
                    icon: 'view-show',
-                   title_field: 'desc',
                    hide_if_null: 'page'
           act.separator
           act.popup_link 'new internal page', '/masterfiles/config/dashboards/$col1$/new_internal_page',
@@ -73,11 +72,6 @@ module MasterfilesApp
           #                title: 'Change text',
           #                col1: 'id',
           #                hide_if_false: 'text'
-          # act.popup_link 'change image', '/masterfiles/config/dashboards/$col1$/change_image',
-          #                icon: 'play',
-          #                title: 'Change image',
-          #                col1: 'id',
-          #                hide_if_false: 'image'
           # act.popup_link 're-sequence pages', '/masterfiles/config/dashboards/$col1$/re_sequence_pages',
           #                icon: 'sort',
           #                title: 'Re-sequence pages',
@@ -115,8 +109,12 @@ module MasterfilesApp
       config = section_from_yml('dashboards.yml', key)
       raise CrossbeamsInfoError, "There is no dashboard entry for #{key}" if config.nil?
 
-      url_set = config['boards']
-      url_set[index]['url']
+      if index
+        url_set = config['boards']
+        url_set[index]['url']
+      else
+        "/dashboard/#{key}"
+      end
     end
 
     def text_for(key)
@@ -208,12 +206,13 @@ module MasterfilesApp
     end
 
     def update_dashboard_page(key, page, params) # rubocop:disable Metrics/AbcSize
+      url = params[:select_image] ? "/dashboard/image/#{params[:select_image]}" : params[:url]
       config = load_config('dashboards.yml')
       config[key]['boards'][page]['desc'] = params[:desc]
-      config[key]['boards'][page]['url'] = params[:url]
+      config[key]['boards'][page]['url'] = url
       config[key]['boards'][page]['secs'] = params[:secs].to_i
       rewrite_config('dashboards.yml', config)
-      success_response('Saved change', { page: params[:desc], url: params[:url], secs: params[:secs] })
+      success_response('Saved change', { page: params[:desc], url: url, secs: params[:secs] })
     end
 
     def delete_dashboard_page(key, page)

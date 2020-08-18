@@ -3,15 +3,16 @@
 module Masterfiles
   module Config
     module Dashboard
-      class NewImagePage
-        def self.call(key) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:dashboard, :new_image_page, key: key)
+      class ImagePage
+        def self.call(key, mode) # rubocop:disable Metrics/AbcSize
+          ui_rule = UiRules::Compiler.new(:dashboard, mode, key: key)
           rules   = ui_rule.compile
+          action = mode == :new_image_page ? 'save' : 'update'
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              form.action "/masterfiles/config/dashboards/#{key}/save_image_page"
+              form.action "/masterfiles/config/dashboards/#{key}/#{action}_image_page"
               form.remote!
               form.multipart!
               form.add_field :key
