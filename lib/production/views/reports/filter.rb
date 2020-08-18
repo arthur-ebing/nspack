@@ -18,6 +18,11 @@ module Production
                   col.add_field :from_date
                   col.add_field :to_date
                   col.add_field :detail_level
+                  col.add_field :packhouse_resource_id
+                  col.add_field :line_resource_id
+                  col.add_field :puc_id
+                  col.add_field :orchard_id
+                  col.add_field :cultivar_id
                 end
                 row.column do |col|
                   col.add_field :spacer
