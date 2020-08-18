@@ -220,6 +220,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          'packer_summary'
                        when 'palletizer'
                          'palletizer_summary'
+                       when 'packer_count'
+                         'packer_summary_count'
                        end
         res = CreateJasperReport.call(report_name: report_name.to_s,
                                       user: current_user.login_name,

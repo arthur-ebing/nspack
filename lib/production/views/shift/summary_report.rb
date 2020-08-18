@@ -37,7 +37,7 @@ module Production
               section.add_grid('contract_workers',
                                '/list/contract_workers/grid_multi',
                                height: 35,
-                               caption: "#{employment_type.to_s.capitalize} Contract Workers",
+                               caption: employment_type.to_s.capitalize.gsub('_', ' '),
                                is_multiselect: true,
                                can_be_cleared: false,
                                multiselect_save_method: 'loading',

@@ -2,7 +2,7 @@
 
 module UiRules
   class ShiftRule < Base
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::HumanResourcesRepo.new
       @mf_hr_repo = MasterfilesApp::HumanResourcesRepo.new
       make_form_object
@@ -108,11 +108,12 @@ module UiRules
                                     end_date_time: nil)
     end
 
-    def make_summary_report_object
-      employment_type_id = @repo.select_values(:employment_types, :id, employment_type_code: @options[:employment_type].upcase).first
-      @form_object = OpenStruct.new(from_date: @options[:attrs].nil? ? nil : @options[:attrs][:from_date],
-                                    to_date: @options[:attrs].nil? ? nil : @options[:attrs][:to_date],
-                                    employment_type: @options[:employment_type],
+    def make_summary_report_object # rubocop:disable Metrics/AbcSize
+      employment_type_code = @options[:employment_type].include?('pack') ? 'PACKERS' : 'PALLETIZER'
+      employment_type_id = @repo.get_id(:employment_types, employment_type_code: employment_type_code)
+      @form_object = OpenStruct.new(from_date: @options[:attrs].nil? ? (Date.today - 14).to_time : @options[:attrs][:from_date],
+                                    to_date: @options[:attrs].nil? ? Date.today.next_day.to_time - 1 : @options[:attrs][:to_date],
+                                    employment_type: employment_type_code.downcase,
                                     employment_type_id: employment_type_id)
     end
   end

@@ -11,7 +11,7 @@ module Production
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              form.caption "#{employment_type.to_s.capitalize} Summary Report"
+              form.caption "#{employment_type.capitalize.gsub('_', ' ')} summary report"
               form.action "/production/shifts/summary_reports/#{employment_type}/select_contract_workers"
               form.row do |row|
                 row.column do |col|
