@@ -19,6 +19,7 @@ module Masterfiles
                   col.add_field :description
                   col.add_field :desc
                   col.add_field :secs
+                  col.add_field :existing_text
                   col.add_text <<~HTML
                     Fill in the text as lines of colour;size;text'<br>
                     Where colour is any value from the background colour dropdown.<br>

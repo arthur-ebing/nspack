@@ -34,6 +34,11 @@ module MasterfilesApp
                          col1: 'id',
                          icon: 'edit',
                          title: 'Dashboard'
+          act.popup_link 're-order pages', '/masterfiles/config/dashboards/$col1$/reorder',
+                         icon: 'sort',
+                         title: 'Re-order pages',
+                         col1: 'id',
+                         hide_if_null: 'page'
           act.separator
           act.popup_link 'dashboard link', '/masterfiles/config/dashboards/$col1$/dashboard_url',
                          col1: 'id',
@@ -72,10 +77,6 @@ module MasterfilesApp
           #                title: 'Change text',
           #                col1: 'id',
           #                hide_if_false: 'text'
-          # act.popup_link 're-sequence pages', '/masterfiles/config/dashboards/$col1$/re_sequence_pages',
-          #                icon: 'sort',
-          #                title: 'Re-sequence pages',
-          #                col1: 'id'
           act.popup_delete_link '/masterfiles/config/dashboards/$col1$',
                                 col1: 'id'
         end
@@ -185,19 +186,23 @@ module MasterfilesApp
     end
 
     def create_dashboard_text_page(key, params) # rubocop:disable Metrics/AbcSize
-      url = "/dashboard/text/#{params[:text_page_key]}"
+      if params[:existing_text]
+        url = "/dashboard/text/#{params[:existing_text]}"
+      else
+        url = "/dashboard/text/#{params[:text_page_key]}"
 
-      text_ar = []
-      params[:text].each_line do |line|
-        next if line.strip.chomp.empty?
+        text_ar = []
+        params[:text].each_line do |line|
+          next if line.strip.chomp.empty?
 
-        ar = line.split(';').map(&:strip)
-        text_ar << { 'text' => ar.last, 'size' => ar[1], 'colour' => ar.first }
+          ar = line.split(';').map(&:strip)
+          text_ar << { 'text' => ar.last, 'size' => ar[1], 'colour' => ar.first }
+        end
+
+        config = load_config('dashboard_texts.yml')
+        config[params[:text_page_key]] = { 'background' => params[:background_colour], 'content' => text_ar }
+        rewrite_config('dashboard_texts.yml', config)
       end
-
-      config = load_config('dashboard_texts.yml')
-      config[params[:text_page_key]] = { 'background' => params[:background_colour], 'content' => text_ar }
-      rewrite_config('dashboard_texts.yml', config)
 
       config = load_config('dashboards.yml')
       config[key]['boards'] << { 'url' => url, 'desc' => params[:desc], 'secs' => params[:secs].to_i }
@@ -220,6 +225,18 @@ module MasterfilesApp
       config[key]['boards'].delete_at(page)
       rewrite_config('dashboards.yml', config)
       success_response('Deleted dashboard page')
+    end
+
+    def reorder_pages(key, sorted_id_list)
+      config = load_config('dashboards.yml')
+      current = config[key]['boards']
+      new = []
+      sorted_id_list.each do |idx|
+        new << current[idx]
+      end
+      config[key]['boards'] = new
+      rewrite_config('dashboards.yml', config)
+      success_response("Re-ordered dashboard #{config[key]['description']}")
     end
 
     private

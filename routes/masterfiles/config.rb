@@ -142,6 +142,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'existing_text_changed' do
+        actions = []
+        actions << OpenStruct.new(type: :set_required, dom_id: 'dashboard_text_page_key', required: params[:changed_value].empty?)
+        actions << OpenStruct.new(type: :set_required, dom_id: 'dashboard_text', required: params[:changed_value].empty?)
+        json_actions(actions)
+      end
+
       r.on String do |dash_key|
         key, page = dash_key.split('_')
 
@@ -196,6 +203,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           else
             re_show_form(r, res) { Masterfiles::Config::Dashboard::Edit.call(key, page.to_i) }
           end
+        end
+
+        r.on 'reorder' do
+          show_partial { Masterfiles::Config::Dashboard::Reorder.call(key) }
+        end
+
+        r.on 'save_reorder' do
+          sorted_id_list = params[:pages_sorted_ids].split(',').map(&:to_i)
+          res = interactor.reorder_pages(key, sorted_id_list)
+          flash[:notice] = res.message
+          redirect_via_json '/masterfiles/config/dashboards/list'
         end
 
         r.on 'edit' do
