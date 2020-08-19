@@ -419,6 +419,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Max number of passenger instances - used for designating high, busy or over usage
   MAX_PASSENGER_INSTANCES = ENV.fetch('MAX_PASSENGER_INSTANCES', 30).to_i
+  # Lowest state for passenger usage to send emails. Can be INFO, BUSY or HIGH.
+  PASSENGER_USAGE_LEVEL = ENV.fetch('PASSENGER_USAGE_LEVEL', 'INFO')
 
   # ERP_PURCHASE_INVOICE_URI = ENV.fetch('ERP_PURCHASE_INVOICE_URI', 'default')
 

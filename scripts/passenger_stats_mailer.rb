@@ -22,11 +22,22 @@ class PassengerStatsMailer < BaseScript
     memory = check_memory
     top = check_top
 
-    send_error_email(subject: "#{curr}: Passenger-stats", message: "#{status}\n\n\n#{memory}\n\n\n#{top}", recipients: 'james@nosoft.biz,hans@nosoft.biz')
+    send_error_email(subject: "#{curr}: Passenger-stats", message: "#{status}\n\n\n#{memory}\n\n\n#{top}", recipients: 'james@nosoft.biz,hans@nosoft.biz') if threshold_reached?(curr)
     success_response('Mail sent')
   end
 
   private
+
+  LEVELS = {
+    'INFO' => 1,
+    'BUSY' => 2,
+    'HIGH' => 3,
+    'OVER' => 4
+  }.freeze
+
+  def threshold_reached?(curr)
+    LEVELS[curr] >= LEVELS[AppConst::PASSENGER_USAGE_LEVEL]
+  end
 
   def check_status
     `echo "#{ENV['NSPACKSUDO']}" | sudo -S passenger-status` # rubocop:disable Lint/Env
