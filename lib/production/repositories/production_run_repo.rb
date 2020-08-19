@@ -5,6 +5,7 @@ module ProductionApp
     crud_calls_for :production_runs, name: :production_run, wrapper: ProductionRun
     crud_calls_for :production_run_stats, name: :production_run_stat, wrapper: ProductionRunStat
     crud_calls_for :pallet_mix_rules, name: :pallet_mix_rule, wrapper: PalletMixRule
+    crud_calls_for :product_resource_allocations, name: :product_resource_allocation, wrapper: ProductResourceAllocation
 
     def for_select_production_runs_for_line(production_line_id)
       query = <<~SQL
@@ -207,6 +208,21 @@ module ProductionApp
                             wrapper: ProductionRunFlat)
     end
 
+    def find_product_resource_allocation_flat(id)
+      find_with_association(:product_resource_allocations,
+                            id,
+                            parent_tables: [{ parent_table: :label_templates,
+                                              columns: [:label_template_name],
+                                              flatten_columns: { label_template_name: :label_template_name } },
+                                            { parent_table: :packing_methods,
+                                              columns: [:packing_method_code],
+                                              flatten_columns: { packing_method_code: :packing_method_code } }],
+                            lookup_functions: [{ function: :fn_product_setup_code,
+                                                 args: [:product_setup_id],
+                                                 col_name: :product_setup_code }],
+                            wrapper: ProductResourceAllocationFlat)
+    end
+
     def production_run_code(id)
       DB[:production_runs].select(Sequel.lit("fn_production_run_code(#{id}) AS production_run_code")).where(id: id).first[:production_run_code]
     end
@@ -334,6 +350,19 @@ module ProductionApp
     # Does the run have at least one resource allocation with a setup and label?
     def any_allocated_setup?(id)
       exists?(:product_resource_allocations, Sequel.lit("production_run_id = #{id} AND product_setup_id IS NOT NULL AND label_template_id IS NOT NULL"))
+    end
+
+    def for_select_product_setups_for_allocation(product_resource_allocation_id)
+      run_id = get_value(:product_resource_allocations, :production_run_id, id: product_resource_allocation_id)
+      query = <<~SQL
+        SELECT fn_product_setup_code(id) AS code, id
+        FROM product_setups
+        WHERE product_setup_template_id = (SELECT product_setup_template_id
+                                           FROM production_runs
+                                           WHERE id = ?)
+        ORDER BY 1
+      SQL
+      DB[query, run_id].select_map(%i[code id])
     end
 
     # Is there an active tipping run on this line?

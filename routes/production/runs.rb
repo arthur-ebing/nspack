@@ -626,6 +626,28 @@ class Nspack < Roda
         end
       end
 
+      r.on 'edit' do
+        check_auth!('runs', 'edit')
+        show_partial { Production::Runs::ProductResourceAllocation::Edit.call(id) }
+      end
+
+      r.patch do # UPDATE
+        res = interactor.update_product_resource_allocation(id, params[:product_resource_allocation])
+        if res.success
+          row_keys = %i[
+            product_setup_id
+            label_template_id
+            packing_method_id
+            product_setup_code
+            label_template_name
+            packing_method_code
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        else
+          re_show_form(r, res) { Production::Runs::ProductionRun::SelectProductSetup.call(id, form_values: params[:product_resource_allocation], form_errors: res.errors) }
+        end
+      end
+
       r.on 'preview_label' do
         res = interactor.preview_allocation_carton_label(id)
         if res.success

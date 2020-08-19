@@ -276,6 +276,20 @@ module ProductionApp
       res
     end
 
+    def update_product_resource_allocation(id, params)
+      res = validate_product_resource_allocation(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
+      repo.transaction do
+        repo.update_product_resource_allocation(id, res)
+      end
+      instance = product_resource_allocation_flat(id)
+      success_response('Updated allocation',
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def label_for_allocation(product_resource_allocation_id, params)
       res = repo.label_for_allocation(product_resource_allocation_id, params[:column_value])
       res.instance = { changes: { label_template_name: res.instance[:label_template_name] } }
@@ -560,6 +574,14 @@ module ProductionApp
       repo.find_production_run_flat(id)
     end
 
+    def product_resource_allocation(id)
+      repo.find_product_resource_allocation(id)
+    end
+
+    def product_resource_allocation_flat(id)
+      repo.find_product_resource_allocation_flat(id)
+    end
+
     def validate_new_production_run_params(params)
       ProductionRunNewSchema.call(params)
     end
@@ -574,6 +596,10 @@ module ProductionApp
 
     def validate_production_run_template_params(params)
       ProductionRunTemplateSchema.call(params)
+    end
+
+    def validate_product_resource_allocation(params)
+      ProductResourceAllocationSelectSchema.call(params)
     end
 
     def validate_print_carton(params)
