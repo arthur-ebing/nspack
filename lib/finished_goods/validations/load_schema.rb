@@ -6,7 +6,7 @@ module FinishedGoodsApp
 
     optional(:id, :integer).filled(:int?)
     optional(:load_id, :integer).filled(:int?)
-    required(:rmt_load, :bool).filled(:bool?)
+    optional(:rmt_load, :bool).maybe(:bool?)
     required(:customer_party_role_id, :integer).filled(:int?)
     required(:exporter_party_role_id, :integer).filled(:int?)
     required(:billing_client_party_role_id, :integer).filled(:int?)
@@ -56,7 +56,7 @@ module FinishedGoodsApp
     required(:transfer_load, :bool).maybe(:bool?)
     optional(:order_number, Types::StrippedString).maybe(:str?)
     optional(:allocated, :bool).maybe(:bool?)
-    required(:rmt_load, :bool).filled(:bool?)
+    optional(:rmt_load, :bool).maybe(:bool?)
     optional(:allocated_at, %i[nil time]).maybe(:time?)
     required(:requires_temp_tail, :bool).filled(:bool?)
   end
