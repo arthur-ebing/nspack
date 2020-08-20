@@ -156,3 +156,6 @@ INSERT INTO asset_transaction_types (transaction_type_code, description) VALUES 
 -- EMPLOYMENT TYPE CODE
 INSERT INTO employment_types (employment_type_code) VALUES ('PACKERS') ON CONFLICT DO NOTHING;
 INSERT INTO employment_types (employment_type_code) VALUES ('PALLETIZER') ON CONFLICT DO NOTHING;
+
+-- REMOVING GLOBAL PALLET MIX RULE
+DELETE FROM pallet_mix_rules WHERE scope = 'GLOBAL';
