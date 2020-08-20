@@ -5,6 +5,13 @@
     :text: Sequences
     :title: Pallet sequences for Pallet No $:pallet_number$
     :icon: list
+    :hide_if_true: scrapped
+  - :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
+    :text: Pallet Audit
+    :icon: list
+  - :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequences&ids=$:pallet_sequence_ids$"
+    :text: Sequence Audit
+    :icon: list
 :captions:
   :conditions:
     :production_run_pallets: Pallets for Production Run
@@ -17,4 +24,3 @@
     - :col: pallet_sequences.production_run_id
       :op: =
       :val: $:production_run_id$
-

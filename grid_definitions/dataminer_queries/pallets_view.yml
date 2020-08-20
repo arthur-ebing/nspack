@@ -1,6 +1,6 @@
 ---
 :caption: All Pallets - Grouped Sequences
-:sql: "SELECT DISTINCT\r\n   vw_pallets.pallet_id AS pallet_id,\r\n   vw_pallets.pallet_status,\r\n
+:sql: "SELECT DISTINCT\r\n   vw_pallets.pallet_id,\r\n   vw_pallets.pallet_status,\r\n
   \  vw_pallets.pallet_number,\r\n   vw_pallets.target_customer_party_role_id,\r\n
   \  vw_pallets.target_customer,\r\n   vw_pallets.pallet_verification_failed,\r\n
   \  vw_pallets.in_stock,\r\n   vw_pallets.stock_created_at,\r\n   vw_pallets.exit_ref,\r\n
@@ -86,10 +86,10 @@
   \      WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
   'error'\r\n       WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
   'error'\r\n       WHEN aggregated.verified AND NOT aggregated.verifications_passed
-  THEN 'error'\r\n   END AS colour_rule\r\n\r\nFROM vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated
-  aggregated ON aggregated.pallet_id = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences
-  ON vw_pallets.pallet_id = pallet_sequences.pallet_id\r\nLEFT JOIN vw_loads ON vw_loads.load_id
-  = vw_pallets.load_id"
+  THEN 'error'\r\n   END AS colour_rule,\r\n   vw_pallets.pallet_id AS id\r\n\r\nFROM
+  vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
+  = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences ON vw_pallets.pallet_id = pallet_sequences.pallet_id\r\nLEFT
+  JOIN vw_loads ON vw_loads.load_id = vw_pallets.load_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -105,7 +105,7 @@
   pallet_id:
     :name: pallet_id
     :sequence_no: 1
-    :caption: Pallet
+    :caption: Pallet Id
     :namespaced_name: vw_pallets.pallet_id
     :data_type: :integer
     :width: 
@@ -3740,6 +3740,22 @@
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 229
+    :caption: Row Id
+    :namespaced_name: vw_pallets.pallet_id
+    :data_type: :integer
     :width: 
     :format: 
     :hide: true

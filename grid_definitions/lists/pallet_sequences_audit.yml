@@ -1,0 +1,11 @@
+---
+:dataminer_definition: pallet_sequences_audit
+:conditions:
+  :pallet_sequence:
+    - :col: row_data_id
+      :op: =
+      :val: $:id$
+  :pallet_sequences:
+    - :col: row_data_id
+      :op: IN
+      :val: $:ids$

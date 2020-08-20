@@ -1,0 +1,9 @@
+---
+:dataminer_definition: pallets_audit
+:conditions:
+  :pallet:
+    - :col: row_data_id
+      :op: =
+      :val: $:id$
+
+

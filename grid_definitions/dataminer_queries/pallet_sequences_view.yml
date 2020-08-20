@@ -1,23 +1,24 @@
 ---
 :caption: All Pallet Sequences
-:sql: "SELECT\r\n    vw_pallet_sequences.pallet_sequence_id AS id, vw_pallet_sequences.sequence_status,
-  vw_pallet_sequences.pallet_number, vw_pallet_sequences.pallet_sequence_number, vw_pallet_sequences.packed_at,\r\n
-  \   vw_pallet_sequences.packed_date, vw_pallet_sequences.packed_week, vw_pallet_sequences.production_run_id,
-  vw_pallet_sequences.season_id, vw_pallet_sequences.season_code, vw_pallet_sequences.farm_id,
-  vw_pallet_sequences.farm_code, vw_pallet_sequences.farm_group_code,\r\n    vw_pallet_sequences.production_region_code,
-  vw_pallet_sequences.puc_id, vw_pallet_sequences.puc_code, vw_pallet_sequences.orchard_id,
-  vw_pallet_sequences.orchard_code, vw_pallet_sequences.commodity_code, vw_pallet_sequences.cultivar_group_id,\r\n
-  \   vw_pallet_sequences.cultivar_group_code, vw_pallet_sequences.cultivar_id, vw_pallet_sequences.cultivar_name,
-  vw_pallet_sequences.cultivar_code, vw_pallet_sequences.resource_allocation_id,\r\n
-  \   vw_pallet_sequences.packhouse_resource_id, vw_pallet_sequences.packhouse_code,
-  vw_pallet_sequences.production_line_id, vw_pallet_sequences.line_code, vw_pallet_sequences.marketing_variety_id,\r\n
-  \   vw_pallet_sequences.marketing_variety_code, vw_pallet_sequences.customer_variety_id,
-  vw_pallet_sequences.variety_as_customer_variety_id,\r\n    vw_pallet_sequences.customer_marketing_variety_code,
-  vw_pallet_sequences.std_fruit_size_count_id, vw_pallet_sequences.standard_size,
-  vw_pallet_sequences.count_group, vw_pallet_sequences.standard_count,\r\n    vw_pallet_sequences.basic_pack_code_id,
-  vw_pallet_sequences.basic_pack_code, vw_pallet_sequences.standard_pack_code_id,
-  vw_pallet_sequences.standard_pack_code,\r\n    vw_pallet_sequences.fruit_actual_counts_for_pack_id,
-  vw_pallet_sequences.actual_count, vw_pallet_sequences.edi_size_count, vw_pallet_sequences.fruit_size_reference_id,
+:sql: "SELECT\r\n    vw_pallet_sequences.pallet_sequence_id, vw_pallet_sequences.pallet_number,
+  vw_pallet_sequences.pallet_sequence_number, \r\nvw_pallet_sequences.sequence_status,
+  vw_pallet_sequences.packed_at,\r\n    vw_pallet_sequences.packed_date, vw_pallet_sequences.packed_week,
+  vw_pallet_sequences.production_run_id, vw_pallet_sequences.season_id, vw_pallet_sequences.season_code,
+  vw_pallet_sequences.farm_id, vw_pallet_sequences.farm_code, vw_pallet_sequences.farm_group_code,\r\n
+  \   vw_pallet_sequences.production_region_code, vw_pallet_sequences.puc_id, vw_pallet_sequences.puc_code,
+  vw_pallet_sequences.orchard_id, vw_pallet_sequences.orchard_code, vw_pallet_sequences.commodity_code,
+  vw_pallet_sequences.cultivar_group_id,\r\n    vw_pallet_sequences.cultivar_group_code,
+  vw_pallet_sequences.cultivar_id, vw_pallet_sequences.cultivar_name, vw_pallet_sequences.cultivar_code,
+  vw_pallet_sequences.resource_allocation_id,\r\n    vw_pallet_sequences.packhouse_resource_id,
+  vw_pallet_sequences.packhouse_code, vw_pallet_sequences.production_line_id, vw_pallet_sequences.line_code,
+  vw_pallet_sequences.marketing_variety_id,\r\n    vw_pallet_sequences.marketing_variety_code,
+  vw_pallet_sequences.customer_variety_id, vw_pallet_sequences.variety_as_customer_variety_id,\r\n
+  \   vw_pallet_sequences.customer_marketing_variety_code, vw_pallet_sequences.std_fruit_size_count_id,
+  vw_pallet_sequences.standard_size, vw_pallet_sequences.count_group, vw_pallet_sequences.standard_count,\r\n
+  \   vw_pallet_sequences.basic_pack_code_id, vw_pallet_sequences.basic_pack_code,
+  vw_pallet_sequences.standard_pack_code_id, vw_pallet_sequences.standard_pack_code,\r\n
+  \   vw_pallet_sequences.fruit_actual_counts_for_pack_id, vw_pallet_sequences.actual_count,
+  vw_pallet_sequences.edi_size_count, vw_pallet_sequences.fruit_size_reference_id,
   vw_pallet_sequences.size_ref,\r\n    vw_pallet_sequences.marketing_org_party_role_id,
   vw_pallet_sequences.marketing_org, vw_pallet_sequences.packed_tm_group_id, vw_pallet_sequences.packed_tm_group,
   vw_pallet_sequences.mark_id, vw_pallet_sequences.mark,\r\n    vw_pallet_sequences.inventory_code_id,
@@ -84,10 +85,10 @@
   \       WHEN vw_pallets.inspected AND NOT vw_pallets.govt_inspection_passed THEN
   'error'\r\n        WHEN fn_pallet_verification_failed(vw_pallets.pallet_id) THEN
   'error'\r\n        WHEN vw_pallet_sequences.verified AND NOT vw_pallet_sequences.verification_passed
-  THEN 'error'\r\n        END AS colour_rule\r\n\r\nfrom vw_pallet_sequences\r\nLEFT
-  JOIN vw_pallets ON vw_pallets.pallet_id = vw_pallet_sequences.pallet_id\r\nLEFT
-  JOIN vw_loads ON vw_loads.load_id = vw_pallets.load_id\r\nORDER BY \r\nvw_pallet_sequences.pallet_number
-  DESC,\r\nvw_pallet_sequences.pallet_sequence_number\r\n\r\n"
+  THEN 'error'\r\n        END AS colour_rule,\r\n    vw_pallet_sequences.pallet_sequence_id
+  AS id\r\n\r\nfrom vw_pallet_sequences\r\nLEFT JOIN vw_pallets ON vw_pallets.pallet_id
+  = vw_pallet_sequences.pallet_id\r\nLEFT JOIN vw_loads ON vw_loads.load_id = vw_pallets.load_id\r\nORDER
+  BY \r\nvw_pallet_sequences.pallet_number DESC,\r\nvw_pallet_sequences.pallet_sequence_number\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings:
@@ -100,13 +101,13 @@
     error: Failed inspection and/or failed verifications
   :render_url: 
 :columns:
-  id:
-    :name: id
+  pallet_sequence_id:
+    :name: pallet_sequence_id
     :sequence_no: 1
-    :caption: Id
+    :caption: Pallet sequence Id
     :namespaced_name: vw_pallet_sequences.pallet_sequence_id
-    :data_type: :string
-    :width: 
+    :data_type: :integer
+    :width: 100
     :format: 
     :hide: true
     :pinned: 
@@ -116,25 +117,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  sequence_status:
-    :name: sequence_status
-    :sequence_no: 2
-    :caption: Sequence status
-    :namespaced_name: vw_pallet_sequences.sequence_status
-    :data_type: :string
-    :width: 200
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 3
+    :sequence_no: 2
     :caption: Pallet number
     :namespaced_name: vw_pallet_sequences.pallet_number
     :data_type: :string
@@ -150,11 +135,27 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 4
+    :sequence_no: 3
     :caption: Sequence number
     :namespaced_name: vw_pallet_sequences.pallet_sequence_number
     :data_type: :integer
     :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sequence_status:
+    :name: sequence_status
+    :sequence_no: 4
+    :caption: Sequence status
+    :namespaced_name: vw_pallet_sequences.sequence_status
+    :data_type: :string
+    :width: 200
     :format: 
     :hide: false
     :pinned: 
@@ -3721,6 +3722,22 @@
     :sequence_no: 227
     :caption: Colour rule
     :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  id:
+    :name: id
+    :sequence_no: 228
+    :caption: Id
+    :namespaced_name: vw_pallet_sequences.pallet_sequence_id
     :data_type: :string
     :width: 
     :format: 

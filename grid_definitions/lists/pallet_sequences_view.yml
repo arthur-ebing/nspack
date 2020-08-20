@@ -1,5 +1,12 @@
 ---
 :dataminer_definition: pallet_sequences_view
+:actions:
+  - :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
+    :text: Pallet Audit
+    :icon: list
+  - :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequence&id=$:pallet_sequence_id$"
+    :text: Sequence Audit
+    :icon: list
 :captions:
   :conditions:
     :production_run_sequences: Pallet Sequences on Production Run
