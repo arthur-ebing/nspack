@@ -49,7 +49,7 @@ module MesscadaApp
         .gsub('$:FNC:current_date$', current_date)
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize
+    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
@@ -57,7 +57,11 @@ module MesscadaApp
       @pick_ref = UtilityFunctions.calculate_pick_ref(packhouse_no)
       attrs = attrs.merge(pick_ref: pick_ref)
       @personnel_number = nil
-      unless identifier.nil_or_empty?
+
+      validate_identifier = AppConst::INCENTIVISED_LABELING
+      validate_identifier = false if identifier.nil_or_empty?
+
+      if validate_identifier
         hr_ids = MesscadaApp::HrRepo.new.contract_worker_ids(identifier)
         raise Crossbeams::InfoError, "Personnel identifier #{identifier} is not registered" if hr_ids.nil?
 

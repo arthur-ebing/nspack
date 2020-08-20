@@ -222,14 +222,17 @@ module MesscadaApp
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
 
-    def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonLabelingSchema.call(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       check_res = validate_device_exists(res[:device])
       return check_res unless check_res.success
 
-      if res.to_h.key?(:identifier)
+      validate_identifier = AppConst::INCENTIVISED_LABELING
+      validate_identifier = false unless res.to_h.key?(:identifier)
+
+      if validate_identifier && res[:identifier].nil_or_empty?
         check_res = validate_incentivised_labeling(res[:identifier])
         return check_res unless check_res.success
       end
