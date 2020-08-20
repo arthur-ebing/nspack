@@ -125,27 +125,31 @@ const crossbeamsGridFormatters = {
         return { key: `${prefix}${key}`, name: item.text, value: '---' };
       }
       return null;
-    } else if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
+    }
+    if (item.hide_if_null && checkNulls(item.hide_if_null, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
+    }
+    if (item.hide_if_present && checkNulls(item.hide_if_present, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
+    }
+    if (item.hide_if_true && checkBooleans(item.hide_if_true, true, params.data)) {
       // No show of item
       return null;
-    } else if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
+    }
+    if (item.hide_if_false && checkBooleans(item.hide_if_false, false, params.data)) {
       // No show of item
       return null;
-    } else if (item.is_submenu) {
-      node = { key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null };
+    }
+    if (item.is_submenu) {
+      node = {
+        key: `${prefix}${key}`, name: item.text, items: [], is_submenu: true, row_id: null,
+      };
       item.items.forEach((subitem) => {
         subKey = crossbeamsGridFormatters.nextChar(subKey);
         subPrefix = `${prefix}${key}_`;
-        subnode = crossbeamsGridFormatters.makeContextNode(subKey,
-                                                           subPrefix,
-                                                           node.items,
-                                                           subitem, params);
+        subnode = crossbeamsGridFormatters.makeContextNode(subKey, subPrefix, node.items, subitem, params);
         if (subnode !== null) {
           node.items.push(subnode);
         }
@@ -165,7 +169,8 @@ const crossbeamsGridFormatters = {
         url += params.data[item[cmp]];
       }
     });
-    return { key: `${prefix}${key}`,
+    return {
+      key: `${prefix}${key}`,
       name: item.text,
       url,
       prompt: promptValue,
@@ -205,7 +210,7 @@ const crossbeamsGridFormatters = {
       return '';
     }
     // svg: chevron-right
-    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`;
+    return `<button class='grid-context-menu' data-dom-grid-id='${params.context.domGridId}' data-row='${JSON.stringify(items)}'><svg class="cbl-icon blue" width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1363 877l-742 742q-19 19-45 19t-45-19l-166-166q-19-19-19-45t19-45l531-531-531-531q-19-19-19-45t19-45l166-166q19-19 45-19t45 19l742 742q19 19 19 45t-19 45z"/></svg></button>`; // eslint-disable-line max-len
   },
 
   // Return a number with thousand separator and at least 2 digits after the decimal.
@@ -258,7 +263,7 @@ const crossbeamsGridFormatters = {
 
     const icoCol = params.value.split(',');
     if (!icoCol[1]) icoCol.push('gray'); // default colour
-    if (!icoCol[2]) {                    // default indent from "level" column
+    if (!icoCol[2]) { //                 // default indent from "level" column
       if (params.data.level) {
         icoCol.push(params.data.level - 1);
       } else {
@@ -475,7 +480,7 @@ const crossbeamsGridEvents = {
             });
             const sortable = Array.from(dlgContent.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
             sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
-                                                     elem.dataset.sortableGroup));
+              elem.dataset.sortableGroup));
           } else {
             console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
           }
@@ -675,7 +680,6 @@ const crossbeamsGridEvents = {
     btn.hidden = false;
     btn.dataset.bookmarkRowId = rowId;
 
-
     const bkmkClick = function bkmkClick() {
       const gridOptions = crossbeamsGridStore.getGrid(gridId);
       const node = gridOptions.api.getRowNode(btn.dataset.bookmarkRowId);
@@ -738,7 +742,7 @@ const crossbeamsGridEvents = {
 
       if (parms.value) {
         testStr = `${parms.value}`;
-        if (testStr.length > 12 && !isNaN(testStr) && !testStr.includes('.')) {
+        if (testStr.length > 12 && !Number.isNaN(Number(testStr)) && !testStr.includes('.')) {
           return `'${testStr}`;
         }
       }
@@ -967,7 +971,8 @@ const crossbeamsGridEvents = {
     const method = target.dataset.method;
     const caller = () => {
       document.body.innerHTML += `<form id="dynForm" action="${url}"
-        method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" /><input name="_method" type="hidden" value="${+method}" /></form>`;
+        method="post"><input name="_csrf" type="hidden" value="${document.querySelector('meta[name="_csrf"]').content}" />
+        <input name="_method" type="hidden" value="${+method}" /></form>`;
       document.getElementById('dynForm').submit();
     };
 
@@ -978,8 +983,8 @@ const crossbeamsGridEvents = {
     });
     // TODO: make call via AJAX & reload grid? Or http to server to figure it out?.....
     // ALSO: disable link automatically while call is being processed...
-    event.stopPropagation();
-    event.preventDefault();
+    target.stopPropagation();
+    target.preventDefault();
   },
 };
 
@@ -1056,7 +1061,7 @@ NumericCellEditor.prototype.destroy = () => {
 };
 
 // if true, then this editor will appear in a popup
-  // and we could leave this method out also, false is the default
+// and we could leave this method out also, false is the default
 NumericCellEditor.prototype.isPopup = () => true;
 
 // -------------------------------------------------------------------
@@ -1123,8 +1128,7 @@ Level2PanelCellRenderer.prototype.setupLevel2Grid = function setupLevel2Grid(l2D
 Level2PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
-  const template =
-    `<div class="full-width-panel">
+  const template = `<div class="full-width-panel">
        <div class="full-width-grid" style="height:100%"></div>
        <div class="full-width-grid-toolbar">
             <b>Functional area: </b>${parentRecord.functional_area_name}
@@ -1182,7 +1186,6 @@ Level2PanelCellRenderer.prototype.consumeMouseWheelOnDetailGrid = function consu
   eDetailGrid.addEventListener('DOMMouseScroll', mouseWheelListener);
 };
 
-
 Level3PanelCellRenderer.prototype.init = function init(params) {
   // trick to convert string of html into dom object
   const eTemp = document.createElement('div');
@@ -1214,8 +1217,7 @@ Level3PanelCellRenderer.prototype.setupDetailGrid = function setupDetailGrid(l3D
 Level3PanelCellRenderer.prototype.getTemplate = function getTemplate(params) {
   const parentRecord = params.node.parent.data;
 
-  const template =
-    `<div class="full-width-panel"style="background-color: silver">
+  const template = `<div class="full-width-panel"style="background-color: silver">
        <div class="full-width-grid" style="height:100%"></div>
        <div class="full-width-grid-toolbar">
             <b>Program: </b>s${parentRecord.program_name}
@@ -1340,7 +1342,7 @@ const crossbeamsGridStaticLoader = {
             newCol.cellEditorParams = {
               values: col[attr].values,
               cellRenderer: function cellRenderer(params) {
-                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`;
+                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`; // eslint-disable-line max-len
               },
             };
           } else {
@@ -1428,52 +1430,52 @@ const crossbeamsGridStaticLoader = {
         'X-Custom-Request-Type': 'Fetch',
       }),
     })
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      }
-      throw new HttpError(response);
-    })
-    .then((data) => {
-      let newColDefs = null;
-      if (data.exception) {
-        crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
-        if (data.backtrace) {
-          console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
-          console.info('==Backend Backtrace=='); // eslint-disable-line no-console
-          console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
-          console.groupEnd(); // eslint-disable-line no-console
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        throw new HttpError(response);
+      })
+      .then((data) => {
+        let newColDefs = null;
+        if (data.exception) {
+          crossbeamsUtils.alert({ prompt: data.flash.error, type: 'error' });
+          if (data.backtrace) {
+            console.groupCollapsed('EXCEPTION:', data.exception, data.flash.error); // eslint-disable-line no-console
+            console.info('==Backend Backtrace=='); // eslint-disable-line no-console
+            console.info(data.backtrace.join('\n')); // eslint-disable-line no-console
+            console.groupEnd(); // eslint-disable-line no-console
+          }
+          return null;
+        }
+
+        if (data.nestedColumnDefs) {
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
+          midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
+          detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
+        } else {
+          newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
+        }
+        gridOptions.api.setColumnDefs(newColDefs);
+        gridOptions.api.setRowData(data.rowDefs);
+        if (!gridOptions.forPrint) {
+          crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
+            newColDefs,
+            data.fieldUpdateUrl,
+            data.extraContext);
+
+          if (data.multiselect_ids) {
+            gridOptions.api.forEachNode((node) => {
+              if (node.data && data.multiselect_ids.includes(node.data.id)) {
+                node.setSelected(true);
+              }
+            });
+          }
         }
         return null;
-      }
-
-      if (data.nestedColumnDefs) {
-        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['1']);
-        midLevelColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['2']);
-        detailColumnDefs = crossbeamsGridStaticLoader.translateColDefs(data.nestedColumnDefs['3']);
-      } else {
-        newColDefs = crossbeamsGridStaticLoader.translateColDefs(data.columnDefs);
-      }
-      gridOptions.api.setColumnDefs(newColDefs);
-      gridOptions.api.setRowData(data.rowDefs);
-      if (!gridOptions.forPrint) {
-        crossbeamsGridStaticLoader.applyGeneralGridUi(gridOptions,
-          newColDefs,
-          data.fieldUpdateUrl,
-          data.extraContext);
-
-        if (data.multiselect_ids) {
-          gridOptions.api.forEachNode((node) => {
-            if (node.data && data.multiselect_ids.includes(node.data.id)) {
-              node.setSelected(true);
-            }
-          });
-        }
-      }
-      return null;
-    }).catch((data) => {
-      crossbeamsUtils.fetchErrorHandler(data);
-    });
+      }).catch((data) => {
+        crossbeamsUtils.fetchErrorHandler(data);
+      });
   };
 
   const listenForGrid = function listenForGrid() {
