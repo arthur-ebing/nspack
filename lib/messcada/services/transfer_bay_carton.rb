@@ -22,7 +22,8 @@ module MesscadaApp
       @original_pallet_id = repo.get(:pallet_sequences, original_pallet_sequence_id, :pallet_id)
 
       res = transfer_carton
-      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
+      # raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
+      return res unless res.success
 
       success_response('ok', pallet_sequence_id: pallet_sequence_id)
     end
@@ -40,7 +41,7 @@ module MesscadaApp
     def transfer_carton  # rubocop:disable Metrics/AbcSize
       new_sequence = NewSequence.new(pallet_id, carton_id).call
       if new_sequence
-        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true)
+        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, AppConst::PALLETIZING_BAYS_PALLET_MIX)
         return res unless res.success
 
         @pallet_sequence_id = res.instance[:pallet_sequence_id]

@@ -36,7 +36,7 @@ module MesscadaApp
       orig_seq = repo.get_value(:cartons, :pallet_sequence_id, id: carton_id)
       new_sequence = NewSequence.new(pallet_id, carton_id).call
       if new_sequence
-        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true)
+        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, AppConst::BUILDUP_PALLET_MIX)
         return res unless res.success
 
         @pallet_sequence_id = res.instance[:pallet_sequence_id]

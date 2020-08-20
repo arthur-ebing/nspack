@@ -583,27 +583,71 @@ class Nspack < Roda
       end
     end
 
-    r.on 'mix_pallet_rules' do
-      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      r.on 'global' do
-        rule = interactor.find_pallet_mix_rules_by_scope(AppConst::GLOBAL_PALLET_MIX)
-        show_partial_or_page(r) { Production::Runs::PalletMixRule::Edit.call(rule[:id]) }
-      end
-    end
-
     r.on 'pallet_mix_rules', Integer do |id|
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'edit' do   # EDIT
+        show_partial { Production::Runs::PalletMixRule::Edit.call(id) }
+      end
 
       r.patch do
         res = interactor.update_pallet_mix_rule(id, params[:pallet_mix_rule])
         if res.success
-          flash[:notice] = res.message
-          redirect_via_json('/production/runs/mix_pallet_rules/global')
+          row_keys = %i[
+            scope
+            production_run_id
+            pallet_id
+            allow_tm_mix
+            allow_grade_mix
+            allow_size_ref_mix
+            allow_pack_mix
+            allow_std_count_mix
+            allow_mark_mix
+            allow_inventory_code_mix
+            allow_cultivar_mix
+            allow_cultivar_group_mix
+            allow_puc_mix
+            allow_orchard_mix
+            packhouse_code
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
           re_show_form(r, res) { Production::Runs::PalletMixRule::Edit.call(id, form_values: params[:pallet_mix_rule], form_errors: res.errors) }
         end
       end
+
+      r.is do
+        r.get do       # SHOW
+          show_partial { Production::Runs::PalletMixRule::Show.call(id) }
+        end
+      end
+    end
+
+    r.on 'pallet_mix_rules' do
+      interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do    # NEW
+        res = interactor.create_pallet_mix_rules
+        flash[:notice] = res.message
+        r.redirect('/list/pallet_mix_rules')
+      end
+    end
+
+    r.on 'toggle' do
+      toggle = params[:changed_value] != 'f'
+      json_actions([
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_tm_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_grade_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_size_ref_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_pack_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_std_count_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_mark_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_inventory_code_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_cultivar_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_cultivar_group_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_puc_mix', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'pallet_mix_rule_allow_orchard_mix', checked: toggle)
+                   ])
     end
 
     r.on 'product_resource_allocations', Integer do |id|

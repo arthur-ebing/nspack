@@ -2,16 +2,17 @@
 
 module MesscadaApp
   class AddCartonToPallet < BaseService
-    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id
+    attr_reader :repo, :prod_repo, :carton_id, :pallet_id, :pallet_sequence_id, :mix_rule_scope
 
-    def initialize(carton_id, pallet_id)
+    def initialize(carton_id, pallet_id, mix_rule_scope = nil)
       @carton_id = carton_id
       @pallet_id = pallet_id
+      @mix_rule_scope = mix_rule_scope
       @repo = MesscadaApp::MesscadaRepo.new
       @prod_repo = ProductionApp::ProductionRunRepo.new
     end
 
-    def call  # rubocop:disable Metrics/AbcSize
+    def cal
       return failed_response("Pallet :#{pallet_id} does not exist") unless pallet_exists?
 
       return failed_response("Carton :#{carton_id} does not exist") unless carton_exists?
@@ -19,7 +20,7 @@ module MesscadaApp
       return failed_response("Carton :#{carton_id} already on a pallet") unless carton_is_available?
 
       res = add_carton_to_pallet
-      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
+      return res unless res.success
 
       success_response('ok', pallet_sequence_id: pallet_sequence_id)
     end
@@ -41,7 +42,7 @@ module MesscadaApp
     def add_carton_to_pallet  # rubocop:disable Metrics/AbcSize
       new_sequence = NewSequence.call(pallet_id, carton_id)
       if new_sequence
-        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true)
+        res = NewPalletSequence.call(@user_name, carton_id, pallet_id, 1, true, mix_rule_scope)
         return res unless res.success
 
         @pallet_sequence_id = res.instance[:pallet_sequence_id]

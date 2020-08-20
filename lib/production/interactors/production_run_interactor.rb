@@ -36,7 +36,7 @@ module ProductionApp
 
       res = nil
       repo.transaction do
-        res = MesscadaApp::AddSequenceToPallet.new(user_name, carton_id, pallet[:id], carton_quantity).call
+        res = MesscadaApp::AddSequenceToPallet.new(user_name, carton_id, pallet[:id], carton_quantity, AppConst::PALLETIZING_PALLET_MIX).call
         log_transaction
       end
       res
@@ -69,7 +69,7 @@ module ProductionApp
 
       res = nil
       repo.transaction do
-        res = MesscadaApp::CreatePalletFromCarton.new(@user, carton_id, cpp[:cartons_per_pallet]).call
+        res = MesscadaApp::CreatePalletFromCarton.new(@user, carton_id, cpp[:cartons_per_pallet], nil, false).call
         log_transaction
       end
       res
@@ -503,6 +503,26 @@ module ProductionApp
       repo.labeling_run_for_line(current_user.profile['packhouse_line_id'])
     end
 
+    def create_pallet_mix_rules # rubocop:disable Metrics/AbcSize
+      rules = repo.all_hash(:pallet_mix_rules, scope: AppConst::PALLET_MIX_RULES)
+      unless AppConst::PALLET_MIX_RULES.sort == rules.map { |r| r[:scope] }.sort
+        new = AppConst::PALLET_MIX_RULES.sort.find_all { |c| c != AppConst::PALLETIZING_BAYS_PALLET_MIX } - rules.map { |r| r[:scope] }.sort.find_all { |c| c != AppConst::PALLETIZING_BAYS_PALLET_MIX }
+
+        new.each do |scope|
+          repo.create_pallet_mix_rule(scope: scope)
+        end
+
+        if rules.map { |r| r[:scope] }.sort.find_all { |c| c != AppConst::PALLETIZING_BAYS_PALLET_MIX }.empty?
+          ProductionApp::ResourceRepo.new.for_select_plant_resources_of_type(Crossbeams::Config::ResourceDefinitions::PACKHOUSE).each do |pakchse|
+            repo.create_pallet_mix_rule(scope: AppConst::PALLETIZING_BAYS_PALLET_MIX, packhouse_plant_resource_id: pakchse[1])
+          end
+        end
+      end
+      success_response('All Pallet Mix Rules Created Successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def update_pallet_mix_rule(id, params)
       res = validate_pallet_mix_rule_params(params)
       return validation_failed_response(res) unless res.messages.empty?
@@ -559,7 +579,7 @@ module ProductionApp
     end
 
     def pallet_mix_rule(id)
-      repo.find_pallet_mix_rule(id)
+      repo.find_pallet_mix_rule_flat(id)
     end
 
     def validate_pallet_mix_rule_params(params)

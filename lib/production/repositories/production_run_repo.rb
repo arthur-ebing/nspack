@@ -31,6 +31,16 @@ module ProductionApp
       !res.nil? ? res[:rmt_delivery_id] : nil
     end
 
+    def find_pallet_mix_rule_flat(id)
+      find_with_association(:pallet_mix_rules,
+                            id,
+                            parent_tables: [{ parent_table: :plant_resources,
+                                              foreign_key: :packhouse_plant_resource_id,
+                                              columns: [:plant_resource_code],
+                                              flatten_columns: { plant_resource_code: :packhouse_code } }],
+                            wrapper: PalletMixRuleFlat)
+    end
+
     def find_pallet_mix_rules_by_scope(scope)
       DB[:pallet_mix_rules].where(scope: scope).first
     end

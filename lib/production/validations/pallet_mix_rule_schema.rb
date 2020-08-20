@@ -7,6 +7,7 @@ module ProductionApp
     optional(:id, :integer).filled(:int?)
     required(:scope, Types::StrippedString).filled(:str?)
     optional(:production_run_id, :integer).maybe(:int?)
+    optional(:packhouse_plant_resource_id, :integer).maybe(:int?)
     optional(:pallet_id, :integer).maybe(:int?)
     optional(:allow_tm_mix, :bool).maybe(:bool?)
     optional(:allow_grade_mix, :bool).maybe(:bool?)
@@ -17,5 +18,7 @@ module ProductionApp
     optional(:allow_inventory_code_mix, :bool).maybe(:bool?)
     optional(:allow_cultivar_mix, :bool).maybe(:bool?)
     optional(:allow_cultivar_group_mix, :bool).maybe(:bool?)
+    optional(:allow_puc_mix, :bool).maybe(:bool?)
+    optional(:allow_orchard_mix, :bool).maybe(:bool?)
   end
 end

@@ -259,7 +259,7 @@ module MesscadaApp
     def get_oldest_pallet_sequence(pallet_id)
       query = <<~SQL
         SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference, sp.standard_pack_code, sf.size_count_value
-        ,c.cultivar_name, cg.cultivar_group_code, s.*
+        ,c.cultivar_name, cg.cultivar_group_code, p.puc_code, o,orchard_code, s.*
         FROM pallet_sequences s
         JOIN inventory_codes i ON i.id = s.inventory_code_id
         JOIN target_market_groups tm on tm.id=s.packed_tm_group_id
@@ -270,6 +270,8 @@ module MesscadaApp
         JOIN marks m on m.id=s.mark_id
         JOIN cultivars c on c.id=s.cultivar_id
         JOIN cultivar_groups cg on cg.id=s.cultivar_group_id
+        JOIN pucs p on p.id=s.puc_id
+        JOIN orchards o on o.id=s.orchard_id
         WHERE s.pallet_id = ?
         ORDER BY s.pallet_sequence_number ASC
       SQL
