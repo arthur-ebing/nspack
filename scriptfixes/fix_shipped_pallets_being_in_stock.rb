@@ -41,7 +41,7 @@ class FixShippedPalletsBeingInStock < BaseScript
 
       Results:
       --------
-      Updated something
+      Fixed shipped pallets where in_stock was true to false.
       pallet_ids: #{ids.join(', ')}
     STR
 
@@ -53,7 +53,7 @@ class FixShippedPalletsBeingInStock < BaseScript
     if debug_mode
       success_response('Dry run complete')
     else
-      success_response('Something was done')
+      success_response('Shipped pallets fixe')
     end
   end
 end
