@@ -20,10 +20,11 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_shift(id, params)
+    def update_shift(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_update_shift_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
+      repo.check_if_shift_overlap!(res)
       repo.transaction do
         repo.update_shift(id, res)
         log_transaction

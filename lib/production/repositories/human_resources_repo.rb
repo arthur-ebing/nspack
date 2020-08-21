@@ -56,13 +56,14 @@ module ProductionApp
 
       attrs[:start_date_time] = Time.parse("#{date} #{start_hr}")
       end_date = end_hr < start_hr ? date + 1 : date
-      attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr}")
+      attrs[:end_date_time] = Time.parse("#{end_date} #{end_hr}") - 59
 
       check_if_shift_overlap!(attrs)
       DB[:shifts].insert(attrs)
     end
 
-    def check_if_shift_overlap!(args) # rubocop:disable Metrics/AbcSize
+    def check_if_shift_overlap!(params) # rubocop:disable Metrics/AbcSize
+      args = params.to_h
       shift_type = DB[:shift_types].where(id: args[:shift_type_id])
       similar_shift_type_ids = DB[:shift_types]
                                .where(plant_resource_id: shift_type.get(:plant_resource_id),
@@ -74,10 +75,11 @@ module ProductionApp
                .where { start_date_time >= (args[:start_date_time] - (24 * 60 * 60)) }
                .select_map(%i[id start_date_time end_date_time])
       shifts.each do |id, start_date_time, end_date_time|
-        next unless (args[:start_date_time] + 1).between?(start_date_time, end_date_time) || (args[:end_date_time] - 1).between?(start_date_time, end_date_time)
+        next if id == args[:id]
+        next unless (args[:start_date_time]).between?(start_date_time, end_date_time) || (args[:end_date_time]).between?(start_date_time, end_date_time)
 
         shift = find_shift(id)
-        message = "Shift Times overlaps with, #{shift.shift_type_code} starting at: #{shift.start_date_time}"
+        message = "Shift overlaps with #{shift.shift_type_code} from #{shift.start_date_time.strftime('%Y-%m-%d %H:%M:%S')} to #{shift.end_date_time.strftime('%Y-%m-%d %H:%M:%S')}"
         raise Crossbeams::InfoError, message
       end
     end

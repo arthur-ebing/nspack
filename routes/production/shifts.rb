@@ -25,7 +25,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_shift(id, params[:shift])
           if res.success
             flash[:notice] = res.message
-            redirect_via_json "/production/shifts/shifts/#{id}/edit"
+            redirect_via_json '/list/shifts'
           else
             re_show_form(r, res) { Production::Shifts::Shift::Edit.call(id, form_values: params[:shift], form_errors: res.errors, current_user: current_user) }
           end

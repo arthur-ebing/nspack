@@ -30,6 +30,7 @@ module Production
                     col.add_field :shift_type_id
                     col.add_field :shift_type_code
                     col.add_field :running_hours
+                    col.add_field :id
                   end
                   row.column do |col|
                     col.add_field :start_date_time

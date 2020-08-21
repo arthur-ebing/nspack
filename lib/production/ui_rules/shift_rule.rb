@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ShiftRule < Base
+  class ShiftRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::HumanResourcesRepo.new
       @mf_hr_repo = MasterfilesApp::HumanResourcesRepo.new
@@ -63,15 +63,18 @@ module UiRules
 
     def edit_fields
       {
+        id: { renderer: :hidden },
         shift_type_id: { renderer: :hidden },
         shift_type_code: { renderer: :label,
                            options: @form_object.shift_type_code,
                            caption: 'Shift Type',
                            required: true },
         running_hours: {},
-        start_date_time: { renderer: :label,
+        start_date_time: { renderer: :datetime,
+                           required: true,
                            format: :without_timezone_or_seconds },
-        end_date_time: { renderer: :label,
+        end_date_time: { renderer: :datetime,
+                         required: true,
                          format: :without_timezone_or_seconds }
       }
     end

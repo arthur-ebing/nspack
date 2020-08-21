@@ -15,6 +15,10 @@ module ProductionApp
   UpdateShiftSchema = Dry::Validation.Params do
     configure { config.type_specs = true }
 
+    required(:id, :integer).filled(:int?)
+    required(:shift_type_id, :integer).filled(:int?)
     required(:running_hours, %i[nil decimal]).maybe(:decimal?)
+    required(:start_date_time, %i[nil time]).maybe(:time?)
+    required(:end_date_time, %i[nil time]).maybe(:time?)
   end
 end
