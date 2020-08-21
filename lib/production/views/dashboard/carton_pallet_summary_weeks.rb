@@ -97,7 +97,7 @@ module Production
                 <tr><th></th><th></th><th></th><th>Cartons</th><th>Pallets</th></tr>
                 <tr><th colspan="2"></th><td rowspan="2" class="tc f3 b">TOTAL</td><td colspan="2" class="bg-white">Pallets</td></tr>
                 <tr><th>Cartons</th><th>Pallets</th><td class="tr f2">#{item[:ctn_qty]}</td><td class="tr f2">#{item[:plt_qty]}</td></tr>
-                <tr><td colspan="2" class="bg-white">Shiped (#{item[:load_s_qty]})</td><td rowspan="2" class="tc f3 b">LOAD</td><td colspan="2" class="bg-white">Allocated (#{item[:load_a_qty]})</td></tr>
+                <tr><td colspan="2" class="bg-white">Shipped (#{item[:load_s_qty]})</td><td rowspan="2" class="tc f3 b">LOAD</td><td colspan="2" class="bg-white">Allocated (#{item[:load_a_qty]})</td></tr>
                 <tr><td class="tr f2">#{item[:ship_c_qty]}</td><td class="tr f2">#{item[:ship_p_qty]}</td><td class="tr f2">#{item[:alloc_c_qty]}</td><td class="tr f2">#{item[:alloc_p_qty]}</td></tr>
                 <tr><td colspan="2" class="bg-white">Verified</td><td rowspan="2" class="tc f3 b">VERIFY</td><td colspan="2" class="bg-white">Unverified</td></tr>
                 <tr><td class="tr f2">#{item[:ver_c_qty]}</td><td class="tr f2">#{item[:ver_p_qty]}</td><td class="tr f2">#{item[:unver_c_qty]}</td><td class="tr f2">#{item[:unver_p_qty]}</td></tr>
