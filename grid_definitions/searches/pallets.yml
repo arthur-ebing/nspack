@@ -1,2 +1,14 @@
 ---
-:dataminer_definition: all_pallets
+:dataminer_definition: pallets_view
+:actions:
+  - :url: "/list/pallet_sequences_view/with_params?key=standard&pallet_id=$:pallet_id$"
+    :text: Sequences
+    :title: Pallet sequences for Pallet No $:pallet_number$
+    :icon: list
+    :hide_if_true: scrapped
+  - :url: "/list/pallets_audit/with_params?key=pallet&id=$:pallet_id$"
+    :text: Pallet Audit
+    :icon: list
+  - :url: "/list/pallet_sequences_audit/with_params?key=pallet_sequences&ids=$:pallet_sequence_ids$"
+    :text: Sequence Audit
+    :icon: list

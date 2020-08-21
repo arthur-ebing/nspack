@@ -3773,4 +3773,99 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.season_code
+  :caption: Season Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.farm_code
+  :caption: Farm Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.puc_code
+  :caption: PUC Code
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
   :list_def: 
+- :column: vw_pallet_sequences.orchard_code
+  :caption: Orchard Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.commodity_code
+  :caption: Commodity Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.cultivar_group_code
+  :caption: Cultivar Group Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.cultivar_code
+  :caption: Cultivar Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.cultivar_name
+  :caption: Cultivar Name
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.packhouse_code
+  :caption: Packhouse Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.line_code
+  :caption: Line Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+- :column: vw_pallet_sequences.standard_pack_code
+  :caption: Standard Pack Code
+  :data_type: :string
+  :control_type: :text
+  :default_value:
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+
+
+
+
+
+
+

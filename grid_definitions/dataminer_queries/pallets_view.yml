@@ -89,7 +89,8 @@
   THEN 'error'\r\n   END AS colour_rule,\r\n   vw_pallets.pallet_id AS id\r\n\r\nFROM
   vw_pallets\r\nLEFT JOIN vw_pallet_sequences_aggregated aggregated ON aggregated.pallet_id
   = vw_pallets.pallet_id\r\nLEFT JOIN pallet_sequences ON vw_pallets.pallet_id = pallet_sequences.pallet_id\r\nLEFT
-  JOIN vw_loads ON vw_loads.load_id = vw_pallets.load_id"
+  JOIN vw_loads ON vw_loads.load_id = vw_pallets.load_id\r\n\r\nORDER BY vw_pallets.pallet_number
+  DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -2617,7 +2618,7 @@
   rmt_grades:
     :name: rmt_grades
     :sequence_no: 158
-    :caption: Rmt grades
+    :caption: RMT grades
     :namespaced_name: aggregated.rmt_grades
     :data_type: :boolean
     :width: 100
@@ -3791,3 +3792,117 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: aggregated.verified
+  :caption: Verified
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false
+- :column: vw_pallets.in_stock
+  :caption: In Stock
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false
+- :column: vw_pallets.pallet_repacked
+  :caption: Repacked
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false
+- :column: vw_loads.shipped
+  :caption: Shipped
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false
+- :column: vw_pallets.scrapped
+  :caption: Scrapped
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
+  - true
+  - false
+- :column: aggregated.season_codes
+  :caption: Season Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.farm_codes
+  :caption: Farm Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.puc_codes
+  :caption: PUC Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.orchard_codes
+  :caption: Orchard Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.cultivar_codes
+  :caption: Cultivar Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.cultivar_names
+  :caption: Cultivar Names
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.packhouse_codes
+  :caption: Packhouse Codes
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 
+- :column: aggregated.phyto_data
+  :caption: Phyto Data
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def:
