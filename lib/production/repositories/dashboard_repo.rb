@@ -327,5 +327,93 @@ module ProductionApp
 
       DB[query].all.group_by { |r| r[:bin_received_date] }
     end
+
+    def last_day_for_summary
+      query = 'SELECT MAX(carton_labels.created_at)::date AS dat FROM carton_labels JOIN cartons ON cartons.carton_label_id = carton_labels.id'
+      d1 = DB[query].get(:dat)
+      query = 'SELECT MAX(created_at)::date AS dat FROM pallet_sequences'
+      d2 = DB[query].get(:dat)
+      [d1, d2].max
+    end
+
+    def carton_summary
+      query = <<~SQL
+            SELECT
+            c.carton_label_created_at::date AS date,
+            to_char(c.carton_label_created_at, 'IW'::text)::integer AS week,
+            c.packhouse AS packhouse_code,
+            c.cultivar_code,
+            c.standard_pack_code,
+            c.scrapped,
+            COUNT(DISTINCT carton_id) AS total_verified_carton_qty
+
+        FROM (
+            SELECT
+                cartons.id as carton_id,
+                carton_labels.created_at AS carton_label_created_at,
+                packhouses.plant_resource_code AS packhouse,
+                cultivars.cultivar_code AS cultivar_code,
+                standard_pack_codes.standard_pack_code,
+                cartons.scrapped
+            FROM carton_labels
+            JOIN cartons ON carton_labels.id = cartons.carton_label_id
+            JOIN production_runs ON production_runs.id = carton_labels.production_run_id
+            JOIN plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id
+            JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
+            JOIN standard_pack_codes ON standard_pack_codes.id = carton_labels.standard_pack_code_id
+             ) c
+        GROUP BY
+            c.carton_label_created_at::date,
+            to_char(c.carton_label_created_at, 'IW'::text)::integer,
+            c.packhouse,
+            c.cultivar_code,
+            c.standard_pack_code,
+            c.scrapped
+
+        ORDER BY c.carton_label_created_at::date DESC
+      SQL
+      DB[query].all
+    end
+
+    def pallet_summary
+      query = <<~SQL
+        SELECT
+            ps.created_at::date AS date,
+            to_char(ps.created_at, 'IW'::text)::integer AS week,
+            packhouses.plant_resource_code AS packhouse_code,
+            cultivars.cultivar_code,
+            standard_pack_codes.standard_pack_code,
+
+            COUNT(DISTINCT CASE WHEN l.shipped THEN p.load_id END) AS shipped_load_qty,
+            COUNT(DISTINCT CASE WHEN NOT l.shipped THEN p.load_id END) AS allocated_load_qty,
+
+            COUNT(DISTINCT CASE WHEN l.shipped THEN p.id END) AS shipped_pallet_qty,
+            COUNT(DISTINCT CASE WHEN NOT l.shipped THEN p.id END) AS allocated_pallet_qty,
+            COUNT(DISTINCT CASE WHEN p.load_id IS NULL AND ps.verified THEN p.id END) AS verified_pallet_qty,
+            COUNT(DISTINCT CASE WHEN p.load_id IS NULL AND NOT ps.verified THEN p.id END) AS unverified_pallet_qty,
+            COUNT(DISTINCT p.id) AS total_pallet_qty,
+
+            SUM(CASE WHEN l.shipped THEN ps.carton_quantity ELSE 0 END) AS shipped_carton_qty,
+            SUM(CASE WHEN NOT l.shipped THEN ps.carton_quantity ELSE 0 END) AS allocated_carton_qty,
+            SUM(CASE WHEN p.load_id IS NULL AND ps.verified THEN ps.carton_quantity ELSE 0 END) AS verified_carton_qty,
+            SUM(CASE WHEN p.load_id IS NULL AND NOT ps.verified THEN ps.carton_quantity ELSE 0 END) AS unverified_carton_qty,
+            SUM(ps.carton_quantity) AS total_carton_qty
+
+        FROM pallet_sequences ps
+        JOIN pallets p ON p.id = ps.pallet_id
+        LEFT JOIN loads l ON p.load_id = l.id
+        JOIN cultivars ON cultivars.id = ps.cultivar_id
+        LEFT JOIN plant_resources packhouses ON packhouses.id = ps.packhouse_resource_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = ps.standard_pack_code_id
+
+        GROUP BY
+            ps.created_at::date,
+            to_char(ps.created_at, 'IW'::text)::integer,
+            packhouses.plant_resource_code,
+            cultivars.cultivar_code,
+            standard_pack_codes.standard_pack_code
+      SQL
+      DB[query].all
+    end
   end
 end

@@ -38,7 +38,7 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 618a9d3f94f0730e3be0e1cde9c94d9f586512ab
+  revision: 6bb2afd3849f7fa0a8ceb1dc379a986539142eeb
   specs:
     roda-data_grid (0.4.1)
       caxlsx

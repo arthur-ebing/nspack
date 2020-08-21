@@ -59,5 +59,15 @@ class Nspack < Roda
     r.on 'delivery_days' do
       show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::DeliveryDays.call }
     end
+
+    # CARTON-PALLET SUMMARY
+    # --------------------------------------------------------------------------
+    r.on 'carton_pallet_summary_weeks' do
+      show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::CartonPalletSummaryWeeks.call }
+    end
+
+    r.on 'carton_pallet_summary_days' do
+      show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::CartonPalletSummaryDays.call }
+    end
   end
 end
