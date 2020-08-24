@@ -8,10 +8,7 @@ module FinishedGoodsApp
         @task = task
         @repo = LoadRepo.new
         @id = load_id
-        raise ArgumentError, "Load \"#{@id}\" is not valid. Perhaps you scanned a pallet number?" if @id.to_i > AppConst::MAX_DB_INT
-
-        @pallet_numbers = pallet_numbers || @repo.select_values(:pallets, :pallet_number, load_id: id)
-        @entity = @repo.find_load_flat(@id)
+        @pallet_numbers = pallet_numbers
       end
 
       CHECKS = {
@@ -28,9 +25,13 @@ module FinishedGoodsApp
         delete: :delete_check
       }.freeze
 
-      def call
+      def call # rubocop:disable Metrics/AbcSize
         return failed_response "Value #{id} is too big to be a load. Perhaps you scanned a pallet number?" if id.to_i > AppConst::MAX_DB_INT
+
+        @entity = @repo.find_load_flat(id)
         return failed_response 'Record not found' unless @entity || task == :create
+
+        @pallet_numbers ||= @repo.select_values(:pallets, :pallet_number, load_id: id)
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
