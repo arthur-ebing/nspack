@@ -8,9 +8,9 @@ module FinishedGoodsApp
         @task = task
         @repo = LoadRepo.new
         @id = load_id
-        @pallet_numbers = pallet_numbers || @repo.select_values(:pallets, :pallet_number, load_id: id)
-        return if @id.to_i > AppConst::MAX_DB_INT
+        raise ArgumentError, 'Load id not valid' if @id.to_i > AppConst::MAX_DB_INT
 
+        @pallet_numbers = pallet_numbers || @repo.select_values(:pallets, :pallet_number, load_id: id)
         @entity = @repo.find_load_flat(@id)
       end
 
