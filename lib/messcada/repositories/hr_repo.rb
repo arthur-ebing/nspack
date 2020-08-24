@@ -15,6 +15,8 @@ module MesscadaApp
 
     def contract_worker_name(personnel_identifier)
       personnel_identifier_id = DB[:personnel_identifiers].where(identifier: personnel_identifier).get(:id)
+      return nil if personnel_identifier_id.nil?
+
       id = DB[:contract_workers].where(personnel_identifier_id: personnel_identifier_id).get(:id)
       DB.get(Sequel.function(:fn_contract_worker_name, id))
     end
