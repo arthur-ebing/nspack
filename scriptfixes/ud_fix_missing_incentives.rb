@@ -22,7 +22,7 @@ class UdFixMissingIncentives < BaseScript
 
     unless debug_mode
       DB.transaction do
-        updates.each do |carton_label_id, carton_id, identifier_id, contract_worker_id|
+        updates.each do |carton_label_id, carton_id, _, identifier_id, contract_worker_id|
           DB[:carton_labels].where(id: carton_label_id).update(personnel_identifier_id: identifier_id, contract_worker_id: contract_worker_id)
           DB[:cartons].where(id: carton_id).update(personnel_identifier_id: identifier_id, contract_worker_id: contract_worker_id) unless carton_id.nil?
         end
