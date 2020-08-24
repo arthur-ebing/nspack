@@ -51,6 +51,7 @@ module MesscadaApp
     attribute? :scrapped, Types::Bool
     attribute :scrapped_at, Types::DateTime
     attribute :scrapped_sequence_id, Types::Integer
+    attribute :palletizer_contract_worker_id, Types::Integer
   end
   class ScannedCartonNumber < Dry::Struct
     attribute :scanned_carton_number, Types::String

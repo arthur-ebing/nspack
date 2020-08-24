@@ -45,13 +45,17 @@ module MesscadaApp
       MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call # if AppConst::CARTON_EQUALS_PALLET || bin
     end
 
-    def carton_verification
+    def carton_verification # rubocop:disable Metrics/AbcSize
       @carton_id = repo.get_id(:cartons, carton_label_id: carton_label_id)
       return if @carton_id
 
-      palletizer_identifier_id = find_personnel_identifier unless palletizer_identifier.nil?
+      unless palletizer_identifier.nil?
+        palletizer_identifier_id = find_personnel_identifier
+        palletizer_contract_worker_id = find_palletizer_contract_worker(palletizer_identifier_id)
+      end
       attrs = { carton_label_id: carton_label_id,
                 palletizer_identifier_id: palletizer_identifier_id,
+                palletizer_contract_worker_id: palletizer_contract_worker_id,
                 palletizing_bay_resource_id: palletizing_bay_resource_id }
       carton_params = carton_label_carton_params.to_h.merge(attrs)
       @carton_id = DB[:cartons].insert(carton_params)
@@ -67,6 +71,10 @@ module MesscadaApp
 
     def find_personnel_identifier
       repo.find_personnel_identifiers_by_palletizer_identifier(palletizer_identifier)
+    end
+
+    def find_palletizer_contract_worker(palletizer_identifier_id)
+      repo.find_palletizer_contract_worker(palletizer_identifier_id)
     end
   end
 end

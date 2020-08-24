@@ -340,6 +340,10 @@ module MesscadaApp
       DB[:personnel_identifiers].where(identifier: palletizer_identifier).get(:id)
     end
 
+    def find_palletizer_contract_worker(palletizer_identifier_id)
+      DB[:contract_workers].where(personnel_identifier_id: palletizer_identifier_id).get(:id)
+    end
+
     def carton_attributes(carton_id)
       query = <<~SQL
         SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference,
@@ -366,7 +370,7 @@ module MesscadaApp
 
     def matching_sequence_for_carton(carton_id, pallet_id)
       carton_rejected_fields = %i[id carton_label_id pallet_number product_resource_allocation_id fruit_sticker_pm_product_id
-                                  gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id
+                                  gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id palletizer_contract_worker_id
                                   palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id
                                   palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id]
       attrs = find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
