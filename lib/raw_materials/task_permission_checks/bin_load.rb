@@ -9,7 +9,6 @@ module RawMaterialsApp
         @task = task
         @id = id
         @params = params
-        @bin_load = id ? repo.find_bin_load_flat(id) : nil
       end
 
       CHECKS = {
@@ -23,7 +22,10 @@ module RawMaterialsApp
         unship: :unship_check
       }.freeze
 
-      def call
+      def call # rubocop:disable Metrics/AbcSize
+        return failed_response "Value #{id} is too big to be a load. Perhaps you scanned a bin number?" if id.to_i > AppConst::MAX_DB_INT
+
+        @bin_load = repo.find_bin_load_flat(id)
         return failed_response 'Bin load record not found' unless bin_load || task == :create
 
         check = CHECKS[task]

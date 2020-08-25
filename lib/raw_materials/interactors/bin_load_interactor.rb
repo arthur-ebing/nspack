@@ -35,6 +35,7 @@ module RawMaterialsApp
     end
 
     def delete_bin_load(id) # rubocop:disable Metrics/AbcSize
+      check!(:delete, id)
       bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
 
       repo.transaction do
@@ -53,6 +54,7 @@ module RawMaterialsApp
     end
 
     def complete_bin_load(id)
+      check!(:complete, id)
       params = { completed: true, completed_at: Time.now }
       repo.transaction do
         repo.update_bin_load(id, params)
@@ -66,6 +68,7 @@ module RawMaterialsApp
     end
 
     def reopen_bin_load(id)
+      check!(:reopen, id)
       repo.transaction do
         repo.update_bin_load(id, completed: false, completed_at: nil)
         log_status(:bin_loads, id, 'REOPENED')
@@ -98,6 +101,7 @@ module RawMaterialsApp
     end
 
     def unallocate_bin_load(id)
+      check!(:reopen, id)
       bin_load_product_ids = repo.select_values(:bin_load_products, :id, bin_load_id: id)
       bin_ids = repo.select_values(:rmt_bins, :id, bin_load_product_id: bin_load_product_ids)
       repo.transaction do
@@ -112,6 +116,7 @@ module RawMaterialsApp
     end
 
     def ship_bin_load(id)
+      check!(:ship, id)
       repo.transaction do
         repo.ship_bin_load(id, @user, 'SHIPPED MANUALLY')
         log_transaction
@@ -123,6 +128,7 @@ module RawMaterialsApp
     end
 
     def unship_bin_load(id)
+      check!(:unship, id)
       repo.transaction do
         repo.unship_bin_load(id, @user)
         log_transaction
@@ -140,17 +146,17 @@ module RawMaterialsApp
       return validation_failed_response(res) unless res.messages.empty?
 
       id = params[:bin_load_id]
-      instance = bin_load(id)
-      res = TaskPermissionCheck::BinLoad.call(:allocate, id)
-      return failed_response res.message unless res.success
+      check!(:allocate, id)
 
       products = repo.select_values(:bin_load_products, %i[id qty_bins], bin_load_id: id)
       products.each do |bin_load_product_id, qty_bins|
         qty_available = repo.rmt_bins_matching_bin_load(:bin_asset_number, bin_load_product_id: bin_load_product_id).count
         return failed_response("Bin load: #{id} - Insufficient bins available") if qty_available < qty_bins
       end
-
+      instance = bin_load(id)
       success_response('Load valid', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     def scan_bin_to_bin_load(params)
@@ -189,6 +195,11 @@ module RawMaterialsApp
 
     def validate_bin_load_params(params)
       BinLoadSchema.call(params)
+    end
+
+    def check!(task, id = nil)
+      res = TaskPermissionCheck::BinLoad.call(task, id)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
   end
 end
