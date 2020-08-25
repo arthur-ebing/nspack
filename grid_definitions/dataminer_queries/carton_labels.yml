@@ -14,8 +14,8 @@
   \   nett_weight,\r\n    pick_ref,\r\n    pallet_sequence_id,\r\n    pallet_number,\r\n
   \   pallet_sequence_number,\r\n    personnel_identifier,\r\n    personnel_number,\r\n
   \   packing_method_code,\r\n    palletizer_identifier,\r\n    palletizer_contract_worker,\r\n
-  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM vw_carton_labels
-  \r\nORDER BY carton_label_id DESC"
+  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM vw_cartons \r\nORDER
+  BY carton_label_id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1070,4 +1070,4 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def:
+  :list_def: 

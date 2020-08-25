@@ -15,7 +15,7 @@
   \   pallet_sequence_number,\r\n    personnel_identifier,\r\n    personnel_number,\r\n
   \   packing_method_code,\r\n    palletizer_identifier,\r\n    palletizer_contract_worker,\r\n
   \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM
-  vw_cartons ORDER BY carton_id DESC"
+  vw_cartons WHERE carton_id IS NOT NULL ORDER BY carton_id DESC"
 :limit: 
 :offset: 
 :external_settings:
