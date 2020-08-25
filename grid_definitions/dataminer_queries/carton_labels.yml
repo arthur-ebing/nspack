@@ -1,5 +1,5 @@
 ---
-:caption: Cartons
+:caption: Carton Labels
 :sql: "SELECT \r\n    carton_id,\r\n    carton_label_id,\r\n    production_run_id,\r\n
   \   carton_label_created_at,\r\n    label_age_hrs,\r\n    carton_age_hrs,\r\n    contract_worker,\r\n
   \   carton_verified_at,\r\n    packhouse,\r\n    line,\r\n    packpoint,\r\n    palletizing_bay,\r\n
@@ -14,8 +14,8 @@
   \   nett_weight,\r\n    pick_ref,\r\n    pallet_sequence_id,\r\n    pallet_number,\r\n
   \   pallet_sequence_number,\r\n    personnel_identifier,\r\n    personnel_number,\r\n
   \   packing_method_code,\r\n    palletizer_identifier,\r\n    palletizer_contract_worker,\r\n
-  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM
-  vw_cartons ORDER BY carton_id DESC"
+  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM vw_carton_labels
+  \r\nORDER BY carton_label_id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -30,7 +30,7 @@
     :width: 100
     :format: 
     :hide: false
-    :pinned: left
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -46,7 +46,7 @@
     :width: 120
     :format: 
     :hide: false
-    :pinned: 
+    :pinned: left
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -1070,14 +1070,4 @@
   :default_value: 
   :ordered_list: false
   :ui_priority: 2
-  :list_def: 
-- :column: is_virtual
-  :caption: Virtual?
-  :data_type: :boolean
-  :control_type: :list
-  :default_value: 
-  :ordered_list: false
-  :ui_priority: 6
   :list_def:
-  - true
-  - false
