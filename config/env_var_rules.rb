@@ -89,7 +89,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { AUTO_PRINT_PALLET_LABEL_ON_BAY: 'Carton Palletizing - Print pallet labels on pallet complete only if true.' },
     { ALLOW_OVERFULL_PALLETIZING: 'Carton Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached.' },
     { MAX_PASSENGER_INSTANCES: 'Number of passenger instance as set in /etc/nginx/conf.d/mod-http-passenger.conf' },
-    { ALLOW_OVERFULL_REWORKS_PALLETIZING: 'Reworks Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached in reworks.' }
+    { ALLOW_OVERFULL_REWORKS_PALLETIZING: 'Reworks Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached in reworks.' },
+    { USE_LABEL_ID_ON_BIN_LABEL: 'Use carton_label_id to lookup carton_labels existence. Default false' }
   ].freeze
 
   NO_OVERRIDE = [

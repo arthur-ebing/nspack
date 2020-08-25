@@ -518,7 +518,10 @@ module MesscadaApp
     end
 
     def validate_carton_label_exists(carton_id_or_pallet_no)
-      if AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
+
+      if lookup_by_pallet_no
         return failed_response("Bin label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists_for_pallet?(carton_id_or_pallet_no)
       else
         return failed_response("Carton label:#{carton_id_or_pallet_no} could not be found") unless carton_label_exists?(carton_id_or_pallet_no)
