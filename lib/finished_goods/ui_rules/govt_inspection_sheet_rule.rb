@@ -36,9 +36,8 @@ module UiRules
       fields[:results_captured_at] = { renderer: :label }
       fields[:api_results_received] = { renderer: :label,
                                         as_boolean: true }
-      fields[:as_edi_location] = { renderer: :label,
-                                   caption: 'Use Inspection Destination for EDI',
-                                   as_boolean: true }
+      fields[:use_inspection_destination_for_load_out] = { renderer: :label,
+                                                           as_boolean: true }
       fields[:completed] = { renderer: :label,
                              as_boolean: true }
       fields[:completed_at] = { renderer: :label }
@@ -89,8 +88,7 @@ module UiRules
         results_captured: { renderer: :checkbox },
         results_captured_at: { renderer: :date },
         api_results_received: { renderer: :checkbox },
-        as_edi_location: { renderer: :checkbox,
-                           caption: 'Use Inspection Destination for EDI' },
+        use_inspection_destination_for_load_out: { renderer: :checkbox },
         completed: { renderer: :checkbox,
                      disabled: true },
         completed_at: { renderer: :date },
@@ -139,7 +137,7 @@ module UiRules
                                     results_captured: nil,
                                     results_captured_at: nil,
                                     api_results_received: nil,
-                                    as_edi_location: nil,
+                                    use_inspection_destination_for_load_out: nil,
                                     completed: nil,
                                     completed_at: nil,
                                     inspected: nil,

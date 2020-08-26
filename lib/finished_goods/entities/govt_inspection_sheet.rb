@@ -36,7 +36,7 @@ module FinishedGoodsApp
     attribute :tripsheet_loaded, Types::Bool
     attribute :tripsheet_loaded_at, Types::DateTime
     attribute :tripsheet_offloaded, Types::Bool
-    attribute :as_edi_location, Types::Bool
+    attribute :use_inspection_destination_for_load_out, Types::Bool
     attribute? :status, Types::String
     attribute? :active, Types::Bool
   end

@@ -26,7 +26,7 @@ module FinishedGoodsApp
     optional(:tripsheet_loaded, :bool).maybe(:bool?)
     optional(:tripsheet_loaded_at, %i[nil time]).maybe(:time?)
     optional(:tripsheet_offloaded, :bool).maybe(:bool?)
-    optional(:as_edi_location, :bool).maybe(:bool?)
+    optional(:use_inspection_destination_for_load_out, :bool).maybe(:bool?)
     optional(:created_by, Types::StrippedString).maybe(:str?)
   end
 end

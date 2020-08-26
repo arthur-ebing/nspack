@@ -106,7 +106,7 @@ module FinishedGoodsApp
         tripsheet_loaded: false,
         tripsheet_loaded_at: '2010-01-01 12:00',
         tripsheet_offloaded: false,
-        as_edi_location: false,
+        use_inspection_destination_for_load_out: false,
         active: true
       }
     end
