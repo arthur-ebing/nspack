@@ -37,6 +37,7 @@ module UiRules
       fields[:api_results_received] = { renderer: :label,
                                         as_boolean: true }
       fields[:use_inspection_destination_for_load_out] = { renderer: :label,
+                                                           caption: 'Use Destination Region For Load Out',
                                                            as_boolean: true }
       fields[:completed] = { renderer: :label,
                              as_boolean: true }
@@ -88,7 +89,8 @@ module UiRules
         results_captured: { renderer: :checkbox },
         results_captured_at: { renderer: :date },
         api_results_received: { renderer: :checkbox },
-        use_inspection_destination_for_load_out: { renderer: :checkbox },
+        use_inspection_destination_for_load_out: { renderer: :checkbox,
+                                                   caption: 'Use Destination Region For Load Out' },
         completed: { renderer: :checkbox,
                      disabled: true },
         completed_at: { renderer: :date },
@@ -204,11 +206,12 @@ module UiRules
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
                  prompt: 'Are you sure you want to reopen this inspection?',
                  icon: :back }
+      toggle = @form_object.use_inspection_destination_for_load_out
       toggle_use_inspection_destination = { control_type: :link,
                                             style: :action_button,
-                                            text: 'Use Inspection Destination for Load Out',
+                                            text: "#{toggle ? "Don't use" : 'Use'} Destination Region for Load Out",
                                             url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/toggle_use_inspection_destination",
-                                            prompt: 'Are you sure you want to change use inspection destination for load out?',
+                                            prompt: "Are you sure you#{toggle ? ' do not' : ''} want to use destination region for load out?",
                                             icon: :edit }
 
       case @form_object.step
