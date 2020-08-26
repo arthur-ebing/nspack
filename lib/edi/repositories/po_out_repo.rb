@@ -85,8 +85,20 @@ module EdiApp
 
           depots.depot_code AS dest_locn,
           depots.depot_code AS orig_depot,
-          destination_regions.destination_region_name AS target_region,
-          destination_countries.iso_country_code AS target_country,
+          CASE WHEN govt_inspection_sheets.use_inspection_destination_for_load_out THEN
+            (SELECT destination_regions.destination_region_name
+              FROM destination_regions_tm_groups
+              LEFT JOIN destination_regions ON destination_regions.id = destination_regions_tm_groups.destination_region_id
+              WHERE destination_regions_tm_groups.target_market_group_id = pallet_sequences.packed_tm_group_id
+              LIMIT 1)
+          ELSE
+            destination_regions.destination_region_name
+          END AS target_region,
+          CASE WHEN govt_inspection_sheets.use_inspection_destination_for_load_out THEN
+            target_market_groups.target_market_group_name
+          ELSE
+            destination_countries.iso_country_code
+          END AS target_country,
           substring(pallet_sequences.pallet_number from '.........$') AS pallet_id,
           pallet_sequences.pallet_sequence_number AS seq_no,
           govt_inspection_sheets.id AS consignment_number,
