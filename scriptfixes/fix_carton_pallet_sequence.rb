@@ -31,6 +31,7 @@ class FixCartonPalletSequence < BaseScript
       @carton_ids = []
       repacked_from_pallet_cartons(repacked_from_pallet_id, pallet_sequence_number)
       puts "Pallet sequence id: #{sequence_id}. Cartons:"
+      @carton_ids = @carton_ids.flatten
       p @carton_ids
 
       next if @carton_ids.count.zero?
@@ -90,7 +91,7 @@ class FixCartonPalletSequence < BaseScript
                   .where(scrapped_from_pallet_id: pallet_id)
                   .where(pallet_sequence_number: pallet_sequence_number)
                   .get(:id)
-    @carton_ids = DB[:cartons].where(pallet_sequence_id: sequence_id).map(:id)
+    @carton_ids << DB[:cartons].where(pallet_sequence_id: sequence_id).map(:id)
 
     repacked_from_pallet_id = DB[:pallets]
                               .join(:pallet_sequences, scrapped_from_pallet_id: :id)
@@ -99,13 +100,6 @@ class FixCartonPalletSequence < BaseScript
                               .get(:repacked_from_pallet_id)
 
     return if repacked_from_pallet_id.nil_or_empty?
-
-    sequence_id = DB[:pallet_sequences]
-                  .where(scrapped_from_pallet_id: repacked_from_pallet_id)
-                  .where(pallet_sequence_number: pallet_sequence_number)
-                  .get(:id)
-
-    @carton_ids = DB[:cartons].where(pallet_sequence_id: sequence_id).map(:id)
 
     repacked_from_pallet_cartons(repacked_from_pallet_id, pallet_sequence_number)
   end
