@@ -130,6 +130,19 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def toggle_use_inspection_destination(id)
+      use_inspection_destination = repo.get(:govt_inspection_sheets, id, :use_inspection_destination_for_load_out)
+
+      repo.transaction do
+        repo.update_govt_inspection_sheet(id, use_inspection_destination_for_load_out: !use_inspection_destination)
+        log_transaction
+      end
+
+      success_response('Updated sheet.')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def cancel_govt_inspection_sheet(id)
       check!(:cancel, id)
 

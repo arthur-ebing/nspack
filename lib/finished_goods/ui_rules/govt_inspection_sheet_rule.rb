@@ -204,6 +204,12 @@ module UiRules
                  url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/reopen",
                  prompt: 'Are you sure you want to reopen this inspection?',
                  icon: :back }
+      toggle_use_inspection_destination = { control_type: :link,
+                                            style: :action_button,
+                                            text: 'Use Inspection Destination for Load Out',
+                                            url: "/finished_goods/inspection/govt_inspection_sheets/#{id}/toggle_use_inspection_destination",
+                                            prompt: 'Are you sure you want to change use inspection destination for load out?',
+                                            icon: :edit }
 
       case @form_object.step
       when 0
@@ -213,7 +219,7 @@ module UiRules
         progress_controls = [uncomplete, preverify, finish]
         instance_controls = [edit]
       when 2
-        progress_controls = [reopen]
+        progress_controls = [reopen, toggle_use_inspection_destination]
         instance_controls = []
       else
         progress_controls = []

@@ -141,6 +141,13 @@ class Nspack < Roda
         r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
       end
 
+      r.on 'toggle_use_inspection_destination' do
+        check_auth!('inspection', 'edit')
+        res = interactor.toggle_use_inspection_destination(id)
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
+      end
+
       r.on 'cancel' do
         check_auth!('inspection', 'edit')
         res = interactor.cancel_govt_inspection_sheet(id)
