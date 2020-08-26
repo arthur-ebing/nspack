@@ -96,15 +96,16 @@ module FinishedGoods
                   col.add_field :booking_reference
                   col.add_field :created_by
                   col.add_field :pallet_number
+                  col.add_field :status
                 end
                 row.column do |col|
                   col.add_field :consignment_note_number
                   col.add_field :inspection_point
                   col.add_field :destination_region_id
+                  col.add_field :as_edi_location
                   col.add_field :completed
                   col.add_field :inspected
                   col.add_field :reinspection
-                  col.add_field :status
                 end
               end
             end

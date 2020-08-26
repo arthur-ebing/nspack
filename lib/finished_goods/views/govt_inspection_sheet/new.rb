@@ -27,6 +27,7 @@ module FinishedGoods
                   col.add_field :inspection_point
                   col.add_field :packed_tm_group_id
                   col.add_field :destination_region_id
+                  col.add_field :as_edi_location
                   col.add_field :reinspection
                 end
               end

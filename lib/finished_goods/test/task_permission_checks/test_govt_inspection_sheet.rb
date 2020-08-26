@@ -43,6 +43,7 @@ module FinishedGoodsApp
         tripsheet_loaded: false,
         tripsheet_loaded_at: '2010-01-01 12:00',
         tripsheet_offloaded: false,
+        as_edi_location: false,
         active: true
       }
       FinishedGoodsApp::GovtInspectionSheet.new(base_attrs.merge(attrs))
