@@ -69,5 +69,18 @@ class Nspack < Roda
     r.on 'carton_pallet_summary_days' do
       show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::CartonPalletSummaryDays.call }
     end
+
+    # DEVICE ALLOCATIONS
+    # --------------------------------------------------------------------------
+    r.on 'device_allocation', String do |device|
+      r.is do
+        show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::DeviceAllocation.call(device) }
+      end
+
+      r.on 'detail' do
+        content = render_partial { Production::Dashboards::Dashboard::DeviceAllocationDetail.call(device) }
+        { updateMessage: { content: content, continuePolling: true } }.to_json
+      end
+    end
   end
 end

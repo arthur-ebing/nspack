@@ -149,6 +149,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         json_actions(actions)
       end
 
+      r.on 'internal_url_changed' do
+        opts = interactor.internal_url_changed(params[:changed_value])
+        visibility = opts.empty? ? :hide_element : :show_element
+        actions = []
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'dashboard_parameter', options_array: opts)
+        actions << OpenStruct.new(type: visibility, dom_id: 'dashboard_parameter_field_wrapper')
+        json_actions(actions)
+      end
+
       r.on String do |dash_key|
         key, page = dash_key.split('_')
 

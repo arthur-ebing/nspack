@@ -26,6 +26,7 @@ module UiRules
                                end
       make_dash_items if @mode == :reorder
       add_behaviour if @mode == :new_text_page
+      add_internal_behaviour if %i[new_internal edit_page].include?(@mode)
 
       form_name 'dashboard'
     end
@@ -70,9 +71,44 @@ module UiRules
         description: { renderer: :label },
         desc: { required: true, caption: 'Page description' },
         url: url_renderer,
+        parameter: { renderer: :select, options: param_options, hide_on_load: hide_param?, prompt: true, invisible: @mode == :new_page },
         select_image: { renderer: :select, options: images, invisible: !image_dashboard?, min_charwidth: 40 },
         secs: { renderer: :integer, required: true, caption: 'No seconds to display', minvalue: 1 }
       }
+    end
+
+    def hide_param?
+      return true if @mode == :new_internal
+
+      return false if @form_object.url.include?('$:')
+
+      dash_rules = dash_rules_for(@form_object.url)
+      return true if dash_rules.nil?
+
+      false
+    end
+
+    def param_options
+      return [] if @mode == :new_internal
+
+      mtc = @form_object.url.match(/\$:(.+)?\$/)
+      return url_params_for(mtc[1]) unless mtc.nil?
+
+      dash_rules = dash_rules_for(@form_object.url)
+      return [] if dash_rules.nil?
+
+      url_params_for(dash_rules.first[:key])
+    end
+
+    def dash_rules_for(url)
+      dash_key = AppConst::DASHBOARD_INTERNAL_PAGES.rassoc(url)
+      return nil if dash_key.nil?
+
+      AppConst::DASHBOARD_QUERYSTRING_PARAMS[dash_key.first]
+    end
+
+    def url_params_for(key)
+      ProductionApp::ResourceRepo.new.for_select_plant_resource_codes(key)
     end
 
     def images
@@ -222,6 +258,14 @@ module UiRules
     def add_behaviour
       behaviours do |behaviour|
         behaviour.dropdown_change :existing_text, notify: [{ url: '/masterfiles/config/dashboards/existing_text_changed' }]
+      end
+    end
+
+    def add_internal_behaviour
+      return if @mode == :edit_page && !internal_url?
+
+      behaviours do |behaviour|
+        behaviour.dropdown_change :url, notify: [{ url: '/masterfiles/config/dashboards/internal_url_changed' }]
       end
     end
   end

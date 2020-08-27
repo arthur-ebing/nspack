@@ -415,5 +415,38 @@ module ProductionApp
       SQL
       DB[query].all
     end
+
+    def device_allocation(run_id, plant_resource_id)
+      query = <<~SQL
+        SELECT plant_resources.plant_resource_code,
+        farms.farm_code,
+        pucs.puc_code,
+        orchards.orchard_code,
+        cultivars.cultivar_code,
+        grades.grade_code,
+        marketing_varieties.marketing_variety_code,
+        standard_pack_codes.standard_pack_code,
+        fruit_actual_counts_for_packs.actual_count_for_pack AS actual_count,
+        fruit_size_references.size_reference AS size_ref,
+        target_market_groups.target_market_group_name AS packed_tm_group
+        FROM product_resource_allocations
+        JOIN production_runs ON production_runs.id = product_resource_allocations.production_run_id
+        JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id
+        JOIN farms ON farms.id = production_runs.farm_id
+        JOIN pucs ON pucs.id = production_runs.puc_id
+        LEFT JOIN orchards ON orchards.id = production_runs.orchard_id
+        LEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id
+        JOIN grades ON grades.id = product_setups.grade_id
+        JOIN target_market_groups ON target_market_groups.id = product_setups.packed_tm_group_id
+        JOIN marketing_varieties ON marketing_varieties.id = product_setups.marketing_variety_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = product_setups.standard_pack_code_id
+        LEFT JOIN fruit_size_references ON fruit_size_references.id = product_setups.fruit_size_reference_id
+        LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = product_setups.fruit_actual_counts_for_pack_id
+        JOIN plant_resources ON plant_resources.id = product_resource_allocations.plant_resource_id
+        WHERE production_run_id = ?
+          AND plant_resource_id = ?
+      SQL
+      DB[query, run_id, plant_resource_id].all
+    end
   end
 end

@@ -39,6 +39,17 @@ module ProductionApp
       for_select_plant_resources(where: { plant_resource_type_id: type[:id] })
     end
 
+    def for_select_plant_resource_codes(plant_resource_type_code) # rubocop:disable Metrics/AbcSize
+      type = where_hash(:plant_resource_types, plant_resource_type_code: plant_resource_type_code, active: true)
+      return [] if type.nil?
+
+      opts = DB[:plant_resources]
+             .left_join(:system_resources, id: :system_resource_id)
+             .where(Sequel[:plant_resources][:plant_resource_type_id] => type[:id])
+             .select_map(%i[plant_resource_code system_resource_code])
+      opts.map { |o| [o.first, o.last.nil? ? o.first : o.last] }
+    end
+
     def packhouse_lines(packhouse_id, active: true) # rubocop:disable Metrics/AbcSize
       DB[:plant_resources]
         .join(:tree_plant_resources, descendant_plant_resource_id: Sequel[:plant_resources][:id])
@@ -138,6 +149,10 @@ module ProductionApp
       DB[:plant_resource_types].where(id: plant_resource_type_id).get(:plant_resource_type_code)
     end
 
+    def plant_resource_type_code_for(plant_resource_id)
+      DB[:plant_resources].join(:plant_resource_types, id: :plant_resource_type_id).where(Sequel[:plant_resources][:id] => plant_resource_id).get(:plant_resource_type_code)
+    end
+
     def plant_resource_type_id_from_code(plant_resource_type_code)
       get_value(:plant_resource_types, :id, plant_resource_type_code: plant_resource_type_code)
     end
@@ -148,6 +163,14 @@ module ProductionApp
 
     def system_resource_type_id_from_code(system_resource_type)
       DB[:system_resource_types].where(system_resource_type_code: system_resource_type).get(:id)
+    end
+
+    def plant_resource_id_for_system_code(system_code)
+      DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: system_code).get(:id)).get(:id)
+    end
+
+    def plant_resource_code_for_system_code(system_code)
+      DB[:plant_resources].where(system_resource_id: DB[:system_resources].where(system_resource_code: system_code).get(:id)).get(:plant_resource_code)
     end
 
     def plant_resource_definition(id)
@@ -202,10 +225,6 @@ module ProductionApp
       DB[:palletizing_bay_states].where(palletizing_bay_resource_id: id).delete
       DB[:plant_resources].where(id: id).delete
       DB[:system_resources].where(id: system_resource_id).delete if system_resource_id
-    end
-
-    def plant_resource_type_code_for(plant_resource_id)
-      DB[:plant_resources].join(:plant_resource_types, id: :plant_resource_type_id).where(Sequel[:plant_resources][:id] => plant_resource_id).get(:plant_resource_type_code)
     end
 
     def next_peripheral_code(plant_resource_type_id)

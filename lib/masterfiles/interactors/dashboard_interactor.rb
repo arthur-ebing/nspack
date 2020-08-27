@@ -10,13 +10,16 @@ module MasterfilesApp
         out = []
         config.each_key do |key|
           desc = config[key]['description']
-          out << { id: key, key: key, desc: desc, page: nil, url: nil, seconds: nil, text: false, image: false } if config[key]['boards'].length.zero?
+          out << { id: key, key: key, desc: desc, page: nil, url: nil, params: nil, seconds: nil, text: false, image: false } if config[key]['boards'].length.zero?
           config[key]['boards'].each_with_index do |board, index|
+            p_value = board['params']&.first
+            p_value = p_value['value'] unless p_value.nil?
             out << { id: "#{key}_#{index}",
                      key: key,
                      desc: desc,
                      page: board['desc'],
                      url: board['url'],
+                     params: p_value,
                      seconds: board['secs'],
                      text: board['url'].start_with?('/dashboard/text/'),
                      image: board['url'].start_with?('/dashboard/image/') }
@@ -85,6 +88,7 @@ module MasterfilesApp
         mk.col 'page', 'Page description', width: 300
         mk.integer 'seconds', 'Seconds'
         mk.col 'url', 'URL', width: 500
+        mk.col 'params', 'Param value'
         mk.integer 'id', 'ID', hide: true
         mk.boolean 'text', 'Text', hide: true
         mk.boolean 'image', 'Image', hide: true
@@ -101,9 +105,27 @@ module MasterfilesApp
 
       name = config['description']
       url_set = config['boards'].map do |dash|
-        [dash['url'], dash['secs']]
+        [apply_url_params(dash), dash['secs']]
       end
       [name, url_set]
+    end
+
+    def apply_url_params(config) # rubocop:disable Metrics/AbcSize
+      return config['url'] unless config['params']
+
+      url = config['url']
+      config['params'].each do |param|
+        if param['type'] == 'inline'
+          url.gsub!("$:#{param['key']}$", param['value'])
+        else
+          url = if url.include?('?')
+                  "#{url}&#{param['key']}=#{param['value']}"
+                else
+                  "#{url}?#{param['key']}=#{param['value']}"
+                end
+        end
+      end
+      url
     end
 
     def url_for(key, index)
@@ -112,7 +134,7 @@ module MasterfilesApp
 
       if index
         url_set = config['boards']
-        url_set[index]['url']
+        apply_url_params(url_set[index])
       else
         "/dashboard/#{key}"
       end
@@ -216,8 +238,30 @@ module MasterfilesApp
       config[key]['boards'][page]['desc'] = params[:desc]
       config[key]['boards'][page]['url'] = url
       config[key]['boards'][page]['secs'] = params[:secs].to_i
+
+      if params[:parameter] && !params[:parameter].empty?
+        config[key]['boards'][page]['params'] = param_for_url(url, params[:parameter])
+      else
+        config[key]['boards'][page].delete('params')
+      end
       rewrite_config('dashboards.yml', config)
       success_response('Saved change', { page: params[:desc], url: url, secs: params[:secs] })
+    end
+
+    def param_for_url(url, value)
+      mtc = url.match(/\$:(.+)?\$/)
+      if mtc.nil?
+        p_type = 'querystring'
+        dash_rules = dash_rules_for(url)
+        raise Crossbeams::FrameworkError, "No dashboard rules for URL: #{url}" if dash_rules.empty?
+
+        key = dash_rules.first[:key]
+      else
+        p_type = 'inline'
+        key = mtc[1]
+      end
+
+      [{ 'type' => p_type, 'key' => key, 'value' => value }]
     end
 
     def delete_dashboard_page(key, page)
@@ -239,7 +283,28 @@ module MasterfilesApp
       success_response("Re-ordered dashboard #{config[key]['description']}")
     end
 
+    def internal_url_changed(url)
+      mtc = url.match(/\$:(.+)?\$/)
+      return url_params_for(mtc[1]) unless mtc.nil?
+
+      dash_rules = dash_rules_for(url)
+      return [] if dash_rules.nil?
+
+      url_params_for(dash_rules.first[:key])
+    end
+
     private
+
+    def dash_rules_for(url)
+      dash_key = AppConst::DASHBOARD_INTERNAL_PAGES.rassoc(url)
+      return nil if dash_key.nil?
+
+      AppConst::DASHBOARD_QUERYSTRING_PARAMS[dash_key.first]
+    end
+
+    def url_params_for(key)
+      ProductionApp::ResourceRepo.new.for_select_plant_resource_codes(key)
+    end
 
     def text_style(section)
       styles = []

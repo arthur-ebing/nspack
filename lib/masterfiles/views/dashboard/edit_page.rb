@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :description
               form.add_field :desc
               form.add_field :url
+              form.add_field :parameter
               form.add_field :secs
               form.add_field :select_image
             end

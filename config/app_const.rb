@@ -458,6 +458,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DASHBOARD_INTERNAL_PAGES = [
     ['Production runs', '/production/dashboards/production_runs?fullpage=y'],
     ['Palletizing bay states', '/production/dashboards/palletizing_bays?fullpage=y'],
+    ['Device allocation', '/production/dashboards/device_allocation/$:ROBOT_BUTTON$?fullpage=y'],
     ['Loads per week', '/production/dashboards/load_weeks?fullpage=y'],
     ['Loads per day', '/production/dashboards/load_days?fullpage=y'],
     ['Pallets in stock', '/production/dashboards/in_stock?fullpage=y'],
@@ -466,6 +467,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ['Carton Pallet summary per week', '/production/dashboards/carton_pallet_summary_weeks?fullpage=y'],
     ['Carton Pallet summary per day', '/production/dashboards/carton_pallet_summary_days?fullpage=y']
   ].freeze
+
+  DASHBOARD_QUERYSTRING_PARAMS = {
+    'Production runs' => [{ key: 'LINE', optional: true }]
+  }.freeze
 
   # Addendum: place of issue for export certificate
   ADDENDUM_PLACE_OF_ISSUE = ENV.fetch('ADDENDUM_PLACE_OF_ISSUE', 'CPT')
