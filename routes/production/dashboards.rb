@@ -25,11 +25,11 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'production_runs' do
       r.is do
-        show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::ProductionRuns.call }
+        show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::ProductionRuns.call(params) }
       end
 
       r.on 'detail' do
-        content = render_partial { Production::Dashboards::Dashboard::ProductionRunsDetail.call }
+        content = render_partial { Production::Dashboards::Dashboard::ProductionRunsDetail.call(params) }
         { updateMessage: { content: content, continuePolling: true } }.to_json
       end
     end

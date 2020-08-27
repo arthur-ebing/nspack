@@ -110,18 +110,19 @@ module MasterfilesApp
       [name, url_set]
     end
 
-    def apply_url_params(config) # rubocop:disable Metrics/AbcSize
+    def apply_url_params(config)
       return config['url'] unless config['params']
 
       url = config['url']
       config['params'].each do |param|
+        key = param['key'].downcase
         if param['type'] == 'inline'
-          url.gsub!("$:#{param['key']}$", param['value'])
+          url.gsub!("$:#{key}$", param['value'])
         else
           url = if url.include?('?')
-                  "#{url}&#{param['key']}=#{param['value']}"
+                  "#{url}&#{key}=#{param['value']}"
                 else
-                  "#{url}?#{param['key']}=#{param['value']}"
+                  "#{url}?#{key}=#{param['value']}"
                 end
         end
       end
@@ -245,7 +246,7 @@ module MasterfilesApp
         config[key]['boards'][page].delete('params')
       end
       rewrite_config('dashboards.yml', config)
-      success_response('Saved change', { page: params[:desc], url: url, secs: params[:secs] })
+      success_response('Saved change', { page: params[:desc], url: url, params: params[:parameter], secs: params[:secs] })
     end
 
     def param_for_url(url, value)

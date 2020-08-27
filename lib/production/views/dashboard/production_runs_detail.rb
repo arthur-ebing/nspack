@@ -4,16 +4,16 @@ module Production
   module Dashboards
     module Dashboard
       class ProductionRunsDetail
-        def self.call
+        def self.call(params)
           layout = Crossbeams::Layout::Page.build({}) do |page|
-            page.add_text draw_boxes
+            page.add_text draw_boxes(params[:line])
           end
 
           layout
         end
 
-        def self.draw_boxes
-          recs = ProductionApp::DashboardRepo.new.production_runs
+        def self.draw_boxes(line)
+          recs = ProductionApp::DashboardRepo.new.production_runs(line)
           <<~HTML
             <div class="flex flex-column">
               #{runs(recs).join("\n")}

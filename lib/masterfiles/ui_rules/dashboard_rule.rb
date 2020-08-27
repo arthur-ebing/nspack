@@ -247,10 +247,13 @@ module UiRules
 
     def edit_page_object # rubocop:disable Metrics/AbcSize
       dash = load_config(@options[:key])
+      p_value = dash['boards'][@options[:index]]['params']&.first
+      p_value = p_value['value'] unless p_value.nil?
       OpenStruct.new(key: @options[:key],
                      description: dash['description'],
                      desc: dash['boards'][@options[:index]]['desc'],
                      url: dash['boards'][@options[:index]]['url'],
+                     parameter: p_value,
                      select_image: image_name(dash['boards'][@options[:index]]['url']),
                      secs: dash['boards'][@options[:index]]['secs'])
     end

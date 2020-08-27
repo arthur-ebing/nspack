@@ -45,7 +45,13 @@ module ProductionApp
       DB[query].all
     end
 
-    def production_runs
+    def production_runs(line)
+      and_clause = if line.nil_or_empty?
+                     ''
+                   else
+                     line_id = DB[:plant_resources].where(plant_resource_code: line).get(:id)
+                     "AND production_line_id = #{line_id}"
+                   end
       query = <<~SQL
         SELECT production_runs.id, fn_production_run_code(production_runs.id) AS production_run_code,
         production_runs.active_run_stage,
@@ -82,6 +88,7 @@ module ProductionApp
         LEFT JOIN orchards ON orchards.id = production_runs.orchard_id
         JOIN pucs ON pucs.id = production_runs.puc_id
         WHERE running
+        #{and_clause}
         ORDER BY plant_resources2.plant_resource_code, production_runs.tipping
       SQL
 

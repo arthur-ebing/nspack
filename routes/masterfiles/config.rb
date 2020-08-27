@@ -208,7 +208,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.on 'update_page' do
           res = interactor.update_dashboard_page(key, page.to_i, params[:dashboard])
           if res.success
-            update_grid_row(dash_key, changes: { page: res.instance[:page], url: res.instance[:url], seconds: res.instance[:secs] }, notice: res.message)
+            update_grid_row(dash_key, changes: { page: res.instance[:page], url: res.instance[:url], params: res.instance[:params], seconds: res.instance[:secs] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Config::Dashboard::Edit.call(key, page.to_i) }
           end
