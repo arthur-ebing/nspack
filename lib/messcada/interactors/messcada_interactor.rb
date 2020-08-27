@@ -262,7 +262,7 @@ module MesscadaApp
       check_res = validate_carton_label_exists(res[:carton_number])
       return check_res unless check_res.success
 
-      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
+      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET && !AppConst::USE_LABEL_ID_ON_BIN_LABEL
 
       cvl_res = nil
       repo.transaction do

@@ -245,7 +245,7 @@ module MesscadaApp
     # end
 
     def find_pallet_by_carton_number(carton_number)
-      return carton_number if AppConst::CARTON_EQUALS_PALLET
+      return carton_number if AppConst::CARTON_EQUALS_PALLET && !AppConst::USE_LABEL_ID_ON_BIN_LABEL
 
       pallet_sequence_id = get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_number)
       pallet_id = get(:pallet_sequences, pallet_sequence_id, :pallet_id)
