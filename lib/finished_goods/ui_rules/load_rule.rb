@@ -350,15 +350,15 @@ module UiRules
       re_send_po_edi = { control_type: :link,
                          text: 'Re-send PO EDI',
                          url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-                         prompt: 'Are you sure, you want to re send the PO EDI for this load?',
                          icon: :plus,
+                         behaviour: :popup,
                          visible: !@form_object.rmt_load,
                          style: :action_button }
       # re_send_palbin_edi = { control_type: :link,
       #                        text: 'Re-send PALBIN EDI',
       #                        url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-      #                        prompt: 'Are you sure, you want to re send the PALBIN EDI for this load?',
       #                        icon: :plus,
+      #                        behaviour: :popup,
       #                        visible: @form_object.rmt_load,
       #                        style: :action_button }
 
