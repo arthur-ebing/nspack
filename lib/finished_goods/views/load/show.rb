@@ -96,17 +96,7 @@ module FinishedGoods
                   fold.add_grid('edi_po',
                                 "/list/edi_po/grid?key=standard&record_id=#{id}",
                                 caption: 'EDI Transactions',
-                                height: 10)
-                  fold.row do |row|
-                    row.column do |col|
-                      col.add_control(control_type: :link,
-                                      text: 'Re-Send EDI',
-                                      url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-                                      icon: :plus,
-                                      behaviour: :popup,
-                                      style: :action_button)
-                    end
-                  end
+                                height: 8)
                 end
               end
               form.fold_up do |fold|

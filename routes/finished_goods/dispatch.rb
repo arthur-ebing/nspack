@@ -344,9 +344,9 @@ class Nspack < Roda
       end
 
       r.on 're_send_edi' do
-        check_auth!('dispatch', 'edit')
         res = interactor.send_edi(id)
-        update_dialog_content(content: wrap_content_in_style(res.message, res.success ? :success : :error, caption: ''))
+        flash[res.success ? :notice : :error] = res.message
+        r.redirect request.referer
       end
 
       r.on 'allocate_multiselect' do
