@@ -289,7 +289,10 @@ module MesscadaApp
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
 
-      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
+
+      res = convert_pallet_no_to_carton_no(res) if lookup_by_pallet_no
 
       cvl_res = nil
       repo.transaction do
@@ -317,7 +320,10 @@ module MesscadaApp
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
 
-      res = convert_pallet_no_to_carton_no(res) if AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = AppConst::CARTON_EQUALS_PALLET
+      lookup_by_pallet_no = false if AppConst::USE_LABEL_ID_ON_BIN_LABEL
+
+      res = convert_pallet_no_to_carton_no(res) if lookup_by_pallet_no
 
       cvl_res = nil
       repo.transaction do
