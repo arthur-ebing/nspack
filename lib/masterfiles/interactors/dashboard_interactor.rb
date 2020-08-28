@@ -133,7 +133,7 @@ module MasterfilesApp
 
     def url_for(key, index)
       config = section_from_yml('dashboards.yml', key)
-      raise CrossbeamsInfoError, "There is no dashboard entry for #{key}" if config.nil?
+      raise Crossbeams::InfoError, "There is no dashboard entry for #{key}" if config.nil?
 
       if index
         url_set = config['boards']
