@@ -76,7 +76,8 @@ module FinishedGoodsApp
 
     def send_edi(load_id)
       load_entity = load_entity(load_id)
-      EdiApp::SendEdiOut.call(AppConst::EDI_FLOW_PO, load_entity.customer_party_role_id, @user.user_name, load_id) unless load_entity.rmt_load
+      flow_type = load_entity.rmt_load ? AppConst::EDI_FLOW_PALBIN : AppConst::EDI_FLOW_PO
+      EdiApp::SendEdiOut.call(flow_type, load_entity.customer_party_role_id, @user.user_name, load_id)
     end
 
     def allocate_multiselect(load_id, pallet_numbers, initial_pallet_numbers = nil) # rubocop:disable Metrics/AbcSize

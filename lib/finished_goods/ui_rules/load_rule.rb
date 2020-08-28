@@ -347,20 +347,12 @@ module UiRules
                       url: "/finished_goods/dispatch/loads/#{id}/update_otmc",
                       prompt: 'Are you sure, you want to update the OTMC Results for this load?',
                       icon: :plus }
-      re_send_po_edi = { control_type: :link,
-                         text: 'Re-send PO EDI',
-                         url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-                         icon: :plus,
-                         behaviour: :popup,
-                         visible: !@form_object.rmt_load,
-                         style: :action_button }
-      # re_send_palbin_edi = { control_type: :link,
-      #                        text: 'Re-send PALBIN EDI',
-      #                        url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
-      #                        icon: :plus,
-      #                        behaviour: :popup,
-      #                        visible: @form_object.rmt_load,
-      #                        style: :action_button }
+      re_send_edi = { control_type: :link,
+                      text: 'Re-send EDI',
+                      url: "/finished_goods/dispatch/loads/#{id}/re_send_edi",
+                      icon: :plus,
+                      behaviour: :popup,
+                      style: :action_button }
 
       case @form_object.step
       when 0
@@ -376,7 +368,7 @@ module UiRules
         progress_controls = [unload_truck, delete_tail, tail, ship]
         instance_controls = [edit]
       when 4
-        progress_controls = [unship, update_otmc, re_send_po_edi]
+        progress_controls = [unship, update_otmc, re_send_edi]
         instance_controls = [edit]
       else
         progress_controls = []

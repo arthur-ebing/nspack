@@ -1,0 +1,15 @@
+---
+:shipped_at: :string
+:destination: :string
+:depot: :string
+:sscc: :string
+:farm: :string
+:puc: :string
+:orchard: :string
+:commodity: :string
+:cultivar: :string
+:grade: :string
+:pack: :string
+:size_reference: :string
+:gross_weight: :string
+:nett_weight: :string

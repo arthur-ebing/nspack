@@ -24,3 +24,5 @@ LI:
   XML: true
 UISTK:
   CSV: true
+PALBIN:
+  CSV: true

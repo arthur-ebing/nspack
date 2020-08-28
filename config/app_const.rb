@@ -485,6 +485,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   EDI_FLOW_PS = 'PS'
   EDI_FLOW_PO = 'PO'
   EDI_FLOW_UISTK = 'UISTK'
+  EDI_FLOW_PALBIN = 'PALBIN'
   EDI_AUTO_CREATE_MF = make_boolean('EDI_AUTO_CREATE_MF')
   PS_APPLY_SUBSTITUTES = make_boolean('PS_APPLY_SUBSTITUTES')
   DEPOT_DESTINATION_TYPE = 'DEPOT'
@@ -502,6 +503,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     EDI_FLOW_UISTK => {
       depot: false,
       roles: [ROLE_MARKETER]
+    },
+    EDI_FLOW_PALBIN => {
+      depot: true,
+      roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
     }
   }.freeze
 

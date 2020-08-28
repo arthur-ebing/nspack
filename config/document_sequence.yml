@@ -8,6 +8,11 @@ edi_out_po:
   data_type: :integer
   table: edi_out_transaction
   column: edi_sequence_number
+edi_out_palbin:
+  db_sequence_name: doc_seqs_edi_out_palbin
+  data_type: :integer
+  table: edi_out_transaction
+  column: edi_sequence_number
 edi_out_uistk:
   db_sequence_name: doc_seqs_edi_out_uistk
   data_type: :integer

@@ -125,7 +125,7 @@ record_entries:: A Hash to be filled with data for output. For flat files, add a
 
 validate_data(identifiers, check_lengths = false):: Validate data for a flat file EDI against the flow's schema. Limit to certain identifiers.
 build_hash_from_data(rec, rec_id):: Builds up a hash from a query `rec` and adds it to `record_entries[rec_id]`.
-add_recordadd_record(record_type, rec = {}):: Add a hash to `record_entries` for `record_type`.
+add_record(record_type, rec = {}):: Add a hash to `record_entries` for `record_type`.
 create_flat_file:: creates the flat file from `record_entries`.
 add_csv_record(rec):: add a csv formatted record to `record_entries` from the `rec` hash.
 create_csv_file:: creates the csv file from `record_entries`.
