@@ -5,9 +5,9 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     # SET LOCAL PALLET TO IN STOCK
     # --------------------------------------------------------------------------
-    r.on 'local_pallet_to_in_stock' do
+    r.on 'local_pallets_to_in_stock' do
       interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      res = interactor.pallet_to_in_stock
+      res = interactor.local_pallets_to_in_stock
       flash[res.success ? :notice : :error] = res.message
       redirect_to_last_grid(r)
     end
@@ -15,9 +15,9 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     # SET EXPORT PALLET TO IN STOCK
     # --------------------------------------------------------------------------
-    r.on 'export_pallet_to_in_stock' do
+    r.on 'export_pallets_to_in_stock' do
       interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      res = interactor.pallet_to_in_stock(pallet_sequence_ids: multiselect_grid_choices(params))
+      res = interactor.export_pallets_to_in_stock(multiselect_grid_choices(params))
       flash[res.success ? :notice : :error] = res.message
       redirect_via_json request.referer
     end

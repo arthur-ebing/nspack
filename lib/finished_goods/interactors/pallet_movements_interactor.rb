@@ -55,13 +55,23 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def pallet_to_in_stock(pallet_sequence_ids: nil) # rubocop:disable Metrics/AbcSize
-      pallet_ids = if AppConst::ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
-                     repo.select_values(:pallet_sequences, :pallet_id, id: pallet_sequence_ids)
-                   else
-                     repo.local_non_stock_pallets
-                   end
+    def local_pallets_to_in_stock
+      pallet_ids = repo.local_non_stock_pallets
+      update_pallets_to_in_stock(pallet_ids)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
 
+    def export_pallets_to_in_stock(pallet_sequence_ids)
+      raise Crossbeams::InfoError, 'Can not allow pallets to bypass inspection' unless AppConst::ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
+
+      pallet_ids = repo.select_values(:pallet_sequences, :pallet_id, id: pallet_sequence_ids).uniq
+      update_pallets_to_in_stock(pallet_ids)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def update_pallets_to_in_stock(pallet_ids)
       repo.transaction do
         repo.update(:pallets, pallet_ids, in_stock: true, stock_created_at: Time.now)
         log_multiple_statuses(:pallets, pallet_ids, 'ACCEPTED_AS_LOCAL_STOCK')

@@ -15,7 +15,7 @@
       - can_unship
 :page_controls:
   - :control_type: :link
-    :url: '/finished_goods/stock/local_pallet_to_in_stock'
+    :url: '/finished_goods/stock/local_pallets_to_in_stock'
     :text: Set Local Pallets to Stock
     :style: :button
     :prompt: 'Are you sure you want to set all local pallets to stock?'
@@ -194,7 +194,7 @@
     :can_be_cleared: true
     :conditions: target_customer_pallets
   :export_pack:
-    :url: '/finished_goods/stock/export_pallet_to_in_stock'
+    :url: '/finished_goods/stock/export_pallets_to_in_stock'
     :multiselect_save_method: remote
     :can_be_cleared: true
     :grid_caption: Export Pallets
