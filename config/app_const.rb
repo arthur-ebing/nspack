@@ -403,6 +403,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # * actual_count_for_pack
   # * basic_pack_code
   # * commodity_code
+  # * grade_code
   # * mark_code
   # * marketing_variety_code
   # * org_code

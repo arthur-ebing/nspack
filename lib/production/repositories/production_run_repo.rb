@@ -401,6 +401,7 @@ module ProductionApp
         "marketing_varieties"."marketing_variety_code",
         "standard_pack_codes"."standard_pack_code",
         "basic_pack_codes"."basic_pack_code",
+        "grades"."grade_code",
         "std_fruit_size_counts"."size_count_value",
         "fruit_actual_counts_for_packs"."actual_count_for_pack",
         "fruit_size_references"."size_reference",
@@ -438,6 +439,7 @@ module ProductionApp
         LEFT JOIN "organizations" ON "organizations"."id" = "party_roles"."organization_id"
         LEFT JOIN "target_market_groups" ON "target_market_groups"."id" = "product_setups"."packed_tm_group_id"
         LEFT JOIN "marks" ON "marks"."id" = "product_setups"."mark_id"
+        LEFT JOIN "grades" ON "grades"."id" = "product_setups"."grade_id"
 
         WHERE r.id = ?
         ORDER BY "btns"."system_resource_code"
