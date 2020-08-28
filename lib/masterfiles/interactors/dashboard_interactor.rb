@@ -321,7 +321,11 @@ module MasterfilesApp
 
     def load_config(file)
       fn = File.join(ENV['ROOT'], 'config', file)
-      YAML.load_file(fn)
+      if File.exist?(fn)
+        YAML.load_file(fn)
+      else
+        {}
+      end
     end
 
     def rewrite_config(file, config)
