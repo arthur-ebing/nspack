@@ -90,6 +90,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ALLOW_OVERFULL_PALLETIZING: 'Carton Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached.' },
     { MAX_PASSENGER_INSTANCES: 'Number of passenger instance as set in /etc/nginx/conf.d/mod-http-passenger.conf' },
     { ALLOW_OVERFULL_REWORKS_PALLETIZING: 'Reworks Palletizing - If FALSE auto complete pallet if pallets cartons_per_pallet is reached in reworks.' },
+    { ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION: 'optional. Allow non LO pallets to be set to in_stock by users' },
     { USE_LABEL_ID_ON_BIN_LABEL: 'If CARTON_EQUALS_PALLET is true, use carton_label_id instead of pallet_number to lookup carton_labels existence if USE_LABEL_ID_ON_BIN_LABEL is set to true. Default false' }
   ].freeze
 

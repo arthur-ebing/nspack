@@ -149,7 +149,7 @@ module FinishedGoodsApp
         .join(:pallets, id: :pallet_id)
         .where(in_stock: false, packed_tm_group_id: tm_id)
         .distinct
-        .select_map([:pallet_id, Sequel[:pallets][:pallet_number]])
+        .select_map(:pallet_id)
     end
   end
 end

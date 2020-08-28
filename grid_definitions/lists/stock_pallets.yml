@@ -15,7 +15,7 @@
       - can_unship
 :page_controls:
   - :control_type: :link
-    :url: '/finished_goods/stock/set_local_pallet'
+    :url: '/finished_goods/stock/local_pallet_to_in_stock'
     :text: Set Local Pallets to Stock
     :style: :button
     :prompt: 'Are you sure you want to set all local pallets to stock?'
@@ -23,6 +23,7 @@
       - active
       - daily_pack
       - in_stock
+      - export_pack
       - unallocated_stock
       - scrapped
       - failed_inspections
@@ -36,6 +37,7 @@
     :active: Active Pallets
     :daily_pack: Daily Pack Pallets
     :local_pack: Local Pack Pallets
+    :export_pack: Export Pack Pallets
     :in_stock: Pallets in stock
     :unallocated_stock: Unallocated Pallets
     :scrapped: Scrapped Pallets
@@ -62,8 +64,21 @@
     - :col: in_stock
       :op: =
       :val: false
+    - :col: shipped
+      :op: =
+      :val: false
     - :col: packed_tm_group
       :op: =
+      :val: 'LO'
+  :export_pack:
+    - :col: in_stock
+      :op: =
+      :val: false
+    - :col: shipped
+      :op: =
+      :val: false
+    - :col: packed_tm_group
+      :op: <>
       :val: 'LO'
   :in_stock:
     - :col: in_stock
@@ -178,3 +193,10 @@
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: target_customer_pallets
+  :export_pack:
+    :url: '/finished_goods/stock/export_pallet_to_in_stock'
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :grid_caption: Export Pallets
+    :caption: Test
+    :conditions: export_pack

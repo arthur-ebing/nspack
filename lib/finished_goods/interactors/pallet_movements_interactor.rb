@@ -55,18 +55,19 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def set_local_pallet # rubocop:disable Metrics/AbcSize
-      ar = repo.local_non_stock_pallets
-      pallet_ids = ar.map(&:first)
-      pallet_numbers = ar.map(&:last)
+    def pallet_to_in_stock(pallet_sequence_ids: nil) # rubocop:disable Metrics/AbcSize
+      pallet_ids = if AppConst::ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION
+                     repo.select_values(:pallet_sequences, :pallet_id, id: pallet_sequence_ids)
+                   else
+                     repo.local_non_stock_pallets
+                   end
 
       repo.transaction do
         repo.update(:pallets, pallet_ids, in_stock: true, stock_created_at: Time.now)
         log_multiple_statuses(:pallets, pallet_ids, 'ACCEPTED_AS_LOCAL_STOCK')
         log_transaction
       end
-
-      success_response("Updated pallets #{pallet_numbers.join(', ')}")
+      success_response("Updated #{pallet_ids.length} pallets to in stock")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

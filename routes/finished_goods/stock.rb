@@ -3,13 +3,23 @@
 class Nspack < Roda
   route 'stock', 'finished_goods' do |r| # rubocop:disable Metrics/BlockLength
     # --------------------------------------------------------------------------
-    # SET LOCAL PALLET
+    # SET LOCAL PALLET TO IN STOCK
     # --------------------------------------------------------------------------
-    r.on 'set_local_pallet' do
+    r.on 'local_pallet_to_in_stock' do
       interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      res = interactor.set_local_pallet
+      res = interactor.pallet_to_in_stock
       flash[res.success ? :notice : :error] = res.message
       redirect_to_last_grid(r)
+    end
+
+    # --------------------------------------------------------------------------
+    # SET EXPORT PALLET TO IN STOCK
+    # --------------------------------------------------------------------------
+    r.on 'export_pallet_to_in_stock' do
+      interactor = FinishedGoodsApp::PalletMovementsInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      res = interactor.pallet_to_in_stock(pallet_sequence_ids: multiselect_grid_choices(params))
+      flash[res.success ? :notice : :error] = res.message
+      redirect_via_json request.referer
     end
 
     # ALLOCATE TARGET CUSTOMER
@@ -31,12 +41,7 @@ class Nspack < Roda
 
       r.on 'multiselect_target_customer_pallets' do
         res = interactor.set_pallets_target_customer(retrieve_from_local_store(:target_customer_id), multiselect_grid_choices(params))
-
-        if res.success
-          flash[:notice] = res.message
-        else
-          flash[:error] = res.message
-        end
+        flash[res.success ? :notice : :error] = res.message
         redirect_via_json('/finished_goods/stock/allocate_target_customer/new')
       end
     end

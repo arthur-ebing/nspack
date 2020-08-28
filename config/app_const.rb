@@ -85,6 +85,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
 
   # Constants for pallet movements:
+  ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION = make_boolean('ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION')
   CALCULATE_PALLET_DECK_POSITIONS = make_boolean('CALCULATE_PALLET_DECK_POSITIONS')
   PALLET_MIX_RULES_SCOPE = ENV.fetch('PALLET_MIX_RULES_SCOPE', '').split(',')
   BUILDUP_PALLET_MIX = 'BUILDUP'
