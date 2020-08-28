@@ -115,14 +115,16 @@ module MasterfilesApp
 
       url = config['url']
       config['params'].each do |param|
-        key = param['key'].downcase
+        key = param['key']
+        val = param['value']
         if param['type'] == 'inline'
-          url.gsub!("$:#{key}$", param['value'])
+          url.gsub!("$:#{key}$", val)
         else
+          key = key.downcase
           url = if url.include?('?')
-                  "#{url}&#{key}=#{param['value']}"
+                  "#{url}&#{key}=#{val}"
                 else
-                  "#{url}?#{key}=#{param['value']}"
+                  "#{url}?#{key}=#{val}"
                 end
         end
       end
