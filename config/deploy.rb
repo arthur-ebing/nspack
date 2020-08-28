@@ -142,6 +142,9 @@ namespace :devops do
       execute :mkdir, "#{shared_path}/app_reports"
       execute :mkdir, "#{shared_path}/app_prepared_reports"
 
+      execute :echo, "--- > #{shared_path}/config/dashboards.yml"
+      execute :echo, "--- > #{shared_path}/config/dashboard_texts.yml"
+
       execute :touch, "#{shared_path}/.env.local"
     end
   end
