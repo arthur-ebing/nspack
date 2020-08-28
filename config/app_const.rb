@@ -506,7 +506,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
     },
     EDI_FLOW_PALBIN => {
       depot: true,
-      roles: [ROLE_CUSTOMER, ROLE_SHIPPER, ROLE_EXPORTER]
+      roles: [ROLE_CUSTOMER, ROLE_EXPORTER]
     }
   }.freeze
 

@@ -3,7 +3,7 @@
 module EdiApp
   class PalbinOutRepo < BaseRepo
     def palbin_details(load_id)
-      query = "
+      query = <<~SQL
         SELECT
             loads.shipped_at,
             depots.depot_code destination,
@@ -40,18 +40,18 @@ module EdiApp
         LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = pallet_sequences.fruit_actual_counts_for_pack_id
 
         WHERE loads.rmt_load
-        AND loads.id = #{load_id}
-      "
-      DB[query].all
+        AND loads.id = ?
+      SQL
+      DB[query, load_id].all
     end
 
     def store_edi_filename(file_name, record_id)
       DB[:loads].where(id: record_id).update(edi_file_name: file_name)
       log_status(:loads, record_id, 'PALBIN SENT', user_name: 'System', comment: file_name)
     end
-    #
-    # def log_palbin_fail(record_id, message)
-    #   log_status(:loads, record_id, 'PALBIN SEND FAILURE', user_name: 'System', comment: message)
-    # end
+
+    def log_palbin_fail(record_id, message)
+      log_status(:loads, record_id, 'PALBIN SEND FAILURE', user_name: 'System', comment: message)
+    end
   end
 end
