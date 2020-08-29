@@ -245,7 +245,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                   interactor.delete_dashboard_page(key, page.to_i)
                 end
           if res.success
-            delete_grid_row(dash_key, notice: res.message)
+            flash[:notice] = res.message
+            redirect_via_json '/masterfiles/config/dashboards/list'
           else
             show_json_error(res.message, status: 200)
           end
