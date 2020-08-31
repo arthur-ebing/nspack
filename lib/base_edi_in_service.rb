@@ -58,9 +58,25 @@ class BaseEdiInService < BaseService
     file_type = check_file_type(file_path)
     if file_type == :xml
       build_xml_records(file_path)
+    elsif file_type == :csv
+      build_csv_records(file_path)
     else
       build_flat_file_records(file_path)
     end
+  end
+
+  def build_csv_records(file_path)
+    @csv_file_repo = EdiApp::CsvFileRepo.new(flow_type)
+    res = @xml_file_repo.validate_xml_schema(file_path)
+    if res.success
+      @edi_result.schema_valid = true
+    else
+      @edi_result.schema_valid = false
+      @edi_result.notes = "CSV validation error:\n\n#{res.message}:\n#{res.instance.join("\n")}"
+      log_err(@edi_result.notes)
+      raise Crossbeams::InfoError, 'Invalid CSV file'
+    end
+    @edi_records = @csv_file_repo.records_from_file(file_path)
   end
 
   def build_xml_records(file_path)
@@ -86,6 +102,9 @@ class BaseEdiInService < BaseService
 
   def check_file_type(file_path)
     typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
-    %w[application/xml text/xml].include?(typ) ? :xml : :text
+    return :xml if %w[application/xml text/xml].include?(typ)
+    return :csv if type == 'application/csv'
+
+    :text
   end
 end
