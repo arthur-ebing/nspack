@@ -67,7 +67,7 @@ class BaseEdiInService < BaseService
 
   def build_csv_records(file_path)
     @csv_file_repo = EdiApp::CsvFileRepo.new(flow_type)
-    res = @xml_file_repo.validate_xml_schema(file_path)
+    res = @csv_file_repo.validate_csv_schema(file_path)
     if res.success
       @edi_result.schema_valid = true
     else
@@ -103,7 +103,7 @@ class BaseEdiInService < BaseService
   def check_file_type(file_path)
     typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
     return :xml if %w[application/xml text/xml].include?(typ)
-    return :csv if type == 'application/csv'
+    return :csv if %w[text/plain].include?(typ)
 
     :text
   end
