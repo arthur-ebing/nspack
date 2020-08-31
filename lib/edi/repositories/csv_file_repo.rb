@@ -14,7 +14,7 @@ module EdiApp
       schema_file = File.expand_path("../schemas/#{flow_type.downcase}.yml", __dir__)
       raise "There is no YML schema for EDI flow type #{flow_type}" unless File.exist?(schema_file)
 
-      schema = YAML.load_file(file_path)
+      schema = YAML.load_file(schema_file)
       required_keys = schema.keys.map(&:to_s)
       header = File.foreach(file_path).first.chomp.split(',')
       result = required_keys - header
