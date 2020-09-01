@@ -462,9 +462,11 @@ class Nspack < Roda
               std_pack_label_code
               basic_pack_code
               use_size_ref_for_edi
-              bin
-              active
               palletizer_incentive_rate
+              bin
+              container_type
+              material_type
+              active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -485,6 +487,28 @@ class Nspack < Roda
 
     r.on 'standard_pack_codes' do
       interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'bin_changed' do
+        actions = []
+        if params[:changed_value] == 't'
+          actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_code_rmt_container_type_id_field_wrapper')
+        else
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_code_rmt_container_type_id_field_wrapper')
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_code_rmt_container_material_type_id_field_wrapper')
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_code_rmt_container_type_id', value: '')
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_code_rmt_container_material_type_id', value: '')
+        end
+        json_actions(actions)
+      end
+
+      r.on 'container_type_changed' do
+        actions = []
+        material_types = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'standard_pack_code_rmt_container_material_type_id', options_array: material_types)
+        actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_code_rmt_container_material_type_id_field_wrapper')
+        json_actions(actions)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }

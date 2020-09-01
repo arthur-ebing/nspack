@@ -16,9 +16,12 @@ module MasterfilesApp
         plant_resource_button_indicator: 'ABC',
         basic_pack_code_id: 1,
         use_size_ref_for_edi: false,
+        palletizer_incentive_rate: 1.0,
         bin: false,
-        active: true,
-        palletizer_incentive_rate: 1.0
+        rmt_container_type_id: nil,
+        rmt_container_material_type_id: nil,
+        active: true
+
       }
       MasterfilesApp::StandardPackCode.new(base_attrs.merge(attrs))
     end

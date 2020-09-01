@@ -1,14 +1,19 @@
 ---
 :caption: Standard Pack Codes
 :sql: "SELECT\r\n    standard_pack_codes.id,\r\n    standard_pack_codes.standard_pack_code,\r\n
+  \   fn_masterfile_variants('standard_pack_codes', standard_pack_codes.id) AS variant_codes,\r\n
   \   standard_pack_codes.description,\r\n    standard_pack_codes.std_pack_label_code,\r\n
   \   standard_pack_codes.material_mass,\r\n    standard_pack_codes.plant_resource_button_indicator,\r\n
   \   basic_pack_codes.basic_pack_code,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
-  \   standard_pack_codes.bin,\r\n    fn_masterfile_variants('standard_pack_codes',
-  standard_pack_codes.id) AS variant_codes,\r\n    standard_pack_codes.active,\r\n
-  \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    palletizer_incentive_rate\r\nFROM
-  standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nORDER
-  BY\r\n    standard_pack_codes.standard_pack_code"
+  \   standard_pack_codes.palletizer_incentive_rate,\r\n    standard_pack_codes.bin,\r\n
+  \   standard_pack_codes.rmt_container_type_id,\r\n    rmt_container_types.container_type_code
+  AS container_type,\r\n    standard_pack_codes.rmt_container_material_type_id,\r\n
+  \   rmt_container_material_types.container_material_type_code AS material_type,\r\n
+  \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    standard_pack_codes.active\r\nFROM
+  standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nLEFT
+  JOIN rmt_container_material_types ON rmt_container_material_types.id = standard_pack_codes.rmt_container_material_type_id\r\nLEFT
+  JOIN rmt_container_types ON rmt_container_types.id = standard_pack_codes.rmt_container_type_id\r\nORDER
+  BY\r\n    standard_pack_codes.standard_pack_code\r\n\r\n\r\n\r\n\r\n\r\n"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -45,9 +50,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 3
+    :caption: Variant codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   description:
     :name: description
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Description
     :namespaced_name: standard_pack_codes.description
     :data_type: :string
@@ -63,7 +84,7 @@
     :group_max: false
   std_pack_label_code:
     :name: std_pack_label_code
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Label code
     :namespaced_name: standard_pack_codes.std_pack_label_code
     :data_type: :string
@@ -79,7 +100,7 @@
     :group_max: false
   material_mass:
     :name: material_mass
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Material mass
     :namespaced_name: standard_pack_codes.material_mass
     :data_type: :number
@@ -95,7 +116,7 @@
     :group_max: false
   plant_resource_button_indicator:
     :name: plant_resource_button_indicator
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Plant resource button indicator
     :namespaced_name: standard_pack_codes.plant_resource_button_indicator
     :data_type: :string
@@ -111,7 +132,7 @@
     :group_max: false
   basic_pack_code:
     :name: basic_pack_code
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Basic pack code
     :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
@@ -127,7 +148,7 @@
     :group_max: false
   use_size_ref_for_edi:
     :name: use_size_ref_for_edi
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Use size ref for edi
     :namespaced_name: standard_pack_codes.use_size_ref_for_edi
     :data_type: :boolean
@@ -141,9 +162,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  palletizer_incentive_rate:
+    :name: palletizer_incentive_rate
+    :sequence_no: 10
+    :caption: Palletizer incentive rate
+    :namespaced_name: standard_pack_codes.palletizer_incentive_rate
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   bin:
     :name: bin
-    :sequence_no: 9
+    :sequence_no: 11
     :caption: Bin?
     :namespaced_name: standard_pack_codes.bin
     :data_type: :boolean
@@ -157,14 +194,94 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  variant_codes:
-    :name: variant_codes
-    :sequence_no: 10
-    :caption: Variant codes
-    :namespaced_name: 
+  rmt_container_type_id:
+    :name: rmt_container_type_id
+    :sequence_no: 12
+    :caption: Rmt container type
+    :namespaced_name: standard_pack_codes.rmt_container_type_id
     :data_type: :string
     :width: 
     :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  container_type:
+    :name: container_type
+    :sequence_no: 13
+    :caption: Container type
+    :namespaced_name: rmt_container_types.container_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_container_material_type_id:
+    :name: rmt_container_material_type_id
+    :sequence_no: 14
+    :caption: Rmt container material type
+    :namespaced_name: standard_pack_codes.rmt_container_material_type_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_type:
+    :name: material_type
+    :sequence_no: 15
+    :caption: Material type
+    :namespaced_name: rmt_container_material_types.container_material_type_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 16
+    :caption: Created at
+    :namespaced_name: standard_pack_codes.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 17
+    :caption: Updated at
+    :namespaced_name: standard_pack_codes.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
     :hide: false
     :pinned: 
     :groupable: false
@@ -175,7 +292,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 11
+    :sequence_no: 18
     :caption: Active
     :namespaced_name: standard_pack_codes.active
     :data_type: :boolean
@@ -184,54 +301,6 @@
     :hide: false
     :pinned: 
     :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  created_at:
-    :name: created_at
-    :sequence_no: 12
-    :caption: Created at
-    :namespaced_name: standard_pack_codes.created_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  updated_at:
-    :name: updated_at
-    :sequence_no: 13
-    :caption: Updated at
-    :namespaced_name: standard_pack_codes.updated_at
-    :data_type: :datetime
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  palletizer_incentive_rate:
-    :name: palletizer_incentive_rate
-    :sequence_no: 14
-    :caption: Palletizer incentive rate
-    :namespaced_name: palletizer_incentive_rate
-    :data_type: :number
-    :width: 
-    :format: :delimited_1000
-    :hide: false
-    :pinned: 
-    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false

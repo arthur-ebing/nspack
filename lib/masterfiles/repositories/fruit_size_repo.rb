@@ -81,7 +81,13 @@ module MasterfilesApp
                             id,
                             parent_tables: [{ parent_table: :basic_pack_codes,
                                               columns: %i[basic_pack_code],
-                                              flatten_columns: { basic_pack_code: :basic_pack_code } }],
+                                              flatten_columns: { basic_pack_code: :basic_pack_code } },
+                                            { parent_table: :rmt_container_types,
+                                              columns: %i[container_type_code],
+                                              flatten_columns: { container_type_code: :container_type } },
+                                            { parent_table: :rmt_container_material_types,
+                                              columns: %i[container_material_type_code],
+                                              flatten_columns: { container_material_type_code: :material_type } }],
                             wrapper: StandardPackCodeFlat)
     end
 

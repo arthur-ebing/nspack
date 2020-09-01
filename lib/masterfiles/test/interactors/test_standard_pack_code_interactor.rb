@@ -82,8 +82,12 @@ module MasterfilesApp
         basic_pack_code_id: basic_pack_code_id,
         basic_pack_code: 'ABC',
         use_size_ref_for_edi: false,
+        palletizer_incentive_rate: 1.0,
         bin: false,
-        palletizer_incentive_rate: 1.0
+        rmt_container_type_id: nil,
+        container_type: nil,
+        rmt_container_material_type_id: nil,
+        material_type: nil
       }
     end
 
