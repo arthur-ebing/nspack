@@ -38,11 +38,10 @@ module MesscadaApp
 
     def create_pallet_from_bin
       has_pallet = repo.get_value(:cartons, :pallet_sequence_id, carton_label_id: carton_label_id)
-      return if has_pallet
+      already_scanned = repo.exists?(:pallet_sequences, scanned_from_carton_id: carton_id)
+      return if has_pallet || already_scanned
 
-      # standard_pack_code_id = repo.get(:carton_labels, carton_label_id, :standard_pack_code_id)
-      # bin = repo.get(:standard_pack_codes, standard_pack_code_id, :bin)
-      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call # if AppConst::CARTON_EQUALS_PALLET || bin
+      MesscadaApp::CreatePalletFromCarton.new(user, carton_id, carton_quantity).call
     end
 
     def carton_verification # rubocop:disable Metrics/AbcSize
