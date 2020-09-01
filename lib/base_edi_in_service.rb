@@ -38,6 +38,14 @@ class BaseEdiInService < BaseService
     end
   end
 
+  def prepare_array_for_match(array)
+    if array.length == 1
+      "#{array.first},"
+    else
+      array.join(',')
+    end
+  end
+
   def missing_masterfiles_detected(notes)
     @edi_result.has_missing_master_files = true
     @edi_result.notes = notes
