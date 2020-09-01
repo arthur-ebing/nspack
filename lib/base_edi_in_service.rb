@@ -111,7 +111,8 @@ class BaseEdiInService < BaseService
   def check_file_type(file_path)
     typ = IO.popen(['file', '--brief', '--mime-type', file_path], in: :close, err: :close) { |io| io.read.chomp }
     return :xml if %w[application/xml text/xml].include?(typ)
-    return :csv if %w[text/plain].include?(typ)
+    return :csv if typ == 'application/csv'
+    return :csv if File.extname(file_path) == '.csv'
 
     :text
   end
