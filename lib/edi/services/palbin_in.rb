@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 module EdiApp
-  class PalbinIn < BaseEdiInService # rubocop:disable Metrics/ClassLength
+  class PalbinIn < BaseEdiInService
     attr_accessor :missing_masterfiles, :match_data, :parsed_bins
-    attr_reader :user, :repo, :file_name
+    attr_reader :user, :repo
 
     def initialize(edi_in_transaction_id, file_path, logger, edi_in_result)
       super(edi_in_transaction_id, file_path, logger, edi_in_result)
       @repo = EdiApp::EdiInRepo.new
       @user = OpenStruct.new(user_name: 'System')
-      @file_name = @repo.get(:edi_in_transactions, edi_in_transaction_id, :file_name)
+      @missing_masterfiles = []
+      @match_data = []
     end
 
     def call
@@ -61,38 +62,35 @@ module EdiApp
     def check_missing_masterfiles
       return if missing_masterfiles.empty?
 
-      notes = missing_masterfiles.uniq.join(", \n")
+      notes = "Missing masterfiles for #{missing_masterfiles.uniq.join(", \n")}"
       missing_masterfiles_detected(notes)
       raise Crossbeams::InfoError, 'Missing masterfiles'
     end
 
     def parse_palbin_edi # rubocop:disable Metrics/AbcSize
-      @missing_masterfiles = []
-      @match_data = []
       @parsed_bins = []
       @edi_records.each do |params|
         res = EdiPalbinInSchema.call(params)
         raise Crossbeams::InfoError, "Validation error: #{res.messages}" unless res.messages.empty?
 
         palbin = res.to_h
-        # fruit_size_reference_id = get_id_or_variant!(:fruit_size_references, size_reference: palbin[:size_reference])
         match_data << palbin[:sscc]
         hash = { reference_number: "#{palbin[:destination]}_#{palbin[:depot]}_#{file_name}",
                  bin_asset_number: palbin[:sscc],
                  bin_received_date_time: palbin[:shipped_at],
-                 farm_id: get_id!(:farms, farm_code: palbin[:farm]),
-                 puc_id: get_id_or_variant!(:pucs, puc_code: palbin[:puc]),
-                 rmt_class_id: get_id!(:rmt_classes, rmt_class_code: palbin[:grade]),
-                 rmt_container_type_id: get_id!(:rmt_container_types, container_type_code: 'BIN'),
-                 rmt_container_material_type_id: get_value!(:standard_pack_codes, :rmt_container_material_type_id, standard_pack_code: palbin[:pack]),
+                 farm_id: get_masterfile_id(:farms, farm_code: palbin[:farm]),
+                 puc_id: get_masterfile_or_variant(:pucs, puc_code: palbin[:puc]),
+                 rmt_class_id: get_masterfile_id(:rmt_classes, rmt_class_code: palbin[:grade]),
+                 rmt_container_type_id: get_masterfile_id(:rmt_container_types, container_type_code: 'BIN'),
+                 rmt_container_material_type_id: get_masterfile_value(:standard_pack_codes, :rmt_container_material_type_id, standard_pack_code: palbin[:pack]),
                  bin_fullness: 'full',
                  qty_bins: 1,
                  gross_weight: palbin[:gross_weight],
                  nett_weight: palbin[:nett_weight] }
 
-        hash[:orchard_id] = get_id!(:orchards, orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id])
-        commodity_id = get_id!(:commodities, code: palbin[:commodity])
-        hash[:cultivar_id] = get_id!(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id)
+        hash[:orchard_id] = get_masterfile_id(:orchards, orchard_code: palbin[:orchard], farm_id: hash[:farm_id], puc_id: hash[:puc_id])
+        commodity_id = get_masterfile_id(:commodities, code: palbin[:commodity])
+        hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id)
 
         hash[:season_id] = RawMaterialsApp::RmtDeliveryRepo.new.rmt_delivery_season(hash[:cultivar_id], hash[:bin_received_date_time])
         missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, date_delivered: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
@@ -101,31 +99,19 @@ module EdiApp
       end
     end
 
-    def get_id_or_variant!(table_name, args)
-      id = repo.get_id(table_name, args)
+    def get_masterfile_or_variant(table_name, args)
+      id = repo.get_id(table_name, args) || repo.get_variant_id(table_name, args.values.first)
       return id unless id.nil?
 
-      args.each do |key, value|
-        variant_id = repo.get_variant_id(table_name, value)
-        if variant_id
-          id = repo.get_id(table_name, args.reject { |x| x == key }.merge(id: variant_id))
-          return id unless id.nil?
-        end
-      end
-
-      missing_masterfiles << "#{table_name}.id #{args}"
+      missing_masterfiles << "#{table_name}: #{args}"
       nil
     end
 
-    def get_id!(table_name, args)
-      id = repo.get_id(table_name, args)
-      return id unless id.nil?
-
-      missing_masterfiles << "#{table_name}.id #{args}"
-      nil
+    def get_masterfile_id(table_name, args)
+      get_masterfile_value(table_name, :id, args)
     end
 
-    def get_value!(table_name, column, args)
+    def get_masterfile_value(table_name, column, args)
       value = repo.get_value(table_name, column, args)
       return value unless value.nil?
 

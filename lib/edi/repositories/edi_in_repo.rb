@@ -69,17 +69,17 @@ module EdiApp
       DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
     end
 
+    # Gets the variant id from a record matching on the variant code
+    #
     # @param table_name [Symbol] the db table name.
     # @param variant_code [String] the where-clause condition.
     # @return [integer] the id value for the matching record or nil.
     def get_variant_id(table_name, variant_code)
-      # FIXME: temporary reversion before code review
-      # variants_exits = !MasterfilesApp::MasterfileVariantRepo.new.lookup_mf_variant(table_name).empty?
-      # raise Crossbeams::FrameworkError, "Variants not setup for table_name: #{table_name}" unless variants_exits
-
       DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: variant_code).get(:masterfile_id)
     end
 
+    # Gets the id from a record matching on the args where the strings are case insensitive
+    #
     # @param table_name [Symbol] the db table name.
     # @param args [Hash] the where-clause conditions.
     # @return [integer] the id value for the matching record or nil.
@@ -98,6 +98,8 @@ module EdiApp
       values.first
     end
 
+    # Creates a record and logs a status
+    #
     # @param table_name [Symbol] the db table name.
     # @param status [String] status of created record.
     # @param args [Hash] the where-clause conditions.
@@ -108,6 +110,8 @@ module EdiApp
       id
     end
 
+    # Looks for a match if found returns an id, else creates a record and logs a status
+    #
     # @param table_name [Symbol] the db table name.
     # @param status [String] status of created record.
     # @param args [Hash] the where-clause conditions.
