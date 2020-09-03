@@ -33,8 +33,9 @@ module EdiApp
 
     def create_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
-        parsed_bins.uniq.each do |attrs|
-          delivery_attrs = { season_id: attrs[:season_id],
+        parsed_bins.each do |attrs|
+          delivery_attrs = { delivery_pending: true,
+                             season_id: attrs[:season_id],
                              farm_id: attrs[:farm_id],
                              puc_id: attrs[:puc_id],
                              orchard_id: attrs[:orchard_id],
