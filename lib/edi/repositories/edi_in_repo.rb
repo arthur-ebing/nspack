@@ -73,8 +73,9 @@ module EdiApp
     # @param variant_code [String] the where-clause condition.
     # @return [integer] the id value for the matching record or nil.
     def get_variant_id(table_name, variant_code)
-      variants_exits = !MasterfilesApp::MasterfileVariantRepo.new.lookup_mf_variant(table_name).empty?
-      raise Crossbeams::FrameworkError, "Variants not setup for table_name: #{table_name}" unless variants_exits
+      # FIXME: temporary reversion before code review
+      # variants_exits = !MasterfilesApp::MasterfileVariantRepo.new.lookup_mf_variant(table_name).empty?
+      # raise Crossbeams::FrameworkError, "Variants not setup for table_name: #{table_name}" unless variants_exits
 
       DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: variant_code).get(:masterfile_id)
     end
