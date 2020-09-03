@@ -69,10 +69,19 @@ module EdiApp
       DB[:edi_in_transactions].where(id: ids).update(newer_edi_received: true, reprocessed: true)
     end
 
+    # @param table_name [Symbol] the db table name.
+    # @param variant_code [String] the where-clause condition.
+    # @return [integer] the id value for the matching record or nil.
     def get_variant_id(table_name, variant_code)
+      variants_exits = !MasterfilesApp::MasterfileVariantRepo.new.lookup_mf_variant(table_name).empty?
+      raise Crossbeams::FrameworkError, "Variants not setup for table_name: #{table_name}" unless variants_exits
+
       DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: variant_code).get(:masterfile_id)
     end
 
+    # @param table_name [Symbol] the db table name.
+    # @param args [Hash] the where-clause conditions.
+    # @return [integer] the id value for the matching record or nil.
     def get_case_insensitive_match(table_name, args)
       ds = DB[table_name]
       args.each do |k, v|
@@ -86,6 +95,27 @@ module EdiApp
       raise Crossbeams::FrameworkError, 'Method must return only one record' if values.length > 1
 
       values.first
+    end
+
+    # @param table_name [Symbol] the db table name.
+    # @param status [String] status of created record.
+    # @param args [Hash] the where-clause conditions.
+    # @return [integer] the id value for the matching record or nil.
+    def create_with_status(table_name, status, args)
+      id = create(table_name, args)
+      log_status(table_name, id, status)
+      id
+    end
+
+    # @param table_name [Symbol] the db table name.
+    # @param status [String] status of created record.
+    # @param args [Hash] the where-clause conditions.
+    # @return [integer] the id value for the matching record or nil.
+    def get_id_or_create_with_status(table_name, status, args)
+      id = get_id(table_name, args)
+      return id unless id.nil?
+
+      create_with_status(table_name, status, args)
     end
   end
 end

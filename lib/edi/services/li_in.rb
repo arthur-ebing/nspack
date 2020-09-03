@@ -21,7 +21,7 @@ module EdiApp
       parse_load_edi
       parse_pallets_edi
 
-      match_data_on(match_data)
+      match_data_on(prepare_array_for_match(pallet_numbers))
 
       check_missing_masterfiles
       check_load_service_schema
@@ -181,8 +181,6 @@ module EdiApp
       pallets.each do |hash|
         pallet_numbers << hash['pallet_number']
       end
-      @match_data = pallet_numbers.join(',')
-      @match_data = "#{@match_data}," if pallet_numbers.length == 1
     end
 
     def get_party_role_id(party_role_name, role_name) # rubocop:disable Metrics/AbcSize
