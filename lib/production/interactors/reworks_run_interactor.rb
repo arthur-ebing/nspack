@@ -1395,8 +1395,12 @@ module ProductionApp
       shipped_pallets = repo.shipped_pallets?(pallet_numbers)
       return OpenStruct.new(success: false, messages: { pallets_selected: ["#{shipped_pallets.join(', ')} have been shipped."] }, pallets_selected: pallet_numbers) unless shipped_pallets.nil_or_empty?
 
-      scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
+      if AppConst::RUN_TYPE_SCRAP_PALLET == reworks_run_type
+        allocated_pallets = repo.allocated_pallets?(pallet_numbers)
+        return OpenStruct.new(success: false, messages: { pallets_selected: ["#{allocated_pallets.join(', ')} have been allocated."] }, pallets_selected: pallet_numbers) unless allocated_pallets.nil_or_empty?
+      end
 
+      scrapped_pallets = repo.scrapped_pallets?(pallet_numbers)
       if AppConst::RUN_TYPE_UNSCRAP_PALLET == reworks_run_type
         unscrapped_pallets = (pallet_numbers - scrapped_pallets)
         return OpenStruct.new(success: false, messages: { pallets_selected: ["#{unscrapped_pallets.join(', ')} cannot be unscrapped"] }, pallets_selected: pallet_numbers) unless unscrapped_pallets.nil_or_empty?

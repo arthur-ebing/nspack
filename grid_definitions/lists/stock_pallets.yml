@@ -153,6 +153,9 @@
     - :col: govt_inspection_passed
       :op: =
       :val: false
+    - :col: allocated
+      :op: =
+      :val: false
 #    - :col: repacked
 #      :op: =
 #      :val: false

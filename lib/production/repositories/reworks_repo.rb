@@ -117,6 +117,10 @@ module ProductionApp
       DB[:pallets].where(pallet_number: pallet_numbers, shipped: true).select_map(:pallet_number)
     end
 
+    def allocated_pallets?(pallet_numbers)
+      DB[:pallets].where(pallet_number: pallet_numbers, allocated: true).select_map(:pallet_number)
+    end
+
     def production_run_pallets?(pallet_numbers, production_run_id)
       DB[:pallet_sequences].where(pallet_number: pallet_numbers, production_run_id: production_run_id).select_map(:pallet_number)
     end
