@@ -356,18 +356,14 @@ const crossbeamsGridEvents = {
   /**
    * Add a row to the end of a grid.
    * @param {object} row - the row to be aded to the grid.
-   * @param {boolean} atStart - should the row to be aded to the start of the grid.
    * @returns {void}
    */
-  addRowToGrid: function addRowToGrid(row, atStart) {
+  addRowToGrid: function addRowToGrid(row) {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
-      if (atStart) {
-        gridOptions.api.updateRowData({ add: [row], addIndex: 0 });
-      } else {
-        gridOptions.api.updateRowData({ add: [row] });
-      }
+      const nodes = gridOptions.api.applyTransaction({ add: [row] });
+      gridOptions.api.ensureNodeVisible(nodes.add[0]);
     } else {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
     }
@@ -382,7 +378,7 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.currentGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
-    gridOptions.api.updateRowData({ remove: [rowNode] });
+    gridOptions.api.applyTransaction({ remove: [rowNode] });
   },
 
   /**
@@ -1580,6 +1576,7 @@ const crossbeamsGridStaticLoader = {
           sortable: true,
           filter: true,
         },
+        allowDragFromColumnsToolPanel: true,
         rowSelection: 'single',
         popupParent: document.body,
         enableCharts: true,
@@ -1684,7 +1681,9 @@ const crossbeamsGridStaticLoader = {
     }
 
     // Index rows by the id column...
-    gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
+    if (grid.dataset.gridurl !== '') {
+      gridOptions.getRowNodeId = function getRowNodeId(data) { return data.id; };
+    }
 
     new agGrid.Grid(grid, gridOptions); // eslint-disable-line no-new
     crossbeamsGridStore.addGrid(gridId, gridOptions);

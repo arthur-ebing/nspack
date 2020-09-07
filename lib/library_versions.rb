@@ -67,7 +67,14 @@ class LibraryVersions
   end
 
   def ag_grid_version
-    format_lib('AG-Grid', File.readlines('public/js/ag-grid-enterprise.min.js', encoding: 'UTF-8').first.chomp.split(' v').last)
+    lines = File.readlines('public/js/ag-grid-enterprise.min.js', encoding: 'UTF-8')
+    l1 = lines.first
+    ver = if l1.start_with?('/**')
+            lines[2].chomp.split(' v').last
+          else
+            l1.chomp.split(' v').last
+          end
+    format_lib('AG-Grid', ver)
   end
 
   def selectr_version

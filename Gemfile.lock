@@ -38,9 +38,9 @@ GIT
 
 GIT
   remote: https://github.com/NoSoft-SA/roda-data_grid.git
-  revision: 6bb2afd3849f7fa0a8ceb1dc379a986539142eeb
+  revision: 24ff89d08759603551b7041ec2ce9eb1bb356f42
   specs:
-    roda-data_grid (0.4.1)
+    roda-data_grid (0.5.0)
       caxlsx
       crossbeams-dataminer
       crossbeams-layout

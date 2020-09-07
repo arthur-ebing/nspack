@@ -80,13 +80,13 @@ After a grid action opens a dialog and changes are saved from the dialog, you mi
 
 Like with updating a grid row, this will close the dialog and append a row to the underlying grid.
 
-    add_grid_row(attrs:, notice: nil, at_start: false)
+    add_grid_row(attrs:, notice: nil)
 
 `attrs` is a Hash of symbol key/values where the symbol key matches the field name in the grid and the value is what you want to place in the grid cell.
 
 `add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
-If `at_start` is true, the new row will be inserted at the top of the grid. Useful when a grid is sorted in decending order.
+The newly-added row will be scrolled into view if neccessary.
 
 == Changing DOM elements
 

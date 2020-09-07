@@ -179,6 +179,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
+            # row_keys = %i[
+            #   resource_type_id
+            #   system_resource_id
+            #   resource_code
+            #   description
+            #   resource_attributes
+            # ]
+            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Production::Resources::PlantResource::Edit.call(id, form_values: params[:plant_resource], form_errors: res.errors) }
           end

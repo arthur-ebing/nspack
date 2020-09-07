@@ -817,7 +817,7 @@ const crossbeamsUtils = {
   },
 
   addGridRow: function addGridRow(action) {
-    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes, action.addRowToGrid.atStart);
+    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes);
   },
 
   updateGridRow: function updateGridRow(action) {

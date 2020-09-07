@@ -31,7 +31,6 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
               party
               role
               hub_address
-              directory_keys
               targets
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -79,7 +78,6 @@ class Nspack < Roda # rubocop:disable  Metrics/ClassLength
               party
               role
               hub_address
-              directory_keys
               targets
             ]
             add_grid_row(attrs: select_attributes(res.instance, row_keys),

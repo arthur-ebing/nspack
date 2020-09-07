@@ -4,6 +4,12 @@
 .brown {
   color: #a52a2a;
 }
+
+/* Override AG-Grid z-index for popups so that they are foreward enough in grids inside dialogs */
+.ag-theme-balham .ag-popup-child {
+  z-index: 30 !important;
+}
+
 /* Force editable grid column to render when in modal */
 .ag-theme-balham .ag-popup-editor {
   z-index: 30 !important;

@@ -1,26 +1,31 @@
 ---
 :caption: Locations
-:sql: "SELECT locations.id, locations.primary_storage_type_id, locations.units_in_location, locations.location_type_id,
-  locations.primary_assignment_id, \r\nlocations.location_long_code, locations.location_description,
-  locations.active, locations.location_short_code, locations.print_code, locations.has_single_container,
-  locations.virtual_location, \r\nlocations.can_be_moved,\r\nlocations.can_store_stock,\r\nlocations.consumption_area,
-  locations.created_at, locations.updated_at, location_types.location_type_code, \r\nlocation_assignments.assignment_code,
-  location_storage_types.storage_type_code,\r\n\"locations\".\"location_storage_definition_id\",\r\n
-  \ \"location_storage_definitions\".\"storage_definition_code\",\r\n(SELECT array_agg(cc.location_long_code)
-  as path\r\n  FROM (SELECT c.location_long_code\r\n         FROM locations AS c \r\n
-  \       JOIN tree_locations AS t1 ON t1.ancestor_location_id = c.id\r\n       WHERE
-  t1.descendant_location_id = locations.id\r\n       ORDER BY t1.path_length DESC)
-  AS cc) AS path_array,\r\n(SELECT MAX(path_length)\r\n   FROM tree_locations\r\n
-  \  WHERE descendant_location_id = locations.id) + 1 AS level \r\nFROM locations\r\nJOIN
-  location_types ON location_types.id = locations.location_type_id\r\nJOIN location_assignments
-  ON location_assignments.id = locations.primary_assignment_id\r\nJOIN location_storage_types
-  ON location_storage_types.id = locations.primary_storage_type_id\r\nLEFT JOIN \"location_storage_definitions\"
-  ON \"location_storage_definitions\".\"id\" = \"locations\".\"location_storage_definition_id\"\r\nWHERE
-  location_types.hierarchical\r\nORDER BY (SELECT string_agg(\"cc\".\"location_long_code\",
-  ';') AS path \r\n    FROM (SELECT \"c\".\"location_long_code\" FROM \"locations\"
-  c JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\" = \"c\".\"id\" \r\n
-  \   WHERE \"t1\".\"descendant_location_id\" = \"locations\".\"id\" \r\n    ORDER
-  BY \"t1\".\"path_length\" DESC) cc)"
+:sql: "SELECT\r\n  locations.id,\r\n  locations.primary_storage_type_id,\r\n  locations.units_in_location,\r\n
+  \ locations.location_type_id,\r\n  locations.primary_assignment_id,\r\n  locations.location_long_code,\r\n
+  \ locations.location_description,\r\n  locations.active,\r\n  locations.location_short_code,\r\n
+  \ locations.print_code,\r\n  locations.has_single_container,\r\n  locations.virtual_location,\r\n
+  \ locations.can_be_moved,\r\n  locations.can_store_stock,\r\n  locations.consumption_area,\r\n
+  \ locations.created_at,\r\n  locations.updated_at,\r\n  location_types.location_type_code,\r\n
+  \ location_assignments.assignment_code,\r\n  location_storage_types.storage_type_code,\r\n
+  \ \"locations\".\"location_storage_definition_id\",\r\n  \"location_storage_definitions\".\"storage_definition_code\",\r\n
+  \ (\r\n    SELECT\r\n      array_agg(cc.location_long_code) AS path\r\n    FROM
+  (\r\n      SELECT\r\n        c.location_long_code\r\n      FROM\r\n        locations
+  AS c\r\n        JOIN tree_locations AS t1 ON t1.ancestor_location_id = c.id\r\n
+  \     WHERE\r\n        t1.descendant_location_id = locations.id\r\n      ORDER BY\r\n
+  \       t1.path_length DESC) AS cc) AS path_array,\r\n  (\r\n    SELECT\r\n      MAX(path_length)\r\n
+  \   FROM\r\n      tree_locations\r\n    WHERE\r\n      descendant_location_id =
+  locations.id) + 1 AS level\r\nFROM\r\n  locations\r\n  JOIN location_types ON location_types.id
+  = locations.location_type_id\r\n  JOIN location_assignments ON location_assignments.id
+  = locations.primary_assignment_id\r\n  JOIN location_storage_types ON location_storage_types.id
+  = locations.primary_storage_type_id\r\n  LEFT JOIN \"location_storage_definitions\"
+  ON \"location_storage_definitions\".\"id\" = \"locations\".\"location_storage_definition_id\"\r\nWHERE\r\n
+  \ location_types.hierarchical\r\n  AND EXISTS (\r\n    SELECT\r\n      ancestor_location_id\r\n
+  \   FROM\r\n      tree_locations\r\n    WHERE\r\n      descendant_location_id =
+  locations.id)\r\nORDER BY\r\n  (\r\n    SELECT\r\n      string_agg(\"cc\".\"location_long_code\",
+  ';') AS path\r\n    FROM (\r\n      SELECT\r\n        \"c\".\"location_long_code\"\r\n
+  \     FROM\r\n        \"locations\" c\r\n        JOIN \"tree_locations\" t1 ON \"t1\".\"ancestor_location_id\"
+  = \"c\".\"id\"\r\n      WHERE\r\n        \"t1\".\"descendant_location_id\" = \"locations\".\"id\"\r\n
+  \     ORDER BY\r\n        \"t1\".\"path_length\" DESC) cc)"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -57,9 +62,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  units_in_location:
+    :name: units_in_location
+    :sequence_no: 3
+    :caption: Units In Location
+    :namespaced_name: locations.units_in_location
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   location_type_id:
     :name: location_type_id
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Location type
     :namespaced_name: locations.location_type_id
     :data_type: :integer
@@ -75,7 +96,7 @@
     :group_max: false
   primary_assignment_id:
     :name: primary_assignment_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Primary assignment
     :namespaced_name: locations.primary_assignment_id
     :data_type: :integer
@@ -91,7 +112,7 @@
     :group_max: false
   location_long_code:
     :name: location_long_code
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Long code
     :namespaced_name: locations.location_long_code
     :data_type: :string
@@ -105,25 +126,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  units_in_location:
-    :name: units_in_location
-    :sequence_no: 5
-    :caption: Units In Location
-    :namespaced_name: locations.units_in_location
-    :data_type: :string
-    :width:
-    :format:
-    :hide: false
-    :pinned:
-    :groupable: true
-    :group_by_seq:
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   location_description:
     :name: location_description
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Location description
     :namespaced_name: locations.location_description
     :data_type: :string
@@ -139,7 +144,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: locations.active
     :data_type: :boolean
@@ -155,7 +160,7 @@
     :group_max: false
   location_short_code:
     :name: location_short_code
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Location short code
     :namespaced_name: locations.location_short_code
     :data_type: :string
@@ -171,7 +176,7 @@
     :group_max: false
   print_code:
     :name: print_code
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Print code
     :namespaced_name: locations.print_code
     :data_type: :string
@@ -187,7 +192,7 @@
     :group_max: false
   has_single_container:
     :name: has_single_container
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Has single container
     :namespaced_name: locations.has_single_container
     :data_type: :boolean
@@ -203,7 +208,7 @@
     :group_max: false
   virtual_location:
     :name: virtual_location
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Virtual location
     :namespaced_name: locations.virtual_location
     :data_type: :boolean
@@ -219,7 +224,7 @@
     :group_max: false
   can_be_moved:
     :name: can_be_moved
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Can be moved
     :namespaced_name: locations.can_be_moved
     :data_type: :boolean
@@ -235,7 +240,7 @@
     :group_max: false
   can_store_stock:
     :name: can_store_stock
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Can store stock
     :namespaced_name: locations.can_store_stock
     :data_type: :boolean
@@ -251,7 +256,7 @@
     :group_max: false
   consumption_area:
     :name: consumption_area
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Consumption area
     :namespaced_name: locations.consumption_area
     :data_type: :boolean
@@ -267,7 +272,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Created at
     :namespaced_name: locations.created_at
     :data_type: :datetime
@@ -283,7 +288,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Updated at
     :namespaced_name: locations.updated_at
     :data_type: :datetime
@@ -299,7 +304,7 @@
     :group_max: false
   location_type_code:
     :name: location_type_code
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Location type code
     :namespaced_name: location_types.location_type_code
     :data_type: :string
@@ -315,7 +320,7 @@
     :group_max: false
   assignment_code:
     :name: assignment_code
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Assignment code
     :namespaced_name: location_assignments.assignment_code
     :data_type: :string
@@ -331,7 +336,7 @@
     :group_max: false
   storage_type_code:
     :name: storage_type_code
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Storage type code
     :namespaced_name: location_storage_types.storage_type_code
     :data_type: :string
@@ -347,7 +352,7 @@
     :group_max: false
   location_storage_definition_id:
     :name: location_storage_definition_id
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Location storage definition
     :namespaced_name: locations.location_storage_definition_id
     :data_type: :string
@@ -363,7 +368,7 @@
     :group_max: false
   storage_definition_code:
     :name: storage_definition_code
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Storage definition code
     :namespaced_name: location_storage_definitions.storage_definition_code
     :data_type: :string
@@ -379,7 +384,7 @@
     :group_max: false
   path_array:
     :name: path_array
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Path array
     :namespaced_name: 
     :data_type: :string
@@ -395,7 +400,7 @@
     :group_max: false
   level:
     :name: level
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Level
     :namespaced_name: 
     :data_type: :integer

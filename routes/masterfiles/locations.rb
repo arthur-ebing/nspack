@@ -205,23 +205,20 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_location(id, params[:location])
           if res.success
-            flash[:notice] = res.message
-            redirect_to_last_grid(r)
-            # NB. 2020-02-26: AG Grid has a problem updating the grid in place. (Seems to be related to tree grid's path column)
-            # row_keys = %i[
-            #   storage_type_code
-            #   location_type_code
-            #   assignment_code
-            #   location_long_code
-            #   location_description
-            #   location_short_code
-            #   has_single_container
-            #   virtual_location
-            #   can_be_moved
-            #   can_store_stock
-            #   consumption_area
-            # ]
-            # update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            row_keys = %i[
+              storage_type_code
+              location_type_code
+              assignment_code
+              location_long_code
+              location_description
+              location_short_code
+              has_single_container
+              virtual_location
+              can_be_moved
+              can_store_stock
+              consumption_area
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             form_errors = move_validation_errors_to_base(res.errors, :receiving_bay_type_location, highlights: { receiving_bay_type_location: %i[location_type_id can_store_stock] })
             re_show_form(r, res) { Masterfiles::Locations::Location::Edit.call(id, form_values: params[:location], form_errors: form_errors) }
