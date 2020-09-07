@@ -238,8 +238,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_port(id, params[:port])
           if res.success
             row_keys = %i[
-              port_type_ids
-              voyage_type_ids
               port_code
               city_name
               description
@@ -276,8 +274,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
-            port_type_ids
-            voyage_type_ids
             port_code
             city_name
             description
