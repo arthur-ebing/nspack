@@ -240,6 +240,7 @@ const crossbeamsGridFormatters = {
   // Remove the time zone portion of a datetime column.
   dateTimeWithoutZoneFormatter: function dateTimeWithoutZoneFormatter(params) {
     if (!params.data) { return null; }
+    if (!params.value) { return null; }
 
     if (params.value === '' || params.value === null) { return ''; }
     return params.value.replace(/ \+\d\d\d\d$/, '');
@@ -349,7 +350,11 @@ const crossbeamsGridEvents = {
     }
 
     Object.keys(changes).forEach((k) => {
-      rowNode.setDataValue(k, changes[k]);
+      if (rowNode.data[k] === undefined) {
+        crossbeamsUtils.showWarning(`Unable to update the grid properly - "${k}" is not one of the grid's columns.`);
+      } else {
+        rowNode.setDataValue(k, changes[k]);
+      }
     });
   },
 
@@ -362,8 +367,13 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
-      const nodes = gridOptions.api.applyTransaction({ add: [row] });
-      gridOptions.api.ensureNodeVisible(nodes.add[0]);
+      const missing = Object.keys(row).filter(a => gridOptions.columnApi.getColumn(a) === null);
+      if (missing.length > 0) {
+        crossbeamsUtils.showWarning(`Unable to add row to the grid - columns not defined in the grid: ${missing.join(', ')}.`);
+      } else {
+        const nodes = gridOptions.api.applyTransaction({ add: [row] });
+        gridOptions.api.ensureNodeVisible(nodes.add[0]);
+      }
     } else {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
     }
