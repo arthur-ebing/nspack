@@ -916,6 +916,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             r.redirect('/rmd/finished_goods/repack_pallet/scan_pallet')
           end
 
+          if pallet_sequence[:allocated]
+            store_locally(:error, "Pallet :#{pallet_sequence[:pallet_number]} has been allocated")
+            r.redirect('/rmd/finished_goods/repack_pallet/scan_pallet')
+          end
+
           ps_ids = interactor.find_pallet_sequences_from_same_pallet(id)
 
           error = retrieve_from_local_store(:error)
