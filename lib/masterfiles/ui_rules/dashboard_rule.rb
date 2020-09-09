@@ -38,14 +38,14 @@ module UiRules
 
     def new_fields
       {
-        key: { required: true },
+        key: { required: true, pattern: '[a-zA-Z0-9]+', caption: 'Key (alphanumeric)' },
         description: { required: true }
       }
     end
 
     def edit_fields
       {
-        key: { renderer: :label },
+        key: { renderer: :label, pattern: '[a-zA-Z0-9]+', caption: 'Key (alphanumeric)' },
         description: { required: true },
         pages: { renderer: :list, items: @form_object.pages }
       }
