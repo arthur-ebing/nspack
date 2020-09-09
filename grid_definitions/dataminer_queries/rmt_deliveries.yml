@@ -13,22 +13,26 @@
   AS picked_at,\r\n    rmt_deliveries.date_delivered AS delivered_at,\r\n    rmt_deliveries.tipping_complete_date_time
   AS tipping_completed_at,\r\n    --\r\n    SUM(rmt_bins.qty_bins) AS qty_bins,\r\n
   \   ARRAY_AGG(distinct production_run_tipped_id order by production_run_tipped_id)
-  filter (where production_run_tipped_id is not null) AS production_runs,\r\n    SUM(rmt_bins.qty_bins)
+  filter (where production_run_tipped_id > 0 ) AS production_runs,\r\n    SUM(rmt_bins.qty_bins)
   filter (where rmt_delivery_id = rmt_deliveries.id and bin_tipped is true) > 0 IS
   TRUE AS contains_tipped_bins,\r\n    SUM(rmt_bins.qty_bins) filter (where rmt_delivery_id
-  = rmt_deliveries.id and bin_tipped is true) AS qty_bins_tipped,\r\n    --\r\n    rmt_deliveries.created_at,\r\n
+  = rmt_deliveries.id and bin_tipped is true) AS qty_bins_tipped,\r\n    ARRAY_AGG(distinct
+  rmt_class_code order by rmt_class_code) filter (where rmt_class_code is not null)
+  AS classes,\r\n    SUM(rmt_bins.nett_weight) filter (where rmt_delivery_id = rmt_deliveries.id)::INTEGER
+  AS nett_weight,\r\n    SUM(rmt_bins.gross_weight) filter (where rmt_delivery_id
+  = rmt_deliveries.id)::INTEGER AS gross_weight,\r\n    --\r\n    rmt_deliveries.created_at,\r\n
   \   rmt_deliveries.updated_at,\r\n    CASE\r\n        WHEN rmt_deliveries.current
   THEN 'green'\r\n        WHEN delivery_tipped THEN 'gray'\r\n        WHEN keep_open
   THEN 'orange'\r\n        WHEN shipped THEN 'blue'\r\n        END AS colour_rule\r\nFROM\r\n
-  \   rmt_deliveries\r\n        JOIN seasons ON seasons.id = rmt_deliveries.season_id\r\n
-  \       JOIN farms ON farms.id = rmt_deliveries.farm_id\r\n        JOIN pucs ON
-  pucs.id = rmt_deliveries.puc_id\r\n        JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n
-  \       JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n        LEFT
-  JOIN rmt_delivery_destinations ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
-  \       LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\nGROUP
-  BY\r\n    rmt_deliveries.id,\r\n    cultivars.id,\r\n    farms.id,\r\n    orchards.id,\r\n
-  \   pucs.id,\r\n    rmt_delivery_destinations.id,\r\n    seasons.id\r\nORDER BY\r\n
-  \   rmt_deliveries.updated_at DESC"
+  \   rmt_deliveries\r\n    JOIN seasons ON seasons.id = rmt_deliveries.season_id\r\n
+  \   JOIN farms ON farms.id = rmt_deliveries.farm_id\r\n    JOIN pucs ON pucs.id
+  = rmt_deliveries.puc_id\r\n    JOIN orchards ON orchards.id = rmt_deliveries.orchard_id\r\n
+  \   JOIN cultivars ON cultivars.id = rmt_deliveries.cultivar_id\r\n    LEFT JOIN
+  rmt_delivery_destinations ON rmt_delivery_destinations.id = rmt_deliveries.rmt_delivery_destination_id\r\n
+  \   LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\n    LEFT
+  JOIN rmt_classes ON rmt_bins.rmt_class_id = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n
+  \   cultivars.id,\r\n    farms.id,\r\n    orchards.id,\r\n    pucs.id,\r\n    rmt_delivery_destinations.id,\r\n
+  \   seasons.id\r\nORDER BY\r\n    rmt_deliveries.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -518,9 +522,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  classes:
+    :name: classes
+    :sequence_no: 31
+    :caption: Class
+    :namespaced_name: 
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 32
+    :caption: Nett weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 33
+    :caption: Gross weight
+    :namespaced_name: 
+    :data_type: :number
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 31
+    :sequence_no: 34
     :caption: Created at
     :namespaced_name: rmt_deliveries.created_at
     :data_type: :datetime
@@ -536,7 +588,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 32
+    :sequence_no: 35
     :caption: Updated at
     :namespaced_name: rmt_deliveries.updated_at
     :data_type: :datetime
@@ -552,7 +604,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 33
+    :sequence_no: 36
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -570,7 +622,7 @@
 - :column: rmt_deliveries.id
   :caption: Id
   :data_type: :integer
-  :control_type: :text
+  :control_type: :integer
   :default_value: 
   :ordered_list: false
   :ui_priority: 1
