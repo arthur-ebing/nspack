@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'faker'
-
 namespace :app do
   namespace :stress do
     desc 'Print labels'
@@ -9,7 +7,7 @@ namespace :app do
       repo = MesserverApp::MesserverRepo.new
 
       template = MasterfilesApp::LabelTemplateRepo.new.find_label_template_by_name(args.lbl)
-      vars = Hash[template.variables.each_with_index.map { |_, i| ["F#{i + 1}".to_sym, Faker::Lorem.word] }]
+      vars = Hash[template.variables.each_with_index.map { |_, i| ["F#{i + 1}".to_sym, "AA-#{i + 1}"] }]
 
       ok = true
       args.no.to_i.times do
