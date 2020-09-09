@@ -1628,6 +1628,32 @@ const crossbeamsGridStaticLoader = {
           }
           return null;
         },
+        // getRowStyle(params) {
+        //   if (params.data) {
+        //     if (params.data.colour_rule) {
+        //       switch (params.data.colour_rule) {
+        //         case 'error':
+        //           return { color: 'red' };
+        //         case 'warning':
+        //           return { color: 'orange' };
+        //         case 'inactive':
+        //           return { color: 'gray;font-style:italic' };
+        //         case 'ready':
+        //           return { color: 'blue' };
+        //         case 'ok':
+        //           return { color: 'green' };
+        //         case 'inprogress':
+        //           return { color: 'purple' };
+        //         default:
+        //           return { color: params.data.colour_rule };
+        //       }
+        //     }
+        //     if (typeof params.data.active !== 'undefined' && !params.data.active) {
+        //       return { color: 'gray;font-style:italic' };
+        //     }
+        //   }
+        //   return null;
+        // },
         onFilterChanged() {
           if (!forPrint) {
             let filterLength = 0;

@@ -324,7 +324,7 @@ module MasterfilesApp
     def load_config(file)
       fn = File.join(ENV['ROOT'], 'config', file)
       if File.exist?(fn)
-        YAML.load_file(fn)
+        YAML.load_file(fn) || {}
       else
         {}
       end
