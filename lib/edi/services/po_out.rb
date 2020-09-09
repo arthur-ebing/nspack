@@ -72,14 +72,14 @@ module EdiApp
 
     def prepare_lf
       hash = build_hash_from_data(@header_rec, 'LF')
-      hash[:locn_code] = AppConst::DEFAULT_DEPOT
+      hash[:locn_code] = AppConst::FROM_DEPOT
       add_record('LF', hash)
       @ol_count += 1
     end
 
     def prepare_lt
       hash = build_hash_from_data(@header_rec, 'LT')
-      if AppConst::DEFAULT_DEPOT && @header_rec[:next_code] == AppConst::DEFAULT_DEPOT
+      if AppConst::FROM_DEPOT && @header_rec[:next_code] == AppConst::FROM_DEPOT
         hash[:locn_type] = 'CU'
         hash[:locn_code] = @header_rec[:customer]
       end
