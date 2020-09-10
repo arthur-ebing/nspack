@@ -92,6 +92,7 @@ module EdiApp
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
       hash[:ship_line] = (@current_row[:ship_line] || '')[0, 1] # Just the 1st char
+      hash[:sender] = AppConst::FROM_DEPOT
       add_record('OK', hash)
       @ok_count += 1
     end
@@ -100,12 +101,17 @@ module EdiApp
       hash = build_hash_from_data(@current_row, 'OC')
       hash[:ctn_qty] = @current_row[:tot_ctn_qty]
       hash[:plt_qty] = @current_row[:tot_plt_qty]
+      hash[:locn_code] = AppConst::FROM_DEPOT
       add_record('OC', hash)
       @oc_count += 1
     end
 
     def prepare_op(row)
       hash = build_hash_from_data(row, 'OP')
+      hash[:locn_code] = AppConst::FROM_DEPOT
+      hash[:sender] = AppConst::FROM_DEPOT
+      hash[:orig_depot] = AppConst::FROM_DEPOT
+
       add_record('OP', hash)
       @op_count += 1
     end
