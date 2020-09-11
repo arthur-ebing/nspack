@@ -14,7 +14,7 @@ module DevelopmentApp
 
     def create_user(params)
       res = validate_new_user_params(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure? # unless res.messages.empty?
 
       id = repo.create_user(prepare_password(res))
       instance = user(id)
@@ -26,7 +26,7 @@ module DevelopmentApp
 
     def update_user(id, params)
       res = validate_user_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure? # unless res.messages.empty?
 
       repo.update_user(id, res)
       instance = user(id)
