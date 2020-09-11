@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  DepotSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:city_id, :integer).maybe(:int?)
-    required(:depot_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    required(:bin_depot, :bool).maybe(:bool?)
+  DepotSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:city_id).maybe(:integer)
+    required(:depot_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
+    required(:bin_depot).maybe(:bool)
   end
 end

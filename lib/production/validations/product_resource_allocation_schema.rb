@@ -1,22 +1,18 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  ProductResourceAllocationSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:production_run_id, :integer).filled(:int?)
-    required(:plant_resource_id, :integer).filled(:int?)
-    required(:product_setup_id, :integer).maybe(:int?)
-    required(:label_template_id, :integer).maybe(:int?)
-    required(:packing_method_id, :integer).filled(:int?)
+  ProductResourceAllocationSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:production_run_id).filled(:integer)
+    required(:plant_resource_id).filled(:integer)
+    required(:product_setup_id).maybe(:integer)
+    required(:label_template_id).maybe(:integer)
+    required(:packing_method_id).filled(:integer)
   end
 
-  ProductResourceAllocationSelectSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:product_setup_id, :integer).maybe(:int?)
-    required(:label_template_id, :integer).maybe(:int?)
-    required(:packing_method_id, :integer).filled(:int?)
+  ProductResourceAllocationSelectSchema = Dry::Schema.Params do
+    required(:product_setup_id).maybe(:integer)
+    required(:label_template_id).maybe(:integer)
+    required(:packing_method_id).filled(:integer)
   end
 end

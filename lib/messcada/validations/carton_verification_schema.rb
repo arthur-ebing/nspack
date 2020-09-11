@@ -1,59 +1,45 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  CartonLabelingSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:device, Types::StrippedString).filled(:str?)
-    optional(:card_reader, Types::StrippedString).maybe(:str?)
-    optional(:identifier, Types::StrippedString).maybe(:str?)
+  CartonLabelingSchema = Dry::Schema.Params do
+    required(:device).filled(Types::StrippedString)
+    optional(:card_reader).maybe(Types::StrippedString)
+    optional(:identifier).maybe(Types::StrippedString)
   end
 
-  CartonVerificationSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:carton_number, :integer).filled(:int?)
-    required(:device, Types::StrippedString).filled(:str?)
+  CartonVerificationSchema = Dry::Schema.Params do
+    required(:carton_number).filled(:integer)
+    required(:device).filled(Types::StrippedString)
   end
 
-  CartonAndPalletVerificationSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:carton_number, :integer).filled(:int?)
+  CartonAndPalletVerificationSchema = Dry::Schema.Params do
+    required(:carton_number).filled(:integer)
   end
 
-  CartonVerificationAndWeighingSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:carton_number, :integer).filled(:int?)
-    required(:device, Types::StrippedString).filled(:str?)
-    required(:gross_weight, :decimal).filled(:decimal?)
-    required(:measurement_unit, Types::StrippedString).filled(:str?)
+  CartonVerificationAndWeighingSchema = Dry::Schema.Params do
+    required(:carton_number).filled(:integer)
+    required(:device).filled(Types::StrippedString)
+    required(:gross_weight).filled(:decimal)
+    required(:measurement_unit).filled(Types::StrippedString)
   end
 
-  FgPalletWeighingSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    # required(:pallet_number, Types::StrippedString).filled(:str?)
-    required(:bin_number, Types::StrippedString).filled(:str?)
-    required(:gross_weight, :decimal).filled(:decimal?)
-    required(:measurement_unit, Types::StrippedString).filled(:str?)
+  FgPalletWeighingSchema = Dry::Schema.Params do
+    # required(:pallet_number).filled(Types::StrippedString)
+    required(:bin_number).filled(Types::StrippedString)
+    required(:gross_weight).filled(:decimal)
+    required(:measurement_unit).filled(Types::StrippedString)
   end
 
-  CartonPalletizingScanSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:device, Types::StrippedString).filled(:str?)
-    required(:reader_id, Types::StrippedString).filled(:str?)
-    required(:identifier, Types::StrippedString).filled(:str?)
-    required(:carton_number, :integer).filled(:int?)
+  CartonPalletizingScanSchema = Dry::Schema.Params do
+    required(:device).filled(Types::StrippedString)
+    required(:reader_id).filled(Types::StrippedString)
+    required(:identifier).filled(Types::StrippedString)
+    required(:carton_number).filled(:integer)
   end
 
-  CartonPalletizingSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:device, Types::StrippedString).filled(:str?)
-    required(:reader_id, Types::StrippedString).filled(:str?)
-    required(:identifier, Types::StrippedString).filled(:str?)
+  CartonPalletizingSchema = Dry::Schema.Params do
+    required(:device).filled(Types::StrippedString)
+    required(:reader_id).filled(Types::StrippedString)
+    required(:identifier).filled(Types::StrippedString)
   end
 end

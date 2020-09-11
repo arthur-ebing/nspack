@@ -329,6 +329,12 @@ module DevelopmentApp
       end
 
       def column_dry_validation_type(column, optional = false)
+        # optional(:linked_users).maybe(:array).maybe { each(:integer) }
+        # required(:report_description).filled(Types::StrippedString)
+        # required(:caption).filled(Types::StrippedString)
+        # required(:sql).filled(:string)
+        # optional(:test).maybe(:integer)
+
         if optional
           VALIDATION_OPTIONAL_TYPE_LOOKUP[@col_lookup[column][:type]] || VALIDATION_TYPE_LOOKUP[@col_lookup[column][:type]] || "Types::??? (#{@col_lookup[column][:type]})"
         else
@@ -683,9 +689,7 @@ module DevelopmentApp
           # frozen_string_literal: true
 
           module #{opts.classnames[:module]}
-            #{opts.classnames[:schema]} = Dry::Validation.Params do
-              configure { config.type_specs = true }
-
+            #{opts.classnames[:schema]} = Dry::Schema.Params do
               #{attr.join("\n    ")}
             end
           end

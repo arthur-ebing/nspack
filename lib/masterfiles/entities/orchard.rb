@@ -13,7 +13,7 @@ module MasterfilesApp
     attribute :cultivar_names, Types::String
     attribute :farm_section_name, Types::String
     attribute? :active, Types::Bool
-    attribute :cultivars, Types::Array.default([]) do
+    attribute :cultivars, Types::Array.default([].freeze) do
       attribute :id, Types::Integer
       attribute :cultivar_name, Types::String
     end

@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 module DevelopmentApp
-  UserPasswordSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
+  UserPasswordSchema = Dry::Schema.Params do
+    required(:password).filled(Types::StrippedString, min_size?: 4)
+    required(:password_confirmation).filled(Types::StrippedString, min_size?: 4)
 
-    required(:password, Types::StrippedString).filled(min_size?: 4)
-    required(:password_confirmation, Types::StrippedString).filled(:str?, min_size?: 4)
-
-    rule(password_confirmation: [:password]) do |password|
-      value(:password_confirmation).eql?(password)
-    end
+    # FIXME: Dry-update
+    # rule(password_confirmation: [:password]) do |password|
+    #   value(:password_confirmation).eql?(password)
+    # end
   end
 end

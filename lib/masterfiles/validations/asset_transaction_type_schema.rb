@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  AssetTransactionTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:transaction_type_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).filled(:str?)
+  AssetTransactionTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:transaction_type_code).filled(Types::StrippedString)
+    required(:description).filled(Types::StrippedString)
   end
 end

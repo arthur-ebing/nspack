@@ -1,234 +1,193 @@
 # frozen_string_literal: true
 
 module ProductionApp  # rubocop:disable Metrics/ModuleLength
-  ReworksRunSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:user, Types::StrippedString).filled(:str?)
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    optional(:remarks, Types::StrippedString).maybe(:str?)
-    optional(:scrap_reason_id, :integer).maybe(:int?)
-    optional(:pallets_selected, :array).maybe(:array?) { each(:str?) }
-    optional(:pallets_affected, :array).maybe(:array?) { each(:str?) }
-    optional(:changes_made, :hash).maybe(:hash?)
-    optional(:pallets_scrapped, :array).maybe(:array?) { each(:str?) }
-    optional(:pallets_unscrapped, :array).maybe(:array?) { each(:str?) }
+  ReworksRunSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:user).filled(Types::StrippedString)
+    required(:reworks_run_type_id).filled(:integer)
+    optional(:remarks).maybe(Types::StrippedString)
+    optional(:scrap_reason_id).maybe(:integer)
+    optional(:pallets_selected).maybe(:array).each(:string)
+    optional(:pallets_affected).maybe(:array).each(:string)
+    optional(:changes_made).maybe(:hash)
+    optional(:pallets_scrapped).maybe(:array).each(:string)
+    optional(:pallets_unscrapped).maybe(:array).each(:string)
   end
 
-  ReworksRunNewSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    optional(:make_changes, :bool).maybe(:bool?)
+  ReworksRunNewSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    optional(:make_changes).maybe(:bool)
   end
 
-  ReworksRunScrapPalletsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:scrap_reason_id, :integer).filled(:int?)
-    required(:remarks, Types::StrippedString).filled(:str?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    optional(:make_changes, :bool).maybe(:bool?)
+  ReworksRunScrapPalletsSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:scrap_reason_id).filled(:integer)
+    required(:remarks).filled(Types::StrippedString)
+    required(:pallets_selected).filled(:array).each(:string)
+    optional(:make_changes).maybe(:bool)
   end
 
-  ReworksRunFlatSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:user, Types::StrippedString).filled(:str?)
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    optional(:remarks, Types::StrippedString).maybe(:str?)
-    optional(:scrap_reason_id, :integer).maybe(:int?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    optional(:pallets_affected, :array).maybe(:array?) { each(:str?) }
-    optional(:changes_made, :hash).maybe(:hash?)
-    optional(:pallets_scrapped, :array).maybe(:array?) { each(:str?) }
-    optional(:pallets_unscrapped, :array).maybe(:array?) { each(:str?) }
-    optional(:pallet_sequence_id, :integer).maybe(:int?)
-    optional(:affected_sequences, :array).maybe(:array?) { each(:int?) }
-    optional(:make_changes, :bool).maybe(:bool?)
-    required(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
+  ReworksRunFlatSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:user).filled(Types::StrippedString)
+    required(:reworks_run_type_id).filled(:integer)
+    optional(:remarks).maybe(Types::StrippedString)
+    optional(:scrap_reason_id).maybe(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    optional(:pallets_affected).maybe(:array).each(:string)
+    optional(:changes_made).maybe(:hash)
+    optional(:pallets_scrapped).maybe(:array).each(:string)
+    optional(:pallets_unscrapped).maybe(:array).each(:string)
+    optional(:pallet_sequence_id).maybe(:integer)
+    optional(:affected_sequences).maybe(:array).each(:integer)
+    optional(:make_changes).maybe(:bool)
+    required(:allow_cultivar_group_mixing).maybe(:bool)
   end
 
-  ReworksRunTipBinsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:production_run_id, :integer).filled(:int?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    optional(:make_changes, :bool).maybe(:bool?)
-    required(:allow_cultivar_mixing, :bool).maybe(:bool?)
-    required(:gross_weight, :decimal).maybe(:decimal?)
+  ReworksRunTipBinsSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:production_run_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    optional(:make_changes).maybe(:bool)
+    required(:allow_cultivar_mixing).maybe(:bool)
+    required(:gross_weight).maybe(:decimal)
   end
 
-  ReworksRunPrintBarcodeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:printer, :integer).filled(:int?)
-    required(:label_template_id, :integer).filled(:int?)
-    required(:no_of_prints, :integer).filled(:int?, gt?: 0)
-    required(:pallet_number, Types::StrippedString).maybe(:str?)
-    required(:pallet_sequence_id, :integer).maybe(:int?)
+  ReworksRunPrintBarcodeSchema = Dry::Schema.Params do
+    optional(:printer).filled(:integer)
+    required(:label_template_id).filled(:integer)
+    required(:no_of_prints).filled(:integer, gt?: 0)
+    required(:pallet_number).maybe(Types::StrippedString)
+    required(:pallet_sequence_id).maybe(:integer)
   end
 
-  ProductionRunUpdateSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:pallet_sequence_id, :integer).filled(:int?)
-    required(:production_run_id, :integer).filled(:int?)
-    required(:old_production_run_id, :integer).filled(:int?)
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    optional(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
+  ProductionRunUpdateSchema = Dry::Schema.Params do
+    required(:pallet_sequence_id).filled(:integer)
+    required(:production_run_id).filled(:integer)
+    required(:old_production_run_id).filled(:integer)
+    required(:reworks_run_type_id).filled(:integer)
+    optional(:allow_cultivar_group_mixing).maybe(:bool)
   end
 
-  ProductionRunUpdateFarmDetailsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:pallet_sequence_id, :integer).filled(:int?)
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:farm_id, :integer).filled(:int?)
-    required(:puc_id, :integer).filled(:int?)
-    required(:orchard_id, :integer).maybe(:int?)
-    required(:cultivar_group_id, :integer).filled(:int?)
-    required(:cultivar_id, :integer).maybe(:int?)
-    required(:season_id, :integer).filled(:int?)
+  ProductionRunUpdateFarmDetailsSchema = Dry::Schema.Params do
+    required(:pallet_sequence_id).filled(:integer)
+    required(:reworks_run_type_id).filled(:integer)
+    required(:farm_id).filled(:integer)
+    required(:puc_id).filled(:integer)
+    required(:orchard_id).maybe(:integer)
+    required(:cultivar_group_id).filled(:integer)
+    required(:cultivar_id).maybe(:integer)
+    required(:season_id).filled(:integer)
   end
 
-  ReworksRunUpdateGrossWeightSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallet_number, Types::StrippedString).maybe(:str?)
-    required(:standard_pack_code_id, :integer).filled(:int?)
-    required(:gross_weight, :decimal).filled(:decimal?)
+  ReworksRunUpdateGrossWeightSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallet_number).maybe(Types::StrippedString)
+    required(:standard_pack_code_id).filled(:integer)
+    required(:gross_weight).filled(:decimal)
   end
 
-  SequenceSetupDataSchema = Dry::Validation.Params do # rubocop:disable Metrics/BlockLength
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:marketing_variety_id, :integer).filled(:int?)
-    required(:customer_variety_id, :integer).maybe(:int?)
-    required(:std_fruit_size_count_id, :integer).maybe(:int?)
-    required(:basic_pack_code_id, :integer).filled(:int?)
-    required(:standard_pack_code_id, :integer).filled(:int?)
-    required(:fruit_actual_counts_for_pack_id, :integer).maybe(:int?)
-    required(:fruit_size_reference_id, :integer).maybe(:int?)
-    required(:marketing_org_party_role_id, :integer).filled(:int?)
-    required(:packed_tm_group_id, :integer).filled(:int?)
-    required(:mark_id, :integer).filled(:int?)
-    required(:inventory_code_id, :integer).maybe(:int?)
-    required(:pallet_format_id, :integer).filled(:int?)
-    required(:cartons_per_pallet_id, :integer).filled(:int?)
-    required(:pm_bom_id, :integer).maybe(:int?)
-    # required(:extended_columns, :hash).maybe(:hash?)
-    required(:client_size_reference, Types::StrippedString).maybe(:str?)
-    required(:client_product_code, Types::StrippedString).maybe(:str?)
-    optional(:treatment_ids, Types::IntArray).maybe { each(:int?) }
-    required(:marketing_order_number, Types::StrippedString).maybe(:str?)
-    required(:sell_by_code, Types::StrippedString).maybe(:str?)
-    required(:pallet_label_name, Types::StrippedString).maybe(:str?)
-    required(:grade_id, :integer).maybe(:int?)
-    required(:product_chars, Types::StrippedString).maybe(:str?)
-    required(:pm_type_id, :integer).maybe(:int?)
-    required(:pm_subtype_id, :integer).maybe(:int?)
+  SequenceSetupDataSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:marketing_variety_id).filled(:integer)
+    required(:customer_variety_id).maybe(:integer)
+    required(:std_fruit_size_count_id).maybe(:integer)
+    required(:basic_pack_code_id).filled(:integer)
+    required(:standard_pack_code_id).filled(:integer)
+    required(:fruit_actual_counts_for_pack_id).maybe(:integer)
+    required(:fruit_size_reference_id).maybe(:integer)
+    required(:marketing_org_party_role_id).filled(:integer)
+    required(:packed_tm_group_id).filled(:integer)
+    required(:mark_id).filled(:integer)
+    required(:inventory_code_id).maybe(:integer)
+    required(:pallet_format_id).filled(:integer)
+    required(:cartons_per_pallet_id).filled(:integer)
+    required(:pm_bom_id).maybe(:integer)
+    # required(:extended_columns).maybe(:hash)
+    required(:client_size_reference).maybe(Types::StrippedString)
+    required(:client_product_code).maybe(Types::StrippedString)
+    optional(:treatment_ids).maybe(:array).each(:integer)
+    required(:marketing_order_number).maybe(Types::StrippedString)
+    required(:sell_by_code).maybe(Types::StrippedString)
+    required(:pallet_label_name).maybe(Types::StrippedString)
+    required(:grade_id).maybe(:integer)
+    required(:product_chars).maybe(Types::StrippedString)
+    required(:pm_type_id).maybe(:integer)
+    required(:pm_subtype_id).maybe(:integer)
   end
 
-  ReworksRunUpdatePalletSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallet_number, Types::StrippedString).maybe(:str?)
-    required(:fruit_sticker_pm_product_id, :integer).filled(:int?)
-    required(:fruit_sticker_pm_product_2_id, :integer).maybe(:int?)
+  ReworksRunUpdatePalletSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallet_number).maybe(Types::StrippedString)
+    required(:fruit_sticker_pm_product_id).filled(:integer)
+    required(:fruit_sticker_pm_product_2_id).maybe(:integer)
   end
 
-  EditCartonQuantitySchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:column_value, :integer).filled(:int?, gt?: 0)
+  EditCartonQuantitySchema = Dry::Schema.Params do
+    required(:column_value).filled(:integer, gt?: 0)
   end
 
-  ManuallyWeighRmtBinSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:bin_number, Types::StrippedString).maybe(:str?)
-    required(:gross_weight, :decimal).filled(:decimal?)
-    required(:measurement_unit, Types::StrippedString).maybe(:str?)
+  ManuallyWeighRmtBinSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:bin_number).maybe(Types::StrippedString)
+    required(:gross_weight).filled(:decimal)
+    required(:measurement_unit).maybe(Types::StrippedString)
   end
 
-  ChangeDeliveriesOrchardSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:to_orchard, :integer).filled(:int?)
-    optional(:from_cultivar, :integer)
-    required(:from_orchard, :integer).filled(:int?)
-    required(:to_cultivar, :integer).filled(:int?)
+  ChangeDeliveriesOrchardSchema = Dry::Schema.Params do
+    required(:to_orchard).filled(:integer)
+    optional(:from_cultivar).maybe(:integer)
+    required(:from_orchard).filled(:integer)
+    required(:to_cultivar).filled(:integer)
   end
 
-  FromCultivarSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:from_cultivar, :integer).filled(:int?)
+  FromCultivarSchema = Dry::Schema.Params do
+    required(:from_cultivar).filled(:integer)
   end
 
-  ChangeCultivarOnlyCultivarSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:allow_cultivar_mixing, :bool).filled(:bool?)
+  ChangeCultivarOnlyCultivarSchema = Dry::Schema.Params do
+    required(:allow_cultivar_mixing).filled(:bool)
   end
 
-  ReworksRunBulkProductionRunUpdateSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallets_selected, :array).maybe(:array?) { each(:str?) }
-    required(:from_production_run_id, :integer).filled(:int?)
-    required(:to_production_run_id, :integer).filled(:int?)
-    optional(:make_changes, :bool).maybe(:bool?)
-    optional(:allow_cultivar_group_mixing, :bool).maybe(:bool?)
+  ReworksRunBulkProductionRunUpdateSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).maybe(:array).each(:string)
+    required(:from_production_run_id).filled(:integer)
+    required(:to_production_run_id).filled(:integer)
+    optional(:make_changes).maybe(:bool)
+    optional(:allow_cultivar_group_mixing).maybe(:bool)
   end
 
-  ReworksBulkWeighBinsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    optional(:make_changes, :bool).maybe(:bool?)
-    required(:gross_weight, :decimal).filled(:decimal?)
-    required(:avg_gross_weight, :bool).maybe(:bool?)
+  ReworksBulkWeighBinsSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    optional(:make_changes).maybe(:bool)
+    required(:gross_weight).filled(:decimal)
+    required(:avg_gross_weight).maybe(:bool)
   end
 
-  ReworksOrchardChangeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:delivery_ids, :array).filled(:array?) { each(:int?) }
-    required(:from_orchard, :integer).filled(:int?)
-    required(:from_cultivar, :integer).maybe(:int?)
-    required(:to_orchard, :integer).filled(:int?)
-    required(:to_cultivar, :integer).filled(:int?)
-    required(:allow_cultivar_mixing, :bool).maybe(:bool?)
-    required(:ignore_runs_that_allow_mixing, :bool).maybe(:bool?)
+  ReworksOrchardChangeSchema = Dry::Schema.Params do
+    required(:delivery_ids).filled(:array).each(:integer)
+    required(:from_orchard).filled(:integer)
+    required(:from_cultivar).maybe(:integer)
+    required(:to_orchard).filled(:integer)
+    required(:to_cultivar).filled(:integer)
+    required(:allow_cultivar_mixing).maybe(:bool)
+    required(:ignore_runs_that_allow_mixing).maybe(:bool)
   end
 
-  ReworksBulkUpdatePalletDatesSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:reworks_run_type_id, :integer).filled(:int?)
-    required(:pallets_selected, :array).filled(:array?) { each(:str?) }
-    required(:first_cold_storage_at, :date).filled(:date?)
-    optional(:make_changes, :bool).maybe(:bool?)
+  ReworksBulkUpdatePalletDatesSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallets_selected).filled(:array).each(:string)
+    required(:first_cold_storage_at).filled(:date)
+    optional(:make_changes).maybe(:bool)
   end
-  ReworksRunCloneCartonSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
 
-    required(:carton_id, :integer).filled(:int?)
-    required(:pallet_id, :integer).filled(:int?)
-    required(:pallet_sequence_id, :integer).filled(:int?)
-    required(:no_of_clones, :integer).filled(:int?, gt?: 0)
+  ReworksRunCloneCartonSchema = Dry::Schema.Params do
+    required(:carton_id).filled(:integer)
+    required(:pallet_id).filled(:integer)
+    required(:pallet_sequence_id).filled(:integer)
+    required(:no_of_clones).filled(:integer, gt?: 0)
   end
 end

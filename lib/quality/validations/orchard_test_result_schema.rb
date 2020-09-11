@@ -1,31 +1,27 @@
 # frozen_string_literal: true
 
 module QualityApp
-  OrchardTestCreateSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:orchard_test_type_id, :integer).filled(:int?)
-    required(:puc_id, :integer).filled(:int?)
+  OrchardTestCreateSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:orchard_test_type_id).filled(:integer)
+    required(:puc_id).filled(:integer)
   end
 
-  OrchardTestUpdateSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    optional(:orchard_test_type_id, :integer).maybe(:int?)
-    optional(:puc_id, :integer).filled(:int?)
-    optional(:orchard_id, :integer).filled(:int?)
-    optional(:cultivar_id, :integer).maybe(:int?)
-    optional(:puc_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
-    optional(:orchard_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
-    optional(:cultivar_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
-    optional(:passed, :bool).maybe(:bool?)
-    optional(:classification, :bool).maybe(:bool?)
-    required(:freeze_result, :bool).maybe(:bool?)
-    required(:api_result, :string).maybe(:str?)
-    optional(:api_response, :string).maybe(:str?)
-    optional(:update_all, :bool).maybe(:bool?)
-    optional(:group_ids, Types::IntArray).maybe(min_size?: 1) { each(:int?) }
+  OrchardTestUpdateSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    optional(:orchard_test_type_id).maybe(:integer)
+    optional(:puc_id).filled(:integer)
+    optional(:orchard_id).filled(:integer)
+    optional(:cultivar_id).maybe(:integer)
+    optional(:puc_ids).maybe(:array, min_size?: 1).each(:integer)
+    optional(:orchard_ids).maybe(:array, min_size?: 1).each(:integer)
+    optional(:cultivar_ids).maybe(:array, min_size?: 1).each(:integer)
+    optional(:passed).maybe(:bool)
+    optional(:classification).maybe(:bool)
+    required(:freeze_result).maybe(:bool)
+    required(:api_result).maybe(:string)
+    optional(:api_response).maybe(:string)
+    optional(:update_all).maybe(:bool)
+    optional(:group_ids).maybe(:array, min_size?: 1).each(:integer)
   end
 end

@@ -13,11 +13,11 @@ module MasterfilesApp
     attribute :standard_packs, Types::String
     attribute :size_references, Types::String
     attribute? :active, Types::Bool
-    attribute :fruit_size_references, Types::Array.default([]) do
+    attribute :fruit_size_references, Types::Array.default([].freeze) do
       attribute :id, Types::Integer
       attribute :size_reference, Types::String
     end
-    attribute :standard_pack_codes, Types::Array.default([]) do
+    attribute :standard_pack_codes, Types::Array.default([].freeze) do
       attribute :id, Types::Integer
       attribute :standard_pack_code, Types::String
     end

@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  PalletFormatSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:description, Types::StrippedString).filled(:str?)
-    required(:pallet_base_id, :integer).filled(:int?)
-    required(:pallet_stack_type_id, :integer).filled(:int?)
+  PalletFormatSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:description).filled(Types::StrippedString)
+    required(:pallet_base_id).filled(:integer)
+    required(:pallet_stack_type_id).filled(:integer)
   end
 end

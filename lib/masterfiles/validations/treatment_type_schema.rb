@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  TreatmentTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:treatment_type_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
+  TreatmentTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:treatment_type_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
   end
 end

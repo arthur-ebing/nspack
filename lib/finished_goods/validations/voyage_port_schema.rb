@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  VoyagePortSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:voyage_id, :integer).filled(:int?)
-    required(:port_id, :integer).filled(:int?)
-    required(:port_type_id, :integer).filled(:int?)
-    optional(:trans_shipment_vessel_id, :integer).maybe(:int?)
-    optional(:ata, %i[nil date]).maybe(:date?)
-    optional(:atd, %i[nil date]).maybe(:date?)
-    optional(:eta, %i[nil date]).maybe(:date?)
-    optional(:etd, %i[nil date]).maybe(:date?)
+  VoyagePortSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:voyage_id).filled(:integer)
+    required(:port_id).filled(:integer)
+    required(:port_type_id).filled(:integer)
+    optional(:trans_shipment_vessel_id).maybe(:integer)
+    optional(:ata).maybe(:date)
+    optional(:atd).maybe(:date)
+    optional(:eta).maybe(:date)
+    optional(:etd).maybe(:date)
   end
 end
