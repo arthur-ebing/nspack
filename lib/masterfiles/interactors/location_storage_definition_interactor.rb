@@ -16,7 +16,7 @@ module MasterfilesApp
 
     def create_location_storage_definition(params) # rubocop:disable Metrics/AbcSize
       res = validate_location_storage_definition_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module MasterfilesApp
 
     def update_location_storage_definition(id, params)
       res = validate_location_storage_definition_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_location_storage_definition(id, res)

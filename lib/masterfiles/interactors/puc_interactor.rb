@@ -4,7 +4,7 @@ module MasterfilesApp
   class PucInteractor < BaseInteractor
     def create_puc(params) # rubocop:disable Metrics/AbcSize
       res = validate_puc_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -24,7 +24,7 @@ module MasterfilesApp
 
     def update_puc(id, params)
       res = validate_puc_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_puc(id, res)

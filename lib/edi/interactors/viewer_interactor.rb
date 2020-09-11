@@ -5,7 +5,7 @@ module EdiApp
     def edi_upload(params)
       # res = validate_edi_upload_params(params)
       # p res
-      # return validation_failed_response(res) unless res.messages.empty?
+      # return validation_failed_response(res) if res.failure?
       # unless params[:convert] && params[:convert][:file] &&
       #        (tempfile = params[:convert][:file][:tempfile]) &&
       #        (filename = params[:convert][:file][:filename])

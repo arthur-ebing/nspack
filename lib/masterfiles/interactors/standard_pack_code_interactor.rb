@@ -4,7 +4,7 @@ module MasterfilesApp
   class StandardPackCodeInteractor < BaseInteractor
     def create_standard_pack_code(params)
       res = validate_standard_pack_code_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -18,7 +18,7 @@ module MasterfilesApp
 
     def update_standard_pack_code(id, params)
       res = validate_standard_pack_code_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_standard_pack_code(id, res)

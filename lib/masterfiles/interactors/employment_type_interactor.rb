@@ -4,7 +4,7 @@ module MasterfilesApp
   class EmploymentTypeInteractor < BaseInteractor
     def create_employment_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_employment_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     def update_employment_type(id, params)
       res = validate_employment_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_employment_type(id, res)

@@ -395,7 +395,7 @@ module DevelopmentApp
             class #{opts.classnames[:interactor]} < BaseInteractor
               def create_#{opts.singlename}(#{needs_id}params)#{add_parent_to_params}
                 res = validate_#{opts.singlename}_params(params)
-                return validation_failed_response(res) unless res.messages.empty?
+                return validation_failed_response(res) if res.failure?
 
                 id = nil
                 repo.transaction do
@@ -414,7 +414,7 @@ module DevelopmentApp
 
               def update_#{opts.singlename}(id, params)
                 res = validate_#{opts.singlename}_params(params)
-                return validation_failed_response(res) unless res.messages.empty?
+                return validation_failed_response(res) if res.failure?
 
                 repo.transaction do
                   repo.update_#{opts.singlename}(id, res)

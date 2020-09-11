@@ -14,7 +14,7 @@ module DevelopmentApp
 
     def create_user(params)
       res = validate_new_user_params(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure? # unless res.messages.empty?
+      return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure? # if res.failure?
 
       id = repo.create_user(prepare_password(res))
       instance = user(id)
@@ -26,7 +26,7 @@ module DevelopmentApp
 
     def update_user(id, params)
       res = validate_user_params(params)
-      return validation_failed_response(res) if res.failure? # unless res.messages.empty?
+      return validation_failed_response(res) if res.failure? # if res.failure?
 
       repo.update_user(id, res)
       instance = user(id)
@@ -44,7 +44,7 @@ module DevelopmentApp
       return invalid_password unless matching_password?(id, params[:old_password])
 
       res = validate_change_user_params(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure?
 
       repo.transaction do
         repo.save_new_password(id, params[:password])
@@ -57,7 +57,7 @@ module DevelopmentApp
     def set_user_password(id, params)
       # Force the user's password to the new value.
       res = validate_change_password(params)
-      return validation_failed_response(hide_passwords_in_validation_errors(res)) unless res.messages.empty?
+      return validation_failed_response(hide_passwords_in_validation_errors(res)) if res.failure?
 
       repo.transaction do
         repo.save_new_password(id, params[:password])
@@ -69,7 +69,7 @@ module DevelopmentApp
 
     def set_user_permissions(id, ids, params)
       res = validate_user_permission(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = repo.update_user_permission(ids, res.to_h[:security_group_id])
       success_response("Updated permissions for #{user(id).user_name}",

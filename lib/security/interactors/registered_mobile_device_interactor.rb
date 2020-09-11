@@ -14,9 +14,9 @@ module SecurityApp
       RegisteredMobileDeviceSchema.call(params)
     end
 
-    def create_registered_mobile_device(params) # rubocop:disable Metrics/AbcSize
+    def create_registered_mobile_device(params)
       res = validate_registered_mobile_device_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -33,7 +33,7 @@ module SecurityApp
 
     def update_registered_mobile_device(id, params)
       res = validate_registered_mobile_device_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_registered_mobile_device(id, res)

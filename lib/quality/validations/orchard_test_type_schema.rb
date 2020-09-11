@@ -15,8 +15,8 @@ module QualityApp
     optional(:api_attribute).maybe(:string)
     optional(:api_pass_result).maybe(Types::StrippedString)
     optional(:api_default_result).maybe(Types::StrippedString)
-    optional(:applicable_tm_group_ids).maybe(:array).each(:integer)
-    optional(:applicable_cultivar_ids).maybe(:array).each(:integer)
-    optional(:applicable_commodity_group_ids).maybe(:array).each(:integer)
+    optional(:applicable_tm_group_ids).maybe(:array).maybe { each(:integer) }
+    optional(:applicable_cultivar_ids).maybe(:array).maybe { each(:integer) }
+    optional(:applicable_commodity_group_ids).maybe(:array).maybe { each(:integer) }
   end
 end

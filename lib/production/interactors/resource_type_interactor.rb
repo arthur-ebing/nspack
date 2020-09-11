@@ -4,7 +4,7 @@ module ProductionApp
   class ResourceTypeInteractor < BaseInteractor
     def create_plant_resource_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module ProductionApp
 
     def update_plant_resource_type(id, params)
       res = validate_plant_resource_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_plant_resource_type(id, res)

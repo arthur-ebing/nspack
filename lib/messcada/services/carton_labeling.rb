@@ -71,7 +71,7 @@ module MesscadaApp
       end
 
       res = validate_carton_label_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = create_carton_label(res)
       return res unless res.success

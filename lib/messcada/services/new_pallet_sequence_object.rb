@@ -25,7 +25,7 @@ module MesscadaApp
       attrs = pallet_sequence_carton_params.to_h.merge(pallet_sequence_pallet_params).to_h
       attrs = attrs.merge(created_by: user_name).to_h
       res = validate_pallet_sequence_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = attrs.to_h
       treatment_ids = attrs.delete(:treatment_ids)

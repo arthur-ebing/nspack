@@ -4,7 +4,7 @@ module MasterfilesApp
   class ScrapReasonInteractor < BaseInteractor
     def create_scrap_reason(params)  # rubocop:disable Metrics/AbcSize
       res = validate_scrap_reason_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_scrap_reason(id, params)
       res = validate_scrap_reason_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_scrap_reason(id, res)

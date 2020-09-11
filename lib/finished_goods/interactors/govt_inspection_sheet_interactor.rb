@@ -5,7 +5,7 @@ module FinishedGoodsApp
     def create_govt_inspection_sheet(params) # rubocop:disable Metrics/AbcSize
       params[:created_by] ||= @user.user_name
       res = validate_govt_inspection_sheet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,11 +21,11 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_sheet(id, params) # rubocop:disable Metrics/AbcSize
+    def update_govt_inspection_sheet(id, params)
       check!(:edit, id)
 
       res = validate_govt_inspection_sheet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_govt_inspection_sheet(id, res)
@@ -157,7 +157,7 @@ module FinishedGoodsApp
 
     def create_intake_tripsheet(govt_inspection_sheet_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_vehicle_job_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         vehicle_job_id = repo.create_vehicle_job(res)
@@ -258,7 +258,7 @@ module FinishedGoodsApp
 
     def validate_offload_vehicle(vehicle_job_id, location, location_scan_field) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = UtilityFunctions.validate_integer_length(:vehicle_job_id, vehicle_job_id)
-      return failed_response('Invalid barcode. Perhaps a pallet was scanned?') unless res.messages.empty?
+      return failed_response('Invalid barcode. Perhaps a pallet was scanned?') if res.failure?
 
       vehicle_job = repo.find_vehicle_job(vehicle_job_id)
       return failed_response('Tripsheet does not exist') unless vehicle_job
@@ -372,7 +372,7 @@ module FinishedGoodsApp
 
     def validate_add_pallet_govt_inspection_params(params) # rubocop:disable Metrics/AbcSize
       res = GovtInspectionAddPalletSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: attrs.delete(:pallet_number)).pallet_number

@@ -4,7 +4,7 @@ module MasterfilesApp
   class BasicPackCodeInteractor < BaseInteractor
     def create_basic_pack_code(params)
       res = validate_basic_pack_code_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_basic_pack_code(res)
       instance = basic_pack_code(id)
@@ -17,7 +17,7 @@ module MasterfilesApp
     def update_basic_pack_code(id, params)
       @id = id
       res = validate_basic_pack_code_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_basic_pack_code(id, res)
       instance = basic_pack_code(id)

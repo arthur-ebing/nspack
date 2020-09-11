@@ -4,7 +4,7 @@ module MasterfilesApp
   class VesselTypeInteractor < BaseInteractor
     def create_vessel_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_vessel_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     def update_vessel_type(id, params)
       res = validate_vessel_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_vessel_type(id, res)

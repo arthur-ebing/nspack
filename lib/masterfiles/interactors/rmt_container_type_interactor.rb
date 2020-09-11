@@ -16,7 +16,7 @@ module MasterfilesApp
 
     def create_rmt_container_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_rmt_container_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module MasterfilesApp
 
     def update_rmt_container_type(id, params)
       res = validate_rmt_container_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_container_type(id, res)

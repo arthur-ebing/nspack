@@ -9,21 +9,21 @@ module ProductionApp
 
     def validate_change_delivery_orchard_screen_params(params) # rubocop:disable Metrics/AbcSize
       res = validate_only_cultivar_change(params)
-      unless res.messages.empty?
+      if res.failure?
         error_res = validation_failed_response(res)
         error_res.message = "#{error_res.message}: you must allow_cultivar_mixing when changing only the cultivar"
         return error_res
       end
 
       res = validate_change_delivery_orchard_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = validate_changes_made?(params)
       return failed_response('No Changes were made') unless res
 
       if params[:allow_cultivar_mixing] == 'f'
         res = validate_from_cultivar_param(params)
-        return validation_failed_response(res) unless res.messages.empty?
+        return validation_failed_response(res) if res.failure?
       end
 
       ok_response
@@ -85,7 +85,7 @@ module ProductionApp
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
 
       res = validate_reworks_run_params(reworks_run_attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       # rw_res = ProductionApp::ChangeDeliveriesOrchards.call(change_attrs, reworks_run_attrs)
       # return failed_response(unwrap_failed_response(rw_res), attrs) unless rw_res.success
@@ -108,7 +108,7 @@ module ProductionApp
     def apply_change_deliveries_orchard_changes(allow_cultivar_mixing, to_orchard, to_cultivar, delivery_ids, reworks_run_type_id) # rubocop:disable Metrics/AbcSize
       reworks_run_attrs = { allow_cultivar_mixing: allow_cultivar_mixing == 't', user: @user.user_name, pallets_affected: delivery_ids.split(','), pallets_selected: delivery_ids.split(','), reworks_run_type_id: reworks_run_type_id }
       res = validate_reworks_run_params(reworks_run_attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       reworks_run_attrs[:changes_made] = calc_changes_made(to_orchard.to_i, to_cultivar.to_i, delivery_ids)
       return failed_response(reworks_run_attrs[:changes_made]) if reworks_run_attrs[:changes_made].is_a?(String)
@@ -321,7 +321,7 @@ module ProductionApp
       return validation_failed_response(res) unless res.success
 
       res = validate_reworks_run_new_params(reworks_run_type, params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       make_changes = make_changes?(reworks_run_type)
       attrs = res.to_h.merge(user: @user.user_name, make_changes: make_changes, pallets_affected: nil, pallet_sequence_id: nil, affected_sequences: nil)
@@ -386,7 +386,7 @@ module ProductionApp
       attrs[:allow_cultivar_group_mixing] = false unless AppConst::ALLOW_CULTIVAR_GROUP_MIXING && !attrs[:allow_cultivar_group_mixing].nil?
 
       res = validate_reworks_run_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       return create_scrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_SCRAP_BIN
       return create_unscrap_bin_reworks_run(res) if repo.find_reworks_run_type(attrs[:reworks_run_type_id])[:run_type] == AppConst::RUN_TYPE_UNSCRAP_BIN
@@ -433,7 +433,7 @@ module ProductionApp
 
     def print_reworks_pallet_label(pallet_number, params)  # rubocop:disable Metrics/AbcSize
       res = validate_print_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = reworks_run_pallet_print_data(pallet_number)
       label_name = label_template_name(res[:label_template_id])
@@ -448,7 +448,7 @@ module ProductionApp
 
     def print_reworks_carton_label(sequence_id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_print_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = reworks_run_carton_print_data(sequence_id)
       label_name = label_template_name(res[:label_template_id])
@@ -526,7 +526,7 @@ module ProductionApp
 
     def edit_carton_quantities(sequence_id, reworks_run_type_id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_edit_carton_quantity_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = pallet_sequence(sequence_id)
       repo.transaction do
@@ -555,7 +555,7 @@ module ProductionApp
       end
 
       res = validate_reworks_run_pallet_sequence_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
 
       rejected_fields = %i[id product_setup_template_id pallet_label_name]
@@ -652,7 +652,7 @@ module ProductionApp
 
     def update_reworks_production_run(params)  # rubocop:disable Metrics/AbcSize
       res = validate_update_reworks_production_run_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       sequence_id = attrs[:pallet_sequence_id]
@@ -711,7 +711,7 @@ module ProductionApp
 
     def update_reworks_farm_details(params)  # rubocop:disable Metrics/AbcSize
       res = validate_update_reworks_farm_details_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       sequence_id = attrs.delete(:pallet_sequence_id)
@@ -754,7 +754,7 @@ module ProductionApp
 
     def update_pallet_gross_weight(params)  # rubocop:disable Metrics/AbcSize
       res = validate_update_gross_weight_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       instance = pallet(attrs[:pallet_number])
@@ -784,7 +784,7 @@ module ProductionApp
 
     def update_pallet_details(params)  # rubocop:disable Metrics/AbcSize
       res = validate_update_pallet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       reworks_run_type_id = attrs.delete(:reworks_run_type_id)
@@ -996,7 +996,7 @@ module ProductionApp
 
     def manually_weigh_rmt_bin(params)  # rubocop:disable Metrics/AbcSize
       res = validate_manually_weigh_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       rmt_bin_id = find_rmt_bin(attrs[:bin_number])
@@ -1033,7 +1033,7 @@ module ProductionApp
 
     def clone_carton(params)
       res = validate_clone_carton_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
 

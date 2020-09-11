@@ -4,7 +4,7 @@ module MasterfilesApp
   class FarmInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_farm(params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -24,7 +24,7 @@ module MasterfilesApp
 
     def update_farm(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       attrs.delete(:puc_id)
@@ -55,7 +55,7 @@ module MasterfilesApp
     def create_farm_section(farm_id, params) # rubocop:disable Metrics/AbcSize
       params[:farm_id] = farm_id
       res = validate_farm_section_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -79,7 +79,7 @@ module MasterfilesApp
     def update_farm_section(id, params) # rubocop:disable Metrics/AbcSize
       params[:farm_id] = repo.get(:orchards, params[:orchard_ids][0], :farm_id)
       res = validate_farm_section_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_farm_section(id, params)

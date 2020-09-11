@@ -7,7 +7,7 @@ module MasterfilesApp
     required(:first_name).filled(Types::StrippedString)
     required(:title).filled(Types::StrippedString)
     required(:vat_number).maybe(Types::StrippedString)
-    required(:role_ids).maybe(:array).each(:integer)
+    required(:role_ids).filled(:array).each(:integer)
     # required(:active).filled(:bool)
   end
 end

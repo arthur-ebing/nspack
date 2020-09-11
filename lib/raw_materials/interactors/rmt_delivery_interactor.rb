@@ -4,7 +4,7 @@ module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
       res = validate_rmt_delivery_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -20,9 +20,11 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def update_rmt_delivery(id, params)
+    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_rmt_delivery_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      # return failed_response(unwrap_failed_response(validation_failed_response(res))) if !res.messages.empty? && res.messages.one? && res.messages.include?(:season_id)
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
@@ -49,7 +51,7 @@ module RawMaterialsApp
                                 pallets_affected: bins.map { |b| b[:bin_asset_number] }, allow_cultivar_group_mixing: nil }
 
           res = validate_reworks_run_params(reworks_run_attrs)
-          return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
+          return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
 
           create_delete_rmt_delivery_reworks_run(res, before: before, after: after)
           repo.delete_rmt_bin(bins.map { |b| b[:id] })
@@ -154,7 +156,7 @@ module RawMaterialsApp
 
     def create_cost_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_cost_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -173,7 +175,7 @@ module RawMaterialsApp
 
     def update_cost_type(id, params)
       res = validate_cost_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_cost_type(id, res)
@@ -203,7 +205,7 @@ module RawMaterialsApp
 
     def create_cost(params) # rubocop:disable Metrics/AbcSize
       res = validate_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -222,7 +224,7 @@ module RawMaterialsApp
 
     def update_cost(id, params)
       res = validate_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_cost(id, res)
@@ -286,7 +288,7 @@ module RawMaterialsApp
     def create_rmt_delivery_cost(id, params) # rubocop:disable Metrics/AbcSize
       params[:rmt_delivery_id] = id
       res = validate_rmt_delivery_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.create_rmt_delivery_cost(res)
@@ -304,7 +306,7 @@ module RawMaterialsApp
     def update_rmt_delivery_cost(rmt_delivery_id, cost_id, params)
       params[:rmt_delivery_id] = rmt_delivery_id
       res = validate_rmt_delivery_cost_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_delivery_cost(rmt_delivery_id, cost_id, res)

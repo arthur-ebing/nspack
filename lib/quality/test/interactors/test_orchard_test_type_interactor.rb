@@ -11,6 +11,10 @@ module QualityApp
     include MasterfilesApp::FarmsFactory
     include MasterfilesApp::PartyFactory
 
+    def transform_pg_arrays(hash)
+      hash.transform_values { |v| v.is_a?(Sequel::Postgres::PGArray) ? v.to_a : v }
+    end
+
     def test_repo
       repo = interactor.send(:repo)
       assert repo.is_a?(QualityApp::OrchardTestRepo)
@@ -42,7 +46,7 @@ module QualityApp
       attrs = interactor.send(:repo).find_hash(:orchard_test_types, id).reject { |k, _| k == :id }
       value = attrs[:test_type_code]
       attrs[:test_type_code] = 'a_change'
-      res = interactor.update_orchard_test_type(id, attrs)
+      res = interactor.update_orchard_test_type(id, transform_pg_arrays(attrs))
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(OrchardTestTypeFlat, res.instance)
       assert_equal 'a_change', res.instance.test_type_code
@@ -52,7 +56,7 @@ module QualityApp
     def test_update_orchard_test_type_fail
       id = create_orchard_test_type
       attrs = interactor.send(:repo).find_hash(:orchard_test_types, id).reject { |k, _| %i[id test_type_code].include?(k) }
-      res = interactor.update_orchard_test_type(id, attrs)
+      res = interactor.update_orchard_test_type(id, transform_pg_arrays(attrs))
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:test_type_code]
     end

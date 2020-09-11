@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class GovtInspectionApiResultInteractor < BaseInteractor
     def create_govt_inspection_api_result(params) # rubocop:disable Metrics/AbcSize
       res = validate_govt_inspection_api_result_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module FinishedGoodsApp
 
     def update_govt_inspection_api_result(id, params)
       res = validate_govt_inspection_api_result_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_govt_inspection_api_result(id, res)

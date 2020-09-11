@@ -4,7 +4,7 @@ module MasterfilesApp
   class ContractWorkerInteractor < BaseInteractor
     def create_contract_worker(params) # rubocop:disable Metrics/AbcSize
       res = validate_contract_worker_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     def update_contract_worker(id, params)
       res = validate_contract_worker_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_contract_worker(id, res)
@@ -70,7 +70,7 @@ module MasterfilesApp
 
     def link_to_personnel_identifier(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_contract_worker_link_params(params.merge(id: id))
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_contract_worker(params[:contract_worker_id], personnel_identifier_id: id)

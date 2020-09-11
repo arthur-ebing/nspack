@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class LoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_load(params)
       res = LoadServiceSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       load_res = nil
       repo.transaction do
@@ -20,7 +20,7 @@ module FinishedGoodsApp
 
     def update_load(params)
       res = LoadServiceSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       load_res = nil
       repo.transaction do

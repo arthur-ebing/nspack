@@ -4,7 +4,7 @@ module MasterfilesApp
   class TreatmentTypeInteractor < BaseInteractor
     def create_treatment_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_treatment_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_treatment_type(id, params)
       res = validate_treatment_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_treatment_type(id, res)

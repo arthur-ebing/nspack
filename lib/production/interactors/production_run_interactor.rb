@@ -4,7 +4,7 @@ module ProductionApp
   class ProductionRunInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_production_run(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_production_run_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -49,7 +49,7 @@ module ProductionApp
 
     def validate_carton_number_for_palletizing(carton_number)
       res = UtilityFunctions.validate_integer_length(:carton_number, carton_number)
-      return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") unless res.messages.empty?
+      return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
 
       ok_response
     end
@@ -198,7 +198,7 @@ module ProductionApp
     def update_production_run(id, params) # rubocop:disable Metrics/AbcSize
       run = production_run(id)
       res = validate_production_run_params(run.reconfiguring, params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       template_res = validate_run_matches_template(id, res)
       return template_res unless template_res.success
@@ -250,7 +250,7 @@ module ProductionApp
 
     def update_template(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_production_run_template_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       current_template = production_run(id).product_setup_template_id
       repo.transaction do
@@ -278,7 +278,7 @@ module ProductionApp
 
     def update_product_resource_allocation(id, params)
       res = validate_product_resource_allocation(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_product_resource_allocation(id, res)
@@ -375,7 +375,7 @@ module ProductionApp
 
     def lines_for_packhouse(params)
       res = validate_changed_value_as_int(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
       return success_response('ok', []) if res[:changed_value].nil?
 
       success_response('ok', ResourceRepo.new.packhouse_lines(res[:changed_value]))
@@ -383,7 +383,7 @@ module ProductionApp
 
     def change_for_farm(params)
       res = validate_changed_value_as_int(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = { pucs: [], orchards: [], cultivar_groups: [], cultivars: [], seasons: [] }
       return success_response('ok', instance) if res[:changed_value].nil?
@@ -395,7 +395,7 @@ module ProductionApp
 
     def change_for_puc(params)
       res = validate_changed_value_as_int(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = { orchards: [], cultivar_groups: [], cultivars: [], seasons: [] }
       return success_response('ok', instance) if res[:changed_value].nil?
@@ -408,7 +408,7 @@ module ProductionApp
 
     def change_for_orchard(params) # rubocop:disable Metrics/AbcSize
       res = validate_changed_value_as_int(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = { cultivar_groups: [], cultivars: [], seasons: [] }
       if res[:changed_value].nil?
@@ -430,7 +430,7 @@ module ProductionApp
 
     def change_for_cultivar_group(params) # rubocop:disable Metrics/AbcSize
       res = validate_changed_value_as_int(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = { cultivars: [], seasons: [] }
       if params[:production_run_orchard_id].nil_or_empty?
@@ -464,7 +464,7 @@ module ProductionApp
     # create carton_print_repo?
     def print_carton_label(id, product_setup_id, request_ip, params)
       res = validate_print_carton(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
       return mixed_validation_failed_response(res, messages: { no_of_prints: ["cannot be more than #{AppConst::BATCH_PRINT_MAX_LABELS}"] }) if res[:no_of_prints] > AppConst::BATCH_PRINT_MAX_LABELS
 
       MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], request_ip, params)
@@ -525,7 +525,7 @@ module ProductionApp
 
     def update_pallet_mix_rule(id, params)
       res = validate_pallet_mix_rule_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pallet_mix_rule(id, res)

@@ -4,7 +4,7 @@ module MasterfilesApp
   class MarkInteractor < BaseInteractor
     def create_mark(params) # rubocop:disable Metrics/AbcSize
       res = validate_mark_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_mark(id, params)
       res = validate_mark_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_mark(id, res)

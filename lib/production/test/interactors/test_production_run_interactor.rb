@@ -46,7 +46,7 @@ module ProductionApp
       value = attrs[:active_run_stage]
       attrs[:active_run_stage] = 'a_change'
       res = interactor.update_production_run(id, attrs)
-      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert res.success, "#{res.message} : #{res.inspect}"
       assert_instance_of(ProductionRunFlat, res.instance)
       assert_equal 'a_change', res.instance.active_run_stage
       refute_equal value, res.instance.active_run_stage

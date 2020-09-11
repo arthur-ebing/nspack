@@ -14,9 +14,9 @@ module MasterfilesApp
       LabelTemplateSchema.call(params)
     end
 
-    def create_label_template(params) # rubocop:disable Metrics/AbcSize
+    def create_label_template(params)
       res = validate_label_template_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -33,7 +33,7 @@ module MasterfilesApp
 
     def update_label_template(id, params)
       res = validate_label_template_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_label_template(id, res)
@@ -72,8 +72,8 @@ module MasterfilesApp
     def update_published_templates(params)
       # validate params are as expected
       res = validate_published_labels(params)
-      # Log error here unless res.messages.empty?
-      return validation_failed_response(res) unless res.messages.empty?
+      # Log error here if res.failure?
+      return validation_failed_response(res) if res.failure?
 
       UpdatePublishedTemplates.call(res)
     end
@@ -82,7 +82,7 @@ module MasterfilesApp
 
     def validate_published_labels(params) # rubocop:disable Metrics/AbcSize
       res = LabelTemplatePublishSchema.call(params)
-      return res unless res.messages.empty?
+      return res if res.failure?
       return res unless matching_variable_set?(res)
 
       var_errs = {}

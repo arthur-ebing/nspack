@@ -17,7 +17,7 @@ module MasterfilesApp
     def create_uom(params) # rubocop:disable Metrics/AbcSize
       attrs = params.to_h.merge(uom_type_id: repo.default_uom_type_id)
       res = validate_uom_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module MasterfilesApp
     def update_uom(id, params)  # rubocop:disable Metrics/AbcSize
       attrs = params.to_h.merge(uom_type_id: repo.default_uom_type_id)
       res = validate_uom_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_uom(id, res)

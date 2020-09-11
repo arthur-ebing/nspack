@@ -4,7 +4,7 @@ module MasterfilesApp
   class ShiftTypeInteractor < BaseInteractor
     def create_shift_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_shift_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -37,7 +37,7 @@ module MasterfilesApp
 
     def swap_employees(params) # rubocop:disable Metrics/AbcSize
       res = ShiftTypeIdsSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       from_st = shift_type(params[:from_shift_type_id])
       to_st = shift_type(params[:to_shift_type_id])
@@ -52,7 +52,7 @@ module MasterfilesApp
 
     def move_employees(params) # rubocop:disable Metrics/AbcSize
       res = ShiftTypeIdsSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       from_st = shift_type(params[:from_shift_type_id])
       to_st = shift_type(params[:to_shift_type_id])

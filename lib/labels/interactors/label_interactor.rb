@@ -17,7 +17,7 @@ module LabelApp
     def pre_create_label(params)
       extcols = select_extended_columns_params(params, delete_prefix: false)
       res = validate_label_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = {
         # container_type: params[:container_type],
@@ -34,7 +34,7 @@ module LabelApp
     def create_label(params) # rubocop:disable Metrics/AbcSize
       extcols = select_extended_columns_params(params)
       res = validate_label_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -52,7 +52,7 @@ module LabelApp
       parms, extcols = unwrap_extended_columns_params(params)
       ext_res = validate_extended_columns(:labels, params)
       res = validate_label_params(parms)
-      return mixed_validation_failed_response(res, ext_res) unless res.messages.empty? && ext_res.messages.empty?
+      return mixed_validation_failed_response(res, ext_res) if res.failure? && ext_res.messages.empty?
 
       repo.transaction do
         repo.update_label(id, include_updated_by_in_changeset(add_extended_columns_to_changeset(res, repo, extcols)))
@@ -132,7 +132,7 @@ module LabelApp
 
     def prepare_clone_label(id, params)
       res = validate_clone_label_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       instance = label(id)
       attrs = {

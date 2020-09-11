@@ -4,7 +4,7 @@ module RawMaterialsApp
   class BinLoadPurposeInteractor < BaseInteractor
     def create_bin_load_purpose(params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_load_purpose_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module RawMaterialsApp
 
     def update_bin_load_purpose(id, params)
       res = validate_bin_load_purpose_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_bin_load_purpose(id, res)
