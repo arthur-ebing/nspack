@@ -8,7 +8,6 @@ module FinishedGoodsApp
         @task = task
         @repo = GovtInspectionRepo.new
         @id = govt_inspection_sheet_id
-        @entity = @id ? @repo.find_govt_inspection_sheet(@id) : nil
       end
 
       CHECKS = {
@@ -24,7 +23,10 @@ module FinishedGoodsApp
         reopen: :reopen_check
       }.freeze
 
-      def call
+      def call # rubocop:disable Metrics/AbcSize
+        return failed_response "Value #{id} is too big to be a Inspection Sheet. Perhaps you scanned a pallet number?" if id.to_i > AppConst::MAX_DB_INT
+
+        @entity = @repo.find_govt_inspection_sheet(id)
         return failed_response 'Govt Inspection Sheet record not found.' unless @entity || task == :create
 
         check = CHECKS[task]
