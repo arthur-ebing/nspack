@@ -2,52 +2,34 @@
 
 module RawMaterialsApp
   class RmtDeliveryInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
-    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      assert_permission!(:create)
-      params[:date_delivered] = Time.now.to_s
-      if !params[:cultivar_id].nil_or_empty? && !params[:date_delivered].nil_or_empty?
-        params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered])
-        return failed_response("Season not found for selected cultivar and delivery_date:#{params[:date_delivered]}") if params[:season_id].nil_or_empty?
-      end
-
+    def create_rmt_delivery(params) # rubocop:disable Metrics/AbcSize
       res = validate_rmt_delivery_params(params)
       return validation_failed_response(res) unless res.messages.empty?
 
       id = nil
       repo.transaction do
         id = repo.create_rmt_delivery(res)
-        repo.delivery_set_current(id) if res[:current]
         log_status(:rmt_deliveries, id, 'DELIVERY_RECEIVED')
         log_transaction
       end
       instance = rmt_delivery(id)
-      success_response("Created rmt delivery #{instance.truck_registration_number}",
-                       instance)
+      success_response("Created rmt delivery #{id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { truck_registration_number: ['This rmt delivery already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { reference_number: ['This rmt delivery already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def  get_rmt_delivery_season(cultivar_id, date_delivered)
-      repo.rmt_delivery_season(cultivar_id, date_delivered)
-    end
-
-    def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      params[:date_delivered] = rmt_delivery(id).date_delivered
-      params[:season_id] = get_rmt_delivery_season(params[:cultivar_id], params[:date_delivered]) unless params[:cultivar_id].nil_or_empty? || params[:date_delivered].to_s.nil_or_empty?
+    def update_rmt_delivery(id, params)
       res = validate_rmt_delivery_params(params)
-      return failed_response(unwrap_failed_response(validation_failed_response(res))) if !res.messages.empty? && res.messages.one? && res.messages.include?(:season_id)
       return validation_failed_response(res) unless res.messages.empty?
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
-        repo.update_rmt_bins_inherited_field(id, res)
         log_transaction
       end
       instance = rmt_delivery(id)
-      success_response("Updated rmt delivery #{instance.truck_registration_number}",
-                       instance)
+      success_response("Updated rmt delivery #{instance.reference_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -92,18 +74,20 @@ module RawMaterialsApp
                                                         changes_made: { pallets: { pallet_sequences: { changes: changes_made } } }.to_json)
     end
 
-    def set_receive_date(id, params) # rubocop:disable Metrics/AbcSize
+    def update_received_at(id, params) # rubocop:disable Metrics/AbcSize
+      res = RmtDeliveryReceivedAtSchema.call(params)
+      return validation_failed_response(res) unless res.messages.empty?
+
       repo.transaction do
-        bins = repo.find_bins_by_delivery_id(id)
-        repo.update_rmt_delivery(id, date_delivered: params[:date_received])
-        repo.update(:rmt_bins, bins.map { |b| b[:id] }, bin_received_date_time: params[:date_received])
-        log_multiple_statuses(:rmt_bins, bins.map { |b| b[:id] }, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
+        repo.update_rmt_delivery(id, res)
         log_status(:rmt_deliveries, id, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
+
+        bin_ids = repo.select_values(:rmt_bins, :id, rmt_delivery_id: id)
+        log_multiple_statuses(:rmt_bins, bin_ids, AppConst::RMT_BIN_RECEIPT_DATE_OVERRIDE)
         log_transaction
       end
       instance = rmt_delivery(id)
-
-      success_response('Delivery/Bins: date_delivered/date_delivered have been updated', instance)
+      success_response("Updated rmt delivery #{instance.reference_number}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -137,7 +121,7 @@ module RawMaterialsApp
 
       repo.transaction do
         repo.update_rmt_delivery(id, changeset)
-        log_status(:rmt_deliveries, id, 'DELIVERY OPENED')
+        log_status(:rmt_deliveries, id, 'DELIVERY CLOSED')
         log_transaction
       end
       instance = rmt_delivery(id)

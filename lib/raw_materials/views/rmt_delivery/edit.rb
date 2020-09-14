@@ -1,34 +1,33 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Deliveries
     module RmtDelivery
       class Edit
-        def self.call(id, back_url:, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+        def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
-            page.section do |section| # rubocop:disable Metrics/BlockLength
+            page.section do |section|
               section.add_control(control_type: :link,
                                   text: 'Back',
-                                  url: back_url,
+                                  url: '/list/rmt_deliveries',
                                   style: :back_button)
 
               section.add_control(control_type: :link,
                                   text: 'Print Bin Barcodes',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_bin_barcodes",
-                                  visible: rules[:print_bin_barcodes],
                                   loading_window: true,
                                   style: :button)
 
               section.add_control(control_type: :link,
                                   text: 'Print Delivery',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_delivery",
-                                  visible: rules[:print_bin_barcodes],
                                   loading_window: true,
                                   style: :button)
 
@@ -50,26 +49,32 @@ module RawMaterials
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
+                    col.add_field :rmt_delivery_destination_id
                     col.add_field :reference_number
-                    col.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
+                    col.add_field :truck_registration_number
+                    col.add_field :qty_damaged_bins
+                    col.add_field :qty_empty_bins
+                    col.add_field :quantity_bins_with_fruit
                   end
 
                   row.column do |col|
-                    col.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
-                    col.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
+                    col.add_field :current
                     col.add_field :date_picked
-                    col.add_field :quantity_bins_with_fruit
-                    col.add_field :truck_registration_number if rules[:show_truck_registration_number]
-                    # col.add_field :rmt_delivery_destination_id
+                    col.add_field :received
+                    col.add_field :date_delivered
+                    col.add_field :delivery_tipped
+                    col.add_field :tipping_complete_date_time
+                    # col.add_field :keep_open
+                    # col.add_field :auto_allocate_asset_number
                   end
                 end
               end
             end
 
             unless is_update
-              page.section do |section| # rubocop:disable Metrics/BlockLength
+              page.section do |section|
                 bin_type = nil
-                if rules[:is_auto_allocate_asset_number_delivery]
+                if ui_rule.form_object.auto_allocate_asset_number
                   section.add_control(control_type: :link,
                                       text: 'Create Bin Groups',
                                       url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_bin_groups",
@@ -77,7 +82,7 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: :popup)
                   bin_type = 'asset_number_'
-                elsif rules[:scan_bulk_rmt_bin_asset_numbers]
+                elsif AppConst::BULK_BIN_ASSET_NUMBER_ENTRY && !ui_rule.form_object.auto_allocate_asset_number
                   section.add_control(control_type: :link,
                                       text: 'Scan Bin Groups',
                                       url: "/raw_materials/deliveries/rmt_deliveries/#{id}/rmt_bins/create_scanned_bin_groups",
@@ -85,7 +90,7 @@ module RawMaterials
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: :popup)
                   bin_type = 'asset_number_'
-                elsif rules[:scan_rmt_bin_asset_numbers]
+                elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
                   section.add_control(control_type: :link,
                                       text: 'New Rmt Bin',
                                       url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new",
@@ -114,3 +119,4 @@ module RawMaterials
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# ========================================================= #
-# NB. Scaffolds for test factories should be combined       #
-#     - Otherwise you'll have methods for the same table in #
-#       several factories.                                  #
-#     - Rather create a factory for several related tables  #
-# ========================================================= #
-
 module RawMaterialsApp
   module RmtDeliveryFactory
     def create_rmt_delivery(opts = {}) # rubocop:disable Metrics/AbcSize
@@ -31,6 +24,7 @@ module RawMaterialsApp
         active: true,
         delivery_tipped: false,
         date_picked: '2010-01-01',
+        received: true,
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         created_at: '2010-01-01 12:00',

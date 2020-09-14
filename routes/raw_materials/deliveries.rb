@@ -13,32 +13,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         handle_not_found(r)
       end
 
-      r.on 'edit' do   # EDIT
-        check_auth!('deliveries', 'edit')
-        interactor.assert_permission!(:edit, id)
-        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
-      end
-
-      r.on 'set_receive_date' do
-        r.get do
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::SetReceiveDate.call(id) }
-        end
-
-        r.post do
-          res = interactor.set_receive_date(id, params[:rmt_delivery])
-          if res.success
-            if res.success
-              flash[:notice] = res.message
-            else
-              flash[:error] = unwrap_failed_response(res)
-            end
-            r.redirect("/list/rmt_deliveries/with_params?key=standard&id=#{id}")
-          else
-            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::SetReceiveDate.call(id, form_values: params[:rmt_delivery], form_errors: res.errors) }
-          end
-        end
-      end
-
       # --------------------------------------------------------------------------
       # BIN BARCODES SHEET
       # --------------------------------------------------------------------------
@@ -111,6 +85,28 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect("/list/rmt_deliveries/with_params?key=standard&id=#{id}")
       end
 
+      r.on 'edit_received_at' do
+        r.get do
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::EditReceivedAt.call(id) }
+        end
+
+        r.post do
+          res = interactor.update_received_at(id, params[:rmt_delivery])
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          else
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::EditReceivedAt.call(id, form_values: params[:rmt_delivery], form_errors: res.errors) }
+          end
+        end
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('deliveries', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id) }
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('deliveries', 'read')
@@ -120,9 +116,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_rmt_delivery(id, params[:rmt_delivery])
           if res.success
-            show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true) }
+            show_partial(notice: 'Delivery Updated') { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true) }
           else
-            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
+            re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, is_update: true, form_values: params[:rmt_delivery], form_errors: res.errors) }
           end
         end
 

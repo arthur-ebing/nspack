@@ -46,11 +46,16 @@ module MasterfilesApp
 
     crud_calls_for :farm_sections, name: :farm_section, wrapper: FarmSection
 
-    def for_select_pucs(where: nil)
-      ds = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map(%i[puc_code id])
+    def for_select_pucs(opts = {})
+      dataset = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)
+      if opts[:where]
+        raise Crossbeams::FrameworkError, 'WHERE clause in "for_select" must be a hash' unless opts[:where].is_a?(Hash)
+
+        dataset = dataset.where(opts[:where].transform_values { |v| v == '' ? nil : v })
+      end
+      dataset.select_map(%i[puc_code id])
     end
+
     build_inactive_select :pucs,
                           label: :puc_code,
                           value: :id,

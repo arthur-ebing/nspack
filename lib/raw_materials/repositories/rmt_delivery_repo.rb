@@ -39,6 +39,48 @@ module RawMaterialsApp
     crud_calls_for :costs, name: :cost, wrapper: MasterfilesApp::Cost
     crud_calls_for :rmt_delivery_costs, name: :rmt_delivery_cost, wrapper: RmtDeliveryCost
 
+    def create_rmt_delivery(res)
+      attrs = res.to_h
+      attrs[:season_id] ||= rmt_delivery_season!(attrs)
+      DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
+
+      create(:rmt_deliveries, attrs)
+    end
+
+    def rmt_delivery_season!(attrs, rmt_delivery_id = nil)
+      instance = find_rmt_delivery(rmt_delivery_id)
+
+      if attrs[:cultivar_id] || attrs[:date_delivered]
+        cultivar_id = attrs[:cultivar_id] || instance.cultivar_id
+        received_at = attrs[:date_delivered] || instance.date_delivered
+        season_id = rmt_delivery_season(cultivar_id, received_at)
+        raise Crossbeams::InfoError, 'Season not found for delivery' unless season_id
+      end
+
+      season_id
+    end
+
+    def update_rmt_delivery(id, res)
+      attrs = res.to_h
+      attrs[:season_id] ||= rmt_delivery_season!(attrs, id)
+      DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
+
+      update_untipped_rmt_delivery_bins(id, attrs)
+      update(:rmt_deliveries, id, attrs)
+    end
+
+    def update_untipped_rmt_delivery_bins(id, attrs)
+      bin_attrs = { orchard_id: attrs[:orchard_id],
+                    season_id: attrs[:season_id],
+                    cultivar_id: attrs[:cultivar_id],
+                    bin_received_date_time: attrs[:date_delivered],
+                    farm_id: attrs[:farm_id],
+                    puc_id: attrs[:puc_id] }.delete_if { |_, v| v.nil? }
+      return if bin_attrs.empty?
+
+      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false).update(bin_attrs)
+    end
+
     def delivery_bin_count(id)
       DB[:rmt_bins].where(rmt_delivery_id: id).count
     end
@@ -61,27 +103,12 @@ module RawMaterialsApp
       DB[qry, id].first
     end
 
-    def update_rmt_bins_inherited_field(id, res) # rubocop:disable Metrics/AbcSize
-      updates = { orchard_id: res.output[:orchard_id],
-                  season_id: res.output[:season_id],
-                  cultivar_id: res.output[:cultivar_id],
-                  bin_received_date_time: res.output[:date_delivered].to_s,
-                  farm_id: res.output[:farm_id],
-                  puc_id: res.output[:puc_id] }
-
-      find_delivery_untipped_bins(id).update(updates)
-    end
-
     def all_bins_tipped?(id)
       return false if DB[:rmt_bins].where(rmt_delivery_id: id).count.zero?
 
       DB[:rmt_bins]
         .where(rmt_delivery_id: id, bin_tipped: false)
         .count.zero?
-    end
-
-    def find_delivery_untipped_bins(id)
-      DB[:rmt_bins].where(rmt_delivery_id: id, bin_tipped: false)
     end
 
     def find_delivery_tipped_bins(id)

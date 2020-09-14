@@ -34,12 +34,12 @@ module EdiApp
     def create_records # rubocop:disable Metrics/AbcSize
       repo.transaction do
         parsed_bins.each do |attrs|
-          delivery_attrs = { delivery_pending: true,
-                             season_id: attrs[:season_id],
+          delivery_attrs = { season_id: attrs[:season_id],
                              farm_id: attrs[:farm_id],
                              puc_id: attrs[:puc_id],
                              orchard_id: attrs[:orchard_id],
                              cultivar_id: attrs[:cultivar_id],
+                             received: false,
                              date_delivered: attrs[:bin_received_date_time],
                              reference_number: attrs.delete(:reference_number) }
           rmt_delivery_id = repo.get_id_or_create_with_status(:rmt_deliveries, 'PALBIN_RECEIVED', delivery_attrs)
@@ -94,7 +94,7 @@ module EdiApp
         hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id)
 
         hash[:season_id] = RawMaterialsApp::RmtDeliveryRepo.new.rmt_delivery_season(hash[:cultivar_id], hash[:bin_received_date_time])
-        missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, date_delivered: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
+        missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, received: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
 
         parsed_bins << hash
       end

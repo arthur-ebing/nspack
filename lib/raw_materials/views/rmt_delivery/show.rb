@@ -19,14 +19,12 @@ module RawMaterials
               section.add_control(control_type: :link,
                                   text: 'Print Bin Barcodes',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_bin_barcodes",
-                                  visible: rules[:print_bin_barcodes],
                                   loading_window: true,
                                   style: :button)
 
               section.add_control(control_type: :link,
                                   text: 'Print Delivery',
                                   url: "/raw_materials/deliveries/rmt_deliveries/#{id}/print_delivery",
-                                  visible: rules[:print_bin_barcodes],
                                   loading_window: true,
                                   style: :button)
 
@@ -35,29 +33,30 @@ module RawMaterials
                 form.no_submit!
                 form.row do |row|
                   row.column do |col|
+                    col.add_field :season_id
                     col.add_field :farm_id
                     col.add_field :puc_id
                     col.add_field :orchard_id
                     col.add_field :farm_section
                     col.add_field :cultivar_id
-                    col.add_field :reference_number
                     col.add_field :rmt_delivery_destination_id
+                    col.add_field :reference_number
+                    col.add_field :truck_registration_number
                     col.add_field :qty_damaged_bins
                     col.add_field :qty_empty_bins
-                    col.add_field :date_delivered
-                    col.add_field :date_picked
+                    col.add_field :quantity_bins_with_fruit
                   end
 
                   row.column do |col|
-                    col.add_field :truck_registration_number
-                    col.add_field :season_id
-                    col.add_field :tipping_complete_date_time
-                    col.add_field :quantity_bins_with_fruit
+                    col.add_field :current
+                    col.add_field :date_picked
+                    col.add_field :received
+                    col.add_field :date_delivered
                     col.add_field :delivery_tipped
-                    col.add_field :active
+                    col.add_field :tipping_complete_date_time
                     col.add_field :keep_open
                     col.add_field :auto_allocate_asset_number
-                    # col.add_field :rmt_delivery_destination_id
+                    col.add_field :active
                   end
                 end
               end

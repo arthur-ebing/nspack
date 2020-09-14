@@ -322,7 +322,7 @@ module RawMaterialsApp
     end
 
     def find_rmt_delivery(id)
-      repo.find(:rmt_deliveries, RawMaterialsApp::RmtDelivery, id)
+      repo.find_rmt_delivery(id)
     end
 
     def get_delivery_confirmation_details(id)

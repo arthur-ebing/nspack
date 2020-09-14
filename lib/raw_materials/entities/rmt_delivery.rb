@@ -14,6 +14,7 @@ module RawMaterialsApp
     attribute :qty_empty_bins, Types::Integer
     attribute :delivery_tipped, Types::Bool
     attribute :date_picked, Types::Date
+    attribute :received, Types::Bool
     attribute :date_delivered, Types::DateTime
     attribute :tipping_complete_date_time, Types::DateTime
     attribute? :keep_open, Types::Bool

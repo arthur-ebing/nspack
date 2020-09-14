@@ -23,7 +23,7 @@ module MasterfilesApp
         description: Faker::Lorem.word,
         season_year: '2010',
         start_date: '2010-01-01',
-        end_date: '2010-01-01',
+        end_date: Date.today + 1,
         active: true
       }
       DB[:seasons].insert(default.merge(opts))

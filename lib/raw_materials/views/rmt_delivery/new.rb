@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 module RawMaterials
   module Deliveries
     module RmtDelivery
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :new, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
+          layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -23,18 +24,22 @@ module RawMaterials
                   col.add_field :orchard_id
                   col.add_field :farm_section
                   col.add_field :cultivar_id
+                  col.add_field :rmt_delivery_destination_id
                   col.add_field :reference_number
+                  col.add_field :truck_registration_number
+                  col.add_field :qty_damaged_bins
+                  col.add_field :qty_empty_bins
+                  col.add_field :quantity_bins_with_fruit
                 end
                 row.column do |col|
-                  col.add_field :rmt_delivery_destination_id if rules[:show_delivery_destination]
-                  col.add_field :qty_damaged_bins if rules[:show_qty_damaged_bins]
-                  col.add_field :qty_empty_bins if rules[:show_qty_empty_bins]
-                  col.add_field :date_picked
-                  col.add_field :truck_registration_number if rules[:show_truck_registration_number]
                   col.add_field :current
-                  col.add_field :quantity_bins_with_fruit
-                  col.add_field :auto_allocate_asset_number if rules[:auto_allocate_asset_number]
-                  # col.add_field :rmt_delivery_destination_id
+                  col.add_field :date_picked
+                  col.add_field :received
+                  col.add_field :date_delivered
+                  # col.add_field :delivery_tipped
+                  # col.add_field :tipping_complete_date_time
+                  # col.add_field :keep_open
+                  col.add_field :auto_allocate_asset_number
                 end
               end
             end
@@ -46,3 +51,4 @@ module RawMaterials
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

@@ -12,8 +12,8 @@
   :title: Edit
   :popup: false
   :hide_if_true: delivery_tipped
-- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/set_receive_date"
-  :text: set receive date
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/edit_received_at"
+  :text: date received
   :icon: edit
   :popup: true
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$"
@@ -53,7 +53,11 @@
   :popup: false
   :hide_if_false: keep_open
   :prompt: 'You are about to close this delivery. Are you sure?'
-
+:page_controls:
+  - :control_type: :link
+    :url: '/raw_materials/deliveries/rmt_deliveries/new'
+    :text: New Delivery
+    :style: :button
 :captions:
   :conditions:
     :production_run_deliveries: Deliveries for Production Run

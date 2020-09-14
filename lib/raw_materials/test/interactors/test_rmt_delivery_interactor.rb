@@ -24,10 +24,7 @@ module RawMaterialsApp
 
     def test_create_rmt_delivery
       attrs = fake_rmt_delivery.to_h.reject { |k, _| k == :id }
-      res = nil
-      interactor.stub(:get_rmt_delivery_season, attrs[:season_id]) do
-        res = interactor.create_rmt_delivery(attrs)
-      end
+      res = interactor.create_rmt_delivery(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(RmtDelivery, res.instance)
       assert res.instance.id.nonzero?
@@ -35,10 +32,7 @@ module RawMaterialsApp
 
     def test_create_rmt_delivery_fail
       attrs = fake_rmt_delivery(farm_id: nil).to_h.reject { |k, _| k == :id }
-      res = nil
-      interactor.stub(:get_rmt_delivery_season, attrs[:season_id]) do
-        res = interactor.create_rmt_delivery(attrs)
-      end
+      res = interactor.create_rmt_delivery(attrs)
       refute res.success, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:farm_id]
     end
@@ -48,10 +42,7 @@ module RawMaterialsApp
       attrs = interactor.send(:repo).find_hash(:rmt_deliveries, id).reject { |k, _| k == :id }
       value = attrs[:truck_registration_number]
       attrs[:truck_registration_number] = 'a_change'
-      res = nil
-      interactor.stub(:get_rmt_delivery_season, attrs[:season_id]) do
-        res = interactor.update_rmt_delivery(id, attrs)
-      end
+      res = interactor.update_rmt_delivery(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(RmtDelivery, res.instance)
       assert_equal 'a_change', res.instance.truck_registration_number
@@ -100,6 +91,7 @@ module RawMaterialsApp
         qty_empty_bins: 1,
         delivery_tipped: false,
         date_picked: '2010-01-01',
+        received: true,
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
         current: false,

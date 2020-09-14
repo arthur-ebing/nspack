@@ -2,22 +2,12 @@
 
 module UiRules
   class RmtDeliveryRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = RawMaterialsApp::RmtDeliveryRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
-
-      @rules[:show_delivery_destination] = AppConst::DELIVERY_USE_DELIVERY_DESTINATION
-      @rules[:show_qty_damaged_bins] = AppConst::DELIVERY_CAPTURE_DAMAGED_BINS
-      @rules[:show_qty_empty_bins] = AppConst::DELIVERY_CAPTURE_EMPTY_BINS
-      @rules[:show_truck_registration_number] = AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION
-      @rules[:scan_rmt_bin_asset_numbers] = AppConst::USE_PERMANENT_RMT_BIN_BARCODES
-      @rules[:auto_allocate_asset_number] = AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION
-      @rules[:scan_bulk_rmt_bin_asset_numbers] = AppConst::BULK_BIN_ASSET_NUMBER_ENTRY && !@form_object.auto_allocate_asset_number
-      @rules[:is_auto_allocate_asset_number_delivery] = @form_object.auto_allocate_asset_number
-      @rules[:print_bin_barcodes] = (%i[show edit].include? @mode)
 
       set_show_fields if %i[show reopen].include? @mode
       add_behaviours if %i[new edit].include? @mode
@@ -26,60 +16,128 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      orchard_id_label = MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code
-      cultivar_id_label = MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name
-      rmt_delivery_destination_id_label = MasterfilesApp::RmtDeliveryDestinationRepo.new.find_rmt_delivery_destination(@form_object.rmt_delivery_destination_id)&.delivery_destination_code
-      season_id_label = MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code
-      farm_id_label = MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code
-      puc_id_label = MasterfilesApp::FarmRepo.new.find_puc(@form_object.puc_id)&.puc_code
-      # farm_section_label = MasterfilesApp::FarmRepo.new.find_orchard_farm_section(@form_object.orchard_id)
-      fields[:orchard_id] = { renderer: :label, with_value: orchard_id_label, caption: 'Orchard' }
-      fields[:farm_section] = { renderer: :label, with_value: @options[:farm_section].to_s, hide_on_load: @options[:farm_section].nil_or_empty?, caption: 'Farm Section' }
-      fields[:cultivar_id] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
-      fields[:rmt_delivery_destination_id] = { renderer: :label, with_value: rmt_delivery_destination_id_label, caption: 'Destination' }
-      fields[:season_id] = { renderer: :label, with_value: season_id_label, caption: 'Season' }
-      fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
-      fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
-      fields[:truck_registration_number] = { renderer: :label }
+      fields[:orchard_id] = { renderer: :label,
+                              with_value: MasterfilesApp::FarmRepo.new.find_orchard(@form_object.orchard_id)&.orchard_code,
+                              caption: 'Orchard' }
+      fields[:farm_section] = { renderer: :label,
+                                with_value: @options[:farm_section].to_s,
+                                hide_on_load: @options[:farm_section].nil_or_empty?,
+                                caption: 'Farm Section' }
+      fields[:cultivar_id] = { renderer: :label,
+                               with_value: MasterfilesApp::CultivarRepo.new.find_cultivar(@form_object.cultivar_id)&.cultivar_name,
+                               caption: 'Cultivar' }
+      fields[:rmt_delivery_destination_id] = { renderer: :label,
+                                               with_value: MasterfilesApp::RmtDeliveryDestinationRepo.new.find_rmt_delivery_destination(@form_object.rmt_delivery_destination_id)&.delivery_destination_code,
+                                               caption: 'Destination',
+                                               hide_on_load: !AppConst::DELIVERY_USE_DELIVERY_DESTINATION }
+      fields[:season_id] = { renderer: :label,
+                             with_value: MasterfilesApp::CalendarRepo.new.find_season(@form_object.season_id)&.season_code,
+                             caption: 'Season' }
+      fields[:farm_id] = { renderer: :label,
+                           with_value: MasterfilesApp::FarmRepo.new.find_farm(@form_object.farm_id)&.farm_code,
+                           caption: 'Farm' }
+      fields[:puc_id] = { renderer: :label,
+                          with_value: MasterfilesApp::FarmRepo.new.find_puc(@form_object.puc_id)&.puc_code,
+                          caption: 'PUC' }
+      fields[:truck_registration_number] = { renderer: :label,
+                                             hide_on_load: !AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION }
       fields[:reference_number] = { renderer: :label }
-      fields[:qty_damaged_bins] = { renderer: :label }
-      fields[:qty_empty_bins] = { renderer: :label }
-      fields[:date_picked] = { renderer: :label }
-      fields[:date_delivered] = { renderer: :label, format: :without_timezone_or_seconds }
-      fields[:tipping_complete_date_time] = { renderer: :label }
+      fields[:qty_damaged_bins] = { renderer: :label,
+                                    hide_on_load: !AppConst::DELIVERY_CAPTURE_DAMAGED_BINS }
+      fields[:qty_empty_bins] = { renderer: :label,
+                                  hide_on_load: !AppConst::DELIVERY_CAPTURE_EMPTY_BINS }
+      fields[:date_picked] = { renderer: :label,
+                               caption: 'Picked at' }
+      fields[:received] = { renderer: :label,
+                            hide_on_load: true,
+                            as_boolean: true }
+      fields[:date_delivered] = { renderer: :label,
+                                  caption: 'Received at',
+                                  format: :without_timezone_or_seconds }
+      fields[:tipping_complete_date_time] = { renderer: :label,
+                                              caption: 'Tipped at' }
       fields[:quantity_bins_with_fruit] = { renderer: :label }
-      fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:delivery_tipped] = { renderer: :label, as_boolean: true }
-      fields[:keep_open] = { renderer: :label, as_boolean: true }
-      fields[:auto_allocate_asset_number] = { renderer: :label, as_boolean: true }
+      fields[:current] = { renderer: :label,
+                           as_boolean: true }
+      fields[:delivery_tipped] = { renderer: :label,
+                                   caption: 'Tipped',
+                                   as_boolean: true }
+      fields[:keep_open] = { renderer: :label,
+                             as_boolean: true }
+      fields[:auto_allocate_asset_number] = { renderer: :label,
+                                              as_boolean: true }
+      fields[:active] = { renderer: :label,
+                          as_boolean: true }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
-      fields = {
-        farm_id: { renderer: :select, options: MasterfilesApp::FarmRepo.new.for_select_farms, disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms, caption: 'Farm',
-                   required: true, prompt: true },  # ClientSettings.default_farm
-        puc_id: { renderer: :select, options: [], caption: 'Puc', required: true, prompt: true },  # ClientSettings.default_puc
-        orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: true, prompt: true  },
-        farm_section: { renderer: :label, with_value: @options[:farm_section].to_s, hide_on_load: @options[:farm_section].nil_or_empty?  },
-        cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: true, prompt: true },
+      {
+        farm_id: { renderer: :select,
+                   options: MasterfilesApp::FarmRepo.new.for_select_farms,
+                   disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms,
+                   caption: 'Farm',
+                   required: true,
+                   prompt: true },
+        puc_id: { renderer: :select,
+                  options: MasterfilesApp::FarmRepo.new.for_select_pucs(where: { farm_id: @form_object.farm_id }),
+                  disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_pucs,
+                  caption: 'PUC',
+                  required: true,
+                  prompt: true },
+        orchard_id: { renderer: :select,
+                      options: MasterfilesApp::FarmRepo.new.for_select_orchards(where: { puc_id: @form_object.puc_id }),
+                      disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_orchards,
+                      caption: 'Orchard',
+                      required: true,
+                      prompt: true  },
+        farm_section: { renderer: :label,
+                        with_value: @options[:farm_section].to_s,
+                        hide_on_load: @options[:farm_section].nil_or_empty? },
+        cultivar_id: { renderer: :select,
+                       options: MasterfilesApp::CultivarRepo.new.for_select_cultivars(where: { id: @repo.get(:orchards, @form_object.orchard_id, :cultivar_ids).to_a }),
+                       disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_cultivars,
+                       caption: 'Cultivar',
+                       required: true,
+                       prompt: true },
         rmt_delivery_destination_id: { renderer: :select, options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_rmt_delivery_destinations,
-                                       disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations, caption: 'Destination',
-                                       required: true, prompt: true },
-        truck_registration_number: {},
+                                       disabled_options: MasterfilesApp::RmtDeliveryDestinationRepo.new.for_select_inactive_rmt_delivery_destinations,
+                                       caption: 'Destination',
+                                       required: AppConst::DELIVERY_USE_DELIVERY_DESTINATION,
+                                       hide_on_load: !AppConst::DELIVERY_USE_DELIVERY_DESTINATION,
+                                       prompt: true },
+        truck_registration_number: { pattern: :alphanumeric,
+                                     hide_on_load: !AppConst::DELIVERY_CAPTURE_TRUCK_AT_FRUIT_RECEPTION },
         reference_number: {},
-        qty_damaged_bins: {},
-        qty_empty_bins: {},
-        date_picked: { renderer: :date },
-        date_delivered: { renderer: :date },
-        current: { renderer: :checkbox, caption: 'Set As Current' },
-        quantity_bins_with_fruit: { caption: 'Qty Bins With Fruit' },
-        auto_allocate_asset_number: { renderer: :checkbox }
+        qty_damaged_bins: { renderer: :integer,
+                            hide_on_load: !AppConst::DELIVERY_CAPTURE_DAMAGED_BINS,
+                            minvalue: 0 },
+        qty_empty_bins: { renderer: :integer,
+                          hide_on_load: !AppConst::DELIVERY_CAPTURE_EMPTY_BINS,
+                          minvalue: 0 },
+        date_picked: { renderer: :date,
+                       caption: 'Picked at' },
+        received: { renderer: :checkbox,
+                    hide_on_load: true },
+        date_delivered: { renderer: :datetime,
+                          caption: 'Received at' },
+        current_date_delivered: { renderer: :label,
+                                  with_value: @form_object.date_delivered,
+                                  caption: 'Current Received date' },
+        current: { renderer: :checkbox,
+                   caption: 'Set As Current' },
+        delivery_tipped: { renderer: :label,
+                           caption: 'Tipped',
+                           as_boolean: true },
+        tipping_complete_date_time: { renderer: :label,
+                                      caption: 'Tipped at' },
+        keep_open: { renderer: :label,
+                     as_boolean: true },
+        quantity_bins_with_fruit: { renderer: :integer,
+                                    caption: 'Qty Bins With Fruit',
+                                    minvalue: 0 },
+        auto_allocate_asset_number: { renderer: :checkbox,
+                                      hide_on_load: !AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION }
       }
-
-      fields[:puc_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.farm_pucs(@form_object.farm_id) unless @form_object.farm_id.nil_or_empty?
-      fields[:orchard_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchards(@form_object.farm_id, @form_object.puc_id) unless @form_object.puc_id.nil_or_empty?
-      fields[:cultivar_id][:options] = RawMaterialsApp::RmtDeliveryRepo.new.orchard_cultivars(@form_object.orchard_id) unless @form_object.orchard_id.nil_or_empty?
-      fields
     end
 
     def make_form_object
@@ -106,7 +164,9 @@ module UiRules
                                     delivery_tipped: false,
                                     date_picked: Time.now,
                                     date_delivered: Time.now,
-                                    tipping_complete_date_time: nil)
+                                    received: true,
+                                    tipping_complete_date_time: nil,
+                                    auto_allocate_asset_number: AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION)
     end
 
     private

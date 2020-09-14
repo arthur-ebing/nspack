@@ -32,7 +32,7 @@
   \   LEFT JOIN rmt_bins ON rmt_bins.rmt_delivery_id = rmt_deliveries.id\r\n    LEFT
   JOIN rmt_classes ON rmt_bins.rmt_class_id = rmt_classes.id\r\nGROUP BY\r\n    rmt_deliveries.id,\r\n
   \   cultivars.id,\r\n    farms.id,\r\n    orchards.id,\r\n    pucs.id,\r\n    rmt_delivery_destinations.id,\r\n
-  \   seasons.id\r\nORDER BY\r\n    rmt_deliveries.updated_at DESC"
+  \   seasons.id\r\nORDER BY\r\n    rmt_deliveries.id DESC"
 :limit: 
 :offset: 
 :external_settings:
