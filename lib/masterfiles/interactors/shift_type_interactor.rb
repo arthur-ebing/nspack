@@ -93,7 +93,9 @@ module MasterfilesApp
     end
 
     def validate_shift_type_params(params)
-      ShiftTypeSchema.call(params)
+      # ShiftTypeSchema.call(params)
+      contract = ShiftTypeContract.new
+      contract.call(params)
     end
   end
 end

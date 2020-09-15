@@ -51,7 +51,9 @@ module MasterfilesApp
     end
 
     def validate_standard_pack_code_params(params)
-      StandardPackCodeSchema.call(params)
+      # StandardPackCodeSchema.call(params)
+      contract = StandardPackCodeContract.new
+      contract.call(params)
     end
   end
 end

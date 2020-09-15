@@ -130,7 +130,9 @@ module MesscadaApp
     end
 
     def validate_carton_label_params(params)
-      CartonLabelSchema.call(params)
+      # CartonLabelSchema.call(params)
+      contract = CartonLabelContract.new
+      contract.call(params)
     end
 
     def create_carton_label(params) # rubocop:disable Metrics/AbcSize

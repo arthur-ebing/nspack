@@ -9,6 +9,8 @@ See the link:http://dry-rb.org/gems/dry-validation/[dry-validation] documentatio
 
 This page gives a simple overview of usage - mainly as a reminder of typical use.
 
+Schemas are used to validate data structures and types, while Contracts do the same, but allow for extra business logic validation.
+
 == Schemas
 
 Create one or more schemas in a file (typically in `lib/applet_name/validations`.

@@ -18,13 +18,13 @@ class Nspack < Roda
       end
 
       r.post do        # CREATE
-        res = DevelopmentApp::ScaffoldNewSchema.call(params[:scaffold] || {})
-        errors = res.messages
-        if errors.empty?
+        contract = DevelopmentApp::ScaffoldNewContract.new
+        res = contract.call(params[:scaffold] || {})
+        if res.success?
           result = DevelopmentApp::GenerateNewScaffold.call(res.to_h, request.roda_class)
           show_page { Development::Generators::Scaffolds::Show.call(result) }
         else
-          show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], errors) }
+          show_page { Development::Generators::Scaffolds::New.call(params[:scaffold], res.errors.to_h) }
         end
       end
 

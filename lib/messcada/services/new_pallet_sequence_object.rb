@@ -62,7 +62,9 @@ module MesscadaApp
     end
 
     def validate_pallet_sequence_params(params)
-      PalletSequenceSchema.call(params)
+      # PalletSequenceSchema.call(params)
+      contract = PalletSequenceContract.new
+      contract.call(params)
     end
   end
 end
