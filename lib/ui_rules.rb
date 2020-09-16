@@ -166,6 +166,8 @@ module UiRules
       @options[:form_values].each do |k, v|
         @form_object[k] = if v.is_a?(Hash)
                             v.transform_keys(&:to_s)
+                          elsif v.is_a?(String) && v.empty?
+                            nil
                           else
                             v
                           end
