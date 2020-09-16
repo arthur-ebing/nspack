@@ -14,7 +14,7 @@ module UiRules
       form_name 'standard_product_weight'
     end
 
-    def set_show_fields
+    def set_show_fields  # rubocop:disable Metrics/AbcSize
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       standard_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_standard_pack_code(@form_object.standard_pack_id)&.standard_pack_code
       fields[:commodity_id] = { renderer: :label,
@@ -26,6 +26,9 @@ module UiRules
       fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:standard_carton_nett_weight] = { renderer: :label }
+      fields[:ratio_to_standard_carton] = { renderer: :label }
+      fields[:is_standard_carton] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -41,7 +44,10 @@ module UiRules
         gross_weight: { renderer: :numeric,
                         required: true },
         nett_weight: { renderer: :numeric,
-                       required: true }
+                       required: true },
+        standard_carton_nett_weight: { renderer: :numeric },
+        ratio_to_standard_carton: { renderer: :numeric },
+        is_standard_carton: { renderer: :checkbox }
       }
     end
 
@@ -58,7 +64,10 @@ module UiRules
       @form_object = OpenStruct.new(commodity_id: nil,
                                     standard_pack_id: nil,
                                     gross_weight: nil,
-                                    nett_weight: nil)
+                                    nett_weight: nil,
+                                    standard_carton_nett_weight: nil,
+                                    ratio_to_standard_carton: nil,
+                                    is_standard_carton: nil)
     end
   end
 end

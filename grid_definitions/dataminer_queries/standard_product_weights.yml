@@ -4,10 +4,12 @@
   "standard_product_weights"."standard_pack_id", "standard_product_weights"."gross_weight",
   "standard_product_weights"."nett_weight", "standard_product_weights"."active", "standard_product_weights"."created_at",
   "standard_product_weights"."updated_at", "commodities"."code" AS commodity_code,
-  "standard_pack_codes"."standard_pack_code", fn_current_status('standard_product_weights',
-  "standard_product_weights"."id") AS status FROM "standard_product_weights" JOIN
-  "commodities" ON "commodities"."id" = "standard_product_weights"."commodity_id"
-  JOIN "standard_pack_codes" ON "standard_pack_codes"."id" = "standard_product_weights"."standard_pack_id"
+  "standard_pack_codes"."standard_pack_code", "standard_product_weights"."standard_carton_nett_weight",
+  "standard_product_weights"."ratio_to_standard_carton", "standard_product_weights"."is_standard_carton",
+  fn_current_status('standard_product_weights', "standard_product_weights"."id") AS
+  status FROM "standard_product_weights" JOIN "commodities" ON "commodities"."id"
+  = "standard_product_weights"."commodity_id" JOIN "standard_pack_codes" ON "standard_pack_codes"."id"
+  = "standard_product_weights"."standard_pack_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -172,9 +174,57 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  standard_carton_nett_weight:
+    :name: standard_carton_nett_weight
+    :sequence_no: 11
+    :caption: Standard carton nett weight
+    :namespaced_name: standard_product_weights.standard_carton_nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ratio_to_standard_carton:
+    :name: ratio_to_standard_carton
+    :sequence_no: 12
+    :caption: Ratio to standard carton
+    :namespaced_name: standard_product_weights.ratio_to_standard_carton
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_standard_carton:
+    :name: is_standard_carton
+    :sequence_no: 13
+    :caption: Std carton?
+    :namespaced_name: standard_product_weights.is_standard_carton
+    :data_type: :boolean
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   status:
     :name: status
-    :sequence_no: 11
+    :sequence_no: 14
     :caption: Status
     :namespaced_name: 
     :data_type: :string

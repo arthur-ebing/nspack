@@ -4,7 +4,7 @@ module Masterfiles
   module Fruit
     module StandardProductWeight
       class Show
-        def self.call(id)
+        def self.call(id)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:standard_product_weight, :show, id: id)
           rules   = ui_rule.compile
 
@@ -17,6 +17,9 @@ module Masterfiles
               form.add_field :standard_pack_id
               form.add_field :gross_weight
               form.add_field :nett_weight
+              form.add_field :standard_carton_nett_weight
+              form.add_field :ratio_to_standard_carton
+              form.add_field :is_standard_carton
               form.add_field :active
             end
           end

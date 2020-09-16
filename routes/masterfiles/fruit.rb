@@ -544,6 +544,16 @@ class Nspack < Roda
         show_partial { Masterfiles::Fruit::StandardProductWeight::Edit.call(id) }
       end
 
+      r.on 'derive_ratios' do
+        res = interactor.derive_ratios(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('fruit', 'read')
@@ -559,6 +569,9 @@ class Nspack < Roda
               standard_pack_code
               gross_weight
               nett_weight
+              standard_carton_nett_weight
+              ratio_to_standard_carton
+              is_standard_carton
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -580,6 +593,17 @@ class Nspack < Roda
 
     r.on 'standard_product_weights' do
       interactor = MasterfilesApp::StandardProductWeightInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'derive_all_ratios' do
+        res = interactor.derive_all_ratios
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = res.message
+        end
+        redirect_to_last_grid(r)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::StandardProductWeight::New.call(remote: fetch?(r)) }
@@ -596,6 +620,9 @@ class Nspack < Roda
             gross_weight
             nett_weight
             active
+            standard_carton_nett_weight
+            ratio_to_standard_carton
+            is_standard_carton
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

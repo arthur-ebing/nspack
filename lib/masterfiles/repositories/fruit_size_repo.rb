@@ -203,5 +203,38 @@ module MasterfilesApp
       SQL
       DB[query, plant_resource_type_code].select_map(:button)
     end
+
+    def update_same_commodity_ratios(commodity_id, std_carton_nett_weight, standard_product_weight_id)
+      standard_product_weight_ids = commodity_standard_product_weights(commodity_id, standard_product_weight_id)
+      return if standard_product_weight_ids.empty?
+
+      DB.execute(<<~SQL)
+        UPDATE standard_product_weights SET ratio_to_standard_carton = (#{std_carton_nett_weight} / standard_carton_nett_weight)
+        WHERE id IN (#{standard_product_weight_ids.join(',')});
+      SQL
+    end
+
+    def commodity_standard_product_weights(commodity_id, standard_product_weight_id = nil)
+      extra_conditions = standard_product_weight_id.nil? ? '' : " AND id != #{standard_product_weight_id}"
+      query = <<~SQL
+        SELECT id
+        FROM standard_product_weights
+        WHERE commodity_id = #{commodity_id} #{extra_conditions}
+      SQL
+      DB[query].select_map(:id)
+    end
+
+    def standard_carton_nett_weight(commodity_id)
+      DB[:standard_product_weights]
+        .where(commodity_id: commodity_id)
+        .where(is_standard_carton: true)
+        .get(:standard_carton_nett_weight)
+    end
+
+    def standard_carton_product_weights
+      DB[:standard_product_weights]
+        .where(is_standard_carton: true)
+        .all
+    end
   end
 end

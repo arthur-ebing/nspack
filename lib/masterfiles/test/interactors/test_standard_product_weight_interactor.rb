@@ -72,7 +72,10 @@ module MasterfilesApp
         standard_pack_id: standard_pack_code_id,
         gross_weight: 1.0,
         nett_weight: 1.0,
-        active: true
+        active: true,
+        standard_carton_nett_weight: 1.0,
+        ratio_to_standard_carton: 1.0,
+        is_standard_carton: false
       }
     end
 
