@@ -44,12 +44,9 @@ module FinishedGoods
                                is_multiselect: true,
                                can_be_cleared: true,
                                multiselect_url: "/finished_goods/dispatch/loads/#{id}/allocate_multiselect",
-                               multiselect_key: 'allocate',
+                               multiselect_key: ui_rule.form_object.rmt_load ? 'allocate_bins' : 'allocate',
                                height: 40,
-                               multiselect_params: { key: 'allocate',
-                                                     id: id,
-                                                     in_stock: true,
-                                                     rmt_grade: ui_rule.form_object.rmt_load })
+                               multiselect_params: { id: id })
             end
           end
 

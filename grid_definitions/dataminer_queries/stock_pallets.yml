@@ -1742,3 +1742,11 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
+- :column: pallet_sequence_number
+  :caption: Pallet Sequence Number
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

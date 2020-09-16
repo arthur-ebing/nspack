@@ -122,7 +122,20 @@
       :val: $:id$,0
     - :col: rmt_grade
       :op: =
-      :val: $:rmt_grade$
+      :val: false
+  :unallocated_bin_stock:
+    - :col: in_stock
+      :op: =
+      :val: true
+    - :col: zero_load_id
+      :op: IN
+      :val: $:id$,0
+    - :col: pallet_sequence_number
+      :op: =
+      :val: 1
+    - :col: rmt_grade
+      :op: =
+      :val: true
   :on_load:
     - :col: load_id
       :op: =
@@ -171,6 +184,13 @@
     :multiselect_save_method: remote
     :can_be_cleared: true
     :conditions: unallocated_load_stock
+  :allocate_bins:
+    :url: "/finished_goods/dispatch/loads/$:id$/allocate"
+    :preselect: "SELECT id FROM vw_pallet_sequence_flat WHERE load_id = $:id$"
+    :section_caption: "SELECT 'Assign pallets to load ' || order_number FROM loads WHERE id = $:id$"
+    :multiselect_save_method: remote
+    :can_be_cleared: true
+    :conditions: unallocated_bin_stock
   :reworks_pallets:
     :url: "/production/reworks/reworks_run_types/$:id$/reworks_runs/multiselect_reworks_run_pallets"
     :section_caption: "SELECT 'Select pallets for reworks run type: ' || run_type FROM reworks_run_types WHERE id = $:id$"
