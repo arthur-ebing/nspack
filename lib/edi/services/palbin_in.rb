@@ -93,7 +93,7 @@ module EdiApp
         commodity_id = get_masterfile_id(:commodities, code: palbin[:commodity])
         hash[:cultivar_id] = get_masterfile_id(:cultivars, cultivar_name: palbin[:cultivar], commodity_id: commodity_id)
 
-        hash[:season_id] = RawMaterialsApp::RmtDeliveryRepo.new.rmt_delivery_season(hash[:cultivar_id], hash[:bin_received_date_time])
+        hash[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(hash[:cultivar_id], hash[:bin_received_date_time])
         missing_masterfiles << "seasons: cultivar: #{palbin[:cultivar]}, received: #{hash[:bin_received_date_time]}" if hash[:season_id].nil?
 
         parsed_bins << hash

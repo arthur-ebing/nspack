@@ -37,6 +37,13 @@ module MasterfilesApp
       Season.new(hash)
     end
 
+    def get_season_id(cultivar_id, date)
+      raise ArgumentError, 'get_season_id: cultivar_id and date required' unless cultivar_id && date
+
+      commodity_id = get(:cultivars, cultivar_id, :commodity_id)
+      DB[:seasons].where(commodity_id: commodity_id).where(Sequel.lit('? between start_date and end_date', date)).get(:id)
+    end
+
     def for_select_seasons_for_cultivar_group(cultivar_group_id)
       DB[:seasons]
         .join(:cultivars, commodity_id: :commodity_id)

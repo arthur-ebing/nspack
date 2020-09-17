@@ -41,29 +41,27 @@ module RawMaterialsApp
 
     def create_rmt_delivery(res)
       attrs = res.to_h
-      attrs = find_valid_rmt_delivery_season_id!(attrs)
+      attrs = append_valid_season_id(attrs) unless attrs[:season_id]
       DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
 
       create(:rmt_deliveries, attrs)
     end
 
-    def find_valid_rmt_delivery_season_id!(attrs, rmt_delivery_id = nil)
+    def append_valid_season_id(attrs, rmt_delivery_id = nil)
+      return attrs unless attrs[:cultivar_id] || attrs[:date_delivered]
+
       instance = find_rmt_delivery(rmt_delivery_id)
-
-      if attrs[:cultivar_id] || attrs[:date_delivered]
-        cultivar_id = attrs[:cultivar_id] || instance.cultivar_id
-        received_at = attrs[:date_delivered] || instance.date_delivered
-
-        attrs[:season_id] ||= rmt_delivery_season(cultivar_id, received_at)
-        raise Crossbeams::InfoError, 'Season not found for delivery' unless attrs[:season_id]
-      end
+      cultivar_id = attrs[:cultivar_id] || instance.cultivar_id
+      received_at = attrs[:date_delivered] || instance.date_delivered
+      attrs[:season_id] = MasterfilesApp::CalendarRepo.new.get_season_id(cultivar_id, received_at)
+      raise Crossbeams::InfoError, 'Season not found for delivery' unless attrs[:season_id]
 
       attrs
     end
 
     def update_rmt_delivery(id, res)
       attrs = res.to_h
-      attrs = find_valid_rmt_delivery_season_id!(attrs, id)
+      attrs = append_valid_season_id(attrs, id) unless attrs[:season_id]
       DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
 
       update_untipped_rmt_delivery_bins(id, attrs)
@@ -169,18 +167,6 @@ module RawMaterialsApp
          FROM cultivars
          JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
          WHERE orchards.id = ?", orchard_id].map { |o| [o[:cultivar_name], o[:id]] }
-    end
-
-    def rmt_delivery_season(cultivar_id, date_delivered)
-      raise ArgumentError, 'rmt_delivery_season: cultivar_id or date_delivered missing' unless cultivar_id && date_delivered
-
-      hash = DB["SELECT s.*
-         FROM seasons s
-          JOIN cultivars c on c.commodity_id=s.commodity_id
-         WHERE c.id = #{cultivar_id} and '#{date_delivered}' between start_date and end_date"].first
-      return nil if hash.nil?
-
-      hash[:id]
     end
 
     def orchards(farm_id, puc_id)
