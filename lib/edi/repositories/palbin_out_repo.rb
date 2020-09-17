@@ -5,6 +5,7 @@ module EdiApp
     def palbin_details(load_id)
       query = <<~SQL
         SELECT
+            loads.id AS load_id,
             loads.shipped_at,
             depots.depot_code destination,
             '#{AppConst::INSTALL_LOCATION}' AS depot,

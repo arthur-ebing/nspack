@@ -93,8 +93,8 @@ module FinishedGoods
                 form.fold_up do |fold|
                   fold.caption 'EDI'
                   fold.open!
-                  fold.add_grid('edi_po',
-                                "/list/edi_po/grid?key=standard&record_id=#{id}",
+                  fold.add_grid('load_edi',
+                                "/list/load_edi/grid?key=standard&record_id=#{id}",
                                 caption: 'EDI Transactions',
                                 height: 8)
                 end

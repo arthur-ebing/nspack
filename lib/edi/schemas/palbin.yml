@@ -1,4 +1,5 @@
 ---
+:load_id: :string
 :shipped_at: :string
 :destination: :string
 :depot: :string
