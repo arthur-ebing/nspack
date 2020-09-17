@@ -206,8 +206,6 @@ class Nspack < Roda
         if res.success
           row_keys = %i[
             id
-            vessel_id
-            voyage_type_id
             voyage_number
             voyage_code
             year

@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class EcertTrackingUnitInteractor < BaseInteractor
     def elot_preverify(params) # rubocop:disable Metrics/AbcSize
       res = EcertElotSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       service_res = nil
       repo.transaction do

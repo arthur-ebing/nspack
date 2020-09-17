@@ -4,7 +4,7 @@ module MasterfilesApp
   class WageLevelInteractor < BaseInteractor
     def create_wage_level(params) # rubocop:disable Metrics/AbcSize
       res = validate_wage_level_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     def update_wage_level(id, params)
       res = validate_wage_level_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_wage_level(id, res)

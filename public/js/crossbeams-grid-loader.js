@@ -367,10 +367,13 @@ const crossbeamsGridEvents = {
     const thisGridId = crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
-      const missing = Object.keys(row).filter(a => gridOptions.columnApi.getColumn(a) === null);
+      const missing = Object.keys(row).filter(a => gridOptions.columnApi.getColumn(a) === null && a !== 'created_at' && a !== 'updated_at');
       if (missing.length > 0) {
         crossbeamsUtils.showWarning(`Unable to add row to the grid - columns not defined in the grid: ${missing.join(', ')}.`);
       } else {
+        missing.forEach((col) => {
+          delete row[col];
+        });
         const nodes = gridOptions.api.applyTransaction({ add: [row] });
         gridOptions.api.ensureNodeVisible(nodes.add[0]);
       }

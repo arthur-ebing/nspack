@@ -1,33 +1,29 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  RmtDeliverySchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:orchard_id, :integer).filled(:int?)
-    required(:cultivar_id, :integer).filled(:int?)
-    optional(:rmt_delivery_destination_id, :integer).maybe(:int?)
-    optional(:season_id, :integer).maybe(:int?)
-    required(:farm_id, :integer).filled(:int?)
-    required(:puc_id, :integer).filled(:int?)
-    optional(:truck_registration_number, Types::StrippedString).maybe(:str?)
-    optional(:qty_damaged_bins, :integer).maybe(:int?)
-    optional(:qty_empty_bins, :integer).maybe(:int?)
-    optional(:date_picked, %i[nil date]).maybe(:date?)
-    required(:date_delivered, :time).maybe(:time?)
-    required(:received, :bool).filled(:bool?)
-    optional(:current, :bool).filled(:bool?)
-    optional(:keep_open, :bool).filled(:bool?)
-    optional(:auto_allocate_asset_number, :bool).filled(:bool?)
-    optional(:quantity_bins_with_fruit, :integer).maybe(:int?)
-    optional(:reference_number, Types::StrippedString).maybe(:str?)
+  RmtDeliverySchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:orchard_id).filled(:integer)
+    required(:cultivar_id).filled(:integer)
+    optional(:rmt_delivery_destination_id).maybe(:integer)
+    optional(:season_id).maybe(:integer)
+    required(:farm_id).filled(:integer)
+    required(:puc_id).filled(:integer)
+    optional(:truck_registration_number).maybe(Types::StrippedString)
+    optional(:qty_damaged_bins).maybe(:integer)
+    optional(:qty_empty_bins).maybe(:integer)
+    optional(:date_picked).maybe(:date)
+    required(:date_delivered).maybe(:time)
+    required(:received).filled(:bool)
+    optional(:current).filled(:bool)
+    optional(:keep_open).filled(:bool)
+    optional(:auto_allocate_asset_number).filled(:bool)
+    optional(:quantity_bins_with_fruit).maybe(:integer)
+    optional(:reference_number).maybe(Types::StrippedString)
   end
 
-  RmtDeliveryReceivedAtSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:date_delivered, :time).filled(:time?)
+  RmtDeliveryReceivedAtSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:date_delivered).filled(:time)
   end
 end

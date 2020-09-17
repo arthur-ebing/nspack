@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  UpdateRmtBinWeightsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:bin_number, Types::StrippedString).maybe(:str?)
-    required(:gross_weight, :decimal).maybe(:decimal?)
-    required(:measurement_unit, Types::StrippedString).maybe(:str?)
+  UpdateRmtBinWeightsSchema = Dry::Schema.Params do
+    required(:bin_number).maybe(Types::StrippedString)
+    required(:gross_weight).maybe(:decimal)
+    required(:measurement_unit).maybe(Types::StrippedString)
   end
 end

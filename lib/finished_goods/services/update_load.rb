@@ -31,9 +31,9 @@ module FinishedGoodsApp
 
     private
 
-    def update_load # rubocop:disable Metrics/AbcSize
+    def update_load
       res = LoadSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       attrs[:requires_temp_tail] = AppConst::TEMP_TAIL_REQUIRED_TO_SHIP unless attrs[:requires_temp_tail]
@@ -46,7 +46,7 @@ module FinishedGoodsApp
 
     def update_load_voyage
       res = LoadVoyageSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       load_voyage_id = repo.get_id(:load_voyages, load_id: load_id)
       repo.update(:load_voyages, load_voyage_id, res)

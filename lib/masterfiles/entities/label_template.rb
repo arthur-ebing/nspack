@@ -6,8 +6,9 @@ module MasterfilesApp
     attribute :label_template_name, Types::String
     attribute :description, Types::String
     attribute :application, Types::String
-    attribute :variables, Types::Array.default([])
-    attribute :variable_rules, Types::JSON::Hash
+    attribute :variables, Types::Array.default([].freeze)
+    # attribute :variable_rules, Types::JSON::Hash
+    attribute :variable_rules, Types::Hash
     attribute :active, Types::Bool
   end
 end

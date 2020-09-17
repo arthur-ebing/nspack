@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  RegionSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:destination_region_name, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
+  RegionSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:destination_region_name).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
   end
 end

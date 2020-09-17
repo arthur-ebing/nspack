@@ -4,7 +4,7 @@ module MesscadaApp
   class HrInteractor < BaseInteractor
     def register_identifier(params) # rubocop:disable Metrics/AbcSize
       res = validate_identifier_for_registration(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       return success_response('Already registered.') if repo.exists?(:personnel_identifiers, identifier: res[:value])
 

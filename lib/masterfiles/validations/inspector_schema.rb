@@ -1,27 +1,23 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  InspectorSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:inspector_party_role_id, :integer).filled(:int?)
-    required(:tablet_ip_address, Types::StrippedString).filled(:str?)
-    required(:tablet_port_number, :integer).maybe(:int?)
-    required(:inspector_code, Types::StrippedString).filled(:str?)
+  InspectorSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:inspector_party_role_id).filled(:integer)
+    required(:tablet_ip_address).filled(Types::StrippedString)
+    required(:tablet_port_number).maybe(:integer)
+    required(:inspector_code).filled(Types::StrippedString)
   end
 
-  InspectorPersonSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:surname, Types::StrippedString).filled(:str?)
-    required(:first_name, Types::StrippedString).filled(:str?)
-    required(:title, Types::StrippedString).filled(:str?)
-    required(:vat_number, Types::StrippedString).maybe(:str?)
-    required(:role_ids, Types::IntArray).filled { each(:int?) }
-    required(:tablet_ip_address, Types::StrippedString).filled(:str?)
-    required(:tablet_port_number, :integer).maybe(:int?)
-    required(:inspector_code, Types::StrippedString).filled(:str?)
+  InspectorPersonSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:surname).filled(Types::StrippedString)
+    required(:first_name).filled(Types::StrippedString)
+    required(:title).filled(Types::StrippedString)
+    required(:vat_number).maybe(Types::StrippedString)
+    required(:role_ids).filled(:array).each(:integer)
+    required(:tablet_ip_address).filled(Types::StrippedString)
+    required(:tablet_port_number).maybe(:integer)
+    required(:inspector_code).filled(Types::StrippedString)
   end
 end

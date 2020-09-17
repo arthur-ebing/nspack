@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  CostSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:cost_type_id, :integer).filled(:int?)
-    required(:cost_code, Types::StrippedString).filled(:str?)
-    required(:default_amount, %i[nil decimal]).maybe(:decimal?)
-    optional(:description, Types::StrippedString).maybe(:str?)
+  CostSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:cost_type_id).filled(:integer)
+    required(:cost_code).filled(Types::StrippedString)
+    required(:default_amount).maybe(:decimal)
+    optional(:description).maybe(Types::StrippedString)
   end
 end

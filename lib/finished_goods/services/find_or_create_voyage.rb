@@ -15,7 +15,7 @@ module FinishedGoodsApp
 
     def create_voyage  # rubocop:disable Metrics/AbcSize
       res = validate_voyage_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       params[:voyage_id] = repo.create(:voyages, res)
       repo.log_status(:voyages, params[:voyage_id], 'CREATED', user_name: @user.user_name)
@@ -39,7 +39,7 @@ module FinishedGoodsApp
 
     def create_voyage_port(attrs)
       res = validate_voyage_port_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       voyage_port_id = repo.create(:voyage_ports, res)
       repo.log_status(:voyage_ports, voyage_port_id, 'CREATED', user_name: @user.user_name)

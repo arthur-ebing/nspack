@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module MesscadaApp
-  TipRmtBinSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:bin_number, Types::StrippedString).maybe(:str?)
-    required(:device, Types::StrippedString).maybe(:str?)
+  TipRmtBinSchema = Dry::Schema.Params do
+    required(:bin_number).maybe(Types::StrippedString)
+    required(:device).maybe(Types::StrippedString)
   end
 end

@@ -4,7 +4,7 @@ module MasterfilesApp
   class PalletFormatInteractor < BaseInteractor
     def create_pallet_format(params) # rubocop:disable Metrics/AbcSize
       res = validate_pallet_format_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_pallet_format(id, params)
       res = validate_pallet_format_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pallet_format(id, res)

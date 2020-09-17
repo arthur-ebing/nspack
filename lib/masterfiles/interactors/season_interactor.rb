@@ -6,7 +6,7 @@ module MasterfilesApp
       params[:season_year] = season_year(params[:end_date])
       attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
       res = validate_season_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -27,7 +27,7 @@ module MasterfilesApp
       params[:season_year] = season_year(params[:end_date])
       attrs = params.merge(season_code: season_code(params[:season_year], params[:commodity_id]))
       res = validate_season_params(attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_season(id, res)

@@ -4,7 +4,7 @@ module MasterfilesApp
   class InspectionFailureTypeInteractor < BaseInteractor
     def create_inspection_failure_type(params) # rubocop:disable Metrics/AbcSize
       res = validate_inspection_failure_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_inspection_failure_type(id, params)
       res = validate_inspection_failure_type_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_inspection_failure_type(id, res)

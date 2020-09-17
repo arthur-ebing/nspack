@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class VoyageInteractor < BaseInteractor
     def create_voyage(params) # rubocop:disable Metrics/AbcSize
       res = validate_voyage_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module FinishedGoodsApp
 
     def update_voyage(id, params)
       res = UpdateVoyageSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_voyage(id, res)

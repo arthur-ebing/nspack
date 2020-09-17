@@ -4,7 +4,7 @@ module RawMaterialsApp
   class BinLoadInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_bin_load(params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_load_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module RawMaterialsApp
 
     def update_bin_load(id, params)
       res = validate_bin_load_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_bin_load(id, res)
@@ -143,7 +143,7 @@ module RawMaterialsApp
 
     def scan_bin_load(params) # rubocop:disable Metrics/AbcSize
       res = ScanBinLoadSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = params[:bin_load_id]
       check!(:allocate, id)
@@ -161,7 +161,7 @@ module RawMaterialsApp
 
     def scan_bin_to_bin_load(params)
       res = ScanBinToBinLoadSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       bin_asset_number = params[:bin_asset_number]
       bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)

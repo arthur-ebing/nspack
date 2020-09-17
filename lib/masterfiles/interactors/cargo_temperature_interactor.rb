@@ -4,7 +4,7 @@ module MasterfilesApp
   class CargoTemperatureInteractor < BaseInteractor
     def create_cargo_temperature(params) # rubocop:disable Metrics/AbcSize
       res = validate_cargo_temperature_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_cargo_temperature(id, params)
       res = validate_cargo_temperature_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_cargo_temperature(id, res)

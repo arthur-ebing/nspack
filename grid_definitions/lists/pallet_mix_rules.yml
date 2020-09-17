@@ -16,3 +16,4 @@
   :url: "/production/runs/pallet_mix_rules/new"
   :text: Create Pallet Mix Rules
   :style: :button
+  :prompt: Create missing pallet mix rules?

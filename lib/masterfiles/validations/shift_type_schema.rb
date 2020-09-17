@@ -1,26 +1,24 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  ShiftTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
+  class ShiftTypeContract < Dry::Validation::Contract
+    params do
+      optional(:id).filled(:integer)
+      required(:ph_plant_resource_id).filled(:integer)
+      required(:line_plant_resource_id).filled(:integer)
+      required(:employment_type_id).filled(:integer)
+      required(:start_hour).filled(:integer)
+      required(:end_hour).filled(:integer)
+      required(:day_night_or_custom).filled(:string)
+    end
 
-    optional(:id, :integer).filled(:int?)
-    required(:ph_plant_resource_id, :integer).filled(:int?)
-    required(:line_plant_resource_id, :integer).filled(:int?)
-    required(:employment_type_id, :integer).filled(:int?)
-    required(:start_hour, :integer).filled(:int?)
-    required(:end_hour, :integer).filled(:int?)
-    required(:day_night_or_custom, :string).filled(:str?)
-
-    rule(end_hour: [:start_hour]) do |start_hour|
-      value(:end_hour).not_eql?(start_hour)
+    rule(:end_hour, :start_hour) do
+      key.failure 'cannot be the same as start hour' if values[:start_hour] == values[:end_hour]
     end
   end
 
-  ShiftTypeIdsSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:from_shift_type_id).filled(:int?)
-    required(:to_shift_type_id).filled(:int?)
+  ShiftTypeIdsSchema = Dry::Schema.Params do
+    required(:from_shift_type_id).filled(:integer)
+    required(:to_shift_type_id).filled(:integer)
   end
 end

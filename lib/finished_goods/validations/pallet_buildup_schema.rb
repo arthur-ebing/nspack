@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  PalletBuildupSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:destination_pallet_number, Types::StrippedString).filled(:str?)
-    required(:source_pallets, :array).filled(:array?) { each(:str?) }
-    required(:qty_cartons_to_move, :integer).maybe(:int?)
-    required(:created_by, Types::StrippedString).maybe(:str?)
-    optional(:completed_at, %i[nil time]).maybe(:time?)
-    optional(:cartons_moved, :hash).maybe(:hash?)
-    optional(:completed, :bool).maybe(:bool?)
+  PalletBuildupSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:destination_pallet_number).filled(Types::StrippedString)
+    required(:source_pallets).filled(:array).each(:string)
+    required(:qty_cartons_to_move).maybe(:integer)
+    required(:created_by).maybe(Types::StrippedString)
+    optional(:completed_at).maybe(:time)
+    optional(:cartons_moved).maybe(:hash)
+    optional(:completed).maybe(:bool)
   end
 end

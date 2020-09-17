@@ -33,7 +33,8 @@ module MasterfilesApp
     def create_inspector(attrs) # rubocop:disable Metrics/AbcSize
       params = attrs.to_h
       person_params = PersonSchema.call(params)
-      raise Crossbeams::InfoError, person_params.messages unless person_params.messages.empty?
+      # FIXME: messages...
+      raise Crossbeams::InfoError, person_params.messages if person_params.failure?
 
       role_id = params[:role_ids].first
       # find person
@@ -49,7 +50,8 @@ module MasterfilesApp
 
       params[:inspector_party_role_id] = get_id(:party_roles, person_id: person_id, role_id: role_id)
       inspector_params = InspectorSchema.call(params)
-      raise Crossbeams::InfoError, inspector_params.messages unless inspector_params.messages.empty?
+      # FIXME: messages...
+      raise Crossbeams::InfoError, inspector_params.messages if inspector_params.failure?
 
       create(:inspectors, inspector_params)
     end

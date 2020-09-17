@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  RmtClassSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:rmt_class_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).filled(:str?)
+  RmtClassSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:rmt_class_code).filled(Types::StrippedString)
+    required(:description).filled(Types::StrippedString)
   end
 end

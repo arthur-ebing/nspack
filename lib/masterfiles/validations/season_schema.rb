@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  SeasonSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:season_group_id, :integer).filled(:int?)
-    required(:commodity_id, :integer).filled(:int?)
-    required(:season_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    required(:season_year, :integer).maybe(:int?)
-    required(:start_date, :date).maybe(:date?)
-    required(:end_date, :date).maybe(:date?)
+  SeasonSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:season_group_id).filled(:integer)
+    required(:commodity_id).filled(:integer)
+    required(:season_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
+    required(:season_year).maybe(:integer)
+    required(:start_date).maybe(:date)
+    required(:end_date).maybe(:date)
   end
 end

@@ -50,27 +50,27 @@ module RawMaterialsApp
 
     def validate_receive_params(params)
       res = ReceiveEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+      res.success? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_issue_params(params)
       res = IssueEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+      res.success? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_params(params)
       res = AdhocEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+      res.success? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_create_params(params)
       res = AdhocCreateEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+      res.success? ? ok_response : adjusted_failed_response(res)
     end
 
     def validate_adhoc_destroy_params(params)
       res = AdhocDestroyEmptyBinSchema.call(params)
-      res.messages.empty? ? ok_response : adjusted_failed_response(res)
+      res.success? ? ok_response : adjusted_failed_response(res)
     end
 
     def adjusted_failed_response(res)

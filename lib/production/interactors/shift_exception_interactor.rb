@@ -5,7 +5,7 @@ module ProductionApp
     def create_shift_exception(parent_id, params) # rubocop:disable Metrics/AbcSize
       params[:shift_id] = parent_id
       res = validate_shift_exception_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -24,7 +24,7 @@ module ProductionApp
 
     def update_shift_exception(id, params)
       res = validate_shift_exception_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_shift_exception(id, res)

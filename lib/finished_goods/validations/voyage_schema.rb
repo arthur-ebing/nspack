@@ -1,28 +1,25 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  VoyageSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:vessel_id, :integer).filled(:int?)
-    required(:voyage_type_id, :integer).filled(:int?)
-    required(:voyage_number, Types::StrippedString).filled(:str?)
-    optional(:voyage_code, Types::StrippedString).maybe(:str?)
-    required(:year, :integer).filled(:int?)
-    optional(:completed, :bool).maybe(:bool?)
-    optional(:completed_at, :time).filled(:time?)
+  VoyageSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:vessel_id).filled(:integer)
+    required(:voyage_type_id).filled(:integer)
+    required(:voyage_number).filled(Types::StrippedString)
+    optional(:voyage_code).maybe(Types::StrippedString)
+    required(:year).filled(:integer)
+    optional(:completed).maybe(:bool)
+    optional(:completed_at).filled(:time)
   end
-  UpdateVoyageSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
 
-    optional(:id, :integer).filled(:int?)
-    required(:vessel_id, :integer).filled(:int?)
-    optional(:voyage_type_id, :integer).maybe(:int?)
-    required(:voyage_number, Types::StrippedString).filled(:str?)
-    optional(:voyage_code, Types::StrippedString).maybe(:str?)
-    required(:year, :integer).filled(:int?)
-    optional(:completed, :bool).maybe(:bool?)
-    optional(:completed_at, :time).filled(:time?)
+  UpdateVoyageSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:vessel_id).filled(:integer)
+    optional(:voyage_type_id).maybe(:integer)
+    required(:voyage_number).filled(Types::StrippedString)
+    optional(:voyage_code).maybe(Types::StrippedString)
+    required(:year).filled(:integer)
+    optional(:completed).maybe(:bool)
+    optional(:completed_at).filled(:time)
   end
 end

@@ -4,7 +4,7 @@ module MasterfilesApp
   class FarmGroupInteractor < BaseInteractor
     def create_farm_group(params) # rubocop:disable Metrics/AbcSize
       res = validate_farm_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_farm_group(id, params)
       res = validate_farm_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_farm_group(id, res)

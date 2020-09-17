@@ -55,7 +55,7 @@ UtilityFunctions.validate_integer_length(:load_id, 'abc123')
 
 # Example usage:
 res = UtilityFunctions.validate_integer_length(:carton_number, carton_number)
-return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") unless res.messages.empty?
+return failed_response("Value #{carton_number} is too big to be a carton. Perhaps you scanned a pallet number?") if res.failure?
 ----
 
 ---

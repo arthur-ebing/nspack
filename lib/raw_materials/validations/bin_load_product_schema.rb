@@ -1,26 +1,22 @@
 # frozen_string_literal: true
 
 module RawMaterialsApp
-  BinLoadProductSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:bin_load_id, :integer).filled(:int?)
-    required(:qty_bins, :integer).filled(:int?)
-    required(:cultivar_group_id, :integer).filled(:int?)
-    required(:cultivar_id, :integer).maybe(:int?)
-    required(:rmt_container_material_type_id, :integer).maybe(:int?)
-    required(:rmt_material_owner_party_role_id, :integer).maybe(:int?)
-    required(:farm_id, :integer).maybe(:int?)
-    required(:puc_id, :integer).maybe(:int?)
-    required(:orchard_id, :integer).maybe(:int?)
-    required(:rmt_class_id, :integer).maybe(:int?)
+  BinLoadProductSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:bin_load_id).filled(:integer)
+    required(:qty_bins).filled(:integer)
+    required(:cultivar_group_id).filled(:integer)
+    required(:cultivar_id).maybe(:integer)
+    required(:rmt_container_material_type_id).maybe(:integer)
+    required(:rmt_material_owner_party_role_id).maybe(:integer)
+    required(:farm_id).maybe(:integer)
+    required(:puc_id).maybe(:integer)
+    required(:orchard_id).maybe(:integer)
+    required(:rmt_class_id).maybe(:integer)
   end
 
-  AllocateBinLoadProductSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:bin_ids, Types::IntArray).maybe { each(:int?) }
+  AllocateBinLoadProductSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:bin_ids).maybe(:array).each(:integer)
   end
 end

@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class GovtInspectionPalletInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_govt_inspection_pallet(params)
       res = validate_govt_inspection_pallet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -20,7 +20,7 @@ module FinishedGoodsApp
 
     def fail_govt_inspection_pallet(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_govt_inspection_failed_pallet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       govt_inspection_sheet_id = repo.get(:govt_inspection_pallets, id, :govt_inspection_sheet_id)
       reinspection = repo.get(:govt_inspection_sheets, govt_inspection_sheet_id, :reinspection)
@@ -66,7 +66,7 @@ module FinishedGoodsApp
 
     def update_govt_inspection_pallet(id, params)
       res = validate_govt_inspection_pallet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_govt_inspection_pallet(id, attrs)

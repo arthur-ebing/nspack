@@ -7,7 +7,7 @@ module MasterfilesApp
       return validation_failed_response(OpenStruct.new(messages: { marketing_variety_ids: ['You did not choose a marketing variety'] })) if marketing_variety_ids.empty?
 
       res = validate_customer_variety_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -26,7 +26,7 @@ module MasterfilesApp
 
     def update_customer_variety(id, params)
       res = validate_customer_variety_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_customer_variety(id, res)
