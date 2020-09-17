@@ -4,7 +4,7 @@ module MasterfilesApp
   class InspectorInteractor < BaseInteractor
     def create_inspector(params) # rubocop:disable Metrics/AbcSize
       res = InspectorPersonSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module MasterfilesApp
 
     def update_inspector(id, params) # rubocop:disable Metrics/AbcSize
       res = InspectorSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_inspector(id, res)

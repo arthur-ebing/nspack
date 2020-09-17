@@ -1,25 +1,21 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  EcertTrackingUnitSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:pallet_id, :integer).filled(:int?)
-    required(:ecert_agreement_id, :integer).filled(:int?)
-    required(:business_id, :integer).filled(:int?)
-    required(:industry, Types::StrippedString).filled(:str?)
-    required(:elot_key, Types::StrippedString).maybe(:str?)
-    required(:verification_key, Types::StrippedString).maybe(:str?)
-    required(:passed, :bool).filled(:bool?)
-    required(:process_result, :array).maybe(:array?) { each(:str?) }
-    required(:rejection_reasons, :array).maybe(:array?) { each(:str?) }
+  EcertTrackingUnitSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:pallet_id).filled(:integer)
+    required(:ecert_agreement_id).filled(:integer)
+    required(:business_id).filled(:integer)
+    required(:industry).filled(Types::StrippedString)
+    required(:elot_key).maybe(Types::StrippedString)
+    required(:verification_key).maybe(Types::StrippedString)
+    required(:passed).filled(:bool)
+    required(:process_result).maybe(:array).each(:string)
+    required(:rejection_reasons).maybe(:array).each(:string)
   end
 
-  EcertElotSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:ecert_agreement_id, :integer).filled(:int?)
-    required(:pallet_list, Types::StrippedString).filled(:str?)
+  EcertElotSchema = Dry::Schema.Params do
+    required(:ecert_agreement_id).filled(:integer)
+    required(:pallet_list).filled(Types::StrippedString)
   end
 end

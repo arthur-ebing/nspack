@@ -16,7 +16,7 @@ module SecurityApp
 
     def create_program_function(params)
       res = validate_program_function_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = repo.create_program_function(res)
       instance = program_function(id)
@@ -28,7 +28,7 @@ module SecurityApp
 
     def update_program_function(id, params)
       res = validate_program_function_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.update_program_function(id, res)
       instance = program_function(id)

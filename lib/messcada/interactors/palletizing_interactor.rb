@@ -4,7 +4,7 @@ module MesscadaApp
   class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonPalletizingScanSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success
@@ -65,7 +65,7 @@ module MesscadaApp
 
     def return_to_bay(params) # rubocop:disable Metrics/AbcSize
       res = CartonPalletizingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success
@@ -90,7 +90,7 @@ module MesscadaApp
 
     def refresh(params) # rubocop:disable Metrics/AbcSize
       res = CartonPalletizingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success
@@ -115,7 +115,7 @@ module MesscadaApp
 
     def complete(params) # rubocop:disable Metrics/AbcSize
       res = CartonPalletizingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success
@@ -176,7 +176,7 @@ module MesscadaApp
 
     def complete_autopack_pallet(params) # rubocop:disable Metrics/AbcSize
       res = CartonPalletizingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success
@@ -222,7 +222,7 @@ module MesscadaApp
 
     def transfer_carton(params) # rubocop:disable Metrics/AbcSize
       res = CartonPalletizingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
       return check_res unless check_res.success

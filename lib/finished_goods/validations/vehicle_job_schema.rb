@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  VehicleJobSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    optional(:vehicle_number, Types::StrippedString).maybe(:str?)
-    required(:govt_inspection_sheet_id, :integer).filled(:int?)
-    required(:planned_location_to_id, :integer).filled(:int?)
-    required(:business_process_id, :integer).filled(:int?)
-    required(:stock_type_id, :integer).filled(:int?)
-    optional(:loaded_at, %i[nil time]).maybe(:time?)
-    optional(:offloaded_at, %i[nil time]).maybe(:time?)
+  VehicleJobSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    optional(:vehicle_number).maybe(Types::StrippedString)
+    required(:govt_inspection_sheet_id).filled(:integer)
+    required(:planned_location_to_id).filled(:integer)
+    required(:business_process_id).filled(:integer)
+    required(:stock_type_id).filled(:integer)
+    optional(:loaded_at).maybe(:time)
+    optional(:offloaded_at).maybe(:time)
   end
 end

@@ -175,7 +175,7 @@ module DataminerApp
 
     def create_report(params) # rubocop:disable Metrics/AbcSize
       res = validate_new_report_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       page = OpenStruct.new
       s = params[:filename].strip.downcase.tr(' ', '_').gsub(/_+/, '_').gsub(%r{[/:*?"\\<>\|\r\n]}i, '-')

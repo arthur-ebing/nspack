@@ -24,7 +24,7 @@ module RawMaterialsApp
       delivery = find_rmt_delivery(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       res = validate_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       bin_asset_numbers = UtilityFunctions.parse_string_to_array(params.delete(:scan_bin_numbers).gsub(' ', ','))
       bin_asset_numbers.each do |bin_asset_number|
@@ -41,7 +41,7 @@ module RawMaterialsApp
       delivery = find_rmt_delivery(id)
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       res = validate_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
       return validation_failed_response(OpenStruct.new(messages: { qty_bins_to_create: ["Couldn't find #{params[:qty_bins_to_create].to_i - bin_asset_numbers.length} available bin_asset_numbers in the system"] })) unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
@@ -76,7 +76,7 @@ module RawMaterialsApp
       return failed_response('Max delivery for run could not be found') if params[:rmt_delivery_id].nil_or_empty?
 
       res = validate_rmt_rebin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
       return failed_response("Couldn't find #{params[:qty_bins_to_create]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
@@ -108,7 +108,7 @@ module RawMaterialsApp
       return failed_response('Max delivery for run could not be found') if params[:rmt_delivery_id].nil_or_empty?
 
       res = validate_rmt_rebin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -134,7 +134,7 @@ module RawMaterialsApp
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       params = params.merge(location_id: default_location_id) unless params[:location_id]
       res = validate_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -200,7 +200,7 @@ module RawMaterialsApp
       params = params.merge(location_id: default_location_id) unless params[:location_id]
 
       res = validate_rmt_bin_params(params)
-      return failed_response(unwrap_failed_response(validation_failed_response(res))) unless res.messages.empty?
+      return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure?
 
       repo.transaction do
         submitted_bins.each do |bin_asset_number|
@@ -262,7 +262,7 @@ module RawMaterialsApp
       params = params.merge(get_header_inherited_field(delivery, params[:rmt_container_type_id]))
       params[:bin_received_date_time] = submitted_bin_received_date_time if submitted_bin_received_date_time
       res = validate_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_bin(id, res)
@@ -376,7 +376,7 @@ module RawMaterialsApp
 
     def pre_print_bin_labels(params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_label_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:no_of_prints])
       return failed_response("Couldn't find #{params[:no_of_prints]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:no_of_prints].to_i

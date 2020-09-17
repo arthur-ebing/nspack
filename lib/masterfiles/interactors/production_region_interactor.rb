@@ -16,7 +16,7 @@ module MasterfilesApp
 
     def create_production_region(params) # rubocop:disable Metrics/AbcSize
       res = validate_production_region_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -35,7 +35,7 @@ module MasterfilesApp
 
     def update_production_region(id, params)
       res = validate_production_region_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_production_region(id, res)

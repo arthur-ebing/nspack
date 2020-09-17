@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  PucSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:puc_code, Types::StrippedString).filled(:str?)
-    required(:gap_code, Types::StrippedString).maybe(:str?)
+  PucSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:puc_code).filled(Types::StrippedString)
+    required(:gap_code).maybe(Types::StrippedString)
   end
 end

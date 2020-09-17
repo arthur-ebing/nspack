@@ -4,7 +4,7 @@ module MasterfilesApp
   class StandardProductWeightInteractor < BaseInteractor
     def create_standard_product_weight(params) # rubocop:disable Metrics/AbcSize
       res = validate_standard_product_weight_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -28,7 +28,7 @@ module MasterfilesApp
 
     def update_standard_product_weight(id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_standard_product_weight_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         ratio_to_standard_carton = calculate_ratio_to_standard_carton(res, id) unless res[:standard_carton_nett_weight].nil?

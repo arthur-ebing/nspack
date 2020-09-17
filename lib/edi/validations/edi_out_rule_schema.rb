@@ -1,31 +1,25 @@
 # frozen_string_literal: true
 
 module EdiApp
-  EdiOutRuleDestSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:destination_type, Types::StrippedString).filled(:str?)
+  EdiOutRuleDestSchema = Dry::Schema.Params do
+    required(:destination_type).filled(Types::StrippedString)
   end
 
-  EdiOutRuleDepotSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:flow_type, Types::StrippedString).filled(:str?)
-    required(:destination_type, Types::StrippedString).filled(:str?)
-    required(:depot_id, :integer).filled(:int?)
-    required(:hub_address, Types::StrippedString).filled(:str?)
-    required(:directory_keys, :array).filled(:array?) { each(:str?) }
+  EdiOutRuleDepotSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:flow_type).filled(Types::StrippedString)
+    required(:destination_type).filled(Types::StrippedString)
+    required(:depot_id).filled(:integer)
+    required(:hub_address).filled(Types::StrippedString)
+    required(:directory_keys).filled(:array).each(:string)
   end
 
-  EdiOutRulePartyRoleSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:flow_type, Types::StrippedString).filled(:str?)
-    required(:role_id, :integer).filled(:str?)
-    required(:party_role_id, :integer).filled(:int?)
-    required(:hub_address, Types::StrippedString).filled(:str?)
-    required(:directory_keys, :array).filled(:array?) { each(:str?) }
+  EdiOutRulePartyRoleSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:flow_type).filled(Types::StrippedString)
+    required(:role_id).filled(:string)
+    required(:party_role_id).filled(:integer)
+    required(:hub_address).filled(Types::StrippedString)
+    required(:directory_keys).filled(:array).each(:string)
   end
 end

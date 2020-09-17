@@ -4,7 +4,7 @@ module RawMaterialsApp
   class BinLoadProductInteractor < BaseInteractor
     def create_bin_load_product(params) # rubocop:disable Metrics/AbcSize
       res = validate_bin_load_product_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module RawMaterialsApp
 
     def update_bin_load_product(id, params)
       res = validate_bin_load_product_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_bin_load_product(id, res)
@@ -54,7 +54,7 @@ module RawMaterialsApp
 
     def allocate_bin_load_product(id, params) # rubocop:disable Metrics/AbcSize
       res = AllocateBinLoadProductSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       new_allocation = res.to_h[:bin_ids]
       current_allocation = repo.select_values(:rmt_bins, :id, bin_load_product_id: id)

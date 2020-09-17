@@ -4,7 +4,7 @@ module EdiApp
   class EdiOutRuleInteractor < BaseInteractor
     def create_edi_out_rule(params) # rubocop:disable Metrics/AbcSize
       res = validate_edi_out_rule_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -24,7 +24,7 @@ module EdiApp
 
     def update_edi_out_rule(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_edi_out_rule_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         params.delete_if { |_k, v| v.nil_or_empty? }

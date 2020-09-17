@@ -35,7 +35,7 @@ module Crossbeams
 
       VALIDATIONS = {
         labels: {
-          AppConst::DEFAULT_KEY => Dry::Validation.Params do
+          AppConst::DEFAULT_KEY => Dry::Schema.Params do
             required(:label_type).filled(:str?)
           end
           # 'srcc' => Dry::Validation.Params do

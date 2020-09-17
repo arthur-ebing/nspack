@@ -32,7 +32,7 @@ module FinishedGoodsApp
 
     def create_load # rubocop:disable Metrics/AbcSize
       res = LoadSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       attrs[:requires_temp_tail] = AppConst::TEMP_TAIL_REQUIRED_TO_SHIP unless attrs[:requires_temp_tail]
@@ -46,7 +46,7 @@ module FinishedGoodsApp
 
     def create_load_voyage
       res = LoadVoyageSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       load_voyage_id = repo.create(:load_voyages, res)
       repo.log_status(:load_voyages, load_voyage_id, 'CREATED', user_name: @user.user_name, comment: comment)

@@ -2,7 +2,7 @@
 
 # Custom types to be used in dry-validation forms.
 module Types
-  include Dry::Types.module
+  include Dry.Types(default: :nominal)
 
   # Strips leading and trailing spaces from the input string.
   # Returns nil if the new result is blank.

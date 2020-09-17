@@ -15,9 +15,9 @@ module SecurityApp
     end
 
     # --| actions
-    def create_security_group(params) # rubocop:disable Metrics/AbcSize
+    def create_security_group(params)
       res = validate_security_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -32,9 +32,9 @@ module SecurityApp
       validation_failed_response(OpenStruct.new(messages: { security_group_name: ['This security group already exists'] }))
     end
 
-    def update_security_group(id, params) # rubocop:disable Metrics/AbcSize
+    def update_security_group(id, params)
       res = validate_security_group_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       # res = validate_security_group... etc.
       repo.transaction do

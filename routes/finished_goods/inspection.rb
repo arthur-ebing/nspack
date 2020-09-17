@@ -107,7 +107,7 @@ class Nspack < Roda
             r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
           else
             re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}") do
-              FinishedGoods::Inspection::GovtInspectionSheet::Show.call(id)
+              FinishedGoods::Inspection::GovtInspectionSheet::Show.call(id, form_values: params[:govt_inspection_sheet], form_errors: res.errors)
             end
           end
         end

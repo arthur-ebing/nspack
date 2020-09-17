@@ -4,7 +4,7 @@ module MasterfilesApp
   class PmBomInteractor < BaseInteractor
     def create_pm_bom(params) # rubocop:disable Metrics/AbcSize
       res = validate_pm_bom_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_pm_bom(id, params)
       res = validate_pm_bom_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_bom(id, res)

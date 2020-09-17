@@ -4,7 +4,7 @@ module ProductionApp
   class ShiftInteractor < BaseInteractor
     def create_shift(params) # rubocop:disable Metrics/AbcSize
       res = validate_shift_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -22,7 +22,7 @@ module ProductionApp
 
     def update_shift(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_update_shift_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.check_if_shift_overlap!(res)
       repo.transaction do

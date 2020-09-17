@@ -1,24 +1,20 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  ShiftSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:shift_type_id, :integer).filled(:int?)
-    required(:date, :date).filled(:date?)
-    # required(:running_hours, %i[nil decimal]).maybe(:decimal?)
-    # required(:start_date_time, %i[nil time]).maybe(:time?)
-    # required(:end_date_time, %i[nil time]).maybe(:time?)
+  ShiftSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:shift_type_id).filled(:integer)
+    required(:date).filled(:date)
+    # required(:running_hours).maybe(:decimal)
+    # required(:start_date_time).maybe(:time)
+    # required(:end_date_time).maybe(:time)
   end
 
-  UpdateShiftSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    required(:id, :integer).filled(:int?)
-    required(:shift_type_id, :integer).filled(:int?)
-    required(:running_hours, %i[nil decimal]).maybe(:decimal?)
-    required(:start_date_time, %i[nil time]).maybe(:time?)
-    required(:end_date_time, %i[nil time]).maybe(:time?)
+  UpdateShiftSchema = Dry::Schema.Params do
+    required(:id).filled(:integer)
+    required(:shift_type_id).filled(:integer)
+    required(:running_hours).maybe(:decimal)
+    required(:start_date_time).maybe(:time)
+    required(:end_date_time).maybe(:time)
   end
 end

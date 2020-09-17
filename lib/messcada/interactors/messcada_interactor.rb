@@ -184,7 +184,7 @@ module MesscadaApp
 
     def update_rmt_bin_weights(params) # rubocop:disable Metrics/AbcSize
       res = validate_update_rmt_bin_weights_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       MesscadaApp::UpdateBinWeights.call(res)
     rescue Crossbeams::InfoError => e
@@ -201,7 +201,7 @@ module MesscadaApp
 
     def tip_rmt_bin(params) # rubocop:disable Metrics/AbcSize
       res = validate_tip_rmt_bin_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         res = MesscadaApp::TipBin.new(res).call
@@ -224,7 +224,7 @@ module MesscadaApp
 
     def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonLabelingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_device_exists(res[:device])
       return check_res unless check_res.success
@@ -257,7 +257,7 @@ module MesscadaApp
 
     def carton_verification(params)  # rubocop:disable Metrics/AbcSize
       res = CartonAndPalletVerificationSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_carton_label_exists(res[:carton_number])
       return check_res unless check_res.success
@@ -284,7 +284,7 @@ module MesscadaApp
 
     def carton_verification_and_weighing(params)  # rubocop:disable Metrics/AbcSize
       res = CartonVerificationAndWeighingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
@@ -315,7 +315,7 @@ module MesscadaApp
 
     def carton_verification_and_weighing_and_labeling(params, request_ip)  # rubocop:disable Metrics/AbcSize
       res = CartonVerificationAndWeighingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       check_res = validate_device_and_label_exist(res[:device], res[:carton_number])
       return check_res unless check_res.success
@@ -394,7 +394,7 @@ module MesscadaApp
     def fg_pallet_weighing(params)  # rubocop:disable Metrics/AbcSize
       params[:bin_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:bin_number]).pallet_number
       res = FgPalletWeighingSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       pallet_number = res[:bin_number]
 

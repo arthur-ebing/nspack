@@ -2,9 +2,9 @@
 
 module MasterfilesApp
   class OrganizationInteractor < BaseInteractor
-    def create_organization(params) # rubocop:disable Metrics/AbcSize
+    def create_organization(params)
       res = validate_organization_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -20,7 +20,7 @@ module MasterfilesApp
 
     def update_organization(id, params)
       res = validate_organization_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_organization(id, res)

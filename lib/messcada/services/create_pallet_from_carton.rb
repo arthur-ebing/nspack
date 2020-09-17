@@ -51,7 +51,7 @@ module MesscadaApp
     def create_pallet
       pallet_params = set_pallet_params
       res = validate_pallet_params(pallet_params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       @pallet_id = repo.create_pallet(user_name, res.to_h)
 

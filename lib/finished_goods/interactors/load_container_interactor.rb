@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class LoadContainerInteractor < BaseInteractor
     def create_load_container(params) # rubocop:disable Metrics/AbcSize
       res = validate_load_container_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module FinishedGoodsApp
 
     def update_load_container(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_load_container_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       # test for changes
       instance = load_container(id).to_h.reject { |k, _| %i[id active].include?(k) }

@@ -4,7 +4,7 @@ module MasterfilesApp
   class PackingMethodInteractor < BaseInteractor
     def create_packing_method(params)  # rubocop:disable Metrics/AbcSize
       res = validate_packing_method_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_packing_method(id, params)
       res = validate_packing_method_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_packing_method(id, res)

@@ -5,7 +5,7 @@ module FinishedGoodsApp
     def create_govt_inspection_sheet(params) # rubocop:disable Metrics/AbcSize
       params[:created_by] ||= @user.user_name
       res = validate_govt_inspection_sheet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,11 +21,11 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_govt_inspection_sheet(id, params) # rubocop:disable Metrics/AbcSize
+    def update_govt_inspection_sheet(id, params)
       check!(:edit, id)
 
       res = validate_govt_inspection_sheet_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_govt_inspection_sheet(id, res)
@@ -157,7 +157,7 @@ module FinishedGoodsApp
 
     def create_intake_tripsheet(govt_inspection_sheet_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_vehicle_job_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         vehicle_job_id = repo.create_vehicle_job(res)
@@ -166,7 +166,7 @@ module FinishedGoodsApp
         govt_inspection_pallets.each do |govt_inspection_pallet|
           unit_res = validate_vehicle_job_unit_params(stock_item_id: govt_inspection_pallet[:pallet_id], stock_type_id: pallet_stock_type_id,
                                                       vehicle_job_id: vehicle_job_id)
-          raise unit_res.messages.to_s unless unit_res.messages.empty?
+          raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(unit_res)) if unit_res.failure?
 
           repo.create_vehicle_job_unit(unit_res)
           log_status(:pallets, govt_inspection_pallet[:pallet_id], 'ADDED TO INTAKE TRIPSHEET')
@@ -176,8 +176,6 @@ module FinishedGoodsApp
         log_transaction
       end
       success_response('Intake Tripsheet Created')
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -238,7 +236,7 @@ module FinishedGoodsApp
           new_vehicle_job_units.each do |new_vehicle_job_unit|
             unit_res = validate_vehicle_job_unit_params(stock_item_id: new_vehicle_job_unit, stock_type_id: pallet_stock_type_id,
                                                         vehicle_job_id: vehicle_job_id)
-            raise unit_res.messages.to_s unless unit_res.messages.empty?
+            raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(unit_res)) if unit_res.failure?
 
             repo.create_vehicle_job_unit(unit_res)
             log_status(:pallets, new_vehicle_job_unit, 'ADDED TO INTAKE TRIPSHEET')
@@ -250,15 +248,13 @@ module FinishedGoodsApp
       end
 
       success_response('Vehicle Refreshed Successfully')
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def validate_offload_vehicle(vehicle_job_id, location, location_scan_field) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = UtilityFunctions.validate_integer_length(:vehicle_job_id, vehicle_job_id)
-      return failed_response('Invalid barcode. Perhaps a pallet was scanned?') unless res.messages.empty?
+      return failed_response('Invalid barcode. Perhaps a pallet was scanned?') if res.failure?
 
       vehicle_job = repo.find_vehicle_job(vehicle_job_id)
       return failed_response('Tripsheet does not exist') unless vehicle_job
@@ -372,7 +368,7 @@ module FinishedGoodsApp
 
     def validate_add_pallet_govt_inspection_params(params) # rubocop:disable Metrics/AbcSize
       res = GovtInspectionAddPalletSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: attrs.delete(:pallet_number)).pallet_number

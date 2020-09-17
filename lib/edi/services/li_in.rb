@@ -104,7 +104,7 @@ module EdiApp
 
     def create_load
       res = FinishedGoodsApp::LoadServiceSchema.call(attrs)
-      raise Crossbeams::InfoError, res.messages unless res.messages.empty?
+      raise Crossbeams::InfoError, res.messages if res.failure?
 
       load_res = FinishedGoodsApp::CreateLoad.call(res, @user, comment: "Created from EDI File: #{file_name}")
       raise Crossbeams::InfoError, load_res.message unless load_res.success

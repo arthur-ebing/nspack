@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  CultivarGroupSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:commodity_id, :integer).filled(:int?)
-    required(:cultivar_group_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
+  CultivarGroupSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:commodity_id).filled(:integer)
+    required(:cultivar_group_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
   end
 end

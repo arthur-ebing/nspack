@@ -4,7 +4,7 @@ module MasterfilesApp
   class FruitSizeReferenceInteractor < BaseInteractor
     def create_fruit_size_reference(params) # rubocop:disable Metrics/AbcSize
       res = validate_fruit_size_reference_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_fruit_size_reference(id, params)
       res = validate_fruit_size_reference_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_fruit_size_reference(id, res)

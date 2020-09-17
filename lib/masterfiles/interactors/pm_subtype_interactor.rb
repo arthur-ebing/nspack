@@ -4,7 +4,7 @@ module MasterfilesApp
   class PmSubtypeInteractor < BaseInteractor
     def create_pm_subtype(params) # rubocop:disable Metrics/AbcSize
       res = validate_pm_subtype_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -23,7 +23,7 @@ module MasterfilesApp
 
     def update_pm_subtype(id, params)
       res = validate_pm_subtype_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_subtype(id, res)

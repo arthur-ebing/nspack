@@ -4,7 +4,7 @@ module ProductionApp
   class ProductSetupTemplateInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_product_setup_template(params) # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_template_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -21,9 +21,9 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_product_setup_template(id, params)  # rubocop:disable Metrics/AbcSize
+    def update_product_setup_template(id, params)
       res = validate_product_setup_template_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_product_setup_template(id, res.to_h)
@@ -95,7 +95,7 @@ module ProductionApp
 
     def clone_product_setup_template(id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_template_params(params.to_h.reject { |k, _| k == :id })
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         new_product_setup_template_id = repo.create_product_setup_template(res)

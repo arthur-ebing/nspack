@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  RmtContainerMaterialTypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:rmt_container_type_id, :integer).filled(:int?)
-    required(:container_material_type_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
-    optional(:party_role_ids, Types::IntArray)
-    optional(:tare_weight, :decimal).maybe(:decimal?)
+  RmtContainerMaterialTypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:rmt_container_type_id).filled(:integer)
+    required(:container_material_type_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
+    optional(:party_role_ids).maybe(:array).each(:integer)
+    optional(:tare_weight).maybe(:decimal)
   end
 end

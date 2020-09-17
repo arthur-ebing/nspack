@@ -1,18 +1,16 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  LoadVehicleSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    optional(:load_vehicle_id, :integer).maybe(:int?)
-    required(:load_id, :integer).filled(:int?)
-    required(:vehicle_type_id, :integer).filled(:int?)
-    required(:haulier_party_role_id, :integer).filled(:int?)
-    required(:vehicle_number, Types::StrippedString).filled(:str?)
-    optional(:vehicle_weight_out, %i[nil decimal]).maybe(:decimal?)
-    optional(:dispatch_consignment_note_number, Types::StrippedString).maybe(:str?)
-    required(:driver_name, Types::StrippedString).filled(:str?)
-    required(:driver_cell_number, Types::StrippedString).filled(:str?)
+  LoadVehicleSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    optional(:load_vehicle_id).maybe(:integer)
+    required(:load_id).filled(:integer)
+    required(:vehicle_type_id).filled(:integer)
+    required(:haulier_party_role_id).filled(:integer)
+    required(:vehicle_number).filled(Types::StrippedString)
+    optional(:vehicle_weight_out).maybe(:decimal)
+    optional(:dispatch_consignment_note_number).maybe(Types::StrippedString)
+    required(:driver_name).filled(Types::StrippedString)
+    required(:driver_cell_number).filled(Types::StrippedString)
   end
 end

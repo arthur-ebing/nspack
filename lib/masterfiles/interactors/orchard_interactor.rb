@@ -4,7 +4,7 @@ module MasterfilesApp
   class OrchardInteractor < BaseInteractor
     def create_orchard(params) # rubocop:disable Metrics/AbcSize
       res = validate_orchard_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       cultivar_ids = attrs.delete(:cultivar_ids)
@@ -27,7 +27,7 @@ module MasterfilesApp
 
     def update_orchard(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_orchard_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
       cultivar_ids = attrs.delete(:cultivar_ids)

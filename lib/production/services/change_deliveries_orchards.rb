@@ -28,10 +28,10 @@ module ProductionApp
 
     def change_deliveries_orchards  # rubocop:disable Metrics/AbcSize
       res = validate_orchard_change_params(change_attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       res = validate_reworks_run_params(reworks_run_attrs)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       reworks_run_attrs[:changes_made] = reworks_run_attrs[:changes_made].to_json
       from_attrs = { orchard_id: change_attrs[:from_orchard],

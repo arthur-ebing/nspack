@@ -20,7 +20,7 @@ module QualityApp
 
     def create_orchard_test_result(params)
       res = OrchardTestCreateSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       ids = nil
       repo.transaction do
@@ -47,7 +47,7 @@ module QualityApp
 
     def update_orchard_test_result(id, params)
       res = OrchardTestUpdateSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         QualityApp::UpdateOrchardTestResult.call(id, res, @user)

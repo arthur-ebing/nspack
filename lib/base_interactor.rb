@@ -114,7 +114,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
     return OpenStruct.new(messages: {}) unless validator
 
     res = validator.call(select_extended_columns_params(params))
-    errs = { messages: res.messages.transform_keys { |k| "extcol_#{k}".to_sym } }
+    errs = { messages: res.errors.to_h.transform_keys { |k| "extcol_#{k}".to_sym } }
     fields = res.to_h.transform_keys { |k| "extcol_#{k}".to_sym }
     OpenStruct.new(errs.merge(fields))
   end

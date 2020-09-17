@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  CustomerVarietySchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:variety_as_customer_variety_id, :integer).filled(:int?)
-    required(:packed_tm_group_id, :integer).filled(:int?)
+  CustomerVarietySchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:variety_as_customer_variety_id).filled(:integer)
+    required(:packed_tm_group_id).filled(:integer)
   end
 end

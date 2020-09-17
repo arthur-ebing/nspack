@@ -4,7 +4,7 @@ module ProductionApp
   class ResourceInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_root_plant_resource(params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -39,7 +39,7 @@ module ProductionApp
 
     def create_plant_resource(parent_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
@@ -58,7 +58,7 @@ module ProductionApp
 
     def update_plant_resource(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_plant_resource_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       current = plant_resource(id)
       name_changed = current.plant_resource_code != res[:plant_resource_code]
@@ -89,7 +89,7 @@ module ProductionApp
 
     def set_module_resource(id, params)
       res = validate_system_resource_module_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_system_resource(id, res)
@@ -104,7 +104,7 @@ module ProductionApp
 
     def set_peripheral_resource(id, params)
       res = validate_system_resource_peripheral_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_system_resource(id, res)
@@ -162,7 +162,7 @@ module ProductionApp
 
     def bulk_add_ptms(id, params)
       res = validate_plant_resource_ptm_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       srv_res = nil
       repo.transaction do
@@ -173,7 +173,7 @@ module ProductionApp
 
     def bulk_add_clms(id, params)
       res = validate_plant_resource_clm_params(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
       return validation_failed_message_response(no_clms_per_printer: ['Not yet implemented - must be "1" for now']) if res[:no_clms_per_printer] != 1
 
       srv_res = nil

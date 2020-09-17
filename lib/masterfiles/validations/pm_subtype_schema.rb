@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  PmSubtypeSchema = Dry::Validation.Params do
-    configure { config.type_specs = true }
-
-    optional(:id, :integer).filled(:int?)
-    required(:pm_type_id, :integer).filled(:int?)
-    required(:subtype_code, Types::StrippedString).filled(:str?)
-    required(:description, Types::StrippedString).maybe(:str?)
+  PmSubtypeSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    required(:pm_type_id).filled(:integer)
+    required(:subtype_code).filled(Types::StrippedString)
+    required(:description).maybe(Types::StrippedString)
   end
 end
