@@ -90,7 +90,7 @@ module MasterfilesApp
         lbl[:variables].each do |var_hash|
           var_hash.each do |var, val|
             inner_res = LabelTemplatePublishInnerSchema.call(val)
-            var_errs[var] = inner_res.messages.map { |k, v| "#{k} #{v.join(', ')}" } unless inner_res.messages.empty?
+            var_errs[var] = inner_res.errors.to_h.map { |k, v| "#{k} #{v.join(', ')}" } if inner_res.failure?
           end
         end
       end

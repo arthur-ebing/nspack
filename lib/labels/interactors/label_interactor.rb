@@ -52,7 +52,7 @@ module LabelApp
       parms, extcols = unwrap_extended_columns_params(params)
       ext_res = validate_extended_columns(:labels, params)
       res = validate_label_params(parms)
-      return mixed_validation_failed_response(res, ext_res) if res.failure? && ext_res.messages.empty?
+      return mixed_validation_failed_response(res, ext_res) unless res.success? && ext_res.messages.empty?
 
       repo.transaction do
         repo.update_label(id, include_updated_by_in_changeset(add_extended_columns_to_changeset(res, repo, extcols)))

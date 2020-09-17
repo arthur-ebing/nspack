@@ -4,8 +4,6 @@ module DataminerApp
   PreparedReportSchema = Dry::Schema.Params do
     required(:report_description).filled(Types::StrippedString)
     optional(:existing_report).maybe(Types::StrippedString)
-    # optional(:linked_users).maybe(Types::IntArray).maybe { each(:int?) }
-    # optional(:linked_users).maybe(:array).each(:int?)
     optional(:linked_users).maybe(:array).maybe { each(:integer) }
   end
 end

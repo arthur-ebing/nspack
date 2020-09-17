@@ -85,6 +85,7 @@ module UiRules
                          options: @mf_hr_repo.for_select_shift_types_with_codes,
                          caption: 'Shift Type',
                          required: true,
+                         min_charwidth: 40,
                          prompt: true },
         date: { renderer: :input,
                 subtype: :date,

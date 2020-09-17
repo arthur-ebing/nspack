@@ -246,8 +246,8 @@ module DevelopmentApp
         float: 'maybe(:float)',
         decimal: 'maybe(:decimal)',
         jsonb: 'maybe(:hash)',
-        integer_array: 'maybe(:array).each(:integer)',
-        string_array: 'maybe(:array).each(:string)'
+        integer_array: 'maybe(:array).each(:integer) # OR: maybe(:array).maybe { each(:integer) } # if param can be nil (not [])',
+        string_array: 'maybe(:array).each(:string) # OR: maybe(:array).maybe { each(:string) } # if param can be nil (not [])'
       }.freeze
 
       def initialize(table)

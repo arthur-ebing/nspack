@@ -11,6 +11,7 @@ module FinishedGoodsApp
     optional(:completed).maybe(:bool)
     optional(:completed_at).filled(:time)
   end
+
   UpdateVoyageSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:vessel_id).filled(:integer)

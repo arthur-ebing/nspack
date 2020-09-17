@@ -119,13 +119,13 @@ module FinishedGoodsApp
 
     def truck_arrival(id, params) # rubocop:disable Metrics/AbcSize
       vehicle_res = LoadVehicleSchema.call(params)
-      return validation_failed_response(vehicle_res) unless vehicle_res.messages.empty?
+      return validation_failed_response(vehicle_res) if vehicle_res.failure?
 
       # load has a container
       container_res = nil
       if params[:container] == 't'
         container_res = LoadContainerSchema.call(params)
-        return validation_failed_response(container_res) unless container_res.messages.nil_or_empty?
+        return validation_failed_response(container_res) if container_res.failure?
       end
 
       res = nil

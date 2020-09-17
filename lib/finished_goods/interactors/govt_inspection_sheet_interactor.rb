@@ -166,7 +166,7 @@ module FinishedGoodsApp
         govt_inspection_pallets.each do |govt_inspection_pallet|
           unit_res = validate_vehicle_job_unit_params(stock_item_id: govt_inspection_pallet[:pallet_id], stock_type_id: pallet_stock_type_id,
                                                       vehicle_job_id: vehicle_job_id)
-          raise unit_res.messages.to_s unless unit_res.messages.empty?
+          raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(unit_res)) if unit_res.failure?
 
           repo.create_vehicle_job_unit(unit_res)
           log_status(:pallets, govt_inspection_pallet[:pallet_id], 'ADDED TO INTAKE TRIPSHEET')
@@ -176,8 +176,6 @@ module FinishedGoodsApp
         log_transaction
       end
       success_response('Intake Tripsheet Created')
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -238,7 +236,7 @@ module FinishedGoodsApp
           new_vehicle_job_units.each do |new_vehicle_job_unit|
             unit_res = validate_vehicle_job_unit_params(stock_item_id: new_vehicle_job_unit, stock_type_id: pallet_stock_type_id,
                                                         vehicle_job_id: vehicle_job_id)
-            raise unit_res.messages.to_s unless unit_res.messages.empty?
+            raise Crossbeams::InfoError, unwrap_failed_response(validation_failed_response(unit_res)) if unit_res.failure?
 
             repo.create_vehicle_job_unit(unit_res)
             log_status(:pallets, new_vehicle_job_unit, 'ADDED TO INTAKE TRIPSHEET')
@@ -250,8 +248,6 @@ module FinishedGoodsApp
       end
 
       success_response('Vehicle Refreshed Successfully')
-    rescue StandardError => e
-      failed_response(e.message)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

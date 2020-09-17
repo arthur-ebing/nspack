@@ -22,7 +22,6 @@ module RawMaterialsApp
 
     def update_rmt_delivery(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_rmt_delivery_params(params)
-      # return failed_response(unwrap_failed_response(validation_failed_response(res))) if !res.messages.empty? && res.messages.one? && res.messages.include?(:season_id)
       return failed_response(unwrap_failed_response(validation_failed_response(res))) if res.failure? && res.errors.to_h.one? && res.errors.to_h.include?(:season_id)
       return validation_failed_response(res) if res.failure?
 
@@ -78,7 +77,7 @@ module RawMaterialsApp
 
     def update_received_at(id, params) # rubocop:disable Metrics/AbcSize
       res = RmtDeliveryReceivedAtSchema.call(params)
-      return validation_failed_response(res) unless res.messages.empty?
+      return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_rmt_delivery(id, res)
@@ -298,7 +297,7 @@ module RawMaterialsApp
       success_response("Created rmt delivery cost #{instance[:id]}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { id: ['This rmt delivery cost already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { base: ['This rmt delivery cost already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

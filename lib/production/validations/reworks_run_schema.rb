@@ -7,11 +7,11 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:reworks_run_type_id).filled(:integer)
     optional(:remarks).maybe(Types::StrippedString)
     optional(:scrap_reason_id).maybe(:integer)
-    optional(:pallets_selected).maybe(:array).each(:string)
-    optional(:pallets_affected).maybe(:array).each(:string)
+    optional(:pallets_selected).maybe(:array).maybe { each(:string) }
+    optional(:pallets_affected).maybe(:array).maybe { each(:string) }
     optional(:changes_made).maybe(:hash)
-    optional(:pallets_scrapped).maybe(:array).each(:string)
-    optional(:pallets_unscrapped).maybe(:array).each(:string)
+    optional(:pallets_scrapped).maybe(:array).maybe { each(:string) }
+    optional(:pallets_unscrapped).maybe(:array).maybe { each(:string) }
   end
 
   ReworksRunNewSchema = Dry::Schema.Params do
@@ -35,12 +35,12 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     optional(:remarks).maybe(Types::StrippedString)
     optional(:scrap_reason_id).maybe(:integer)
     required(:pallets_selected).filled(:array).each(:string)
-    optional(:pallets_affected).maybe(:array).each(:string)
+    optional(:pallets_affected).maybe(:array).maybe { each(:string) }
     optional(:changes_made).maybe(:hash)
-    optional(:pallets_scrapped).maybe(:array).each(:string)
-    optional(:pallets_unscrapped).maybe(:array).each(:string)
+    optional(:pallets_scrapped).maybe(:array).maybe { each(:string) }
+    optional(:pallets_unscrapped).maybe(:array).maybe { each(:string) }
     optional(:pallet_sequence_id).maybe(:integer)
-    optional(:affected_sequences).maybe(:array).each(:integer)
+    optional(:affected_sequences).maybe(:array).maybe { each(:integer) }
     optional(:make_changes).maybe(:bool)
     required(:allow_cultivar_group_mixing).maybe(:bool)
   end
@@ -107,7 +107,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     # required(:extended_columns).maybe(:hash)
     required(:client_size_reference).maybe(Types::StrippedString)
     required(:client_product_code).maybe(Types::StrippedString)
-    optional(:treatment_ids).maybe(:array).each(:integer)
+    optional(:treatment_ids).maybe(:array).maybe { each(:integer) }
     required(:marketing_order_number).maybe(Types::StrippedString)
     required(:sell_by_code).maybe(Types::StrippedString)
     required(:pallet_label_name).maybe(Types::StrippedString)
