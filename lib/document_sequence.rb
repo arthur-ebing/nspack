@@ -95,7 +95,7 @@ class DocumentSequence
     res_errs = rule_schema.call(rule.transform_keys(&:to_sym)).errors(full: true).to_h
     return if res_errs.empty?
 
-    raise ArgumentError, "Document sequence config for #{name} is not valid: #{messages.map { |_, v| v.join(', ') }.join(', ')}"
+    raise ArgumentError, "Document sequence config for #{name} is not valid: #{res_errs.map { |_, v| v.join(', ') }.join(', ')}"
   end
 
   def string_prefix
