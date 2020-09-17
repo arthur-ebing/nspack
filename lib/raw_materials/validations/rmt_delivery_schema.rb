@@ -14,7 +14,7 @@ module RawMaterialsApp
     optional(:truck_registration_number, Types::StrippedString).maybe(:str?)
     optional(:qty_damaged_bins, :integer).maybe(:int?)
     optional(:qty_empty_bins, :integer).maybe(:int?)
-    required(:date_picked, :date).maybe(:date?)
+    optional(:date_picked, %i[nil date]).maybe(:date?)
     required(:date_delivered, :time).maybe(:time?)
     required(:received, :bool).filled(:bool?)
     optional(:current, :bool).filled(:bool?)

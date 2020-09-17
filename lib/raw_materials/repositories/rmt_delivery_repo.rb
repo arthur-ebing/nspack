@@ -41,28 +41,29 @@ module RawMaterialsApp
 
     def create_rmt_delivery(res)
       attrs = res.to_h
-      attrs[:season_id] ||= rmt_delivery_season!(attrs)
+      attrs = find_valid_rmt_delivery_season_id!(attrs)
       DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
 
       create(:rmt_deliveries, attrs)
     end
 
-    def rmt_delivery_season!(attrs, rmt_delivery_id = nil)
+    def find_valid_rmt_delivery_season_id!(attrs, rmt_delivery_id = nil)
       instance = find_rmt_delivery(rmt_delivery_id)
 
       if attrs[:cultivar_id] || attrs[:date_delivered]
         cultivar_id = attrs[:cultivar_id] || instance.cultivar_id
         received_at = attrs[:date_delivered] || instance.date_delivered
-        season_id = rmt_delivery_season(cultivar_id, received_at)
-        raise Crossbeams::InfoError, 'Season not found for delivery' unless season_id
+
+        attrs[:season_id] ||= rmt_delivery_season(cultivar_id, received_at)
+        raise Crossbeams::InfoError, 'Season not found for delivery' unless attrs[:season_id]
       end
 
-      season_id
+      attrs
     end
 
     def update_rmt_delivery(id, res)
       attrs = res.to_h
-      attrs[:season_id] ||= rmt_delivery_season!(attrs, id)
+      attrs = find_valid_rmt_delivery_season_id!(attrs, id)
       DB[:rmt_deliveries].where(current: true).update(current: false) if attrs[:current]
 
       update_untipped_rmt_delivery_bins(id, attrs)
@@ -171,6 +172,8 @@ module RawMaterialsApp
     end
 
     def rmt_delivery_season(cultivar_id, date_delivered)
+      raise ArgumentError, 'rmt_delivery_season: cultivar_id or date_delivered missing' unless cultivar_id && date_delivered
+
       hash = DB["SELECT s.*
          FROM seasons s
           JOIN cultivars c on c.commodity_id=s.commodity_id
