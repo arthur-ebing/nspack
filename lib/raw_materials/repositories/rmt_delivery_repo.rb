@@ -256,7 +256,7 @@ module RawMaterialsApp
         order by last_used_at asc
         limit ?
       SQL
-      DB[query, count].select_map(%i[bin_asset_number id])
+      DB[query, count].select_map(%i[id bin_asset_number]).sort_by(&:last)
     end
 
     def find_rmt_container_material_owner(rmt_material_owner_party_role_id, rmt_container_material_type_id)
