@@ -4,7 +4,7 @@
   \   status,\r\n    pallet_number,\r\n    pallet_sequence_number,\r\n    has_individual_cartons,\r\n
   \   location,\r\n    cultivar,\r\n    carton_quantity,\r\n    pallet_carton_quantity,\r\n
   \   cpp AS cartons_per_pallet,\r\n    pallet_size,\r\n    pallet_age,\r\n    stock_age,\r\n
-  \   cold_age,\r\n    ambient_age,\r\n    pack_to_inspect_age, \r\n    inspect_to_cold_age,\r\n
+  \   cold_age,\r\n    ambient_age,\r\n    pack_to_inspect_age,\r\n    inspect_to_cold_age,\r\n
   \   inspect_to_exit_warm_age,\r\n    created_at,\r\n    palletized_at,\r\n    govt_first_inspection_at,\r\n
   \   govt_inspection_passed,\r\n    inspected_dest_country,\r\n    shipped_at,\r\n
   \   govt_reinspection_at,\r\n    allocated_at,\r\n    verified_at,\r\n    allocated,\r\n
@@ -22,10 +22,10 @@
   \   packed_at,\r\n    packed_date,\r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n
   \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
   \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
-  \   target_customer,\r\n    consignment_note_number,\r\n    active,\r\n    CASE\r\n
-  \     WHEN fn_pallet_verification_failed(pallet_id) THEN 'error'\r\n      ELSE colour_rule\r\n
-  \   END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER BY zero_load_id
-  DESC, pallet_number DESC"
+  \   target_customer,\r\n    consignment_note_number,\r\n    sequence_count,\r\n
+  \   active,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
+  THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
+  BY zero_load_id DESC, pallet_number DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -1505,9 +1505,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  sequence_count:
+    :name: sequence_count
+    :sequence_no: 93
+    :caption: Sequence count
+    :namespaced_name: sequence_count
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 93
+    :sequence_no: 94
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1523,7 +1539,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 94
+    :sequence_no: 95
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -1742,8 +1758,8 @@
   :ordered_list: false
   :ui_priority: 1
   :list_def: 
-- :column: pallet_sequence_number
-  :caption: Pallet Sequence Number
+- :column: sequence_count
+  :caption: Sequence Count
   :data_type: :integer
   :control_type: :text
   :default_value: 
