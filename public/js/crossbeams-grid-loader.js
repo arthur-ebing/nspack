@@ -997,6 +997,132 @@ const crossbeamsGridEvents = {
   },
 };
 
+// ------------------------------
+// || SEARCHABLE SELECT EDITOR ||
+// ------------------------------
+
+// function to act as a class
+function SearchableSelectCellEditor() {}
+
+// SearchableSelectCellEditor.prototype.build = function build() {
+this.build = function build() {
+  this.eList.innerHTML = '';
+  this.filtered_params.forEach((param) => {
+    const li = document.createElement('li');
+    li.textContent = param;
+    if (param === this.selected) {
+      li.classList.add('selected');
+    }
+    this.eList.appendChild(li);
+  });
+};
+
+// gets called once before the renderer is used
+SearchableSelectCellEditor.prototype.init = (params) => {
+  this.selected = params.value;
+  this.container = document.createElement('div');
+  this.container.setAttribute('class', 'ag-editor-popup');
+  this.params = params;
+  this.filtered_params = params.values;
+  this.eInput = document.createElement('input');
+  this.eInput.placeholder = 'Filter options';
+  this.container.appendChild(this.eInput);
+  this.eList = document.createElement('ul');
+  this.container.appendChild(this.eList);
+  this.build();
+
+  const that = this;
+  this.eList.addEventListener('click', (e) => {
+    that.eList.querySelectorAll('.selected').forEach(item => item.classList.remove('selected'));
+    that.selected = e.target.textContent;
+    e.target.classList.add('selected'); // remove all others...
+    that.params.stopEditing();
+  });
+
+  this.eInput.addEventListener('keyup', () => {
+    const searchTerm = that.eInput.value.toUpperCase();
+    if (searchTerm === '') {
+      that.filtered_params = that.params.values;
+    } else {
+      that.filtered_params = that.params.values.filter(item => item && item.toUpperCase().includes(searchTerm));
+    }
+    that.build();
+  });
+};
+
+// gets called once when grid ready to insert the element
+SearchableSelectCellEditor.prototype.getGui = () => this.container;
+
+// focus and select can be done after the gui is attached
+SearchableSelectCellEditor.prototype.afterGuiAttached = () => this.eInput.focus();
+
+// returns the new value after editing
+SearchableSelectCellEditor.prototype.getValue = () => this.selected;
+
+// if true, then this editor will appear in a popup
+SearchableSelectCellEditor.prototype.isPopup = () => true;
+
+// // ----------------------------------------
+// // || SEARCHABLE SELECT EDITOR - Choices ||
+// // ----------------------------------------
+//
+// // function to act as a class
+// function SearchableSelectCellEditor() {}
+//
+// // gets called once before the renderer is used
+// SearchableSelectCellEditor.prototype.init = (params) => {
+//   this.eInput = document.createElement('select');
+//   params.values.forEach((item) => {
+//     const option = document.createElement('option');
+//     option.value = item;
+//     option.text = item;
+//     if (params.value && params.value === item) {
+//       option.selected = true;
+//     }
+//     this.eInput.appendChild(option);
+//   });
+// };
+//
+// // gets called once when grid ready to insert the element
+// SearchableSelectCellEditor.prototype.getGui = () => this.eInput;
+//
+// // focus and select can be done after the gui is attached
+// SearchableSelectCellEditor.prototype.afterGuiAttached = () => {
+//   this.eChoice = new Choices(this.eInput, {
+//     searchEnabled: true,
+//     searchResultLimit: 100,
+//     removeItemButton: true,
+//     itemSelectText: '',
+//     classNames: {
+//       containerOuter: 'choices cbl-input',
+//       containerInner: 'choices__inner_cbl',
+//       highlightedState: 'is-highlighted_cbl',
+//     },
+//     shouldSort: true,
+//     searchFields: ['label'],
+//     fuseOptions: {
+//       include: 'score',
+//       threshold: 0.25,
+//     },
+//   });
+//   this.eChoice.showDropdown();
+// };
+//
+// // returns the new value after editing
+// SearchableSelectCellEditor.prototype.getValue = () => this.eChoice.getValue(true);
+//
+// // any cleanup we need to be done here
+// SearchableSelectCellEditor.prototype.destroy = () => {
+//   this.eChoice.destroy();
+// };
+//
+// // if true, then this editor will appear in a popup
+// SearchableSelectCellEditor.prototype.isPopup = () => true;
+
+// -------------------------
+// || NUMERIC CELL EDITOR ||
+// -------------------------
+
 // function to act as a class
 function NumericCellEditor() {
 }
@@ -1341,6 +1467,7 @@ const crossbeamsGridStaticLoader = {
             'agPopupTextCellEditor',
             'agPopupSelectCellEditor',
             'agRichSelectCellEditor',
+            'searchableSelectCellEditor',
             'agLargeTextCellEditor'].indexOf(col[attr]) > -1) {
             newCol[attr] = col[attr];
           } else {
@@ -1668,6 +1795,7 @@ const crossbeamsGridStaticLoader = {
         },
         components: {
           numericCellEditor: NumericCellEditor,
+          searchableSelectCellEditor: SearchableSelectCellEditor,
           // moodEditor: MoodEditor
         },
         onCellEditingStarted(evt) {

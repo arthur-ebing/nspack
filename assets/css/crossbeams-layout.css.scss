@@ -124,6 +124,33 @@ div.ag-row.washed-red {
   color: #FFDFDF;
 }
 
+// Popup editor:
+div.ag-editor-popup {
+  max-height: 20em;
+  overflow-y: scroll;
+  background-color: #f5f7f7;
+  display: flex;
+  flex-direction: column;
+}
+div.ag-editor-popup input {
+  flex-grow: 1;
+}
+div.ag-editor-popup ul li {
+  padding: 0.1em 0.5em;
+  font-size: 1.2em;
+}
+div.ag-editor-popup li.selected {
+  background-color: #b7e4ff;
+}
+div.ag-editor-popup li:hover {
+  background-color: #d6d6e0;
+}
+div.ag-editor-popup ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 /* Override AG-Grid z-index for popups so that they are foreward enough in grids inside dialogs */
 .ag-theme-balham .ag-popup-child {
   z-index: 30 !important;
