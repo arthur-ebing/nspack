@@ -82,6 +82,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ALLOW_CULTIVAR_GROUP_MIXING: 'Allow users to set allow_cultivar_group_mixing flag on production_runs' },
     { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' },
     { TEMP_TAIL_REQUIRED_TO_SHIP: 'optional. Makes temp tail required on all loads' },
+    { VAT_FACTOR: 'To calculate vat amounts for the delivery cost invoice report' },
     { USE_CARTON_PALLETIZING: 'Use carton palletizing application. Default false' },
     { DEFAULT_PALLET_LABEL_NAME: 'Default pallet label_name for Carton Palletizing.' },
     { AUTO_PRINT_PALLET_LABEL_ON_BAY: 'Carton Palletizing - Print pallet labels on pallet complete only if true.' },

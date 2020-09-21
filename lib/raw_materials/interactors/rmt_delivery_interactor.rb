@@ -112,13 +112,13 @@ module RawMaterialsApp
     end
 
     def manage_delivery_batch(rep_delivery_id, selection) # rubocop:disable Metrics/AbcSize
-      rep_delivery = rmt_delivery(rep_delivery_id)
-      current_batch = repo.select_values(:rmt_deliveries, :id, batch_number: rep_delivery.batch_number)
+      rep_delivery_batch = repo.get_value(:rmt_deliveries, :batch_number, id: rep_delivery_id)
+      current_batch = repo.select_values(:rmt_deliveries, :id, batch_number: rep_delivery_batch)
       repo.transaction do
-        repo.update_rmt_delivery(selection - current_batch, batch_number: rep_delivery.batch_number, batch_number_updated_at: Time.now)
+        repo.update_rmt_delivery(selection - current_batch, batch_number: rep_delivery_batch, batch_number_updated_at: Time.now)
         repo.update_rmt_delivery(current_batch - selection, batch_number: nil, batch_number_updated_at: Time.now)
       end
-      success_response("Batch #{rep_delivery.batch_number} updated successfully")
+      success_response("Batch #{rep_delivery_batch} updated successfully")
     rescue StandardError => e
       failed_response(e.message)
     rescue Crossbeams::InfoError => e

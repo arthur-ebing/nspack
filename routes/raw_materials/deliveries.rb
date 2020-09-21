@@ -791,7 +791,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     user: current_user.login_name,
                                     file: 'delivery_cost_invoice',
                                     params: { batch_number: rep_delivery.batch_number,
-                                              vat: AppConst::VAT,
+                                              vat: AppConst::VAT_FACTOR,
                                               keep_file: false })
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -803,7 +803,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'create_delivery_batch' do
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.create_delivery_batch(retrieve_from_local_store(:batch_number), params[:selection][:list].split(','))
+      res = interactor.create_delivery_batch(retrieve_from_local_store(:batch_number), multiselect_grid_choices(params))
       if res.success
         flash[:notice] = res.message
       else
@@ -815,7 +815,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     r.on 'manage_delivery_batch', Integer do |id|
       interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      res = interactor.manage_delivery_batch(id, params[:selection][:list].split(',').map(&:to_i))
+      res = interactor.manage_delivery_batch(id, multiselect_grid_choices(params))
       if res.success
         flash[:notice] = res.message
       else
