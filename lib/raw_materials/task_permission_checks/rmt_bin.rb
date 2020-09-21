@@ -8,16 +8,14 @@ module RawMaterialsApp
         @task = task
         @repo = RmtDeliveryRepo.new
         @id = rmt_bin_id
-        @entity = @id ? @repo.find_rmt_bin(@id) : nil
+        @entity = @id ? @repo.find_rmt_bin_flat(@id) : nil
       end
 
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
+        delete: :delete_check,
+        receive: :receive_check
       }.freeze
 
       def call
@@ -47,32 +45,11 @@ module RawMaterialsApp
         all_ok
       end
 
-      # def complete_check
-      #   return failed_response 'RmtBin has already been completed' if completed?
+      def receive_check
+        return failed_response "Bin: #{entity.bin_asset_number} already received." if entity.received
 
-      #   all_ok
-      # end
-
-      # def approve_check
-      #   return failed_response 'RmtBin has not been completed' unless completed?
-      #   return failed_response 'RmtBin has already been approved' if approved?
-
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'RmtBin has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
+        all_ok
+      end
     end
   end
 end

@@ -66,6 +66,7 @@ module RawMaterialsApp
     attribute :nett_weight, Types::Decimal
     attribute :gross_weight, Types::Decimal
     attribute :bin_tipped, Types::Bool
+    attribute :received, Types::Bool
     attribute :bin_received_date_time, Types::DateTime
     attribute :bin_tipped_date_time, Types::DateTime
     attribute :exit_ref_date_time, Types::DateTime
@@ -78,6 +79,7 @@ module RawMaterialsApp
     attribute :puc_code, Types::String
     attribute :cultivar_name, Types::String
     attribute :season_code, Types::String
+    attribute :class_code, Types::String
     attribute :container_type_code, Types::String
     attribute :container_material_type_code, Types::String
     attribute :scrapped_bin_asset_number, Types::String

@@ -54,57 +54,15 @@ module RawMaterialsApp
     end
 
     def test_edit
-      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity)
+      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin_flat).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:edit, 1)
       assert res.success, 'Should be able to edit a rmt_bin'
-
-      # RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed rmt_bin'
     end
 
     def test_delete
-      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity)
+      RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin_flat).returns(entity)
       res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:delete, 1)
       assert res.success, 'Should be able to delete a rmt_bin'
-
-      # RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true))
-      # res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed rmt_bin'
     end
-
-    # def test_complete
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a rmt_bin'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed rmt_bin'
-    # end
-
-    # def test_approve
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true, approved: false))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed rmt_bin'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed rmt_bin'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved rmt_bin'
-    # end
-
-    # def test_reopen
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity)
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a rmt_bin that has not been approved'
-
-    #   RawMaterialsApp::RmtDeliveryRepo.any_instance.stubs(:find_rmt_bin).returns(entity(completed: true, approved: true))
-    #   res = RawMaterialsApp::TaskPermissionCheck::RmtBin.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved rmt_bin'
-    # end
   end
 end

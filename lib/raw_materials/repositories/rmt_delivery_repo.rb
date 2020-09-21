@@ -143,6 +143,7 @@ module RawMaterialsApp
                                                    { parent_table: :farms, columns: [:farm_code], flatten_columns: { farm_code: :farm_code } },
                                                    { parent_table: :pucs, columns: [:puc_code], flatten_columns: { puc_code: :puc_code } },
                                                    { parent_table: :seasons, columns: [:season_code], flatten_columns: { season_code: :season_code } },
+                                                   { parent_table: :rmt_classes, columns: [:rmt_class_code], flatten_columns: { rmt_class_code: :class_code } },
                                                    { parent_table: :locations, columns: [:location_long_code], flatten_columns: { location_long_code: :location_long_code } },
                                                    { parent_table: :rmt_container_types, columns: [:container_type_code], flatten_columns: { container_type_code: :container_type_code } },
                                                    { parent_table: :rmt_container_material_types, columns: [:container_material_type_code], flatten_columns: { container_material_type_code: :container_material_type_code } },
@@ -154,7 +155,8 @@ module RawMaterialsApp
 
       return nil if hash.nil?
 
-      hash[:asset_number] = hash[:bin_asset_number]
+      hash[:asset_number] = hash[:bin_asset_number] || hash[:shipped_asset_number] || hash[:tipped_asset_number] || hash[:scrapped_bin_asset_number]
+      hash[:received] = get(:rmt_deliveries, hash[:rmt_delivery_id], :received)
       RmtBinFlat.new(hash)
     end
 

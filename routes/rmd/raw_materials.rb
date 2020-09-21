@@ -104,6 +104,75 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # --------------------------------------------------------------------------
+    # PALBIN LOADS
+    # --------------------------------------------------------------------------
+    r.on 'receive_bin' do
+      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      repo = RawMaterialsApp::RmtDeliveryRepo.new
+      stepper = interactor.stepper(:receive_bin)
+
+      r.on 'cancel' do
+        stepper.clear
+        r.redirect('/rmd/raw_materials/receive_bin')
+      end
+
+      r.on 'complete' do
+        stepper.complete
+        stepper.clear
+        r.redirect('/rmd/home')
+      end
+
+      r.get do
+        form_state = stepper.form_state
+        form_state[:error_message] = retrieve_from_local_store(:flash_notice)
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :receive_bin,
+                                       progress: stepper.progress,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       notes: stepper.notes,
+                                       links: stepper.links,
+                                       caption: 'Scan to Receive Bin',
+                                       action: '/rmd/raw_materials/receive_bin',
+                                       button_caption: 'Submit')
+        hash = form_state[:entity]
+        unless hash.nil_or_empty?
+          form.add_label(:bin_asset_number, 'Bin Asset Number', hash[:bin_asset_number])
+          form.add_label(:farm, 'Farm', hash[:farm_code])
+          form.add_label(:puc, 'PUC', hash[:puc_code])
+          form.add_label(:orchard, 'Orchard', hash[:orchard_code])
+          form.add_label(:cultivar, 'Cultivar', hash[:cultivar_name])
+          form.add_label(:class, 'Class', hash[:class_code])
+          form.add_label(:pack, 'Pack', hash[:container_material_type_code])
+          form.add_label(:gross_weight, 'Gross Weight', hash[:gross_weight])
+          form.add_label(:nett_weight, 'Nett Weight', hash[:nett_weight])
+        end
+
+        form.add_field(:bin_asset_number,
+                       'Bin Asset Number',
+                       data_type: 'number',
+                       scan: 'key248_all',
+                       scan_type: :pallet_number,
+                       submit_form: true,
+                       required: true)
+
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        bin_asset_number = params[:receive_bin][:bin_asset_number]
+        bin_id = repo.get_id(:rmt_bins, bin_asset_number: bin_asset_number)
+        res = interactor.check(:receive, bin_id)
+        if res.success
+          stepper.scan(bin_asset_number)
+        else
+          store_locally(:flash_notice, rmd_error_message(res.message))
+        end
+        r.redirect('/rmd/raw_materials/receive_bin')
+      end
+    end
   end
 
   # --------------------------------------------------------------------------

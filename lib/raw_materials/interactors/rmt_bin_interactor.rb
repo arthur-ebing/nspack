@@ -404,6 +404,14 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def stepper(step_key)
+      @stepper ||= RmtBinStep.new(step_key, @user, @context.request_ip)
+    end
+
+    def check(task, id = nil)
+      TaskPermissionCheck::RmtBin.call(task, id)
+    end
+
     private
 
     def calc_rebin_params(params) # rubocop:disable Metrics/AbcSize

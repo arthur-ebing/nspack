@@ -49,7 +49,6 @@ module UiRules
       fields[:date_picked] = { renderer: :label,
                                caption: 'Picked at' }
       fields[:received] = { renderer: :label,
-                            hide_on_load: true,
                             as_boolean: true }
       fields[:date_delivered] = { renderer: :label,
                                   caption: 'Received at',
