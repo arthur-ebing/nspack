@@ -276,6 +276,10 @@ module RawMaterialsApp
       DB[:rmt_bins].where(bin_asset_number: bin_asset_number, exit_ref: nil).count.zero?
     end
 
+    def only_one_farm_batch?(batch_number)
+      DB[:rmt_deliveries].where(batch_number: batch_number).select_map(:farm_id).uniq.count == 1
+    end
+
     def find_bin_by_asset_number(bin_asset_number)
       rmt_bin = DB["SELECT *
                     FROM rmt_bins

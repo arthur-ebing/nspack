@@ -79,6 +79,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Regular expression(s) to validate bin asset numbers when present (in case they are typed in incorrectly)
   # If more than one format is required, separate with commas (no spaces).
   BIN_ASSET_REGEX = ENV.fetch('BIN_ASSET_REGEX', '.+')
+  VAT = ENV['VAT']
 
   # Resources
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')

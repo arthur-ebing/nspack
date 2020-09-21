@@ -93,6 +93,38 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
+    def validate_batch_number(batch_number)
+      return validation_failed_response(OpenStruct.new(messages: { batch_number: ['Must be filled'] })) if batch_number.empty?
+      return validation_failed_response(OpenStruct.new(messages: { batch_number: ['Batch already exists'] })) if repo.exists?(:rmt_deliveries, batch_number: batch_number)
+
+      ok_response
+    end
+
+    def create_delivery_batch(batch_number, ids)
+      repo.transaction do
+        repo.update_rmt_delivery(ids, batch_number: batch_number, batch_number_updated_at: Time.now)
+      end
+      success_response("Batch #{batch_number} created successfully")
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def manage_delivery_batch(rep_delivery_id, selection) # rubocop:disable Metrics/AbcSize
+      rep_delivery = rmt_delivery(rep_delivery_id)
+      current_batch = repo.select_values(:rmt_deliveries, :id, batch_number: rep_delivery.batch_number)
+      repo.transaction do
+        repo.update_rmt_delivery(selection - current_batch, batch_number: rep_delivery.batch_number, batch_number_updated_at: Time.now)
+        repo.update_rmt_delivery(current_batch - selection, batch_number: nil, batch_number_updated_at: Time.now)
+      end
+      success_response("Batch #{rep_delivery.batch_number} updated successfully")
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def delivery_set_current(id)
       repo.transaction do
         repo.delivery_set_current(id)

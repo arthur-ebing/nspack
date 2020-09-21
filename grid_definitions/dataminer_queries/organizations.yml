@@ -3,7 +3,7 @@
 :sql: "SELECT\r\n    organizations.id,\r\n    organizations.party_id,\r\n    organizations.parent_id,\r\n
   \   parent.medium_description AS parent,\r\n    fn_party_name(organizations.party_id)
   AS organization_code,\r\n    organizations.short_description,\r\n    organizations.long_description,\r\n
-  \   organizations.vat_number,\r\n    array_agg(distinct roles.name order by roles.name)
+  \   organizations.vat_number,\r\n    organizations.company_reg_no,\r\n    array_agg(distinct roles.name order by roles.name)
   AS roles,\r\n    fn_masterfile_variants('organizations', organizations.id) AS variant_codes,\r\n
   \   organizations.active,\r\n    organizations.created_at,\r\n    organizations.updated_at\r\nFROM\r\n
   \   organizations\r\n        LEFT JOIN organizations parent ON parent.id = organizations.parent_id\r\n
@@ -138,6 +138,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  company_reg_no:
+    :name: company_reg_no
+    :sequence_no: 8
+    :caption: Company Reg No
+    :namespaced_name: organizations.company_reg_no
+    :data_type: :string
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

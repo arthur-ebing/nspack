@@ -763,5 +763,65 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: [])])
       end
     end
+
+    r.on 'delivery_batch' do
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Batch.call(remote: fetch?(r)) }
+      end
+
+      r.post do
+        res = interactor.validate_batch_number(params[:rmt_delivery][:batch_number])
+        if res.success
+          store_locally(:batch_number, params[:rmt_delivery][:batch_number])
+          load_via_json("/list/batch_deliveries/multi?key=standard&id=#{params[:rmt_delivery][:batch_number]}")
+        else
+          re_show_form(r, res) { RawMaterials::Deliveries::RmtDelivery::Batch.call(form_values: params[:rmt_delivery], form_errors: res.errors) }
+        end
+      end
+    end
+
+    r.on 'delivery_cost_invoice_report', Integer do |id|
+      repo = RawMaterialsApp::RmtDeliveryRepo.new
+      rep_delivery = repo.find_rmt_delivery(id)
+      return show_error('<br>Could not print report. <br>Batch has more than one farm', fetch?(r)) unless repo.only_one_farm_batch?(rep_delivery.batch_number)
+
+      res = CreateJasperReport.call(report_name: 'delivery_cost_invoice',
+                                    user: current_user.login_name,
+                                    file: 'delivery_cost_invoice',
+                                    params: { batch_number: rep_delivery.batch_number,
+                                              vat: AppConst::VAT,
+                                              keep_file: false })
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
+    r.on 'create_delivery_batch' do
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.create_delivery_batch(retrieve_from_local_store(:batch_number), params[:selection][:list].split(','))
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = unwrap_failed_response(res)
+      end
+      r.redirect('/list/delivery_batches')
+    end
+
+    r.on 'manage_delivery_batch', Integer do |id|
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.manage_delivery_batch(id, params[:selection][:list].split(',').map(&:to_i))
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = unwrap_failed_response(res)
+      end
+      r.redirect('/list/delivery_batches')
+    end
   end
 end

@@ -68,6 +68,8 @@ module UiRules
                                               as_boolean: true }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
+      fields[:batch_number] = { renderer: :label }
+      fields[:batch_number_updated_at] = { renderer: :label }
     end
 
     def common_fields # rubocop:disable Metrics/AbcSize
@@ -136,7 +138,9 @@ module UiRules
                                     caption: 'Qty Bins With Fruit',
                                     minvalue: 0 },
         auto_allocate_asset_number: { renderer: :checkbox,
-                                      hide_on_load: !AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION }
+                                      hide_on_load: !AppConst::ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION },
+        batch_number: { renderer: :label },
+        batch_number_updated_at: { renderer: :label }
       }
     end
 

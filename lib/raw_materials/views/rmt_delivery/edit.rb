@@ -4,7 +4,7 @@
 module RawMaterials
   module Deliveries
     module RmtDelivery
-      class Edit
+      class Edit # rubocop:disable Metrics/ClassLength
         def self.call(id, is_update: nil, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_delivery, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -64,6 +64,8 @@ module RawMaterials
                     col.add_field :date_delivered
                     col.add_field :delivery_tipped
                     col.add_field :tipping_complete_date_time
+                    col.add_field :batch_number
+                    col.add_field :batch_number_updated_at
                     # col.add_field :keep_open
                     # col.add_field :auto_allocate_asset_number
                   end

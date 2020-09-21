@@ -74,6 +74,7 @@ module MasterfilesApp
         short_description: Faker::Lorem.unique.word,
         medium_description: Faker::Lorem.unique.word,
         long_description: Faker::Lorem.unique.word,
+        company_reg_no: Faker::Lorem.unique.word,
         vat_number: 'ABC',
         variants: %w[A B C],
         role_ids: [hash[:role_id]],

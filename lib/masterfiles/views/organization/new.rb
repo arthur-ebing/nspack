@@ -24,6 +24,7 @@ module Masterfiles
                             css_classes: 'orange b'
               form.add_field :long_description
               form.add_field :vat_number
+              form.add_field :company_reg_no
               form.add_field :role_ids
             end
           end

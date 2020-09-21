@@ -1,0 +1,10 @@
+---
+:dataminer_definition: rmt_deliveries
+:multiselect:
+  :standard:
+    :section_caption: "SELECT '$:id$' limit 1"
+    :url: "/raw_materials/deliveries/create_delivery_batch"
+  :manage_batch:
+    :section_caption: "SELECT 'Manage Batch: ' || s.batch_number from rmt_deliveries s where s.id=$:id$ limit 1"
+    :url: "/raw_materials/deliveries/manage_delivery_batch/$:id$"
+    :preselect: "SELECT * from rmt_deliveries where batch_number IN (SELECT s.batch_number from rmt_deliveries s where s.id=$:id$)"

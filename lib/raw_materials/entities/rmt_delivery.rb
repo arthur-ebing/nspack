@@ -23,5 +23,7 @@ module RawMaterialsApp
     attribute? :active, Types::Bool
     attribute? :quantity_bins_with_fruit, Types::Integer
     attribute :reference_number, Types::String
+    attribute :batch_number, Types::String
+    attribute :batch_number_updated_at, Types::String
   end
 end

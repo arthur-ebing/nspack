@@ -18,6 +18,7 @@ module RawMaterialsApp
         puc_id: 1, # puc_id,
         truck_registration_number: Faker::Lorem.unique.word,
         reference_number: Faker::Lorem.unique.word,
+        batch_number: Faker::Lorem.unique.word,
         qty_damaged_bins: 1,
         qty_empty_bins: 1,
         delivery_tipped: false,
@@ -25,6 +26,7 @@ module RawMaterialsApp
         received: true,
         date_delivered: '2010-01-01 12:00',
         tipping_complete_date_time: '2010-01-01 12:00',
+        batch_number_updated_at: '2010-01-01 12:00',
         active: true
       }
       RawMaterialsApp::RmtDelivery.new(base_attrs.merge(attrs))

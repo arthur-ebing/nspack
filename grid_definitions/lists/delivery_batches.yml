@@ -1,0 +1,22 @@
+---
+:dataminer_definition: delivery_batches
+:actions:
+- :url: "/list/batch_deliveries/multi?key=manage_batch&id=$:id$"
+  :text: manage batch
+  :icon: edit
+  :title: false
+  :popup: true
+#  :hide_if_false: in_batch
+  :hide_if_false: is_rep_del
+- :url: "/raw_materials/deliveries/delivery_cost_invoice_report/$:id$"
+  :text: delivery cost invoice
+  :icon: printer
+  :loading_window: true
+#  :popup: true
+  :hide_if_false: is_rep_del
+:page_controls:
+  - :control_type: :link
+    :url: "/raw_materials/deliveries/delivery_batch"
+    :text: New Batch
+    :style: :button
+    :behaviour: :popup

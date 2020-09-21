@@ -16,7 +16,7 @@ module UiRules
       form_name 'organization'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:parent_organization] = { renderer: :label,
                                        caption: 'Parent' }
       fields[:medium_description] = { renderer: :label,
@@ -28,6 +28,7 @@ module UiRules
       fields[:short_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
+      fields[:company_reg_no] = { renderer: :label }
       fields[:role_names] = { renderer: :list,
                               caption: 'Roles',
                               items: @form_object.role_names.map(&:capitalize!) }
@@ -44,6 +45,7 @@ module UiRules
         short_description: { required: true },
         long_description: {},
         vat_number: {},
+        company_reg_no: {},
         role_ids: { renderer: :multi,
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,

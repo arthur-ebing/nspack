@@ -31,7 +31,7 @@ module RawMaterials
               section.form do |form| # rubocop:disable Metrics/BlockLength
                 form.view_only!
                 form.no_submit!
-                form.row do |row|
+                form.row do |row| # rubocop:disable Metrics/BlockLength
                   row.column do |col|
                     col.add_field :season_id
                     col.add_field :farm_id
@@ -57,6 +57,8 @@ module RawMaterials
                     col.add_field :keep_open
                     col.add_field :auto_allocate_asset_number
                     col.add_field :active
+                    col.add_field :batch_number
+                    col.add_field :batch_number_updated_at
                   end
                 end
               end
