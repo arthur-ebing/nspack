@@ -229,8 +229,8 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   # @param params [Hash] the request parameters.
   # @return [DryValidationResponse]
   def validate_changed_value_as_int(params)
-    Dry::Validation.Params do
-      required(:changed_value).maybe(:int?)
+    Dry::Schema.Params do
+      required(:changed_value).maybe(:integer)
     end.call(params)
   end
 
@@ -240,7 +240,7 @@ class BaseInteractor # rubocop:disable Metrics/ClassLength
   # @param params [Hash] the request parameters.
   # @return [DryValidationResponse]
   def validate_changed_value_as_str(params)
-    Dry::Validation.Params do
+    Dry::Schema.Params do
       required(:changed_value).maybe(:str?)
     end.call(params)
   end

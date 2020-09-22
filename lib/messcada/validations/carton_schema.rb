@@ -31,7 +31,7 @@ module MesscadaApp
       optional(:extended_columns).maybe(:hash)
       optional(:client_size_reference).maybe(Types::StrippedString)
       optional(:client_product_code).maybe(Types::StrippedString)
-      optional(:treatment_ids).filled(:array).each(:integer)
+      optional(:treatment_ids).filled(:array).maybe { each(:integer) }
       optional(:marketing_order_number).maybe(Types::StrippedString)
       optional(:fruit_sticker_pm_product_id).maybe(:integer)
       optional(:pm_type_id).maybe(:integer)
