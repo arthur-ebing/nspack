@@ -48,7 +48,7 @@ class Nspack < Roda
   plugin :json_parser
   plugin :message_bus
   plugin :status_handler
-  plugin :cookies, path: '/'
+  plugin :cookies, path: '/', same_site: :lax
   plugin :rodauth do
     db DB
     enable :login, :logout # , :change_password
