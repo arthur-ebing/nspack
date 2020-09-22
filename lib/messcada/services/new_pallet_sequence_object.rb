@@ -62,9 +62,8 @@ module MesscadaApp
     end
 
     def validate_pallet_sequence_params(params)
-      # PalletSequenceSchema.call(params)
       contract = PalletSequenceContract.new
-      contract.call(params)
+      contract.call(params.transform_values { |v| v.is_a?(Sequel::Postgres::PGArray) ? v.to_a : v })
     end
   end
 end
