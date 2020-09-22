@@ -36,21 +36,21 @@ module Crossbeams
       VALIDATIONS = {
         labels: {
           AppConst::DEFAULT_KEY => Dry::Schema.Params do
-            required(:label_type).filled(:str?)
+            required(:label_type).filled(:string)
           end
-          # 'srcc' => Dry::Validation.Params do
-          #   required(:agent).filled(:str?)
-          #   required(:pack_week).filled(:int?, gteq?: 1, lteq?: 52)
-          #   required(:srcc_order_nr).maybe(:str?)
-          #   required(:receiver_client).maybe(:str?)
-          #   required(:commodity).filled(:str?)
-          #   required(:variety).maybe(:str?)
-          #   required(:pack_code).maybe(:str?)
-          #   required(:weight).maybe(:str?)
-          #   required(:brand).maybe(:bool?)
-          #   required(:class).maybe(:str?)
-          #   required(:lot_number).maybe(:str?)
-          #   required(:comments).maybe(:str?)
+          # 'srcc' => Dry::Schema.Params do
+          #   required(:agent).filled(:string)
+          #   required(:pack_week).filled(:integer, gteq?: 1, lteq?: 52)
+          #   required(:srcc_order_nr).maybe(:string)
+          #   required(:receiver_client).maybe(:string)
+          #   required(:commodity).filled(:string)
+          #   required(:variety).maybe(:string)
+          #   required(:pack_code).maybe(:string)
+          #   required(:weight).maybe(:string)
+          #   required(:brand).maybe(:booling)
+          #   required(:class).maybe(:string)
+          #   required(:lot_number).maybe(:string)
+          #   required(:comments).maybe(:string)
           # end
         }
       }.freeze

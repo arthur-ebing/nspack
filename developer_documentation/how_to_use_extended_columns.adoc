@@ -52,20 +52,20 @@ There is a Hash named `VALIDATIONS` with keys for table name as a `Symbol`.
 
 Each table name is a Hash with keys for every `CLIENT_CODE` (as a `String`). If there is no entry for the current `CLIENT_CODE`, the table will not have validation for extended columns for that client.
 
-Each validation is a Dry::Validation schema.
+Each validation is a Dry::Schema schema.
 e.g.
 [source,ruby]
 ----
 VALIDATIONS = {
   labels: {
-    AppConst::DEFAULT_KEY => Dry::Validation.Params do
-      required(:label_type).filled(:str?)
+    AppConst::DEFAULT_KEY => Dry::Schema.Params do
+      required(:label_type).filled(:string)
     end,
-    'srcc' => Dry::Validation.Params do
-      required(:agent).filled(:str?)
-      required(:pack_week).filled(:int?, gteq?: 1, lteq?: 52)
-      required(:important).maybe(:bool?)
-      required(:commodity).filled(:str?)
+    'srcc' => Dry::Schema.Params do
+      required(:agent).filled(:string)
+      required(:pack_week).filled(:integer, gteq?: 1, lteq?: 52)
+      required(:important).maybe(:bool)
+      required(:commodity).filled(:string)
     end
   }
 }.freeze
