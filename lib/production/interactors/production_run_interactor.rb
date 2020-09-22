@@ -623,12 +623,10 @@ module ProductionApp
     end
 
     def validate_print_carton(params)
-      Dry::Validation.Params do
-        configure { config.type_specs = true }
-
-        optional(:printer, :integer).filled(:int?)
-        required(:label_template_id, :integer).filled(:int?)
-        required(:no_of_prints, :integer).filled(:int?, gt?: 0)
+      Dry::Schema.Params do
+        optional(:printer).filled(:integer)
+        required(:label_template_id).filled(:integer)
+        required(:no_of_prints).filled(:integer, gt?: 0)
       end.call(params)
     end
 
