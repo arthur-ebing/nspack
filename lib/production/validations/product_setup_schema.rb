@@ -21,7 +21,7 @@ module ProductionApp
     # required(:extended_columns).maybe(:hash)
     required(:client_size_reference).maybe(Types::StrippedString)
     required(:client_product_code).maybe(Types::StrippedString)
-    optional(:treatment_ids).filled(:array).maybe { each(:integer) }
+    optional(:treatment_ids).maybe(:array).maybe { each(:integer) }
     required(:marketing_order_number).maybe(Types::StrippedString)
     required(:sell_by_code).maybe(Types::StrippedString)
     required(:pallet_label_name).maybe(Types::StrippedString)
