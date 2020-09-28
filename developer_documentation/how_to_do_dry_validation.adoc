@@ -221,6 +221,76 @@ contract.call(join_id: '1', code: 'AA', name: 'AA', active: 't', multiselected_i
 #   :multiselected_ids=>[1, 2]} errors={:code=>["Code and name cannot be the same"]}>
 ----
 
+== Contract validation with external dependencies
+
+Contract validation can include rules that use "outside" data via the `option` method.
+
+Here is an example using a class and an external variable:
+[source, ruby]
+----
+class NewUserContract < Dry::Validation::Contract
+  option :today, default: Date.method(:today)
+  option :address_validator
+
+  params do
+    required(:address).filled(:string)
+  end
+
+  rule(:address) do
+    key.failure("invalid address") unless address_validator.valid?(values[:address])
+  end
+
+  rule(:address) do
+    key.failure("Date cannot be Sunday") unless today.wday > 0
+  end
+end
+
+# A class that does specialised validation:
+class AV
+  def valid?(val)
+    val.include?('street')
+  end
+end
+
+# Instantiate the contract like this:
+
+contract = ScaffoldNewValidation.new(address_validator: AV.new)
+# Or with a value for `today`:
+contract = ScaffoldNewValidation.new(address_validator: AV.new, today: Date.new(2020,3,1))
+----
+
+You could also pass in a method or lambda:
+[source, ruby]
+----
+class NewUserContract < Dry::Validation::Contract
+  option :address_validator
+
+  params do
+    required(:address).filled(:string)
+  end
+
+  rule(:address) do
+    key.failure("invalid address") unless address_validator[values[:address]]
+    # You could also use "value" instead of "values[:address]" here:
+    # key.failure("invalid address") unless address_validator[value]
+  end
+end
+
+# A lambda:
+chk_lambda = ->(v) { v.include?('street') }
+
+# A method:
+def chk_method(val)
+  val.include?('street')
+end
+
+# Instantiate the contract like this:
+
+contract = NewUserContract.new(address_validator: chk_lambda)
+# Or with a value for `today`:
+contract = NewUserContract.new(address_validator: method(:chk_method))
+----
+
 == Base validation errors
 
 NOTE: Where possible, rather use the `base.failure` result from a rule in a `Contract`.
