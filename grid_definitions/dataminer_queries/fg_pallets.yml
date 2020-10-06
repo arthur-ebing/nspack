@@ -1,6 +1,13 @@
 ---
 :caption: Finished Goods Pallets
 :sql: "SELECT DISTINCT ON (pallet_number)\r\n    id,\r\n    pallet_id,\r\n    pallet_number,\r\n
+  \   (select l.location_long_code \r\n
+  \   from serialized_stock_movement_logs s \r\n
+  \   join locations l on l.id=s.location_from_id \r\n
+  \   join location_assignments a on a.id=l.primary_assignment_id \r\n
+  \   where stock_item_number=pallet_number and a.assignment_code='COLD_STORAGE' \r\n
+  \   order by s.id desc \r\n
+  \   limit 1) as from_coldroom, \r\n
   \   pallet_sequence_number,\r\n    has_individual_cartons,\r\n    location,\r\n
   \   carton_quantity,\r\n    pallet_carton_quantity,\r\n    pallet_size,\r\n    pallet_age,\r\n
   \   stock_age,\r\n    cold_age,\r\n    ambient_age,\r\n    pack_to_inspect_age,
@@ -115,6 +122,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  from_coldroom:
+    :name: from_coldroom
+    :sequence_no: 6
+    :caption: From Coldroom
+    :namespaced_name: from_coldroom
+    :data_type: :string
+    :width: 150
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: true
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
