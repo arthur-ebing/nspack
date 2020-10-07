@@ -34,7 +34,7 @@
     product_setup_code:
       :editor: :search_select
       :width: 600
-      :value_sql: SELECT NULL UNION SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$)
+      :value_sql: SELECT NULL UNION SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$) ORDER BY 1 NULLS FIRST
     label_template_name:
       :editor: :search_select
       :width: 300
