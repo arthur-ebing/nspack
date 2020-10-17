@@ -62,14 +62,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # ADDENDUM
     # --------------------------------------------------------------------------
     r.on 'addendum', Integer do |id|
-      res = CreateJasperReport.call(report_name: 'addendum',
-                                    user: current_user.login_name,
-                                    file: 'addendum',
-                                    params: { load_id: id,
-                                              place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
-                                              keep_file: false })
+      res = if AppConst::JASPER_NEW_METHOD
+              jasper_params = JasperParams.new('addendum',
+                                               current_user.login_name,
+                                               load_id: id,
+                                               place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
+              # jasper_params.mode = :print
+              # jasper_params.printer = 'L3060'
+              CreateJasperReportNew.call(jasper_params)
+            else
+              CreateJasperReport.call(report_name: 'addendum',
+                                      user: current_user.login_name,
+                                      file: 'addendum',
+                                      params: { load_id: id,
+                                                place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
+                                                keep_file: false })
+            end
       if res.success
-        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        # change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        change_window_location_via_json('/', request.path)
       else
         show_error(res.message, fetch?(r))
       end
