@@ -90,10 +90,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'incentive_report' do
-        res = CreateJasperReport.call(report_name: 'incentive',
-                                      user: current_user.login_name,
-                                      file: 'incentive',
-                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('incentive',
+                                                 current_user.login_name,
+                                                 shift_id: id)
+                jasper_params.mode = :xls if params[:key] == 'excel'
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'incentive',
+                                        user: current_user.login_name,
+                                        file: 'incentive',
+                                        params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
         else
@@ -101,10 +109,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
       r.on 'incentive_count_report' do
-        res = CreateJasperReport.call(report_name: 'incentive_count',
-                                      user: current_user.login_name,
-                                      file: 'incentive_count',
-                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('incentive_count',
+                                                 current_user.login_name,
+                                                 shift_id: id)
+                jasper_params.mode = :xls if params[:key] == 'excel'
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'incentive_count',
+                                        user: current_user.login_name,
+                                        file: 'incentive_count',
+                                        params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
         else
@@ -112,10 +128,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
       r.on 'incentive_palletizer_report' do
-        res = CreateJasperReport.call(report_name: 'incentive_plt',
-                                      user: current_user.login_name,
-                                      file: 'incentive_plt',
-                                      params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('incentive_plt',
+                                                 current_user.login_name,
+                                                 shift_id: id)
+                jasper_params.mode = :xls if params[:key] == 'excel'
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'incentive_plt',
+                                        user: current_user.login_name,
+                                        file: 'incentive_plt',
+                                        params: { shift_id: id, OUT_FILE_TYPE: (params[:key] == 'excel' ? 'XLS' : 'PDF') })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
         else
@@ -223,14 +247,24 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                        when 'packer_count'
                          'packer_summary_count'
                        end
-        res = CreateJasperReport.call(report_name: report_name.to_s,
-                                      user: current_user.login_name,
-                                      file: report_name.to_s,
-                                      params: { FromDateTime: "#{DateTime.parse(attrs[:from_date]).strftime('%Y-%m-%d %H:%M:%S')}|date",
-                                                ToDateTime: "#{DateTime.parse(attrs[:to_date]).strftime('%Y-%m-%d %H:%M:%S')}|date",
-                                                WorkerIds: "#{multiselect_grid_choices(params).join(',')}|intarray",
-                                                OUT_FILE_TYPE: 'CSV',
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new(report_name,
+                                                 current_user.login_name,
+                                                 FromDateTime: DateTime.parse(attrs[:from_date]).strftime('%Y-%m-%d %H:%M:%S'),
+                                                 ToDateTime: DateTime.parse(attrs[:to_date]).strftime('%Y-%m-%d %H:%M:%S'),
+                                                 WorkerIds: multiselect_grid_choices(params))
+                jasper_params.mode = :csv
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: report_name.to_s,
+                                        user: current_user.login_name,
+                                        file: report_name.to_s,
+                                        params: { FromDateTime: "#{DateTime.parse(attrs[:from_date]).strftime('%Y-%m-%d %H:%M:%S')}|date",
+                                                  ToDateTime: "#{DateTime.parse(attrs[:to_date]).strftime('%Y-%m-%d %H:%M:%S')}|date",
+                                                  WorkerIds: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                  OUT_FILE_TYPE: 'CSV',
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: true)
         else

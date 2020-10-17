@@ -246,7 +246,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               jasper_params = JasperParams.new('interwarehouse',
                                                current_user.login_name,
                                                vehicle_job_id: vehicle_job_id)
-              jasper_params.parent_folder = AppConst::RPT_INDUSTRY
               CreateJasperReportNew.call(jasper_params)
             else
               CreateJasperReport.call(report_name: 'interwarehouse',

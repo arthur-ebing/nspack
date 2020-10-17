@@ -17,11 +17,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # BIN BARCODES SHEET
       # --------------------------------------------------------------------------
       r.on 'print_bin_barcodes' do
-        res = CreateJasperReport.call(report_name: 'bin_tickets',
-                                      user: current_user.login_name,
-                                      file: 'bin_tickets',
-                                      params: { delivery_id: id,
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('bin_tickets',
+                                                 current_user.login_name,
+                                                 delivery_id: id)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'bin_tickets',
+                                        user: current_user.login_name,
+                                        file: 'bin_tickets',
+                                        params: { delivery_id: id,
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
@@ -33,11 +40,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # DELIVERY SHEET
       # --------------------------------------------------------------------------
       r.on 'print_delivery' do
-        res = CreateJasperReport.call(report_name: 'delivery',
-                                      user: current_user.login_name,
-                                      file: 'delivery',
-                                      params: { delivery_id: id,
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('delivery',
+                                                 current_user.login_name,
+                                                 delivery_id: id)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'delivery',
+                                        user: current_user.login_name,
+                                        file: 'delivery',
+                                        params: { delivery_id: id,
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
@@ -787,12 +801,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       rep_delivery = repo.find_rmt_delivery(id)
       return show_error('<br>Could not print report. <br>Batch has more than one farm', fetch?(r)) unless repo.only_one_farm_batch?(rep_delivery.batch_number)
 
-      res = CreateJasperReport.call(report_name: 'delivery_cost_invoice',
-                                    user: current_user.login_name,
-                                    file: 'delivery_cost_invoice',
-                                    params: { batch_number: rep_delivery.batch_number,
-                                              vat: AppConst::VAT_FACTOR,
-                                              keep_file: false })
+      res = if AppConst::JASPER_NEW_METHOD
+              jasper_params = JasperParams.new('delivery_cost_invoice',
+                                               current_user.login_name,
+                                               batch_number: rep_delivery.batch_number,
+                                               vat: AppConst::VAT_FACTOR)
+              CreateJasperReportNew.call(jasper_params)
+            else
+              CreateJasperReport.call(report_name: 'delivery_cost_invoice',
+                                      user: current_user.login_name,
+                                      file: 'delivery_cost_invoice',
+                                      params: { batch_number: rep_delivery.batch_number,
+                                                vat: AppConst::VAT_FACTOR,
+                                                keep_file: false })
+            end
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
