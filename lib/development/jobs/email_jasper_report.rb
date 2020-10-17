@@ -13,12 +13,24 @@ module DevelopmentApp
 
     private
 
-    def build_report(user, spec)
-      res = CreateJasperReport.call(report_name: spec[:report_name],
-                                    user: user,
-                                    file: spec[:file],
-                                    debug_mode: spec[:debug_mode] || false,
-                                    params: spec[:report_params].merge(return_full_path: true))
+    def build_report(user, spec) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+      res = if AppConst::JASPER_NEW_METHOD
+              jasper_params = JasperParams.new(spec[:report_name],
+                                               current_user.login_name,
+                                               spec[:report_params])
+              jasper_params.return_full_path = true
+              jasper_params.file_name = spec[:file] if spec[:file]
+              jasper_params.mode = spec[:mode] if spec[:mode]
+              jasper_params.mode = spec[:parent_folder] if spec[:parent_folder]
+              jasper_params.mode = spec[:top_level_dir] if spec[:top_level_dir]
+              CreateJasperReportNew.call(jasper_params)
+            else
+              CreateJasperReport.call(report_name: spec[:report_name],
+                                      user: user,
+                                      file: spec[:file],
+                                      debug_mode: spec[:debug_mode] || false,
+                                      params: spec[:report_params].merge(return_full_path: true))
+            end
       unless res.success
         send_bus_message("Failed to build report '#{spec[:report_name]}' - #{res.message}",
                          message_type: :error,
