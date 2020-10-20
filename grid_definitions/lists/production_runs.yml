@@ -139,6 +139,17 @@
   :icon: view-show
   :title: View run stats
   :popup: true
+- :submenu:
+    :text: Dispatched only
+    :items:
+      - :url: "/production/runs/production_runs/$:id$/packout_report_dispatched"
+        :text: packout report
+        :icon: printer
+        :loading_window: true
+      - :url: "/production/runs/production_runs/$:id$/packout_report_derived_dispatched"
+        :text: packout report (derived weights)
+        :icon: printer
+        :loading_window: true
 - :url: "/production/runs/production_runs/$:id$/packout_report"
   :text: packout report
   :icon: printer

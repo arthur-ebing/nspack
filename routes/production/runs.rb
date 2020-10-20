@@ -328,14 +328,15 @@ class Nspack < Roda
         end
       end
 
-      r.on 'packout_report' do
+      r.on 'packout_report_dispatches' do
         res = if AppConst::JASPER_NEW_METHOD
                 jasper_params = JasperParams.new('pack_out',
                                                  current_user.login_name,
                                                  production_run_id: id,
                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
-                                                 use_derived_weight: false)
+                                                 use_derived_weight: false,
+                                                 dispatched_only: true)
                 CreateJasperReportNew.call(jasper_params)
               else
                 CreateJasperReport.call(report_name: 'pack_out',
@@ -345,6 +346,63 @@ class Nspack < Roda
                                                   carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                   use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
                                                   use_derived_weight: 'false|boolean',
+                                                  dispatched_only: 'true|boolean',
+                                                  keep_file: false })
+              end
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'packout_report_derived_dispatches' do
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: true,
+                                                 dispatched_only: true)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'true|boolean',
+                                                  dispatched_only: 'true|boolean',
+                                                  keep_file: false })
+              end
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'packout_report' do
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: false,
+                                                 dispatched_only: false)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'false|boolean',
+                                                  dispatched_only: 'false|boolean',
                                                   keep_file: false })
               end
         if res.success
@@ -361,7 +419,8 @@ class Nspack < Roda
                                                  production_run_id: id,
                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
-                                                 use_derived_weight: true)
+                                                 use_derived_weight: true,
+                                                 dispatched_only: false)
                 CreateJasperReportNew.call(jasper_params)
               else
                 CreateJasperReport.call(report_name: 'pack_out',
@@ -371,6 +430,7 @@ class Nspack < Roda
                                                   carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                   use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
                                                   use_derived_weight: 'true|boolean',
+                                                  dispatched_only: 'false|boolean',
                                                   keep_file: false })
               end
         if res.success
