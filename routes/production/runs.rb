@@ -328,7 +328,7 @@ class Nspack < Roda
         end
       end
 
-      r.on 'packout_report_dispatches' do
+      r.on 'packout_report_dispatched' do
         res = if AppConst::JASPER_NEW_METHOD
                 jasper_params = JasperParams.new('pack_out',
                                                  current_user.login_name,
@@ -356,7 +356,7 @@ class Nspack < Roda
         end
       end
 
-      r.on 'packout_report_derived_dispatches' do
+      r.on 'packout_report_derived_dispatched' do
         res = if AppConst::JASPER_NEW_METHOD
                 jasper_params = JasperParams.new('pack_out',
                                                  current_user.login_name,

@@ -18,6 +18,7 @@ module Production
                   col.add_field :from_date
                   col.add_field :to_date
                   col.add_field :detail_level
+                  col.add_field :dispatched_only
                   col.add_field :packhouse_resource_id
                   col.add_field :line_resource_id
                   col.add_field :puc_id
