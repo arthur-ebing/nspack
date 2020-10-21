@@ -44,11 +44,18 @@ class Nspack < Roda
       end
 
       r.on 'print_barcodes' do
-        res = CreateJasperReport.call(report_name: 'bin_ticket',
-                                      user: current_user.login_name,
-                                      file: 'bin_ticket',
-                                      params: { bin_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('bin_ticket',
+                                                 current_user.login_name,
+                                                 bin_id: multiselect_grid_choices(params))
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'bin_ticket',
+                                        user: current_user.login_name,
+                                        file: 'bin_ticket',
+                                        params: { bin_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
@@ -321,15 +328,83 @@ class Nspack < Roda
         end
       end
 
+      r.on 'packout_report_dispatched' do
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: false,
+                                                 dispatched_only: true)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'false|boolean',
+                                                  dispatched_only: 'true|boolean',
+                                                  keep_file: false })
+              end
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
+      r.on 'packout_report_derived_dispatched' do
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: true,
+                                                 dispatched_only: true)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'true|boolean',
+                                                  dispatched_only: 'true|boolean',
+                                                  keep_file: false })
+              end
+        if res.success
+          change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+        else
+          show_error(res.message, fetch?(r))
+        end
+      end
+
       r.on 'packout_report' do
-        res = CreateJasperReport.call(report_name: 'pack_out',
-                                      user: current_user.login_name,
-                                      file: 'pack_out',
-                                      params: { production_run_id: id,
-                                                carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
-                                                use_derived_weight: 'false|boolean',
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: false,
+                                                 dispatched_only: false)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'false|boolean',
+                                                  dispatched_only: 'false|boolean',
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
@@ -338,14 +413,26 @@ class Nspack < Roda
       end
 
       r.on 'packout_report_derived' do
-        res = CreateJasperReport.call(report_name: 'pack_out',
-                                      user: current_user.login_name,
-                                      file: 'pack_out',
-                                      params: { production_run_id: id,
-                                                carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
-                                                use_derived_weight: 'true|boolean',
-                                                keep_file: false })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('pack_out',
+                                                 current_user.login_name,
+                                                 production_run_id: id,
+                                                 carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_derived_weight: true,
+                                                 dispatched_only: false)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'pack_out',
+                                        user: current_user.login_name,
+                                        file: 'pack_out',
+                                        params: { production_run_id: id,
+                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_derived_weight: 'true|boolean',
+                                                  dispatched_only: 'false|boolean',
+                                                  keep_file: false })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else
@@ -354,10 +441,17 @@ class Nspack < Roda
       end
 
       r.on 'carton_packout_report' do
-        res = CreateJasperReport.call(report_name: 'carton_packout',
-                                      user: current_user.login_name,
-                                      file: 'carton_packout',
-                                      params: { production_run_id: id })
+        res = if AppConst::JASPER_NEW_METHOD
+                jasper_params = JasperParams.new('carton_packout',
+                                                 current_user.login_name,
+                                                 production_run_id: id)
+                CreateJasperReportNew.call(jasper_params)
+              else
+                CreateJasperReport.call(report_name: 'carton_packout',
+                                        user: current_user.login_name,
+                                        file: 'carton_packout',
+                                        params: { production_run_id: id })
+              end
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else

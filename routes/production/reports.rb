@@ -8,24 +8,39 @@ class Nspack < Roda
       show_page { Production::Reports::Packout::Edit.call }
     end
 
-    r.on 'aggregate_packout_print' do
+    r.on 'aggregate_packout_print' do # rubocop:disable Metrics/BlockLength
       attrs = params[:packout_report]
       line = attrs[:line_resource_id].nil_or_empty? ? '' : BaseRepo.new.get(:plant_resources, attrs[:line_resource_id], :plant_resource_code)
       puc = attrs[:puc_id].nil_or_empty? ? '' : BaseRepo.new.get(:pucs, attrs[:puc_id], :puc_code)
       orchard = attrs[:orchard_id].nil_or_empty? ? nil : BaseRepo.new.get(:orchards, attrs[:orchard_id], :orchard_code)
       cultivar = attrs[:cultivar_id].nil_or_empty? ? '' : BaseRepo.new.get(:cultivars, attrs[:cultivar_id], :cultivar_name)
 
-      res = CreateJasperReport.call(report_name: 'packout_summary',
-                                    user: current_user.login_name,
-                                    file: 'packout_summary',
-                                    params: { FromDate: "#{attrs[:from_date]} 00:00:00|date",
-                                              ToDate: "#{attrs[:to_date]} 00:00:00|date",
-                                              detail_level: attrs[:detail_level] == 't' ? 'Detail' : 'Summary',
-                                              line: line,
-                                              puc: puc,
-                                              orchard: orchard.nil_or_empty? ? nil : "#{orchard}|string",
-                                              cultivar: cultivar,
-                                              keep_file: false })
+      res = if AppConst::JASPER_NEW_METHOD
+              jasper_params = JasperParams.new('packout_summary',
+                                               current_user.login_name,
+                                               FromDate: "#{attrs[:from_date]} 00:00:00",
+                                               ToDate: "#{attrs[:to_date]} 00:00:00",
+                                               detail_level: attrs[:detail_level] == 't' ? 'Detail' : 'Summary',
+                                               dispatched_only: attrs[:dispatched_only] == 't' ? 'true|boolean' : 'false|boolean',
+                                               line: line,
+                                               puc: puc,
+                                               orchard: orchard.nil_or_empty? ? nil : orchard,
+                                               cultivar: cultivar)
+              CreateJasperReportNew.call(jasper_params)
+            else
+              CreateJasperReport.call(report_name: 'packout_summary',
+                                      user: current_user.login_name,
+                                      file: 'packout_summary',
+                                      params: { FromDate: "#{attrs[:from_date]} 00:00:00|date",
+                                                ToDate: "#{attrs[:to_date]} 00:00:00|date",
+                                                detail_level: attrs[:detail_level] == 't' ? 'Detail' : 'Summary',
+                                                dispatched_only: attrs[:dispatched_only] == 't' ? 'true|boolean' : 'false|boolean',
+                                                line: line,
+                                                puc: puc,
+                                                orchard: orchard.nil_or_empty? ? nil : "#{orchard}|string",
+                                                cultivar: cultivar,
+                                                keep_file: false })
+            end
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else
