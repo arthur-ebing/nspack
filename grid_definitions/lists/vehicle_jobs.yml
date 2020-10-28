@@ -6,3 +6,12 @@
   :icon: view-show
   :title: View
   :popup: true
+- :url: "/finished_goods/interwarehouse_transfers/cancel_pallet_tripsheet/$:id$"
+  :text: cancel
+  :icon: edit-pencil
+  :hide_if_false: can_cancel
+  :prompt: 'Are you sure you want to cancel this Tripsheet Sheet?'
+- :url: "/finished_goods/interwarehouse_transfers/open_pallet_tripsheet/$:id$"
+  :text: open
+  :icon: toggle-off
+  :hide_if_false: can_open

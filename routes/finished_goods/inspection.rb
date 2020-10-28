@@ -396,14 +396,36 @@ class Nspack < Roda
     # VEHICLE JOBS
     # --------------------------------------------------------------------------
     r.on 'vehicle_jobs', Integer do |id|
-      # interactor = FinishedGoodsApp::VehicleJobInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       r.is do
         r.get do       # SHOW
           # check_auth!('interwarehouse transfers', 'read')
           show_partial { FinishedGoods::InterwarehouseTransfers::VehicleJob::Show.call(id) }
         end
       end
+    end
+
+    r.on 'cancel_pallet_tripsheet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.cancel_manual_tripsheet(id)
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = res.message
+      end
+      r.redirect('/list/vehicle_jobs')
+    end
+
+    r.on 'open_pallet_tripsheet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.open_manual_tripsheet(id)
+      if res.success
+        flash[:notice] = res.message
+      else
+        flash[:error] = res.message
+      end
+      r.redirect('/list/vehicle_jobs')
     end
   end
 

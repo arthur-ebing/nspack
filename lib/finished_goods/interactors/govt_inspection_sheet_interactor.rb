@@ -155,6 +155,102 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
+    def manually_create_pallet_tripsheet(planned_location_to_id) # rubocop:disable Metrics/AbcSize
+      res = validate_manual_tripsheet_params(planned_location_to_id: planned_location_to_id, business_process_id: MesscadaApp::MesscadaRepo.new.find_business_process('MANUAL_TRIPSHEET')[:id],
+                                             stock_type_id: MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id])
+      return validation_failed_response(res) if res.failure?
+
+      vehicle_job_id = nil
+      repo.transaction do
+        vehicle_job_id = repo.create_vehicle_job(res)
+        log_transaction
+      end
+
+      success_response('Tripsheet Has Been Manually Created', vehicle_job_id)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def create_pallet_vehicle_job_unit(id, pallet_number) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
+      pallet = ProductionApp::ProductionRunRepo.new.find_pallet_by_pallet_number(pallet_number)
+      return failed_response('Pallet does not exist') unless pallet
+      return failed_response('Pallet has been scrapped') if pallet[:scrapped]
+      return failed_response('Pallet has been shipped') if pallet[:shipped]
+      return failed_response("Pallet:#{pallet_number} belongs to another tripsheet") if repo.pallet_in_different_tripsheet?(pallet[:id], id)
+      return failed_response("Cannot add:#{pallet_number}. Tripsheet has already been offloaded") if repo.get(:vehicle_jobs, id, :offloaded_at)
+
+      pallet_stock_type_id = MesscadaApp::MesscadaRepo.new.find_stock_type('PALLET')[:id]
+      res = validate_vehicle_job_unit_params(stock_item_id: pallet[:id], stock_type_id: pallet_stock_type_id, vehicle_job_id: id)
+      return validation_failed_response(res) if res.failure?
+
+      msg = nil
+      repo.transaction do
+        if (vehicle_job_unit_id = repo.get_value(:vehicle_job_units, :id, stock_item_id: pallet[:id], vehicle_job_id: id))
+          repo.delete_vehicle_job_unit(vehicle_job_unit_id)
+          msg = 'Removed From Tripsheet'
+        else
+          repo.create_vehicle_job_unit(res)
+          log_status(:pallets, pallet[:id], 'ADDED TO TRIPSHEET')
+          msg = 'Vehicle Job Created'
+        end
+        log_transaction
+      end
+      success_response(msg)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def can_continue_tripsheet(tripsheet_number)
+      return failed_response("Cannot continue intake tripsheet:#{tripsheet_number}") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, govt_inspection_sheet_id: nil)
+      return failed_response("Tripsheet:#{tripsheet_number} already offloaded") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, offloaded_at: nil)
+      return failed_response("Tripsheet:#{tripsheet_number} has been completed") unless repo.exists?(:vehicle_jobs, id: tripsheet_number, loaded_at: nil)
+
+      success_response 'Tripsheet valid'
+    end
+
+    def complete_pallet_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: Time.now)
+        repo.load_vehicle_job_units(vehicle_job_id)
+        log_multiple_statuses(:pallets, repo.get_tripsheet_pallet_ids(vehicle_job_id), 'LOADED ON VEHICLE')
+      end
+
+      success_response('Tripsheet Completed Successfully')
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def cancel_manual_tripsheet(vehicle_job_id) # rubocop:disable Metrics/AbcSize
+      return failed_response('Cannot cancel. Tripsheet has already been offloaded') if repo.get(:vehicle_jobs, vehicle_job_id, :offloaded_at)
+      return failed_response('Cannot cancel. Tripsheet has been completed') if repo.get(:vehicle_jobs, vehicle_job_id, :loaded_at)
+
+      repo.transaction do
+        tripsheet_pallets = repo.get_tripsheet_pallet_ids(vehicle_job_id)
+        repo.delete_vehicle_job(vehicle_job_id)
+        log_multiple_statuses(:pallets, tripsheet_pallets, 'MANUAL SHEET CANCELLED')
+      end
+
+      success_response "Tripsheet:#{vehicle_job_id} cancelled successfully"
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def open_manual_tripsheet(vehicle_job_id)
+      repo.transaction do
+        repo.update(:vehicle_jobs, vehicle_job_id, loaded_at: nil)
+      end
+
+      success_response "Tripsheet:#{vehicle_job_id} is now open"
+    rescue StandardError => e
+      failed_response(e.message)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     def create_intake_tripsheet(govt_inspection_sheet_id, params) # rubocop:disable Metrics/AbcSize
       res = validate_vehicle_job_params(params)
       return validation_failed_response(res) if res.failure?
@@ -351,6 +447,10 @@ module FinishedGoodsApp
 
     def validate_vehicle_job_params(params)
       VehicleJobSchema.call(params)
+    end
+
+    def validate_manual_tripsheet_params(params)
+      TripsheetSchema.call(params)
     end
 
     def validate_vehicle_job_unit_params(params)

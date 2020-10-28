@@ -63,6 +63,16 @@ module FinishedGoodsApp
       ok_response
     end
 
+    def pallet_in_different_tripsheet?(pallet_id, vehicle_job_id)
+      query = <<~SQL
+        SELECT u.id
+        FROM  vehicle_job_units u
+        JOIN vehicle_jobs j on j.id=u.vehicle_job_id
+        WHERE u.stock_item_id = ? and u.vehicle_job_id <> ? and j.offloaded_at is null
+      SQL
+      !DB[query, pallet_id, vehicle_job_id].empty?
+    end
+
     def clone_govt_inspection_sheet(id, user)
       attrs = where_hash(:govt_inspection_sheets, id: id) || {}
       attrs = attrs.slice(:inspector_id,

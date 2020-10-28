@@ -1016,6 +1016,148 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     # --------------------------------------------------------------------------
+    # CREATE PALLET TRIPSHEET
+    # --------------------------------------------------------------------------
+    r.on 'create_pallet_tripsheet' do
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        form_state = {}
+        notice = retrieve_from_local_store(:flash_notice)
+        error = retrieve_from_local_store(:error)
+        form_state.merge!(error_message: error) unless error.nil?
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :location,
+                                       notes: notice,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Choose Location',
+                                       action: '/rmd/finished_goods/create_pallet_tripsheet',
+                                       button_caption: 'Submit')
+
+        form.add_select(:planned_location_id,
+                        'Planned Location',
+                        items: MasterfilesApp::LocationRepo.new.find_warehouse_pallets_locations,
+                        required: true)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.manually_create_pallet_tripsheet(params[:location][:planned_location_id])
+
+        unless res.success
+          store_locally(:error, unwrap_failed_response(res))
+          r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
+          return
+        end
+
+        r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{res.instance}")
+      end
+    end
+
+    r.on 'scan_tripsheet_pallet', Integer do |id|
+      form_state = {}
+      error = retrieve_from_local_store(:error)
+      form_state.merge!(error_message: error) unless error.nil?
+
+      form = Crossbeams::RMDForm.new(form_state,
+                                     form_name: :pallet,
+                                     scan_with_camera: @rmd_scan_with_camera,
+                                     caption: 'Scan Tripeheet Pallet',
+                                     action: "/rmd/finished_goods/create_pallet_vehicle_job_unit/#{id}",
+                                     button_caption: 'Submit')
+
+      tripsheet_pallets = FinishedGoodsApp::GovtInspectionRepo.new.get_vehicle_job_units(id)
+      form.add_label(:tripsheet_number, 'Tripsheet Number', id)
+      form.add_field(:pallet_number, 'Pallet Number', scan: 'key248_all', scan_type: :pallet_number, submit_form: true, data_type: :number, required: false)
+
+      unless tripsheet_pallets.empty?
+        form.add_section_header('Pallets On Tripsheet')
+        tripsheet_pallets.each do |o|
+          form.add_label(:tripsheet_pallet, '', o[:pallet_number])
+        end
+      end
+
+      form.add_button('Cancel', "/rmd/finished_goods/cancel_pallet_tripsheet/#{id}")
+      form.add_button('Complete', "/rmd/finished_goods/complete_pallet_tripsheet/#{id}")
+      form.add_csrf_tag csrf_tag
+      view(inline: form.render, layout: :layout_rmd)
+    end
+
+    r.on 'complete_pallet_tripsheet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.complete_pallet_tripsheet(id)
+      if res.success
+        store_locally(:flash_notice, "Tripsheet:#{id} completed successfully")
+        r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
+      else
+        store_locally(:error, unwrap_failed_response(res))
+        r.redirect('/rmd/finished_goods/continue_pallet_tripsheet')
+      end
+    end
+
+    r.on 'continue_pallet_tripsheet' do
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.get do
+        form_state = {}
+        notice = retrieve_from_local_store(:flash_notice)
+        error = retrieve_from_local_store(:error)
+        if error.is_a?(String)
+          form_state.merge!(error_message: error)
+        elsif !error.nil?
+          form_state.merge!(error_message: error.message)
+          form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+        end
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :vehicle_job,
+                                       notes: notice,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Scan Tripsheet',
+                                       action: '/rmd/finished_goods/continue_pallet_tripsheet',
+                                       button_caption: 'Submit')
+
+        form.add_field(:tripsheet_number, 'Tripsheet Number', scan: 'key248_all', scan_type: :vehicle_job, submit_form: false, required: true, lookup: false)
+        form.add_csrf_tag csrf_tag
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.post do
+        res = interactor.can_continue_tripsheet(params[:vehicle_job][:tripsheet_number])
+        if res.success
+          r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{params[:vehicle_job][:tripsheet_number]}")
+        else
+          store_locally(:error, unwrap_failed_response(res))
+          r.redirect('/rmd/finished_goods/continue_pallet_tripsheet')
+        end
+      end
+    end
+
+    r.on 'cancel_pallet_tripsheet', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.cancel_manual_tripsheet(id)
+      if res.success
+        store_locally(:flash_notice, res.message)
+        r.redirect('/rmd/finished_goods/create_pallet_tripsheet')
+      else
+        store_locally(:error, unwrap_failed_response(res))
+        r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+      end
+    end
+
+    r.on 'create_pallet_vehicle_job_unit', Integer do |id|
+      interactor = FinishedGoodsApp::GovtInspectionSheetInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.create_pallet_vehicle_job_unit(id, params[:pallet][:pallet_number])
+
+      store_locally(:error, unwrap_failed_response(res)) unless res.success
+      r.redirect("/rmd/finished_goods/scan_tripsheet_pallet/#{id}")
+    end
+    # --------------------------------------------------------------------------
     # MOVE DECK PALLETS
     # --------------------------------------------------------------------------
     r.on 'move_deck_pallets' do

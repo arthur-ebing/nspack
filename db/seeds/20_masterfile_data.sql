@@ -126,6 +126,7 @@ INSERT INTO business_processes(process, description) VALUES('RECEIVE_EMPTY_BINS'
 INSERT INTO business_processes(process, description) VALUES('ISSUE_EMPTY_BINS', 'Issue Empty Bins') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('ADHOC_TRANSACTIONS', 'Adhoc Transactions') ON CONFLICT DO NOTHING;
 INSERT INTO business_processes(process, description) VALUES('REWORKS_MOVE_PALLET', 'Reworks Pallet movements') ON CONFLICT DO NOTHING;
+INSERT INTO business_processes(process, description) VALUES('MANUAL_TRIPSHEET', 'mamually created tripsheets') ON CONFLICT DO NOTHING;
 
 -- STOCK TYPES
 INSERT INTO stock_types(stock_type_code, description) VALUES('PALLET', 'FG PALLETS') ON CONFLICT DO NOTHING;

@@ -5,8 +5,14 @@
   "vehicle_jobs"."loaded_at", "vehicle_jobs"."offloaded_at", "business_processes"."process", string_agg(pallet_number::text, ', '::text)AS pallet_numbers,
   "govt_inspection_sheets"."booking_reference", "locations"."location_long_code" AS
   planned_location_to_location_long_code, "stock_types"."stock_type_code", fn_current_status('vehicle_jobs',
-  "vehicle_jobs"."id") AS status FROM "vehicle_jobs" JOIN vehicle_job_units u on u.vehicle_job_id="vehicle_jobs"."id"
-  JOIN "business_processes" ON "business_processes"."id" = "vehicle_jobs"."business_process_id" JOIN "govt_inspection_sheets"
+  "vehicle_jobs"."id") AS status, CASE WHEN (vehicle_jobs.loaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_cancel,
+  CASE WHEN (vehicle_jobs.loaded_at is not null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null) THEN true ELSE false END as can_open,
+  CASE WHEN vehicle_jobs.offloaded_at is not null THEN 'gray'
+  WHEN vehicle_jobs.loaded_at is null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null THEN 'green'
+  WHEN vehicle_jobs.loaded_at is not null AND vehicle_jobs.offloaded_at is null AND govt_inspection_sheet_id is null THEN 'blue'
+  END AS colour_rule
+  FROM "vehicle_jobs" JOIN vehicle_job_units u on u.vehicle_job_id="vehicle_jobs"."id"
+  JOIN "business_processes" ON "business_processes"."id" = "vehicle_jobs"."business_process_id" LEFT OUTER JOIN "govt_inspection_sheets"
   ON "govt_inspection_sheets"."id" = "vehicle_jobs"."govt_inspection_sheet_id" JOIN
   "locations" ON "locations"."id" = "vehicle_jobs"."planned_location_to_id" JOIN "stock_types"
   ON "stock_types"."id" = "vehicle_jobs"."stock_type_id" JOIN pallets p on p.id=u.stock_item_id
@@ -116,7 +122,7 @@
     :group_max: false
   loaded_at:
     :name: loaded_at
-    :sequence_no: 9
+    :sequence_no: 8
     :caption: Loaded at
     :namespaced_name: vehicle_jobs.loaded_at
     :data_type: :datetime
@@ -132,7 +138,7 @@
     :group_max: false
   offloaded_at:
     :name: offloaded_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Offloaded at
     :namespaced_name: vehicle_jobs.offloaded_at
     :data_type: :datetime
@@ -222,6 +228,37 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  can_cancel:
+    :name: can_cancel
+    :sequence_no: 14
+    :caption: Cancel
+    :namespaced_name:
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+  can_open:
+    :name: can_open
+    :sequence_no: 15
+    :caption: Open
+    :namespaced_name:
+    :data_type: :boolean
+    :width:
+    :format:
+    :hide: true
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
