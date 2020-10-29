@@ -12,7 +12,8 @@ module MasterfilesApp
         pm_composition_level_id: 1,
         pm_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
-        active: true
+        active: true,
+        composition_level: 'ABC'
       }
       MasterfilesApp::PmType.new(base_attrs.merge(attrs))
     end

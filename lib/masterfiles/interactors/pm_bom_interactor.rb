@@ -22,13 +22,13 @@ module MasterfilesApp
     end
 
     def update_pm_bom(id, params)  # rubocop:disable Metrics/AbcSize
+      system_code = repo.pm_bom_system_code(id)
+      # params[:bom_code] = system_code
       res = validate_pm_bom_params(params)
       return validation_failed_response(res) if res.failure?
 
-      system_code = repo.pm_bom_system_code(id)
-      default = { bom_code: system_code, system_code: system_code }
       repo.transaction do
-        repo.update_pm_bom(id, res.to_h.merge(default))
+        repo.update_pm_bom(id, res.to_h.merge({ system_code: system_code }))
         log_transaction
       end
       instance = pm_bom(id)

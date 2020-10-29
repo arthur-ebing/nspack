@@ -6,6 +6,7 @@ module MasterfilesApp
   class TestPmBomsProductInteractor < MiniTestWithHooks
     include PackagingFactory
     include GeneralFactory
+    include FruitFactory
 
     def test_repo
       repo = interactor.send(:repo)

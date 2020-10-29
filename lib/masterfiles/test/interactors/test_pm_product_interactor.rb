@@ -74,6 +74,7 @@ module MasterfilesApp
 
     def pm_product_attrs
       pm_subtype_id = create_pm_subtype
+      basic_pack_id = create_basic_pack_code
 
       {
         id: 1,
@@ -84,8 +85,9 @@ module MasterfilesApp
         active: true,
         subtype_code: 'ABC',
         material_mass: 1.0,
-        basic_pack_id: 1,
-        height_mm: 1
+        basic_pack_id: basic_pack_id,
+        height_mm: 1,
+        basic_pack_code: 'ABC'
       }
     end
 

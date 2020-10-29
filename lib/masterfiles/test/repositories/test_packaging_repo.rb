@@ -10,7 +10,6 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_pallet_formats
       assert_respond_to repo, :for_select_cartons_per_pallet
       assert_respond_to repo, :for_select_packing_methods
-      assert_respond_to repo, :for_select_pm_composition_levels
     end
 
     def test_crud_calls
@@ -19,7 +18,6 @@ module MasterfilesApp
       test_crud_calls_for :pallet_formats, name: :pallet_format, wrapper: PalletFormat
       test_crud_calls_for :cartons_per_pallet, name: :cartons_per_pallet, wrapper: CartonsPerPallet
       test_crud_calls_for :packing_methods, name: :packing_method, wrapper: PackingMethod
-      test_crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
     end
 
     private
