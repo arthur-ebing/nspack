@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Pm Type'
               form.view_only!
+              form.add_field :pm_composition_level_id
               form.add_field :pm_type_code
               form.add_field :description
               form.add_field :active

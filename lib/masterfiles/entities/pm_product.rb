@@ -9,5 +9,9 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute? :active, Types::Bool
     attribute :subtype_code, Types::String
+    attribute :material_mass, Types::Decimal
+    attribute :basic_pack_id, Types::Integer
+    attribute :basic_pack_code, Types::String
+    attribute :height_mm, Types::Integer
   end
 end

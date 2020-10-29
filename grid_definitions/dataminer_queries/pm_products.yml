@@ -1,16 +1,21 @@
 ---
 :caption: Pm Products
-:sql: SELECT "pm_products"."id", "pm_products"."pm_subtype_id", "pm_products"."erp_code",
-  "pm_products"."product_code", "pm_products"."description", "pm_products"."active",
-  "pm_products"."created_at", "pm_products"."updated_at", "pm_subtypes"."subtype_code"
-  FROM "pm_products" JOIN "pm_subtypes" ON "pm_subtypes"."id" = "pm_products"."pm_subtype_id"
+:sql: "SELECT \"pm_products\".\"id\", \"pm_products\".\"pm_subtype_id\",  \"pm_products\".\"product_code\",
+  \"pm_products\".\"description\", \"pm_products\".\"erp_code\", \"pm_products\".\"created_at\",
+  \"pm_products\".\"updated_at\", \"pm_types\".\"pm_type_code\" , \"pm_subtypes\".\"subtype_code\"
+  , \"basic_pack_codes\".\"basic_pack_code\", \"pm_products\".\"material_mass\", \"pm_products\".\"height_mm\",
+  \"pm_products\".\"basic_pack_id\", \"pm_products\".\"active\"\r\nFROM \"pm_products\"
+  \r\nLEFT JOIN \"pm_subtypes\" ON \"pm_subtypes\".\"id\" = \"pm_products\".\"pm_subtype_id\"\r\nLEFT
+  JOIN \"pm_types\" ON \"pm_types\".\"id\" = \"pm_subtypes\".\"pm_type_id\"\r\nLEFT
+  JOIN \"basic_pack_codes\" ON \"basic_pack_codes\".\"id\" = \"pm_products\".\"basic_pack_id\"\r\nORDER
+  BY \"pm_products\".\"product_code\""
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
   id:
     :name: id
-    :sequence_no: 6
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: pm_products.id
     :data_type: :integer
@@ -26,7 +31,7 @@
     :group_max: false
   pm_subtype_id:
     :name: pm_subtype_id
-    :sequence_no: 7
+    :sequence_no: 2
     :caption: Pm subtype
     :namespaced_name: pm_products.pm_subtype_id
     :data_type: :integer
@@ -40,29 +45,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  erp_code:
-    :name: erp_code
-    :sequence_no: 3
-    :caption: Erp code
-    :namespaced_name: pm_products.erp_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   product_code:
     :name: product_code
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Product code
     :namespaced_name: pm_products.product_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -78,7 +67,7 @@
     :caption: Description
     :namespaced_name: pm_products.description
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -88,13 +77,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  active:
-    :name: active
+  erp_code:
+    :name: erp_code
     :sequence_no: 5
-    :caption: Active
-    :namespaced_name: pm_products.active
-    :data_type: :boolean
-    :width: 
+    :caption: Erp code
+    :namespaced_name: pm_products.erp_code
+    :data_type: :string
+    :width: 100
     :format: 
     :hide: false
     :pinned: 
@@ -106,7 +95,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 6
     :caption: Created at
     :namespaced_name: pm_products.created_at
     :data_type: :datetime
@@ -122,7 +111,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 7
     :caption: Updated at
     :namespaced_name: pm_products.updated_at
     :data_type: :datetime
@@ -136,13 +125,109 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  pm_type_code:
+    :name: pm_type_code
+    :sequence_no: 8
+    :caption: Type
+    :namespaced_name: pm_types.pm_type_code
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   subtype_code:
     :name: subtype_code
-    :sequence_no: 1
-    :caption: Subtype code
+    :sequence_no: 9
+    :caption: Subtype
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_code:
+    :name: basic_pack_code
+    :sequence_no: 10
+    :caption: Basic pack
+    :namespaced_name: basic_pack_codes.basic_pack_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_mass:
+    :name: material_mass
+    :sequence_no: 11
+    :caption: Material mass
+    :namespaced_name: pm_products.material_mass
+    :data_type: :number
     :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  height_mm:
+    :name: height_mm
+    :sequence_no: 12
+    :caption: Height mm
+    :namespaced_name: pm_products.height_mm
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_id:
+    :name: basic_pack_id
+    :sequence_no: 13
+    :caption: Basic pack
+    :namespaced_name: pm_products.basic_pack_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 14
+    :caption: Active
+    :namespaced_name: pm_products.active
+    :data_type: :boolean
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -167,5 +252,13 @@
   :control_type: :text
   :default_value: 
   :ordered_list: false
-  :ui_priority: 1
+  :ui_priority: 2
   :list_def: 
+- :column: pm_products.basic_pack_id
+  :caption: Basic pack
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 3
+  :list_def: SELECT basic_pack_code, id FROM basic_pack_codes ORDER BY basic_pack_code

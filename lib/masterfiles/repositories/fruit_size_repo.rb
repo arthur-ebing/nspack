@@ -236,5 +236,20 @@ module MasterfilesApp
         .where(is_standard_carton: true)
         .all
     end
+
+    def find_std_fruit_size_counts
+      query = <<~SQL
+        SELECT commodities.code AS commodity_code,
+               std_fruit_size_counts.size_count_value,
+               std_fruit_size_counts.uom_id,
+               commodities.code || '_' || std_fruit_size_counts.size_count_value AS product_code,
+               commodities.code || '_' || uoms.uom_code || '_' || std_fruit_size_counts.size_count_value AS system_code,
+               commodities.code || ' - ' || std_fruit_size_counts.size_count_value AS description
+        FROM std_fruit_size_counts
+        JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id
+        JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
+      SQL
+      DB[query].all
+    end
   end
 end

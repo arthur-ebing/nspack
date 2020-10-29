@@ -16,6 +16,7 @@ module Masterfiles
               form.caption 'New Pm Boms Product'
               form.action "/masterfiles/packaging/pm_boms/#{pm_bom_id}/pm_boms_products"
               form.remote! if remote
+              form.add_field :pm_subtype_id
               form.add_field :pm_product_id
               form.add_field :pm_bom_id
               form.add_field :pm_bom

@@ -22,8 +22,24 @@
   :text: New Pm Boms Product
   :style: :button
   :behaviour: :popup
+  :hide_for_key:
+    - standard
+    - pm_product
 :conditions:
   :standard:
     - :col: pm_boms_products.pm_bom_id
       :op: =
       :val: $:pm_boms_products.pm_bom_id$
+  :pm_product:
+    - :col: pm_boms_products.pm_product_id
+      :op: =
+      :val: $:pm_boms_products.pm_product_id$
+:edit_rules:
+  :url: /masterfiles/packaging/pm_boms_products/inline_edit_bom_product/$:id$
+  :editable_fields:
+    uom_code:
+      :editor: :search_select
+      :width: 600
+      :value_sql: SELECT uom_code FROM uoms
+    quantity:
+      :editor: :numeric

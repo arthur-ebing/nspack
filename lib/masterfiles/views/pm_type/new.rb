@@ -16,6 +16,7 @@ module Masterfiles
               form.caption 'New Pm Type'
               form.action '/masterfiles/packaging/pm_types'
               form.remote! if remote
+              form.add_field :pm_composition_level_id
               form.add_field :pm_type_code
               form.add_field :description
             end

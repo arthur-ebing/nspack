@@ -55,8 +55,20 @@ module MasterfilesApp
       DB[:cartons_per_pallet].insert(default.merge(opts))
     end
 
-    def create_pm_type(opts = {})
+    def create_pm_composition_level(opts = {})
       default = {
+        composition_level: Faker::Number.number(4),
+        description: Faker::Lorem.unique.word,
+        active: true
+      }
+      DB[:pm_composition_levels].insert(default.merge(opts))
+    end
+
+    def create_pm_type(opts = {})
+      pm_composition_level_id = create_pm_composition_level
+
+      default = {
+        pm_composition_level_id: pm_composition_level_id,
         pm_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true
@@ -78,13 +90,17 @@ module MasterfilesApp
 
     def create_pm_product(opts = {})
       pm_subtype_id = create_pm_subtype
+      basic_pack_code_id = create_basic_pack_code
 
       default = {
         pm_subtype_id: pm_subtype_id,
         erp_code: Faker::Lorem.unique.word,
         product_code: Faker::Lorem.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        material_mass: Faker::Number.decimal,
+        basic_pack_id: basic_pack_code_id,
+        height_mm: Faker::Number.number(4)
       }
       DB[:pm_products].insert(default.merge(opts))
     end
@@ -94,7 +110,8 @@ module MasterfilesApp
         bom_code: Faker::Lorem.unique.word,
         erp_bom_code: Faker::Lorem.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        system_code: Faker::Lorem.word
       }
       DB[:pm_boms].insert(default.merge(opts))
     end

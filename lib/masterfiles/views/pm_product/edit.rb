@@ -21,6 +21,9 @@ module Masterfiles
               form.add_field :erp_code
               form.add_field :product_code
               form.add_field :description
+              form.add_field :material_mass
+              form.add_field :height_mm
+              form.add_field :basic_pack_id
             end
           end
 

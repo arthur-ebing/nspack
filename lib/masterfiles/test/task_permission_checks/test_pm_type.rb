@@ -9,6 +9,7 @@ module MasterfilesApp
     def entity(attrs = {})
       base_attrs = {
         id: 1,
+        pm_composition_level_id: 1,
         pm_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true

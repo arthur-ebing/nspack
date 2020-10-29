@@ -30,3 +30,8 @@
   :text: New Std Fruit Size Count
   :style: :button
   :behaviour: :popup
+- :control_type: :link
+  :url: "/masterfiles/fruit/std_fruit_size_counts/sync_pm_boms"
+  :text: Sync Pm Boms
+  :style: :button
+  :prompt: Create missing pm boms?

@@ -710,6 +710,14 @@ class Nspack < Roda
         check_auth!('fruit', 'new')
         show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'sync_pm_boms' do
+        check_auth!('fruit', 'new')
+        res = interactor.sync_pm_boms
+        flash[:notice] = res.message
+        redirect_to_last_grid(r)
+      end
+
       r.post do        # CREATE
         res = interactor.create_std_fruit_size_count(params[:std_fruit_size_count])
         if res.success

@@ -1,0 +1,13 @@
+---
+:dataminer_definition: pm_products
+:multiselect:
+  :standard:
+    :url: "/masterfiles/packaging/pm_boms/multiselect_pm_products"
+    :section_caption: "Choose Pm Products"
+    :conditions: standard
+:conditions:
+  :standard:
+    - :col: pm_products.pm_subtype_id
+      :op: IN
+      :val: $:pm_subtype_ids$
+

@@ -1,0 +1,35 @@
+---
+:dataminer_definition: pm_composition_levels
+:actions:
+- :url: "/masterfiles/packaging/pm_composition_levels/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/packaging/pm_composition_levels/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/packaging/pm_composition_levels/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/list/pm_types/with_params?key=standard&pm_types.pm_composition_level_id=$:id$"
+  :text: pm types
+  :title: Pm types for composition level $:description$
+  :icon: list
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/packaging/pm_composition_levels/new"
+  :text: New Composition Level
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
+  :url: "/masterfiles/packaging/pm_composition_levels/reorder"
+  :text: Re-order
+  :style: :button
+  :behaviour: :popup

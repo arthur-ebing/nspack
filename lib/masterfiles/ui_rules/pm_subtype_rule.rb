@@ -30,7 +30,8 @@ module UiRules
                       disabled_options: @repo.for_select_inactive_pm_types,
                       caption: 'pm_type',
                       required: true },
-        subtype_code: { required: true },
+        subtype_code: { required: true,
+                        force_uppercase: true },
         description: {}
       }
     end

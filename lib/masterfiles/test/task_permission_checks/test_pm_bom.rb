@@ -12,7 +12,8 @@ module MasterfilesApp
         bom_code: Faker::Lorem.unique.word,
         erp_bom_code: 'ABC',
         description: 'ABC',
-        active: true
+        active: true,
+        system_code: 'ABC'
       }
       MasterfilesApp::PmBom.new(base_attrs.merge(attrs))
     end

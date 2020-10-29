@@ -68,8 +68,11 @@ module MasterfilesApp
     private
 
     def pm_type_attrs
+      pm_composition_level_id = create_pm_composition_level
+
       {
         id: 1,
+        pm_composition_level_id: pm_composition_level_id,
         pm_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
         active: true

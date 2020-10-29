@@ -14,9 +14,11 @@ module Masterfiles
               # form.caption 'Pm Bom'
               form.view_only!
               form.add_field :bom_code
+              form.add_field :system_code
               form.add_field :erp_bom_code
               form.add_field :description
               form.add_field :active
+              form.add_field :pm_boms_products
             end
           end
 

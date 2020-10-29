@@ -53,6 +53,32 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def for_select_subtype_products(pm_subtype_id)
+      MasterfilesApp::BomsRepo.new.for_select_pm_products(where: { pm_subtype_id: pm_subtype_id })
+    end
+
+    def inline_edit_bom_product(bom_product_id, params)
+      if params[:column_name] == 'uom_code'
+        update_uom_code(bom_product_id, params)
+      elsif params[:column_name] == 'quantity'
+        update_quantity(bom_product_id, params)
+      else
+        failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
+      end
+    end
+
+    def update_uom_code(bom_product_id, params)
+      res = repo.update_uom_code(bom_product_id, params[:column_value])
+      res.instance = { changes: { uom_code: res.instance[:uom_code] } }
+      res
+    end
+
+    def update_quantity(bom_product_id, params)
+      res = repo.update_quantity(bom_product_id, params[:column_value])
+      res.instance = { changes: { quantity: res.instance[:quantity] } }
+      res
+    end
+
     private
 
     def repo

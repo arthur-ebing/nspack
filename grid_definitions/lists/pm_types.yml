@@ -16,9 +16,21 @@
     :icon: delete
     :is_delete: true
     :popup: true
+  - :separator: true
+  - :url: "/list/pm_subtypes/with_params?key=standard&pm_subtypes.pm_type_id=$:id$"
+    :text: pm subtypes
+    :title: Pm subtypes for type $:pm_type_code$
+    :icon: list
+    :popup: true
 :page_controls:
   - :control_type: :link
     :url: "/masterfiles/packaging/pm_types/new"
     :text: New Pm Type
     :style: :button
     :behaviour: :popup
+    :hide_for_key: standard
+:conditions:
+  :standard:
+    - :col: pm_types.pm_composition_level_id
+      :op: =
+      :val: $:pm_types.pm_composition_level_id$

@@ -17,6 +17,7 @@ module Masterfiles
               form.action "/masterfiles/packaging/pm_boms_products/#{id}"
               form.remote!
               form.method :update
+              form.add_field :pm_subtype_id
               form.add_field :pm_product_id
               form.add_field :pm_bom_id
               form.add_field :pm_bom

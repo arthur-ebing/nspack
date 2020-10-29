@@ -13,6 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Pm Boms Product'
               form.view_only!
+              form.add_field :pm_subtype_id
               form.add_field :pm_product_id
               form.add_field :pm_bom_id
               form.add_field :uom_id

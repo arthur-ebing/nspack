@@ -188,6 +188,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   DEFAULT_FG_PACKAGING_TYPE = ENV.fetch('DEFAULT_FG_PACKAGING_TYPE', 'CARTON') # Can be BIN or CARTON
   REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
   BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
+  REQUIRE_EXTENDED_PACKAGING = make_boolean('REQUIRE_EXTENDED_PACKAGING')
+  FRUIT_PM_TYPE = 'FRUIT'
+  FRUIT_COMPOSITION_LEVEL = 4
 
   # Default packing method
   DEFAULT_PACKING_METHOD = ENV.fetch('DEFAULT_PACKING_METHOD', 'NORMAL')
@@ -198,6 +201,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Default UOM TYPE
   UOM_TYPE = 'INVENTORY'
+  DEFAULT_UOM_CODE = 'EACH'
 
   # Constants for Reworks run types:
   RUN_TYPE_SINGLE_PALLET_EDIT = 'SINGLE PALLET EDIT'

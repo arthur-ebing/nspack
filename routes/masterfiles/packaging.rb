@@ -337,7 +337,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmType::Edit.call(id) }
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmType::Show.call(id) }
@@ -345,8 +345,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_pm_type(id, params[:pm_type])
           if res.success
-            update_grid_row(id, changes: { pm_type_code: res.instance[:pm_type_code], description: res.instance[:description] },
-                                notice: res.message)
+            update_grid_row(id,
+                            changes: { pm_type_code: res.instance[:pm_type_code],
+                                       description: res.instance[:description],
+                                       composition_level: res.instance[:composition_level] },
+                            notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Packaging::PmType::Edit.call(id, form_values: params[:pm_type], form_errors: res.errors) }
           end
@@ -378,6 +381,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             pm_type_code
             description
             active
+            composition_level
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -492,6 +496,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               product_code
               description
               active
+              material_mass
+              basic_pack_code
+              height_mm
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -527,6 +534,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             product_code
             description
             active
+            material_mass
+            basic_pack_code
+            height_mm
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -553,7 +563,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('packaging', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { Masterfiles::Packaging::PmBom::Edit.call(id) }
+        show_partial { Masterfiles::Packaging::PmBom::Edit.call(id, is_update: true) }
       end
 
       r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
@@ -573,8 +583,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               quantity
               active
             ]
-            json_actions([OpenStruct.new(type: :add_grid_row, attrs: select_attributes(res.instance, row_keys))],
-                         res.message)
+            json_actions([OpenStruct.new(type: :add_grid_row,
+                                         attrs: select_attributes(res.instance, row_keys))],
+                         res.message,
+                         keep_dialog_open: false)
           else
             re_show_form(r, res, url: "/masterfiles/packaging/pm_boms/#{id}/pm_boms_products/new") do
               Masterfiles::Packaging::PmBomsProduct::New.call(id,
@@ -594,8 +606,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_pm_bom(id, params[:pm_bom])
           if res.success
-            update_grid_row(id, changes: { bom_code: res.instance[:bom_code], erp_bom_code: res.instance[:erp_bom_code], description: res.instance[:description] },
-                                notice: res.message)
+            show_partial(notice: 'BOM Updated') {  Masterfiles::Packaging::PmBom::Edit.call(id, is_update: true) }
           else
             re_show_form(r, res) { Masterfiles::Packaging::PmBom::Edit.call(id, form_values: params[:pm_bom], form_errors: res.errors) }
           end
@@ -613,12 +624,55 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_boms' do
+    r.on 'pm_boms' do # rubocop:disable Metrics/BlockLength
       interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
         show_partial_or_page(r) { Masterfiles::Packaging::PmBom::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'select_subtypes' do
+        r.get do
+          show_partial { Masterfiles::Packaging::PmBom::SelectSubtypes.call(remote: fetch?(r)) }
+        end
+        r.post do
+          res = interactor.select_subtypes(params[:pm_bom])
+          if res.success
+            store_locally(:pm_subtype_ids, params[:pm_bom][:pm_subtype_ids].map(&:to_i))
+            show_partial_or_page(r) { Masterfiles::Packaging::PmBom::AddProducts.call(params[:pm_bom][:pm_subtype_ids].map(&:to_i)) }
+          else
+            re_show_form(r, res) do
+              Masterfiles::Packaging::PmBom::SelectSubtypes.call(form_values: params[:pm_bom][:pm_subtype_ids],
+                                                                 form_errors: res.errors,
+                                                                 remote: fetch?(r))
+            end
+          end
+        end
+      end
+
+      r.on 'multiselect_pm_products' do
+        pm_subtype_ids = retrieve_from_local_store(:pm_subtype_ids)
+        store_locally(:pm_subtype_ids, pm_subtype_ids)
+        res = interactor.multiselect_pm_products(multiselect_grid_choices(params), pm_subtype_ids)
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res) do
+            Masterfiles::Packaging::PmBom::AddProducts.call(pm_subtype_ids,
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+          end
+        end
+      end
+
+      r.on 'refresh_system_codes' do
+        check_auth!('fruit', 'new')
+        res = interactor.refresh_system_codes
+        flash[:notice] = res.message
+        redirect_to_last_grid(r)
+      end
+
       r.post do        # CREATE
         res = interactor.create_pm_bom(params[:pm_bom])
         if res.success
@@ -690,6 +744,32 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
+    r.on 'pm_boms_products' do
+      interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'pm_subtype_changed' do
+        pm_products = if params[:changed_value].blank?
+                        []
+                      else
+                        interactor.for_select_subtype_products(params[:changed_value])
+                      end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'pm_boms_product_pm_product_id',
+                                     options_array: pm_products)])
+      end
+
+      r.on 'inline_edit_bom_product', Integer do |bom_product_id|
+        res = interactor.inline_edit_bom_product(bom_product_id, params)
+        if res.success
+          update_grid_row(bom_product_id,
+                          changes: res.instance[:changes],
+                          notice: res.message)
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :warning)
+        end
+      end
+    end
+
     # PACKING METHODS
     # --------------------------------------------------------------------------
     r.on 'packing_methods', Integer do |id| # rubocop:disable Metrics/BlockLength
@@ -756,6 +836,87 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             Masterfiles::Packaging::PackingMethod::New.call(form_values: params[:packing_method],
                                                             form_errors: res.errors,
                                                             remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # PM COMPOSITION LEVELS
+    # --------------------------------------------------------------------------
+    r.on 'pm_composition_levels', Integer do |id| # rubocop:disable Metrics/BlockLength
+      interactor = MasterfilesApp::PmCompositionLevelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:pm_composition_levels, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('packaging', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Packaging::PmCompositionLevel::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('packaging', 'read')
+          show_partial { Masterfiles::Packaging::PmCompositionLevel::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_pm_composition_level(id, params[:pm_composition_level])
+          if res.success
+            update_grid_row(id, changes: { composition_level: res.instance[:composition_level], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Packaging::PmCompositionLevel::Edit.call(id, form_values: params[:pm_composition_level], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('packaging', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_pm_composition_level(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'pm_composition_levels' do # rubocop:disable Metrics/BlockLength
+      interactor = MasterfilesApp::PmCompositionLevelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('packaging', 'new')
+        show_partial_or_page(r) { Masterfiles::Packaging::PmCompositionLevel::New.call(remote: fetch?(r)) }
+      end
+
+      r.on 'reorder' do
+        show_partial_or_page(r) { Masterfiles::Packaging::PmCompositionLevel::Reorder.call }
+      end
+
+      r.on 'save_reorder' do
+        res = interactor.reorder_composition_levels(params[:p_sorted_ids])
+        flash[:notice] = res.message
+        redirect_to_last_grid(r)
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_pm_composition_level(params[:pm_composition_level])
+        if res.success
+          row_keys = %i[
+            id
+            composition_level
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/packaging/pm_composition_levels/new') do
+            Masterfiles::Packaging::PmCompositionLevel::New.call(form_values: params[:pm_composition_level],
+                                                                 form_errors: res.errors,
+                                                                 remote: fetch?(r))
           end
         end
       end

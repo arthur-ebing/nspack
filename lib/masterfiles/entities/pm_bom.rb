@@ -7,5 +7,6 @@ module MasterfilesApp
     attribute :erp_bom_code, Types::String
     attribute :description, Types::String
     attribute? :active, Types::Bool
+    attribute :system_code, Types::String
   end
 end

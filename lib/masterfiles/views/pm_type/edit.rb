@@ -4,7 +4,7 @@ module Masterfiles
   module Packaging
     module PmType
       class Edit
-        def self.call(id, form_values: nil, form_errors: nil)
+        def self.call(id, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:pm_type, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -17,6 +17,7 @@ module Masterfiles
               form.action "/masterfiles/packaging/pm_types/#{id}"
               form.remote!
               form.method :update
+              form.add_field :pm_composition_level_id
               form.add_field :pm_type_code
               form.add_field :description
             end

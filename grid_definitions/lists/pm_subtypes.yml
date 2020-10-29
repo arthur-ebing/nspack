@@ -16,9 +16,21 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :separator: true
+- :url: "/list/pm_products/with_params?key=standard&pm_products.pm_subtype_id=$:id$"
+  :text: pm products
+  :title: Pm products for subtype $:subtype_code$
+  :icon: list
+  :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/pm_subtypes/new"
   :text: New Pm Subtype
   :style: :button
   :behaviour: :popup
+  :hide_for_key: standard
+:conditions:
+  :standard:
+    - :col: pm_subtypes.pm_type_id
+      :op: =
+      :val: $:pm_subtypes.pm_type_id$

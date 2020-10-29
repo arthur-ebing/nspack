@@ -5,6 +5,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 module MasterfilesApp
   class TestPmProductInteractor < MiniTestWithHooks
     include PackagingFactory
+    include FruitFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -81,7 +82,10 @@ module MasterfilesApp
         product_code: 'ABC',
         description: 'ABC',
         active: true,
-        subtype_code: 'ABC'
+        subtype_code: 'ABC',
+        material_mass: 1.0,
+        basic_pack_id: 1,
+        height_mm: 1
       }
     end
 

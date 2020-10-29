@@ -64,6 +64,8 @@ module MasterfilesApp
     end
 
     def validate_pm_product_params(params)
+      return ExtendedPmProductSchema.call(params) if AppConst::REQUIRE_EXTENDED_PACKAGING
+
       PmProductSchema.call(params)
     end
   end

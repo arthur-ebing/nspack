@@ -14,7 +14,10 @@ module MasterfilesApp
         product_code: 'ABC',
         description: 'ABC',
         active: true,
-        subtype_code: 'ABC'
+        subtype_code: 'ABC',
+        material_mass: 1.0,
+        basic_pack_id: 1,
+        height_mm: 1
       }
       MasterfilesApp::PmProduct.new(base_attrs.merge(attrs))
     end
