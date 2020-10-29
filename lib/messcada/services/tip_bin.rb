@@ -25,6 +25,14 @@ module MesscadaApp
       success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
 
+    def can_tip_bin?
+      errors = validations
+      return failed_response(errors) unless errors.nil?
+
+      run_stats_bins_tipped = repo.get_run_bins_tipped(@run_id)
+      success_response('rmt bin is valid for tipping', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
+    end
+
     private
 
     def update_bin

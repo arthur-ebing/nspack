@@ -58,6 +58,18 @@ class Nspack < Roda
         interactor.multi_update_bin_weights_and_tip_bin(params)
       end
     end
+
+    # --------------------------------------------------------------------------
+    # CAN TIP BIN
+    # view-source:http://192.168.43.254:9296/messcada/rmt/can_tip_bin?bin_number=1234&device=BTM-01
+    # --------------------------------------------------------------------------
+    r.on 'can_tip_bin' do
+      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      res = interactor.can_tip_bin?(params)
+      feedback = interactor.bin_tipping_response(res, params)
+      Crossbeams::RobotResponder.new(feedback).render
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

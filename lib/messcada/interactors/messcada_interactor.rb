@@ -222,6 +222,21 @@ module MesscadaApp
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
 
+    def can_tip_bin?(params) # rubocop:disable Metrics/AbcSize
+      res = validate_tip_rmt_bin_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      MesscadaApp::TipBin.new(res).can_tip_bin?
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('can_tip_bin'))
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('can_tip_bin'))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
+    end
+
     def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonLabelingSchema.call(params)
       return validation_failed_response(res) if res.failure?
