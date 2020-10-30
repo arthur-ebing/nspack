@@ -2,6 +2,12 @@
 
 class Nspack < Roda
   route 'reports', 'production' do |r| # rubocop:disable Metrics/BlockLength
+    # AVAILABLE PALLET NUMBERS
+    # --------------------------------------------------------------------------
+    r.on 'available_pallet_numbers' do
+      show_page { Production::Reports::AvailablePallets::Show.call }
+    end
+
     # AGGREGATE PACKOUT REPORT
     # --------------------------------------------------------------------------
     r.on 'aggregate_packout' do

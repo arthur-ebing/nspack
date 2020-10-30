@@ -14,7 +14,7 @@ module Production
         end
 
         def self.draw_boxes # rubocop:disable Metrics/AbcSize
-          last_day_for_summary = ProductionApp::DashboardRepo.new.last_day_for_summary
+          last_day_for_summary = ProductionApp::DashboardRepo.new.last_day_for_summary || Date.today
           week_no = last_day_for_summary.strftime('%V').to_i
           ctn_recs = ProductionApp::DashboardRepo.new.carton_summary
           plt_recs = ProductionApp::DashboardRepo.new.pallet_summary

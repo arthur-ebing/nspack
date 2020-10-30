@@ -40,12 +40,11 @@ class Nspack < Roda
 
       r.post do        # CREATE
         res = DevelopmentApp::ScriptScaffoldNewSchema.call(params[:scaffold] || {})
-        errors = res.messages
-        if errors.empty?
+        if res.success?
           result = DevelopmentApp::GenerateNewScriptScaffold.call(res)
           show_page { Development::Generators::ScriptScaffolds::Show.call(result) }
         else
-          show_page { Development::Generators::ScriptScaffolds::New.call(params[:scaffold], errors) }
+          show_page { Development::Generators::ScriptScaffolds::New.call(params[:scaffold], res.errors.to_h) }
         end
       end
     end

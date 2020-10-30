@@ -385,5 +385,33 @@ module MesscadaApp
     def sequence_has_cartons?(id)
       !DB[:cartons].where(pallet_sequence_id: id).count.zero?
     end
+
+    # Return status of GLN numbers as specified in AppConst.
+    def gln_status # rubocop:disable Metrics/AbcSize
+      AppConst::GLN_OR_LINE_NUMBERS.map do |gln|
+        no = if exists?(:pg_class, relname: "gln_seq_for_#{gln}")
+               DB["SELECT last_value FROM gln_seq_for_#{gln}"].get(:last_value)
+             else
+               0
+             end
+        max = ('9' * (17 - gln.length)).to_i
+        # If max - no <= 0 then GLN has run its course...
+        remain = (max - no) < 1 ? 0 : max - no
+
+        per_year = AppConst::EST_PALLETS_PACKED_PER_YEAR
+        season_left = if remain.zero?
+                        0
+                      else
+                        remain / per_year.to_f
+                      end
+        {
+          gln: gln,
+          used_numbers: no,
+          remaining_numbers: remain,
+          est_per_year: per_year,
+          est_season: season_left
+        }
+      end
+    end
   end
 end

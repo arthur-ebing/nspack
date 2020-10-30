@@ -334,12 +334,12 @@ namespace :db do
 
             pgt_created_at(:#{nm},
                            :created_at,
-                           function_name: :#{nm}_set_created_at,
+                           function_name: :pgt_#{nm}_set_created_at,
                            trigger_name: :set_created_at)
 
             pgt_updated_at(:#{nm},
                            :updated_at,
-                           function_name: :#{nm}_set_updated_at,
+                           function_name: :pgt_#{nm}_set_updated_at,
                            trigger_name: :set_updated_at)
 
             # Log changes to this table. Exclude changes to the updated_at column.

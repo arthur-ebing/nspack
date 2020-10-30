@@ -84,6 +84,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Resources
   PHC_LEVEL = ENV.fetch('PHC_LEVEL')
   GLN_OR_LINE_NUMBERS = ENV.fetch('GLN_OR_LINE_NUMBERS').split(',')
+  EST_PALLETS_PACKED_PER_YEAR = ENV.fetch('EST_PALLETS_PACKED_PER_YEAR', 25_000)
 
   # Constants for pallet movements:
   ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION = make_boolean('ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION')
