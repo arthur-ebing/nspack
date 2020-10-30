@@ -390,7 +390,7 @@ class Nspack < Roda
                                                  current_user.login_name,
                                                  production_run_id: id,
                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_packed_weight: true,
                                                  use_derived_weight: false,
                                                  dispatched_only: false)
                 CreateJasperReportNew.call(jasper_params)
@@ -400,7 +400,7 @@ class Nspack < Roda
                                         file: 'pack_out',
                                         params: { production_run_id: id,
                                                   carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_packed_weight: 'true|boolean',
                                                   use_derived_weight: 'false|boolean',
                                                   dispatched_only: 'false|boolean',
                                                   keep_file: false })
@@ -418,7 +418,7 @@ class Nspack < Roda
                                                  current_user.login_name,
                                                  production_run_id: id,
                                                  carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                 use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED,
+                                                 use_packed_weight: false,
                                                  use_derived_weight: true,
                                                  dispatched_only: false)
                 CreateJasperReportNew.call(jasper_params)
@@ -428,7 +428,7 @@ class Nspack < Roda
                                         file: 'pack_out',
                                         params: { production_run_id: id,
                                                   carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
-                                                  use_packed_weight: AppConst::CARTON_VERIFICATION_REQUIRED ? 'true|boolean' : 'false|boolean',
+                                                  use_packed_weight: 'false|boolean',
                                                   use_derived_weight: 'true|boolean',
                                                   dispatched_only: 'false|boolean',
                                                   keep_file: false })
