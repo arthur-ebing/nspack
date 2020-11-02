@@ -159,6 +159,17 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def find_packout_runs(params)
+      production_runs = repo.all_hash(:production_runs,  params).map { |i| i[:id] }
+      return failed_response('No Runs Found') if production_runs.empty?
+
+      success_response('ok', production_runs.join(','))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def get_pallet_label_data(pallet_id)
       repo.get_pallet_label_data(pallet_id)
     end

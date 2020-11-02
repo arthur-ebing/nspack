@@ -1,7 +1,63 @@
 # frozen_string_literal: true
 
-class Nspack < Roda
+class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'reports', 'production' do |r| # rubocop:disable Metrics/BlockLength
+    # PACKOUT RUNS REPORT
+    # --------------------------------------------------------------------------
+    r.on 'packout_runs' do
+      r.get do
+        show_page { Production::Reports::Packout::SearchPackoutRuns.call }
+      end
+
+      r.post do
+        interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+        params[:packout_runs_report].delete_if { |_k, v| v.nil_or_empty? }
+        store_locally(:dispatches_only, params[:packout_runs_report].delete(:dispatches_only))
+        store_locally(:use_derived_weight, params[:packout_runs_report].delete(:use_derived_weight))
+        res = interactor.find_packout_runs(params[:packout_runs_report])
+        if res.success
+          r.redirect("/list/packout_runs/multi?key=standard&ids=#{res.instance}")
+        else
+          flash[:error] = res.message
+          r.redirect('/production/reports/packout_runs')
+        end
+      end
+    end
+
+    r.on 'packout_runs_report' do # rubocop:disable Metrics/BlockLength
+      use_derived_weight = retrieve_from_local_store(:use_derived_weight)
+      dispatches_only = retrieve_from_local_store(:dispatches_only)
+      res = if AppConst::JASPER_NEW_METHOD
+              jasper_params = JasperParams.new('packout_runs',
+                                               current_user.login_name,
+                                               production_run_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                               carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                               use_packed_weight: use_derived_weight != 't',
+                                               use_derived_weight: use_derived_weight == 't',
+                                               dispatched_only: dispatches_only == 't')
+              CreateJasperReportNew.call(jasper_params)
+            else
+              CreateJasperReport.call(report_name: 'packout_runs',
+                                      user: current_user.login_name,
+                                      file: 'packout_runs',
+                                      params: { production_run_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                                carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
+                                                use_packed_weight: use_derived_weight != 't' ? 'true|boolean' : 'false|boolean',
+                                                use_derived_weight: use_derived_weight == 't' ? 'true|boolean' : 'false|boolean',
+                                                dispatched_only: dispatches_only == 't' ? 'true|boolean' : 'false|boolean',
+                                                keep_file: false })
+            end
+
+      store_locally(:dispatches_only, dispatches_only)
+      store_locally(:use_derived_weight, use_derived_weight)
+      if res.success
+        change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
+      else
+        show_error(res.message, fetch?(r))
+      end
+    end
+
     # AVAILABLE PALLET NUMBERS
     # --------------------------------------------------------------------------
     r.on 'available_pallet_numbers' do

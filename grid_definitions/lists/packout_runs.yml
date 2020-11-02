@@ -1,0 +1,13 @@
+---
+:dataminer_definition: production_runs
+:conditions:
+  :standard:
+    - :col: production_runs.id
+      :op: IN
+      :val: $:ids$
+:multiselect:
+  :standard:
+    :url: "/production/reports/packout_runs_report"
+    :conditions: standard
+    :multiselect_save_method: loading
+

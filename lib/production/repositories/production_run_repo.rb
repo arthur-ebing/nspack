@@ -41,6 +41,14 @@ module ProductionApp
                             wrapper: PalletMixRuleFlat)
     end
 
+    def all_production_runs
+      query = <<~SQL
+        SELECT fn_production_run_code(production_runs.id) AS production_run_code, production_runs.id
+        FROM production_runs
+      SQL
+      DB[query].all.map { |r| [r[:production_run_code], r[:id]] }
+    end
+
     def find_pallet_mix_rules_by_scope(scope)
       DB[:pallet_mix_rules].where(scope: scope).first
     end
