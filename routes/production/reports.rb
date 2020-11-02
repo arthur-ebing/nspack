@@ -31,7 +31,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       res = if AppConst::JASPER_NEW_METHOD
               jasper_params = JasperParams.new('packout_runs',
                                                current_user.login_name,
-                                               production_run_id: "#{multiselect_grid_choices(params).join(',')}|intarray",
+                                               production_run_id: multiselect_grid_choices(params),
                                                carton_or_bin: AppConst::DEFAULT_FG_PACKAGING_TYPE.capitalize,
                                                use_packed_weight: use_derived_weight != 't',
                                                use_derived_weight: use_derived_weight == 't',
