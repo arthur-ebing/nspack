@@ -29,8 +29,7 @@ module UiRules
 
     def common_fields
       {
-        bom_code: { required: true,
-                    force_uppercase: true },
+        bom_code: { required: true },
         erp_bom_code: {},
         description: {},
         system_code: { renderer: :label }
@@ -64,7 +63,8 @@ module UiRules
       end
 
       if @mode == :add_products
-        @form_object = OpenStruct.new(pm_subtype_ids: @options[:pm_subtype_ids])
+        @form_object = OpenStruct.new(pm_subtype_ids: @options[:attrs][:pm_subtype_ids],
+                                      selected_product_ids: @options[:attrs][:selected_product_ids])
         return
       end
 
@@ -80,7 +80,7 @@ module UiRules
     end
 
     def pm_subtypes
-      @repo.pm_subtypes(@options[:pm_subtype_ids])
+      @repo.pm_subtypes(@options[:attrs][:pm_subtype_ids])
     end
 
     def pm_boms_products

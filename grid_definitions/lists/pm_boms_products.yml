@@ -6,11 +6,11 @@
   :icon: view-show
   :title: View
   :popup: true
-- :url: "/masterfiles/packaging/pm_boms_products/$:id$/edit"
-  :text: edit
-  :icon: edit
-  :title: Edit
-  :popup: true
+#- :url: "/masterfiles/packaging/pm_boms_products/$:id$/edit"
+#  :text: edit
+#  :icon: edit
+#  :title: Edit
+#  :popup: true
 - :url: "/masterfiles/packaging/pm_boms_products/$:id$"
   :text: delete
   :icon: delete

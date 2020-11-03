@@ -151,12 +151,13 @@ module MasterfilesApp
       PmBomsProduct.new(hash)
     end
 
-    def for_select_pm_subtype_pm_boms(pm_subtype_id)  # rubocop:disable Metrics/AbcSize
+    def for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
       DB[:pm_boms]
         .join(:pm_boms_products, pm_bom_id: :id)
         .join(:pm_products, id: :pm_product_id)
         .join(:pm_subtypes, id: :pm_subtype_id)
         .where(pm_subtype_id: pm_subtype_id)
+        .where(basic_pack_id: basic_pack_code_id)
         .distinct(Sequel[:pm_boms][:id])
         .select(
           Sequel[:pm_boms][:id],
@@ -275,7 +276,7 @@ module MasterfilesApp
       uom_id = DB[:uoms].where(uom_code: uom_code).get(:id)
       update(:pm_boms_products, bom_product_id, uom_id: uom_id)
 
-      success_response("UOM updated to #{uom_code}", uom_code: uom_code)
+      success_response("UOM updated to #{uom_code}",  uom_code: uom_code)
     end
 
     def update_quantity(bom_product_id, quantity)
@@ -322,7 +323,9 @@ module MasterfilesApp
       query = <<~SQL
         SELECT string_agg(product_codes.product_code, '_'::text) AS system_code
         FROM (
-          SELECT pm_products.product_code
+          SELECT CASE WHEN pm_composition_levels.composition_level = 1 THEN pm_products.product_code::text
+                 ELSE concat(pm_boms_products.quantity::text, 'x'::text, pm_products.product_code::text)
+                 END AS product_code
           FROM pm_boms_products
           JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
           JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id

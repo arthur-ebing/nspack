@@ -1,7 +1,7 @@
 ---
 :caption: Product Setup Details
 :sql: "SELECT product_setup_templates.template_name,\r\n             fn_product_setup_code
-  (product_setups.id) AS product_setup_code,\r\n  \t     fn_product_setup_in_production
+  (product_setups.id) AS product_setup_code,\r\n  \t     pm_boms.bom_code,\r\n             fn_product_setup_in_production
   (product_setups.id) AS in_production,\r\n  \t     commodities.code AS commodity_code,\r\n
   \            marketing_varieties.marketing_variety_code,\r\n             standard_pack_codes.standard_pack_code
   AS standard_pack,\r\n            basic_pack_codes.basic_pack_code AS pack_code,\r\n
@@ -11,7 +11,7 @@
   \           marks.mark_code,\r\n            cust_mkt.marketing_variety_code AS cust_mkt_variety,\r\n
   \           inventory_codes.inventory_code,\r\n            pallet_formats.description
   AS pallet_format_description,\r\n            cartons_per_pallet.cartons_per_pallet,\r\n
-  \           pm_boms.bom_code,\r\n            product_setups.id,\r\n            product_setups.product_setup_template_id,\r\n
+  \           product_setups.id,\r\n            product_setups.product_setup_template_id,\r\n
   \           product_setups.extended_columns,\r\n            product_setups.client_size_reference,\r\n
   \           product_setups.client_product_code,\r\n            product_setups.marketing_order_number,\r\n
   \           product_setups.sell_by_code,\r\n            label_templates.label_template_name
@@ -83,9 +83,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  bom_code:
+    :name: bom_code
+    :sequence_no: 3
+    :caption: PM Bom
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   in_production:
     :name: in_production
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: In production
     :namespaced_name: 
     :data_type: :boolean
@@ -101,7 +117,7 @@
     :group_max: false
   commodity_code:
     :name: commodity_code
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Commodity
     :namespaced_name: commodities.code
     :data_type: :string
@@ -117,7 +133,7 @@
     :group_max: false
   marketing_variety_code:
     :name: marketing_variety_code
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Mkt Var
     :namespaced_name: marketing_varieties.marketing_variety_code
     :data_type: :string
@@ -133,7 +149,7 @@
     :group_max: false
   standard_pack:
     :name: standard_pack
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Std pack
     :namespaced_name: standard_pack_codes.standard_pack_code
     :data_type: :string
@@ -149,7 +165,7 @@
     :group_max: false
   pack_code:
     :name: pack_code
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Pack code
     :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
@@ -165,7 +181,7 @@
     :group_max: false
   size_count:
     :name: size_count
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Size count
     :namespaced_name: std_fruit_size_counts.size_count_value
     :data_type: :integer
@@ -181,7 +197,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Actual count
     :namespaced_name: fruit_actual_counts_for_packs.actual_count_for_pack
     :data_type: :integer
@@ -197,7 +213,7 @@
     :group_max: false
   size_reference:
     :name: size_reference
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Size ref
     :namespaced_name: fruit_size_references.size_reference
     :data_type: :string
@@ -213,7 +229,7 @@
     :group_max: false
   marketing_organization:
     :name: marketing_organization
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Marketing Org.
     :namespaced_name: organizations.medium_description
     :data_type: :string
@@ -229,7 +245,7 @@
     :group_max: false
   target_market_group_name:
     :name: target_market_group_name
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: TM Group
     :namespaced_name: target_market_groups.target_market_group_name
     :data_type: :string
@@ -245,7 +261,7 @@
     :group_max: false
   mark_code:
     :name: mark_code
-    :sequence_no: 13
+    :sequence_no: 14
     :caption: Mark
     :namespaced_name: marks.mark_code
     :data_type: :string
@@ -261,7 +277,7 @@
     :group_max: false
   cust_mkt_variety:
     :name: cust_mkt_variety
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Cust mkt variety
     :namespaced_name: cust_mkt.marketing_variety_code
     :data_type: :string
@@ -277,7 +293,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Inv Code
     :namespaced_name: inventory_codes.inventory_code
     :data_type: :string
@@ -293,7 +309,7 @@
     :group_max: false
   pallet_format_description:
     :name: pallet_format_description
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Pallet format
     :namespaced_name: pallet_formats.description
     :data_type: :string
@@ -309,26 +325,10 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet.cartons_per_pallet
     :data_type: :integer
-    :width: 120
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  bom_code:
-    :name: bom_code
-    :sequence_no: 18
-    :caption: Bom code
-    :namespaced_name: pm_boms.bom_code
-    :data_type: :string
     :width: 120
     :format: 
     :hide: false

@@ -112,10 +112,10 @@ module UiRules
                              MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
 
-      pm_boms = if @form_object.pm_subtype_id.nil_or_empty?
+      pm_boms = if @form_object.pm_subtype_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
                 else
-                  MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id)
+                  MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id, @form_object.basic_pack_code_id)
                 end
 
       actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
@@ -393,7 +393,8 @@ module UiRules
         behaviour.dropdown_change :pm_type_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_type_changed" }]
         behaviour.dropdown_change :pm_subtype_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_subtype_changed" }]
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_subtype_changed",
+                                             param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
         behaviour.dropdown_change :pm_bom_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_bom_changed" }]
       end

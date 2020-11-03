@@ -563,7 +563,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'edit' do   # EDIT
         check_auth!('packaging', 'edit')
         interactor.assert_permission!(:edit, id)
-        show_partial { Masterfiles::Packaging::PmBom::Edit.call(id, is_update: true) }
+        show_partial_or_page(r) do
+          Masterfiles::Packaging::PmBom::Edit.call(id)
+        end
       end
 
       r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
@@ -572,7 +574,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           check_auth!('packaging', 'new')
           show_partial_or_page(r) { Masterfiles::Packaging::PmBomsProduct::New.call(id, remote: fetch?(r)) }
         end
-        r.post do        # CREATE
+        r.post do # rubocop:disable Metrics/BlockLength       # CREATE
           res = interactor.create_pm_boms_product(params[:pm_boms_product])
           if res.success
             row_keys = %i[
@@ -583,10 +585,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               quantity
               active
             ]
-            json_actions([OpenStruct.new(type: :add_grid_row,
-                                         attrs: select_attributes(res.instance, row_keys))],
-                         res.message,
-                         keep_dialog_open: false)
+            acts = [OpenStruct.new(type: :add_grid_row,
+                                   attrs: select_attributes(res.instance, row_keys)),
+                    OpenStruct.new(type: :replace_input_value,
+                                   dom_id: 'pm_bom_bom_code',
+                                   value: res.instance[:bom_code]),
+                    OpenStruct.new(type: :replace_inner_html,
+                                   dom_id: 'pm_bom_system_code',
+                                   value: res.instance[:bom_code])]
+
+            json_actions(acts, res.message, keep_dialog_open: false)
           else
             re_show_form(r, res, url: "/masterfiles/packaging/pm_boms/#{id}/pm_boms_products/new") do
               Masterfiles::Packaging::PmBomsProduct::New.call(id,
@@ -598,7 +606,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmBom::Show.call(id) }
@@ -606,9 +614,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_pm_bom(id, params[:pm_bom])
           if res.success
-            show_partial(notice: 'BOM Updated') {  Masterfiles::Packaging::PmBom::Edit.call(id, is_update: true) }
+            show_partial(notice: 'BOM Updated') do
+              Masterfiles::Packaging::PmBom::Edit.call(id,
+                                                       is_update: true)
+            end
           else
-            re_show_form(r, res) { Masterfiles::Packaging::PmBom::Edit.call(id, form_values: params[:pm_bom], form_errors: res.errors) }
+            re_show_form(r, res) do
+              Masterfiles::Packaging::PmBom::Edit.call(id,
+                                                       is_update: true,
+                                                       form_values: params[:pm_bom],
+                                                       form_errors: res.errors)
+            end
           end
         end
         r.delete do    # DELETE
@@ -633,16 +649,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'select_subtypes' do
         r.get do
-          show_partial { Masterfiles::Packaging::PmBom::SelectSubtypes.call(remote: fetch?(r)) }
+          show_partial_or_page(r) do
+            Masterfiles::Packaging::PmBom::SelectSubtypes.call(remote: fetch?(r))
+          end
         end
         r.post do
           res = interactor.select_subtypes(params[:pm_bom])
           if res.success
             store_locally(:pm_subtype_ids, params[:pm_bom][:pm_subtype_ids].map(&:to_i))
-            show_partial_or_page(r) { Masterfiles::Packaging::PmBom::AddProducts.call(params[:pm_bom][:pm_subtype_ids].map(&:to_i)) }
+            show_partial_or_page(r) do
+              Masterfiles::Packaging::PmBom::AddProducts.call({ pm_subtype_ids: params[:pm_bom][:pm_subtype_ids].map(&:to_i), selected_product_ids: [] },
+                                                              back_url: back_button_url)
+            end
           else
-            re_show_form(r, res) do
-              Masterfiles::Packaging::PmBom::SelectSubtypes.call(form_values: params[:pm_bom][:pm_subtype_ids],
+            re_show_form(r, res, url: '/masterfiles/packaging/pm_boms/select_subtypes') do
+              Masterfiles::Packaging::PmBom::SelectSubtypes.call(form_values: params[:pm_bom],
                                                                  form_errors: res.errors,
                                                                  remote: fetch?(r))
             end
@@ -652,17 +673,30 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'multiselect_pm_products' do
         pm_subtype_ids = retrieve_from_local_store(:pm_subtype_ids)
-        store_locally(:pm_subtype_ids, pm_subtype_ids)
-        res = interactor.multiselect_pm_products(multiselect_grid_choices(params), pm_subtype_ids)
+        store_locally(:pm_bom_params, { pm_subtype_ids: pm_subtype_ids, selected_product_ids: multiselect_grid_choices(params) })
+        res = interactor.multiselect_pm_products(multiselect_grid_choices(params))
         if res.success
           flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          show_partial_or_page(r) do
+            Masterfiles::Packaging::PmBom::Edit.call(res.instance[:id])
+          end
         else
-          re_show_form(r, res) do
-            Masterfiles::Packaging::PmBom::AddProducts.call(pm_subtype_ids,
+          re_show_form(r, res, url: '/masterfiles/packaging/pm_boms/add_pm_bom_products') do
+            Masterfiles::Packaging::PmBom::AddProducts.call({ pm_subtype_ids: pm_subtype_ids, selected_product_ids: multiselect_grid_choices(params) },
+                                                            back_url: back_button_url,
+                                                            form_values: params[:pm_bom],
                                                             form_errors: res.errors,
                                                             remote: fetch?(r))
           end
+        end
+      end
+
+      r.on 'add_pm_bom_products' do
+        pm_bom_params = retrieve_from_local_store(:pm_bom_params)
+        store_locally(:pm_bom_params, pm_bom_params)
+        show_partial_or_page(r) do
+          Masterfiles::Packaging::PmBom::AddProducts.call(pm_bom_params,
+                                                          back_url: back_button_url)
         end
       end
 
@@ -726,7 +760,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               quantity
               active
             ]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            acts = [OpenStruct.new(type: :update_grid_row,
+                                   id: id,
+                                   changes: select_attributes(res.instance, row_keys)),
+                    OpenStruct.new(type: :replace_input_value,
+                                   dom_id: 'pm_bom_bom_code',
+                                   value: res.instance[:bom_code]),
+                    OpenStruct.new(type: :replace_inner_html,
+                                   dom_id: 'pm_bom_system_code',
+                                   value: res.instance[:bom_code])]
+            json_actions(acts, res.message, keep_dialog_open: true)
           else
             re_show_form(r, res) { Masterfiles::Packaging::PmBomsProduct::Edit.call(id, form_values: params[:pm_boms_product], form_errors: res.errors) }
           end
@@ -736,7 +779,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           interactor.assert_permission!(:delete, id)
           res = interactor.delete_pm_boms_product(id)
           if res.success
-            delete_grid_row(id, notice: res.message)
+            acts = [OpenStruct.new(type: :delete_grid_row,
+                                   id: id),
+                    OpenStruct.new(type: :replace_input_value,
+                                   dom_id: 'pm_bom_bom_code',
+                                   value: res.instance[:bom_code]),
+                    OpenStruct.new(type: :replace_inner_html,
+                                   dom_id: 'pm_bom_system_code',
+                                   value: res.instance[:system_code])]
+
+            json_actions(acts, res.message, keep_dialog_open: false)
           else
             show_json_error(res.message, status: 200)
           end
@@ -744,7 +796,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_boms_products' do
+    r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
       interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'pm_subtype_changed' do
@@ -761,9 +813,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'inline_edit_bom_product', Integer do |bom_product_id|
         res = interactor.inline_edit_bom_product(bom_product_id, params)
         if res.success
-          update_grid_row(bom_product_id,
-                          changes: res.instance[:changes],
-                          notice: res.message)
+          acts = [OpenStruct.new(type: :update_grid_row,
+                                 id: bom_product_id,
+                                 changes: res.instance[:changes])]
+          if res.instance[:refresh_bom_code]
+            acts << OpenStruct.new(type: :replace_input_value,
+                                   dom_id: 'pm_bom_bom_code',
+                                   value: res.instance[:bom_code])
+            acts << OpenStruct.new(type: :replace_inner_html,
+                                   dom_id: 'pm_bom_system_code',
+                                   value: res.instance[:system_code])
+          end
+
+          json_actions(acts, res.message, keep_dialog_open: false)
         else
           undo_grid_inline_edit(message: res.message, message_type: :warning)
         end

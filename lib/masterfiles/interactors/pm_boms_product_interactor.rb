@@ -9,6 +9,8 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_pm_boms_product(res)
+        system_code = repo.pm_bom_system_code(res[:pm_bom_id])
+        repo.update_pm_bom(res[:pm_bom_id], { bom_code: system_code, system_code: system_code })
         log_status('pm_boms_products', id, 'CREATED')
         log_transaction
       end
@@ -21,12 +23,14 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_pm_boms_product(id, params)
+    def update_pm_boms_product(id, params)  # rubocop:disable Metrics/AbcSize
       res = validate_pm_boms_product_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_boms_product(id, res)
+        system_code = repo.pm_bom_system_code(res[:pm_bom_id])
+        repo.update_pm_bom(res[:pm_bom_id], { bom_code: system_code, system_code: system_code })
         log_transaction
       end
       instance = pm_boms_product(id)
@@ -36,14 +40,19 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_boms_product(id)
+    def delete_pm_boms_product(id)  # rubocop:disable Metrics/AbcSize
       name = pm_boms_product(id).id
+      pm_bom_id = DB[:pm_boms_products].where(id: id).get(:pm_bom_id)
+
       repo.transaction do
         repo.delete_pm_boms_product(id)
+        system_code = repo.pm_bom_system_code(pm_bom_id)
+        repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
         log_status('pm_boms_products', id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted pm boms product #{name}")
+      instance = pm_bom(pm_bom_id)
+      success_response("Deleted pm boms product #{name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -69,13 +78,25 @@ module MasterfilesApp
 
     def update_uom_code(bom_product_id, params)
       res = repo.update_uom_code(bom_product_id, params[:column_value])
-      res.instance = { changes: { uom_code: res.instance[:uom_code] } }
+      res.instance = { refresh_bom_code: false, changes: { uom_id: res.instance[:uom_id] } }
       res
     end
 
-    def update_quantity(bom_product_id, params)
-      res = repo.update_quantity(bom_product_id, params[:column_value])
-      res.instance = { changes: { quantity: res.instance[:quantity] } }
+    def update_quantity(bom_product_id, params)  # rubocop:disable Metrics/AbcSize
+      pm_bom_id = DB[:pm_boms_products].where(id: bom_product_id).get(:pm_bom_id)
+
+      res = nil
+      repo.transaction do
+        res = repo.update_quantity(bom_product_id, params[:column_value])
+        system_code = repo.pm_bom_system_code(pm_bom_id)
+        repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
+      end
+
+      instance = pm_bom(pm_bom_id)
+      res.instance = { refresh_bom_code: true,
+                       bom_code: instance[:bom_code],
+                       system_code: instance[:system_code],
+                       changes: { quantity: res.instance[:quantity] } }
       res
     end
 
@@ -87,6 +108,10 @@ module MasterfilesApp
 
     def pm_boms_product(id)
       repo.find_pm_boms_product(id)
+    end
+
+    def pm_bom(id)
+      repo.find_pm_bom(id)
     end
 
     def validate_pm_boms_product_params(params)

@@ -10,7 +10,7 @@
   :text: edit
   :icon: edit
   :title: Edit
-  :popup: true
+#  :popup: true
 - :url: "/masterfiles/packaging/pm_boms/$:id$"
   :text: delete
   :icon: delete
@@ -27,9 +27,9 @@
   :url: "/masterfiles/packaging/pm_boms/select_subtypes"
   :text: New Pm Bom
   :style: :button
-  :behaviour: :popup
-- :control_type: :link
-  :url: "/masterfiles/packaging/pm_boms/refresh_system_codes"
-  :text: Refresh system codes
-  :style: :button
-  :prompt: Refresh pm boms system codes?
+#  :behaviour: :popup
+#- :control_type: :link
+#  :url: "/masterfiles/packaging/pm_boms/refresh_system_codes"
+#  :text: Refresh system codes
+#  :style: :button
+#  :prompt: Refresh pm boms system codes?

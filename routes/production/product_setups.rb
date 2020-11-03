@@ -436,10 +436,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'pm_subtype_changed' do
-        pm_boms = if params[:changed_value].blank?
+        basic_pack_code_id = params[:product_setup_basic_pack_code_id]
+        pm_boms = if basic_pack_code_id.blank? || params[:changed_value].blank?
                     []
                   else
-                    interactor.for_select_pm_subtype_pm_boms(params[:changed_value])
+                    interactor.for_select_pm_subtype_pm_boms(params[:changed_value], basic_pack_code_id)
                   end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_pm_bom_id',

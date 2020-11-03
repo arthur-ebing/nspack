@@ -2,6 +2,7 @@
 :dataminer_definition: pm_products
 :multiselect:
   :standard:
+    :preselect: "SELECT id FROM pm_products WHERE id IN $:selected_product_ids$"
     :url: "/masterfiles/packaging/pm_boms/multiselect_pm_products"
     :section_caption: "Choose Pm Products"
     :conditions: standard

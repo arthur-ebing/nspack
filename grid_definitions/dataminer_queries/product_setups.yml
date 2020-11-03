@@ -67,7 +67,7 @@
     :caption: Pm Bom System code
     :namespaced_name: pm_boms.system_code
     :data_type: :string
-    :width: 250
+    :width: 200
     :format: 
     :hide: false
     :pinned: 

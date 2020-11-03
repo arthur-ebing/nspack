@@ -2,18 +2,19 @@
 :caption: Allocated setups for production run
 :sql: "SELECT a.id, parent.plant_resource_code AS pack_station, sysres.system_resource_code
   AS module, p.plant_resource_code, \r\na.product_setup_id, fn_product_setup_code(s.id)
-  AS product_setup_code, a.label_template_id, l.label_template_name, a.packing_method_id,
-  pm.packing_method_code, a. active, a.production_run_id\r\nFROM production_runs r\r\nJOIN
-  tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id\r\nJOIN
-  plant_resources p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id
-  = (SELECT id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')\r\nLEFT
-  OUTER JOIN product_resource_allocations a ON a.production_run_id = r.id AND a.plant_resource_id
-  = p.id\r\nLEFT OUTER JOIN product_setups s ON s.id = a.product_setup_id\r\nLEFT
-  OUTER JOIN label_templates l ON l.id = a.label_template_id\r\nLEFT OUTER JOIN tree_plant_resources
-  tpl ON tpl.descendant_plant_resource_id = p.id AND tpl.path_length = 1\r\nLEFT OUTER
-  JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id\r\nLEFT
+  AS product_setup_code, pm_boms.system_code, a.label_template_id, l.label_template_name,
+  a.packing_method_id, pm.packing_method_code, a. active, a.production_run_id\r\nFROM
+  production_runs r\r\nJOIN tree_plant_resources t ON t.ancestor_plant_resource_id
+  = r.production_line_id\r\nJOIN plant_resources p ON p.id = t.descendant_plant_resource_id
+  AND p.plant_resource_type_id = (SELECT id from plant_resource_types WHERE plant_resource_type_code
+  = 'ROBOT_BUTTON')\r\nLEFT OUTER JOIN product_resource_allocations a ON a.production_run_id
+  = r.id AND a.plant_resource_id = p.id\r\nLEFT OUTER JOIN product_setups s ON s.id
+  = a.product_setup_id\r\nLEFT OUTER JOIN label_templates l ON l.id = a.label_template_id\r\nLEFT
+  OUTER JOIN tree_plant_resources tpl ON tpl.descendant_plant_resource_id = p.id AND
+  tpl.path_length = 1\r\nLEFT OUTER JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id\r\nLEFT
   OUTER JOIN system_resources sysres ON sysres.id = parent.system_resource_id\r\nLEFT
-  OUTER JOIN packing_methods pm ON pm.id = a.packing_method_id"
+  OUTER JOIN packing_methods pm ON pm.id = a.packing_method_id\r\nLEFT OUTER JOIN
+  pm_boms ON pm_boms.id = product_setups.pm_bom_id"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -114,9 +115,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  system_code:
+    :name: system_code
+    :sequence_no: 7
+    :caption: Pm Bom Code
+    :namespaced_name: pm_boms.system_code
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   label_template_id:
     :name: label_template_id
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Label template
     :namespaced_name: a.label_template_id
     :data_type: :integer
@@ -132,7 +149,7 @@
     :group_max: false
   label_template_name:
     :name: label_template_name
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Label template name
     :namespaced_name: l.label_template_name
     :data_type: :string
@@ -148,7 +165,7 @@
     :group_max: false
   packing_method_id:
     :name: packing_method_id
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Packing method
     :namespaced_name: a.packing_method_id
     :data_type: :string
@@ -164,7 +181,7 @@
     :group_max: false
   packing_method_code:
     :name: packing_method_code
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Packing method code
     :namespaced_name: pm.packing_method_code
     :data_type: :string
@@ -180,7 +197,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Active
     :namespaced_name: a.active
     :data_type: :boolean
@@ -196,7 +213,7 @@
     :group_max: false
   production_run_id:
     :name: production_run_id
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Production run
     :namespaced_name: a.production_run_id
     :data_type: :integer

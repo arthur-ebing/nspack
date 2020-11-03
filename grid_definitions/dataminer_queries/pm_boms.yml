@@ -28,7 +28,7 @@
     :caption: Bom code
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
     :pinned: 
@@ -44,7 +44,7 @@
     :caption: Erp bom code
     :namespaced_name: pm_boms.erp_bom_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -60,7 +60,7 @@
     :caption: Description
     :namespaced_name: pm_boms.description
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
     :pinned: 
@@ -76,7 +76,7 @@
     :caption: Active
     :namespaced_name: pm_boms.active
     :data_type: :boolean
-    :width: 
+    :width: 100
     :format: 
     :hide: false
     :pinned: 

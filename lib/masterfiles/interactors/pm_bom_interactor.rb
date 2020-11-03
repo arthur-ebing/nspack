@@ -23,12 +23,13 @@ module MasterfilesApp
 
     def update_pm_bom(id, params)  # rubocop:disable Metrics/AbcSize
       system_code = repo.pm_bom_system_code(id)
-      # params[:bom_code] = system_code
-      res = validate_pm_bom_params(params)
+      params[:bom_code] = system_code
+      attrs = params.merge(system_code: system_code)
+      res = validate_pm_bom_params(attrs)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_pm_bom(id, res.to_h.merge({ system_code: system_code }))
+        repo.update_pm_bom(id, res)
         log_transaction
       end
       instance = pm_bom(id)
@@ -67,11 +68,11 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def multiselect_pm_products(multiselect_list, _pm_subtype_ids)  # rubocop:disable Metrics/AbcSize
+    def multiselect_pm_products(multiselect_list)  # rubocop:disable Metrics/AbcSize
       return failed_response('Pm Product selection cannot be empty') if multiselect_list.nil_or_empty?
 
       res = validate_duplicate_subtypes(pm_product_subtypes(multiselect_list))
-      raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
+      return failed_response(unwrap_failed_response(res)) unless res.success
 
       pm_bom_id = nil
       repo.transaction do
@@ -133,7 +134,7 @@ module MasterfilesApp
 
     def validate_duplicate_subtypes(pm_subtype_ids)
       duplicate_subtypes = pm_subtype_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
-      return failed_response("Duplicate pm types: #{repo.pm_subtype_codes(duplicate_subtypes).join(', ')}") unless duplicate_subtypes.nil_or_empty?
+      return failed_response("Duplicate pm subtypes: #{repo.pm_subtype_codes(duplicate_subtypes).join(', ')}") unless duplicate_subtypes.nil_or_empty?
 
       ok_response
     end

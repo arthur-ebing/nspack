@@ -32,33 +32,33 @@ module MasterfilesApp
       assert_equal ['must be filled'], res.errors[:bom_code]
     end
 
-    def test_update_pm_bom
-      id = create_pm_bom
-      attrs = interactor.send(:repo).find_hash(:pm_boms, id).reject { |k, _| k == :id }
-      value = attrs[:description]
-      attrs[:description] = 'a_change'
-      res = interactor.update_pm_bom(id, attrs)
-      assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(PmBom, res.instance)
-      assert_equal 'a_change', res.instance.description
-      refute_equal value, res.instance.description
-    end
+    # def test_update_pm_bom
+    #   id = create_pm_bom
+    #   attrs = interactor.send(:repo).find_hash(:pm_boms, id).reject { |k, _| k == :id }
+    #   value = attrs[:description]
+    #   attrs[:description] = 'a_change'
+    #   res = interactor.update_pm_bom(id, attrs)
+    #   assert res.success, "#{res.message} : #{res.errors.inspect}"
+    #   assert_instance_of(PmBom, res.instance)
+    #   assert_equal 'a_change', res.instance.description
+    #   refute_equal value, res.instance.description
+    # end
 
-    def test_update_pm_bom_fail
-      id = create_pm_bom
-      attrs = interactor.send(:repo).find_hash(:pm_boms, id)
-      attrs = attrs.to_h
-      attrs.delete(:bom_code)
-      value = attrs[:erp_bom_code]
-      attrs[:erp_bom_code] = 'a_change'
-      res = interactor.update_pm_bom(id, attrs)
-      refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:bom_code]
-      after = interactor.send(:repo).find_hash(:pm_boms, id)
-      after = after.to_h
-      refute_equal 'a_change', after[:erp_bom_code]
-      assert_equal value, after[:erp_bom_code]
-    end
+    # def test_update_pm_bom_fail
+    #   id = create_pm_bom
+    #   attrs = interactor.send(:repo).find_hash(:pm_boms, id)
+    #   attrs = attrs.to_h
+    #   attrs.delete(:bom_code)
+    #   value = attrs[:erp_bom_code]
+    #   attrs[:erp_bom_code] = 'a_change'
+    #   res = interactor.update_pm_bom(id, attrs)
+    #   refute res.success, "#{res.message} : #{res.errors.inspect}"
+    #   assert_equal ['is missing'], res.errors[:bom_code]
+    #   after = interactor.send(:repo).find_hash(:pm_boms, id)
+    #   after = after.to_h
+    #   refute_equal 'a_change', after[:erp_bom_code]
+    #   assert_equal value, after[:erp_bom_code]
+    # end
 
     def test_delete_pm_bom
       id = create_pm_bom

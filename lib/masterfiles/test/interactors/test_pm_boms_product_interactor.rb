@@ -63,13 +63,13 @@ module MasterfilesApp
       assert_equal value, after[:quantity]
     end
 
-    def test_delete_pm_boms_product
-      id = create_pm_boms_product
-      assert_count_changed(:pm_boms_products, -1) do
-        res = interactor.delete_pm_boms_product(id)
-        assert res.success, res.message
-      end
-    end
+    # def test_delete_pm_boms_product
+    #   id = create_pm_boms_product
+    #   assert_count_changed(:pm_boms_products, -1) do
+    #     res = interactor.delete_pm_boms_product(id)
+    #     assert res.success, res.message
+    #   end
+    # end
 
     private
 

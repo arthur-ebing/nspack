@@ -138,8 +138,8 @@ module ProductionApp
       MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: pm_type_id })
     end
 
-    def for_select_pm_subtype_pm_boms(pm_subtype_id)
-      MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(pm_subtype_id)
+    def for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)
+      MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)
     end
 
     def pm_bom_products_table(pm_bom_id)
