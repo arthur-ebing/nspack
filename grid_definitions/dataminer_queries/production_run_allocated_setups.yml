@@ -14,7 +14,7 @@
   tpl.path_length = 1\r\nLEFT OUTER JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id\r\nLEFT
   OUTER JOIN system_resources sysres ON sysres.id = parent.system_resource_id\r\nLEFT
   OUTER JOIN packing_methods pm ON pm.id = a.packing_method_id\r\nLEFT OUTER JOIN
-  pm_boms ON pm_boms.id = product_setups.pm_bom_id"
+  pm_boms ON pm_boms.id = s.pm_bom_id"
 :limit: 
 :offset: 
 :external_settings: {}
