@@ -677,6 +677,93 @@ class Nspack < Roda
       end
     end
 
+    r.on 'packout_runs_search' do
+      interactor = RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      repo = MasterfilesApp::CultivarRepo.new
+
+      r.on 'farm_combo_changed' do
+        pucs = if !params[:changed_value].nil_or_empty?
+                 interactor.lookup_farms_pucs(params[:changed_value])
+               else
+                 MasterfilesApp::FarmRepo.new.for_select_pucs
+               end
+
+        for_select_cultivars = repo.for_select_cultivar_groups
+        for_select_cultivar_groups = repo.for_select_cultivars
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_puc_id',
+                                     options_array: pucs),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_orchard_id',
+                                     options_array: []),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_id',
+                                     options_array: for_select_cultivars),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_group_id',
+                                     options_array: for_select_cultivar_groups)])
+
+        # json_replace_select_options('packout_runs_report_puc_id', pucs)
+      end
+
+      r.on 'puc_combo_changed' do
+        if !params[:changed_value].nil_or_empty?
+          orchards = repo.all_hash(:orchards,  puc_id: params[:changed_value])
+          for_select_orchards = orchards.map { |i| [i[:orchard_code], i[:id]] }
+          cultivars = repo.all_hash(:cultivars,  id: orchards.map { |o| o[:cultivar_ids] }.flatten)
+          for_select_cultivars = cultivars.map { |i| [i[:cultivar_name], i[:id]] }
+          for_select_cultivar_groups = repo.all_hash(:cultivar_groups,  id: cultivars.map { |i| i[:cultivar_group_id] }).map { |i| [i[:cultivar_group_code], i[:id]] }
+        else
+          for_select_orchards = []
+          for_select_cultivars = repo.for_select_cultivar_groups
+          for_select_cultivar_groups = repo.for_select_cultivars
+        end
+
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_orchard_id',
+                                     options_array: for_select_orchards),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_id',
+                                     options_array: for_select_cultivars),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_group_id',
+                                     options_array: for_select_cultivar_groups)])
+      end
+
+      r.on 'orchard_combo_changed' do
+        cultivar_ids = repo.all_hash(:orchards,  id: params[:changed_value]).map { |o| o[:cultivar_ids] }.flatten
+        cultivars = repo.all_hash(:cultivars,  id: cultivar_ids)
+        for_select_cultivars = cultivars.map { |i| [i[:cultivar_name], i[:id]] }
+        for_select_cultivar_groups = repo.all_hash(:cultivar_groups,  id: cultivars.map { |i| i[:cultivar_group_id] }).map { |i| [i[:cultivar_group_code], i[:id]] }
+
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_id',
+                                     options_array: for_select_cultivars),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'packout_runs_report_cultivar_group_id',
+                                     options_array: for_select_cultivar_groups)])
+      end
+
+      r.on 'cultivar_group_combo_changed' do
+        cultivars = if !params[:changed_value].nil_or_empty?
+                      repo.all_hash(:cultivars,  cultivar_group_id: params[:changed_value]).map { |i| [i[:cultivar_name], i[:id]] }
+                    else
+                      []
+                    end
+
+        json_replace_select_options('packout_runs_report_cultivar_id', cultivars)
+      end
+
+      r.on 'packhouse_resource_changed' do
+        packhouse_resource_lines = if params[:changed_value].blank?
+                                     []
+                                   else
+                                     ProductionApp::ProductSetupRepo.new.for_select_packhouse_lines(params[:changed_value])
+                                   end
+        json_replace_select_options('packout_runs_report_production_line_id', packhouse_resource_lines)
+      end
+    end
+
     r.on 'pallet_mix_rules', Integer do |id|
       interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 

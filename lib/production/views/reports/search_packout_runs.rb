@@ -14,14 +14,12 @@ module Production
               form.action '/production/reports/packout_runs'
               form.add_field :farm_id
               form.add_field :puc_id
-              form.add_field :packhouse_resource_id
-              form.add_field :production_line_id
-              form.add_field :season_id
               form.add_field :orchard_id
               form.add_field :cultivar_group_id
               form.add_field :cultivar_id
-              form.add_field :product_setup_template_id
-              form.add_field :cloned_from_run_id
+              form.add_field :packhouse_resource_id
+              form.add_field :production_line_id
+              form.add_field :season_id
               form.add_field :dispatches_only
               form.add_field :use_derived_weight
             end
