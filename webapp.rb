@@ -295,7 +295,6 @@ class Nspack < Roda
                                      :choices,
                                      :sortable,
                                      :konva,
-                                     :lodash,
                                      :multi,
                                      :sweetalert)
       @layout = Crossbeams::Layout::Page.build do |page, _|
