@@ -59,8 +59,9 @@ class App < Roda # rubocop:disable Metrics/ClassLength
 
             .led_light {
               height: 2em;
-              width: 6em;
+              width: 2em;
               margin: 1em;
+              border-radius: 50%;
             }
             #led_red {
               background-color: red;
@@ -72,8 +73,10 @@ class App < Roda # rubocop:disable Metrics/ClassLength
               background-color: green;
             }
             div.button_line button {
-              height: 4em;
-              width: 20em;
+              height: 2em;
+              width: 2em;
+              font-weight: bold;
+              font-size: 4em;
             }
             div.button_line {
               display: flex;
@@ -106,16 +109,10 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 <div id="led_green" class="led_light"></div>
               </div>
               <div class="button_line">
-                <button id="btn1" type="button" onclick="clearLcd();fetchJSONResponse();">Button 1</button>
-                <button id="btn3" type="button" disabled>Button 3</button>
-              </div>
-              <div class="button_line">
-                <button id="btn2" type="button" disabled>Button 2</button>
-                <button id="btn4" type="button" disabled>Button 4</button>
-              </div>
-              <div class="button_line">
-                <button id="btn5" type="button" onclick="clearLcd(); document.getElementById('lcd1').textContent='I am some kind of NoSoft module';">Systeminfo</button>
-                <button id="btn6" type="button" onclick="clearLcd(); document.getElementById('lcd1').textContent='I might be on a network (#{request.ip})';">Networkinfo</button>
+                <button id="btn1" type="button" onclick="clearLcd();fetchJSONResponse();">1</button>
+                <button id="btn3" type="button" disabled>2</button>
+                <button id="btn2" type="button" disabled>3</button>
+                <button id="btn4" type="button" disabled>4</button>
               </div>
             </div>
             <div>
@@ -257,32 +254,42 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                   lcd1.textContent = 'There was an error from the robot simulator. See JSON result below';
                   return;
                 }
-                if (data['red']) {
+                let inner = data.responseStation;
+                if (!inner) {
+                  inner = data.responseUser;
+                }
+                if (!inner) {
+                  inner = data.responseKeypad;
+                }
+                if (!inner) {
+                  inner = {};
+                }
+                if (inner['red'] && inner['red'] === 'true') {
                   ledRed.style.backgroundColor='red';
                 }
-                if (data['orange']) {
+                if (inner['orange'] && inner['orange'] === 'true') {
                   ledOrange.style.backgroundColor='orange';
                 }
-                if (data['green']) {
+                if (inner['green'] && inner['green'] === 'true') {
                   ledGreen.style.backgroundColor='green';
                 }
-                if (data['lcd1']) {
-                  lcd1.textContent = setText(data['lcd1']);
+                if (inner['lcd1']) {
+                  lcd1.textContent = setText(inner['lcd1']);
                 }
-                if (data['lcd2']) {
-                  lcd2.textContent = setText(data['lcd2']);
+                if (inner['lcd2']) {
+                  lcd2.textContent = setText(inner['lcd2']);
                 }
-                if (data['lcd3']) {
-                  lcd3.textContent = setText(data['lcd3']);
+                if (inner['lcd3']) {
+                  lcd3.textContent = setText(inner['lcd3']);
                 }
-                if (data['lcd4']) {
-                  lcd4.textContent = setText(data['lcd4']);
+                if (inner['lcd4']) {
+                  lcd4.textContent = setText(inner['lcd4']);
                 }
-                if (data['lcd5']) {
-                  lcd5.textContent = setText(data['lcd5']);
+                if (inner['lcd5']) {
+                  lcd5.textContent = setText(inner['lcd5']);
                 }
-                if (data['lcd6']) {
-                  lcd6.textContent = setText(data['lcd6']);
+                if (inner['lcd6']) {
+                  lcd6.textContent = setText(inner['lcd6']);
                 }
                 // TODO: handle confirm etc type responses...
                 console.log('Got response:', data);
@@ -373,7 +380,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
             document.addEventListener('DOMContentLoaded', () => {
               const option = document.createElement('option');
               option.value = '';
-              option.text = 'Select a URL to test';
+              option.text = 'Select an API call to test';
               selUrls.appendChild(option);
               urlSet.forEach((node) => {
                 const option = document.createElement('option');
@@ -476,7 +483,12 @@ class App < Roda # rubocop:disable Metrics/ClassLength
       request.body = params.to_json
 
       response = http.request(request)
-      response.body
+      if response.code == '200'
+        response.body
+      else
+        str = response.body.split("<div class='crossbeams-error-note'><p><strong>Error:</strong></p>").last.split('</div>').first
+        { error: 'The server crashed - please check server logs.', message: str || 'Unknown' }.to_json
+      end
 
     rescue Timeout::Error
       { error: 'The call to the server timed out.' }.to_json

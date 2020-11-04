@@ -52,6 +52,7 @@ require './lib/http_calls'
 require './lib/local_store' # Will only work for processes running from one dir.
 require './lib/rmd_form'
 require './lib/robot_responder'
+require './lib/json_robot_interface'
 require './lib/ui_rules'
 require './lib/library_versions'
 require './lib/dataminer_connections'
