@@ -1,77 +1,244 @@
 # frozen_string_literal: true
 
-class JsonRobotInterface
+class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
-  attr_reader :request, :input_payload, :action_type, :mac_addr, :params
+  attr_reader :request, :input_payload, :action_type, :mac_addr, :robot_params, :resource_repo, :system_user, :robot, :inflector
 
-  ACTION_TYPES = %i[requestPing requestSetup requestDateTime].freeze
+  ACTION_TYPES = %i[requestPing requestSetup requestDateTime publishStatus publishBarcodeScan publishButton publishLogon publishLogoff].freeze
+  # Not implemented: action for publishScaleWeight
 
-  def initialize(request, input_payload)
+  RESPONSE_TYPES = {
+    station: :responseStation,
+    user: :responseUser,
+    key: :responseKeypad
+  }.freeze
+
+  def initialize(system_user, request, input_payload)
     @request = request
+    @system_user = system_user
     @input_payload = input_payload
+    @resource_repo = ProductionApp::ResourceRepo.new
+    @inflector = Dry::Inflector.new
   end
 
   def check_params
-    # vres = validate_params
-    # unless vres.success?
-    #   @validation_errors = unwrap_failed_response(validation_failed_response(vres))
-    #   return failed_response('validation errors')
-    # end
+    vres = validate_params
+    return vres unless vres.success
 
-    @action_type = input_payload.keys.first
-    unless ACTION_TYPES.include?(@action_type)
-      @validation_errors = "Action #{@action_type} is not a valid option."
-      return failed_response('invalid action')
-    end
-    @params = input_payload[@action_type]
-    @mac_addr = input_payload[@action_type][:MAC]
+    extract_params
+    vres = validate_action
+    return vres unless vres.success
+
+    vres = find_and_validate_resource
+    return vres unless vres.success
+
     ok_response
   end
 
   def process_invalid_params
-    { responseStation: {
-      MAC: @mac_addr,
-      LCD1: @validation_errors,
-      LCD2: '',
-      LCD3: '',
-      LCD4: '',
-      green: 'false',
-      orange: 'false',
-      red: 'true'
-    } }
+    puts "JSON ROBOT: Invalid params. #{@validation_errors.inspect} - #{input_payload.inspect}"
+
+    lcd1, lcd2, lcd3, lcd4 = @validation_errors
+    lcd4 ||= Time.now.strftime('%H:%M:%S')
+    res = {
+      responseStation: {
+        MAC: @mac_addr,
+        LCD1: lcd1 || '',
+        LCD2: lcd2 || '',
+        LCD3: lcd3 || '',
+        LCD4: lcd4 || '',
+        green: 'false',
+        orange: 'false',
+        red: 'true'
+      }
+    }
+    p res
+    res
   end
 
   def process_request
-    # lookup MAC to resource to get device etc info...
-    send(action_type)
+    puts "JSON ROBOT: #{@robot.system_resource_code} - #{input_payload.inspect}"
+
+    send(inflector.underscore(action_type))
+  end
+
+  def respond(feedback, success, type: :station, orange: false)
+    lcd1, lcd2, lcd3, lcd4 = feedback.four_lines
+    res = {
+      RESPONSE_TYPES[type] => {
+        MAC: @mac_addr,
+        LCD1: lcd1 || '',
+        LCD2: lcd2 || '',
+        LCD3: lcd3 || '',
+        LCD4: lcd4 || '',
+        green: true_state(success),
+        orange: true_state(orange),
+        red: false_state(success)
+      }
+    }
+    p res
+    res
   end
 
   private
 
   def validate_params
-    # schema.call(input_payload)
+    if input_payload.is_a?(Hash) &&
+       input_payload.keys.length == 1 &&
+       input_payload[input_payload.keys.first].is_a?(Hash)
+      ok_response
+    else
+      @validation_errors = ['Invalid parameters']
+      failed_response('validation errors')
+    end
   end
 
-  def requestPing # rubocop:disable Naming/MethodName
-    { responsePong: @params }
+  def extract_params
+    @action_type = input_payload.keys.first
+    @robot_params = input_payload[@action_type]
+    @mac_addr = input_payload[@action_type][:MAC]
   end
 
-  def requestSetup # rubocop:disable Naming/MethodName
-    { responseSetup: { MAC: @mac_addr,
-                       message: 'Test setup',
-                       lowLimit: '850',
-                       highLimit: '1150',
-                       units: 'kg',
-                       name: 'Weighbridge 1',
-                       security: 'OPEN', # 'OPEN/REQUIRED',
+  def validate_action
+    if ACTION_TYPES.include?(@action_type)
+      ok_response
+    else
+      @validation_errors = [@action_type, 'Unknown action']
+      failed_response('Unknown action')
+    end
+  end
+
+  def find_and_validate_resource
+    @robot = resource_repo.find_robot_by_mac_addr(mac_addr)
+    if @robot
+      ok_response
+    else
+      @validation_errors = [@action_type, @mac_addr, 'Unconfigured MAC addr']
+      failed_response('MAC addr not registered')
+    end
+  end
+
+  # Robot actions
+  # --------------------------
+  def request_ping
+    { responsePong: robot_params }
+  end
+
+  def request_setup
+    # Get device resource to read:
+    # - resource-specific hash (if present) e.g. weight units etc.
+    # serverURL: "#{request.base_url}/messcada/robot/api" --- DO NOT SEND THIS, robot can not work with it!
+    res = {
+      responseSetup: { MAC: @mac_addr,
+                       message: "#{@robot.system_resource_code} setup",
+                       # lowLimit: '850',    # depends on robot type
+                       # highLimit: '1150',  # depends on robot type
+                       # units: 'kg',        # depends on robot type
+                       name: @robot.description,
+                       security: 'OPEN', # 'OPEN/REQUIRED', -- probably should remain open and the system checks that the payload includes identifier
                        date: Time.now.strftime('%Y-%m-%d'),
                        time: Time.now.strftime('%H:%M:%S'),
-                       type: 'SOLAS-SCALE', # TERMINAL/SOLAS-SCALE/BARCODE-SCANNER/BIN-TIPPING',
-                       serverURL: "#{request.base_url}/messcada/robot/api" } }
+                       type: @robot.module_function || 'TERMINAL' } # TERMINAL/SOLAS-SCALE/BARCODE-SCANNER/BIN-TIPPING
+    }
+    p res
+    res
   end
 
-  def requestDateTime # rubocop:disable Naming/MethodName
+  def request_date_time
     { responseDateTime: { status: 'OK', MAC: @mac_addr, date: Time.now.strftime('%Y-%m-%d'), time: Time.now.strftime('%H:%M:%S') } }
+  end
+
+  def publish_barcode_scan # rubocop:disable Metrics/AbcSize
+    # from resource: is this bin_tip / bin_tip+weigh / palletize scan / verify ctn/plt / ...
+    class_name = "MesscadaApp::RobotHandleScan#{inflector.classify(robot.module_action)}"
+    klass = inflector.constantize(class_name)
+    p "Handing work over to #{class_name}"
+    klass.call(self)
+  rescue NameError => e
+    ErrorMailer.send_exception_email(e,
+                                     subject: "#{self.class.name} scan handler",
+                                     message: "There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}.")
+    puts e.message
+    puts e.backtrace.join("\n")
+    feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
+                                              status: false,
+                                              short1: 'System error',
+                                              short2: 'Cannot process')
+    respond(feedback, false)
+  end
+
+  def publish_button # rubocop:disable Metrics/AbcSize
+    class_name = "MesscadaApp::RobotHandleButton#{inflector.classify(robot.module_action)}"
+    klass = inflector.constantize(class_name)
+    p "Handing work over to #{class_name}"
+    klass.call(self)
+  rescue NameError => e
+    ErrorMailer.send_exception_email(e,
+                                     subject: "#{self.class.name} button handler",
+                                     message: "There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}.")
+    puts e.message
+    puts e.backtrace.join("\n")
+    feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
+                                              status: false,
+                                              short1: 'System error',
+                                              short2: 'Cannot process')
+    respond(feedback, false)
+  end
+
+  def publish_logon # rubocop:disable Metrics/AbcSize
+    interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    params = { device: robot.system_resource_code, identifier: robot_params[:id] }
+    res = interactor.logon(params)
+
+    feedback = if res.success
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: true,
+                                                line1: res.instance[:contract_worker],
+                                                line4: 'Logged on')
+               else
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: false,
+                                                line1: 'Cannot logon',
+                                                line4: res.message)
+               end
+    respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
+  end
+
+  def publish_logoff
+    # This wil need to update state for bin tipper and personnel groups for label incentives
+    # This version does nothing because the robot payload does not include the id
+    feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
+                                              status: true,
+                                              line1: 'Logged off')
+    respond(feedback, true, type: :user) # Which type to respond here must depend on the robot use.
+    # interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    # params = { device: robot.system_resource_code, identifier: robot_params[:id] }
+    # res = interactor.logoff(params)
+    #
+    # feedback = if res.success
+    #              MesscadaApp::RobotFeedback.new(device: params[:device],
+    #                                             status: true,
+    #                                             line1: res.instance[:contract_worker],
+    #                                             line4: 'Logged off')
+    #            else
+    #              MesscadaApp::RobotFeedback.new(device: params[:device],
+    #                                             status: false,
+    #                                             line1: 'Cannot logoff',
+    #                                             line4: res.message)
+    #            end
+    # respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
+  end
+
+  def publish_status
+    {} # Not sure what to return here...
+  end
+
+  def true_state(success)
+    success ? 'true' : 'false'
+  end
+
+  def false_state(success)
+    success ? 'false' : 'true'
   end
 end

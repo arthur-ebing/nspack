@@ -7,8 +7,9 @@ class Nspack < Roda
     # --------------------------------------------------------------------------
     r.on 'api' do
       response['Content-Type'] = 'application/json'
-      json_robot_interface = JsonRobotInterface.new(request, params)
+      json_robot_interface = JsonRobotInterface.new(system_user, request, params)
       res = json_robot_interface.check_params
+
       if res.success
         json_robot_interface.process_request.to_json
       else

@@ -426,6 +426,44 @@ module ProductionApp
       DB[:system_resources].where(plant_resource_type_id: type_id).max(:system_resource_code)
     end
 
+    def find_robot_by_mac_addr(mac_addr)
+      query = <<~SQL
+        SELECT system_resources.id,
+          plant_resources.plant_resource_code,
+          plant_resources.description,
+          --system_resources.plant_resource_type_id,
+          --system_resources.system_resource_type_id,
+          system_resources.system_resource_code,
+          system_resources.description AS system_resource_description,
+          system_resources.active,
+          system_resources.equipment_type,
+          system_resources.module_function,
+          system_resources.mac_address,
+          -- system_resources.ip_address,
+          -- system_resources.port,
+          -- system_resources.ttl,
+          -- system_resources.cycle_time,
+          -- system_resources.publishing,
+          -- system_resources.login,
+          -- system_resources.logoff,
+          system_resources.module_action,
+          -- system_resources.peripheral_model,
+          -- system_resources.connection_type,
+          -- system_resources.printer_language,
+          -- system_resources.print_username,
+          -- system_resources.print_password,
+          -- system_resources.pixels_mm,
+          system_resources.robot_function
+        FROM system_resources
+        JOIN plant_resources ON plant_resources.system_resource_id = system_resources.id
+        WHERE system_resources.mac_address = ?
+      SQL
+      hash = DB[query, mac_addr].first
+      return nil if hash.nil?
+
+      Robot.new(hash)
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res, sys_code)

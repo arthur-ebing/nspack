@@ -254,8 +254,18 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                   lcd1.textContent = 'There was an error from the robot simulator. See JSON result below';
                   return;
                 }
+                if (data.responseStation) {
+                  lcd6.textContent = '= STATION mode =';
+                }
+                if (data.responseUser) {
+                  lcd6.textContent = '= USER mode =';
+                }
+                if (data.responseKeypad) {
+                  lcd6.textContent = '= KEYPAD mode =';
+                }
                 let inner = data.responseStation;
                 if (!inner) {
+                  console.log('no inner');
                   inner = data.responseUser;
                 }
                 if (!inner) {
@@ -273,23 +283,23 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 if (inner['green'] && inner['green'] === 'true') {
                   ledGreen.style.backgroundColor='green';
                 }
-                if (inner['lcd1']) {
-                  lcd1.textContent = setText(inner['lcd1']);
+                if (inner['LCD1']) {
+                  lcd1.textContent = setText(inner['LCD1']);
                 }
-                if (inner['lcd2']) {
-                  lcd2.textContent = setText(inner['lcd2']);
+                if (inner['LCD2']) {
+                  lcd2.textContent = setText(inner['LCD2']);
                 }
-                if (inner['lcd3']) {
-                  lcd3.textContent = setText(inner['lcd3']);
+                if (inner['LCD3']) {
+                  lcd3.textContent = setText(inner['LCD3']);
                 }
-                if (inner['lcd4']) {
-                  lcd4.textContent = setText(inner['lcd4']);
+                if (inner['LCD4']) {
+                  lcd4.textContent = setText(inner['LCD4']);
                 }
-                if (inner['lcd5']) {
-                  lcd5.textContent = setText(inner['lcd5']);
+                if (inner['LCD5']) {
+                  lcd5.textContent = setText(inner['LCD5']);
                 }
-                if (inner['lcd6']) {
-                  lcd6.textContent = setText(inner['lcd6']);
+                if (inner['LCD6']) {
+                  lcd6.textContent = setText(inner['LCD6']);
                 }
                 // TODO: handle confirm etc type responses...
                 console.log('Got response:', data);
@@ -338,6 +348,16 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 p6: 'status',
                 dp5: 'kg',
                 dp6: 'NORMAL',
+              },
+              {
+                payloadType: 'publishBarcodeScan',
+                p1: 'MAC',
+                p2: 'id',
+                p3: 'barcode',
+                p4: 'session',
+                p5: 'status',
+                p6: null,
+                dp5: 'NORMAL',
               },
               {
                 payloadType: 'publishButton',
