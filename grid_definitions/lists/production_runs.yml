@@ -190,6 +190,11 @@
   :icon: play
   :popup: false
 - :separator: true
+:conditions:
+  :standard:
+    - :col: production_runs.id
+      :op: IN
+      :val: $:ids$
 :page_controls:
 - :control_type: :link
   :url: "/production/runs/production_runs/new"

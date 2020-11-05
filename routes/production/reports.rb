@@ -6,7 +6,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # --------------------------------------------------------------------------
     r.on 'packout_runs' do
       r.get do
-        show_page { Production::Reports::Packout::SearchPackoutRuns.call }
+        show_page { Production::Reports::Packout::SearchProductionRuns.call }
       end
 
       r.post do

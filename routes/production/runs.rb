@@ -615,6 +615,25 @@ class Nspack < Roda
         end
       end
 
+      r.on 'search' do
+        r.get do
+          show_page { Production::Reports::Packout::SearchProductionRuns.call(mode: :list) }
+        end
+
+        r.post do
+          interactor = ProductionApp::ProductionRunInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+          params[:packout_runs_report].delete_if { |_k, v| v.nil_or_empty? }
+          res = interactor.find_packout_runs(params[:packout_runs_report])
+          if res.success
+            r.redirect("/list/production_runs?key=standard&ids=#{res.instance}")
+          else
+            flash[:error] = res.message
+            r.redirect('/production/runs/production_runs/search')
+          end
+        end
+      end
+
       # BEHAVIOURS
       # -------------------------------
       r.on 'changed', String do |key|
