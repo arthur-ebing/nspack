@@ -9,7 +9,7 @@ class Nspack < Roda
       jasper_params = JasperParams.new('bin_loads',
                                        current_user.login_name,
                                        bin_load_id: id)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

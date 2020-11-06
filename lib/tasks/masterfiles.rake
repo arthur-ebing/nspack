@@ -77,7 +77,7 @@ namespace :app do
                                        load_id: 278,
                                        place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
       jasper_params.file_name = args.fname
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         puts "REPORT CREATED: #{res.instance}"

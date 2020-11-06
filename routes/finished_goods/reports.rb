@@ -13,7 +13,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        pallet_report: 'detail',
                                        for_picklist: false,
                                        cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -31,7 +31,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        pallet_report: 'summary',
                                        for_picklist: false,
                                        cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -50,7 +50,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        pallet_report: 'detail',
                                        for_picklist: true,
                                        cartons_equals_pallets: AppConst::CARTON_EQUALS_PALLET)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -66,7 +66,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        current_user.login_name,
                                        load_id: id,
                                        place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -81,7 +81,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     #   jasper_params = JasperParams.new('container_mass_declaration',
     #                                    current_user.login_name,
     #                                    load_container_id: @repo.get_id(:load_containers, load_id: id))
-    #   res = CreateJasperReportNew.call(jasper_params)
+    #   res = CreateJasperReport.call(jasper_params)
     #
     #   if res.success
     #     change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -97,7 +97,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        current_user.login_name,
                                        load_container_id: @repo.get_id(:load_containers, load_id: id),
                                        user_name: current_user.user_name)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -114,7 +114,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        govt_inspection_sheet_id: id,
                                        inspection_passed: true,
                                        signee_caption: AppConst::GOVT_INSPECTION_SIGNEE_CAPTION)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -131,7 +131,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        govt_inspection_sheet_id: id,
                                        inspection_passed: false,
                                        signee_caption: AppConst::GOVT_INSPECTION_SIGNEE_CAPTION)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -147,7 +147,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        current_user.login_name,
                                        govt_inspection_sheet_id: id)
       jasper_params.parent_folder = AppConst::RPT_INDUSTRY
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -163,7 +163,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       jasper_params = JasperParams.new('interwarehouse',
                                        current_user.login_name,
                                        vehicle_job_id: vehicle_job_id)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

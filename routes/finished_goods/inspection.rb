@@ -351,7 +351,7 @@ class Nspack < Roda
                                          current_user.login_name,
                                          repack_date: pallet[:repacked_at].strftime('%Y-%m-%d'),
                                          pallet_number: pallet[:pallet_number])
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

@@ -21,7 +21,7 @@ module DevelopmentApp
       jasper_params.file_name = spec[:file] if spec[:file]
       jasper_params.mode = spec[:mode] if spec[:mode]
       jasper_params.parent_folder = spec[:parent_folder] if spec[:parent_folder]
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       unless res.success
         send_bus_message("Failed to build report '#{spec[:report_name]}' - #{res.message}",

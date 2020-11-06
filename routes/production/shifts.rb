@@ -94,7 +94,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          current_user.login_name,
                                          shift_id: id)
         jasper_params.mode = :xls if params[:key] == 'excel'
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
@@ -107,7 +107,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          current_user.login_name,
                                          shift_id: id)
         jasper_params.mode = :xls if params[:key] == 'excel'
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
@@ -120,7 +120,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          current_user.login_name,
                                          shift_id: id)
         jasper_params.mode = :xls if params[:key] == 'excel'
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: params[:key] == 'excel')
@@ -235,7 +235,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          ToDateTime: DateTime.parse(attrs[:to_date]).strftime('%Y-%m-%d %H:%M:%S'),
                                          WorkerIds: multiselect_grid_choices(params))
         jasper_params.mode = :csv
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path, download: true)

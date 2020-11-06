@@ -47,7 +47,7 @@ class Nspack < Roda
         jasper_params = JasperParams.new('bin_ticket',
                                          current_user.login_name,
                                          bin_id: multiselect_grid_choices(params))
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -329,7 +329,7 @@ class Nspack < Roda
                                          use_packed_weight: true,
                                          use_derived_weight: false,
                                          dispatched_only: true)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -346,7 +346,7 @@ class Nspack < Roda
                                          use_packed_weight: false,
                                          use_derived_weight: true,
                                          dispatched_only: true)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -363,7 +363,7 @@ class Nspack < Roda
                                          use_packed_weight: true,
                                          use_derived_weight: false,
                                          dispatched_only: false)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -380,7 +380,7 @@ class Nspack < Roda
                                          use_packed_weight: false,
                                          use_derived_weight: true,
                                          dispatched_only: false)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -393,7 +393,7 @@ class Nspack < Roda
         jasper_params = JasperParams.new('carton_packout',
                                          current_user.login_name,
                                          production_run_id: id)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

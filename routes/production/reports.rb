@@ -35,7 +35,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        use_packed_weight: use_derived_weight != 't',
                                        use_derived_weight: use_derived_weight == 't',
                                        dispatched_only: dispatches_only == 't')
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       store_locally(:dispatches_only, dispatches_only)
       store_locally(:use_derived_weight, use_derived_weight)
@@ -75,7 +75,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        puc: puc,
                                        orchard: orchard.nil_or_empty? ? nil : orchard,
                                        cultivar: cultivar)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

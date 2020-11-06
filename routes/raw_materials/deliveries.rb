@@ -20,7 +20,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         jasper_params = JasperParams.new('bin_tickets',
                                          current_user.login_name,
                                          delivery_id: id)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -36,7 +36,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         jasper_params = JasperParams.new('delivery',
                                          current_user.login_name,
                                          delivery_id: id)
-        res = CreateJasperReportNew.call(jasper_params)
+        res = CreateJasperReport.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
@@ -791,7 +791,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                        current_user.login_name,
                                        batch_number: rep_delivery.batch_number,
                                        vat: AppConst::VAT_FACTOR)
-      res = CreateJasperReportNew.call(jasper_params)
+      res = CreateJasperReport.call(jasper_params)
 
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
