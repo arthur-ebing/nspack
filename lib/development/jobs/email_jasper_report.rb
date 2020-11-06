@@ -21,8 +21,7 @@ module DevelopmentApp
               jasper_params.return_full_path = true
               jasper_params.file_name = spec[:file] if spec[:file]
               jasper_params.mode = spec[:mode] if spec[:mode]
-              jasper_params.mode = spec[:parent_folder] if spec[:parent_folder]
-              jasper_params.mode = spec[:top_level_dir] if spec[:top_level_dir]
+              jasper_params.parent_folder = spec[:parent_folder] if spec[:parent_folder]
               CreateJasperReportNew.call(jasper_params)
             else
               CreateJasperReport.call(report_name: spec[:report_name],

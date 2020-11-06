@@ -3,7 +3,7 @@
 # Gather settings for a Jasper Report and apply defaults.
 class JasperParams
   attr_reader :report_name, :user_name, :params
-  attr_accessor :file_name, :mode, :parent_folder, :top_level_dir, :printer, :return_full_path
+  attr_accessor :file_name, :mode, :parent_folder, :printer, :return_full_path
 
   def initialize(report_name, user_name, params = {})
     @report_name = report_name
@@ -18,7 +18,6 @@ class JasperParams
     @mode = :pdf
     @file_name = report_name
     @parent_folder = nil
-    @top_level_dir = ''
     @printer = nil
     @return_full_path = false
   end
