@@ -13,6 +13,9 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
+      # For KR, supervisor actions are not going to be in place initially.
+      # When a bin is scanned that does not exist, show an appropriate error.
+      # When a bin is tipped that has already been tipped, show an appropriate error.
       interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       params = { bin_number: robot_params[:barcode], device: robot.system_resource_code }
       res = interactor.tip_rmt_bin(params)

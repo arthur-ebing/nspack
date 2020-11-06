@@ -36,8 +36,10 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     ok_response
   end
 
-  def process_invalid_params
+  def process_invalid_params # rubocop:disable Metrics/CyclomaticComplexity
     puts "JSON ROBOT: Invalid params. #{@validation_errors.inspect} - #{input_payload.inspect}"
+
+    return invalid_setup if @action_type && @action_type == :requestSetup
 
     lcd1, lcd2, lcd3, lcd4 = @validation_errors
     lcd4 ||= Time.now.strftime('%H:%M:%S')
@@ -131,6 +133,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     # serverURL: "#{request.base_url}/messcada/robot/api" --- DO NOT SEND THIS, robot can not work with it!
     res = {
       responseSetup: { MAC: @mac_addr,
+                       status: 'OK',
                        message: "#{@robot.system_resource_code} setup",
                        # lowLimit: '850',    # depends on robot type
                        # highLimit: '1150',  # depends on robot type
@@ -140,6 +143,21 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                        date: Time.now.strftime('%Y-%m-%d'),
                        time: Time.now.strftime('%H:%M:%S'),
                        type: @robot.module_function || 'TERMINAL' } # TERMINAL/SOLAS-SCALE/BARCODE-SCANNER/BIN-TIPPING
+    }
+    p res
+    res
+  end
+
+  def invalid_setup
+    res = {
+      responseSetup: { MAC: @mac_addr,
+                       status: 'FAIL',
+                       message: 'Unknown MAC addr',
+                       name: 'UNKNOWN',
+                       security: 'OPEN',
+                       date: Time.now.strftime('%Y-%m-%d'),
+                       time: Time.now.strftime('%H:%M:%S'),
+                       type: 'TERMINAL' }
     }
     p res
     res
