@@ -6,18 +6,11 @@ class Nspack < Roda
     # DELIVERY NOTE
     # --------------------------------------------------------------------------
     r.on 'bin_load', Integer do |id|
-      res = if AppConst::JASPER_NEW_METHOD
-              jasper_params = JasperParams.new('bin_loads',
-                                               current_user.login_name,
-                                               bin_load_id: id)
-              CreateJasperReportNew.call(jasper_params)
-            else
-              CreateJasperReport.call(report_name: 'bin_loads',
-                                      user: current_user.login_name,
-                                      file: 'bin_loads',
-                                      params: { bin_load_id: id,
-                                                keep_file: false })
-            end
+      jasper_params = JasperParams.new('bin_loads',
+                                       current_user.login_name,
+                                       bin_load_id: id)
+      res = CreateJasperReportNew.call(jasper_params)
+
       if res.success
         change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
       else

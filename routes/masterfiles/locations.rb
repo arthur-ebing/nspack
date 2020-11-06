@@ -241,18 +241,11 @@ class Nspack < Roda
       interactor = MasterfilesApp::LocationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'print_location_barcodes' do
-        res = if AppConst::JASPER_NEW_METHOD
-                jasper_params = JasperParams.new('location_barcode',
-                                                 current_user.login_name,
-                                                 location_ids: multiselect_grid_choices(params))
-                CreateJasperReportNew.call(jasper_params)
-              else
-                CreateJasperReport.call(report_name: 'location_barcode',
-                                        user: current_user.login_name,
-                                        file: 'location_barcode',
-                                        params: { location_ids: "#{multiselect_grid_choices(params).join(',')}|intarray",
-                                                  keep_file: false })
-              end
+        jasper_params = JasperParams.new('location_barcode',
+                                         current_user.login_name,
+                                         location_ids: multiselect_grid_choices(params))
+        res = CreateJasperReportNew.call(jasper_params)
+
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)
         else

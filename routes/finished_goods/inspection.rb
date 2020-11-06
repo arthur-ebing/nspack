@@ -347,21 +347,11 @@ class Nspack < Roda
       r.on 'print_barcode' do
         pallet = BaseRepo.new.find_hash(:pallets, id)
 
-        res = if AppConst::JASPER_NEW_METHOD
-                jasper_params = JasperParams.new('single_pallet_barcode',
-                                                 current_user.login_name,
-                                                 repack_date: pallet[:repacked_at].strftime('%Y-%m-%d'),
-                                                 pallet_number: pallet[:pallet_number])
-                CreateJasperReportNew.call(jasper_params)
-              else
-                CreateJasperReport.call(report_name: 'single_pallet_barcode',
-                                        user: current_user.login_name,
-                                        file: 'single_pallet_barcode',
-                                        params: {
-                                          repack_date: pallet[:repacked_at].strftime('%Y-%m-%d'),
-                                          pallet_number: "#{pallet[:pallet_number]}|string"
-                                        })
-              end
+        jasper_params = JasperParams.new('single_pallet_barcode',
+                                         current_user.login_name,
+                                         repack_date: pallet[:repacked_at].strftime('%Y-%m-%d'),
+                                         pallet_number: pallet[:pallet_number])
+        res = CreateJasperReportNew.call(jasper_params)
 
         if res.success
           change_window_location_via_json(UtilityFunctions.cache_bust_url(res.instance), request.path)

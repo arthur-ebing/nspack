@@ -72,21 +72,13 @@ namespace :app do
   namespace :jasper do
     desc 'Run a Jasper report'
     task :run_report, %i[rpt fname] => [:load_app] do |_, args|
-      res = if AppConst::JASPER_NEW_METHOD
-              jasper_params = JasperParams.new(args.rpt,
-                                               'rakeU',
-                                               load_id: 278,
-                                               place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
-              jasper_params.file_name = args.fname
-              CreateJasperReportNew.call(jasper_params)
-            else
-              CreateJasperReport.call(report_name: args.rpt,
-                                      user: 'rakeU',
-                                      file: args.fname,
-                                      params: { load_id: 278,
-                                                place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE,
-                                                keep_file: true })
-            end
+      jasper_params = JasperParams.new(args.rpt,
+                                       'rakeU',
+                                       load_id: 278,
+                                       place_of_issue: AppConst::ADDENDUM_PLACE_OF_ISSUE)
+      jasper_params.file_name = args.fname
+      res = CreateJasperReportNew.call(jasper_params)
+
       if res.success
         puts "REPORT CREATED: #{res.instance}"
       else
