@@ -34,5 +34,21 @@ module MasterfilesApp
         table_name: table_name,
         column_name: variant.values.first[:column_name] }
     end
+
+    # Gets the id or variant id from a record matching the args
+    #
+    # @param table_name [Symbol] the db table name.
+    # @param args [Hash] the where-clause conditions.
+    # @return [integer] the id value for the matching record or nil.
+    def get_variant_id(table_name, args)
+      id = get_id(table_name, args)
+      return id unless id.nil?
+
+      variant_code = args.delete(lookup_mf_variant(table_name)[:column_name].to_sym)
+      id = DB[:masterfile_variants].where(masterfile_table: table_name, variant_code: variant_code).get(:masterfile_id)
+      return nil if id.nil?
+
+      get_id(table_name, args.merge(id: id))
+    end
   end
 end
