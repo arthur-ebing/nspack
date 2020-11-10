@@ -39,6 +39,7 @@ module Production
                   col.add_field :publishing
                   col.add_field :login
                   col.add_field :logoff
+                  col.add_field :group_incentive
                 end
               end
             end

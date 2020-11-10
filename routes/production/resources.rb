@@ -326,6 +326,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               publishing
               login
               logoff
+              group_incentive
               module_action
               robot_function
             ]

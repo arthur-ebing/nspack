@@ -13,6 +13,7 @@ module ProductionApp
     required(:publishing).maybe(:bool)
     required(:login).maybe(:bool)
     required(:logoff).maybe(:bool)
+    required(:group_incentive).maybe(:bool)
     required(:module_action).maybe(Types::StrippedString)
     required(:robot_function).maybe(Types::StrippedString)
   end

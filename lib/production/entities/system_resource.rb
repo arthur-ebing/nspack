@@ -17,6 +17,7 @@ module ProductionApp
     attribute :publishing, Types::Bool
     attribute :login, Types::Bool
     attribute :logoff, Types::Bool
+    attribute :group_incentive, Types::Bool
     attribute :module_action, Types::String
     attribute :peripheral_model, Types::String
     attribute :connection_type, Types::String
@@ -48,6 +49,7 @@ module ProductionApp
     attribute :publishing, Types::Bool
     attribute :login, Types::Bool
     attribute :logoff, Types::Bool
+    attribute :group_incentive, Types::Bool
     attribute :module_action, Types::String
     attribute :peripheral_model, Types::String
     attribute :connection_type, Types::String
