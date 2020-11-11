@@ -80,7 +80,6 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { MAX_BINS_ON_LOAD: 'optional. Sets maximum bins allowed on load' },
     { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' },
     { ALLOW_CULTIVAR_GROUP_MIXING: 'Allow users to set allow_cultivar_group_mixing flag on production_runs' },
-    { MAX_PALLETS_ON_LOAD: 'optional. Sets maximum pallets allowed on load' },
     { TEMP_TAIL_REQUIRED_TO_SHIP: 'optional. Makes temp tail required on all loads' },
     { VAT_FACTOR: 'To calculate vat amounts for the delivery cost invoice report' },
     { USE_CARTON_PALLETIZING: 'Use carton palletizing application. Default false' },
