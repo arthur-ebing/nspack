@@ -75,12 +75,18 @@ class EndOfSeasonTruncate < BaseScript
           puts "Truncated #{tbl}"
         end
 
+        puts 'DELETING audit trail rows (could take a while)...'
         # Clear audit tables
         # But clear ALL logged action details (no table_name column and the data from previous season is not important)
+        puts 'Deleting logged_action_details...'
         DB[Sequel[:audit][:logged_action_details]].delete
+        puts 'Deleting logged_actions...'
         DB[Sequel[:audit][:logged_actions]].where(table_name: ORDERED_TABLES.map(&:to_s)).delete
+        puts 'Deleting current_statuses...'
         DB[Sequel[:audit][:current_statuses]].where(table_name: ORDERED_TABLES.map(&:to_s)).delete
+        puts 'Deleting status_logs...'
         DB[Sequel[:audit][:status_logs]].where(table_name: ORDERED_TABLES.map(&:to_s)).delete
+        puts '...DONE'
       end
     end
 
