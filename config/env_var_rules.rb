@@ -9,14 +9,14 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { RUN_FOR_RMD: 'Dev mode: Force the server to act as if it is being called from a Registered Mobile Device' },
     { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' },
     { DEFAULT_FARM: 'Many pack houses will receive fruit from only one farm. System should therefore allow for a default value.' },
-    { CAPTURE_INNER_BINS: 'qty_inner_bins only applicable to certain clients.' },
-    { CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION: 'In future, Some packhouse may want to integrate a physical scale so that weights can be obtained directly from the scale.' },
-    { CAPTURE_CONTAINER_MATERIAL: 'rmt_container_material_type not applicable to all clients.' },
-    { CAPTURE_CONTAINER_MATERIAL_OWNER: 'rmt_container_material_owner not applicable to all clients.' },
-    { USE_DELIVERY_DESTINATION: 'not applicable to many clients.' },
-    { CAPTURE_DAMAGED_BINS: 'not applicable to many clients.' },
-    { CAPTURE_EMPTY_BINS: 'not applicable to many clients.' },
-    { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'optional, not applicable to many clients.' },
+    { CAPTURE_INNER_BINS: 'Applies when RMT Containers have inner containers eg. Lugs on trailers for grapes.' },
+    { CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION: 'In future, some packhouses may want to integrate a physical scale so that weights can be obtained directly from the scale.' },
+    { CAPTURE_CONTAINER_MATERIAL: 'Type of bin at delivery eg. Wood, Plastic (Required for empty bin control)' },
+    { CAPTURE_CONTAINER_MATERIAL_OWNER: 'Capture container material owner at delivery eg. Chep (Required for empty bin control)' },
+    { USE_DELIVERY_DESTINATION: 'Intended destination for a delivery of rmt_fruit eg. degreening or PH1' },
+    { CAPTURE_DAMAGED_BINS: 'Optional capture at delivery' },
+    { CAPTURE_EMPTY_BINS: 'Optional capture at delivery' },
+    { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'Optional capture at delivery' },
     { PALLET_MIX_RULES_SCOPE: 'a list of scope values for pallet_mix_rules.' },
     { USE_PERMANENT_RMT_BIN_BARCODES: 'Capture deliveries with permanently barcoded bins.' },
     { BULK_BIN_ASSET_NUMBER_ENTRY: 'create the bin group as per usual, but allocate bin asset numbers from the user provided list inside text area' },
@@ -92,7 +92,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { ALLOW_EXPORT_PALLETS_TO_BYPASS_INSPECTION: 'optional. Allow non LO pallets to be set to in_stock by users' },
     { USE_LABEL_ID_ON_BIN_LABEL: 'If CARTON_EQUALS_PALLET is true, use carton_label_id instead of pallet_number to lookup carton_labels existence if USE_LABEL_ID_ON_BIN_LABEL is set to true. Default false' },
     { REQUIRE_EXTENDED_PACKAGING: 'If REQUIRE_EXTENDED_PACKAGING is true, packaging for product setup is extended. Default false' },
-    { EST_PALLETS_PACKED_PER_YEAR: 'An estimate of the number of pallets packed in a year (season). Used to report the number of available pallet numbers per GLN.' }
+    { EST_PALLETS_PACKED_PER_YEAR: 'An estimate of the number of pallets packed in a year (season). Used to report the number of available pallet numbers per GLN.' },
+    { NO_RUN_ALLOCATION: 'Product setups are not allocated to plant resources during run setup.' }
   ].freeze
 
   NO_OVERRIDE = [
