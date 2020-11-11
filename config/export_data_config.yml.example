@@ -1,69 +1,67 @@
 ---
 eos_cartons:
   grid: cartons
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_bins:
   grid: rmt_bins
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_pallet_sequences:
   grid: all_pallet_sequences
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_pallets:
   grid: all_pallets
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_deliveries:
   grid: rmt_deliveries
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_loads:
   grid: loads
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_inspection_pallets:
   grid: govt_inspection_pallets
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_prodrunstats:
-#  grid: ?
-  grid: production_runs
-  out_dir: /home/violet/end_of_season
+  report: end_of_season_prodrun_stats
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_bin_loads:
-#  grid: ?
-  grid: rmt_bins
-  out_dir: /home/violet/end_of_season
+  grid: bin_loads
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_empty_bin_locations:
   grid: empty_bin_locations
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
 eos_empty_bin_transactions:
   grid: empty_bin_transactions
-  out_dir: /home/violet/end_of_season
+  out_dir: /home/nspack/end_of_season
   export_hidden_fields: true
   boolean_as_yn: true
   prefix_long_numbers_with_quote: true
@@ -90,3 +88,4 @@ bins:
 shipped_pallets:
   report: shipped_pallets
   out_dir: /home/nspack/csv_exports
+
