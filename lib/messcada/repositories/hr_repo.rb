@@ -33,5 +33,13 @@ module MesscadaApp
         .select(Sequel[:contract_workers][:id].as(:contract_worker_id), :personnel_identifier_id, :personnel_number)
         .first
     end
+
+    def personnel_identifier_id_from_device_identifier(identifier)
+      DB[:personnel_identifiers].where(identifier: identifier).get(:id)
+    end
+
+    def contract_worker_id_from_personnel_id(personnel_identifier_id)
+      DB[:contract_workers].where(personnel_identifier_id: personnel_identifier_id).get(:id)
+    end
   end
 end

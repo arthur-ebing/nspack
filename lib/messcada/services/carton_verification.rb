@@ -2,7 +2,7 @@
 
 module MesscadaApp
   class CartonVerification < BaseService
-    attr_reader :repo, :carton_quantity, :carton_label_id, :carton_id, :resource_code, :user, :palletizer_identifier, :palletizing_bay_resource_id
+    attr_reader :repo, :hr_repo, :carton_quantity, :carton_label_id, :carton_id, :resource_code, :user, :palletizer_identifier, :palletizing_bay_resource_id
 
     def initialize(user, params, palletizer_identifier = nil, palletizing_bay_resource_id = nil)
       @carton_label_id = params[:carton_number]
@@ -10,6 +10,7 @@ module MesscadaApp
       @palletizer_identifier = palletizer_identifier
       @palletizing_bay_resource_id = palletizing_bay_resource_id
       @repo = MesscadaApp::MesscadaRepo.new
+      @hr_repo = MesscadaApp::HrRepo.new
       @carton_quantity = 1
       @container_type = AppConst::CARTON_EQUALS_PALLET ? 'Bin' : 'Carton'
     end
@@ -49,8 +50,8 @@ module MesscadaApp
       return if @carton_id
 
       unless palletizer_identifier.nil?
-        palletizer_identifier_id = find_personnel_identifier
-        palletizer_contract_worker_id = find_palletizer_contract_worker(palletizer_identifier_id)
+        palletizer_identifier_id = find_personnel_identifier_id
+        palletizer_contract_worker_id = find_palletizer_contract_worker_id(palletizer_identifier_id)
       end
       attrs = { carton_label_id: carton_label_id,
                 palletizer_identifier_id: palletizer_identifier_id,
@@ -68,12 +69,12 @@ module MesscadaApp
       repo.find_hash(:carton_labels, carton_label_id).reject { |k, _| %i[id resource_id label_name carton_equals_pallet active created_at updated_at].include?(k) }
     end
 
-    def find_personnel_identifier
-      repo.find_personnel_identifiers_by_palletizer_identifier(palletizer_identifier)
+    def find_personnel_identifier_id
+      hr_repo.personnel_identifier_id_from_device_identifier(palletizer_identifier)
     end
 
-    def find_palletizer_contract_worker(palletizer_identifier_id)
-      repo.find_palletizer_contract_worker(palletizer_identifier_id)
+    def find_palletizer_contract_worker_id(palletizer_identifier_id)
+      hr_repo.contract_worker_id_from_personnel_id(palletizer_identifier_id)
     end
   end
 end

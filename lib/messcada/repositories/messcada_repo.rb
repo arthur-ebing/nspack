@@ -341,14 +341,6 @@ module MesscadaApp
       mtype == 'robot-T200' ? 4 : 6
     end
 
-    def find_personnel_identifiers_by_palletizer_identifier(palletizer_identifier)
-      DB[:personnel_identifiers].where(identifier: palletizer_identifier).get(:id)
-    end
-
-    def find_palletizer_contract_worker(palletizer_identifier_id)
-      DB[:contract_workers].where(personnel_identifier_id: palletizer_identifier_id).get(:id)
-    end
-
     def carton_attributes(carton_id)
       query = <<~SQL
         SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference,
