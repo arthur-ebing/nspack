@@ -23,6 +23,7 @@ namespace :app do
       eos_pallets
       eos_prodrunstats
     ].each do |key|
+      puts "\nExtracting for #{key}..."
       Crossbeams::ExportData.run(key)
     end
   end
