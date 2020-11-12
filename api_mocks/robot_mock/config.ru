@@ -364,6 +364,15 @@ class App < Roda # rubocop:disable Metrics/ClassLength
                 p6: null,
               },
               {
+                url: '/messcada/rmt/can_tip_bin?',
+                p1: 'device',
+                p2: 'bin_number',
+                p3: null,
+                p4: null,
+                p5: null,
+                p6: null,
+              },
+              {
                 url: '/messcada/rmt/bin_tipping/weighing?',
                 p1: 'device',
                 p2: 'bin_number',
