@@ -3,7 +3,7 @@
 module MesscadaApp
   class CartonWeighing < BaseService
     attr_reader :repo, :carton_is_pallet, :provide_pack_type, :carton_label_id, :resource_code, :gross_weight, :uom,
-                :plant_resource_button_indicator
+                :plant_resource_button_indicator, :standard_pack_code_id
 
     def initialize(params)
       @carton_label_id = params[:carton_number]
@@ -31,6 +31,9 @@ module MesscadaApp
       if provide_pack_type
         return failed_response("Pack Type for button :#{plant_resource_button_indicator} not found") unless standard_pack_code_exists?
         return failed_response("Button Indicator for button:#{plant_resource_button_indicator} referenced by more than 1 Standard Pack Code") unless one_standard_pack_code?
+
+        @standard_pack_code_id = find_standard_pack_code(plant_resource_button_indicator)
+
       end
 
       attrs = update_attrs
@@ -60,10 +63,8 @@ module MesscadaApp
     def update_attrs
       attrs = { gross_weight: gross_weight }
       if provide_pack_type
-        standard_pack_code_id = find_standard_pack_code(plant_resource_button_indicator)
         nett_weight = gross_weight - BigDecimal(repo.find_standard_pack_code_material_mass(standard_pack_code_id))
-        attrs = attrs.to_h.merge(nett_weight: nett_weight,
-                                 standard_pack_code_id: standard_pack_code_id)
+        attrs = attrs.to_h.merge(nett_weight: nett_weight)
       end
       attrs
     end
@@ -72,11 +73,12 @@ module MesscadaApp
       repo.find_standard_pack_code(plant_resource_button_indicator)
     end
 
-    def update_carton(id, attrs)
+    def update_carton(id, attrs)  # rubocop:disable Metrics/AbcSize
+      repo.update_carton_label(carton_label_id, { standard_pack_code_id: standard_pack_code_id }) if provide_pack_type
       repo.update_carton(id, attrs)
       return unless carton_is_pallet
 
-      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: attrs[:standard_pack_code_id]) if provide_pack_type
+      DB[:pallet_sequences].where(scanned_from_carton_id: id).update(standard_pack_code_id: standard_pack_code_id) if provide_pack_type
       pallet_id = find_pallet_from_carton(id)
       DB[:pallets].where(id: pallet_id).update(gross_weight: gross_weight)
     end

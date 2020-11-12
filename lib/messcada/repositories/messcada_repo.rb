@@ -3,7 +3,7 @@
 module MesscadaApp
   class MesscadaRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     crud_calls_for :carton_labels, name: :carton_label, wrapper: CartonLabel
-    crud_calls_for :cartons, name: :carton, wrapper: Carton
+    crud_calls_for :cartons, name: :carton, wrapper: CartonFlat
     crud_calls_for :pallets, name: :pallet, wrapper: Pallet
     crud_calls_for :pallet_sequences, name: :pallet_sequence, wrapper: PalletSequence
 
@@ -46,6 +46,24 @@ module MesscadaApp
       hash[:pallet_percentage] = hash[:pallet_carton_quantity].zero? ? 0 : (hash[:carton_quantity] / hash[:pallet_carton_quantity].to_f).round(3)
       hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
       PalletSequenceFlat.new(hash)
+    end
+
+    def find_carton(id)
+      hash = DB["SELECT cartons.* ,cl.production_run_id, cl.farm_id, cl.puc_id, cl.orchard_id, cl.cultivar_group_id,
+                 cl.cultivar_id, cl.product_resource_allocation_id, cl.packhouse_resource_id, cl.production_line_id,
+                 cl.season_id, cl.marketing_variety_id, cl.customer_variety_id, cl.std_fruit_size_count_id,
+                 cl.basic_pack_code_id, cl.standard_pack_code_id, cl.fruit_actual_counts_for_pack_id, cl.fruit_size_reference_id,
+                 cl.marketing_org_party_role_id, cl.packed_tm_group_id, cl.mark_id, cl.inventory_code_id, cl.pallet_format_id,
+                 cl.cartons_per_pallet_id, cl.pm_bom_id, cl.extended_columns, cl.client_size_reference, cl.client_product_code,
+                 cl.treatment_ids, cl.marketing_order_number, cl.fruit_sticker_pm_product_id, cl.pm_type_id, cl.pm_subtype_id,
+                 cl.sell_by_code, cl.grade_id, cl.product_chars, cl.pallet_label_name, cl.pick_ref, cl.pallet_number,
+                 cl.phc, cl.personnel_identifier_id, cl.contract_worker_id, cl.packing_method_id
+                 FROM cartons
+                 JOIN carton_labels cl ON cl.id = cartons.carton_label_id
+                 WHERE cartons.id = ?", id].first
+      return nil if hash.nil?
+
+      CartonFlat.new(hash)
     end
 
     def find_stock_item(stock_item_id, stock_type)
@@ -346,15 +364,16 @@ module MesscadaApp
         SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference,
                sp.standard_pack_code, sf.size_count_value ,clt.cultivar_name, cg.cultivar_group_code, c.*
         FROM cartons c
-        JOIN inventory_codes i ON i.id = c.inventory_code_id
-        JOIN target_market_groups tm on tm.id = c.packed_tm_group_id
-        LEFT JOIN fruit_size_references fs on fs.id = c.fruit_size_reference_id
-        JOIN standard_pack_codes sp on sp.id = c.standard_pack_code_id
-        LEFT JOIN std_fruit_size_counts sf on sf.id = c.std_fruit_size_count_id
-        JOIN grades g on g.id = c.grade_id
-        JOIN marks m on m.id = c.mark_id
-        JOIN cultivars clt on clt.id = c.cultivar_id
-        JOIN cultivar_groups cg on cg.id = c.cultivar_group_id
+        JOIN carton_labels cl on cl.id = c.carton_label_id
+        JOIN inventory_codes i ON i.id = cl.inventory_code_id
+        JOIN target_market_groups tm on tm.id = cl.packed_tm_group_id
+        LEFT JOIN fruit_size_references fs on fs.id = cl.fruit_size_reference_id
+        JOIN standard_pack_codes sp on sp.id = cl.standard_pack_code_id
+        LEFT JOIN std_fruit_size_counts sf on sf.id = cl.std_fruit_size_count_id
+        JOIN grades g on g.id = cl.grade_id
+        JOIN marks m on m.id = cl.mark_id
+        JOIN cultivars clt on clt.id = cl.cultivar_id
+        JOIN cultivar_groups cg on cg.id = cl.cultivar_group_id
         WHERE c.id = ?
       SQL
       DB[query, carton_id].first

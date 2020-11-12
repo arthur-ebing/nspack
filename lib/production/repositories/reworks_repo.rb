@@ -633,7 +633,7 @@ module ProductionApp
         FROM pm_products p
         JOIN pm_subtypes s on s.id = p.pm_subtype_id
         JOIN pm_types t on t.id = s.pm_type_id
-        WHERE t.pm_type_code = #{pm_type} AND p.id != #{fruit_sticker_pm_product_id}
+        WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}
       SQL
       DB[query].map { |r| [r[:product_code], r[:id]] }
     end
@@ -871,10 +871,6 @@ module ProductionApp
         SELECT COUNT(id) FROM carton_labels WHERE production_run_id IN (#{production_runs.join(',')})
       SQL
 
-      cartons_query = <<~SQL
-        SELECT COUNT(id) FROM cartons WHERE production_run_id IN (#{production_runs.join(',')})
-      SQL
-
       pallet_sequences_query = <<~SQL
         SELECT COUNT(id) FROM pallet_sequences WHERE production_run_id IN (#{production_runs.join(',')})
       SQL
@@ -895,7 +891,6 @@ module ProductionApp
         production_runs: production_runs.count,
         tipped_bins: DB[tipped_bins_query].single_value,
         carton_labels: DB[carton_labels_query].single_value,
-        cartons: DB[cartons_query].single_value,
         pallet_sequences: DB[pallet_sequences_query].single_value,
         shipped_pallet_sequences: DB[shipped_ps_query].single_value,
         inspected_pallet_sequences: DB[inspected_ps_query].single_value }

@@ -19,9 +19,10 @@
   = palletizing_bay_states.palletizing_bay_resource_id\r\nLEFT JOIN pallet_sequences
   ON pallet_sequences.id = palletizing_bay_states.pallet_sequence_id\r\nLEFT JOIN
   pallets ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN cartons ON cartons.id
-  = palletizing_bay_states.determining_carton_id\r\nLEFT JOIN cartons_per_pallet ON
-  cartons_per_pallet.id = cartons.cartons_per_pallet_id\r\nLEFT JOIN personnel_identifiers
-  ON personnel_identifiers.id = cartons.palletizer_identifier_id\r\nORDER BY 2 ASC"
+  = palletizing_bay_states.determining_carton_id\r\nLEFT JOIN carton_labels ON carton_labels.id
+  = cartons.carton_label_id\r\nLEFT JOIN cartons_per_pallet ON cartons_per_pallet.id
+  = carton_labels.cartons_per_pallet_id\r\nLEFT JOIN personnel_identifiers ON personnel_identifiers.id
+  = cartons.palletizer_identifier_id\r\nORDER BY 2 ASC"
 :limit: 
 :offset: 
 :external_settings:

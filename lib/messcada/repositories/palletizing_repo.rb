@@ -52,7 +52,8 @@ module MesscadaApp
         LEFT JOIN pallet_sequences ON pallet_sequences.id = pallet_sequence_id
         LEFT JOIN pallets ON pallets.id = pallet_id
         LEFT JOIN cartons ON cartons.id = determining_carton_id
-        LEFT JOIN cartons_per_pallet ON cartons_per_pallet.id = cartons.cartons_per_pallet_id
+        LEFT JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
+        LEFT JOIN cartons_per_pallet ON cartons_per_pallet.id = carton_labels.cartons_per_pallet_id
         WHERE palletizing_bay_states.id = ?
       SQL
       DB[query, palletizing_bay_state_id].first.merge(external_attributes)
@@ -75,7 +76,8 @@ module MesscadaApp
       query = <<~SQL
         SELECT EXISTS(
           SELECT production_runs.id FROM production_runs
-          JOIN cartons on cartons.production_run_id = production_runs.id
+          JOIN carton_labels on carton_labels.production_run_id = production_runs.id
+          JOIN cartons on carton_labels.id = cartons.carton_label_id
           WHERE cartons.id = #{carton_id}
           AND production_runs.closed
         )
@@ -182,6 +184,7 @@ module MesscadaApp
     def find_palletizing_bay_carton_label_name(carton_id)
       DB[:label_templates]
         .where(id: DB[:cartons]
+                       .join(:carton_labels, id: :carton_label_id)
                        .join(:product_resource_allocations, id: :product_resource_allocation_id)
                        .join(:product_setups, id: :product_setup_id)
                        .where(Sequel[:cartons][:id] => carton_id)

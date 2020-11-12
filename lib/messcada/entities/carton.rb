@@ -3,6 +3,23 @@
 module MesscadaApp
   class Carton < Dry::Struct
     attribute :id, Types::Integer
+    attribute :carton_label_id, Types::Integer
+    attribute :gross_weight, Types::Decimal
+    attribute :nett_weight, Types::Decimal
+    attribute? :active, Types::Bool
+    attribute :palletizer_identifier_id, Types::Integer
+    attribute :pallet_sequence_id, Types::Integer
+    attribute :palletizing_bay_resource_id, Types::Integer
+    attribute? :is_virtual, Types::Bool
+    attribute? :scrapped, Types::Bool
+    attribute :scrapped_reason, Types::String
+    attribute :scrapped_at, Types::DateTime
+    attribute :scrapped_sequence_id, Types::Integer
+    attribute :palletizer_contract_worker_id, Types::Integer
+  end
+
+  class CartonFlat < Dry::Struct
+    attribute :id, Types::Integer
     attribute :production_run_id, Types::Integer
     attribute :farm_id, Types::Integer
     attribute :puc_id, Types::Integer
@@ -49,6 +66,7 @@ module MesscadaApp
     attribute :palletizing_bay_resource_id, Types::Integer
     attribute? :is_virtual, Types::Bool
     attribute? :scrapped, Types::Bool
+    attribute :scrapped_reason, Types::String
     attribute :scrapped_at, Types::DateTime
     attribute :scrapped_sequence_id, Types::Integer
     attribute :palletizer_contract_worker_id, Types::Integer

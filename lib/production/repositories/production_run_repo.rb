@@ -108,7 +108,8 @@ module ProductionApp
       qry = <<~SQL
         select cpp.cartons_per_pallet
         from cartons c
-        join cartons_per_pallet cpp on cpp.id = c.cartons_per_pallet_id
+        join carton_labels cl on cl.id = c.carton_label_id
+        join cartons_per_pallet cpp on cpp.id = cl.cartons_per_pallet_id
         where c.id = ?
       SQL
       DB[qry, carton_id].first
@@ -122,7 +123,8 @@ module ProductionApp
       qry = <<~SQL
         select c.*, r.closed as production_run_closed
         from cartons c
-        join production_runs r on r.id = c.production_run_id
+        join carton_labels cl on cl.id = c.carton_label_id
+        join production_runs r on r.id = cl.production_run_id
         where c.id = ?
       SQL
       DB[qry, carton_id].first

@@ -39,7 +39,7 @@ module MesscadaApp
                                   phc pallet_label_name active created_at updated_at packing_method_id palletizer_identifier_id palletizer_contract_worker_id
                                   pallet_sequence_id palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id]
       carton_rejected_fields << :pallet_number unless AppConst::CARTON_EQUALS_PALLET
-      repo.find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
+      repo.find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
     end
 
     def pallet_sequence_pallet_params

@@ -28,14 +28,14 @@
   from rmt_bins where production_run_tipped_id = production_runs.id) AS has_deliveries,\r\n
   \   EXISTS(select id from rmt_bins where production_run_tipped_id = production_runs.id)
   AS has_bins,\r\n    EXISTS(select id from rmt_bins where production_run_rebin_id
-  = production_runs.id) AS has_rebins,\r\n    EXISTS(select id from cartons where
-  production_run_id = production_runs.id) AS has_cartons,\r\n    CASE\r\n        WHEN
-  production_runs.reconfiguring THEN 'inprogress'\r\n        WHEN production_runs.running
-  THEN 'ok'\r\n        END AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT JOIN
-  cultivar_groups ON cultivar_groups.id = production_runs.cultivar_group_id\r\nLEFT
-  JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN farms ON farms.id
-  = production_runs.farm_id\r\nLEFT JOIN orchards ON orchards.id = production_runs.orchard_id\r\nJOIN
-  plant_resources ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT
+  = production_runs.id) AS has_rebins,\r\n    EXISTS(select cartons.id from cartons
+  join carton_labels on carton_labels.id = cartons.carton_label_id where production_run_id
+  = production_runs.id) AS has_cartons,\r\n    CASE\r\n        WHEN production_runs.reconfiguring
+  THEN 'inprogress'\r\n        WHEN production_runs.running THEN 'ok'\r\n        END
+  AS colour_rule\r\n\r\nFROM production_runs\r\nLEFT JOIN cultivar_groups ON cultivar_groups.id
+  = production_runs.cultivar_group_id\r\nLEFT JOIN cultivars ON cultivars.id = production_runs.cultivar_id\r\nJOIN
+  farms ON farms.id = production_runs.farm_id\r\nLEFT JOIN orchards ON orchards.id
+  = production_runs.orchard_id\r\nJOIN plant_resources ON plant_resources.id = production_runs.packhouse_resource_id\r\nLEFT
   JOIN product_setup_templates ON product_setup_templates.id = production_runs.product_setup_template_id\r\nJOIN
   plant_resources plant_resources2 ON plant_resources2.id = production_runs.production_line_id\r\nJOIN
   pucs ON pucs.id = production_runs.puc_id\r\nJOIN seasons ON seasons.id = production_runs.season_id\r\n\r\nORDER
@@ -868,10 +868,10 @@
   :caption: Id
   :data_type: :integer
   :control_type: :integer
-  :default_value:
+  :default_value: 
   :ordered_list: false
   :ui_priority: 1
-  :list_def:
+  :list_def: 
 - :column: production_runs.farm_id
   :caption: Farm
   :data_type: :integer

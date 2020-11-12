@@ -17,7 +17,7 @@ module UiRules
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
-      compact_header(columns: %i[deliveries production_runs tipped_bins carton_labels cartons pallet_sequences
+      compact_header(columns: %i[deliveries production_runs tipped_bins carton_labels pallet_sequences
                                  shipped_pallet_sequences inspected_pallet_sequences],
                      display_columns: 2)
 
@@ -86,7 +86,6 @@ module UiRules
                                     production_runs: res[:production_runs],
                                     tipped_bins: res[:tipped_bins],
                                     carton_labels: res[:carton_labels],
-                                    cartons: res[:cartons],
                                     pallet_sequences: res[:pallet_sequences],
                                     shipped_pallet_sequences: res[:shipped_pallet_sequences],
                                     inspected_pallet_sequences: res[:inspected_pallet_sequences])

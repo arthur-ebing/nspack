@@ -135,7 +135,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RMT_BIN_UNTIPPED_MANUALLY = 'UNTIPPED MANUALLY'
 
   # Constants for PM Types
-  PM_TYPE_FRUIT_STICKER = 'fruit_sticker'
+  PM_TYPE_FRUIT_STICKER = 'FRUIT_STICKER'
 
   # Pallet verification
   REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION = make_boolean('REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION')
@@ -600,6 +600,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PLT_LABEL_QTY_TO_PRINT = 4
 
   # Refresh pallet data
-  REFRESH_PALLET_DATA_TABLES = %w[carton_labels cartons pallet_sequences].freeze
+  REFRESH_PALLET_DATA_TABLES = %w[carton_labels pallet_sequences].freeze
   REFRESH_PALLET_DATA_COLUMNS = %w[fruit_actual_counts_for_pack_id fruit_size_reference_id].freeze
 end

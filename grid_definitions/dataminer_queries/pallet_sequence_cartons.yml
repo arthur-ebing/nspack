@@ -1,6 +1,6 @@
 ---
 :caption: Pallet Sequence Cartons
-:sql: "SELECT cartons.id,\r\n             carton_labels.id AS label_id,\r\n             cartons.production_run_id,\r\n
+:sql: "SELECT cartons.id,\r\n             carton_labels.id AS label_id,\r\n             carton_labels.production_run_id,\r\n
   \            pallet_sequences.pallet_number,\r\n             pallet_sequences.pallet_sequence_number,\r\n
   \            CONCAT(contract_workers.first_name, '_', contract_workers.surname)
   AS contract_worker,\r\n             packpoints.plant_resource_code AS packpoint,\r\n
@@ -80,7 +80,7 @@
     :name: production_run_id
     :sequence_no: 3
     :caption: Run
-    :namespaced_name: cartons.production_run_id
+    :namespaced_name: carton_labels.production_run_id
     :data_type: :integer
     :width: 70
     :format: 

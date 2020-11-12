@@ -4,7 +4,7 @@ module ProductionApp
   class ChangeDeliveriesOrchards < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :farm_repo, :cultivar_repo, :change_attrs, :reworks_run_attrs,
                 :delivery_ids, :default_changes_to_apply,
-                :production_runs, :tipped_bins, :cartons, :carton_labels, :pallet_sequences
+                :production_runs, :tipped_bins, :carton_labels, :pallet_sequences
 
     def initialize(change_attrs, reworks_run_attrs)
       @repo = ProductionApp::ReworksRepo.new
@@ -39,7 +39,6 @@ module ProductionApp
       @production_runs = repo.deliveries_production_runs(delivery_ids, change_attrs[:ignore_runs_that_allow_mixing])
       @tipped_bins = DB[:rmt_bins].where(production_run_tipped_id: production_runs).where(from_attrs).select_map(:id)
       @carton_labels = DB[:carton_labels].where(production_run_id: production_runs).where(from_attrs).select_map(:id)
-      @cartons = DB[:cartons].where(production_run_id: production_runs).where(from_attrs).select_map(:id)
       @pallet_sequences = DB[:pallet_sequences].where(production_run_id: production_runs).where(from_attrs).select_map(:id)
 
       errors = change_validations
@@ -84,7 +83,7 @@ module ProductionApp
     end
 
     def run_object_exists?
-      if tipped_bins.nil_or_empty? && carton_labels.nil_or_empty? && cartons.nil_or_empty? && pallet_sequences.nil_or_empty?
+      if tipped_bins.nil_or_empty? && carton_labels.nil_or_empty? && pallet_sequences.nil_or_empty?
         false
       else
         true
@@ -107,7 +106,7 @@ module ProductionApp
       change_attrs[:ignore_runs_that_allow_mixing] && !change_attrs[:allow_cultivar_mixing] && repo.invalidates_marketing_varieties?(production_runs, change_attrs[:to_cultivar])
     end
 
-    def update_orchard_changes  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def update_orchard_changes  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       # repo.transaction do
       unless reworks_run_attrs[:changes_made].nil_or_empty?
         send_bus_message("Cascading orchard change - updating #{delivery_ids.count} deliveries records", message_type: :information, target_user: reworks_run_attrs[:user_name])
@@ -120,7 +119,6 @@ module ProductionApp
       update_objects_changes(production_runs, 'production_runs') unless production_runs.nil_or_empty?
       update_objects_changes(tipped_bins, 'rmt_bins') unless tipped_bins.nil_or_empty?
       update_objects_changes(carton_labels, 'carton_labels') unless carton_labels.nil_or_empty?
-      update_objects_changes(cartons, 'cartons') unless cartons.nil_or_empty?
       update_objects_changes(pallet_sequences, 'pallet_sequences') unless pallet_sequences.nil_or_empty?
       # end
 
