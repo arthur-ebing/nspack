@@ -41,5 +41,11 @@ module MesscadaApp
     def contract_worker_id_from_personnel_id(personnel_identifier_id)
       DB[:contract_workers].where(personnel_identifier_id: personnel_identifier_id).get(:id)
     end
+
+    def active_group_incentive_id(system_resource_id)
+      DB[:group_incentives]
+        .where(system_resource_id: system_resource_id, active: true)
+        .get(:id)
+    end
   end
 end

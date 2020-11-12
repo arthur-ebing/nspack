@@ -464,6 +464,16 @@ module ProductionApp
       Robot.new(hash)
     end
 
+    def system_resource_incentive_settings(device)
+      hash = DB[:system_resources]
+             .select(:id, :system_resource_code, :login, :logoff, :group_incentive)
+             .where(system_resource_code: device)
+             .first
+      return nil if hash.nil?
+
+      SystemResourceIncentiveSettings.new(hash)
+    end
+
     private
 
     def create_twin_system_resource(parent_id, res, sys_code)

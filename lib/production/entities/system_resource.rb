@@ -29,6 +29,25 @@ module ProductionApp
     attribute? :active, Types::Bool
   end
 
+  class SystemResourceIncentiveSettings < Dry::Struct
+    attribute :id, Types::Integer
+    attribute :system_resource_code, Types::String
+    attribute :login, Types::Bool
+    attribute :logoff, Types::Bool
+    attribute :group_incentive, Types::Bool
+  end
+
+  class SystemResourceWithIncentive < Dry::Struct
+    attribute :id, Types::Integer
+    attribute :system_resource_code, Types::String
+    attribute :login, Types::Bool
+    attribute :logoff, Types::Bool
+    attribute :group_incentive, Types::Bool
+    attribute? :contract_worker_id, Types::Integer
+    attribute? :personnel_identifier_id, Types::Integer
+    attribute? :group_incentive_id, Types::Integer
+  end
+
   class SystemResourceFlat < Dry::Struct
     attribute :id, Types::Integer
     attribute :plant_resource_type_id, Types::Integer

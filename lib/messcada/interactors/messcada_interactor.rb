@@ -237,6 +237,45 @@ module MesscadaApp
       failed_response("System error: #{e.message.gsub(/['"`<>]/, '')}")
     end
 
+    # Take params, lookup system resource and some related attributes
+    # and merge them into the params as { system_resource: SystemResourceWithIncentive }.
+    def merge_system_resource_incentive(params, has_button: false) # rubocop:disable Metrics/AbcSize
+      device = if has_button
+                 ar = params[:device].split('-')
+                 ar.take(ar.length - 1).join('-')
+               else
+                 params[:device]
+               end
+      sys_res = resource_repo.system_resource_incentive_settings(device)
+      return failed_response("#{device} is not configured") if sys_res.nil?
+      return success_response('ok', merge_incentive_just_system_resource(sys_res, params)) if !sys_res.login && !sys_res.group_incentive
+      return merge_incentive_contract_worker(sys_res, params) unless sys_res.group_incentive
+
+      merge_incentive_group_incentive(sys_res, params)
+    end
+
+    def merge_incentive_just_system_resource(sys_res, params)
+      params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h))
+    end
+
+    def merge_incentive_contract_worker(sys_res, params)
+      personnel_identifier_id = hr_repo.personnel_identifier_id_from_device_identifier(params[:identifier])
+      return failed_response('Invalid identifier') if personnel_identifier_id.nil?
+
+      contract_worker_id = hr_repo.contract_worker_id_from_personnel_id(personnel_identifier_id)
+      return failed_response('This identifier is not assigned') if contract_worker_id.nil?
+
+      sys = sys_res.to_h.merge(personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id)
+      success_response('ok', params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys)))
+    end
+
+    def merge_incentive_group_incentive(sys_res, params)
+      group_incentive_id = hr_repo.active_group_incentive_id(sys_res.id)
+      return failed_response('There is no active group') if group_incentive_id.nil?
+
+      params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h.merge(group_incentive_id: group_incentive_id)))
+    end
+
     def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = CartonLabelingSchema.call(params)
       return validation_failed_response(res) if res.failure?
@@ -247,7 +286,7 @@ module MesscadaApp
       validate_identifier = AppConst::INCENTIVISED_LABELING
       validate_identifier = false unless res.to_h.key?(:identifier)
 
-      if validate_identifier && res[:identifier].nil_or_empty?
+      if validate_identifier && !res[:identifier].nil_or_empty?
         check_res = validate_incentivised_labeling(res[:identifier])
         return check_res unless check_res.success
       end
@@ -498,6 +537,14 @@ module MesscadaApp
 
     def production_run_repo
       @production_run_repo ||= ProductionApp::ProductionRunRepo.new
+    end
+
+    def hr_repo
+      @hr_repo ||= HrRepo.new
+    end
+
+    def resource_repo
+      @resource_repo ||= ProductionApp::ResourceRepo.new
     end
 
     def reworks_repo
