@@ -50,7 +50,7 @@
   plant_resources packhouses ON packhouses.id = carton_labels.packhouse_resource_id\r\nJOIN
   plant_resources lines ON lines.id = carton_labels.production_line_id\r\nLEFT JOIN
   plant_resources packpoints ON packpoints.id = carton_labels.resource_id\r\nLEFT
-  JOIN plant_resources palletizing_bays ON palletizing_bays.id = carton_labels.palletizing_bay_resource_id\r\nLEFT
+  JOIN plant_resources palletizing_bays ON palletizing_bays.id = cartons.palletizing_bay_resource_id\r\nLEFT
   JOIN system_resources ON packpoints.system_resource_id = system_resources.id\r\nJOIN
   farms ON farms.id = carton_labels.farm_id\r\nJOIN pucs ON pucs.id = carton_labels.puc_id\r\nJOIN
   orchards ON orchards.id = carton_labels.orchard_id\r\nJOIN cultivar_groups ON cultivar_groups.id

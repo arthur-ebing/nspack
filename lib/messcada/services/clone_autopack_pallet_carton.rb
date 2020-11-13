@@ -65,9 +65,8 @@ module MesscadaApp
     end
 
     def create_carton_labels
-      carton_label_rejected_fields = %i[id created_at updated_at is_virtual palletizing_bay_resource_id]
+      carton_label_rejected_fields = %i[id created_at updated_at]
       attrs = repo.find_hash(:carton_labels, carton[:carton_label_id]).reject { |k, _| carton_label_rejected_fields.include?(k) }
-      attrs = attrs.merge(is_virtual: true, palletizing_bay_resource_id: palletizing_bay_resource_id)
 
       @carton_numbers = repo.create_carton_labels(diff, attrs)
 
@@ -77,7 +76,7 @@ module MesscadaApp
     def create_cartons
       carton_numbers.each do |carton_number|
         new_carton_id = get_palletizing_carton(carton_number)
-        repo.update_carton(new_carton_id, { pallet_sequence_id: carton[:pallet_sequence_id] })
+        repo.update_carton(new_carton_id, { pallet_sequence_id: carton[:pallet_sequence_id], is_virtual: true, palletizing_bay_resource_id: palletizing_bay_resource_id })
         prod_repo.increment_sequence(carton[:pallet_sequence_id])
       end
 

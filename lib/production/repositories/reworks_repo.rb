@@ -510,7 +510,6 @@ module ProductionApp
       carton_ids = pallet_sequence_cartons(sequence_id)
       carton_label_ids = carton_carton_label(carton_ids)
       DB[:carton_labels].where(id: carton_label_ids).update(attrs)
-      DB[:cartons].where(id: carton_ids).update(attrs)
     end
 
     def pallet_sequence_cartons(sequence_id)

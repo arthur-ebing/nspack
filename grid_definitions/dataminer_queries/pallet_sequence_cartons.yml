@@ -25,7 +25,7 @@
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
   product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
   JOIN plant_resources packpoints ON packpoints.id = carton_labels.resource_id\r\nLEFT
-  JOIN plant_resources palletizing_bays ON palletizing_bays.id = carton_labels.palletizing_bay_resource_id\r\nLEFT
+  JOIN plant_resources palletizing_bays ON palletizing_bays.id = cartons.palletizing_bay_resource_id\r\nLEFT
   JOIN system_resources ON packpoints.system_resource_id = system_resources.id\r\nJOIN
   seasons ON seasons.id = carton_labels.season_id\r\nJOIN cartons_per_pallet ON cartons_per_pallet.id
   = carton_labels.cartons_per_pallet_id\r\nLEFT JOIN pm_products ON pm_products.id
