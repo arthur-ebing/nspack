@@ -14,6 +14,14 @@
 class BaseRepo # rubocop:disable Metrics/ClassLength
   include Crossbeams::Responses
 
+  # Cache the data type of all columns of all tables in the system
+  DB_TABLE_COLS = Hash[DB.tables
+                         .reject { |table| table == :schema_migrations }
+                         .map { |t| [t, Hash[DB.schema(t).map { |f, s| [f, s[:type]] }]] }] # rubocop:disable Style/HashTransformValues
+  DB_AUDIT_COLS = Hash[DB.tables(schema: :audit)
+                         .reject { |table| table == :schema_migrations }
+                         .map { |t| [t, Hash[DB.schema(t, schema: :audit).map { |f, s| [f, s[:type]] }]] }] # rubocop:disable Style/HashTransformValues
+
   # Wraps Sequel's transaction so that it is not exposed to calling code.
   #
   # @param block [Block] the work to take place within the transaction.
@@ -238,7 +246,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param attrs [Hash, OpenStruct] the fields and their values.
   # @return [Integer] the id of the new record.
   def create(table_name, attrs)
-    DB[table_name].insert(attrs.to_h)
+    DB[table_name].insert(prepare_values_for_db(table_name, attrs))
   end
 
   # Update a record.
@@ -247,7 +255,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param id [Integer] the id of the record.
   # @param attrs [Hash, OpenStruct] the fields and their values.
   def update(table_name, id, attrs)
-    DB[table_name].where(id: id).update(attrs.to_h)
+    DB[table_name].where(id: id).update(prepare_values_for_db(table_name, attrs))
   end
 
   # Delete a record.
@@ -359,6 +367,44 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     return nil if args.nil?
 
     args.to_h.transform_values { |v| v.is_a?(Array) ? array_for_db_col(v, array_type: array_type) : v }
+  end
+
+  # Take the attributes to be inserted/updated on a table
+  # and convert any arrays/hashes into their appropriate
+  # database-specific types.
+  #
+  # @param table_name [Symbol, Sequel::SQL::QualifiedIdentifier] the table name (or qualified name)
+  # @param args [hash,dry validation result] the attributes to apply.
+  # @return [hash] the modified attributes suitable for the DB.
+  def prepare_values_for_db(table_name, args)
+    return nil if args.nil?
+
+    hash = args.to_h.clone
+    hash.each do |k, v|
+      case column_type(table_name, k)
+      when :integer_array
+        hash[k] = array_for_db_col(v)
+      when :string_array
+        hash[k] = array_for_db_col(v, array_type: :text)
+      when :jsonb
+        hash[k] = hash_for_jsonb_col(v)
+      end
+    end
+
+    hash
+  end
+
+  # Get the data type of a table column.
+  #
+  # @param table_name [Symbol, Sequel::SQL::QualifiedIdentifier] the table name (or qualified name)
+  # @param column [symbol] the column name
+  # @return [symbol] the column's data type
+  def column_type(table_name, column)
+    if table_name.is_a?(Symbol)
+      DB_TABLE_COLS[table_name][column]
+    else
+      DB_AUDIT_COLS[table_name.column][column]
+    end
   end
 
   # Helper to convert rows of records to a Hash that can be used for optgroups in a select.

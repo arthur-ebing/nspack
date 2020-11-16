@@ -6,13 +6,9 @@ module MasterfilesApp
       res = validate_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 
-      attrs = res.to_h
-      cultivar_ids = attrs.delete(:cultivar_ids)
-      attrs = attrs.merge(cultivar_ids: "{#{cultivar_ids.join(',')}}") unless cultivar_ids.nil?
-
       id = nil
       repo.transaction do
-        id = repo.create_orchard(attrs)
+        id = repo.create_orchard(res)
         log_status('orchards', id, 'CREATED')
         log_transaction
       end
@@ -25,15 +21,12 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_orchard(id, params) # rubocop:disable Metrics/AbcSize
+    def update_orchard(id, params)
       res = validate_orchard_params(params)
       return validation_failed_response(res) if res.failure?
 
-      attrs = res.to_h
-      cultivar_ids = attrs.delete(:cultivar_ids)
-      attrs = attrs.merge(cultivar_ids: "{#{cultivar_ids.join(',')}}") unless cultivar_ids.nil?
       repo.transaction do
-        repo.update_orchard(id, attrs)
+        repo.update_orchard(id, res)
         log_transaction
       end
       instance = orchard(id)
