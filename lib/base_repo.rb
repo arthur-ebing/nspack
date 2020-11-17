@@ -403,7 +403,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
     if table_name.is_a?(Symbol)
       DB_TABLE_COLS[table_name][column]
     else
-      DB_AUDIT_COLS[table_name.column][column]
+      DB_AUDIT_COLS[table_name.table][column]
     end
   end
 
