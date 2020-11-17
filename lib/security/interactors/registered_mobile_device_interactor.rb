@@ -21,7 +21,7 @@ module SecurityApp
       id = nil
       repo.transaction do
         id = repo.create_registered_mobile_device(res)
-        log_status('registered_mobile_devices', id, 'CREATED')
+        log_status(:registered_mobile_devices, id, 'CREATED')
         log_transaction
       end
       instance = registered_mobile_device(id)
@@ -48,7 +48,7 @@ module SecurityApp
       name = registered_mobile_device(id).ip_address
       repo.transaction do
         repo.delete_registered_mobile_device(id)
-        log_status('registered_mobile_devices', id, 'DELETED')
+        log_status(:registered_mobile_devices, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted registered mobile device #{name}")

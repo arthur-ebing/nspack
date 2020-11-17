@@ -7,7 +7,6 @@ module LabelApp
     attribute :px_per_mm, Types::String.optional
     attribute :variable_xml, Types::String
     attribute :png_image, Types::Any # bytea,
-    # attribute :container_type, Types::String
     # attribute :commodity, Types::String
     # attribute :market, Types::String
     # attribute :language, Types::String

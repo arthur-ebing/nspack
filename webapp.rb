@@ -386,7 +386,6 @@ class Nspack < Roda
                       label_name: params[:labelName],
                       label_dimension: params[:labelDimension],
                       px_per_mm: params[:pixelPerMM],
-                      # container_type: extra_attributes[:container_type],
                       # commodity: extra_attributes[:commodity],
                       # market: extra_attributes[:market],
                       # language: extra_attributes[:language],
@@ -400,10 +399,10 @@ class Nspack < Roda
         DB.transaction do
           id = repo.create_label(interactor.include_created_by_in_changeset(interactor.add_extended_columns_to_changeset(changeset, repo, extcols)))
           if from_id.nil?
-            repo.log_status('labels', id, 'CREATED', user_name: current_user.user_name)
+            repo.log_status(:labels, id, 'CREATED', user_name: current_user.user_name)
           else
             from_lbl = repo.find_label(from_id)
-            repo.log_status('labels', id, 'CLONED', comment: "from #{from_lbl.label_name}", user_name: current_user.user_name)
+            repo.log_status(:labels, id, 'CLONED', comment: "from #{from_lbl.label_name}", user_name: current_user.user_name)
           end
           repo.log_action(user_name: current_user.user_name, context: 'create label', route_url: request.path, request_ip: request.ip)
         end

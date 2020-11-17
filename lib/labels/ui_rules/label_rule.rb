@@ -43,7 +43,6 @@ module UiRules
       fields[:label_name] = { renderer: :label }
       fields[:label_dimension] = { renderer: :label }
       fields[:px_per_mm] = { renderer: :label }
-      # fields[:container_type] = { renderer: :label }
       # fields[:commodity] = { renderer: :label }
       # fields[:market] = { renderer: :label }
       # fields[:language] = { renderer: :label }

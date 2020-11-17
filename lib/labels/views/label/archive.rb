@@ -24,7 +24,6 @@ module Labels
                 form.add_text 'Are you sure you want to archive this label?', wrapper: :h3
               end
               form.add_field :label_name
-              # form.add_field :container_type
               # form.add_field :commodity
               # form.add_field :market
               # form.add_field :language

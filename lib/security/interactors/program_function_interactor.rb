@@ -23,7 +23,7 @@ module SecurityApp
       success_response("Created program function #{instance.program_function_name}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { code: ['This program function already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { program_function_name: ['This program function already exists'] }))
     end
 
     def update_program_function(id, params)

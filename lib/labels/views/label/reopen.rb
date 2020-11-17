@@ -16,7 +16,6 @@ module Labels
               form.submit_captions 'Reopen'
               form.add_text 'Are you sure you want to reopen this label for editing?', wrapper: :h3
               form.add_field :label_name
-              # form.add_field :container_type
               # form.add_field :commodity
               # form.add_field :market
               # form.add_field :language

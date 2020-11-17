@@ -69,7 +69,7 @@ class EndOfSeasonEdiClear < BaseScript
     if debug_mode
       success_response('Dry run complete')
     else
-      success_response('Something was done')
+      success_response('FTP files archived and cleared')
     end
   end
 end

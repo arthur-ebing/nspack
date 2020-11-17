@@ -18,7 +18,6 @@ module Labels
               form.add_field :reject_reason
               form.add_field :label_name
               # form.fold_up do |fold|
-              #   fold.add_field :container_type
               #   fold.add_field :commodity
               #   fold.add_field :market
               #   fold.add_field :language

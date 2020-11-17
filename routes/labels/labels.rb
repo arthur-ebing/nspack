@@ -274,7 +274,6 @@ class Nspack < Roda
             # update_grid_row(id, changes:
             # {
             #   label_name: grid_cols[:label_name],
-            #   container_type: grid_cols[:container_type],
             #   commodity: grid_cols[:commodity],
             #   market: grid_cols[:market],
             #   language: grid_cols[:language],

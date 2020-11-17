@@ -171,7 +171,18 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param args [Hash] the where-clause conditions.
   # @return [Hash, nil] the row as a Hash.
   def where_hash(table_name, args)
-    DB[table_name].where(args).first
+    hash = DB[table_name].where(args).first
+    return nil if hash.nil?
+
+    hash.each do |k, v|
+      case hash[k]
+      when Sequel::Postgres::JSONBHash
+        hash[k] = v.to_h
+      when Sequel::Postgres::PGArray
+        hash[k] = v.to_a
+      end
+    end
+    hash
   end
 
   # Checks to see if a row exists that meets the given requirements.

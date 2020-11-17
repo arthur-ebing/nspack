@@ -39,7 +39,7 @@ module LabelApp
       repo.transaction do
         id = repo.create_printer_application(res)
         repo.unset_default_printer(id, res) if res.to_h[:default_printer]
-        log_status('printer_applications', id, 'CREATED')
+        log_status(:printer_applications, id, 'CREATED')
         log_transaction
       end
       instance = printer_application(id)
@@ -67,7 +67,7 @@ module LabelApp
       name = printer_application(id).application
       repo.transaction do
         repo.delete_printer_application(id)
-        log_status('printer_applications', id, 'DELETED')
+        log_status(:printer_applications, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted printer application #{name}")
