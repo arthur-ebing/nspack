@@ -25,9 +25,9 @@ module MasterfilesApp
     end
 
     def lookup_mf_variant(table_name)
-      return {} if table_name.nil_or_empty?
+      return {} if table_name.to_s.nil_or_empty?
 
-      variant = AppConst::MF_VARIANT_RULES.select { |_, hash| hash.key(table_name) }
+      variant = AppConst::MF_VARIANT_RULES.select { |_, hash| hash.key(table_name.to_s) }
       return {} if variant.values.empty?
 
       { variant: variant.keys.first.to_s.gsub('_', ' '),
@@ -45,7 +45,7 @@ module MasterfilesApp
       return id unless id.nil?
 
       variant_code = args.delete(lookup_mf_variant(table_name)[:column_name].to_sym)
-      id = DB[:masterfile_variants].where(masterfile_table: table_name, variant_code: variant_code).get(:masterfile_id)
+      id = DB[:masterfile_variants].where(masterfile_table: table_name.to_s, variant_code: variant_code).get(:masterfile_id)
       return nil if id.nil?
 
       get_id(table_name, args.merge(id: id))
