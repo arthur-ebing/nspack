@@ -264,14 +264,28 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     @current_user = nil
   end
 
+  # Get the id of a functional area and store as instance valiable
+  #
+  # @param functional_area_name [string] the functional area
+  # @return [integer]
   def store_current_functional_area(functional_area_name)
     @functional_area_id = SecurityApp::MenuRepo.new.functional_area_id_for_name(functional_area_name)
   end
 
+  # Return the functional_area_id instance variable
+  #
+  # @return [integer] functional area id.
   def current_functional_area
     @functional_area_id
   end
 
+  # Is the current user authorised for a particular menu access permission?
+  # Always returns false is there is no logged-on user.
+  #
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @param functional_area_id [nil,integer] the functional area. Optional, typically set by the route
+  # @return [boolean] true if authorised
   def authorised?(programs, sought_permission, functional_area_id = nil)
     return false unless current_user
 
@@ -280,13 +294,34 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     prog_repo.authorise?(current_user, Array(programs), sought_permission, functional_area_id)
   end
 
+  # Using functional area name, is the current user authorised for a particular menu access permission?
+  # Always returns false is there is no logged-on user.
+  #
+  # @param functional_area_name [string] the functional area.
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @return [boolean] true if authorised
   def auth_blocked?(functional_area_name, programs, sought_permission)
     store_current_functional_area(functional_area_name)
     !authorised?(programs, sought_permission)
   end
 
+  # Raise an authorization exception if the current user is not
+  # authorised for a particular menu access permission.
+  #
+  # @param programs [string, array] the program name(s)
+  # @param sought_permission [string] the security permission
+  # @param functional_area_id [nil,integer] the functional area. Optional, typically set by the route
+  # @return [void]
   def check_auth!(programs, sought_permission, functional_area_id = nil)
     raise Crossbeams::AuthorizationError unless authorised?(programs, sought_permission, functional_area_id)
+  end
+
+  # Raises an authorization exception if not running in development mode.
+  #
+  # @return [void]
+  def check_dev_only!
+    raise Crossbeams::AuthorizationError unless AppConst.development?
   end
 
   # Called by RodAuth after successful login to check if user

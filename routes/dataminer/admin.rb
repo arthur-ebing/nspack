@@ -84,6 +84,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'hide_grid_columns' do
+      check_dev_only!
+      check_auth!('reports', 'edit')
+
       r.is do
         r.get do
           show_page { DM::Admin::HideGridColumns.call }
