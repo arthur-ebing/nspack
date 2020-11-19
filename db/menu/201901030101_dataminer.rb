@@ -7,6 +7,7 @@ Crossbeams::MenuMigrations::Migrator.migration('Nspack') do
     add_program_function 'Grid Admin', functional_area: 'Dataminer', program: 'Reports', url: '/dataminer/admin/grids', seq: 3, restricted: true
     add_program_function 'Prepared Reports', functional_area: 'Dataminer', program: 'Reports', url: '/dataminer/prepared_reports/list', seq: 4
     add_program_function 'ALL Prepared Reports', functional_area: 'Dataminer', program: 'Reports', url: '/dataminer/prepared_reports/list_all', seq: 5, restricted: true
+    add_program_function 'Hide grid columns', functional_area: 'Dataminer', program: 'Reports', url: '/dataminer/admin/hide_grid_columns', seq: 6, restricted: true
   end
 
   down do
