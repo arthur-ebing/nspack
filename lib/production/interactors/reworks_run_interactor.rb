@@ -618,13 +618,13 @@ module ProductionApp
         if batch_update
           msg = 'Batch update was successful'
           sequences.each do |id|
-            repo.update_carton_labels_and_cartons(id, changed_attrs) if repo.individual_cartons?(id)
+            repo.update_carton_labels_for_pallet_sequence(id, changed_attrs) if repo.individual_cartons?(id)
             sequence = pallet_sequence(id)
             log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], sequence[:pallet_id], id, AppConst::REWORKS_ACTION_BATCH_EDIT)
           end
         else
           msg = 'Pallet Sequence updated successfully'
-          repo.update_carton_labels_and_cartons(sequence_id, changed_attrs) if repo.individual_cartons?(sequence_id)
+          repo.update_carton_labels_for_pallet_sequence(sequence_id, changed_attrs) if repo.individual_cartons?(sequence_id)
           pallet_id = pallet_sequence(sequence_id)[:pallet_id]
           log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], pallet_id, sequence_id, AppConst::RW_PALLET_SINGLE_EDIT)
         end
