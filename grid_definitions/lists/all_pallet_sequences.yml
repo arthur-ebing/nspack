@@ -17,3 +17,13 @@
   :icon: code
   :title: Transactions
   :popup: true
+:hide_for_client:
+  ud:
+  - fruit_sticker
+  - fruit_sticker_2
+  sr:
+  - fruit_sticker
+  - fruit_sticker_2
+  srp:
+  - fruit_sticker
+  - fruit_sticker_2

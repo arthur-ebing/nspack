@@ -6,14 +6,25 @@
     :in_production: Product Setups in production
 :conditions:
   :standard:
-    - :col: product_setups.product_setup_template_id
-      :op: =
-      :val: $:product_setups.product_setup_template_id$
+  - :col: product_setups.product_setup_template_id
+    :op: "="
+    :val: "$:product_setups.product_setup_template_id$"
   :active:
-    - :col: product_setups.active
-      :op: =
-      :val: $:product_setups.active$
+  - :col: product_setups.active
+    :op: "="
+    :val: "$:product_setups.active$"
   :in_production:
-    - :col: product_setups.in_production
-      :op: =
-      :val: $:product_setups.in_production$
+  - :col: product_setups.in_production
+    :op: "="
+    :val: "$:product_setups.in_production$"
+:hide_for_client:
+  hb:
+  - system_code
+  um:
+  - system_code
+  ud:
+  - system_code
+  sr:
+  - system_code
+  srp:
+  - system_code

@@ -16,7 +16,8 @@ class LibraryVersions
     sortable: %i[jsver sortable],
     konva: %i[jsver konva],
     lodash: %i[jsver lodash],
-    multi: %i[jsver multi]
+    multi: %i[jsver multi],
+    jasper: %i[jasper jasper]
   }.freeze
 
   # Javascript strategies - use send to call private methods.
@@ -57,6 +58,13 @@ class LibraryVersions
 
   def gemver(klass)
     format_lib(klass, Object.const_get(klass).const_get('VERSION'))
+  end
+
+  def jasper(_)
+    repo = DevelopmentApp::JasperReportRepo.new
+    { library: 'Jruby Jasper', version: repo.jasper_version }
+  rescue StandardError => e
+    { library: 'Jruby Jasper', version: e.message }
   end
 
   def jsver(key)

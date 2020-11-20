@@ -506,7 +506,7 @@ module ProductionApp
         .get(:has_individual_cartons)
     end
 
-    def update_carton_labels_and_cartons(sequence_id, attrs)
+    def update_carton_labels_for_pallet_sequence(sequence_id, attrs)
       carton_ids = pallet_sequence_cartons(sequence_id)
       carton_label_ids = carton_carton_label(carton_ids)
       DB[:carton_labels].where(id: carton_label_ids).update(attrs)

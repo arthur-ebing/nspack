@@ -12,6 +12,17 @@
   :popup: true
 :conditions:
   :standard:
-    - :col: production_runs.id
-      :op: =
-      :val: $:production_run_id$
+  - :col: production_runs.id
+    :op: "="
+    :val: "$:production_run_id$"
+:hide_for_client:
+  hb:
+  - bom_code
+  um:
+  - bom_code
+  ud:
+  - bom_code
+  sr:
+  - bom_code
+  srp:
+  - bom_code

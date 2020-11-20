@@ -29,8 +29,17 @@ class AppConst # rubocop:disable Metrics/ClassLength
   end
 
   # Client-specific code
+  CLIENT_SET = {
+    'hb' => 'Habata (Loftus and Badlands)',
+    'um' => 'Unifrutti Matroozefontein',
+    'ud' => 'Unifrutti Dunbrody',
+    'sr' => 'Sitrusrand Kirkwood',
+    'srp' => 'Sitrusrand Addo Presort', # ????? Not sure - can't connect yet
+    'kr' => 'Kromco'
+  }.freeze
   CLIENT_CODE = ENV.fetch('CLIENT_CODE')
   raise 'CLIENT_CODE must be lowercase.' unless CLIENT_CODE == CLIENT_CODE.downcase
+  raise "Unknown CLIENT_CODE - #{CLIENT_CODE}" unless CLIENT_SET.keys.include?(CLIENT_CODE)
 
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
@@ -565,8 +574,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
   PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
   QUALITY_API_NAMES = [PHYT_CLEAN_STANDARD].freeze
-  BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean('BYPASS_QUALITY_TEST_PRE_RUN_CHECK')
-  BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean('BYPASS_QUALITY_TEST_LOAD_CHECK')
+  BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean(ENV.fetch('BYPASS_QUALITY_TEST_PRE_RUN_CHECK', 'y'))
+  BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean(ENV.fetch('BYPASS_QUALITY_TEST_LOAD_CHECK', 'y'))
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
