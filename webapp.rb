@@ -292,6 +292,7 @@ class Nspack < Roda
                                      :rackmid,
                                      :datagrid,
                                      :ag_grid,
+                                     :jasper,
                                      :choices,
                                      :sortable,
                                      :konva,
