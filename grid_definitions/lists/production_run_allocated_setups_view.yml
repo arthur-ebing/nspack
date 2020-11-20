@@ -13,16 +13,27 @@
   :popup: true
 :conditions:
   :standard:
-    - :col: r.id
-      :op: =
-      :val: $:production_run_id$
+  - :col: r.id
+    :op: "="
+    :val: "$:production_run_id$"
   :for_copy:
-    - :col: r.id
-      :op: =
-      :val: $:production_run_id$
+  - :col: r.id
+    :op: "="
+    :val: "$:production_run_id$"
 :multiselect:
   :copy:
     :url: "/production/runs/product_resource_allocations/$:id$/copy"
-    :section_caption: "Choose resources to get a copy of this allocation"
+    :section_caption: Choose resources to get a copy of this allocation
     :multiselect_save_method: remote
     :conditions: :for_copy
+:hide_for_client:
+  hb:
+  - system_code
+  um:
+  - system_code
+  ud:
+  - system_code
+  sr:
+  - system_code
+  srp:
+  - system_code

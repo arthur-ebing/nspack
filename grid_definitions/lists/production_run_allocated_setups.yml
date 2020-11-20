@@ -25,21 +25,35 @@
   :popup: true
 :conditions:
   :standard:
-    - :col: r.id
-      :op: =
-      :val: $:production_run_id$
+  - :col: r.id
+    :op: "="
+    :val: "$:production_run_id$"
 :edit_rules:
-  :url: /production/runs/production_runs/inline_edit_alloc/$:id$
+  :url: "/production/runs/production_runs/inline_edit_alloc/$:id$"
   :editable_fields:
     product_setup_code:
       :editor: :search_select
       :width: 600
-      :value_sql: SELECT NULL UNION SELECT fn_product_setup_code(id) FROM product_setups WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = $:production_run_id$) ORDER BY 1 NULLS FIRST
+      :value_sql: SELECT NULL UNION SELECT fn_product_setup_code(id) FROM product_setups
+        WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs
+        WHERE id = $:production_run_id$) ORDER BY 1 NULLS FIRST
     label_template_name:
       :editor: :search_select
       :width: 300
-      :value_sql: SELECT '' AS label_template_name, NULL AS id UNION SELECT label_template_name, id FROM label_templates WHERE application = 'Carton'
+      :value_sql: SELECT '' AS label_template_name, NULL AS id UNION SELECT label_template_name,
+        id FROM label_templates WHERE application = 'Carton'
     packing_method_code:
       :editor: :select
       :width: 300
       :value_sql: SELECT packing_method_code, id FROM packing_methods
+:hide_for_client:
+  hb:
+  - system_code
+  um:
+  - system_code
+  ud:
+  - system_code
+  sr:
+  - system_code
+  srp:
+  - system_code

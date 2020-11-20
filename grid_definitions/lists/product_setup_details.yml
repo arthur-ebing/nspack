@@ -18,7 +18,7 @@
   :text: edit active run setup
   :icon: edit
   :title: Edit Active Run Setup
-  :prompt: 'Are you sure you want to Edit this Active Run Setup?'
+  :prompt: Are you sure you want to Edit this Active Run Setup?
   :hide_if_false: in_production
   :auth:
     :function: production
@@ -41,7 +41,7 @@
 - :url: "/production/product_setups/product_setups/$:id$/activate"
   :text: Activate
   :icon: check-square
-  :prompt: 'Are you sure you want to Activate this Product Setup?'
+  :prompt: Are you sure you want to Activate this Product Setup?
   :hide_if_true: active
   :auth:
     :function: production
@@ -50,7 +50,7 @@
 - :url: "/production/product_setups/product_setups/$:id$/deactivate"
   :text: De-activate
   :icon: close-outline
-  :prompt: 'Are you sure you want to De-activate this Product Setup?'
+  :prompt: Are you sure you want to De-activate this Product Setup?
   :hide_if_false: active
   :hide_if_true: in_production
   :auth:
@@ -63,14 +63,25 @@
     :in_production: Product Setups in production
 :conditions:
   :standard:
-    - :col: product_setups.product_setup_template_id
-      :op: =
-      :val: $:product_setups.product_setup_template_id$
+  - :col: product_setups.product_setup_template_id
+    :op: "="
+    :val: "$:product_setups.product_setup_template_id$"
   :active:
-    - :col: product_setups.active
-      :op: =
-      :val: $:product_setups.active$
+  - :col: product_setups.active
+    :op: "="
+    :val: "$:product_setups.active$"
   :in_production:
-    - :col: fn_product_setup_in_production(product_setups.id)
-      :op: =
-      :val: $:in_production$
+  - :col: fn_product_setup_in_production(product_setups.id)
+    :op: "="
+    :val: "$:in_production$"
+:hide_for_client:
+  hb:
+  - bom_code
+  um:
+  - bom_code
+  ud:
+  - bom_code
+  sr:
+  - bom_code
+  srp:
+  - bom_code
