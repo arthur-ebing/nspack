@@ -18,7 +18,7 @@ module MasterfilesApp
       }.freeze
 
       def call
-        return failed_response 'Record not found' unless @entity || task == :create
+        return failed_response 'Fruit Size Reference record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?
@@ -33,14 +33,10 @@ module MasterfilesApp
       end
 
       def edit_check
-        # return failed_response 'FruitSizeReference has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'FruitSizeReference has been completed' if completed?
-
         all_ok
       end
     end
