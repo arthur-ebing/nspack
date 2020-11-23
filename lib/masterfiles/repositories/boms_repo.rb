@@ -119,15 +119,15 @@ module MasterfilesApp
     end
 
     def find_pm_product(id)
-      hash = find_with_association(:pm_products,
-                                   id,
-                                   parent_tables: [{ parent_table: :pm_subtypes,
-                                                     columns: [:subtype_code],
-                                                     flatten_columns: { subtype_code: :subtype_code } },
-                                                   { parent_table: :basic_pack_codes,
-                                                     columns: [:basic_pack_code],
-                                                     foreign_key: :basic_pack_id,
-                                                     flatten_columns: { basic_pack_code: :basic_pack_code } }])
+      query = <<~SQL
+        SELECT pm_products.*, pm_subtypes.subtype_code, pm_types.pm_type_code, basic_pack_codes.basic_pack_code
+        FROM pm_products
+        JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
+        WHERE pm_products.id = #{id}
+      SQL
+      hash = DB[query].first
       return nil if hash.nil?
 
       PmProduct.new(hash)

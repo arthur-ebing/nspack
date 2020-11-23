@@ -87,7 +87,8 @@ module MasterfilesApp
         material_mass: 1.0,
         basic_pack_id: basic_pack_id,
         height_mm: 1,
-        basic_pack_code: 'ABC'
+        basic_pack_code: 'ABC',
+        pm_type_code: 'ABC'
       }
     end
 
