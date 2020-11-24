@@ -491,6 +491,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_pm_product(id, params[:pm_product])
           if res.success
             row_keys = %i[
+              pm_type_code
               subtype_code
               erp_code
               product_code
@@ -529,6 +530,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             id
+            pm_type_code
             subtype_code
             erp_code
             product_code

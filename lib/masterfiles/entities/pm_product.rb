@@ -8,6 +8,7 @@ module MasterfilesApp
     attribute :product_code, Types::String
     attribute :description, Types::String
     attribute? :active, Types::Bool
+    attribute :pm_type_code, Types::String
     attribute :subtype_code, Types::String
     attribute :material_mass, Types::Decimal
     attribute :basic_pack_id, Types::Integer

@@ -42,6 +42,7 @@ end
 
 * `Types::StrippedString` will remove leading and trailing spaces from a string before validation. Non-strings pass through and blank strings become `nil`.
 * `Types::IntArray` will convert string elements in an array to integers. Blank strings become `nil` and non-strings or strings that cannot coerce to integers pass through so the dry-validation schema can handle them as raw inputs. **_DEPRECATED_**
+* `Types::IntArrayFromString` will convert a string of comma-separated integers into an array of integers. Blank strings become `[]`, `nil` is returned as-is and non-strings or strings that cannot coerce to integers fail the validation. If you need to treat an empty array as a failure, write a `rule` in a `Contract`.
 
 [NOTE]
 ====
