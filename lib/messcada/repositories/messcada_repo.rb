@@ -49,18 +49,67 @@ module MesscadaApp
     end
 
     def find_carton(id)
-      hash = DB["SELECT cartons.* ,cl.production_run_id, cl.farm_id, cl.puc_id, cl.orchard_id, cl.cultivar_group_id,
-                 cl.cultivar_id, cl.product_resource_allocation_id, cl.packhouse_resource_id, cl.production_line_id,
-                 cl.season_id, cl.marketing_variety_id, cl.customer_variety_id, cl.std_fruit_size_count_id,
-                 cl.basic_pack_code_id, cl.standard_pack_code_id, cl.fruit_actual_counts_for_pack_id, cl.fruit_size_reference_id,
-                 cl.marketing_org_party_role_id, cl.packed_tm_group_id, cl.mark_id, cl.inventory_code_id, cl.pallet_format_id,
-                 cl.cartons_per_pallet_id, cl.pm_bom_id, cl.extended_columns, cl.client_size_reference, cl.client_product_code,
-                 cl.treatment_ids, cl.marketing_order_number, cl.fruit_sticker_pm_product_id, cl.pm_type_id, cl.pm_subtype_id,
-                 cl.sell_by_code, cl.grade_id, cl.product_chars, cl.pallet_label_name, cl.pick_ref, cl.pallet_number,
-                 cl.phc, cl.personnel_identifier_id, cl.contract_worker_id, cl.packing_method_id
-                 FROM cartons
-                 JOIN carton_labels cl ON cl.id = cartons.carton_label_id
-                 WHERE cartons.id = ?", id].first
+      hash = DB[<<~SQL, id].first
+        SELECT cartons.id,
+          cartons.carton_label_id,
+          cartons.gross_weight,
+          cartons.nett_weight,
+          cartons.pallet_sequence_id,
+          cartons.palletizer_contract_worker_id,
+          cartons.palletizer_identifier_id,
+          cartons.palletizing_bay_resource_id,
+          cartons.scrapped,
+          cartons.scrapped_at,
+          cartons.scrapped_reason,
+          cartons.scrapped_sequence_id,
+          cartons.is_virtual,
+          cartons.active,
+          cl.production_run_id,
+          cl.farm_id,
+          cl.puc_id,
+          cl.orchard_id,
+          cl.cultivar_group_id,
+          cl.cultivar_id,
+          cl.product_resource_allocation_id,
+          cl.packhouse_resource_id,
+          cl.production_line_id,
+          cl.season_id,
+          cl.marketing_variety_id,
+          cl.customer_variety_id,
+          cl.std_fruit_size_count_id,
+          cl.basic_pack_code_id,
+          cl.standard_pack_code_id,
+          cl.fruit_actual_counts_for_pack_id,
+          cl.fruit_size_reference_id,
+          cl.marketing_org_party_role_id,
+          cl.packed_tm_group_id,
+          cl.mark_id,
+          cl.inventory_code_id,
+          cl.pallet_format_id,
+          cl.cartons_per_pallet_id,
+          cl.pm_bom_id,
+          cl.extended_columns,
+          cl.client_size_reference,
+          cl.client_product_code,
+          cl.treatment_ids,
+          cl.marketing_order_number,
+          cl.fruit_sticker_pm_product_id,
+          cl.pm_type_id,
+          cl.pm_subtype_id,
+          cl.sell_by_code,
+          cl.grade_id,
+          cl.product_chars,
+          cl.pallet_label_name,
+          cl.pick_ref,
+          cl.pallet_number,
+          cl.phc,
+          cl.personnel_identifier_id,
+          cl.contract_worker_id,
+          cl.packing_method_id
+        FROM cartons
+        JOIN carton_labels cl ON cl.id = cartons.carton_label_id
+        WHERE cartons.id = ?
+      SQL
       return nil if hash.nil?
 
       CartonFlat.new(hash)

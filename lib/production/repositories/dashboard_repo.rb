@@ -73,10 +73,11 @@ module ProductionApp
         (SELECT COUNT(DISTINCT pallet_id) FROM pallet_sequences WHERE production_run_id = production_runs.id AND verified) AS verified_pallets,
         COALESCE((SELECT SUM(COALESCE(standard_product_weights.nett_weight, 0))
              FROM cartons
-             LEFT JOIN cultivars ON cultivars.id = cartons.cultivar_id
+             JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
+             LEFT JOIN cultivars ON cultivars.id = carton_labels.cultivar_id
                  LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
              LEFT OUTER JOIN standard_product_weights ON standard_product_weights.commodity_id = commodities.id
-               AND standard_product_weights.standard_pack_id = cartons.standard_pack_code_id
+               AND standard_product_weights.standard_pack_id = carton_labels.standard_pack_code_id
              WHERE production_run_id = production_runs.id
             ), 0) AS carton_weight
         FROM production_runs
@@ -100,7 +101,8 @@ module ProductionApp
         SELECT target_market_groups.target_market_group_name AS packed_tm_group,
         COUNT(cartons.id) AS no_cartons
         FROM cartons
-        JOIN target_market_groups ON target_market_groups.id = cartons.packed_tm_group_id
+        JOIN carton_labels ON carton_labels.id = cartons.carton_label_id
+        JOIN target_market_groups ON target_market_groups.id = carton_labels.packed_tm_group_id
         WHERE production_run_id = ?
         GROUP BY target_market_groups.target_market_group_name
         ORDER BY target_market_groups.target_market_group_name
