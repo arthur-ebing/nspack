@@ -176,7 +176,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.associate_farms_pucs(id, multiselect_grid_choices(params))
           if fetch?(r)
-            show_json_notice(res.message)
+            update_grid_row(id, changes: { puc_codes: res.instance }, notice: res.message)
           else
             flash[:notice] = res.message
             r.redirect '/list/pucs'
@@ -242,7 +242,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               farm_group_id
               farm_code
               description
-              puc_id
               farm_group_code
               owner_party_role
               pdn_region_production_region_code

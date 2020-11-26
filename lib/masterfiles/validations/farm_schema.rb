@@ -8,6 +8,6 @@ module MasterfilesApp
     optional(:farm_group_id).maybe(:integer)
     required(:farm_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
-    required(:puc_id).filled(:integer)
+    optional(:puc_id).filled(:integer)
   end
 end

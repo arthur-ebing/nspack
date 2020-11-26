@@ -22,12 +22,11 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_farm(id, params) # rubocop:disable Metrics/AbcSize
+    def update_farm(id, params)
       res = validate_farm_params(params)
       return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
-      attrs.delete(:puc_id)
 
       repo.transaction do
         repo.update_farm(id, attrs)
@@ -122,7 +121,8 @@ module MasterfilesApp
       repo.transaction do
         repo.associate_farms_pucs(id, farms_pucs_ids)
       end
-      success_response('Farm => Puc associated successfully')
+      pucs = repo.find_farm_puc_codes(id).join(', ')
+      success_response('Farm => Puc associated successfully', pucs)
     end
 
     private

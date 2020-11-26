@@ -42,6 +42,17 @@ module UiRules
 
     def common_fields
       farm_pucs = @options[:id] ? @repo.selected_farm_pucs(@options[:id]) : @repo.select_unallocated_pucs
+      puc_renderer = if @mode == :new
+                       { renderer: :select,
+                         options: farm_pucs,
+                         disabled_options: @repo.for_select_inactive_pucs,
+                         caption: 'Primary Puc',
+                         required: true }
+                     else
+                       { renderer: :label,
+                         with_value: farm_pucs.first.first,
+                         caption: 'Primary Puc' }
+                     end
       {
         owner_party_role_id: { renderer: :select,
                                options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FARM_OWNER),
@@ -58,11 +69,7 @@ module UiRules
         farm_code: { required: true },
         description: {},
         active: { renderer: :checkbox },
-        puc_id: { renderer: :select,
-                  options: farm_pucs,
-                  disabled_options: @repo.for_select_inactive_pucs,
-                  caption: 'Primary Puc',
-                  required: true }
+        puc_id: puc_renderer
       }
     end
 

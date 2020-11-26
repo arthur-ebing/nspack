@@ -39,7 +39,7 @@ module MasterfilesApp
       attrs = attrs.to_h
       value = attrs[:farm_code]
       attrs[:farm_code] = 'a_change'
-      attrs[:puc_id] = create_puc
+      attrs.delete(:puc_id)
       res = interactor.update_farm(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(Farm, res.instance)
