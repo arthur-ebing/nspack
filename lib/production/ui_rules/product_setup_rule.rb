@@ -41,8 +41,6 @@ module UiRules
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
       pallet_stack_type_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_stack_type(@form_object.pallet_stack_type_id)&.stack_type_code
-      pm_type_id_label = MasterfilesApp::BomsRepo.new.find_pm_type(@form_object.pm_type_id)&.pm_type_code
-      pm_subtype_id_label = MasterfilesApp::BomsRepo.new.find_pm_subtype(@form_object.pm_subtype_id)&.subtype_code
       product_setup_template = @repo.find_product_setup_template(@form_object.product_setup_template_id)
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id_label = product_setup_template&.cultivar_name
@@ -76,8 +74,6 @@ module UiRules
       fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
-      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type', hide_on_load: @rules[:require_packaging_bom] ? false : true }
-      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:description] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:erp_bom_code] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:product_chars] = { renderer: :label }
@@ -94,16 +90,15 @@ module UiRules
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
 
-      default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
       customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
                              []
                            else
                              MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
-      pm_boms = if @form_object.pm_subtype_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
+      pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
                 else
-                  MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id, @form_object.basic_pack_code_id)
+                  MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id)
                 end
 
       actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
@@ -257,23 +252,6 @@ module UiRules
                                  prompt: 'Select Cartons per Pallet',
                                  searchable: true,
                                  remove_search_for_small_list: false },
-        pm_type_id: { renderer: :select,
-                      options: MasterfilesApp::BomsRepo.new.for_select_pm_types,
-                      disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_types,
-                      selected: default_pm_type_id,
-                      caption: 'PM Type',
-                      prompt: 'Select PM Type',
-                      searchable: true,
-                      remove_search_for_small_list: false,
-                      hide_on_load: @rules[:require_packaging_bom] ? false : true },
-        pm_subtype_id: { renderer: :select,
-                         options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: default_pm_type_id }),
-                         disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_subtypes,
-                         caption: 'PM Subtype',
-                         prompt: 'Select PM Subtype',
-                         searchable: true,
-                         remove_search_for_small_list: false,
-                         hide_on_load: @rules[:require_packaging_bom] ? false : true },
         pm_bom_id: { renderer: :select,
                      options: pm_boms,
                      disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
@@ -345,10 +323,10 @@ module UiRules
                                              param_keys: %i[product_setup_product_setup_template_id] }]
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: '/production/product_setups/product_setups/basic_pack_code_changed',
-                                             param_keys: %i[product_setup_std_fruit_size_count_id] }]
+                                             param_keys: %i[product_setup_commodity_id product_setup_std_fruit_size_count_id] }]
         behaviour.dropdown_change :std_fruit_size_count_id,
                                   notify: [{ url: '/production/product_setups/product_setups/std_fruit_size_count_changed',
-                                             param_keys: %i[product_setup_basic_pack_code_id] }]
+                                             param_keys: %i[product_setup_commodity_id product_setup_basic_pack_code_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
                                   notify: [{ url: '/production/product_setups/product_setups/actual_count_changed' }]
         behaviour.dropdown_change :marketing_variety_id,
@@ -363,13 +341,12 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_format_changed',
                                              param_keys: %i[product_setup_basic_pack_code_id] }]
-        behaviour.dropdown_change :pm_type_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/pm_type_changed' }]
-        behaviour.dropdown_change :pm_subtype_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/pm_subtype_changed',
-                                             param_keys: %i[product_setup_basic_pack_code_id] }]
         behaviour.dropdown_change :pm_bom_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/pm_bom_changed' }]
+                                  notify: [{ url: '/production/product_setups/product_setups/pm_bom_changed',
+                                             param_keys: %i[product_setup_mark_id] }]
+        behaviour.dropdown_change :mark_id,
+                                  notify: [{ url: '/production/product_setups/product_setups/mark_changed',
+                                             param_keys: %i[product_setup_pm_bom_id] }]
       end
     end
   end

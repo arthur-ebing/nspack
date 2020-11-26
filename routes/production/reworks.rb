@@ -614,29 +614,59 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'basic_pack_code_changed' do
+        commodity_id = params[:reworks_run_sequence_commodity_id]
         std_fruit_size_count_id = params[:reworks_run_sequence_std_fruit_size_count_id]
-        if std_fruit_size_count_id.blank? || params[:changed_value].blank?
+        if commodity_id.blank? || std_fruit_size_count_id.blank? || params[:changed_value].blank?
           actual_counts = []
+          pm_boms = []
         else
           basic_pack_code_id = params[:changed_value]
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts)])
+                                     options_array: actual_counts),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_bom_id',
+                                     options_array: pm_boms),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'std_fruit_size_count_changed' do
+        commodity_id = params[:reworks_run_sequence_commodity_id]
         basic_pack_code_id = params[:reworks_run_sequence_basic_pack_code_id]
-        if basic_pack_code_id.blank? || params[:changed_value].blank?
+        if commodity_id.blank? || basic_pack_code_id.blank? || params[:changed_value].blank?
           actual_counts = []
+          pm_boms = []
         else
           std_fruit_size_count_id = params[:changed_value]
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
+          pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'reworks_run_sequence_fruit_actual_counts_for_pack_id',
-                                     options_array: actual_counts)])
+                                     options_array: actual_counts),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_bom_id',
+                                     options_array: pm_boms),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_description',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_input_value,
+                                     dom_id: 'reworks_run_sequence_erp_bom_code',
+                                     value: ''),
+                      OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: [])])
       end
 
       r.on 'actual_count_changed' do
@@ -709,58 +739,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: cartons_per_pallets)])
       end
 
-      r.on 'pm_type_changed' do
-        pm_subtypes = if params[:changed_value].blank?
-                        []
-                      else
-                        interactor.for_select_pm_type_pm_subtypes(params[:changed_value])
-                      end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_pm_subtype_id',
-                                     options_array: pm_subtypes),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_pm_bom_id',
-                                     options_array: []),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_erp_bom_code',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'reworks_run_sequence_pm_boms_products',
-                                     value: [])])
-      end
-
-      r.on 'pm_subtype_changed' do
-        basic_pack_code_id = params[:reworks_run_sequence_basic_pack_code_id]
-        pm_boms = if basic_pack_code_id.blank? || params[:changed_value].blank?
-                    []
-                  else
-                    interactor.for_select_pm_subtype_pm_boms(params[:changed_value], basic_pack_code_id)
-                  end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'reworks_run_sequence_pm_bom_id',
-                                     options_array: pm_boms),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'reworks_run_sequence_erp_bom_code',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'reworks_run_sequence_pm_boms_products',
-                                     value: [])])
-      end
-
       r.on 'pm_bom_changed' do
+        mark_id = params[:reworks_run_sequence_mark_id]
         if params[:changed_value].blank?
           pm_bom_products = []
           pm_bom = nil
         else
           pm_bom_id = params[:changed_value]
           pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
-          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id)
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, mark_id)
         end
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'reworks_run_sequence_description',
@@ -769,6 +756,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      dom_id: 'reworks_run_sequence_erp_bom_code',
                                      value: pm_bom&.erp_bom_code),
                       OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'reworks_run_sequence_pm_boms_products',
+                                     value: pm_bom_products)])
+      end
+
+      r.on 'mark_changed' do
+        pm_bom_id = params[:reworks_run_sequence_pm_bom_id]
+        if params[:changed_value].blank?
+          pm_bom_products = []
+        else
+          mark_id = params[:changed_value]
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, mark_id)
+        end
+        json_actions([OpenStruct.new(type: :replace_inner_html,
                                      dom_id: 'reworks_run_sequence_pm_boms_products',
                                      value: pm_bom_products)])
       end

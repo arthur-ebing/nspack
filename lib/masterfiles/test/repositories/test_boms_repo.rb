@@ -11,6 +11,7 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_pm_boms
       assert_respond_to repo, :for_select_pm_boms_products
       assert_respond_to repo, :for_select_pm_composition_levels
+      assert_respond_to repo, :for_select_pm_marks
     end
 
     def test_crud_calls
@@ -20,6 +21,7 @@ module MasterfilesApp
       test_crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom
       test_crud_calls_for :pm_boms_products, name: :pm_boms_product, wrapper: PmBomsProduct
       test_crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
+      test_crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
     end
 
     private

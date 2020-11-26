@@ -56,12 +56,22 @@ module MasterfilesApp
                           value: :id,
                           order_by: :description
 
+    build_for_select :pm_marks,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :pm_marks,
+                          label: :description,
+                          value: :id,
+                          order_by: :description
+
     crud_calls_for :pm_types, name: :pm_type, wrapper: PmType
     crud_calls_for :pm_subtypes, name: :pm_subtype, wrapper: PmSubtype
     crud_calls_for :pm_products, name: :pm_product, wrapper: PmProduct
     crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom
     crud_calls_for :pm_boms_products, name: :pm_boms_product, wrapper: PmBomsProduct
     crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
+    crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
 
     def find_pm_type_subtypes(id)
       DB[:pm_subtypes]
@@ -124,7 +134,7 @@ module MasterfilesApp
         FROM pm_products
         JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
+        LEFT JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
         WHERE pm_products.id = #{id}
       SQL
       hash = DB[query].first
@@ -151,18 +161,34 @@ module MasterfilesApp
       PmBomsProduct.new(hash)
     end
 
-    def for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
-      DB[:pm_boms]
-        .join(:pm_boms_products, pm_bom_id: :id)
-        .join(:pm_products, id: :pm_product_id)
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .where(pm_subtype_id: pm_subtype_id)
-        .where(basic_pack_id: basic_pack_code_id)
-        .distinct(Sequel[:pm_boms][:id])
-        .select(
-          Sequel[:pm_boms][:id],
-          Sequel[:pm_boms][:bom_code]
-        ).map { |r| [r[:bom_code], r[:id]] }
+    def find_pm_mark(id)
+      hash = find_with_association(:pm_marks,
+                                   id,
+                                   parent_tables: [{ parent_table: :marks,
+                                                     columns: [:mark_code],
+                                                     flatten_columns: { mark_code: :mark_code } }])
+      return nil if hash.nil?
+
+      PmMarkFlat.new(hash)
+    end
+
+    def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
+      commodity_code = DB[:commodities].where(id: commodity_id).get(:code)
+      size_count = DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).get(:size_count_value)
+
+      DB["SELECT DISTINCT pm_boms.id, pm_boms.bom_code
+          FROM pm_boms_products
+          JOIN pm_boms ON pm_boms.id = pm_boms_products.pm_bom_id
+          JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+          JOIN ( SELECT pp.id, pp.basic_pack_id
+					       FROM pm_products pp
+                 JOIN pm_subtypes ON pm_subtypes.id = pp.pm_subtype_id
+                 JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+                 JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+                 ORDER BY pm_composition_levels.composition_level ASC LIMIT 1) cpp ON cpp.id = pm_boms_products.pm_product_id
+          WHERE pm_boms.bom_code LIKE '%#{commodity_code}_#{size_count}'
+          AND cpp.basic_pack_id = #{basic_pack_code_id}"]
+        .map { |r| [r[:bom_code], r[:id]] }
     end
 
     def pm_bom_products(id)
@@ -173,8 +199,9 @@ module MasterfilesApp
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         JOIN pm_boms_products ON pm_products.id = pm_boms_products.pm_product_id
         JOIN uoms ON uoms.id = pm_boms_products.uom_id
+        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         WHERE pm_bom_id = #{id}
-        ORDER BY product_code
+        ORDER BY pm_composition_levels.composition_level
       SQL
       DB[query].all unless id.nil?
     end
@@ -264,6 +291,16 @@ module MasterfilesApp
         .select_map(%i[description id])
     end
 
+    def pm_composition_levels
+      DB[:pm_composition_levels]
+        .order(:composition_level)
+        .select_map(%i[composition_level description])
+    end
+
+    def find_packaging_marks_by_fruitspec_mark(mark_id)
+      DB[:pm_marks].where(mark_id: mark_id).get(:packaging_marks)
+    end
+
     def reorder_composition_levels(sorted_ids)
       upd = []
       sorted_ids.split(',').each_with_index do |id, index|
@@ -345,6 +382,30 @@ module MasterfilesApp
         ar << "UPDATE pm_boms SET bom_code = '#{system_code}', system_code = '#{system_code}' WHERE id = #{bom_id};"
       end
       DB[ar.join].update
+    end
+
+    def can_show_pm_product_basic_pack?(pm_subtype_id)
+      subtype_composition_description(pm_subtype_id) == composition_level_description(minimum_composition_level)
+    end
+
+    def subtype_composition_description(pm_subtype_id)
+      DB[:pm_subtypes]
+        .join(:pm_types, id: :pm_type_id)
+        .join(:pm_composition_levels, id: :pm_composition_level_id)
+        .where(Sequel[:pm_subtypes][:id] => pm_subtype_id)
+        .get(Sequel[:pm_composition_levels][:description])
+    end
+
+    def minimum_composition_level
+      DB['SELECT MIN(composition_level) FROM pm_composition_levels'].single_value
+    end
+
+    def composition_level_description(composition_level)
+      DB[:pm_composition_levels].where(composition_level: composition_level).get(:description)
+    end
+
+    def can_show_pm_product_extra_fields?(pm_subtype_id)
+      subtype_composition_description(pm_subtype_id) != AppConst::FRUIT_PM_TYPE
     end
   end
 end

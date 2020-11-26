@@ -142,5 +142,19 @@ module MasterfilesApp
       }
       DB[:packing_methods].insert(default.merge(opts))
     end
+
+    def create_pm_mark(opts = {})
+      mark_id = create_mark
+
+      default = {
+        mark_id: mark_id,
+        packaging_marks: BaseRepo.new.array_of_text_for_db_col(%w[A B C]),
+        description: Faker::Lorem.unique.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:pm_marks].insert(default.merge(opts))
+    end
   end
 end

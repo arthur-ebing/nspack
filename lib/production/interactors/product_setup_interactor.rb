@@ -126,18 +126,28 @@ module ProductionApp
                                                                                basic_pack_id: basic_pack_code_id })
     end
 
-    def for_select_pm_type_pm_subtypes(pm_type_id)
-      MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: pm_type_id })
+    def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
+      MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
     end
 
-    def for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)
-      MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(pm_subtype_id, basic_pack_code_id)
-    end
+    def pm_bom_products_table(pm_bom_id, mark_id = nil)
+      pm_bom_products = MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id)
+      add_pm_bom_products_packaging_marks(pm_bom_products, mark_id) unless mark_id.nil_or_empty?
 
-    def pm_bom_products_table(pm_bom_id)
-      Crossbeams::Layout::Table.new([], MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id), [],
+      Crossbeams::Layout::Table.new([], pm_bom_products, [],
                                     alignment: { quantity: :right },
                                     cell_transformers: { quantity: :decimal }).render
+    end
+
+    def add_pm_bom_products_packaging_marks(pm_bom_products, mark_id)
+      packaging_marks = MasterfilesApp::BomsRepo.new.find_packaging_marks_by_fruitspec_mark(mark_id)
+      return pm_bom_products if packaging_marks.nil_or_empty?
+
+      items = repo.array_of_text_for_db_col(packaging_marks)
+      MasterfilesApp::BomsRepo.new.pm_composition_levels.each do |key, _val|
+        pm_bom_products[key - 1][:mark] = items[key - 1].to_s
+      end
+      pm_bom_products
     end
 
     def activate_product_setup(id)

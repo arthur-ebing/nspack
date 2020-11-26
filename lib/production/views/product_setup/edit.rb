@@ -67,7 +67,7 @@ module Production
                   end
                 end
               end
-              form.row do |row| # rubocop:disable Metrics/BlockLength
+              form.row do |row|
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Packaging details'
@@ -76,8 +76,6 @@ module Production
                     fold.add_field :pallet_format_id
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
-                    fold.add_field :pm_type_id
-                    fold.add_field :pm_subtype_id
                     fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code

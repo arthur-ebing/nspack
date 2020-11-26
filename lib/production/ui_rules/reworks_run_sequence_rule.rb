@@ -104,18 +104,16 @@ module UiRules
       cultivar_id = @form_object[:cultivar_id]
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
-      default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
-
       customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
                              []
                            else
                              MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
 
-      pm_boms = if @form_object.pm_subtype_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
+      pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
                 else
-                  MasterfilesApp::BomsRepo.new.for_select_pm_subtype_pm_boms(@form_object.pm_subtype_id, @form_object.basic_pack_code_id)
+                  MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id)
                 end
 
       actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
@@ -132,9 +130,10 @@ module UiRules
                                            with_value: @form_object[:pallet_sequence_number],
                                            caption: 'Pallet Sequence Number',
                                            readonly: true }
-      fields[:commodity_id] =  { renderer: :label,
-                                 with_value: commodity_id_label,
-                                 caption: 'Commodity' }
+      fields[:commodity_id] =  { renderer: :hidden }
+      fields[:commodity_code] =  { renderer: :label,
+                                   with_value: commodity_id_label,
+                                   caption: 'Commodity' }
       fields[:marketing_variety_id] =  { renderer: :select,
                                          options: @repo.for_select_template_commodity_marketing_varieties(commodity_id),
                                          disabled_options: @cultivar_repo.for_select_inactive_marketing_varieties,
@@ -268,23 +267,6 @@ module UiRules
                                           prompt: 'Select Cartons per Pallet',
                                           searchable: true,
                                           remove_search_for_small_list: false }
-      fields[:pm_type_id] = { renderer: :select,
-                              options: MasterfilesApp::BomsRepo.new.for_select_pm_types,
-                              disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_types,
-                              selected: default_pm_type_id,
-                              caption: 'PM Type',
-                              prompt: 'Select PM Type',
-                              searchable: true,
-                              remove_search_for_small_list: false,
-                              hide_on_load: @rules[:require_packaging_bom] ? false : true }
-      fields[:pm_subtype_id] =  { renderer: :select,
-                                  options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: default_pm_type_id }),
-                                  disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_subtypes,
-                                  caption: 'PM Subtype',
-                                  prompt: 'Select PM Subtype',
-                                  searchable: true,
-                                  remove_search_for_small_list: false,
-                                  hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:pm_bom_id] =  { renderer: :select,
                               options: pm_boms,
                               disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
@@ -372,10 +354,10 @@ module UiRules
       behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
         behaviour.dropdown_change :basic_pack_code_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/basic_pack_code_changed",
-                                             param_keys: %i[reworks_run_sequence_std_fruit_size_count_id] }]
+                                             param_keys: %i[reworks_run_sequence_commodity_id reworks_run_sequence_std_fruit_size_count_id] }]
         behaviour.dropdown_change :std_fruit_size_count_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/std_fruit_size_count_changed",
-                                             param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
+                                             param_keys: %i[reworks_run_sequence_commodity_id reworks_run_sequence_basic_pack_code_id] }]
         behaviour.dropdown_change :fruit_actual_counts_for_pack_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/actual_count_changed" }]
         behaviour.dropdown_change :marketing_variety_id,
@@ -390,13 +372,12 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pallet_format_changed",
                                              param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
-        behaviour.dropdown_change :pm_type_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_type_changed" }]
-        behaviour.dropdown_change :pm_subtype_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_subtype_changed",
-                                             param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
         behaviour.dropdown_change :pm_bom_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_bom_changed" }]
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_bom_changed",
+                                             param_keys: %i[reworks_run_sequence_mark_id] }]
+        behaviour.dropdown_change :mark_id,
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/mark_changed",
+                                             param_keys: %i[reworks_run_sequence_pm_bom_id] }]
       end
     end
   end
