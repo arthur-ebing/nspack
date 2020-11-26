@@ -7,6 +7,7 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:require_extended_packaging] = AppConst::REQUIRE_EXTENDED_PACKAGING
       @rules[:pm_subtype_ids] = @form_object[:pm_subtype_ids].nil? ? [] : @form_object[:pm_subtype_ids] if %i[select_subtypes add_products].include? @mode
 
       common_values_for_fields common_fields
@@ -25,6 +26,8 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:system_code] = { renderer: :label }
       fields[:pm_boms_products] = { renderer: :list, items: pm_boms_products }
+      fields[:gross_weight] = { renderer: :label }
+      fields[:nett_weight] = { renderer: :label }
     end
 
     def common_fields
@@ -32,7 +35,10 @@ module UiRules
         bom_code: { required: true },
         erp_bom_code: {},
         description: {},
-        system_code: { renderer: :label }
+        system_code: { renderer: :label },
+
+        gross_weight: { renderer: :numeric },
+        nett_weight: { renderer: :numeric }
       }
     end
 
@@ -76,7 +82,9 @@ module UiRules
                                     erp_bom_code: nil,
                                     description: nil,
                                     system_code: nil,
-                                    pm_subtype_ids: nil)
+                                    pm_subtype_ids: nil,
+                                    gross_weight: nil,
+                                    nett_weight: nil)
     end
 
     def pm_subtypes

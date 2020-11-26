@@ -4,7 +4,7 @@ module Masterfiles
   module Packaging
     module PmBom
       class Show
-        def self.call(id)
+        def self.call(id) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:pm_bom, :show, id: id)
           rules   = ui_rule.compile
 
@@ -17,6 +17,8 @@ module Masterfiles
               form.add_field :system_code
               form.add_field :erp_bom_code
               form.add_field :description
+              form.add_field :gross_weight
+              form.add_field :nett_weight
               form.add_field :active
               form.add_field :pm_boms_products
             end

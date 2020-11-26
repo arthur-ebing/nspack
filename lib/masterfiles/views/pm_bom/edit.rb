@@ -14,23 +14,43 @@ module Masterfiles
             page.form_errors form_errors
 
             page.section do |section|
-              section.add_control(control_type: :link,
+              section.row do |row|
+                row.column do |col|
+                  col.add_control(control_type: :link,
                                   text: 'Back to PM BOMs',
                                   url: '/list/pm_boms',
                                   style: :back_button)
+
+                  col.add_control(control_type: :link,
+                                  text: 'suggest weights',
+                                  url: "/masterfiles/packaging/pm_boms/#{id}/calculate_bom_weights",
+                                  style: :button,
+                                  visible: rules[:require_extended_packaging])
+                end
+              end
             end
+
             page.form do |form|
               form.caption 'Edit Pm Bom'
               form.action "/masterfiles/packaging/pm_boms/#{id}"
               form.remote!
               form.method :update
-              form.add_field :bom_code
-              form.add_field :system_code
-              form.add_field :erp_bom_code
-              form.add_field :description
+              form.row do |row|
+                row.column do |col|
+                  col.add_field :bom_code
+                  col.add_field :erp_bom_code
+                  col.add_field :gross_weight
+                end
+                row.column do |col|
+                  col.add_field :system_code
+                  col.add_field :description
+                  col.add_field :nett_weight
+                end
+              end
             end
 
             unless is_update
+
               page.section do |section|
                 section.add_control(control_type: :link,
                                     text: 'New Pm Boms Products',

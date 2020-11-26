@@ -77,7 +77,9 @@ module MasterfilesApp
         erp_bom_code: 'ABC',
         description: 'ABC',
         active: true,
-        system_code: 'ABC'
+        system_code: 'ABC',
+        gross_weight: 1.0,
+        nett_weight: 1.0
       }
     end
 

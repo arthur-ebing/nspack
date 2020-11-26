@@ -8,5 +8,7 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute? :active, Types::Bool
     attribute :system_code, Types::String
+    attribute :gross_weight, Types::Decimal
+    attribute :nett_weight, Types::Decimal
   end
 end

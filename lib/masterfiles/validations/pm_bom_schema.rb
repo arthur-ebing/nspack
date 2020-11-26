@@ -7,6 +7,8 @@ module MasterfilesApp
     required(:erp_bom_code).maybe(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     optional(:system_code).maybe(Types::StrippedString)
+    required(:gross_weight).maybe(:decimal)
+    required(:nett_weight).maybe(:decimal)
   end
 
   PmBomSubtypeSchema = Dry::Schema.Params do

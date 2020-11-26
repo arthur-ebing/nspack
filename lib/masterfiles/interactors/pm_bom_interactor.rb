@@ -106,6 +106,18 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def calculate_bom_weights(id)
+      repo.transaction do
+        repo.calculate_bom_weights(id)
+      end
+
+      instance = pm_bom(id)
+      success_response('BOM weights updated successfully',
+                       instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo

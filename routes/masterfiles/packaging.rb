@@ -586,6 +586,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'calculate_bom_weights' do
+        res = interactor.calculate_bom_weights(id)
+        flash[:notice] = res.message
+        if res.success
+          r.redirect("/masterfiles/packaging/pm_boms/#{id}/edit")
+        else
+          re_show_form(r, res) do
+            Masterfiles::Packaging::PmBom::Edit.call(id,
+                                                     is_update: true,
+                                                     form_values: params[:pm_bom],
+                                                     form_errors: res.errors)
+          end
+        end
+      end
+
       r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
         interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
@@ -734,6 +749,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             erp_bom_code
             description
             active
+            gross_weight
+            nett_weight
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

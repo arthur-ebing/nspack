@@ -85,7 +85,7 @@
     :caption: Product code
     :namespaced_name: pm_products.product_code
     :data_type: :string
-    :width: 
+    :width: 300
     :format: 
     :hide: false
     :pinned: 
@@ -101,7 +101,7 @@
     :caption: Unit of measure
     :namespaced_name: uom_code
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 

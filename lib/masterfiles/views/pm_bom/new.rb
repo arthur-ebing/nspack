@@ -20,6 +20,8 @@ module Masterfiles
               form.add_field :system_code
               form.add_field :erp_bom_code
               form.add_field :description
+              form.add_field :gross_weight
+              form.add_field :nett_weight
             end
           end
 

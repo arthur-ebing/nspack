@@ -111,7 +111,9 @@ module MasterfilesApp
         erp_bom_code: Faker::Lorem.word,
         description: Faker::Lorem.word,
         active: true,
-        system_code: Faker::Lorem.word
+        system_code: Faker::Lorem.word,
+        gross_weight: Faker::Number.decimal,
+        nett_weight: Faker::Number.decimal
       }
       DB[:pm_boms].insert(default.merge(opts))
     end

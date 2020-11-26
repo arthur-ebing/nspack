@@ -407,5 +407,70 @@ module MasterfilesApp
     def can_show_pm_product_extra_fields?(pm_subtype_id)
       subtype_composition_description(pm_subtype_id) != AppConst::FRUIT_PM_TYPE
     end
+
+    def fruit_composition_level
+      DB[:pm_composition_levels].where(description: AppConst::FRUIT_PM_TYPE).get(:composition_level)
+    end
+
+    def calculate_bom_weights(pm_bom_id) # rubocop:disable Metrics/AbcSize
+      gross_weight = 0.0
+      nett_weight = 0.0
+      bom_products(pm_bom_id).each do |pm_product|
+        product_weight = case pm_product[:composition_level]
+                         when minimum_composition_level
+                           pm_product[:quantity] * basic_pack_material_mass(pm_product[:basic_pack_id]).to_f
+                         when fruit_composition_level
+                           nett_weight = pm_product[:quantity] * fruit_average_weight(pm_product[:product_code]).to_f
+                           nett_weight
+                         else
+                           pm_product[:quantity] * pm_product[:material_mass].to_f
+                         end
+
+        gross_weight += product_weight
+      end
+
+      update(:pm_boms, pm_bom_id, { gross_weight: gross_weight, nett_weight: nett_weight })
+      { success: true }
+    end
+
+    def bom_products(pm_bom_id)
+      query = <<~SQL
+        SELECT pm_boms_products.pm_product_id, pm_products.product_code, pm_boms_products.quantity,
+               pm_products.material_mass, pm_composition_levels.composition_level,
+               pm_products.basic_pack_id
+        FROM pm_boms_products
+        JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+        JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+        WHERE pm_boms_products.pm_bom_id = #{pm_bom_id}
+        ORDER BY pm_composition_levels.composition_level
+      SQL
+      DB[query]
+        .all
+    end
+
+    def basic_pack_material_mass(basic_pack_id)
+      return 0 if basic_pack_id.nil_or_empty?
+
+      DB[:standard_pack_codes]
+        .where(basic_pack_code_id:  basic_pack_id)
+        .get(:material_mass)
+    end
+
+    def fruit_average_weight(product_code)
+      res = product_code.split('_')
+      commodity_id = find_commodity_by_code(res[0])
+      DB[:std_fruit_size_counts]
+        .where(size_count_value: res[1])
+        .where(commodity_id: commodity_id)
+        .get(:average_weight_gm)
+    end
+
+    def find_commodity_by_code(commodity_code)
+      DB[:commodities]
+        .where(code: commodity_code)
+        .get(:id)
+    end
   end
 end

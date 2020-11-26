@@ -1,7 +1,9 @@
 ---
 :caption: Pm Boms
-:sql: SELECT "pm_boms"."id", "pm_boms"."bom_code", "pm_boms"."erp_bom_code", "pm_boms"."description",
-  "pm_boms"."active", "pm_boms"."created_at", "pm_boms"."updated_at" FROM "pm_boms"
+:sql: "SELECT \"pm_boms\".\"id\", \"pm_boms\".\"bom_code\", \"pm_boms\".\"erp_bom_code\",
+  \"pm_boms\".\"description\", \"pm_boms\".\"gross_weight\",\r\n\"pm_boms\".\"nett_weight\",
+  \"pm_boms\".\"active\", \"pm_boms\".\"created_at\", \"pm_boms\".\"updated_at\" FROM
+  \"pm_boms\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -70,9 +72,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  gross_weight:
+    :name: gross_weight
+    :sequence_no: 5
+    :caption: Gross weight
+    :namespaced_name: pm_boms.gross_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  nett_weight:
+    :name: nett_weight
+    :sequence_no: 6
+    :caption: Nett weight
+    :namespaced_name: pm_boms.nett_weight
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 5
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: pm_boms.active
     :data_type: :boolean
@@ -88,7 +122,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 6
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: pm_boms.created_at
     :data_type: :datetime
@@ -104,7 +138,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 7
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: pm_boms.updated_at
     :data_type: :datetime
