@@ -59,8 +59,16 @@ class AppConst
 
   # Que
   QUEUE_NAME = ENV.fetch('QUEUE_NAME', 'default')            <3>
+
+  # Boolean settings
+  USE_BINS = make_boolean('USE_BINS')                        <4>
+  USE_BINS = make_boolean('USE_BINS', required: true)        <5>
+  USE_BINS = make_boolean('USE_BINS', default_true: true)    <6>
 end
 ----
 <1> Set a constant from a required environment variable. If not set, the application will raise an exception and not start.
 <2> A string constant value. (Not configurable via environment variable)
 <3> This constant is supplied by the environment variable but has a default value if there is no ENV var.
+<4> This will be true/false and defaults to `false`. Environment variables that start with t/T/y/Y (True, Yes, y, yabba dabba doo) will be set to `true` - any others will be `false`.
+<5> This will be true/false and will raise an exception (which prevents the app from starting) if the environment variable is not set.
+<6> This will be true/false and defaults to `true` instead of false.
