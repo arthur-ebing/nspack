@@ -4,7 +4,7 @@
   pucs.id) AS variant_codes,\r\n       pucs.gap_code,\r\n       array_agg(farms.farm_code
   order by farms.farm_code) AS farm_codes,\r\n       pucs.active,\r\n       pucs.created_at,\r\n
   \      pucs.updated_at\r\nFROM pucs\r\nLEFT JOIN farms_pucs on pucs.id = farms_pucs.puc_id\r\nLEFT
-  JOIN farms on farms_pucs.farm_id = farms.id\r\nGROUP BY pucs.id"
+  JOIN farms on farms_pucs.farm_id = farms.id\r\nGROUP BY pucs.id\r\nORDER BY pucs.puc_code"
 :limit: 
 :offset: 
 :external_settings: {}
