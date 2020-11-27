@@ -6,7 +6,7 @@ module ProductionApp
   class ProductSetupInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
       if AppConst::CLIENT_CODE == 'kr'
-        if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?
+        if params[:standard_pack_code_id].to_i.nonzero?.nil?
           standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
           return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
 
@@ -33,25 +33,27 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)
+    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id) # rubocop:disable Metrics/AbcSize
       if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
         standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
       else
-        standard_pack_code_id = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
-        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_id.size.==1
+        standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
+        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_ids.size.==1
+
+        standard_pack_code_id = standard_pack_code_ids[0]
       end
       standard_pack_code_id
     end
 
     def update_product_setup(id, params)  # rubocop:disable Metrics/AbcSize
       if AppConst::CLIENT_CODE == 'kr'
-        if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?
-          standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
-          return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
+        # if params[:standard_pack_code_id].to_i.nonzero?.nil?
+        standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
+        return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
 
-          params = params.merge(standard_pack_code_id: standard_pack_code_id)
-        end
+        params = params.merge(standard_pack_code_id: standard_pack_code_id)
+        # end
       end
 
       res = validate_product_setup_params(params)
