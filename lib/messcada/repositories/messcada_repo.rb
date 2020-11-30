@@ -215,7 +215,8 @@ module MesscadaApp
 
     # Create several carton_labels records returning an array of the newly-created ids
     def create_carton_labels(no_of_prints, attrs)
-      DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET) }, return: :primary_key)
+      prep_attrs = prepare_values_for_db(:carton_labels, attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET))
+      DB[:carton_labels].multi_insert(no_of_prints.to_i.times.map { prep_attrs }, return: :primary_key)
     end
 
     def carton_label_pallet_number(carton_label_id)
@@ -245,7 +246,7 @@ module MesscadaApp
 
     def create_sequences(pallet_sequence, pallet_id)
       pallet_sequence = pallet_sequence.merge(pallet_params(pallet_id))
-      DB[:pallet_sequences].insert(pallet_sequence)
+      create(:pallet_sequences, pallet_sequence)
     end
 
     # def create_pallet_and_sequences(pallet, pallet_sequence)
