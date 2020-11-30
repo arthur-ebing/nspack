@@ -195,13 +195,13 @@ module ProductionApp
       product_setup_ids.each do |product_setup_id|
         attrs = find_hash(:product_setups, product_setup_id).reject { |k, _| %i[id product_setup_template_id].include?(k) }
         attrs[:product_setup_template_id] = product_setup_template_id
-        DB[:product_setups].insert(attrs)
+        create(:product_setups, attrs)
       end
     end
 
     def clone_product_setup(id)
       attrs = find_hash(:product_setups, id).reject { |k, _| k == :id }
-      DB[:product_setups].insert(prepare_values_for_db(:product_setups, attrs))
+      create(:product_setups, attrs)
     end
 
     def delete_product_setup_template(id)
