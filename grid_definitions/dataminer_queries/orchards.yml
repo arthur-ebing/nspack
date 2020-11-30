@@ -1,7 +1,8 @@
 ---
 :caption: Orchards
 :sql: "SELECT\r\n    orchards.id,\r\n    orchards.farm_id,\r\n    orchards.puc_id,\r\n farm_sections.farm_section_name,
-  \   orchards.orchard_code,\r\n    orchards.description,\r\n    array_agg(cultivars.cultivar_name)
+  \   orchards.orchard_code,\r\n  fn_masterfile_variants('orchards', orchards.id)
+  AS variant_codes,\r\n   orchards.description,\r\n    array_agg(cultivars.cultivar_name)
   AS cultivar_names,\r\n    orchards.cultivar_ids,\r\n    orchards.active,\r\n    orchards.created_at,\r\n
   \   orchards.updated_at,\r\n    farms.farm_code,\r\n    pucs.puc_code\r\nFROM orchards\r\nJOIN
   farms ON farms.id = orchards.farm_id\r\nJOIN pucs ON pucs.id = orchards.puc_id\r\n
@@ -104,6 +105,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 6
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

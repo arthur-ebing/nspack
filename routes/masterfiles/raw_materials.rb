@@ -147,6 +147,75 @@ class Nspack < Roda
         end
       end
     end
+
+    # RMT SIZES
+    # --------------------------------------------------------------------------
+    r.on 'rmt_sizes', Integer do |id|
+      interactor = MasterfilesApp::RmtSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:rmt_sizes, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('raw materials', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::RawMaterials::RmtSize::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('raw materials', 'read')
+          show_partial { Masterfiles::RawMaterials::RmtSize::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_rmt_size(id, params[:rmt_size])
+          if res.success
+            update_grid_row(id, changes: { size_code: res.instance[:size_code], description: res.instance[:description] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::RawMaterials::RmtSize::Edit.call(id, form_values: params[:rmt_size], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('raw materials', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_rmt_size(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'rmt_sizes' do
+      interactor = MasterfilesApp::RmtSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('raw materials', 'new')
+        show_partial_or_page(r) { Masterfiles::RawMaterials::RmtSize::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_rmt_size(params[:rmt_size])
+        if res.success
+          row_keys = %i[
+            id
+            size_code
+            description
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/raw_materials/rmt_sizes/new') do
+            Masterfiles::RawMaterials::RmtSize::New.call(form_values: params[:rmt_size],
+                                                         form_errors: res.errors,
+                                                         remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

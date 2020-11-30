@@ -109,7 +109,9 @@ module ProductionApp
         tipping: false,
         labeling: false,
         active: true,
-        allow_cultivar_group_mixing: false
+        allow_cultivar_group_mixing: false,
+        legacy_data: {},
+        legacy_bintip_criteria: {}
       }
     end
 

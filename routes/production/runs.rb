@@ -20,6 +20,48 @@ class Nspack < Roda
         show_partial { Production::Runs::ProductionRun::Edit.call(id) }
       end
 
+      r.on 'set_bin_tipping_control_data' do
+        r.get do
+          run = interactor.production_run(id)
+          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingControlData.call(id, form_values: run.legacy_data, remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.create_run_bin_tipping_control_data(id, params[:bin_tipping_control_data])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect("/production/runs/production_runs/#{id}/edit")
+          else
+            re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_control_data") do
+              Production::Runs::ProductionRun::BinTippingControlData.call(id, form_values: params[:bin_tipping_control_data],
+                                                                              form_errors: res.errors.empty? ? nil : res.errors,
+                                                                              remote: fetch?(r))
+            end
+          end
+        end
+      end
+
+      r.on 'set_bin_tipping_criteria' do
+        r.get do
+          run = interactor.production_run(id)
+          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingCriteria.call(id, form_values: run.legacy_bintip_criteria, remote: fetch?(r)) }
+        end
+
+        r.post do
+          res = interactor.create_run_bin_tipping_criteria(id, params[:bin_tipping_criteria])
+          if res.success
+            flash[:notice] = res.message
+            r.redirect("/production/runs/production_runs/#{id}/edit")
+          else
+            re_show_form(r, res, url: "/production/runs/production_runs/#{id}/set_bin_tipping_criteria") do
+              Production::Runs::ProductionRun::BinTippingControlData.call(id, form_values: params[:bin_tipping_criteria],
+                                                                              form_errors: res.errors.empty? ? nil : res.errors,
+                                                                              remote: fetch?(r))
+            end
+          end
+        end
+      end
+
       r.on 'rebins' do
         interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -528,6 +570,12 @@ class Nspack < Roda
         show_partial_or_page(r) { Production::Runs::ProductionRun::New.call(remote: fetch?(r)) }
       end
 
+      r.on 'ripe_point_code_combo_changed' do
+        pc_codes = []
+        pc_codes = MesscadaApp::MesscadaRepo.new.ripe_point_codes(ripe_point_code: params[:changed_value]).map { |s| s[1] }.uniq unless params[:changed_value].to_s.empty?
+        json_replace_select_options('bin_tipping_control_data_pc_code', pc_codes)
+      end
+
       r.on 'inline_edit_alloc', Integer do |product_resource_allocation_id|
         res = interactor.inline_edit_alloc(product_resource_allocation_id, params)
         if res.success
@@ -774,6 +822,23 @@ class Nspack < Roda
         flash[:notice] = res.message
         r.redirect('/list/pallet_mix_rules')
       end
+    end
+
+    r.on 'toggle_bin_tipping_criteria' do
+      toggle = params[:changed_value] != 'f'
+      json_actions([
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_commodity_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_variety_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_treatment_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_size', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_product_class_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_product_type', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_pc_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_cold_store_type', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_season_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_track_indicator_code', checked: toggle),
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_ripe_point_code', checked: toggle)
+                   ])
     end
 
     r.on 'toggle' do

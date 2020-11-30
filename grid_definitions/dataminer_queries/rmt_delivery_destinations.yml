@@ -2,6 +2,7 @@
 :caption: Rmt Delivery Destinations
 :sql: "SELECT \"rmt_delivery_destinations\".\"id\", \"rmt_delivery_destinations\".\"delivery_destination_code\",
   \"rmt_delivery_destinations\".\"description\", \"rmt_delivery_destinations\".\"active\",
+  fn_masterfile_variants('rmt_delivery_destinations', rmt_delivery_destinations.id) AS variant_codes,
   \"rmt_delivery_destinations\".\"created_at\", \"rmt_delivery_destinations\".\"updated_at\"\r\nFROM
   \"rmt_delivery_destinations\""
 :limit: 
@@ -36,6 +37,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 5
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

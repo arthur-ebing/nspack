@@ -1,6 +1,6 @@
 ---
 :caption: Commodities
-:sql: "SELECT\r\n  \"commodities\".\"id\",\r\n  \"commodities\".\"commodity_group_id\",\r\n
+:sql: "SELECT\r\n  \"commodities\".\"id\",\r\n  \"commodities\".\"commodity_group_id\",\r\n fn_masterfile_variants('commodities', commodities.id) AS variant_codes,
   \ \"commodities\".\"code\",\r\n  \"commodities\".\"description\",\r\n  \"commodities\".\"hs_code\",\r\n
   \ \"commodities\".\"active\",\r\n  \"commodities\".\"created_at\",\r\n  \"commodities\".\"updated_at\",\r\n
   \ \"commodity_groups\".\"code\" AS commodity_group_code,\r\n  \"commodities\".\"requires_standard_counts\",\r\n
@@ -58,9 +58,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 4
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   description:
     :name: description
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Description
     :namespaced_name: commodities.description
     :data_type: :string

@@ -1,0 +1,29 @@
+---
+:dataminer_definition: rmt_sizes
+:actions:
+- :url: "/masterfiles/raw_materials/rmt_sizes/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_sizes/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/raw_materials/rmt_sizes/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/masterfiles/general/masterfile_variants/list_masterfile_variants?masterfile_table=rmt_sizes&masterfile_id=$:id$"
+  :text: variants
+  :icon: list
+  :title: Variants
+  :popup: false
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/raw_materials/rmt_sizes/new"
+  :text: New Rmt Size
+  :style: :button
+  :behaviour: :popup

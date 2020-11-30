@@ -153,6 +153,23 @@ module MasterfilesApp
       DB[:orchards].join(:farms, id: :farm_id).where(farm_id: id).order(:orchard_code).select_map(:orchard_code)
     end
 
+    def find_puc_by_puc_code_and_farm(puc_code, farm_id)
+      DB[:pucs]
+        .join(:farms_pucs, puc_id: :id)
+        .join(:farms, id: Sequel[:farms_pucs][:farm_id])
+        .where(puc_code: puc_code, farm_id: farm_id)
+        .get(Sequel[:pucs][:id])
+    end
+
+    def find_puc_by_variant_and_farm(variant_code, farm_id)
+      DB[:masterfile_variants]
+        .join(:pucs, id: :masterfile_id)
+        .join(:farms_pucs, puc_id: :id)
+        .join(:farms, id: Sequel[:farms_pucs][:farm_id])
+        .where(variant_code: variant_code, farm_id: farm_id)
+        .get(Sequel[:pucs][:id])
+    end
+
     def find_orchard_farm_section(id)
       query = <<~SQL
         SELECT f.farm_section_name || ' - ' || fn_party_role_name(f.farm_manager_party_role_id) AS farm_section

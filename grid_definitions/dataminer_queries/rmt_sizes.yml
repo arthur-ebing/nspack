@@ -1,0 +1,89 @@
+---
+:caption: Rmt Sizes
+:sql: SELECT "rmt_sizes"."id", "rmt_sizes"."size_code", "rmt_sizes"."description", fn_masterfile_variants('rmt_sizes', rmt_sizes.id) AS variant_codes,
+  fn_current_status('rmt_sizes', "rmt_sizes"."id") AS status FROM "rmt_sizes"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: rmt_sizes.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_code:
+    :name: size_code
+    :sequence_no: 2
+    :caption: Size code
+    :namespaced_name: rmt_sizes.size_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 3
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 4
+    :caption: Description
+    :namespaced_name: rmt_sizes.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 5
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

@@ -249,6 +249,115 @@ module MesscadaApp
       create(:pallet_sequences, pallet_sequence)
     end
 
+    def find_orchard_by_variant_and_puc_and_farm(variant_code, puc_id, farm_id)
+      DB[:masterfile_variants]
+        .join(:orchards, id: :masterfile_id)
+        .join(:pucs, id: Sequel[:orchards][:puc_id])
+        .join(:farms, id: Sequel[:orchards][:farm_id])
+        .where(variant_code: variant_code, puc_id: puc_id, farm_id: farm_id)
+        .get(Sequel[:orchards][:id])
+    end
+
+    def find_external_bin_delivery(delivery_number)
+      query = <<~SQL
+        select *
+        from rmt_deliveries
+        where legacy_data  @> '{\"delivery_number\": \"#{delivery_number}\"}';
+      SQL
+      DB[query].select_map(:id).first
+    end
+
+    def fetch_delivery_from_external_system(delivery_number)
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      success_response('ok', JSON.parse(response.body))
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def fetch_bin_from_external_system(bin_number) # rubocop:disable Metrics/AbcSize
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      external_bin = JSON.parse(response.body)
+      return failed_response(external_bin['error']) if external_bin['error']
+
+      success_response('ok', external_bin)
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def can_bin_be_tipped?(bin_number) # rubocop:disable Metrics/AbcSize
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      result = JSON.parse(response.body)
+      return failed_response(result['msg']) unless result['can_tip_bin']
+
+      success_response('ok')
+    rescue Timeout::Error
+      failed_response('The call to the server timed out.', timeout: true)
+    rescue Errno::ECONNREFUSED
+      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
+    rescue StandardError => e
+      failed_response("There was an error: #{e.message}")
+    end
+
+    def run_treatment_codes
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      JSON.parse(response.body)
+    rescue Timeout::Error
+      raise 'The call to the server timed out.'
+    rescue Errno::ECONNREFUSED
+      raise 'The connection was refused. Perhaps the server is not running.'
+    rescue StandardError => e
+      raise "There was an error: #{e.message}"
+    end
+
+    def ripe_point_codes(ripe_point_code: nil)
+      params = ripe_point_code ? "ripe_point_code=#{ripe_point_code}" : nil
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      JSON.parse(response.body)
+    rescue Timeout::Error
+      raise 'The call to the server timed out.'
+    rescue Errno::ECONNREFUSED
+      raise 'The connection was refused. Perhaps the server is not running.'
+    rescue StandardError => e
+      raise "There was an error: #{e.message}"
+    end
+
+    def track_indicator_codes
+      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes")
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      response = http.request(request)
+      JSON.parse(response.body)
+    rescue Timeout::Error
+      raise 'The call to the server timed out.'
+    rescue Errno::ECONNREFUSED
+      raise 'The connection was refused. Perhaps the server is not running.'
+    rescue StandardError => e
+      raise "There was an error: #{e.message}"
+    end
+
     # def create_pallet_and_sequences(pallet, pallet_sequence)
     #   id = DB[:pallets].insert(pallet)
     #

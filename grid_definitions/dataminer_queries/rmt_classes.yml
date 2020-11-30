@@ -1,6 +1,6 @@
 ---
 :caption: Rmt Classes
-:sql: SELECT "rmt_classes"."id", "rmt_classes"."rmt_class_code", "rmt_classes"."description",
+:sql: SELECT "rmt_classes"."id", "rmt_classes"."rmt_class_code", "rmt_classes"."description",fn_masterfile_variants('rmt_classes', rmt_classes.id) AS variant_codes,
   "rmt_classes"."active", "rmt_classes"."created_at", "rmt_classes"."updated_at",
   fn_current_status('rmt_classes', "rmt_classes"."id") AS status FROM "rmt_classes"
 :limit: 
@@ -35,6 +35,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 3
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

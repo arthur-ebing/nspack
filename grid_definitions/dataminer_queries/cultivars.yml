@@ -1,7 +1,7 @@
 ---
 :caption: Cultivars
 :sql: "SELECT\r\n    cultivars.id,\r\n    cultivars.commodity_id,\r\n    cultivars.cultivar_group_id,\r\n
-  \   cultivars.cultivar_name,\r\n    cultivars.description,\r\n    cultivars.created_at,\r\n
+  \   cultivars.cultivar_name,\r\n    cultivars.description,\r\n    cultivars.created_at,\r\n  fn_masterfile_variants('cultivars', cultivars.id) AS variant_codes,\r\n
   \   cultivars.updated_at,\r\n    commodities.code,\r\n    cultivar_groups.cultivar_group_code,\r\n
   \   cultivars.cultivar_code,\r\n    cultivars.active\r\nFROM cultivars\r\nJOIN
   commodities ON commodities.id = cultivars.commodity_id\r\nLEFT JOIN cultivar_groups
@@ -70,6 +70,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 5
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

@@ -10,7 +10,15 @@ module MesscadaApp
       @device = params[:device]
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      if !bin_exists? && AppConst::INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM
+        res = active_run_for_device
+        return res unless res.success
+
+        res = BinIntegration.call(bin_number, res.instance)
+        return res unless res.success
+      end
+
       errors = validations
       return failed_response(errors) unless errors.nil?
 
@@ -41,21 +49,28 @@ module MesscadaApp
       RawMaterialsApp::RmtDeliveryRepo.new.update_rmt_bin(@rmt_bin_id, updates)
     end
 
-    def validations # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def active_run_for_device
+      line = ProductionApp::ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, @device)
+      return line unless line.success
+
+      res = ProductionApp::ProductionRunRepo.new.find_production_runs_for_line_in_state(line.instance, running: true, tipping: true)
+      return res unless res.success
+
+      return failed_response('More than one tipping run on line') unless res.instance.length == 1
+
+      success_response('run found', res.instance[0])
+    end
+
+    def validations # rubocop:disable Metrics/AbcSize
       return "Bin:#{bin_number} could not be found" unless bin_exists?
       return "Bin:#{bin_number} has already been tipped" if bin_tipped?
       return "Bin:#{bin_number} scrapped" if bin_scrapped?
 
-      line = ProductionApp::ResourceRepo.new.plant_resource_parent_of_system_resource(Crossbeams::Config::ResourceDefinitions::LINE, @device)
-      return line.message unless line.success
-
-      res = ProductionApp::ProductionRunRepo.new.find_production_runs_for_line_in_state(line.instance, running: true, tipping: true)
+      res = active_run_for_device
       return res.message unless res.success
 
-      return 'More than one tipping run on line' unless res.instance.length == 1
-
       rmt_bin = find_rmt_bin
-      run = ProductionApp::ProductionRunRepo.new.find_production_run(res.instance[0])
+      run = ProductionApp::ProductionRunRepo.new.find_production_run(res.instance)
 
       @run_id = run[:id]
       @rmt_bin_id = rmt_bin[:id]

@@ -170,6 +170,34 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def create_run_bin_tipping_control_data(id, params)
+      res = validate_bin_tipping_control_data_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      repo.transaction do
+        repo.update(:production_runs, id, legacy_data: params)
+      end
+
+      success_response('legacy_data updated successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
+    def create_run_bin_tipping_criteria(id, params)
+      params.delete_if { |k, _v| k == :toggle }
+      repo.transaction do
+        repo.update(:production_runs, id, legacy_bintip_criteria: params)
+      end
+
+      success_response('legacy_bintip_criteria updated successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def get_pallet_label_data(pallet_id)
       repo.get_pallet_label_data(pallet_id)
     end
@@ -567,6 +595,10 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def production_run(id)
+      repo.find_production_run(id)
+    end
+
     private
 
     def repo
@@ -597,10 +629,6 @@ module ProductionApp
       PalletMixRuleSchema.call(params)
     end
 
-    def production_run(id)
-      repo.find_production_run(id)
-    end
-
     def production_run_flat(id)
       repo.find_production_run_flat(id)
     end
@@ -611,6 +639,10 @@ module ProductionApp
 
     def product_resource_allocation_flat(id)
       repo.find_product_resource_allocation_flat(id)
+    end
+
+    def validate_bin_tipping_control_data_params(params)
+      BinTippingControlDataSchema.call(params)
     end
 
     def validate_new_production_run_params(params)

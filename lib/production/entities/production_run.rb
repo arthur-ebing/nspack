@@ -30,6 +30,8 @@ module ProductionApp
     attribute :allow_cultivar_group_mixing, Types::Bool
     attribute? :active, Types::Bool
     attribute? :allocation_required, Types::Bool
+    attribute :legacy_data, Types::Hash.optional
+    attribute :legacy_bintip_criteria, Types::Hash.optional
 
     def next_stage
       if tipping && labeling
@@ -81,9 +83,12 @@ module ProductionApp
     attribute :puc_code, Types::String
     attribute :orchard_code, Types::String
     attribute :season_code, Types::String
+    attribute :commodity_code, Types::String
     attribute :packhouse_code, Types::String
     attribute :line_code, Types::String
     attribute :status, Types::String
     attribute :allow_cultivar_group_mixing, Types::Bool
+    attribute :legacy_data, Types::Hash.optional
+    attribute :legacy_bintip_criteria, Types::Hash.optional
   end
 end

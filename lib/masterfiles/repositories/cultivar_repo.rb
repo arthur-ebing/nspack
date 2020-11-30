@@ -68,6 +68,27 @@ module MasterfilesApp
       Cultivar.new(hash)
     end
 
+    def find_cultivar_by_variant_and_commodity_and_orchard(variant_code, commodity_code, orchard_id)
+      hash = DB["SELECT cultivars.id
+         FROM masterfile_variants v
+         join cultivars on cultivars.id=v.masterfile_id
+         join commodities on commodities.id=cultivars.commodity_id
+         JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
+         WHERE variant_code = ? and commodities.code= ? and orchards.id = ?", variant_code, commodity_code, orchard_id].first
+
+      hash.nil? ? nil : hash[:id]
+    end
+
+    def find_cultivar_by_cultivar_name_and_commodity_and_orchard(cultivar_name, commodity_code, orchard_id)
+      hash = DB["SELECT cultivars.id
+         FROM cultivars
+         join commodities on commodities.id=cultivars.commodity_id
+         JOIN orchards ON cultivars.id = ANY (orchards.cultivar_ids)
+         WHERE cultivar_name = ? and commodities.code= ? and orchards.id = ?", cultivar_name, commodity_code, orchard_id].first
+
+      hash.nil? ? nil : hash[:id]
+    end
+
     def delete_cultivar_group(id)
       DB[:cultivar_groups].where(id: id).delete
     end

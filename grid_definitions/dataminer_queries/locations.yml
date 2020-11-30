@@ -6,7 +6,8 @@
   \ locations.print_code,\r\n  locations.has_single_container,\r\n  locations.virtual_location,\r\n
   \ locations.can_be_moved,\r\n  locations.can_store_stock,\r\n  locations.consumption_area,\r\n
   \ locations.created_at,\r\n  locations.updated_at,\r\n  location_types.location_type_code,\r\n
-  \ location_assignments.assignment_code,\r\n  location_storage_types.storage_type_code,\r\n
+  \ location_assignments.assignment_code,\r\n  location_storage_types.storage_type_code,\r\n   fn_masterfile_variants('locations', locations.id)
+  \ AS variant_codes,\r\n
   \ \"locations\".\"location_storage_definition_id\",\r\n  \"location_storage_definitions\".\"storage_definition_code\",\r\n
   \ (\r\n    SELECT\r\n      array_agg(cc.location_long_code) AS path\r\n    FROM
   (\r\n      SELECT\r\n        c.location_long_code\r\n      FROM\r\n        locations
@@ -170,6 +171,22 @@
     :pinned: 
     :groupable: false
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 10
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

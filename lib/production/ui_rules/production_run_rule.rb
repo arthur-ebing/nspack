@@ -12,6 +12,8 @@ module UiRules
       apply_form_values
 
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      @rules[:show_bin_tipping_control_data] = (AppConst::CLIENT_CODE == 'kr')
+      @rules[:show_bin_tipping_criteria] = (AppConst::CLIENT_CODE == 'kr')
 
       common_values_for_fields common_fields unless %i[allocate_setups complete_stage confirm].include?(@mode)
 

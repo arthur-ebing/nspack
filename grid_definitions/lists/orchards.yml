@@ -16,6 +16,11 @@
   :icon: delete
   :is_delete: true
   :popup: true
+- :url: "/masterfiles/general/masterfile_variants/list_masterfile_variants?masterfile_table=orchards&masterfile_id=$:id$"
+  :text: variants
+  :icon: list
+  :title: Variants
+  :popup: false
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/farms/farms/$:orchards.farm_id$/orchards/new"

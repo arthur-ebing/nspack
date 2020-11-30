@@ -71,6 +71,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Production Runs
   ALLOW_CULTIVAR_GROUP_MIXING = make_boolean('ALLOW_CULTIVAR_GROUP_MIXING')
 
+  # Integration
+  INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM = make_boolean('INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM')
+  INTEGRATION_SERVER_URI = ENV.fetch('INTEGRATION_SERVER_URI')
+
   # Deliveries
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
   DELIVERY_CAPTURE_INNER_BINS = make_boolean('CAPTURE_INNER_BINS')
@@ -555,6 +559,24 @@ class AppConst # rubocop:disable Metrics/ClassLength
                                  column_name: 'city_name' },
                        Ports: { table_name: 'ports',
                                 column_name: 'port_code' },
+                       Farms: { table_name: 'farms',
+                                column_name: 'farm_code' },
+                       Orchards: { table_name: 'orchards',
+                                   column_name: 'orchard_code' },
+                       RmClasses: { table_name: 'rmt_classes',
+                                    column_name: 'rmt_class_code' },
+                       Commodities: { table_name: 'commodities',
+                                      column_name: 'code' },
+                       Cultivars: { table_name: 'cultivars',
+                                    column_name: 'cultivar_name' },
+                       Seasons: { table_name: 'seasons',
+                                  column_name: 'season_code' },
+                       RmtSizes: { table_name: 'rmt_sizes',
+                                   column_name: 'size_code' },
+                       Locations: { table_name: 'locations',
+                                    column_name: 'location_short_code' },
+                       RmtDeliveryDestinations: { table_name: 'rmt_delivery_destinations',
+                                                  column_name: 'delivery_destination_code' },
                        Vessels: { table_name: 'vessels',
                                   column_name: 'vessel_code' } }.freeze
 

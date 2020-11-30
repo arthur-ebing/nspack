@@ -1,7 +1,7 @@
 ---
 :caption: Seasons
 :sql: "SELECT \"seasons\".\"id\", \"seasons\".\"season_group_id\", \"seasons\".\"commodity_id\",
-  \"seasons\".\"season_code\", \"seasons\".\"description\", \"seasons\".\"season_year\",
+  \"seasons\".\"season_code\", \"seasons\".\"description\", \"seasons\".\"season_year\", fn_masterfile_variants('seasons', seasons.id) AS variant_codes,\r\n
   \"seasons\".\"start_date\", \"seasons\".\"end_date\", \"seasons\".\"active\", \"seasons\".\"created_at\",
   \"seasons\".\"updated_at\", \"commodities\".\"code\" AS commodity_code, \"season_groups\".\"season_group_code\"\r\nFROM
   \"seasons\" JOIN \"commodities\" ON \"commodities\".\"id\" = \"seasons\".\"commodity_id\"
@@ -70,6 +70,22 @@
     :pinned: 
     :groupable: true
     :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  variant_codes:
+    :name: variant_codes
+    :sequence_no: 5
+    :caption: Variant codes
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false

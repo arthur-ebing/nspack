@@ -21,6 +21,11 @@
   :icon: information-solid
   :title: Status
   :popup: true
+- :url: "/masterfiles/general/masterfile_variants/list_masterfile_variants?masterfile_table=seasons&masterfile_id=$:id$"
+  :text: variants
+  :icon: list
+  :title: Variants
+  :popup: false
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/calendar/seasons/new"

@@ -63,5 +63,20 @@ module MasterfilesApp
     def season_code(season_year, commodity_id)
       "#{season_year}_#{DB[:commodities].where(id: commodity_id).get(:code)}"
     end
+
+    def find_season_by_variant(variant_code, commodity_code)
+      DB[:masterfile_variants]
+        .join(:seasons, id: :masterfile_id)
+        .join(:commodities, id: :commodity_id)
+        .where(variant_code: variant_code, code: commodity_code)
+        .get(Sequel[:seasons][:id])
+    end
+
+    def find_cultivar_by_season_code_and_commodity_code(season_code, commodity_code)
+      DB[:seasons]
+        .join(:commodities, id: :commodity_id)
+        .where(season_code: season_code, code: commodity_code)
+        .get(Sequel[:seasons][:id])
+    end
   end
 end
