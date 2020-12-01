@@ -1,0 +1,18 @@
+---
+:dataminer_definition: production_run_allocated_target_customers
+:conditions:
+  :standard:
+  - :col: r.id
+    :op: "="
+    :val: "$:production_run_id$"
+:hide_for_client:
+  hb:
+  - system_code
+  um:
+  - system_code
+  ud:
+  - system_code
+  sr:
+  - system_code
+  srp:
+  - system_code

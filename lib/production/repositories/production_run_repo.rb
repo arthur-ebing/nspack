@@ -309,6 +309,15 @@ module ProductionApp
       success_response("Applied #{packing_method_code}", packing_method_code: packing_method_code)
     end
 
+    def allocate_target_customer(product_resource_allocation_id, target_customer)
+      target_customer_id = MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(target_customer, AppConst::ROLE_TARGET_CUSTOMER)
+      raise Crossbeams::FrameworkError, "Target Customer: #{target_customer} does not exist." if target_customer_id.nil_or_empty?
+
+      update(:product_resource_allocations, product_resource_allocation_id, target_customer_party_role_id: target_customer_id)
+
+      success_response("Allocated Target Customer #{target_customer}", target_customer: target_customer)
+    end
+
     def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, label_template_id)
       xtra = label_template_id.nil? ? '' : ", label_template_id = #{label_template_id}"
       qry = <<~SQL

@@ -88,7 +88,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:gross_weight).filled(:decimal)
   end
 
-  SequenceSetupDataSchema = Dry::Schema.Params do
+  SequenceSetupDataSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
     optional(:id).filled(:integer)
     required(:marketing_variety_id).filled(:integer)
     required(:customer_variety_id).maybe(:integer)
@@ -115,6 +115,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:product_chars).maybe(Types::StrippedString)
     required(:pm_type_id).maybe(:integer)
     required(:pm_subtype_id).maybe(:integer)
+    required(:target_market_id).maybe(:integer)
   end
 
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do
@@ -122,6 +123,7 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pallet_number).maybe(Types::StrippedString)
     required(:fruit_sticker_pm_product_id).filled(:integer)
     required(:fruit_sticker_pm_product_2_id).maybe(:integer)
+    required(:target_customer_party_role_id).maybe(:integer)
   end
 
   EditCartonQuantitySchema = Dry::Schema.Params do

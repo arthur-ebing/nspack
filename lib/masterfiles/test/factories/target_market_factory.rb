@@ -30,5 +30,14 @@ module MasterfilesApp
       }
       DB[:target_market_group_types].insert(default.merge(opts))
     end
+
+    def create_target_market(opts = {})
+      default = {
+        target_market_name: Faker::Lorem.unique.word,
+        active: true,
+        description: Faker::Lorem.word
+      }
+      DB[:target_markets].insert(default.merge(opts))
+    end
   end
 end

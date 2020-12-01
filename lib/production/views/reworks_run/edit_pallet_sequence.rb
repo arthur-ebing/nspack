@@ -52,6 +52,7 @@ module Production
                     fold.caption 'Marketing details'
                     fold.add_field :marketing_org_party_role_id
                     fold.add_field :packed_tm_group_id
+                    fold.add_field :target_market_id
                     fold.add_field :sell_by_code
                     fold.add_field :mark_id
                     fold.add_field :product_chars
@@ -63,7 +64,7 @@ module Production
                   end
                 end
               end
-              form.row do |row|
+              form.row do |row| # rubocop:disable Metrics/BlockLength
                 row.column do |col|
                   col.fold_up do |fold|
                     fold.caption 'Packaging details'
@@ -72,6 +73,8 @@ module Production
                     fold.add_field :pallet_format_id
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
+                    fold.add_field :pm_type_id
+                    fold.add_field :pm_subtype_id
                     fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code

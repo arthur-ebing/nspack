@@ -1,0 +1,27 @@
+---
+:dataminer_definition: production_run_allocated_target_customers
+:conditions:
+  :standard:
+  - :col: r.id
+    :op: "="
+    :val: "$:production_run_id$"
+:edit_rules:
+  :url: "/production/runs/production_runs/inline_edit_alloc/$:id$"
+  :editable_fields:
+    target_customer:
+      :editor: :search_select
+      :width: 600
+      :value_sql: SELECT NULL UNION SELECT fn_party_role_name(party_roles.id) FROM party_roles
+                  JOIN roles ON roles.id = party_roles.role_id
+                  WHERE roles.name = 'TARGET CUSTOMER' AND roles.active ORDER BY 1 NULLS FIRST
+:hide_for_client:
+  hb:
+  - system_code
+  um:
+  - system_code
+  ud:
+  - system_code
+  sr:
+  - system_code
+  srp:
+  - system_code

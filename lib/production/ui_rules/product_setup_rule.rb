@@ -32,6 +32,7 @@ module UiRules
       fruit_size_reference_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
       marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
+      target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)[:target_market_name]
       mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
@@ -57,6 +58,7 @@ module UiRules
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
       fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org Party Role' }
       fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed Tm Group' }
+      fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
@@ -95,6 +97,13 @@ module UiRules
                            else
                              MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
+
+      target_markets = if @form_object.packed_tm_group_id.nil_or_empty?
+                         []
+                       else
+                         MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(@form_object.packed_tm_group_id)
+                       end
+
       pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
                 else
@@ -189,6 +198,13 @@ module UiRules
                               prompt: 'Select Packed TM Group',
                               searchable: true,
                               remove_search_for_small_list: false },
+        target_market_id: { renderer: :select,
+                            options: target_markets,
+                            disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
+                            caption: 'Target Market',
+                            prompt: 'Select Target Market',
+                            searchable: true,
+                            remove_search_for_small_list: false },
         sell_by_code: {},
         mark_id: { renderer: :select,
                    options: MasterfilesApp::MarketingRepo.new.for_select_marks,
@@ -294,6 +310,7 @@ module UiRules
                                     fruit_size_reference_id: nil,
                                     marketing_org_party_role_id: nil,
                                     packed_tm_group_id: nil,
+                                    target_market_id: nil,
                                     mark_id: nil,
                                     inventory_code_id: nil,
                                     pallet_format_id: nil,

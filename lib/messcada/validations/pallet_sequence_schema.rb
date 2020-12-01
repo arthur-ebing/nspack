@@ -56,6 +56,7 @@ module MesscadaApp
       optional(:removed_from_pallet_id).maybe(:integer)
       optional(:verified_by).maybe(Types::StrippedString)
       optional(:created_by).maybe(Types::StrippedString)
+      optional(:target_market_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

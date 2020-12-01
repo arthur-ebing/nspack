@@ -96,6 +96,16 @@
   :icon: list
   :title: Select Product Setup Template
   :hide_if_null: product_setup_template_id
+- :url: "/production/runs/production_runs/$:id$/allocate_target_customer"
+  :text: allocate target customers
+  :icon: arrow-left
+  :hide_if_null: product_setup_template_id
+  :hide_if_false: allocation_required
+  :hide_if_true: view_allocs
+- :url: "/production/runs/production_runs/$:id$/allocate_target_customer"
+  :text: view allocated target customer
+  :icon: list
+  :hide_if_false: view_allocs
 - :url: "/production/runs/production_runs/$:id$"
   :text: delete
   :icon: delete

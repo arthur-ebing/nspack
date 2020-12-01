@@ -43,5 +43,6 @@ module MesscadaApp
     optional(:cooled).maybe(:bool)
     optional(:palletizing_bay_resource_id).maybe(:integer)
     optional(:has_individual_cartons).maybe(:bool)
+    optional(:target_customer_party_role_id).maybe(:integer)
   end
 end

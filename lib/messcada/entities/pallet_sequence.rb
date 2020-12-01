@@ -52,6 +52,7 @@ module MesscadaApp
     attribute :grade_id, Types::Integer
     attribute :verified_by, Types::String
     attribute :created_by, Types::String
+    attribute :target_market_id, Types::Integer
   end
 
   class PalletSequenceFlat < Dry::Struct
@@ -135,5 +136,8 @@ module MesscadaApp
     attribute :created_by, Types::String
     attribute :verified_by, Types::String
     attribute? :active, Types::Bool
+
+    attribute :target_market_id, Types::Integer
+    attribute :target_market_name, Types::String
   end
 end

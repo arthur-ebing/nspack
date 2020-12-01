@@ -52,6 +52,7 @@ module MesscadaApp
           marketing_varieties.marketing_variety_code AS marketing_variety,
           fn_party_role_name(pallet_sequences.marketing_org_party_role_id) AS marketing_org,
           target_market_groups.target_market_group_name AS packed_tm_group,
+          target_markets.target_market_name AS target_market,
           marks.mark_code AS mark,
           inventory_codes.inventory_code,
           cvv.marketing_variety_code AS customer_variety,
@@ -249,6 +250,7 @@ module MesscadaApp
         JOIN marks ON marks.id = pallet_sequences.mark_id
         JOIN inventory_codes ON inventory_codes.id = pallet_sequences.inventory_code_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+        LEFT JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id
         JOIN grades ON grades.id = pallet_sequences.grade_id
         LEFT JOIN customer_varieties ON customer_varieties.id = pallet_sequences.customer_variety_id
         LEFT JOIN marketing_varieties cvv ON cvv.id = customer_varieties.variety_as_customer_variety_id

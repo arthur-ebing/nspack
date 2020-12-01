@@ -83,6 +83,7 @@ module MesscadaApp
           cl.fruit_size_reference_id,
           cl.marketing_org_party_role_id,
           cl.packed_tm_group_id,
+          cl.target_market_id,
           cl.mark_id,
           cl.inventory_code_id,
           cl.pallet_format_id,
@@ -197,6 +198,10 @@ module MesscadaApp
 
     def find_resource_location_id(id)
       DB[:plant_resources].where(id: id).get(:location_id)
+    end
+
+    def find_allocation_target_customer_id(allocation_id)
+      DB[:product_resource_allocations].where(id: allocation_id).get(:target_customer_party_role_id)
     end
 
     def find_resource_phc(id)
@@ -440,11 +445,12 @@ module MesscadaApp
 
     def get_oldest_pallet_sequence(pallet_id)
       query = <<~SQL
-        SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference, sp.standard_pack_code, sf.size_count_value
+        SELECT i.inventory_code, tm.target_market_group_name, target_markets.target_market_name, g.grade_code, m.mark_code,fs.size_reference, sp.standard_pack_code, sf.size_count_value
         ,c.cultivar_name, cg.cultivar_group_code, p.puc_code, o,orchard_code, s.*
         FROM pallet_sequences s
         JOIN inventory_codes i ON i.id = s.inventory_code_id
         JOIN target_market_groups tm on tm.id=s.packed_tm_group_id
+        LEFT JOIN target_markets on target_markets.id=s.target_market_id
         LEFT JOIN fruit_size_references fs on fs.id=s.fruit_size_reference_id
         JOIN standard_pack_codes sp on sp.id=s.standard_pack_code_id
         LEFT JOIN std_fruit_size_counts sf on sf.id=s.std_fruit_size_count_id
@@ -520,12 +526,13 @@ module MesscadaApp
 
     def carton_attributes(carton_id)
       query = <<~SQL
-        SELECT i.inventory_code, tm.target_market_group_name, g.grade_code, m.mark_code,fs.size_reference,
+        SELECT i.inventory_code, tm.target_market_group_name, target_markets.target_market_name, g.grade_code, m.mark_code,fs.size_reference,
                sp.standard_pack_code, sf.size_count_value ,clt.cultivar_name, cg.cultivar_group_code, c.*
         FROM cartons c
         JOIN carton_labels cl on cl.id = c.carton_label_id
         JOIN inventory_codes i ON i.id = cl.inventory_code_id
         JOIN target_market_groups tm on tm.id = cl.packed_tm_group_id
+        LEFT JOIN target_markets on target_markets.id=cl.target_market_id
         LEFT JOIN fruit_size_references fs on fs.id = cl.fruit_size_reference_id
         JOIN standard_pack_codes sp on sp.id = cl.standard_pack_code_id
         LEFT JOIN std_fruit_size_counts sf on sf.id = cl.std_fruit_size_count_id

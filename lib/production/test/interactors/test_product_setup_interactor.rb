@@ -88,6 +88,7 @@ module ProductionApp
       fruit_size_reference_id = create_fruit_size_reference
       marketing_org_party_role_id = create_party_role('O', AppConst::ROLE_MARKETER)
       packed_tm_group_id = create_target_market_group
+      target_market_id = create_target_market
       mark_id = create_mark
       pallet_format_id = create_pallet_format
       cartons_per_pallet_id = create_cartons_per_pallet
@@ -129,6 +130,7 @@ module ProductionApp
         pallet_stack_type_id: 1,
         pm_type_id: 1,
         pm_subtype_id: 1,
+        target_market_id: target_market_id,
         description: 'ABC',
         erp_bom_code: 'ABC'
       }

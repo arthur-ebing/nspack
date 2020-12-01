@@ -391,6 +391,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'packed_tm_group_changed' do
+        target_markets = if params[:changed_value].blank?
+                           []
+                         else
+                           MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(params[:changed_value])
+                         end
         if params[:changed_value].blank? || params[:product_setup_marketing_variety_id].blank?
           customer_varieties = []
         else
@@ -400,7 +405,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_customer_variety_id',
-                                     options_array: customer_varieties)])
+                                     options_array: customer_varieties),
+                      OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'product_setup_target_market_id',
+                                     options_array: target_markets)])
       end
 
       r.on 'marketing_variety_changed' do

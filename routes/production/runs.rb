@@ -480,6 +480,11 @@ class Nspack < Roda
         end
       end
 
+      r.on 'allocate_target_customer' do
+        check_auth!('runs', 'edit')
+        show_page { Production::Runs::ProductionRun::AllocateTargetCustomers.call(id) }
+      end
+
       r.on 'product_setup', Integer do |product_setup_id|
         r.on 'print_label' do
           r.get do
