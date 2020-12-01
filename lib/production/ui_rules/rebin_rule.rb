@@ -9,7 +9,7 @@ module UiRules
 
       @rules[:show_nett_weight] = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
       @rules[:capture_inner_bins] = AppConst::DELIVERY_CAPTURE_INNER_BINS && !@form_object.rmt_inner_container_type_id.nil?
-      @rules[:capture_container_material] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+      # @rules[:capture_container_material] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
       @rules[:capture_container_material_owner] = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
       common_values_for_fields common_fields
@@ -47,7 +47,7 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/production/runs/container_material_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL && AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+        behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/production/runs/container_material_type_combo_changed' }] if AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
       end
     end
   end

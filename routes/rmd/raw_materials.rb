@@ -294,7 +294,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form_state.merge!(details) unless details.nil?
 
           default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-          capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
           capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
           form = Crossbeams::RMDForm.new(form_state,
@@ -310,7 +309,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             behaviour.dropdown_change :production_line_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_line_id_combo_changed' }]
             behaviour.dropdown_change :production_run_rebin_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_production_run_rebin_id_combo_changed' }]
             behaviour.input_change :bin_asset_number, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/bin_asset_number_changed' }]
-            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed', param_keys: %i[rmt_bin_bin_asset_number] }] if capture_container_material && capture_container_material_owner
+            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rebin_container_material_type_combo_changed', param_keys: %i[rmt_bin_bin_asset_number] }] if capture_container_material_owner
           end
 
           form.add_field(:bin_asset_number, 'Bin Number', scan: 'key248_all', scan_type: :bin_asset, required: true, submit_form: false)
@@ -325,13 +324,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_label(:season, 'Season', form_state[:season_code])
           form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
 
-          if capture_container_material
-            form.add_select(:rmt_container_material_type_id, 'Container Material Type',
-                            items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
-                            required: true, prompt: true)
-          end
+          form.add_select(:rmt_container_material_type_id, 'Container Material Type',
+                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
+                          required: true, prompt: true)
 
-          if capture_container_material && capture_container_material_owner
+          if capture_container_material_owner
             form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
                             items: !details.nil? && !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
                             required: true, prompt: true)

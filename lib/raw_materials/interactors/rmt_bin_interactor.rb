@@ -78,6 +78,8 @@ module RawMaterialsApp
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
 
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
+
       bin_asset_numbers = repo.get_available_bin_asset_numbers(params[:qty_bins_to_create])
       return failed_response("Couldn't find #{params[:qty_bins_to_create]} available bin_asset_numbers in the system") unless bin_asset_numbers.length == params[:qty_bins_to_create].to_i
 
@@ -99,7 +101,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def create_rebin(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
@@ -109,6 +111,8 @@ module RawMaterialsApp
 
       res = validate_rmt_rebin_params(params)
       return validation_failed_response(res) if res.failure?
+
+      return failed_response('Container Material Type must have a tare_weight') unless repo.get(:rmt_container_material_types, params[:rmt_container_material_type_id], :tare_weight)
 
       id = nil
       repo.transaction do
