@@ -48,6 +48,7 @@ module MesscadaApp
       optional(:personnel_identifier_id).maybe(:integer)
       optional(:contract_worker_id).maybe(:integer)
       required(:packing_method_id).filled(:integer)
+      optional(:target_market_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

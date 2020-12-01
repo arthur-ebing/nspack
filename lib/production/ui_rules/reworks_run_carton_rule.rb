@@ -28,7 +28,7 @@ module UiRules
     end
 
     def make_header_table(columns = nil, display_columns = 3)
-      compact_header(columns: columns || %i[inventory_code target_market_group_name grade_code mark_code size_reference
+      compact_header(columns: columns || %i[inventory_code target_market_group_name target_market_name grade_code mark_code size_reference
                                             standard_pack_code size_count_value cultivar_name cultivar_group_code],
                      display_columns: display_columns,
                      header_captions: {
@@ -36,6 +36,7 @@ module UiRules
                        pallet_sequence_number: 'Seq Number',
                        inventory_code: 'Inventory',
                        target_market_group_name: 'TM Group',
+                       target_market_name: 'Target Market',
                        grade_code: 'Grade',
                        mark_code: 'Mark',
                        size_reference: 'Size Ref',

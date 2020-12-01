@@ -362,7 +362,7 @@ module ProductionApp
     def sequence_setup_attrs(id)
       DB["SELECT marketing_variety_id, customer_variety_id, std_fruit_size_count_id, basic_pack_code_id,
           standard_pack_code_id, fruit_actual_counts_for_pack_id, fruit_size_reference_id, marketing_org_party_role_id,
-          packed_tm_group_id, mark_id, inventory_code_id, pallet_format_id, cartons_per_pallet_id, pm_bom_id, client_size_reference,
+          packed_tm_group_id, target_market_id, mark_id, inventory_code_id, pallet_format_id, cartons_per_pallet_id, pm_bom_id, client_size_reference,
           client_product_code, treatment_ids, marketing_order_number, sell_by_code, grade_id, product_chars, pm_type_id, pm_subtype_id
           FROM pallet_sequences
           WHERE id = ?", id].first
@@ -370,7 +370,7 @@ module ProductionApp
 
     def sequence_setup_data(id)
       data_ar = %i[marketing_variety customer_variety std_size basic_pack std_pack actual_count size_ref marketing_org
-                   packed_tm_group mark inventory_code pallet_base stack_type cpp bom client_size_ref
+                   packed_tm_group target_market mark inventory_code pallet_base stack_type cpp bom client_size_ref
                    client_product_code treatments order_number sell_by_code grade product_chars pm_type pm_subtype]
       query = MesscadaApp::DatasetPalletSequence.call('WHERE pallet_sequences.id = ?')
       DB[query, id].first.select { |key, _| data_ar.include?(key) }
@@ -387,6 +387,7 @@ module ProductionApp
         size_ref: get(:fruit_size_references, attrs[:fruit_size_reference_id], :size_reference),
         marketing_org: DB['SELECT fn_party_role_name(?) AS marketing_org FROM party_roles WHERE party_roles.id = ?', attrs[:marketing_org_party_role_id], attrs[:marketing_org_party_role_id]].first[:marketing_org],
         packed_tm_group: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
+        target_market: get(:target_markets, attrs[:target_market_id], :target_market_name),
         mark: get(:marks, attrs[:mark_id], :mark_code),
         inventory_code: get(:inventory_codes, attrs[:inventory_code_id], :inventory_code),
         pallet_base: get(:pallet_bases, pallet_format[:pallet_base_id], :pallet_base_code),
@@ -568,7 +569,7 @@ module ProductionApp
       query = <<~SQL
         SELECT ps.id, ps.pallet_number, ps.pallet_sequence_number, ps.marketing_variety_id, ps.customer_variety_id,
         ps.std_fruit_size_count_id, ps.basic_pack_code_id, ps.standard_pack_code_id, ps.fruit_actual_counts_for_pack_id, ps.fruit_size_reference_id,
-        ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
+        ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.target_market_id, ps.mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
         ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code,
         cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
         ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code

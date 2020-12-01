@@ -117,6 +117,12 @@ module UiRules
                                                  prompt: 'Select Fruit Sticker 2',
                                                  searchable: true,
                                                  remove_search_for_small_list: false }
+      fields[:target_customer_party_role_id] = { renderer: :select,
+                                                 options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_TARGET_CUSTOMER),
+                                                 caption: 'Target Customer',
+                                                 prompt: 'Select Target Customer',
+                                                 searchable: true,
+                                                 remove_search_for_small_list: false }
     end
 
     def make_form_object  # rubocop:disable Metrics/AbcSize

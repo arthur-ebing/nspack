@@ -104,11 +104,19 @@ module UiRules
       cultivar_id = @form_object[:cultivar_id]
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
+      default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomsRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
+
       customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
                              []
                            else
                              MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
                            end
+
+      target_markets = if @form_object.packed_tm_group_id.nil_or_empty?
+                         []
+                       else
+                         MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(@form_object.packed_tm_group_id)
+                       end
 
       pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
@@ -204,6 +212,14 @@ module UiRules
                                        prompt: 'Select Packed TM Group',
                                        searchable: true,
                                        remove_search_for_small_list: false }
+      fields[:target_market_id] = { renderer: :select,
+                                    options: target_markets,
+                                    disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
+                                    caption: 'Target Market',
+                                    prompt: 'Select Target Market',
+                                    searchable: true,
+                                    remove_search_for_small_list: false }
+
       fields[:sell_by_code] =  {}
       fields[:mark_id] =  { renderer: :select,
                             options: MasterfilesApp::MarketingRepo.new.for_select_marks,
@@ -267,6 +283,25 @@ module UiRules
                                           prompt: 'Select Cartons per Pallet',
                                           searchable: true,
                                           remove_search_for_small_list: false }
+
+      fields[:pm_type_id] = { renderer: :select,
+                              options: MasterfilesApp::BomsRepo.new.for_select_pm_types,
+                              disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_types,
+                              selected: default_pm_type_id,
+                              caption: 'PM Type',
+                              prompt: 'Select PM Type',
+                              searchable: true,
+                              remove_search_for_small_list: false,
+                              hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:pm_subtype_id] =  { renderer: :select,
+                                  options: MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: default_pm_type_id }),
+                                  disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_subtypes,
+                                  caption: 'PM Subtype',
+                                  prompt: 'Select PM Subtype',
+                                  searchable: true,
+                                  remove_search_for_small_list: false,
+                                  hide_on_load: @rules[:require_packaging_bom] ? false : true }
+
       fields[:pm_bom_id] =  { renderer: :select,
                               options: pm_boms,
                               disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
@@ -372,6 +407,9 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pallet_format_changed",
                                              param_keys: %i[reworks_run_sequence_basic_pack_code_id] }]
+        behaviour.dropdown_change :pm_type_id,
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_type_changed" }]
+
         behaviour.dropdown_change :pm_bom_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_bom_changed",
                                              param_keys: %i[reworks_run_sequence_mark_id] }]

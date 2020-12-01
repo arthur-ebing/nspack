@@ -15,12 +15,12 @@ module UiRules
       @rules[:show_bin_tipping_control_data] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:show_bin_tipping_criteria] = (AppConst::CLIENT_CODE == 'kr')
 
-      common_values_for_fields common_fields unless %i[allocate_setups complete_stage confirm].include?(@mode)
+      common_values_for_fields common_fields unless %i[allocate_setups allocate_target_customers complete_stage confirm].include?(@mode)
 
       set_show_fields if %i[show reopen template show_stats].include? @mode
       set_select_template_fields if @mode == :template
       make_header_table if @mode == :template
-      make_header_table(%i[production_run_code template_name packhouse_code line_code status active_run_stage]) if %i[allocate_setups complete_stage show_stats confirm].include?(@mode)
+      make_header_table(%i[production_run_code template_name packhouse_code line_code status active_run_stage]) if %i[allocate_setups allocate_target_customers complete_stage show_stats confirm].include?(@mode)
       build_stats_table if @mode == :show_stats
       set_stage_fields if @mode == :complete_stage
 

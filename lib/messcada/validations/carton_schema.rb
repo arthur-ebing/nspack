@@ -54,6 +54,7 @@ module MesscadaApp
       optional(:scrapped).maybe(:bool)
       optional(:scrapped_at).maybe(:time)
       optional(:scrapped_sequence_id).maybe(:integer)
+      optional(:target_market_id).maybe(:integer)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

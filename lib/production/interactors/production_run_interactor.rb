@@ -348,9 +348,17 @@ module ProductionApp
         label_for_allocation(product_resource_allocation_id, params)
       elsif params[:column_name] == 'packing_method_code'
         packing_method_for_allocation(product_resource_allocation_id, params)
+      elsif params[:column_name] == 'target_customer'
+        allocate_target_customer(product_resource_allocation_id, params)
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
       end
+    end
+
+    def allocate_target_customer(product_resource_allocation_id, params)
+      res = repo.allocate_target_customer(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { target_customer: res.instance[:target_customer] } }
+      res
     end
 
     def assert_permission!(task, id = nil)

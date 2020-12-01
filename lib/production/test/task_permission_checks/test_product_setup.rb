@@ -41,6 +41,7 @@ module ProductionApp
         pallet_stack_type_id: 1,
         pm_type_id: 1,
         pm_subtype_id: 1,
+        target_market_id: 1,
         description: 'ABC',
         erp_bom_code: 'ABC'
       }

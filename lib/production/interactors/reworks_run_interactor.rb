@@ -544,14 +544,14 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def update_reworks_run_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def update_reworks_run_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
       if AppConst::CLIENT_CODE == 'kr'
-        if params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil? && params[:basic_pack_code_id].to_i.nonzero?.nil? && params[:standard_pack_code_id].to_i.nonzero?.nil?
-          standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
-          return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
+        # if params[:standard_pack_code_id].to_i.nonzero?.nil?
+        standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
+        return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
 
-          params = params.merge(standard_pack_code_id: standard_pack_code_id)
-        end
+        params = params.merge(standard_pack_code_id: standard_pack_code_id)
+        # end
       end
 
       res = validate_reworks_run_pallet_sequence_params(params)
@@ -566,13 +566,15 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)
+    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
       if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
         standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
       else
-        standard_pack_code_id = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
-        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_id.size.==1
+        standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
+        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_ids.size.==1
+
+        standard_pack_code_id = standard_pack_code_ids[0]
       end
       standard_pack_code_id
     end
@@ -1126,6 +1128,10 @@ module ProductionApp
     def for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
       MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet(where: { pallet_format_id: pallet_format_id,
                                                                                basic_pack_id: basic_pack_code_id })
+    end
+
+    def for_select_pm_type_pm_subtypes(pm_type_id)
+      MasterfilesApp::BomsRepo.new.for_select_pm_subtypes(where: { pm_type_id: pm_type_id })
     end
 
     def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)

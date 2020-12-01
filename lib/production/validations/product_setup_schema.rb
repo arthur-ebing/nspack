@@ -28,5 +28,6 @@ module ProductionApp
     required(:grade_id).filled(:integer)
     required(:product_chars).maybe(Types::StrippedString)
     # required(:active).maybe(:bool)
+    required(:target_market_id).maybe(:integer)
   end
 end

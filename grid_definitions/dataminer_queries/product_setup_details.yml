@@ -8,9 +8,10 @@
   AS size_count,\r\n       fruit_actual_counts_for_packs.actual_count_for_pack AS
   actual_count,\r\n       fruit_size_references.size_reference,\r\n       organizations.medium_description
   AS marketing_organization,\r\n       target_market_groups.target_market_group_name,\r\n
-  \      marks.mark_code,\r\n       cust_mkt.marketing_variety_code AS cust_mkt_variety,\r\n
-  \      inventory_codes.inventory_code,\r\n       pallet_formats.description AS pallet_format_description,\r\n
-  \      cartons_per_pallet.cartons_per_pallet,\r\n       product_setups.id,\r\n       product_setups.product_setup_template_id,\r\n
+  \      target_markets.target_market_name,\r\n       marks.mark_code,\r\n       cust_mkt.marketing_variety_code
+  AS cust_mkt_variety,\r\n       inventory_codes.inventory_code,\r\n       pallet_formats.description
+  AS pallet_format_description,\r\n       cartons_per_pallet.cartons_per_pallet,\r\n
+  \      product_setups.id,\r\n       product_setups.product_setup_template_id,\r\n
   \      product_setups.extended_columns,\r\n       product_setups.client_size_reference,\r\n
   \      product_setups.client_product_code,\r\n       product_setups.marketing_order_number,\r\n
   \      product_setups.sell_by_code,\r\n       product_setups.pallet_label_name,\r\n
@@ -34,6 +35,7 @@
   party_roles ON party_roles.id = product_setups.marketing_org_party_role_id\r\n         JOIN
   organizations ON organizations.id = party_roles.organization_id\r\n         JOIN
   target_market_groups ON target_market_groups.id = product_setups.packed_tm_group_id\r\n
+  \        LEFT JOIN target_markets ON target_markets.id = product_setups.target_market_id\r\n
   \        JOIN marks ON marks.id = product_setups.mark_id\r\n         LEFT JOIN customer_varieties
   ON customer_varieties.id = product_setups.customer_variety_id\r\n         LEFT JOIN
   marketing_varieties cust_mkt ON cust_mkt.id = customer_varieties.variety_as_customer_variety_id\r\n
@@ -257,9 +259,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  target_market_name:
+    :name: target_market_name
+    :sequence_no: 14
+    :caption: Target market
+    :namespaced_name: target_markets.target_market_name
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mark_code:
     :name: mark_code
-    :sequence_no: 14
+    :sequence_no: 15
     :caption: Mark
     :namespaced_name: marks.mark_code
     :data_type: :string
@@ -275,7 +293,7 @@
     :group_max: false
   cust_mkt_variety:
     :name: cust_mkt_variety
-    :sequence_no: 15
+    :sequence_no: 16
     :caption: Cust mkt variety
     :namespaced_name: cust_mkt.marketing_variety_code
     :data_type: :string
@@ -291,7 +309,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Inv Code
     :namespaced_name: inventory_codes.inventory_code
     :data_type: :string
@@ -307,7 +325,7 @@
     :group_max: false
   pallet_format_description:
     :name: pallet_format_description
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Pallet format
     :namespaced_name: pallet_formats.description
     :data_type: :string
@@ -323,7 +341,7 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 18
+    :sequence_no: 19
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet.cartons_per_pallet
     :data_type: :integer
@@ -339,7 +357,7 @@
     :group_max: false
   id:
     :name: id
-    :sequence_no: 19
+    :sequence_no: 20
     :caption: Id
     :namespaced_name: product_setups.id
     :data_type: :integer
@@ -355,7 +373,7 @@
     :group_max: false
   product_setup_template_id:
     :name: product_setup_template_id
-    :sequence_no: 20
+    :sequence_no: 21
     :caption: Product setup template
     :namespaced_name: product_setups.product_setup_template_id
     :data_type: :string
@@ -371,7 +389,7 @@
     :group_max: false
   extended_columns:
     :name: extended_columns
-    :sequence_no: 21
+    :sequence_no: 22
     :caption: Extended columns
     :namespaced_name: product_setups.extended_columns
     :data_type: :string
@@ -387,7 +405,7 @@
     :group_max: false
   client_size_reference:
     :name: client_size_reference
-    :sequence_no: 22
+    :sequence_no: 23
     :caption: Client size ref
     :namespaced_name: product_setups.client_size_reference
     :data_type: :string
@@ -403,7 +421,7 @@
     :group_max: false
   client_product_code:
     :name: client_product_code
-    :sequence_no: 23
+    :sequence_no: 24
     :caption: Client product code
     :namespaced_name: product_setups.client_product_code
     :data_type: :string
@@ -419,7 +437,7 @@
     :group_max: false
   marketing_order_number:
     :name: marketing_order_number
-    :sequence_no: 24
+    :sequence_no: 25
     :caption: Marketing order number
     :namespaced_name: product_setups.marketing_order_number
     :data_type: :string
@@ -435,7 +453,7 @@
     :group_max: false
   sell_by_code:
     :name: sell_by_code
-    :sequence_no: 25
+    :sequence_no: 26
     :caption: Sell by code
     :namespaced_name: product_setups.sell_by_code
     :data_type: :string
@@ -451,7 +469,7 @@
     :group_max: false
   pallet_label_name:
     :name: pallet_label_name
-    :sequence_no: 26
+    :sequence_no: 27
     :caption: Pallet label name
     :namespaced_name: product_setups.pallet_label_name
     :data_type: :string
@@ -467,7 +485,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 27
+    :sequence_no: 28
     :caption: Active
     :namespaced_name: product_setups.active
     :data_type: :boolean
@@ -483,7 +501,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 28
+    :sequence_no: 29
     :caption: Created at
     :namespaced_name: product_setups.created_at
     :data_type: :datetime
@@ -499,7 +517,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 29
+    :sequence_no: 30
     :caption: Updated at
     :namespaced_name: product_setups.updated_at
     :data_type: :datetime
@@ -515,7 +533,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 30
+    :sequence_no: 31
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string
@@ -531,7 +549,7 @@
     :group_max: false
   product_setup_treatments:
     :name: product_setup_treatments
-    :sequence_no: 31
+    :sequence_no: 32
     :caption: Product setup treatments
     :namespaced_name: 
     :data_type: :string
