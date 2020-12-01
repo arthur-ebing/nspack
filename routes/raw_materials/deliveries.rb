@@ -363,7 +363,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           check_auth!('deliveries', 'edit')
           interactor.assert_permission!(:edit, id)
-          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id, back_url: back_button_url) }
+          show_partial_or_page(r) { RawMaterials::Deliveries::RmtDelivery::Edit.call(id) }
         end
       end
 
