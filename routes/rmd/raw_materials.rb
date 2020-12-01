@@ -178,69 +178,73 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
   # --------------------------------------------------------------------------
   # DELIVERIES
   # --------------------------------------------------------------------------
-  route 'rmt_deliveries', 'rmd' do |r| # rubocop:disable Metrics/BlockLength
+  route 'rmt_deliveries', 'rmd' do |r|
     # --------------------------------------------------------------------------
     # BINS
     # --------------------------------------------------------------------------
-    r.on 'rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_bins', Integer do |id|
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
-      r.on 'new' do # rubocop:disable Metrics/BlockLength    # NEW
+      r.on 'new' do # NEW
         bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(id)
-        default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-        details = retrieve_from_local_store(:bin) || { cultivar_id: bin_delivery[:cultivar_id], bin_fullness: :Full }
+        if bin_delivery
+          default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
+          details = retrieve_from_local_store(:bin) || { cultivar_id: bin_delivery[:cultivar_id], bin_fullness: :Full }
 
-        capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
-        capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
-        capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
-        capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
+          capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
+          capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
+          capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
+          capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
-        form = Crossbeams::RMDForm.new(details,
-                                       form_name: :rmt_bin,
-                                       scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'New Bin',
-                                       action: "/rmd/rmt_deliveries/rmt_bins/#{id}/rmt_bins",
-                                       button_caption: 'Submit')
+          form = Crossbeams::RMDForm.new(details,
+                                         form_name: :rmt_bin,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         caption: 'New Bin',
+                                         action: "/rmd/rmt_deliveries/rmt_bins/#{id}/rmt_bins",
+                                         button_caption: 'Submit')
 
-        form.behaviours do |behaviour|
-          behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rmt_container_type_combo_changed' }] if capture_container_material
-          behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
-        end
+          form.behaviours do |behaviour|
+            behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rmt_container_type_combo_changed' }] if capture_container_material
+            behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
+          end
 
-        form.add_label(:farm_code, 'Farm', bin_delivery[:farm_code], nil, as_table_cell: true)
-        form.add_label(:puc_code, 'Puc', bin_delivery[:puc_code], nil, as_table_cell: true)
-        form.add_label(:orchard_code, 'Orchard', bin_delivery[:orchard_code], nil, as_table_cell: true)
-        form.add_label(:date_picked, 'Date Picked', bin_delivery[:date_picked], nil, as_table_cell: true)
-        form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
-        form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
-        form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
-        form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
-        form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
-                                                                  required: true, prompt: true)
-        form.add_label(:qty_bins, 'Qty Bins', 1, 1)
-        if capture_inner_bins
-          form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
+          form.add_label(:farm_code, 'Farm', bin_delivery[:farm_code], nil, as_table_cell: true)
+          form.add_label(:puc_code, 'PUC', bin_delivery[:puc_code], nil, as_table_cell: true)
+          form.add_label(:orchard_code, 'Orchard', bin_delivery[:orchard_code], nil, as_table_cell: true)
+          form.add_label(:date_picked, 'Date Picked', bin_delivery[:date_picked], nil, as_table_cell: true)
+          form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
+          form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
+          form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
+          form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
+          form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
+                                                                    required: true, prompt: true)
+          form.add_label(:qty_bins, 'Qty Bins', 1, 1)
+          if capture_inner_bins
+            form.add_field(:qty_inner_bins, 'Qty Inner Bins', data_type: 'number')
+          else
+            form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
+          end
+          form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
+          form.add_field(:nett_weight, 'Nett Weight', required: false) if capture_nett_weight
+
+          if capture_container_material
+            form.add_select(:rmt_container_material_type_id, 'Container Material Type',
+                            items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
+                            required: true, prompt: true)
+          end
+
+          if capture_container_material && capture_container_material_owner
+            form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
+                            items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
+                            required: true, prompt: true)
+          end
+
+          form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true)
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
         else
-          form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
+          view(inline: rmd_warning_message('RMT Delivery not found'), layout: :layout_rmd)
         end
-        form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
-        form.add_field(:nett_weight, 'Nett Weight', required: false) if capture_nett_weight
-
-        if capture_container_material
-          form.add_select(:rmt_container_material_type_id, 'Container Material Type',
-                          items: MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: default_rmt_container_type[:id] }),
-                          required: true, prompt: true)
-        end
-
-        if capture_container_material && capture_container_material_owner
-          form.add_select(:rmt_material_owner_party_role_id, 'Container Material Owner',
-                          items: !details[:rmt_container_material_type_id].to_s.empty? ? RawMaterialsApp::RmtDeliveryRepo.new.find_container_material_owners_by_container_material_type(details[:rmt_container_material_type_id]) : [],
-                          required: true, prompt: true)
-        end
-
-        form.add_field(:bin_asset_number, 'Asset Number', scan: 'key248_all', scan_type: :bin_asset, required: true)
-        form.add_csrf_tag csrf_tag
-        view(inline: form.render, layout: :layout_rmd)
       end
 
       r.post do # CREATE
@@ -257,7 +261,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'rmt_bins' do # rubocop:disable Metrics/BlockLength
+    r.on 'rmt_bins' do
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'rmt_bin_rmt_container_type_combo_changed' do
@@ -335,8 +339,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       # --------------------------------------------------------------------------
       # CREATE RMT REBIN
       # --------------------------------------------------------------------------
-      r.on 'create_rebin' do # rubocop:disable Metrics/BlockLength
-        r.get do # rubocop:disable Metrics/BlockLength
+      r.on 'create_rebin' do
+        r.get do
           form_state = { bin_fullness: :Full }
           error = retrieve_from_local_store(:errors)
           notice = retrieve_from_local_store(:flash_notice)
@@ -465,7 +469,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'rmt_bin_production_run_rebin_id_combo_changed' do # rubocop:disable Metrics/BlockLength
+      r.on 'rmt_bin_production_run_rebin_id_combo_changed' do
         actions = if !params[:changed_value].to_s.empty?
                     prod_run = ProductionApp::ProductionRunRepo.new.find_production_run_flat(params[:changed_value])
                     [OpenStruct.new(type: :replace_inner_html,
@@ -541,7 +545,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'render_edit_rmt_bin', Integer do |id| # rubocop:disable Metrics/BlockLength
+      r.on 'render_edit_rmt_bin', Integer do |id|
         bin = interactor.bin_details(id)
         form_state = { bin_fullness: bin[:bin_fullness], qty_bins: bin[:qty_bins] }
         error = retrieve_from_local_store(:errors)
@@ -686,7 +690,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         container_material_type_combo_changed('rmt_bin')
       end
 
-      r.on 'receive_rmt_bins', Integer do |id| # rubocop:disable Metrics/BlockLength
+      r.on 'receive_rmt_bins', Integer do |id|
         delivery = interactor.get_delivery_confirmation_details(id)
         default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
 
@@ -814,7 +818,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect("/rmd/rmt_deliveries/rmt_bins/set_bin_level/#{id}")
       end
 
-      r.on 'set_bin_level_complete', Integer do |id| # rubocop:disable Metrics/BlockLength
+      r.on 'set_bin_level_complete', Integer do |id|
         if RawMaterialsApp::RmtDeliveryRepo.new.exists?(:rmt_bins, bin_asset_number: params[:bin][:bin_asset_number], rmt_delivery_id: id)
           store_locally(:flash_notice, "Bin:#{params[:bin][:bin_asset_number]} level set to: #{params[:bin][:bin_fullness]} successfully")
           interactor.update_rmt_bin_asset_level(params[:bin][:bin_asset_number], params[:bin][:bin_fullness])
