@@ -72,6 +72,7 @@ module MesscadaApp
     attribute :palletizer_contract_worker_id, Types::Integer
     attribute :target_market_id, Types::Integer
   end
+
   class ScannedCartonNumber < Dry::Struct
     attribute :scanned_carton_number, Types::String
 
