@@ -178,6 +178,15 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
       hs[:const_val] = AppConst.const_defined?(key) ? AppConst.const_get(key).to_s.gsub(',', ', ') : nil
       ar << hs
     end
+    ar << { key: '<strong>APP CONST</strong>', env_val: '<strong>OTHER CONSTANTS</strong>', const_val: '<strong>(Value is hard-coded or might come from ENV VAR)</strong>' }
+    consts = AppConst.constants.sort
+    (consts - keys).each do |key|
+      hs = { key: key, env_val: (ENV[key.to_s] || '').gsub(',', ', ') } # rubocop:disable Lint/Env
+      description = ''
+      hs[:key] = %(<span class="fw5 near-black">#{key}</span><br><span class="f6">#{description}</span>)
+      hs[:const_val] = AppConst.const_defined?(key) ? AppConst.const_get(key).to_s.gsub(',', ', ') : nil
+      ar << hs
+    end
     ar
   end
 

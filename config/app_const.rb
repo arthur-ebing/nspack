@@ -600,8 +600,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   QUALITY_RESULT_TYPE = [PASS_FAIL, CLASSIFICATION].freeze
   PHYT_CLEAN_STANDARD = 'PhytCleanStandardData'
   QUALITY_API_NAMES = [PHYT_CLEAN_STANDARD].freeze
-  BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean('BYPASS_QUALITY_TEST_PRE_RUN_CHECK')
-  BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean('BYPASS_QUALITY_TEST_LOAD_CHECK')
+  BYPASS_QUALITY_TEST_PRE_RUN_CHECK = make_boolean('BYPASS_QUALITY_TEST_PRE_RUN_CHECK', default_true: true)
+  BYPASS_QUALITY_TEST_LOAD_CHECK = make_boolean('BYPASS_QUALITY_TEST_LOAD_CHECK', default_true: true)
 
   # PhytClean
   PHYT_CLEAN_ENVIRONMENT = 'https://www.phytclean.co.za'
