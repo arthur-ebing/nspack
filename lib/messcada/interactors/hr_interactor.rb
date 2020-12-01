@@ -35,7 +35,7 @@ module MesscadaApp
     def stop_bulk_registration(id)
       mes_module = DB[:mes_modules].where(id: id).get(:module_code)
 
-      res = messerver_repo.bulk_registration_mode(mes_module, false)
+      res = messerver_repo.bulk_registration_mode(mes_module, start: false)
       return res unless res.success
 
       DB[:mes_modules].where(id: id).update(bulk_registration_mode: false)

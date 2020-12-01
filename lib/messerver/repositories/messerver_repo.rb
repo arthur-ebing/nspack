@@ -104,8 +104,8 @@ module MesserverApp
       success_response('Preview label', res.instance.body)
     end
 
-    def bulk_registration_mode(mes_module, start = true)
-      request_uri(bulk_registration_mode_uri(mes_module, start))
+    def bulk_registration_mode(mes_module, start: true)
+      request_uri(bulk_registration_mode_uri(mes_module, start: start))
     end
 
     private
@@ -348,7 +348,7 @@ module MesserverApp
       URI.parse("#{AppConst::LABEL_SERVER_URI}LabelPreview")
     end
 
-    def bulk_registration_mode_uri(mes_module, start = true)
+    def bulk_registration_mode_uri(mes_module, start: true)
       URI.parse("#{AppConst::LABEL_SERVER_URI}?Type=SetCardRegistrationState&Name=#{mes_module}&Status=#{start}")
     end
 

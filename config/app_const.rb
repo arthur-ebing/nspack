@@ -73,7 +73,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Integration
   INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM = make_boolean('INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM')
-  INTEGRATION_SERVER_URI = ENV.fetch('INTEGRATION_SERVER_URI')
+  RMT_INTEGRATION_SERVER_URI = ENV['RMT_INTEGRATION_SERVER_URI']
+  raise 'RMT Integration server uri is required' if INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM
 
   # Deliveries
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']

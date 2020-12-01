@@ -268,7 +268,7 @@ module MesscadaApp
     end
 
     def fetch_delivery_from_external_system(delivery_number)
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
@@ -282,7 +282,7 @@ module MesscadaApp
     end
 
     def fetch_bin_from_external_system(bin_number) # rubocop:disable Metrics/AbcSize
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
@@ -299,7 +299,7 @@ module MesscadaApp
     end
 
     def can_bin_be_tipped?(bin_number) # rubocop:disable Metrics/AbcSize
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
@@ -316,7 +316,7 @@ module MesscadaApp
     end
 
     def run_treatment_codes
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
@@ -331,7 +331,7 @@ module MesscadaApp
 
     def ripe_point_codes(ripe_point_code: nil)
       params = ripe_point_code ? "ripe_point_code=#{ripe_point_code}" : nil
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
@@ -345,7 +345,7 @@ module MesscadaApp
     end
 
     def track_indicator_codes
-      uri = URI.parse("#{AppConst::INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes")
+      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.request_uri)
       response = http.request(request)
