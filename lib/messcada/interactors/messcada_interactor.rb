@@ -51,7 +51,13 @@ module MesscadaApp
     end
 
     def carton_to_be_verified(params) # rubocop:disable Metrics/AbcSize
-      scanned_carton_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton_number]).carton_number
+      # scanned_carton_number = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:carton_number]).carton_number
+
+      # TODO: refactor - method name is confusing, not representative...
+      # ----------------------------------------------------------------
+      # Carton number is actually a pallet number...
+      # This should only be called when COMBINE_CARTON_AND_PALLET_VERIFICATION is true
+      scanned_carton_number = params[:carton_number]
 
       if AppConst::CARTON_EQUALS_PALLET
         pallet = repo.find_pallet_by_pallet_number(scanned_carton_number)

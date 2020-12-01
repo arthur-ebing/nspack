@@ -420,3 +420,10 @@ namespace :db do
     puts "Created migration #{fn}"
   end
 end
+
+namespace :cap do
+  desc 'List Capistrano deploy targets'
+  task :deploy_targets do
+    puts Dir['./config/deploy/*.rb'].map { |a| a.sub('./config/deploy/', '') }.map { |a| a.sub(/\.rb$/, '') }.sort.join("\n")
+  end
+end
