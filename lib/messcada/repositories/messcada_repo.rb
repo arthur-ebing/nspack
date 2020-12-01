@@ -427,6 +427,7 @@ module MesscadaApp
     # end
 
     def find_pallet_by_carton_number(carton_number)
+      # FIXME: This is dodgy..... Returns pallet or a string...
       return carton_number if AppConst::CARTON_EQUALS_PALLET && !AppConst::USE_LABEL_ID_ON_BIN_LABEL
 
       pallet_sequence_id = if !AppConst::CARTON_EQUALS_PALLET && AppConst::USE_CARTON_PALLETIZING

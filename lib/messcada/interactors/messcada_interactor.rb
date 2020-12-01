@@ -67,7 +67,8 @@ module MesscadaApp
       res = carton_verification(carton_number: scanned_carton_number)
       return failed_response(res.message) unless res.success
 
-      pallet = repo.find_pallet_by_carton_number(scanned_carton_number)
+      # pallet = repo.find_pallet_by_carton_number(scanned_carton_number)
+      pallet = repo.find_pallet_by_pallet_number(scanned_carton_number)
       return failed_response('Carton verification failed to create pallet.') if pallet.nil?
 
       success_response('Verified Carton', pallet.pallet_sequence_ids.first)
