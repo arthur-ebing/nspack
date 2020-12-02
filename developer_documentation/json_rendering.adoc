@@ -159,6 +159,18 @@ type:: `:replace_dialog`.
 
 content:: the content for the dialog.
 
+==== Launch a new dialog with content
+
+Use this to launch a new dialog with content from the server.
+
+type:: `:launch_dialog`.
+
+content:: the content for the dialog.
+
+title:: (optional) the dialog title. Defaults to blank.
+
+NOTE: For this action, you **must** specify `keep_dialog_open: true`. Or use `json_launch_dialog` which defaults to keeping the dialog open.
+
 ==== Replace the options in a multi element
 
 Works on `Multi.js` elements only.
@@ -304,6 +316,8 @@ json_hide_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: f
 json_show_element(dom_id, reclaim_space: true, message: nil, keep_dialog_open: false)
 
 json_clear_form_validation(dom_id, message: nil, keep_dialog_open: false)
+
+json_launch_dialog(content, title: nil, message: nil, keep_dialog_open: true)
 ----
 
 == Other responses
