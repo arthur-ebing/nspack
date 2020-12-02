@@ -69,7 +69,7 @@ When a dialog opens another dialog, you might want to close the second dialog an
 
 === Close the dialog and update the grid
 
-After a grid action opens a dialog and changes are saved from the dialog, you might want to update certain values on the currect row without reloading the page.
+After a grid action opens a dialog and changes are saved from the dialog, you might want to update certain values on the current row without reloading the page.
 
     update_grid_row(ids, changes:, notice: nil)
 
@@ -86,7 +86,7 @@ Like with updating a grid row, this will close the dialog and append a row to th
 
 `add_grid_row` will automatically set the `created_at` and `updated_at` fields in the new row if the grid has them (so they do not need to be included int the `attrs` Hash).
 
-The newly-added row will be scrolled into view if neccessary.
+The newly-added row will be scrolled into view if necessary.
 
 == Changing DOM elements
 
