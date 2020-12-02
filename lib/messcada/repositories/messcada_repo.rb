@@ -275,7 +275,7 @@ module MesscadaApp
     def fetch_delivery_from_external_system(delivery_number)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
@@ -287,7 +287,7 @@ module MesscadaApp
     def fetch_bin_from_external_system(bin_number)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
@@ -299,7 +299,7 @@ module MesscadaApp
     def can_bin_be_tipped?(bin_number)
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       return failed_response(res.message) unless res.success
 
       instance = JSON.parse(res.instance.body)
@@ -311,7 +311,7 @@ module MesscadaApp
     def run_treatment_codes
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       raise res.message unless res.success
 
       JSON.parse(res.instance.body)
@@ -321,7 +321,7 @@ module MesscadaApp
       params = ripe_point_code ? "ripe_point_code=#{ripe_point_code}" : nil
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       raise res.message unless res.success
 
       JSON.parse(res.instance.body)
@@ -330,7 +330,7 @@ module MesscadaApp
     def track_indicator_codes
       url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes"
       http = Crossbeams::HTTPCalls.new(url.include?('https'))
-      res = http.json_post(url, nil)
+      res = http.request_get(url)
       raise res.message unless res.success
 
       JSON.parse(res.instance.body)
