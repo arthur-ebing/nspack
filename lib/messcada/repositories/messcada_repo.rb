@@ -273,94 +273,67 @@ module MesscadaApp
     end
 
     def fetch_delivery_from_external_system(delivery_number)
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      success_response('ok', JSON.parse(response.body))
-    rescue Timeout::Error
-      failed_response('The call to the server timed out.', timeout: true)
-    rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
-    rescue StandardError => e
-      failed_response("There was an error: #{e.message}")
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_delivery_info?delivery_number=#{delivery_number}"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      return failed_response(res.message) unless res.success
+
+      instance = JSON.parse(res.instance.body)
+      return failed_response(instance['error']) unless instance['error'].nil_or_empty?
+
+      success_response('ok', instance)
     end
 
-    def fetch_bin_from_external_system(bin_number) # rubocop:disable Metrics/AbcSize
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      external_bin = JSON.parse(response.body)
-      return failed_response(external_bin['error']) if external_bin['error']
+    def fetch_bin_from_external_system(bin_number)
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_bin_info?bin_number=#{bin_number}"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      return failed_response(res.message) unless res.success
 
-      success_response('ok', external_bin)
-    rescue Timeout::Error
-      failed_response('The call to the server timed out.', timeout: true)
-    rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
-    rescue StandardError => e
-      failed_response("There was an error: #{e.message}")
+      instance = JSON.parse(res.instance.body)
+      return failed_response(instance['error']) unless instance['error'].nil_or_empty?
+
+      success_response('ok', instance)
     end
 
-    def can_bin_be_tipped?(bin_number) # rubocop:disable Metrics/AbcSize
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      result = JSON.parse(response.body)
-      return failed_response(result['msg']) unless result['can_tip_bin']
+    def can_bin_be_tipped?(bin_number)
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/can_bin_be_tipped?bin_number=#{bin_number}"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      return failed_response(res.message) unless res.success
+
+      instance = JSON.parse(res.instance.body)
+      return failed_response(instance['msg']) unless instance['can_tip_bin']
 
       success_response('ok')
-    rescue Timeout::Error
-      failed_response('The call to the server timed out.', timeout: true)
-    rescue Errno::ECONNREFUSED
-      failed_response('The connection was refused. Perhaps the server is not running.', refused: true)
-    rescue StandardError => e
-      failed_response("There was an error: #{e.message}")
     end
 
     def run_treatment_codes
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      JSON.parse(response.body)
-    rescue Timeout::Error
-      raise 'The call to the server timed out.'
-    rescue Errno::ECONNREFUSED
-      raise 'The connection was refused. Perhaps the server is not running.'
-    rescue StandardError => e
-      raise "There was an error: #{e.message}"
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_treatment_codes"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
     end
 
     def ripe_point_codes(ripe_point_code: nil)
       params = ripe_point_code ? "ripe_point_code=#{ripe_point_code}" : nil
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      JSON.parse(response.body)
-    rescue Timeout::Error
-      raise 'The call to the server timed out.'
-    rescue Errno::ECONNREFUSED
-      raise 'The connection was refused. Perhaps the server is not running.'
-    rescue StandardError => e
-      raise "There was an error: #{e.message}"
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_ripe_point_codes?#{params}"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
     end
 
     def track_indicator_codes
-      uri = URI.parse("#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes")
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.request_uri)
-      response = http.request(request)
-      JSON.parse(response.body)
-    rescue Timeout::Error
-      raise 'The call to the server timed out.'
-    rescue Errno::ECONNREFUSED
-      raise 'The connection was refused. Perhaps the server is not running.'
-    rescue StandardError => e
-      raise "There was an error: #{e.message}"
+      url = "#{AppConst::RMT_INTEGRATION_SERVER_URI}/services/integration/get_run_track_indicator_codes"
+      http = Crossbeams::HTTPCalls.new(url.include?('https'))
+      res = http.json_post(url, nil)
+      raise res.message unless res.success
+
+      JSON.parse(res.instance.body)
     end
 
     # def create_pallet_and_sequences(pallet, pallet_sequence)
