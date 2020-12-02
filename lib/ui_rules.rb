@@ -25,6 +25,7 @@ module UiRules
 
   class Base # rubocop:disable Metrics/ClassLength
     attr_reader :rules, :inflector
+
     def initialize(mode, authorizer, options)
       @mode        = mode
       @authorizer  = authorizer
@@ -177,6 +178,7 @@ module UiRules
 
   class Behaviour
     attr_reader :rules
+
     def initialize
       @rules = []
     end
@@ -274,6 +276,7 @@ module UiRules
 
   class BaseChangeRenderer # rubocop:disable Metrics/ClassLength
     attr_reader :router, :options, :params
+
     def initialize(router, options)
       @router = router
       @options = options
@@ -381,6 +384,13 @@ module UiRules
         OpenStruct.new(type: :show_element,
                        dom_id: act[:dom_id],
                        reclaim_space: act[:reclaim_space])
+      end
+    end
+
+    def launch_dialog(actions)
+      actions.map do |act|
+        OpenStruct.new(type: :launch_dialog,
+                       content: act[:content])
       end
     end
 

@@ -271,6 +271,39 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Launch a new dialog
+   * @param {string} data - the dialog content.
+   * @returns {void}
+   */
+  launchDialogContent: function launchDialogContent(data, title) {
+    document.getElementById(this.nextDialogTitle()).innerHTML = title || '';
+    const dlg = document.getElementById(this.nextDialogContent());
+    dlg.innerHTML = data;
+
+    crossbeamsUtils.makeMultiSelects();
+    crossbeamsUtils.makeSearchableSelects();
+    crossbeamsUtils.applySelectEvents();
+    const grids = dlg.querySelectorAll('[data-grid]');
+    grids.forEach((grid) => {
+      const gridId = grid.getAttribute('id');
+      const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
+      document.dispatchEvent(gridEvent);
+    });
+    const sortable = Array.from(dlg.getElementsByTagName('input')).filter(a => a.dataset && a.dataset.sortablePrefix);
+    sortable.forEach(elem => crossbeamsUtils.makeListSortable(elem.dataset.sortablePrefix,
+                                                              elem.dataset.sortableGroup));
+
+    // Repeating request: Check if there are any areas in the content that should be modified by polling...
+    const pollsters = dlg.querySelectorAll('[data-poll-message-url]');
+    pollsters.forEach((pollable) => {
+      const pollUrl = pollable.dataset.pollMessageUrl;
+      const pollInterval = pollable.dataset.pollMessageInterval;
+      crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
+    });
+    crossbeamsUtils.nextDialog().show();
+  },
+
+  /**
    * Show a popup dialog window and make an AJAX call to populate the dialog.
    * @param {string} title - the title to show in the dialog.
    * @param {string} href - the url to call to load the dialog main content.
@@ -887,6 +920,9 @@ const crossbeamsUtils = {
       }
       if (action.replace_dialog) {
         crossbeamsUtils.setDialogContent(action.replace_dialog.content);
+      }
+      if (action.launch_dialog) {
+        crossbeamsUtils.launchDialogContent(action.launch_dialog.content, action.launch_dialog.title);
       }
     });
   },

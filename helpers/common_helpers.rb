@@ -586,6 +586,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     json_actions(OpenStruct.new(type: :set_checked, dom_id: dom_id, checked: checked), message, keep_dialog_open: keep_dialog_open)
   end
 
+  def json_launch_dialog(content, title: nil, message: nil, keep_dialog_open: true)
+    json_actions(OpenStruct.new(type: :launch_dialog, content: content, title: title), message, keep_dialog_open: keep_dialog_open)
+  end
+
   def build_json_action(action) # rubocop:disable Metrics/AbcSize
     # rubocop:disable Layout/HashAlignment
     {
@@ -606,7 +610,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       set_required:           ->(act) { action_set_required(act) },
       set_checked:            ->(act) { action_set_checked(act) },
       # redirect:               ->(act) { action_redirect(act) }       // url
-      replace_dialog:         ->(act) { action_replace_dialog(act) }
+      replace_dialog:         ->(act) { action_replace_dialog(act) },
+      launch_dialog:          ->(act) { action_launch_dialog(act) }
     }[action.type].call(action)
     # rubocop:enable Layout/HashAlignment
   end
@@ -637,6 +642,10 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
 
   def action_replace_dialog(action)
     { replace_dialog: { content: action.content } }
+  end
+
+  def action_launch_dialog(action)
+    { launch_dialog: { content: action.content, title: action.title } }
   end
 
   def action_replace_list_items(action)
