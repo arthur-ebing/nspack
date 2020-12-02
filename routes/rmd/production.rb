@@ -150,7 +150,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                          form_name: :combined_verification,
                                          scan_with_camera: @rmd_scan_with_camera,
                                          notes: retrieve_from_local_store(:flash_notice),
-                                         caption: 'Pallet/Carton Verification',
+                                         caption: 'Pallet Verification',
                                          action: '/rmd/production/pallet_verification/combined_verification_scan_carton',
                                          button_caption: 'Submit')
           form.add_field(:carton_number,
