@@ -151,6 +151,9 @@ class Nspack < Roda
               template_name
               cloned_from_run_code
               active
+              tipping
+              labeling
+              colour_rule
             ]
             add_grid_row(attrs: select_attributes(res.instance.to_h.merge(status: "CLONED from run id #{id}"), row_keys),
                          notice: res.message)
@@ -242,6 +245,7 @@ class Nspack < Roda
             active_run_stage
             started_at
             status
+            colour_rule
           ]
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
           acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
@@ -272,6 +276,7 @@ class Nspack < Roda
             active_run_stage
             status
             re_executed_at
+            colour_rule
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         end
@@ -289,6 +294,7 @@ class Nspack < Roda
             setup_complete
             active_run_stage
             status
+            colour_rule
           ]
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance, row_keys))]
           content = render_partial { Production::Runs::ProductionRun::Edit.call(id) }
@@ -321,8 +327,9 @@ class Nspack < Roda
               completed
               completed_at
               status
+              colour_rule
             ]
-            acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
+            acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run].to_h.merge(colour_rule: nil), row_keys))]
             acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]
             json_actions(acts, res.message)
           else
@@ -353,6 +360,7 @@ class Nspack < Roda
               completed
               completed_at
               status
+              colour_rule
             ]
             acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance[:this_run], row_keys))]
             acts << OpenStruct.new(type: :update_grid_row,  ids: res.instance[:other_run][:id], changes: select_attributes(res.instance[:other_run], row_keys.reject { |k| k == :re_executed_at })) if res.instance[:other_run]

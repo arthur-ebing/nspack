@@ -23,13 +23,14 @@ module ProductionApp
       end
       if tipping_run_id.nil?
         success_response('Run has been completed', this_run: changeset.to_h.merge(status: 'COMPLETED',
+                                                                                  colour_rule: nil,
                                                                                   re_executed_at: production_run.re_executed_at,
                                                                                   setup_complete: production_run.setup_complete))
       else
         res = ExecuteRun.call(tipping_run_id, user_name, extend_tipping_run: true) unless tipping_run_id.nil?
         success_response('Run has been completed and tipping run has begun labeling',
-                         this_run: changeset.to_h.merge(status: 'COMPLETED', re_executed_at: production_run.re_executed_at, setup_complete: production_run.setup_complete),
-                         other_run: res.instance[:this_run])
+                         this_run: changeset.to_h.merge(status: 'COMPLETED', re_executed_at: production_run.re_executed_at, setup_complete: production_run.setup_complete, colour_rule: nil),
+                         other_run: res.instance[:this_run].to_h.merge(colour_rule: 'ok'))
       end
     end
 
