@@ -333,10 +333,11 @@ const crossbeamsGridEvents = {
    * Change the values of certain columns of a row of a grid.
    * @param {integer} id - the id of the grid's row.
    * @param {object} changes - the changes to be applied to the grid's row.
+   * @param {string} gridId - Optional. The grid's id - only required when it cannot be derived from baseGridIdForPopup().
    * @returns {void}
    */
-  updateGridInPlace: function updateGridInPlace(id, changes) {
-    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
+  updateGridInPlace: function updateGridInPlace(id, changes, gridId) {
+    const thisGridId = gridId || crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions === undefined) {
       crossbeamsUtils.showWarning('Unable to update the grid - please reload the page to see changes.');
@@ -363,10 +364,11 @@ const crossbeamsGridEvents = {
   /**
    * Add a row to the end of a grid.
    * @param {object} row - the row to be aded to the grid.
+   * @param {string} gridId - Optional. The grid's id - only required when it cannot be derived from baseGridIdForPopup().
    * @returns {void}
    */
-  addRowToGrid: function addRowToGrid(row) {
-    const thisGridId = crossbeamsUtils.baseGridIdForPopup();
+  addRowToGrid: function addRowToGrid(row, gridId) {
+    const thisGridId = gridId || crossbeamsUtils.baseGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     if (gridOptions) {
       const missing = Object.keys(row).filter(a => gridOptions.columnApi.getColumn(a) === null && a !== 'created_at' && a !== 'updated_at');
@@ -387,10 +389,11 @@ const crossbeamsGridEvents = {
   /**
    * Remove a row from a grid.
    * @param {integer} id - the id of the grid's row.
+   * @param {string} gridId - Optional. The grid's id - only required when it cannot be derived from baseGridIdForPopup().
    * @returns {void}
    */
-  removeGridRowInPlace: function removeGridRowInPlace(id) {
-    const thisGridId = crossbeamsUtils.currentGridIdForPopup();
+  removeGridRowInPlace: function removeGridRowInPlace(id, gridId) {
+    const thisGridId = gridId || crossbeamsUtils.currentGridIdForPopup();
     const gridOptions = crossbeamsGridStore.getGrid(thisGridId);
     const rowNode = gridOptions.api.getRowNode(id);
     gridOptions.api.applyTransaction({ remove: [rowNode] });
@@ -468,10 +471,10 @@ const crossbeamsGridEvents = {
             window.location = data.redirect;
           } else if (data.updateGridInPlace) {
             data.updateGridInPlace.forEach((gridRow) => {
-              this.updateGridInPlace(gridRow.id, gridRow.changes);
+              this.updateGridInPlace(gridRow.id, gridRow.changes, gridRow.gridId);
             });
           } else if (data.addRowToGrid) {
-            this.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
+            this.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.gridId);
           } else if (data.actions) {
             if (data.keep_dialog_open) {
               closeDialog = false;
@@ -1989,13 +1992,13 @@ document.addEventListener('DOMContentLoaded', () => {
                   if (data.redirect) {
                     window.location = data.redirect;
                   } else if (data.removeGridRowInPlace) {
-                    crossbeamsGridEvents.removeGridRowInPlace(data.removeGridRowInPlace.id);
+                    crossbeamsGridEvents.removeGridRowInPlace(data.removeGridRowInPlace.id, data.removeGridRowInPlace.gridId);
                   } else if (data.updateGridInPlace) {
                     data.updateGridInPlace.forEach((gridRow) => {
-                      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+                      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes, gridRow.gridId);
                     });
                   } else if (data.addRowToGrid) {
-                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.atStart);
+                    crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.gridId);
                   } else if (data.actions) {
                     crossbeamsUtils.processActions(data.actions);
                   } else {

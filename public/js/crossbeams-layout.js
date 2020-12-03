@@ -358,10 +358,10 @@
               loadDialogContent(data.loadNewUrl); // promise...
             } else if (data.updateGridInPlace) {
               data.updateGridInPlace.forEach((gridRow) => {
-                crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+                crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes, gridRow.gridId);
               });
             } else if (data.addRowToGrid) {
-              crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes);
+              crossbeamsGridEvents.addRowToGrid(data.addRowToGrid.changes, data.addRowToGrid.gridId);
             } else if (data.actions) {
               if (data.keep_dialog_open) {
                 closeDialog = false;

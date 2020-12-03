@@ -439,23 +439,23 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param changes [Hash] the changed columns and their values.
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
-  def update_grid_row(ids, changes:, notice: nil)
+  def update_grid_row(ids, changes:, notice: nil, grid_id: nil)
     # res = { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
-    res = action_update_grid_row(ids, changes: changes)
+    res = action_update_grid_row(ids, changes: changes, grid_id: grid_id)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end
 
-  def action_add_grid_row(attrs:)
-    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s) } }
+  def action_add_grid_row(attrs:, grid_id: nil)
+    { addRowToGrid: { changes: attrs.merge(created_at: Time.now.to_s, updated_at: Time.now.to_s), gridId: grid_id } }
   end
 
-  def action_update_grid_row(ids, changes:)
-    { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes } } }
+  def action_update_grid_row(ids, changes:, grid_id: nil)
+    { updateGridInPlace: Array(ids).map { |i| { id: make_id_correct_type(i), changes: changes, gridId: grid_id } } }
   end
 
-  def action_delete_grid_row(id)
-    { removeGridRowInPlace: { id: make_id_correct_type(id) } }
+  def action_delete_grid_row(id, grid_id: nil)
+    { removeGridRowInPlace: { id: make_id_correct_type(id), gridId: grid_id } }
   end
 
   # Add a row to a grid. created_at and updated_at values are provided automatically.
@@ -463,8 +463,8 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   # @param attrs [Hash] the columns and their values.
   # @param notice [String/Nil] the flash message to show.
   # @return [JSON] the changes to be applied.
-  def add_grid_row(attrs:, notice: nil)
-    res = action_add_grid_row(attrs: attrs)
+  def add_grid_row(attrs:, grid_id: nil, notice: nil)
+    res = action_add_grid_row(attrs: attrs, grid_id: grid_id)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end
@@ -484,9 +484,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
     Hash[row_keys.map { |k| [k, instance[k]] }].merge(mods)
   end
 
-  def delete_grid_row(id, notice: nil)
+  def delete_grid_row(id, grid_id: nil, notice: nil)
     # res = { removeGridRowInPlace: { id: make_id_correct_type(id) } }
-    res = action_delete_grid_row(id)
+    res = action_delete_grid_row(id, grid_id: grid_id)
     res[:flash] = { notice: notice } if notice
     res.to_json
   end
@@ -603,9 +603,9 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
       set_readonly:           ->(act) { action_set_readonly(act) },
       hide_element:           ->(act) { action_hide_element(act) },
       show_element:           ->(act) { action_show_element(act) },
-      add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs) },
-      update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes) },
-      delete_grid_row:        ->(act) { action_delete_grid_row(act.id) },
+      add_grid_row:           ->(act) { action_add_grid_row(attrs: act.attrs, grid_id: act.grid_id) },
+      update_grid_row:        ->(act) { action_update_grid_row(act.ids, changes: act.changes, grid_id: act.grid_id) },
+      delete_grid_row:        ->(act) { action_delete_grid_row(act.id, grid_id: act.grid_id) },
       clear_form_validation:  ->(act) { action_clear_form_validation(act) },
       set_required:           ->(act) { action_set_required(act) },
       set_checked:            ->(act) { action_set_checked(act) },
