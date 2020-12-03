@@ -241,6 +241,50 @@ const crossbeamsUtils = {
   },
 
   /**
+   * Get the focusable children of the given element
+   * (code copied and modified from A11Y dialog)
+   *
+   * @param {Element} node
+   * @returns {Array<Element>}
+   */
+  getFocusableChildren: function getFocusableChildren(node) {
+    const focusableElements = [
+      // 'a[href]',
+      'area[href]',
+      'input:not([disabled]):not([type="submit"])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      // 'button:not([disabled])',
+      'iframe',
+      'object',
+      'embed',
+      '[contenteditable]',
+      '[tabindex]:not([tabindex^="-"])'];
+    const elementSet = Array.from((node || document).querySelectorAll(focusableElements.join(',')));
+    return elementSet.filter(child => !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length));
+  },
+
+  /**
+   * Set the focus on the first focusable child of the given element
+   * (code copied and modified from A11Y dialog)
+   *
+   * @param {Element} node
+   * @returns {void}
+   */
+  setDialogFocus: function setDialogFocus(node) {
+    const focusableChildren = crossbeamsUtils.getFocusableChildren(node);
+
+    if (focusableChildren.length) {
+      // NoSoft: Do not focus on the close button if there is another input to focus on...
+      if (focusableChildren.length > 1 && focusableChildren[0].hasAttribute('data-a11y-dialog-hide')) {
+        focusableChildren[1].focus();
+      } else {
+        focusableChildren[0].focus();
+      }
+    }
+  },
+
+  /**
    * Replace the content of the active dialog window.
    * @param {string} data - the new content.
    * @returns {void}
@@ -268,6 +312,7 @@ const crossbeamsUtils = {
       const pollInterval = pollable.dataset.pollMessageInterval;
       crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
     });
+    crossbeamsUtils.setDialogFocus(dlg);
   },
 
   /**
@@ -301,6 +346,7 @@ const crossbeamsUtils = {
       crossbeamsUtils.pollMessage(pollable, pollUrl, pollInterval);
     });
     crossbeamsUtils.nextDialog().show();
+    // Focus is handled by A11Y dialog lib.
   },
 
   /**

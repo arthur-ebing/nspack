@@ -9,7 +9,8 @@
 (function (global) {
   'use strict';
 
-  var FOCUSABLE_ELEMENTS = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
+  // NoSoft: exclude submit buttons from focusable elements:
+  var FOCUSABLE_ELEMENTS = ['a[href]', 'area[href]', 'input:not([disabled]):not([type="submit"])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
   var TAB_KEY = 9;
   var ESCAPE_KEY = 27;
   var focusedBeforeDialog;
@@ -341,7 +342,12 @@
     var focusableChildren = getFocusableChildren(node);
 
     if (focusableChildren.length) {
-      focusableChildren[0].focus();
+      // NoSoft: Do not focus on the close button if there is another input to focus on...
+      if(focusableChildren.length > 1 && focusableChildren[0].hasAttribute('data-a11y-dialog-hide')) {
+        focusableChildren[1].focus();
+      } else {
+        focusableChildren[0].focus();
+      }
     }
   }
 

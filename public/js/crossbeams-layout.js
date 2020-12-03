@@ -380,6 +380,7 @@
                 const gridEvent = new CustomEvent('gridLoad', { detail: gridId });
                 document.dispatchEvent(gridEvent);
               });
+              crossbeamsUtils.setDialogFocus(dlgContent);
             } else {
               console.log('Not sure what to do with this:', data); // eslint-disable-line no-console
             }
