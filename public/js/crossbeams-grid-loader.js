@@ -356,6 +356,8 @@ const crossbeamsGridEvents = {
         rowNode.setDataValue(k, changes[k]);
       }
     });
+    // Redraw the row to ensure CSS changes take effect.
+    gridOptions.api.redrawRows({ rowNodes: [rowNode] });
   },
 
   /**

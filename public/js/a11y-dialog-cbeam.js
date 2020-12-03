@@ -6,6 +6,12 @@
 // NoSoft: DO NOT SHIFT FOCUS WHEN EDITING AG GRID CELL
 // Modified _maintainFocus() from version 4.0.0 so that focus is not lost for AG-Grid inline-edit
 
+// NoSoft: EXCLUDE SUBMIT BUTTONS FROM FOCUSABLE ELEMENTS:
+// Modified FOCUSABLE_ELEMENTS from version 4.0.0 so that submit buttons do not receive focus.
+
+// NoSoft: DO NOT FOCUS ON THE CLOSE BUTTON IF THERE IS ANOTHER INPUT TO FOCUS ON:
+// Modified setFocusToFirstItem() from version 4.0.0 so that the close icon does not receive focus.
+
 (function (global) {
   'use strict';
 

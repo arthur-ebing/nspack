@@ -29,7 +29,7 @@ module ProductionApp
 
         MesscadaApp::Job::NotifyProductionRunResourceStates.enqueue(production_run.id) if AppConst::CLM_BUTTON_CAPTION_FORMAT || AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
       end
-      success_response('Run is executing', this_run: changeset.to_h.merge(status: 'RUNNING', id: production_run.id))
+      success_response('Run is executing', this_run: changeset.to_h.merge(status: 'RUNNING', id: production_run.id, colour_rule: 'ok'))
     end
 
     private
