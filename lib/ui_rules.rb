@@ -404,7 +404,8 @@ module UiRules
     def add_grid_row(actions)
       actions.map do |act|
         OpenStruct.new(type: :add_grid_row,
-                       attrs: act[:attrs])
+                       attrs: act[:attrs],
+                       grid_id: act[:grid_id])
       end
     end
 
@@ -412,14 +413,16 @@ module UiRules
       actions.map do |act|
         OpenStruct.new(type: :update_grid_row,
                        ids: act[:ids],
-                       changes: act[:changes])
+                       changes: act[:changes],
+                       grid_id: act[:grid_id])
       end
     end
 
     def delete_grid_row(actions)
       actions.map do |act|
         OpenStruct.new(type: :delete_grid_row,
-                       id: act[:id])
+                       id: act[:id],
+                       grid_id: act[:grid_id])
       end
     end
   end

@@ -896,17 +896,17 @@ const crossbeamsUtils = {
   },
 
   addGridRow: function addGridRow(action) {
-    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes);
+    crossbeamsGridEvents.addRowToGrid(action.addRowToGrid.changes, action.addRowToGrid.gridId);
   },
 
   updateGridRow: function updateGridRow(action) {
     action.updateGridInPlace.forEach((gridRow) => {
-      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes);
+      crossbeamsGridEvents.updateGridInPlace(gridRow.id, gridRow.changes, gridRow.gridId);
     });
   },
 
   deleteGridRow: function deleteGridRow(action) {
-    crossbeamsGridEvents.removeGridRowInPlace(action.removeGridRowInPlace.id);
+    crossbeamsGridEvents.removeGridRowInPlace(action.removeGridRowInPlace.id, action.removeGridRowInPlace.gridId);
   },
 
   /**
