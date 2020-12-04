@@ -14,5 +14,8 @@ module MasterfilesApp
     attribute :basic_pack_id, Types::Integer
     attribute :basic_pack_code, Types::String
     attribute :height_mm, Types::Integer
+    attribute :composition_level, Types::String
+    attribute :gross_weight_per_unit, Types::Decimal
+    attribute :items_per_unit, Types::Integer
   end
 end

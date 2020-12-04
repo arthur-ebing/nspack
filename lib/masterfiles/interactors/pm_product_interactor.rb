@@ -3,12 +3,15 @@
 module MasterfilesApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params) # rubocop:disable Metrics/AbcSize
+      params[:product_code] = params[:erp_code]
       res = validate_pm_product_params(params)
       return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
         id = repo.create_pm_product(res)
+        product_code = repo.pm_product_product_code(pm_product(id))
+        repo.update_pm_product(id, { product_code: product_code })
         log_status('pm_products', id, 'CREATED')
         log_transaction
       end
@@ -21,12 +24,14 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_pm_product(id, params)
+    def update_pm_product(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_pm_product_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_product(id, res)
+        product_code = repo.pm_product_product_code(pm_product(id))
+        repo.update_pm_product(id, { product_code: product_code })
         log_transaction
       end
       instance = pm_product(id)
@@ -64,9 +69,12 @@ module MasterfilesApp
     end
 
     def validate_pm_product_params(params)
-      return ExtendedPmProductSchema.call(params) if AppConst::REQUIRE_EXTENDED_PACKAGING
+      return PmProductSchema.call(params) unless AppConst::REQUIRE_EXTENDED_PACKAGING
 
-      PmProductSchema.call(params)
+      # ExtendedPmProductSchema.call(params)
+
+      contract = ExtendedPmProductContract.new
+      contract.call(params)
     end
   end
 end

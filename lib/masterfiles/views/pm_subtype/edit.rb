@@ -19,6 +19,7 @@ module Masterfiles
               form.method :update
               form.add_field :pm_type_id
               form.add_field :subtype_code
+              form.add_field :short_code
               form.add_field :description
             end
           end

@@ -18,12 +18,15 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :pm_subtype_id
+              form.add_field :composition_level
               form.add_field :erp_code
               form.add_field :product_code
               form.add_field :description
               form.add_field :material_mass
               form.add_field :height_mm
               form.add_field :basic_pack_id
+              form.add_field :gross_weight_per_unit
+              form.add_field :items_per_unit
             end
           end
 

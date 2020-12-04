@@ -26,6 +26,7 @@ module UiRules
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pm_subtypes] = { renderer: :list, items: pm_subtypes }
+      fields[:short_code] = { renderer: :label }
     end
 
     def common_fields
@@ -41,7 +42,9 @@ module UiRules
                                    required: true },
         pm_type_code: { required: true,
                         force_uppercase: true },
-        description: { required: true }
+        description: { required: true },
+        short_code: { required: true,
+                      force_uppercase: true }
       }
     end
 
@@ -57,7 +60,8 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(pm_composition_level_id: nil,
                                     pm_type_code: nil,
-                                    description: nil)
+                                    description: nil,
+                                    short_code: nil)
     end
 
     def pm_subtypes

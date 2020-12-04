@@ -8,5 +8,6 @@ module MasterfilesApp
     attribute :description, Types::String
     attribute? :active, Types::Bool
     attribute :pm_type_code, Types::String
+    attribute :short_code, Types::String
   end
 end

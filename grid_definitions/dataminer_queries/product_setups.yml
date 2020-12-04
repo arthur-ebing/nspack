@@ -1,10 +1,13 @@
 ---
 :caption: Product Setups
 :sql: "SELECT product_setups.id, product_setups.product_setup_template_id, fn_product_setup_code(product_setups.id)
-  AS product_setup_code, pm_boms.system_code, product_setups.active, fn_product_setup_in_production(product_setups.id)
-  AS in_production, CASE WHEN fn_product_setup_in_production(product_setups.id) THEN
-  'warning' WHEN NOT product_setups.active THEN 'inactive' ELSE NULL END AS colour_rule
-  \r\nFROM product_setups\r\nLEFT OUTER JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id"
+  AS product_setup_code, pm_boms.system_code, CONCAT(marks.mark_code, '_', COALESCE
+  (array_to_string(pm_marks.packaging_marks,'_'), ' ')) AS fg_marks, product_setups.active,
+  fn_product_setup_in_production(product_setups.id) AS in_production, CASE WHEN fn_product_setup_in_production(product_setups.id)
+  THEN 'warning' WHEN NOT product_setups.active THEN 'inactive' ELSE NULL END AS colour_rule
+  \r\nFROM product_setups\r\nLEFT OUTER JOIN pm_boms ON pm_boms.id = product_setups.pm_bom_id\r\nJOIN
+  marks ON marks.id = product_setups.mark_id\r\nLEFT JOIN pm_marks ON pm_marks.id
+  = product_setups.pm_mark_id"
 :limit: 
 :offset: 
 :external_settings:
@@ -51,7 +54,7 @@
     :caption: Product setup code
     :namespaced_name: 
     :data_type: :string
-    :width: 1000
+    :width: 700
     :format: 
     :hide: false
     :pinned: 
@@ -77,13 +80,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  fg_marks:
+    :name: fg_marks
+    :sequence_no: 5
+    :caption: Fg marks
+    :namespaced_name: 
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Active
     :namespaced_name: product_setups.active
     :data_type: :boolean
-    :width: 120
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -95,7 +114,7 @@
     :group_max: false
   in_production:
     :name: in_production
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: In production
     :namespaced_name: 
     :data_type: :boolean
@@ -111,7 +130,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

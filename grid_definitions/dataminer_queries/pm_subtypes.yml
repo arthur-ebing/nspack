@@ -1,16 +1,16 @@
 ---
 :caption: Pm Subtypes
-:sql: SELECT "pm_subtypes"."id", "pm_subtypes"."pm_type_id", "pm_subtypes"."subtype_code",
-  "pm_subtypes"."description", "pm_subtypes"."active", "pm_subtypes"."created_at",
-  "pm_subtypes"."updated_at", "pm_types"."pm_type_code" FROM "pm_subtypes" JOIN "pm_types"
-  ON "pm_types"."id" = "pm_subtypes"."pm_type_id"
+:sql: SELECT "pm_subtypes"."id", "pm_subtypes"."pm_type_id", "pm_subtypes"."short_code",
+  "pm_subtypes"."subtype_code", "pm_subtypes"."description", "pm_subtypes"."active",
+  "pm_subtypes"."created_at", "pm_subtypes"."updated_at", "pm_types"."pm_type_code"
+  FROM "pm_subtypes" JOIN "pm_types" ON "pm_types"."id" = "pm_subtypes"."pm_type_id"
 :limit: 
 :offset: 
 :external_settings: {}
 :columns:
   id:
     :name: id
-    :sequence_no: 5
+    :sequence_no: 1
     :caption: Id
     :namespaced_name: pm_subtypes.id
     :data_type: :integer
@@ -26,7 +26,7 @@
     :group_max: false
   pm_type_id:
     :name: pm_type_id
-    :sequence_no: 6
+    :sequence_no: 2
     :caption: Pm type
     :namespaced_name: pm_subtypes.pm_type_id
     :data_type: :integer
@@ -40,13 +40,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  short_code:
+    :name: short_code
+    :sequence_no: 3
+    :caption: Short code
+    :namespaced_name: pm_subtypes.short_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   subtype_code:
     :name: subtype_code
-    :sequence_no: 2
+    :sequence_no: 4
     :caption: Subtype code
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -58,11 +74,11 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 3
+    :sequence_no: 5
     :caption: Description
     :namespaced_name: pm_subtypes.description
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -74,11 +90,11 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 4
+    :sequence_no: 6
     :caption: Active
     :namespaced_name: pm_subtypes.active
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -122,11 +138,11 @@
     :group_max: false
   pm_type_code:
     :name: pm_type_code
-    :sequence_no: 1
+    :sequence_no: 9
     :caption: Pm type code
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 

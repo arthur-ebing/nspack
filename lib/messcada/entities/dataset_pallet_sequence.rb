@@ -56,6 +56,7 @@ module MesscadaApp
           target_market_groups.target_market_group_name AS packed_tm_group,
           target_markets.target_market_name AS target_market,
           marks.mark_code AS mark,
+          pm_marks.packaging_marks AS pm_mark,
           inventory_codes.inventory_code,
           cvv.marketing_variety_code AS customer_variety,
           std_fruit_size_counts.size_count_value AS std_size,
@@ -250,6 +251,7 @@ module MesscadaApp
         LEFT JOIN commodities ON commodities.id = COALESCE(cultivars.commodity_id, cultivar_groups.commodity_id)
         JOIN marketing_varieties ON marketing_varieties.id = pallet_sequences.marketing_variety_id
         JOIN marks ON marks.id = pallet_sequences.mark_id
+        LEFT JOIN pm_marks ON pm_marks.id = pallet_sequences.pm_mark_id
         JOIN inventory_codes ON inventory_codes.id = pallet_sequences.inventory_code_id
         JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
         LEFT JOIN target_markets ON target_markets.id = pallet_sequences.target_market_id

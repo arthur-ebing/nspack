@@ -4,7 +4,7 @@ module Masterfiles
   module Packaging
     module PmSubtype
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:pm_subtype, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -18,6 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :pm_type_id
               form.add_field :subtype_code
+              form.add_field :short_code
               form.add_field :description
             end
           end

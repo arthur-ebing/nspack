@@ -11,17 +11,22 @@
     target_customer:
       :editor: :search_select
       :width: 600
-      :value_sql: SELECT NULL UNION SELECT fn_party_role_name(party_roles.id) FROM party_roles
-                  JOIN roles ON roles.id = party_roles.role_id
-                  WHERE roles.name = 'TARGET CUSTOMER' AND roles.active ORDER BY 1 NULLS FIRST
+      :value_sql: SELECT NULL UNION SELECT fn_party_role_name(party_roles.id) FROM
+        party_roles JOIN roles ON roles.id = party_roles.role_id WHERE roles.name
+        = 'TARGET CUSTOMER' AND roles.active ORDER BY 1 NULLS FIRST
 :hide_for_client:
   hb:
   - system_code
+  - fg_marks
   um:
   - system_code
+  - fg_marks
   ud:
   - system_code
+  - fg_marks
   sr:
   - system_code
+  - fg_marks
   srp:
   - system_code
+  - fg_marks

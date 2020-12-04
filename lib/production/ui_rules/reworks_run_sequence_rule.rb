@@ -130,6 +130,13 @@ module UiRules
                         @fruit_size_repo.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
                                                                                            std_fruit_size_count_id: @form_object.std_fruit_size_count_id })
                       end
+
+      pm_marks = if @form_object.mark_id.nil_or_empty?
+                   []
+                 else
+                   MasterfilesApp::BomsRepo.new.for_select_fruitspec_pm_marks(@form_object.mark_id)
+                 end
+
       fields[:pallet_number] =  { renderer: :label,
                                   with_value: @form_object[:pallet_number],
                                   caption: 'Pallet Number',
@@ -229,6 +236,13 @@ module UiRules
                             prompt: 'Select Mark',
                             searchable: true,
                             remove_search_for_small_list: false }
+      fields[:pm_mark_id] =  { renderer: :select,
+                               options: pm_marks,
+                               disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_marks,
+                               caption: 'PM Mark',
+                               prompt: 'Select PM Mark',
+                               searchable: true,
+                               remove_search_for_small_list: false }
       fields[:product_chars] =  {}
       fields[:inventory_code_id] =  { renderer: :select,
                                       options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
@@ -412,9 +426,11 @@ module UiRules
 
         behaviour.dropdown_change :pm_bom_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_bom_changed",
-                                             param_keys: %i[reworks_run_sequence_mark_id] }]
+                                             param_keys: %i[reworks_run_sequence_pm_mark_id] }]
         behaviour.dropdown_change :mark_id,
-                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/mark_changed",
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/mark_changed" }]
+        behaviour.dropdown_change :pm_mark_id,
+                                  notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_mark_changed",
                                              param_keys: %i[reworks_run_sequence_pm_bom_id] }]
       end
     end

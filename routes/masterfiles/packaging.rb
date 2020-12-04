@@ -346,7 +346,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_pm_type(id, params[:pm_type])
           if res.success
             update_grid_row(id,
-                            changes: { pm_type_code: res.instance[:pm_type_code],
+                            changes: { short_code: res.instance[:short_code],
+                                       pm_type_code: res.instance[:pm_type_code],
                                        description: res.instance[:description],
                                        composition_level: res.instance[:composition_level] },
                             notice: res.message)
@@ -367,7 +368,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_types' do
+    r.on 'pm_types' do # rubocop:disable Metrics/BlockLength
       interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -382,6 +383,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             description
             active
             composition_level
+            short_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -411,7 +413,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmSubtype::Edit.call(id) }
       end
 
-      r.is do
+      r.is do # rubocop:disable Metrics/BlockLength
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmSubtype::Show.call(id) }
@@ -419,7 +421,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_pm_subtype(id, params[:pm_subtype])
           if res.success
-            update_grid_row(id, changes: { pm_type_code: res.instance[:pm_type_code], subtype_code: res.instance[:subtype_code], description: res.instance[:description] },
+            update_grid_row(id, changes: { short_code: res.instance[:short_code],
+                                           pm_type_code: res.instance[:pm_type_code],
+                                           subtype_code: res.instance[:subtype_code],
+                                           description: res.instance[:description] },
                                 notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Packaging::PmSubtype::Edit.call(id, form_values: params[:pm_subtype], form_errors: res.errors) }
@@ -438,7 +443,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_subtypes' do
+    r.on 'pm_subtypes' do # rubocop:disable Metrics/BlockLength
       interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -453,6 +458,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             subtype_code
             description
             active
+            short_code
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -500,6 +506,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               material_mass
               basic_pack_code
               height_mm
+              composition_level
+              gross_weight_per_unit
+              items_per_unit
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -529,19 +538,30 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'pm_subtype_changed' do
         actions = []
         unless params[:changed_value].nil_or_empty?
+          pm_subtype_id = params[:changed_value]
           repo = MasterfilesApp::BomsRepo.new
-          show_extra_fields = repo.can_show_pm_product_extra_fields?(params[:changed_value])
-          actions = [OpenStruct.new(type: repo.can_show_pm_product_basic_pack?(params[:changed_value]) ? :show_element : :hide_element,
+          show_product_extra_fields = repo.fruit_composition_level?(pm_subtype_id)
+          show_one_level_up_fields = repo.one_level_up_fruit_composition?(pm_subtype_id)
+          actions = [OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'pm_product_composition_level',
+                                    value: repo.subtype_composition_level(pm_subtype_id)),
+                     OpenStruct.new(type: repo.can_edit_product_code?(pm_subtype_id) ? :show_element : :hide_element,
+                                    dom_id: 'pm_product_product_code_field_wrapper'),
+                     OpenStruct.new(type: repo.minimum_composition_level?(pm_subtype_id) ? :show_element : :hide_element,
                                     dom_id: 'pm_product_basic_pack_id_field_wrapper'),
-                     OpenStruct.new(type: show_extra_fields ? :show_element : :hide_element,
+                     OpenStruct.new(type: show_product_extra_fields ? :hide_element : :show_element,
                                     dom_id: 'pm_product_material_mass_field_wrapper'),
-                     OpenStruct.new(type: show_extra_fields ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_height_mm_field_wrapper')]
+                     OpenStruct.new(type: show_product_extra_fields ? :hide_element : :show_element,
+                                    dom_id: 'pm_product_height_mm_field_wrapper'),
+                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                    dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
+                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                    dom_id: 'pm_product_items_per_unit_field_wrapper')]
         end
         json_actions(actions)
       end
 
-      r.post do        # CREATE
+      r.post do # rubocop:disable Metrics/BlockLength     # CREATE
         res = interactor.create_pm_product(params[:pm_product])
         if res.success
           row_keys = %i[
@@ -555,6 +575,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             material_mass
             basic_pack_code
             height_mm
+            composition_level
+            gross_weight_per_unit
+            items_per_unit
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

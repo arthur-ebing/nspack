@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  ProductSetupSchema = Dry::Schema.Params do
+  ProductSetupSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
     optional(:id).filled(:integer)
     required(:product_setup_template_id).filled(:integer)
     required(:marketing_variety_id).filled(:integer)
@@ -29,5 +29,6 @@ module ProductionApp
     required(:product_chars).maybe(Types::StrippedString)
     # required(:active).maybe(:bool)
     required(:target_market_id).maybe(:integer)
+    required(:pm_mark_id).maybe(:integer)
   end
 end

@@ -71,6 +71,7 @@ module MesscadaApp
     attribute :scrapped_sequence_id, Types::Integer
     attribute :palletizer_contract_worker_id, Types::Integer
     attribute :target_market_id, Types::Integer
+    attribute :pm_mark_id, Types::Integer
   end
 
   class ScannedCartonNumber < Dry::Struct

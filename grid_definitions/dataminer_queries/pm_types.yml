@@ -1,7 +1,7 @@
 ---
 :caption: Pm Types
-:sql: "SELECT \"pm_types\".\"id\", \"pm_types\".\"pm_type_code\", \"pm_types\".\"description\",
-  \"pm_types\".\"pm_composition_level_id\",\r\n\"pm_composition_levels\".\"description\"
+:sql: "SELECT \"pm_types\".\"id\", \"pm_types\".\"short_code\", \"pm_types\".\"pm_type_code\",
+  \"pm_types\".\"description\", \"pm_types\".\"pm_composition_level_id\",\r\n\"pm_composition_levels\".\"description\"
   AS composition_level, \"pm_types\".\"active\", \"pm_types\".\"created_at\", \"pm_types\".\"updated_at\"
   \r\nFROM \"pm_types\"\r\nLEFT JOIN \"pm_composition_levels\" ON \"pm_composition_levels\".\"id\"
   = \"pm_types\".\"pm_composition_level_id\"\r\nORDER BY \"pm_composition_levels\".\"composition_level\""
@@ -25,13 +25,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  short_code:
+    :name: short_code
+    :sequence_no: 2
+    :caption: Short code
+    :namespaced_name: pm_types.short_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pm_type_code:
     :name: pm_type_code
-    :sequence_no: 2
+    :sequence_no: 3
     :caption: Pm type code
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -43,11 +59,11 @@
     :group_max: false
   description:
     :name: description
-    :sequence_no: 3
+    :sequence_no: 4
     :caption: Description
     :namespaced_name: pm_types.description
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: 
@@ -59,7 +75,7 @@
     :group_max: false
   pm_composition_level_id:
     :name: pm_composition_level_id
-    :sequence_no: 4
+    :sequence_no: 5
     :caption: Pm composition level
     :namespaced_name: pm_types.pm_composition_level_id
     :data_type: :integer
@@ -75,11 +91,11 @@
     :group_max: false
   composition_level:
     :name: composition_level
-    :sequence_no: 5
+    :sequence_no: 6
     :caption: Composition level
     :namespaced_name: pm_composition_levels.description
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -91,11 +107,11 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Active
     :namespaced_name: pm_types.active
     :data_type: :boolean
-    :width: 
+    :width: 80
     :format: 
     :hide: false
     :pinned: 
@@ -107,7 +123,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Created at
     :namespaced_name: pm_types.created_at
     :data_type: :datetime
@@ -123,7 +139,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Updated at
     :namespaced_name: pm_types.updated_at
     :data_type: :datetime
@@ -150,7 +166,7 @@
   :caption: Composition level
   :data_type: :integer
   :control_type: :list
-  :default_value:
+  :default_value: 
   :ordered_list: true
   :ui_priority: 2
   :list_def: SELECT description, id FROM pm_composition_levels ORDER BY description

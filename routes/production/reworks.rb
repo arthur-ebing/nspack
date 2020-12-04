@@ -760,14 +760,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'pm_bom_changed' do
-        mark_id = params[:reworks_run_sequence_mark_id]
+        pm_mark_id = params[:reworks_run_sequence_pm_mark_id]
         if params[:changed_value].blank?
           pm_bom_products = []
           pm_bom = nil
         else
           pm_bom_id = params[:changed_value]
           pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
-          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, mark_id)
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, pm_mark_id)
         end
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'reworks_run_sequence_description',
@@ -781,12 +781,23 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'mark_changed' do
+        pm_marks = if params[:changed_value].blank?
+                     []
+                   else
+                     interactor.for_select_fruitspec_pm_marks(params[:changed_value])
+                   end
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'reworks_run_sequence_pm_mark_id',
+                                     options_array: pm_marks)])
+      end
+
+      r.on 'pm_mark_changed' do
         pm_bom_id = params[:reworks_run_sequence_pm_bom_id]
         if params[:changed_value].blank?
           pm_bom_products = []
         else
-          mark_id = params[:changed_value]
-          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, mark_id)
+          pm_mark_id = params[:changed_value]
+          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, pm_mark_id)
         end
         json_actions([OpenStruct.new(type: :replace_inner_html,
                                      dom_id: 'reworks_run_sequence_pm_boms_products',

@@ -49,11 +49,16 @@
 :hide_for_client:
   hb:
   - system_code
+  - fg_marks
   um:
   - system_code
+  - fg_marks
   ud:
   - system_code
+  - fg_marks
   sr:
   - system_code
+  - fg_marks
   srp:
   - system_code
+  - fg_marks

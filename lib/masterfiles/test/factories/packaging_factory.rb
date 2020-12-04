@@ -71,7 +71,8 @@ module MasterfilesApp
         pm_composition_level_id: pm_composition_level_id,
         pm_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        short_code: Faker::Lorem.word
       }
       DB[:pm_types].insert(default.merge(opts))
     end
@@ -83,7 +84,8 @@ module MasterfilesApp
         pm_type_id: pm_type_id,
         subtype_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
-        active: true
+        active: true,
+        short_code: Faker::Lorem.word
       }
       DB[:pm_subtypes].insert(default.merge(opts))
     end
@@ -100,7 +102,9 @@ module MasterfilesApp
         active: true,
         material_mass: Faker::Number.decimal,
         basic_pack_id: basic_pack_code_id,
-        height_mm: Faker::Number.number(4)
+        height_mm: Faker::Number.number(4),
+        gross_weight_per_unit: nil,
+        items_per_unit: Faker::Number.number(4)
       }
       DB[:pm_products].insert(default.merge(opts))
     end

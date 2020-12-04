@@ -130,10 +130,12 @@ module MasterfilesApp
 
     def find_pm_product(id)
       query = <<~SQL
-        SELECT pm_products.*, pm_subtypes.subtype_code, pm_types.pm_type_code, basic_pack_codes.basic_pack_code
+        SELECT pm_products.*, pm_subtypes.subtype_code, pm_types.pm_type_code, basic_pack_codes.basic_pack_code,
+        pm_composition_levels.composition_level
         FROM pm_products
         JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         LEFT JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
         WHERE pm_products.id = #{id}
       SQL
@@ -193,7 +195,7 @@ module MasterfilesApp
 
     def pm_bom_products(id)
       query = <<~SQL
-        SELECT product_code,pm_type_code, subtype_code, uom_code, quantity
+        SELECT product_code,pm_type_code, subtype_code, uom_code, quantity, pm_composition_levels.composition_level
         FROM pm_products
         JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
@@ -229,6 +231,19 @@ module MasterfilesApp
         FROM pm_subtypes
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         #{where}
+        ORDER BY 1
+      SQL
+      DB[query]
+        .select_map(%i[subtype id])
+    end
+
+    def for_select_non_fruit_composition_subtypes
+      query = <<~SQL
+        SELECT pm_types.pm_type_code || ' - ' || pm_subtypes.subtype_code AS subtype, pm_subtypes.id
+        FROM pm_subtypes
+        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+        WHERE pm_composition_levels.composition_level != #{fruit_composition_level}
         ORDER BY 1
       SQL
       DB[query]
@@ -297,8 +312,8 @@ module MasterfilesApp
         .select_map(%i[composition_level description])
     end
 
-    def find_packaging_marks_by_fruitspec_mark(mark_id)
-      DB[:pm_marks].where(mark_id: mark_id).get(:packaging_marks)
+    def find_packaging_marks_by_fruitspec_mark(pm_mark_id)
+      DB[:pm_marks].where(id: pm_mark_id).get(:packaging_marks)
     end
 
     def reorder_composition_levels(sorted_ids)
@@ -336,6 +351,12 @@ module MasterfilesApp
 
     def pm_product_subtypes(pm_product_ids)
       DB[:pm_products].where(id: pm_product_ids).select_map(:pm_subtype_id)
+    end
+
+    def find_pm_type_by_subtype(subtype_id)
+      DB[:pm_subtypes]
+        .where(id: subtype_id)
+        .get(:pm_type_id)
     end
 
     def find_uom_by_code(uom_code)
@@ -384,7 +405,7 @@ module MasterfilesApp
       DB[ar.join].update
     end
 
-    def can_show_pm_product_basic_pack?(pm_subtype_id)
+    def minimum_composition_level?(pm_subtype_id)
       subtype_composition_description(pm_subtype_id) == composition_level_description(minimum_composition_level)
     end
 
@@ -404,12 +425,24 @@ module MasterfilesApp
       DB[:pm_composition_levels].where(composition_level: composition_level).get(:description)
     end
 
-    def can_show_pm_product_extra_fields?(pm_subtype_id)
-      subtype_composition_description(pm_subtype_id) != AppConst::FRUIT_PM_TYPE
-    end
-
     def fruit_composition_level
       DB[:pm_composition_levels].where(description: AppConst::FRUIT_PM_TYPE).get(:composition_level)
+    end
+
+    def fruit_composition_level?(pm_subtype_id)
+      subtype_composition_description(pm_subtype_id) == AppConst::FRUIT_PM_TYPE
+    end
+
+    def one_level_up_fruit_composition?(pm_subtype_id)
+      subtype_composition_description(pm_subtype_id) == composition_level_description(fruit_composition_level - 1)
+    end
+
+    def can_edit_product_code?(pm_subtype_id)
+      fruit_composition = fruit_composition_level
+      subtype_composition_level = subtype_composition_level(pm_subtype_id)
+      return false if [minimum_composition_level, fruit_composition, fruit_composition - 1].include?(subtype_composition_level)
+
+      true
     end
 
     def calculate_bom_weights(pm_bom_id) # rubocop:disable Metrics/AbcSize
@@ -471,6 +504,66 @@ module MasterfilesApp
       DB[:commodities]
         .where(code: commodity_code)
         .get(:id)
+    end
+
+    def for_select_fruitspec_pm_marks(mark_id)
+      DB["SELECT id, packaging_marks
+          FROM pm_marks
+          WHERE mark_id = #{mark_id}"].map { |r| [r[:packaging_marks], r[:id]] }
+    end
+
+    def subtype_composition_level(pm_subtype_id)
+      DB[:pm_subtypes]
+        .join(:pm_types, id: :pm_type_id)
+        .join(:pm_composition_levels, id: :pm_composition_level_id)
+        .where(Sequel[:pm_subtypes][:id] => pm_subtype_id)
+        .get(:composition_level)
+    end
+
+    def pm_product_basic_pack(basic_pack_id)
+      DB[:basic_pack_codes]
+        .where(id: basic_pack_id)
+        .get(:basic_pack_code)
+    end
+
+    def pm_product_product_code(pm_product) # rubocop:disable Metrics/AbcSize
+      type_short_code = find_type_short_code(find_pm_type_by_subtype(pm_product[:pm_subtype_id]))
+      subtype_short_code = find_subtype_short_code(pm_product[:pm_subtype_id])
+      product_code = case pm_product[:composition_level]
+                     when minimum_composition_level
+                       "#{type_short_code}_#{pm_product[:basic_pack_code]}_#{subtype_short_code}_#{pm_product[:height_mm]}"
+                     when fruit_composition_level - 1
+                       gross_weight_per_unit = pm_product[:gross_weight_per_unit].nil_or_empty? ? '*' : pm_product[:gross_weight_per_unit].to_f
+                       items_per_unit = pm_product[:items_per_unit].nil_or_empty? ? '*' : pm_product[:items_per_unit]
+                       "#{type_short_code}_#{gross_weight_per_unit}_#{subtype_short_code}_#{items_per_unit}"
+                     else
+                       pm_product[:product_code]
+                     end
+      product_code
+    end
+
+    def find_type_short_code(pm_type_id)
+      DB[:pm_types]
+        .where(id: pm_type_id)
+        .get(:short_code)
+    end
+
+    def find_subtype_short_code(pm_subtype_id)
+      DB[:pm_subtypes]
+        .where(id: pm_subtype_id)
+        .get(:short_code)
+    end
+
+    def find_std_fruit_size_by_product_code(product_code)
+      arr = product_code.split('_')
+      std_fruit_size_count_id =  DB[:std_fruit_size_counts]
+                                 .where(size_count_value: arr[1])
+                                 .where(commodity_id: DB[:commodities]
+                                                        .where(code: arr[0])
+                                                        .get(:id))
+                                 .get(:id)
+
+      DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).first
     end
   end
 end

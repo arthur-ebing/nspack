@@ -20,6 +20,7 @@ module ProductionApp
         marketing_org_party_role_id: 1,
         packed_tm_group_id: 1,
         mark_id: 1,
+        pm_mark_id: 1,
         inventory_code_id: 1,
         pallet_format_id: 1,
         cartons_per_pallet_id: 1,

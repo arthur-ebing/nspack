@@ -6,5 +6,6 @@ module MasterfilesApp
     required(:pm_type_id).filled(:integer)
     required(:subtype_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:short_code).maybe(Types::StrippedString)
   end
 end
