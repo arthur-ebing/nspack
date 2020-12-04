@@ -2,11 +2,13 @@
 :caption: Pm Products
 :sql: "SELECT \"pm_products\".\"id\", \"pm_products\".\"pm_subtype_id\",  \"pm_products\".\"product_code\",
   \"pm_products\".\"description\", \"pm_products\".\"erp_code\", \"pm_products\".\"created_at\",
-  \"pm_products\".\"updated_at\", \"pm_types\".\"pm_type_code\" , \"pm_subtypes\".\"subtype_code\"
-  , \"basic_pack_codes\".\"basic_pack_code\", \"pm_products\".\"material_mass\", \"pm_products\".\"height_mm\",
-  \"pm_products\".\"basic_pack_id\", \"pm_products\".\"active\"\r\nFROM \"pm_products\"
-  \r\nLEFT JOIN \"pm_subtypes\" ON \"pm_subtypes\".\"id\" = \"pm_products\".\"pm_subtype_id\"\r\nLEFT
+  \"pm_products\".\"updated_at\", \"pm_composition_levels\".\"composition_level\"
+  , \"pm_types\".\"pm_type_code\" , \"pm_subtypes\".\"subtype_code\" , \"basic_pack_codes\".\"basic_pack_code\",
+  \"pm_products\".\"material_mass\", \"pm_products\".\"height_mm\", \"pm_products\".\"gross_weight_per_unit\",
+  \"pm_products\".\"items_per_unit\", \"pm_products\".\"basic_pack_id\", \"pm_products\".\"active\"\r\nFROM
+  \"pm_products\" \r\nLEFT JOIN \"pm_subtypes\" ON \"pm_subtypes\".\"id\" = \"pm_products\".\"pm_subtype_id\"\r\nLEFT
   JOIN \"pm_types\" ON \"pm_types\".\"id\" = \"pm_subtypes\".\"pm_type_id\"\r\nLEFT
+  JOIN \"pm_composition_levels\" ON \"pm_composition_levels\".\"id\" = \"pm_types\".\"pm_composition_level_id\"\r\nLEFT
   JOIN \"basic_pack_codes\" ON \"basic_pack_codes\".\"id\" = \"pm_products\".\"basic_pack_id\"\r\nORDER
   BY \"pm_products\".\"product_code\""
 :limit: 
@@ -125,13 +127,29 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  composition_level:
+    :name: composition_level
+    :sequence_no: 8
+    :caption: Composition level
+    :namespaced_name: pm_composition_levels.composition_level
+    :data_type: :integer
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   pm_type_code:
     :name: pm_type_code
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Type
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -143,11 +161,11 @@
     :group_max: false
   subtype_code:
     :name: subtype_code
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Subtype
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
-    :width: 100
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -159,7 +177,7 @@
     :group_max: false
   basic_pack_code:
     :name: basic_pack_code
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Basic pack
     :namespaced_name: basic_pack_codes.basic_pack_code
     :data_type: :string
@@ -175,7 +193,7 @@
     :group_max: false
   material_mass:
     :name: material_mass
-    :sequence_no: 11
+    :sequence_no: 12
     :caption: Material mass
     :namespaced_name: pm_products.material_mass
     :data_type: :number
@@ -191,7 +209,7 @@
     :group_max: false
   height_mm:
     :name: height_mm
-    :sequence_no: 12
+    :sequence_no: 13
     :caption: Height mm
     :namespaced_name: pm_products.height_mm
     :data_type: :integer
@@ -205,9 +223,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  gross_weight_per_unit:
+    :name: gross_weight_per_unit
+    :sequence_no: 14
+    :caption: Gross weight per unit
+    :namespaced_name: pm_products.gross_weight_per_unit
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  items_per_unit:
+    :name: items_per_unit
+    :sequence_no: 15
+    :caption: Items per unit
+    :namespaced_name: pm_products.items_per_unit
+    :data_type: :integer
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   basic_pack_id:
     :name: basic_pack_id
-    :sequence_no: 13
+    :sequence_no: 16
     :caption: Basic pack
     :namespaced_name: pm_products.basic_pack_id
     :data_type: :integer
@@ -223,7 +273,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 14
+    :sequence_no: 17
     :caption: Active
     :namespaced_name: pm_products.active
     :data_type: :boolean

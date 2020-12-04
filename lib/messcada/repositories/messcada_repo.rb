@@ -85,6 +85,7 @@ module MesscadaApp
           cl.packed_tm_group_id,
           cl.target_market_id,
           cl.mark_id,
+          cl.pm_mark_id,
           cl.inventory_code_id,
           cl.pallet_format_id,
           cl.cartons_per_pallet_id,

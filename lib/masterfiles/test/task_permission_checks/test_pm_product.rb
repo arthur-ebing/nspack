@@ -19,7 +19,10 @@ module MasterfilesApp
         basic_pack_id: 1,
         height_mm: 1,
         basic_pack_code: 'ABC',
-        pm_type_code: 'ABC'
+        pm_type_code: 'ABC',
+        gross_weight_per_unit: nil,
+        items_per_unit: 1,
+        composition_level: 1
       }
       MasterfilesApp::PmProduct.new(base_attrs.merge(attrs))
     end

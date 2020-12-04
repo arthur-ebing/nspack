@@ -8,5 +8,6 @@ module MasterfilesApp
     attribute? :active, Types::Bool
     attribute :pm_composition_level_id, Types::Integer
     attribute :composition_level, Types::String
+    attribute :short_code, Types::String
   end
 end

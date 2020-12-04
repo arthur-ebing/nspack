@@ -38,5 +38,6 @@ module ProductionApp
     attribute :description, Types::String
     attribute :erp_bom_code, Types::String
     attribute :target_market_id, Types::Integer
+    attribute :pm_mark_id, Types::Integer
   end
 end

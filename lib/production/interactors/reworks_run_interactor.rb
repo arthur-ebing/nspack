@@ -568,7 +568,7 @@ module ProductionApp
 
     def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
       if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
-        standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
+        standard_pack_code_id = prod_setup_repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
       else
         standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
@@ -1138,22 +1138,29 @@ module ProductionApp
       MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
     end
 
-    def pm_bom_products_table(pm_bom_id, mark_id = nil)
+    def for_select_fruitspec_pm_marks(mark_id)
+      MasterfilesApp::BomsRepo.new.for_select_fruitspec_pm_marks(mark_id)
+    end
+
+    def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)
       pm_bom_products = MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id)
-      add_pm_bom_products_packaging_marks(pm_bom_products, mark_id) unless mark_id.nil_or_empty?
+      add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) unless pm_mark_id.nil_or_empty?
 
       Crossbeams::Layout::Table.new([], pm_bom_products, [],
-                                    alignment: { quantity: :right },
+                                    alignment: { quantity: :right, composition_level: :right },
                                     cell_transformers: { quantity: :decimal }).render
     end
 
-    def add_pm_bom_products_packaging_marks(pm_bom_products, mark_id)
-      packaging_marks = MasterfilesApp::BomsRepo.new.find_packaging_marks_by_fruitspec_mark(mark_id)
+    def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) # rubocop:disable Metrics/AbcSize
+      packaging_marks = MasterfilesApp::BomsRepo.new.find_packaging_marks_by_fruitspec_mark(pm_mark_id)
       return pm_bom_products if packaging_marks.nil_or_empty?
 
       items = repo.array_of_text_for_db_col(packaging_marks)
-      MasterfilesApp::BomsRepo.new.pm_composition_levels.each do |key, _val|
-        pm_bom_products[key - 1][:mark] = items[key - 1].to_s
+      items.each_with_index do |_val, index|
+        next if pm_bom_products[index].nil_or_empty?
+
+        composition_level = pm_bom_products[index][:composition_level].to_i
+        pm_bom_products[index][:mark] = items[composition_level - 1].to_s
       end
       pm_bom_products
     end
@@ -1207,6 +1214,10 @@ module ProductionApp
 
     def prod_repo
       @prod_repo ||= ProductionApp::ProductionRunRepo.new
+    end
+
+    def prod_setup_repo
+      @prod_setup_repo ||= ProductionApp::ProductSetupRepo.new
     end
 
     def reworks_run(id)

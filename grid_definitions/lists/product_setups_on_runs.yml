@@ -18,11 +18,16 @@
 :hide_for_client:
   hb:
   - bom_code
+  - fg_marks
   um:
   - bom_code
+  - fg_marks
   ud:
   - bom_code
+  - fg_marks
   sr:
   - bom_code
+  - fg_marks
   srp:
   - bom_code
+  - fg_marks

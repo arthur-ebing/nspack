@@ -15,6 +15,7 @@ module Masterfiles
               form.view_only!
               form.add_field :pm_composition_level_id
               form.add_field :pm_type_code
+              form.add_field :short_code
               form.add_field :description
               form.add_field :active
               form.add_field :pm_subtypes

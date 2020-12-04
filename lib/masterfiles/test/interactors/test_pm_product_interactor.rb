@@ -37,29 +37,29 @@ module MasterfilesApp
       id = create_pm_product
       attrs = interactor.send(:repo).find_pm_product(id)
       attrs = attrs.to_h
-      value = attrs[:product_code]
-      attrs[:product_code] = 'a_change'
+      value = attrs[:description]
+      attrs[:description] = 'a_change'
       res = interactor.update_pm_product(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(PmProduct, res.instance)
-      assert_equal 'a_change', res.instance.product_code
-      refute_equal value, res.instance.product_code
+      assert_equal 'a_change', res.instance.description
+      refute_equal value, res.instance.description
     end
 
     def test_update_pm_product_fail
       id = create_pm_product
       attrs = interactor.send(:repo).find_pm_product(id)
       attrs = attrs.to_h
-      attrs.delete(:product_code)
-      value = attrs[:erp_code]
-      attrs[:erp_code] = 'a_change'
+      attrs.delete(:erp_code)
+      value = attrs[:description]
+      attrs[:description] = 'a_change'
       res = interactor.update_pm_product(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:product_code]
+      assert_equal ['is missing'], res.errors[:erp_code]
       after = interactor.send(:repo).find_pm_product(id)
       after = after.to_h
-      refute_equal 'a_change', after[:erp_code]
-      assert_equal value, after[:erp_code]
+      refute_equal 'a_change', after[:description]
+      assert_equal value, after[:description]
     end
 
     def test_delete_pm_product
@@ -88,7 +88,10 @@ module MasterfilesApp
         basic_pack_id: basic_pack_id,
         height_mm: 1,
         basic_pack_code: 'ABC',
-        pm_type_code: 'ABC'
+        pm_type_code: 'ABC',
+        gross_weight_per_unit: nil,
+        items_per_unit: 1,
+        composition_level: 1
       }
     end
 

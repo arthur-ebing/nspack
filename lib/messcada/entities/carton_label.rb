@@ -45,5 +45,6 @@ module MesscadaApp
     attribute :phc, Types::String
     attribute :packing_method_id, Types::Integer
     attribute :target_market_id, Types::Integer
+    attribute :pm_mark_id, Types::Integer
   end
 end
