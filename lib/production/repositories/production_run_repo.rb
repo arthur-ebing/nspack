@@ -513,6 +513,11 @@ module ProductionApp
       DB[update_query.join].update
     end
 
+    def update_pallet_sequence_cartons(pallet_sequence_id, attrs)
+      ctn_labels = DB[:cartons].where(pallet_sequence_id: pallet_sequence_id).select_map(:carton_label_id)
+      DB[:carton_labels].where(id: ctn_labels).update(attrs)
+    end
+
     def update_column_sql(table_name, column_name, production_run_id)
       # <<~SQL
       #   UPDATE #{table_name}
