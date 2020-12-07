@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module FinishedGoodsApp
-  GovtInspectionPalletSchema = Dry::Schema.Params do
+  CreateGovtInspectionPalletSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:pallet_id).filled(:integer)
     required(:govt_inspection_sheet_id).filled(:integer)
+    required(:pallet_id).filled(:integer)
+    optional(:carton_id).maybe(:integer)
     optional(:passed).maybe(:bool)
     optional(:inspected).maybe(:bool)
     optional(:inspected_at).maybe(:time)
@@ -12,12 +13,21 @@ module FinishedGoodsApp
     optional(:failure_remarks).maybe(Types::StrippedString)
   end
 
-  GovtInspectionAddPalletSchema = Dry::Schema.Params do
-    required(:pallet_number).filled(:string)
+  UpdateGovtInspectionPalletSchema = Dry::Schema.Params do
+    optional(:id).filled(:integer)
+    optional(:passed).maybe(:bool)
+    optional(:inspected).maybe(:bool)
+    optional(:inspected_at).maybe(:time)
+    optional(:failure_reason_id).maybe(:integer)
+    optional(:failure_remarks).maybe(Types::StrippedString)
+  end
+
+  AddGovtInspectionPalletSchema = Dry::Schema.Params do
+    required(:scanned_number).filled(:string)
     required(:govt_inspection_sheet_id).filled(:integer)
   end
 
-  GovtInspectionFailedPalletSchema = Dry::Schema.Params do
+  FailGovtInspectionPalletSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:failure_reason_id).filled(:integer)
     required(:failure_remarks).maybe(Types::StrippedString)

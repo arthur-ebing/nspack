@@ -1,6 +1,11 @@
 ---
 :dataminer_definition: govt_inspection_pallets
 :actions:
+- :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :hide_if_false: inspected
+  :popup: true
 - :url: "/finished_goods/inspection/govt_inspection_pallets/$:id$/fail"
   :text: fail pallet
   :icon: quit

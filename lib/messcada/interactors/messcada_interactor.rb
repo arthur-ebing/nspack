@@ -18,23 +18,8 @@ module MesscadaApp
     #   success_response('pallet found', oldest_pallet_sequence_id: pallet_sequences.first[:id])
     # end
 
-    def parse_pallet_or_carton_number(params = {}) # rubocop:disable Metrics/AbcSize
-      if params[:pallet_number]
-        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:pallet_number]).pallet_number
-        return params
-      end
-      raise Crossbeams::InfoError, 'scanned number not given' if params[:scanned_number].nil_or_empty?
-
-      if params[:scanned_number].length > 8
-        params[:pallet_number] = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: params[:scanned_number]).pallet_number
-      else
-        params[:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:scanned_number]).carton_number
-      end
-      params
-    end
-
     def pallet_to_be_verified(params) # rubocop:disable Metrics/AbcSize
-      params = parse_pallet_or_carton_number(params)
+      params = repo.parse_pallet_or_carton_number(params)
       if params[:carton_number]
         pallet = repo.find_pallet_by_carton_number(params[:carton_number])
         return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?
@@ -77,7 +62,7 @@ module MesscadaApp
     end
 
     def scan_pallet_or_carton_number(params) # rubocop:disable Metrics/AbcSize
-      params = parse_pallet_or_carton_number(params)
+      params = repo.parse_pallet_or_carton_number(params)
       if params[:carton_number]
         pallet = repo.find_pallet_by_carton_number(params[:carton_number])
         return failed_response("Carton: #{params[:carton_number]} not found.") if pallet.nil?

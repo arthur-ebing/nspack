@@ -9,34 +9,41 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
-
-      set_capture_fields if @mode == :capture
+      set_show_fields if %i[show].include? @mode
 
       form_name 'govt_inspection_pallet'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
-      govt_inspection_sheet_id_label = FinishedGoodsApp::GovtInspectionRepo.new.find_govt_inspection_sheet(@form_object.govt_inspection_sheet_id)&.booking_reference
-      failure_reason_id_label = MasterfilesApp::InspectionFailureReasonRepo.new.find_inspection_failure_reason(@form_object.failure_reason_id)&.failure_reason
-      fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
-      fields[:govt_inspection_sheet_id] = { renderer: :label, with_value: govt_inspection_sheet_id_label, caption: 'Govt Inspection Sheet' }
-      fields[:passed] = { renderer: :label, as_boolean: true }
-      fields[:inspected] = { renderer: :label, as_boolean: true }
+    def set_show_fields
+      fields[:pallet_id] = { renderer: :label,
+                             with_value: @form_object.pallet_number,
+                             caption: 'Pallet' }
+      fields[:passed] = { renderer: :label,
+                          as_boolean: true }
+      fields[:inspected] = { renderer: :label,
+                             as_boolean: true }
       fields[:inspected_at] = { renderer: :label }
-      fields[:failure_reason_id] = { renderer: :label, with_value: failure_reason_id_label, caption: 'Inspection Failure Reason' }
+      fields[:failure_reason_id] = { renderer: :label,
+                                     with_value: @form_object.failure_reason,
+                                     caption: 'Inspection Failure Reason' }
       fields[:failure_remarks] = { renderer: :label }
-      fields[:active] = { renderer: :label, as_boolean: true }
-    end
-
-    def set_capture_fields
-      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
-      fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
+      fields[:active] = { renderer: :label,
+                          as_boolean: true }
     end
 
     def common_fields
       {
+        govt_inspection_sheet_id: { renderer: :hidden },
+        pallet_id: { renderer: :hidden },
+        pallet_number: { renderer: :label,
+                         with_value: @form_object.pallet_number,
+                         caption: 'Pallet' },
+        marketing_variety: { renderer: :label,
+                             with_value: @form_object.marketing_variety.join(','),
+                             caption: 'Marketing Variety' },
+        packed_tm_group: { renderer: :label,
+                           with_value: @form_object.packed_tm_group.join(','),
+                           caption: 'Packed TM Group' },
         passed: { renderer: :checkbox },
         inspected: { renderer: :checkbox },
         inspected_at: { renderer: :input,
@@ -45,8 +52,7 @@ module UiRules
                              options: MasterfilesApp::InspectionFailureReasonRepo.new.for_select_inspection_failure_reasons,
                              disabled_options: MasterfilesApp::InspectionFailureReasonRepo.new.for_select_inactive_inspection_failure_reasons,
                              caption: 'Failure Reason',
-                             prompt: true,
-                             required: true },
+                             prompt: true },
         failure_remarks: {}
       }
     end
@@ -54,17 +60,22 @@ module UiRules
     def make_form_object
       return make_new_form_object if @mode == :new
 
-      @form_object = @repo.find_govt_inspection_pallet(@options[:id])
+      @form_object = @repo.find_govt_inspection_pallet_flat(@options[:id])
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(pallet_id: nil,
-                                    govt_inspection_sheet_id: nil,
-                                    passed: nil,
-                                    inspected: nil,
-                                    inspected_at: nil,
+      @form_values = OpenStruct.new(@options[:form_values])
+      pallet_values = @repo.find_pallet_flat(@form_values.pallet_id)
+      @form_object = OpenStruct.new(govt_inspection_sheet_id: @form_values.govt_inspection_sheet_id,
+                                    passed: true,
+                                    inspected: true,
+                                    inspected_at: Time.now,
                                     failure_reason_id: nil,
-                                    failure_remarks: nil)
+                                    failure_remarks: nil,
+                                    pallet_id: @form_values.pallet_id,
+                                    pallet_number: pallet_values.pallet_number,
+                                    marketing_variety: pallet_values.marketing_variety,
+                                    packed_tm_group: pallet_values.packed_tm_group)
     end
   end
 end

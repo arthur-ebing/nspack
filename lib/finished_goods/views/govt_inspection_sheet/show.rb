@@ -83,12 +83,13 @@ module FinishedGoods
             end
             page.form do |form|
               form.caption 'Govt Inspection Sheet'
-              if ui_rule.form_object.completed
-                form.no_submit!
-              else
-                form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
-                form.submit_captions 'Add Pallet'
+              form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
+              form.submit_captions 'Add Pallet'
+              if AppConst::CONTINUOUS_GOVT_INSPECTION_SHEETS
+                form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_inspected_pallet"
+                form.remote!
               end
+              form.no_submit! if ui_rule.form_object.completed
 
               form.row do |row|
                 row.column do |col|
@@ -97,7 +98,7 @@ module FinishedGoods
                   col.add_field :exporter_party_role_id
                   col.add_field :booking_reference
                   col.add_field :created_by
-                  col.add_field :pallet_number
+                  col.add_field :scanned_number
                   col.add_field :status
                 end
                 row.column do |col|

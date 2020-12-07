@@ -51,26 +51,16 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def add_pallets_govt_inspection_sheet(id, params) # rubocop:disable Metrics/AbcSize
-      check!(:add_pallets, id)
-
-      res = validate_add_pallet_govt_inspection_params(params.merge!(govt_inspection_sheet_id: id))
+    def add_pallet_govt_inspection_sheet(id, params)
+      res = validate_add_pallet_govt_inspection_params(id, params)
       return res unless res.success
 
-      govt_inspection_pallet_id = repo.get_id(:govt_inspection_pallets, res.instance)
-      if govt_inspection_pallet_id
-        repo.transaction do
-          repo.delete_govt_inspection_pallet(govt_inspection_pallet_id)
-          log_transaction
-        end
-        success_response('Deleted govt inspection pallet')
-      else
-        repo.transaction do
-          repo.create_govt_inspection_pallet(res.instance)
-          log_transaction
-        end
-        success_response('Added pallet to sheet.')
+      govt_inspection_pallet_id = nil
+      repo.transaction do
+        govt_inspection_pallet_id = repo.create_govt_inspection_pallet(res.instance)
+        log_transaction
       end
+      success_response('Added pallet to sheet.', govt_inspection_pallet_id)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { failure_remarks: ['This govt inspection pallet already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -435,6 +425,31 @@ module FinishedGoodsApp
       repo.find_govt_inspection_sheet(id)
     end
 
+    def validate_add_pallet_govt_inspection_params(id, params) # rubocop:disable Metrics/AbcSize
+      res = AddGovtInspectionPalletSchema.call(params.merge!(govt_inspection_sheet_id: id))
+      return validation_failed_response(res) if res.failure?
+
+      attrs = repo.scan_pallet_or_carton(res)
+      pallet_number = repo.get(:pallets, attrs[:pallet_id], :pallet_number)
+
+      check_pallet!(:not_shipped, pallet_number)
+      check_pallet!(:not_failed_otmc, pallet_number)
+      check_pallet!(:verification_passed, pallet_number)
+      check_pallet!(:pallet_weight, pallet_number)
+      if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
+        check_pallet!(:inspected, pallet_number)
+      else
+        check_pallet!(:not_on_inspection_sheet, pallet_number)
+      end
+
+      res = CreateGovtInspectionPalletSchema.call(attrs)
+      return validation_failed_response(res) if res.failure?
+
+      success_response('Passed Validation', res.to_h)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
@@ -464,29 +479,6 @@ module FinishedGoodsApp
     def check_pallet!(check, pallet_numbers)
       res = MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
       raise Crossbeams::InfoError, res.message unless res.success
-    end
-
-    def validate_add_pallet_govt_inspection_params(params) # rubocop:disable Metrics/AbcSize
-      res = GovtInspectionAddPalletSchema.call(params)
-      return validation_failed_response(res) if res.failure?
-
-      attrs = res.to_h
-      pallet_number = MesscadaApp::ScannedPalletNumber.new(scanned_pallet_number: attrs.delete(:pallet_number)).pallet_number
-
-      check_pallet!(:not_shipped, pallet_number)
-      check_pallet!(:not_failed_otmc, pallet_number)
-      check_pallet!(:verification_passed, pallet_number)
-      check_pallet!(:pallet_weight, pallet_number)
-      if repo.get(:govt_inspection_sheets, attrs[:govt_inspection_sheet_id], :reinspection)
-        check_pallet!(:inspected, pallet_number)
-      else
-        check_pallet!(:not_on_inspection_sheet, pallet_number)
-      end
-
-      attrs[:pallet_id] = repo.get_id(:pallets, pallet_number: pallet_number)
-      success_response('Passed Validation', attrs)
-    rescue Crossbeams::InfoError => e
-      failed_response(e.message)
     end
   end
 end

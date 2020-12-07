@@ -15,7 +15,7 @@ module FinishedGoodsApp
         edit: :edit_check,
         delete: :delete_check,
         capture: :capture_check,
-        add_pallets: :add_pallets_check,
+        add_pallet: :add_pallet_check,
         complete: :complete_check,
         uncomplete: :uncomplete_check,
         finish: :finish_check,
@@ -53,7 +53,7 @@ module FinishedGoodsApp
         all_ok
       end
 
-      def add_pallets_check
+      def add_pallet_check
         return failed_response 'Govt Inspection Sheet has already been completed.' if completed?
 
         all_ok

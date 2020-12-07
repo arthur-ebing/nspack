@@ -18,8 +18,9 @@ module FinishedGoods
               form.remote!
               form.method :update
               form.add_field :pallet_id
-              form.add_field :govt_inspection_sheet_id
-              form.add_field :passed
+              form.add_field :pallet_number
+              form.add_field :marketing_variety
+              form.add_field :packed_tm_group
               form.add_field :inspected
               form.add_field :inspected_at
               form.add_field :failure_reason_id
