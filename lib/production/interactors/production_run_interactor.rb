@@ -54,6 +54,22 @@ module ProductionApp
       ok_response
     end
 
+    def direct_edit_pallet_sequence(pallet_sequence_id, standard_pack_id, basic_pack_id)
+      ok_response
+      attrs = { standard_pack_code_id: standard_pack_id }
+      attrs[:basic_pack_code_id] = basic_pack_id unless basic_pack_id.nil_or_empty?
+      repo.transaction do
+        repo.update(:pallet_sequences, pallet_sequence_id, attrs)
+        repo.update_pallet_sequence_cartons(pallet_sequence_id, attrs) if AppConst::USE_CARTON_PALLETIZING
+      end
+
+      ok_response
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def find_carton_by_carton_label_id(carton_label_id)
       repo.find_carton_by_carton_label_id(carton_label_id)
     end
