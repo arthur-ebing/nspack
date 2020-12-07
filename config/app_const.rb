@@ -504,6 +504,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Inspection - Signee caption
   GOVT_INSPECTION_SIGNEE_CAPTION = ENV.fetch('GOVT_INSPECTION_SIGNEE_CAPTION', 'Packhouse manager')
+  CONTINUOUS_GOVT_INSPECTION_SHEETS = make_boolean('CONTINUOUS_GOVT_INSPECTION_SHEETS')
 
   # EDI Settings
   EDI_NETWORK_ADDRESS = ENV.fetch('EDI_NETWORK_ADDRESS', '999')

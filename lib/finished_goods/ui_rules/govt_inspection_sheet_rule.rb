@@ -112,9 +112,10 @@ module UiRules
                                          options: @repo.for_select_govt_inspection_api_results,
                                          disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
                                          caption: 'Govt Inspection Api Result' },
-        pallet_number: { renderer: :input,
-                         subtype: :numeric,
-                         hide_on_load: @form_object.completed },
+        scanned_number: { renderer: :input,
+                          caption: 'Pallet Number',
+                          subtype: :numeric,
+                          hide_on_load: @form_object.completed },
         reinspection: { renderer: :checkbox,
                         hide_on_load: !@form_object.reinspection,
                         disable: @mode != :reinspection },
@@ -128,7 +129,7 @@ module UiRules
       make_new_form_object && return if %i[new reinspection].include? @mode
 
       @form_object = @repo.find_govt_inspection_sheet(@options[:id])
-      @form_object = OpenStruct.new(@form_object.to_h.merge!(pallet_number: nil))
+      @form_object = OpenStruct.new(@form_object.to_h.merge!(scanned_number: nil))
     end
 
     def make_new_form_object
@@ -149,7 +150,7 @@ module UiRules
                                     destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
                                     govt_inspection_api_result_id: nil,
                                     reinspection: @mode == :reinspection,
-                                    pallet_number: nil)
+                                    scanned_number: nil)
     end
 
     private

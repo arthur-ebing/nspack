@@ -734,7 +734,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
             form_state = interactor.find_govt_inspection_sheet(govt_inspection_sheet_id)
             form = Crossbeams::RMDForm.new(form_state,
-                                           form_name: :add_pallets_govt_inspection_sheet,
+                                           form_name: :add_pallet_to_govt_inspection_sheet,
                                            progress: progress,
                                            scan_with_camera: @rmd_scan_with_camera,
                                            links: [{ caption: 'Complete',
@@ -761,7 +761,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
 
           r.post do
-            res = interactor.add_pallets_govt_inspection_sheet(govt_inspection_sheet_id, params[:add_pallets_govt_inspection_sheet])
+            res = interactor.add_pallet_govt_inspection_sheet(govt_inspection_sheet_id, params[:add_pallet_to_govt_inspection_sheet])
             if res.success
               store_locally(:flash_notice, rmd_success_message(res.message))
             else
@@ -794,7 +794,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
           r.post do
             govt_inspection_sheet_id = params[:govt_inspection_sheet][:govt_inspection_sheet_id]
-            res = interactor.check(:add_pallets, govt_inspection_sheet_id)
+            res = interactor.check(:add_pallet, govt_inspection_sheet_id)
             if res.success
               r.redirect("/rmd/finished_goods/dispatch/inspection/govt_inspection_sheets/#{govt_inspection_sheet_id}")
             else

@@ -100,8 +100,9 @@ class Nspack < Roda
       end
 
       r.on 'add_pallet' do # ADD_PALLETS
+        interactor.assert_permission!(:add_pallet, id)
         r.post do
-          res = interactor.add_pallets_govt_inspection_sheet(id, params[:govt_inspection_sheet])
+          res = interactor.add_pallet_govt_inspection_sheet(id, params[:govt_inspection_sheet])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/inspection/govt_inspection_sheets/#{id}"
@@ -109,6 +110,19 @@ class Nspack < Roda
             re_show_form(r, res, url: "/finished_goods/inspection/govt_inspection_sheets/#{id}") do
               FinishedGoods::Inspection::GovtInspectionSheet::Show.call(id, form_values: params[:govt_inspection_sheet], form_errors: res.errors)
             end
+          end
+        end
+      end
+
+      r.on 'add_inspected_pallet' do # ADD_PALLETS
+        interactor.assert_permission!(:add_pallet, id)
+        r.post do
+          res = interactor.validate_add_pallet_govt_inspection_params(id, params[:govt_inspection_sheet])
+          if res.success
+            json_launch_dialog(render_partial { FinishedGoods::Inspection::GovtInspectionPallet::New.call(form_values: res.instance) })
+          else
+            flash[:error] = res.message
+            redirect_via_json "/finished_goods/inspection/govt_inspection_sheets/#{id}"
           end
         end
       end
@@ -277,18 +291,20 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_govt_inspection_pallet(id, params[:govt_inspection_pallet])
           if res.success
-            row_keys = %i[pallet_id
-                          govt_inspection_sheet_id
-                          passed
-                          inspected
-                          inspected_at
-                          failure_reason_id
-                          failure_remarks]
-            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+            row_keys = %i[pallet_number id pallet_id
+                          govt_inspection_sheet_id completed passed inspected inspected_at
+                          failure_reason_id failure_reason description main_factor secondary_factor failure_remarks
+                          sheet_inspected gross_weight carton_quantity marketing_variety packed_tm_group pallet_base
+                          active colour_rule]
+            update_grid_row(id,
+                            changes: select_attributes(res.instance, row_keys),
+                            grid_id: 'govt_inspection_pallets',
+                            notice: res.message)
           else
             re_show_form(r, res) { FinishedGoods::Inspection::GovtInspectionPallet::Edit.call(id, form_values: params[:govt_inspection_pallet], form_errors: res.errors) }
           end
         end
+
         r.delete do    # DELETE
           check_auth!('inspection', 'delete')
           interactor.assert_permission!(:delete, id)
@@ -320,16 +336,13 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_govt_inspection_pallet(params[:govt_inspection_pallet])
         if res.success
-          row_keys = %i[id
-                        pallet_id
-                        govt_inspection_sheet_id
-                        passed
-                        inspected
-                        inspected_at
-                        failure_reason_id
-                        failure_remarks
-                        active]
+          row_keys = %i[pallet_number id pallet_id
+                        govt_inspection_sheet_id completed passed inspected inspected_at
+                        failure_reason_id failure_reason description main_factor secondary_factor failure_remarks
+                        sheet_inspected gross_weight carton_quantity marketing_variety packed_tm_group pallet_base
+                        active colour_rule]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       grid_id: 'govt_inspection_pallets',
                        notice: res.message)
         else
           re_show_form(r, res, url: '/finished_goods/inspection/govt_inspection_pallets/new') do

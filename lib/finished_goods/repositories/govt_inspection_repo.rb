@@ -4,6 +4,7 @@ module FinishedGoodsApp
   class GovtInspectionRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :govt_inspection_sheets, label: :id, value: :id, order_by: :id
     build_for_select :govt_inspection_pallets, label: :failure_remarks, value: :id, order_by: :failure_remarks
+    build_for_select :pallets, label: :pallet_number, value: :id, order_by: :pallet_number
     build_for_select :govt_inspection_api_results, label: :upn_number, value: :id, order_by: :upn_number
     build_for_select :govt_inspection_pallet_api_results, label: :id, value: :id, order_by: :id
 
@@ -53,14 +54,6 @@ module FinishedGoodsApp
 
     def for_select_inactive_destination_regions(where: nil)
       for_select_destination_regions(false, where: where)
-    end
-
-    def validate_govt_inspection_sheet_inspect_params(id)
-      pallet_ids = DB[:govt_inspection_pallets].where(govt_inspection_sheet_id: id, inspected: false).select_map(:pallet_id)
-      pallet_numbers = DB[:pallets].where(id: pallet_ids).select_map(:pallet_number).join(', ')
-      return failed_response("Pallet: #{pallet_numbers}, results not captured.") unless pallet_numbers.empty?
-
-      ok_response
     end
 
     def pallet_in_different_tripsheet?(pallet_id, vehicle_job_id)
@@ -160,19 +153,97 @@ module FinishedGoodsApp
     end
 
     def find_govt_inspection_pallet_flat(id)
-      find_with_association(:govt_inspection_pallets,
-                            id,
-                            parent_tables: [{ parent_table: :inspection_failure_reasons,
-                                              columns: %i[failure_reason description main_factor secondary_factor],
-                                              foreign_key: :failure_reason_id,
-                                              flatten_columns: { failure_reason: :failure_reason,
-                                                                 description: :description,
-                                                                 main_factor: :main_factor,
-                                                                 secondary_factor: :secondary_factor } }],
-                            lookup_functions: [{ function: :fn_current_status,
-                                                 args: ['pallets', :pallet_id],
-                                                 col_name: :status }],
-                            wrapper: GovtInspectionPalletFlat)
+      query = <<~SQL
+        SELECT
+          pallets.pallet_number,
+          govt_inspection_pallets.id,
+          govt_inspection_pallets.pallet_id,
+          govt_inspection_pallets.govt_inspection_sheet_id,
+          govt_inspection_sheets.completed,
+          govt_inspection_pallets.passed,
+          govt_inspection_pallets.inspected,
+          govt_inspection_pallets.inspected_at,
+          govt_inspection_pallets.failure_reason_id,
+          inspection_failure_reasons.failure_reason,
+          inspection_failure_reasons.description,
+          inspection_failure_reasons.main_factor,
+          inspection_failure_reasons.secondary_factor,
+          govt_inspection_pallets.failure_remarks,
+          govt_inspection_sheets.inspected AS sheet_inspected,
+          pallets.gross_weight,
+          pallets.carton_quantity,
+          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_variety,
+          array_agg(distinct target_market_groups.target_market_group_name) AS  packed_tm_group,
+          pallet_bases.pallet_base_code AS pallet_base,
+          govt_inspection_pallets.active,
+          govt_inspection_pallets.created_at,
+          govt_inspection_pallets.updated_at,
+          CASE
+            WHEN govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed THEN 'error'
+            WHEN govt_inspection_pallets.passed THEN 'ok'
+          END AS colour_rule
+
+        FROM govt_inspection_pallets
+        JOIN govt_inspection_sheets ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id
+        LEFT JOIN inspection_failure_reasons ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id
+        LEFT JOIN pallets ON pallets.id = govt_inspection_pallets.pallet_id
+        LEFT JOIN pallet_sequences ps ON pallets.id = ps.pallet_id
+        LEFT JOIN marketing_varieties ON marketing_varieties.id = ps.marketing_variety_id
+        LEFT JOIN target_market_groups ON target_market_groups.id = ps.packed_tm_group_id
+        LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
+        LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        WHERE govt_inspection_pallets.id = ?
+
+        GROUP BY
+          govt_inspection_pallets.id,
+          govt_inspection_sheets.id,
+          pallets.id,
+          inspection_failure_reasons.id,
+          pallet_bases.id
+      SQL
+      hash = DB[query, id].first
+      return nil if hash.nil_or_empty?
+
+      GovtInspectionPalletFlat.new(hash)
+    end
+
+    def find_pallet_flat(id)
+      query = <<~SQL
+        SELECT
+          pallets.pallet_number,
+          pallets.gross_weight,
+          pallets.carton_quantity,
+          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_variety,
+          array_agg(distinct target_market_groups.target_market_group_name) AS  packed_tm_group,
+          pallet_bases.pallet_base_code AS pallet_base
+
+        FROM pallets
+        LEFT JOIN pallet_sequences ps ON pallets.id = ps.pallet_id
+        LEFT JOIN marketing_varieties ON marketing_varieties.id = ps.marketing_variety_id
+        LEFT JOIN target_market_groups ON target_market_groups.id = ps.packed_tm_group_id
+        LEFT JOIN pallet_formats ON pallet_formats.id = pallets.pallet_format_id
+        LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id
+        WHERE pallets.id = ?
+        GROUP BY
+          pallets.id,
+          pallet_bases.id
+      SQL
+      hash = DB[query, id].first
+      return nil if hash.nil_or_empty?
+
+      FinishedGoodsApp::PalletFlat.new(hash)
+    end
+
+    def create_govt_inspection_pallet(res)
+      attrs = res.to_h
+      attrs[:passed] = attrs[:failure_reason_id].nil?
+      create(:govt_inspection_pallets, attrs)
+    end
+
+    def update_govt_inspection_pallet(id, res)
+      attrs = res.to_h
+      attrs[:passed] = attrs[:failure_reason_id].nil?
+      update(:govt_inspection_pallets, id, attrs)
     end
 
     def exists_on_inspection_sheet(pallet_numbers)
@@ -181,10 +252,6 @@ module FinishedGoodsApp
       ds = ds.join(:govt_inspection_sheets, id: Sequel[:govt_inspection_pallets][:govt_inspection_sheet_id])
       ds = ds.where(cancelled: false, pallet_number: pallet_numbers)
       ds.select_map(%i[pallet_number govt_inspection_sheet_id])
-    end
-
-    def selected_pallets(pallet_sequence_ids)
-      select_values(:pallet_sequences, :pallet_id, id: pallet_sequence_ids)
     end
 
     def load_vehicle_job_units(vehicle_job_id)
@@ -272,6 +339,23 @@ module FinishedGoodsApp
           AND u.offloaded_at IS NULL)
       SQL
       !DB[query, govt_inspection_sheet_id].single_value
+    end
+
+    def scan_pallet_or_carton(params) # rubocop:disable Metrics/AbcSize
+      args = MesscadaApp::MesscadaRepo.new.parse_pallet_or_carton_number(params)
+      if args[:carton_number]
+        args[:carton_id] = get_id(:cartons, carton_label_id: args[:carton_number])
+        pallet_sequence_id = get(:cartons, args[:carton_id], :pallet_sequence_id)
+        args[:pallet_id] = get(:pallet_sequences, pallet_sequence_id, :pallet_id)
+      end
+      if args[:pallet_number]
+        args[:pallet_id] = get_id(:pallets, pallet_number: args[:pallet_number])
+        args[:carton_id] = nil
+      end
+
+      raise Crossbeams::InfoError, 'Pallet not found.' if args[:pallet_id].nil?
+
+      args
     end
   end
 end
