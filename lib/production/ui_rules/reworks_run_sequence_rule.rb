@@ -242,7 +242,8 @@ module UiRules
                                caption: 'PM Mark',
                                prompt: 'Select PM Mark',
                                searchable: true,
-                               remove_search_for_small_list: false }
+                               remove_search_for_small_list: false,
+                               hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:product_chars] =  {}
       fields[:inventory_code_id] =  { renderer: :select,
                                       options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
