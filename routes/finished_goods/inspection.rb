@@ -352,7 +352,8 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_govt_inspection_pallet(params[:govt_inspection_pallet])
         if res.success
-          row_keys = %i[pallet_number
+          row_keys = %i[id
+                        pallet_number
                         pallet_id
                         govt_inspection_sheet_id
                         completed
