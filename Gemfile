@@ -67,4 +67,5 @@ group :development do
   gem 'pry-doc'
   gem 'rack-console'
   gem 'rerun'
+  gem 'roda-enhanced_logger'
 end
