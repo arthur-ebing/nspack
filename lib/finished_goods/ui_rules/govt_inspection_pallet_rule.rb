@@ -38,12 +38,12 @@ module UiRules
         pallet_number: { renderer: :label,
                          with_value: @form_object.pallet_number,
                          caption: 'Pallet' },
-        marketing_variety: { renderer: :label,
-                             with_value: @form_object.marketing_variety.join(','),
-                             caption: 'Marketing Variety' },
-        packed_tm_group: { renderer: :label,
-                           with_value: @form_object.packed_tm_group.join(','),
-                           caption: 'Packed TM Group' },
+        marketing_varieties: { renderer: :label,
+                               with_value: @form_object.marketing_varieties.join(','),
+                               caption: 'Marketing Varieties' },
+        packed_tm_groups: { renderer: :label,
+                            with_value: @form_object.packed_tm_groups.join(','),
+                            caption: 'Packed TM Groups' },
         passed: { renderer: :checkbox },
         inspected: { renderer: :checkbox },
         inspected_at: { renderer: :input,
@@ -74,8 +74,8 @@ module UiRules
                                     failure_remarks: nil,
                                     pallet_id: @form_values.pallet_id,
                                     pallet_number: pallet_values.pallet_number,
-                                    marketing_variety: pallet_values.marketing_variety,
-                                    packed_tm_group: pallet_values.packed_tm_group)
+                                    marketing_varieties: pallet_values.marketing_varieties,
+                                    packed_tm_groups: pallet_values.packed_tm_groups)
     end
   end
 end
