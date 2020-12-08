@@ -61,7 +61,7 @@ module UiRules
       fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed Tm Group' }
       fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
-      fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark' }
+      fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
       fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
