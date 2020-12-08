@@ -27,10 +27,10 @@ module MasterfilesApp
     end
 
     def test_create_pm_product_fail
-      attrs = fake_pm_product(product_code: nil).to_h.reject { |k, _| k == :id }
+      attrs = fake_pm_product(erp_code: nil).to_h.reject { |k, _| k == :id }
       res = interactor.create_pm_product(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:product_code]
+      assert_equal ['must be filled'], res.errors[:erp_code]
     end
 
     def test_update_pm_product
