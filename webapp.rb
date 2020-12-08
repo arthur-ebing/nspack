@@ -68,6 +68,9 @@ class Nspack < Roda
       redirect(path) if path && scope.can_login_to_path?(path, account[:id])
     end
   end
+  if ENV['RACK_ENV'] == 'development'
+    plugin :enhanced_logger, filter: ->(path) { path.start_with?('/terminus') } # || path.start_with?('/js/') || path.start_with?('/css/') } # , trace_missed: true
+  end
   unless ENV['RACK_ENV'] == 'development' && ENV['NO_ERR_HANDLE']
     plugin :error_mail, to: AppConst::ERROR_MAIL_RECIPIENTS,
                         from: AppConst::SYSTEM_MAIL_SENDER,
