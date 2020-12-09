@@ -63,7 +63,7 @@ module MesscadaApp
       ok_response
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize
+    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
