@@ -248,6 +248,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_page { Production::Production::Shift::Filter.call(employment_type) }
       end
     end
+
+    r.on 'group_incentives' do
+      interactor = ProductionApp::ShiftInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'search_by_contract_worker' do
+        r.get do
+          show_partial_or_page(r) { Production::Production::Shift::SearchByContractWorker.call }
+        end
+
+        r.post do
+          res = interactor.find_group_incentives_with(params[:shift][:contract_worker_id])
+          if res.success
+            r.redirect "/list/group_incentives/with_params?key=search_by_contract_worker&group_incentives_ids=#{res.instance}"
+          else
+            re_show_form(r, res, url: '/production/shifts/group_incentives/search_by_contract_worker') do
+              Production::Production::Shift::SearchByContractWorker.call(form_values: params[:shift], form_errors: res.errors)
+            end
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

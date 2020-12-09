@@ -183,28 +183,103 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     # BINS
     # --------------------------------------------------------------------------
     r.on 'rmt_bins', Integer do |id|
-      interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       r.on 'new' do # NEW
-        new_bin_screen(id, "/rmd/rmt_deliveries/rmt_bins/#{id}/rmt_bins")
+        new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/new')
       end
 
-      r.post do # CREATE
-        res = interactor.create_rmt_bin(id, params[:rmt_bin])
-        if res.success
-          flash[:notice] = 'Bin Created Successfully'
-          r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}/edit")
-        else
-          params[:rmt_bin][:error_message] = res.message
-          params[:rmt_bin][:errors] = res.errors
-          store_locally(:bin, params[:rmt_bin])
-          r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
-        end
+      r.on 'new_delivery_bin' do # NEW
+        store_locally(:new_bin_mode, :edit_delivery)
+        new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/new')
       end
     end
 
     r.on 'rmt_bins' do
       interactor = RawMaterialsApp::RmtBinInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'new' do # NEW
+        r.get do
+          new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/new')
+        end
+
+        r.post do # CREATE
+          id = params[:rmt_bin][:delivery_id]
+          params[:rmt_bin].delete_if { |k, _v| k == :delivery_id }
+          res = interactor.create_rmt_bin(id, params[:rmt_bin])
+          if res.success
+            flash[:notice] = 'Bin Created Successfully'
+            r.redirect("/raw_materials/deliveries/rmt_deliveries/#{id}/edit")
+          else
+            params[:rmt_bin][:error_message] = res.message
+            params[:rmt_bin][:errors] = res.errors
+            store_locally(:bin, params[:rmt_bin])
+            r.redirect("/rmd/rmt_deliveries/rmt_bins/#{id}/new")
+          end
+        end
+      end
+
+      r.on 'rmt_bin_delivery_id_combo_changed' do
+        actions = []
+        if !params[:changed_value].to_s.empty?
+          bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(params[:changed_value])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_delivery_code_value',
+                                    value: bin_delivery[:id])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_farm_code_value',
+                                    value: bin_delivery[:farm_code])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_puc_code_value',
+                                    value: bin_delivery[:puc_code])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_orchard_code_value',
+                                    value: bin_delivery[:orchard_code])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_code_value',
+                                    value: bin_delivery[:cultivar_code])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_date_picked_value',
+                                    value: bin_delivery[:date_picked])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_date_delivered_value',
+                                    value: bin_delivery[:date_delivered])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_qty_bins_tipped_value',
+                                    value: bin_delivery[:qty_bins_tipped])
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_qty_bins_received_value',
+                                    value: bin_delivery[:qty_bins_received])
+        else
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_delivery_code_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_farm_code_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_puc_code_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_orchard_code_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_cultivar_code_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_date_picked_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_date_delivered_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_qty_bins_tipped_value',
+                                    value: nil)
+          actions << OpenStruct.new(type: :replace_inner_html,
+                                    dom_id: 'rmt_bin_qty_bins_received_value',
+                                    value: nil)
+        end
+
+        json_actions(actions)
+      end
 
       r.on 'rmt_bin_rmt_container_type_combo_changed' do
         rmt_container_type_combo_changed('rmt_bin')
@@ -726,15 +801,19 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'receive_single_bin' do
         id = interactor.find_current_delivery
         if id.nil_or_empty?
+          return new_bin_screen(nil, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit') if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
           receive_single_bin_error_screen('There Is No Current Delivery To Add Bins To')
         elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)
           receive_single_bin_error_screen('Cannot Add Bin To Current Delivery. Delivery Has Been Tipped')
         else
-          new_bin_screen(id, "/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit/#{id}")
+          new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit')
         end
       end
 
-      r.on 'receive_single_bin_submit', Integer do |id|
+      r.on 'receive_single_bin_submit' do
+        id = params[:rmt_bin][:delivery_id]
+        params[:rmt_bin].delete_if { |k, _v| k == :delivery_id }
         res = interactor.create_rmt_bin(id, params[:rmt_bin])
         if res.success
           notes = 'Bin Created Successfully'
@@ -743,7 +822,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           params[:rmt_bin][:errors] = res.errors
           store_locally(:bin, params[:rmt_bin])
         end
-        new_bin_screen(id, "/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit/#{id}", notes)
+        new_bin_screen(id, '/rmd/rmt_deliveries/rmt_bins/receive_single_bin_submit', notes)
       end
 
       r.on 'set_bin_level', Integer do |id|
@@ -876,11 +955,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
   def new_bin_screen(delivery_id, action, notes = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     bin_delivery = RawMaterialsApp::RmtDeliveryRepo.new.get_bin_delivery(delivery_id)
+    bin_delivery = {} if !bin_delivery && AppConst::USE_PERMANENT_RMT_BIN_BARCODES
     if bin_delivery
       default_rmt_container_type = RawMaterialsApp::RmtDeliveryRepo.new.rmt_container_type_by_container_type_code(AppConst::DELIVERY_DEFAULT_RMT_CONTAINER_TYPE)
-      details = retrieve_from_local_store(:bin) || { cultivar_id: bin_delivery[:cultivar_id], bin_fullness: :Full }
+      details = retrieve_from_local_store(:bin) || { bin_fullness: :Full } # cultivar_id: bin_delivery[:cultivar_id],
 
-      capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
+      capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
       capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
       capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
       capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
@@ -894,17 +974,25 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      button_caption: 'Submit')
 
       form.behaviours do |behaviour|
+        behaviour.dropdown_change :delivery_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_delivery_id_combo_changed' }]
         behaviour.dropdown_change :rmt_container_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_rmt_container_type_combo_changed' }] if capture_container_material
         behaviour.dropdown_change :rmt_container_material_type_id, notify: [{ url: '/rmd/rmt_deliveries/rmt_bins/rmt_bin_container_material_type_combo_changed' }] if capture_container_material && capture_container_material_owner
       end
 
+      form.add_label(:delivery_code, 'Delivery', bin_delivery[:id], nil, as_table_cell: true)
       form.add_label(:farm_code, 'Farm', bin_delivery[:farm_code], nil, as_table_cell: true)
       form.add_label(:puc_code, 'PUC', bin_delivery[:puc_code], nil, as_table_cell: true)
       form.add_label(:orchard_code, 'Orchard', bin_delivery[:orchard_code], nil, as_table_cell: true)
+      form.add_label(:cultivar_code, 'Cultivar', bin_delivery[:cultivar_code], nil, as_table_cell: true)
       form.add_label(:date_picked, 'Date Picked', bin_delivery[:date_picked], nil, as_table_cell: true)
       form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
       form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)
       form.add_label(:qty_bins_received, 'Qty Bins Received', bin_delivery[:qty_bins_received], nil, as_table_cell: true)
+
+      delivery_codes = []
+      delivery_codes = RawMaterialsApp::RmtDeliveryRepo.new.for_select_delivery_context_info unless retrieve_from_local_store(:new_bin_mode) == :edit_delivery
+      delivery_codes.unshift(["#{bin_delivery[:id]}_#{bin_delivery[:puc_code]}_#{bin_delivery[:orchard_code]}_#{bin_delivery[:cultivar_code]}_#{bin_delivery[:date_delivered]}", bin_delivery[:id]]) unless bin_delivery.empty?
+      form.add_select(:delivery_id, 'Delivery', items: delivery_codes.uniq, value: bin_delivery[:id], prompt: true, required: true)
       form.add_select(:rmt_class_id, 'Rmt Class', items: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, prompt: true, required: false)
       form.add_select(:rmt_container_type_id, 'Container Type', items: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, value: default_rmt_container_type[:id],
                                                                 required: true, prompt: true)

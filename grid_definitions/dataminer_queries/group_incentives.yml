@@ -1,0 +1,237 @@
+---
+:caption: Group Incentives
+:sql: "SELECT  group_incentives.id, group_incentives.system_resource_id, group_incentives.contract_worker_ids,
+  \r\n        (SELECT string_agg(cc.plant_resource_code, ' / ') as path\r\n         FROM
+  (SELECT c.plant_resource_code\r\n                FROM plant_resources AS c \r\n
+  \               JOIN tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id
+  = c.id\r\n                WHERE t1.descendant_plant_resource_id = plant_resources.id\r\n
+  \               ORDER BY t1.path_length DESC) AS cc) AS hierarchy,\r\n        system_resources.system_resource_code,
+  plant_resources.plant_resource_code, plant_resources.description,\r\n              (
+  SELECT array_agg(cw.contract_worker)\r\n                FROM ( SELECT  CONCAT(contract_workers.first_name,
+  \ '_', contract_workers.surname) AS contract_worker\r\n                            FROM
+  contract_workers\r\n                            JOIN group_incentives gi ON contract_workers.id
+  = ANY (gi.contract_worker_ids)\r\n                           WHERE gi.id = group_incentives.id\r\n
+  \                         ORDER BY 1 ASC) AS cw) AS group_incentive_contract_workers,\r\n
+  \             group_incentives.active, group_incentives.created_at,\r\n              CASE
+  WHEN NOT group_incentives.active THEN 'inactive' ELSE NULL END AS colour_rule\r\nFROM
+  group_incentives\r\nJOIN system_resources ON system_resources.id = group_incentives.system_resource_id\r\nJOIN
+  plant_resources ON system_resources.id = plant_resources.system_resource_id\r\nORDER
+  BY group_incentives.id DESC "
+:limit: 
+:offset: 
+:external_settings:
+  :colour_key:
+    inactive: Inactive
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: group_incentives.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_id:
+    :name: system_resource_id
+    :sequence_no: 2
+    :caption: System resource
+    :namespaced_name: group_incentives.system_resource_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  contract_worker_ids:
+    :name: contract_worker_ids
+    :sequence_no: 3
+    :caption: Contract worker ids
+    :namespaced_name: group_incentives.contract_worker_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  hierarchy:
+    :name: hierarchy
+    :sequence_no: 4
+    :caption: Hierarchy
+    :namespaced_name: 
+    :data_type: :string
+    :width: 250
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  system_resource_code:
+    :name: system_resource_code
+    :sequence_no: 5
+    :caption: System resource
+    :namespaced_name: system_resources.system_resource_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: left
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  plant_resource_code:
+    :name: plant_resource_code
+    :sequence_no: 6
+    :caption: Plant resource
+    :namespaced_name: plant_resources.plant_resource_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 7
+    :caption: Description
+    :namespaced_name: plant_resources.description
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  group_incentive_contract_workers:
+    :name: group_incentive_contract_workers
+    :sequence_no: 8
+    :caption: Contract workers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 850
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 9
+    :caption: Active
+    :namespaced_name: group_incentives.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 10
+    :caption: Created at
+    :namespaced_name: group_incentives.created_at
+    :data_type: :datetime
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 11
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: group_incentives.system_resource_id
+  :caption: System resource
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT system_resource_code, id FROM system_resources WHERE group_incentive
+    ORDER BY system_resource_code
+- :column: group_incentives.active
+  :caption: Active?
+  :data_type: :boolean
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 2
+  :list_def:
+  - true
+  - false
+- :column: group_incentives.created_at
+  :caption: Created at
+  :data_type: :date
+  :control_type: :daterange
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 3
+  :list_def: 
+- :column: group_incentives.id
+  :caption: Group incentive
+  :data_type: :integer
+  :control_type: 
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: 

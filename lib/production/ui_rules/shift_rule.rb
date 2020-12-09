@@ -2,7 +2,7 @@
 
 module UiRules
   class ShiftRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules # rubocop:disable Metrics/AbcSize
+    def generate_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
       @repo = ProductionApp::HumanResourcesRepo.new
       @mf_hr_repo = MasterfilesApp::HumanResourcesRepo.new
       make_form_object
@@ -12,6 +12,7 @@ module UiRules
 
       common_values_for_fields new_fields if %i[new filter summary_report].include? @mode
       common_values_for_fields edit_fields if @mode == :edit
+      common_values_for_fields search_fields if @mode == :search
 
       set_show_fields if %i[show reopen].include? @mode
 
@@ -94,6 +95,20 @@ module UiRules
       }
     end
 
+    def search_fields
+      {
+        contract_worker_id: {
+          renderer: :select,
+          options: @repo.for_select_contract_workers,
+          caption: 'Contract Worker',
+          min_charwidth: 30,
+          required: true,
+          prompt: true
+        },
+        spacer: { hide_on_load: true }
+      }
+    end
+
     def make_form_object
       if @mode == :new
         make_new_form_object
@@ -101,6 +116,8 @@ module UiRules
       end
 
       return make_summary_report_object if %i[filter summary_report].include? @mode
+
+      return make_search_form_object if @mode == :search
 
       @form_object = @repo.find_shift(@options[:id])
     end
@@ -119,6 +136,10 @@ module UiRules
                                     to_date: @options[:attrs].nil? ? Date.today.next_day.to_time - 1 : @options[:attrs][:to_date],
                                     employment_type: employment_type_code.downcase,
                                     employment_type_id: employment_type_id)
+    end
+
+    def make_search_form_object
+      @form_object = OpenStruct.new(contract_worker_id: nil)
     end
   end
 end

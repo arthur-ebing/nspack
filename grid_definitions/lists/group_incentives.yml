@@ -1,0 +1,18 @@
+---
+:dataminer_definition: group_incentives
+:conditions:
+#  :standard:
+#    - :col: group_incentives.system_resource_id
+#      :op: =
+#      :val: $:system_resource_id$
+#    - :col: group_incentives.active
+#      :op: =
+#      :val: false
+  :active:
+    - :col: group_incentives.active
+      :op: =
+      :val: true
+  :search_by_contract_worker:
+    - :col: group_incentives.id
+      :op: IN
+      :val: $:group_incentives_ids$

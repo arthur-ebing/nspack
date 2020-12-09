@@ -52,6 +52,15 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def find_group_incentives_with(contract_worker_id)
+      return validation_failed_response(messages: { contract_worker_id: ['Contract worker cannot be empty'] }) if contract_worker_id.nil_or_empty?
+
+      incentive_group_ids = repo.find_group_incentives_with(contract_worker_id)
+      return validation_failed_response(messages: { contract_worker_id: ['Contract worker does not belong to any incentive group'] }) if incentive_group_ids.nil_or_empty?
+
+      success_response('ok', incentive_group_ids)
+    end
+
     private
 
     def repo

@@ -231,7 +231,7 @@ module MesscadaApp
 
     # Take params, lookup system resource and some related attributes
     # and merge them into the params as { system_resource: SystemResourceWithIncentive }.
-    def merge_system_resource_incentive(params, has_button: false) # rubocop:disable Metrics/AbcSize
+    def merge_system_resource_incentive(params, has_button: false) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       device = if has_button
                  ar = params[:device].split('-')
                  ar.take(ar.length - 1).join('-')
@@ -240,10 +240,18 @@ module MesscadaApp
                end
       sys_res = resource_repo.system_resource_incentive_settings(device)
       return failed_response("#{device} is not configured") if sys_res.nil?
+      return success_response('ok', merge_incentive_just_system_resource(sys_res, params)) unless validate_identifier(params)
       return success_response('ok', merge_incentive_just_system_resource(sys_res, params)) if !sys_res.login && !sys_res.group_incentive
       return merge_incentive_contract_worker(sys_res, params) unless sys_res.group_incentive
 
       merge_incentive_group_incentive(sys_res, params)
+    end
+
+    def validate_identifier(params)
+      validate_identifier = AppConst::INCENTIVISED_LABELING
+      validate_identifier = false unless params.to_h.key?(:identifier)
+      validate_identifier = false if params[:identifier].nil_or_empty?
+      validate_identifier
     end
 
     def merge_incentive_just_system_resource(sys_res, params)
@@ -251,41 +259,39 @@ module MesscadaApp
     end
 
     def merge_incentive_contract_worker(sys_res, params)
-      personnel_identifier_id = hr_repo.personnel_identifier_id_from_device_identifier(params[:identifier])
+      res = validate_device_identifier(params[:identifier])
+      return res unless res.success
+
+      sys = sys_res.to_h.merge(res.instance)
+      success_response('ok', params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys)))
+    end
+
+    def validate_device_identifier(identifier)
+      personnel_identifier_id = hr_repo.personnel_identifier_id_from_device_identifier(identifier)
       return failed_response('Invalid identifier') if personnel_identifier_id.nil?
 
       contract_worker_id = hr_repo.contract_worker_id_from_personnel_id(personnel_identifier_id)
       return failed_response('This identifier is not assigned') if contract_worker_id.nil?
 
-      sys = sys_res.to_h.merge(personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id)
-      success_response('ok', params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys)))
+      success_response('ok', { personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id })
     end
 
-    def merge_incentive_group_incentive(sys_res, params)
+    def merge_incentive_group_incentive(sys_res, params)  # rubocop:disable Metrics/AbcSize
       group_incentive_id = hr_repo.active_group_incentive_id(sys_res.id)
       return failed_response('There is no active group') if group_incentive_id.nil?
 
-      params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h.merge(group_incentive_id: group_incentive_id)))
+      res = validate_device_identifier(params[:identifier])
+      return res unless res.success
+
+      default = res.instance.merge({ group_incentive_id: group_incentive_id })
+      attrs = params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h.merge(default)))
+      success_response('ok', attrs)
     end
 
-    def carton_labeling(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      res = CartonLabelingSchema.call(params)
-      return validation_failed_response(res) if res.failure?
-
-      check_res = validate_device_exists(res[:device])
-      return check_res unless check_res.success
-
-      validate_identifier = AppConst::INCENTIVISED_LABELING
-      validate_identifier = false unless res.to_h.key?(:identifier)
-
-      if validate_identifier && !res[:identifier].nil_or_empty?
-        check_res = validate_incentivised_labeling(res[:identifier])
-        return check_res unless check_res.success
-      end
-
+    def carton_labeling(params) # rubocop:disable Metrics/AbcSize
       cvl_res = nil
       repo.transaction do
-        cvl_res = MesscadaApp::CartonLabeling.call(res)
+        cvl_res = MesscadaApp::CartonLabeling.call(params)
         log_transaction
       end
       cvl_res

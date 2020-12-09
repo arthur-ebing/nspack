@@ -83,11 +83,12 @@ module FinishedGoods
             end
             page.form do |form|
               form.caption 'Govt Inspection Sheet'
-              form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
               form.submit_captions 'Add Pallet'
               if AppConst::CONTINUOUS_GOVT_INSPECTION_SHEETS
                 form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_inspected_pallet"
                 form.remote!
+              else
+                form.action "/finished_goods/inspection/govt_inspection_sheets/#{id}/add_pallet"
               end
               form.no_submit! if ui_rule.form_object.completed
 

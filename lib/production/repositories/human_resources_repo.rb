@@ -46,6 +46,12 @@ module ProductionApp
       end
     end
 
+    def for_select_contract_workers
+      MasterfilesApp::HumanResourcesRepo.new.for_select_contract_workers.map do |r|
+        [DB['SELECT fn_contract_worker_name(?)', r[1]].single_value, r[1]]
+      end
+    end
+
     def create_shift(attrs) # rubocop:disable Metrics/AbcSize
       attrs = attrs.to_h
       date = attrs.delete(:date)
@@ -82,6 +88,13 @@ module ProductionApp
         message = "Shift overlaps with #{shift.shift_type_code} from #{shift.start_date_time.strftime('%Y-%m-%d %H:%M:%S')} to #{shift.end_date_time.strftime('%Y-%m-%d %H:%M:%S')}"
         raise Crossbeams::InfoError, message
       end
+    end
+
+    def find_group_incentives_with(contract_worker_id)
+      query = <<~SQL
+        SELECT id FROM group_incentives WHERE contract_worker_ids @> ARRAY[#{contract_worker_id}];
+      SQL
+      DB[query].all.map { |r| r[:id] }
     end
   end
 end

@@ -9,8 +9,8 @@
   \         inspection_failure_reasons.secondary_factor,\r\n          govt_inspection_pallets.failure_remarks,\r\n
   \         govt_inspection_sheets.inspected AS sheet_inspected,\r\n          p.gross_weight,\r\n
   \         p.carton_quantity,\r\n          array_agg(distinct marketing_varieties.marketing_variety_code)
-  AS marketing_variety,\r\n          array_agg(distinct target_market_groups.target_market_group_name)
-  AS  packed_tm_group,\r\n          pallet_bases.pallet_base_code AS pallet_base,\r\n
+  AS marketing_varieties,\r\n          array_agg(distinct target_market_groups.target_market_group_name)
+  AS  packed_tm_groups,\r\n          pallet_bases.pallet_base_code AS pallet_base,\r\n
   \         govt_inspection_pallets.active,\r\n          govt_inspection_pallets.created_at,\r\n
   \         govt_inspection_pallets.updated_at,\r\n          CASE\r\n            WHEN
   govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed THEN 'error'\r\n
@@ -305,10 +305,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  marketing_variety:
-    :name: marketing_variety
+  marketing_varieties:
+    :name: marketing_varieties
     :sequence_no: 18
-    :caption: Marketing variety
+    :caption: Marketing varieties
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -321,10 +321,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packed_tm_group:
-    :name: packed_tm_group
+  packed_tm_groups:
+    :name: packed_tm_groups
     :sequence_no: 19
-    :caption: Packed tm group
+    :caption: Packed tm groups
     :namespaced_name: 
     :data_type: :string
     :width: 
