@@ -2,15 +2,21 @@
 
 module MesscadaApp
   class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
-    attr_reader :repo, :resource_code, :production_run_id, :setup_data, :carton_label_id, :pick_ref, :pallet_number, :identifier, :personnel_number
+    attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
+                :pallet_number, :personnel_number, :params, :incentivised_labeling
 
     def initialize(params)
-      @resource_code = params[:device]
-      @identifier = params.to_h[:identifier]
+      @params = params
+      @repo = MesscadaApp::MesscadaRepo.new
+      @hr_repo = MesscadaApp::HrRepo.new
+      @incentivised_labeling = AppConst::INCENTIVISED_LABELING
     end
 
     def call
-      @repo = MesscadaApp::MesscadaRepo.new
+      if incentivised_labeling && params[:system_resource][:group_incentive]
+        res = validate_packer_incentive_group_combination
+        return res unless res.success
+      end
 
       res = carton_labeling
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
@@ -49,7 +55,15 @@ module MesscadaApp
         .gsub('$:FNC:current_date$', current_date)
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def validate_packer_incentive_group_combination  # rubocop:disable Metrics/AbcSize
+      contract_worker = hr_repo.contract_worker_name(params[:identifier])
+      packer_belongs_to_group = hr_repo.packer_belongs_to_incentive_group?(params[:system_resource][:group_incentive_id], params[:system_resource][:contract_worker_id])
+      raise Crossbeams::InfoError, "No active incentive group for resource #{params[:device]} and contract worker #{contract_worker}" unless packer_belongs_to_group
+
+      ok_response
+    end
+
+    def carton_labeling  # rubocop:disable Metrics/AbcSize
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
@@ -58,16 +72,11 @@ module MesscadaApp
       attrs = attrs.merge(pick_ref: pick_ref)
       @personnel_number = nil
 
-      validate_identifier = AppConst::INCENTIVISED_LABELING
-      validate_identifier = false if identifier.nil_or_empty?
-
-      if validate_identifier
-        hr_ids = MesscadaApp::HrRepo.new.contract_worker_ids(identifier)
-        raise Crossbeams::InfoError, "Personnel identifier #{identifier} is not registered" if hr_ids.nil?
-
-        @personnel_number = hr_ids[:personnel_number]
-        attrs = attrs.merge(personnel_identifier_id: hr_ids[:personnel_identifier_id],
-                            contract_worker_id: hr_ids[:contract_worker_id])
+      if incentivised_labeling
+        @personnel_number = hr_repo.contract_worker_personnel_number(params[:system_resource][:contract_worker_id])
+        attrs = attrs.merge(personnel_identifier_id: params[:system_resource][:personnel_identifier_id],
+                            contract_worker_id: params[:system_resource][:contract_worker_id])
+        attrs = attrs.merge(group_incentive_id: params[:system_resource][:group_incentive_id]) if params[:system_resource][:group_incentive]
       end
 
       res = validate_carton_label_params(attrs)
@@ -89,7 +98,7 @@ module MesscadaApp
 
     def retrieve_resource_cached_setup_data
       @setup_data = search_cache_files
-      raise Crossbeams::InfoError, "No setup data cached for resource #{resource_code}." if setup_data.empty?
+      raise Crossbeams::InfoError, "No setup data cached for resource #{params[:device]}." if setup_data.empty?
 
       # return failed_response("No setup data cached for resource #{resource_code}.") if setup_data.empty?
 
@@ -109,7 +118,7 @@ module MesscadaApp
         file_data = yaml_data_from_file(f)
         next unless file_data
 
-        return file_data[resource_code] unless file_data.empty? || file_data[resource_code].nil?
+        return file_data[params[:device]] unless file_data.empty? || file_data[params[:device]].nil?
       end
 
       {}
