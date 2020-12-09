@@ -43,6 +43,15 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def associate_farm_puc_orgs(organization_id, farm_puc_ids)
+      return validation_failed_response(OpenStruct.new(messages: { farm_puc_ids: ['You did not choose a farm_puc record'] })) if farm_puc_ids.empty?
+
+      repo.transaction do
+        repo.associate_farm_puc_orgs(organization_id, farm_puc_ids)
+      end
+      success_response('Marketing Organization => farm_pucs associated successfully')
+    end
+
     private
 
     def repo

@@ -49,7 +49,7 @@ module MesscadaApp
         .gsub('$:FNC:current_date$', current_date)
     end
 
-    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
@@ -70,6 +70,11 @@ module MesscadaApp
                             contract_worker_id: hr_ids[:contract_worker_id])
       end
 
+      if AppConst::USE_MARKETING_PUC
+        marketing_puc_id = marketing_puc
+        attrs = attrs.merge(marketing_puc_id: marketing_puc_id, marketing_orchard_id: marketing_orchard(marketing_puc_id))
+      end
+
       res = validate_carton_label_params(attrs)
       return validation_failed_response(res) if res.failure?
 
@@ -85,6 +90,14 @@ module MesscadaApp
 
     def phc
       repo.find_resource_phc(setup_data[:production_run_data][:production_line_id]) || repo.find_resource_phc(setup_data[:production_run_data][:packhouse_resource_id])
+    end
+
+    def marketing_puc
+      repo.find_marketing_puc(setup_data[:production_run_data][:marketing_org_party_role_id], setup_data[:production_run_data][:farm_id])
+    end
+
+    def marketing_orchard(marketing_puc_id)
+      repo.find_marketing_orchard(marketing_puc_id, setup_data[:production_run_data][:cultivar_id])
     end
 
     def retrieve_resource_cached_setup_data

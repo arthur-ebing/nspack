@@ -568,7 +568,7 @@ module ProductionApp
 
     def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
       if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
-        standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
+        standard_pack_code_id = setup_repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
       else
         standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
@@ -579,6 +579,12 @@ module ProductionApp
       standard_pack_code_id
     end
 
+    def recalc_marketing_attrs?(params)
+      recalc = AppConst::USE_MARKETING_PUC
+      recalc = false unless params.include?(:marketing_org_party_role_id)
+      recalc
+    end
+
     def update_pallet_sequence_record(sequence_id, reworks_run_type_id, res, batch_pallet_numbers = nil)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       batch_update = batch_pallet_numbers.nil_or_empty? ? false : true
       before_attrs = sequence_setup_attrs(sequence_id).sort.to_h
@@ -587,6 +593,7 @@ module ProductionApp
       changed_attrs = attrs.reject { |k, v|  before_attrs.key?(k) && before_attrs[k] == v }
       changed_treatment_ids = changed_attrs.delete(:treatment_ids)
       changed_attrs = changed_attrs.merge(treatment_ids: "{#{changed_treatment_ids.join(',')}}") unless changed_treatment_ids.nil?
+      changed_attrs = changed_attrs.merge(marketing_attrs(attrs.merge(repo.find_sequence_farm_attrs(sequence_id)))) if recalc_marketing_attrs?(changed_attrs)
       return failed_response('Changed attributes cannot be empty') if changed_attrs.nil_or_empty?
 
       treatment_ids = attrs.delete(:treatment_ids)
@@ -688,12 +695,19 @@ module ProductionApp
     end
 
     def farm_details_attrs(instance)
-      { farm_id: instance[:farm_id],
-        puc_id: instance[:puc_id],
-        orchard_id: instance[:orchard_id],
-        cultivar_group_id: instance[:cultivar_group_id],
-        cultivar_id: instance[:cultivar_id],
-        season_id: instance[:season_id] }
+      attrs = { farm_id: instance[:farm_id],
+                puc_id: instance[:puc_id],
+                orchard_id: instance[:orchard_id],
+                cultivar_group_id: instance[:cultivar_group_id],
+                cultivar_id: instance[:cultivar_id],
+                season_id: instance[:season_id] }
+      attrs = attrs.merge(marketing_attrs(instance)) if AppConst::USE_MARKETING_PUC
+      attrs
+    end
+
+    def marketing_attrs(res)
+      marketing_puc_id = mesc_repo.find_marketing_puc(res[:marketing_org_party_role_id], res[:farm_id])
+      { marketing_puc_id: marketing_puc_id, marketing_orchard_id: mesc_repo.find_marketing_orchard(marketing_puc_id, res[:cultivar_id]) }
     end
 
     def production_run_description_changes(production_run_id, instance_data)
@@ -703,12 +717,19 @@ module ProductionApp
     end
 
     def farm_detail_description_changes(instance_data)
-      { farm: instance_data[:farm],
-        puc: instance_data[:puc],
-        orchard: instance_data[:orchard],
-        cultivar_group: instance_data[:cultivar_group],
-        cultivar: instance_data[:cultivar],
-        season: instance_data[:season] }
+      attrs = { farm: instance_data[:farm],
+                puc: instance_data[:puc],
+                orchard: instance_data[:orchard],
+                cultivar_group: instance_data[:cultivar_group],
+                cultivar: instance_data[:cultivar],
+                season: instance_data[:season] }
+      attrs = attrs.merge(marketing_descriptions(instance_data)) if AppConst::USE_MARKETING_PUC
+      attrs
+    end
+
+    def marketing_descriptions(res)
+      { marketing_puc: res[:marketing_puc],
+        marketing_orchard: res[:marketing_orchard] }
     end
 
     def update_reworks_farm_details(params)  # rubocop:disable Metrics/AbcSize
@@ -1207,6 +1228,14 @@ module ProductionApp
 
     def prod_repo
       @prod_repo ||= ProductionApp::ProductionRunRepo.new
+    end
+
+    def mesc_repo
+      @mesc_repo ||= MesscadaApp::MesscadaRepo.new
+    end
+
+    def setup_repo
+      @setup_repo ||= ProductionApp::ProductSetupRepo.new
     end
 
     def reworks_run(id)

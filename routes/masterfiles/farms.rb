@@ -743,6 +743,85 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # REGISTERED ORCHARDS
+    # --------------------------------------------------------------------------
+    r.on 'registered_orchards', Integer do |id|
+      interactor = MasterfilesApp::RegisteredOrchardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:registered_orchards, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('farms', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Farms::RegisteredOrchard::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('farms', 'read')
+          show_partial { Masterfiles::Farms::RegisteredOrchard::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_registered_orchard(id, params[:registered_orchard])
+          if res.success
+            row_keys = %i[
+              orchard_code
+              cultivar_code
+              puc_code
+              description
+              marketing_orchard
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Farms::RegisteredOrchard::Edit.call(id, form_values: params[:registered_orchard], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('farms', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_registered_orchard(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'registered_orchards' do
+      interactor = MasterfilesApp::RegisteredOrchardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('farms', 'new')
+        show_partial_or_page(r) { Masterfiles::Farms::RegisteredOrchard::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_registered_orchard(params[:registered_orchard])
+        if res.success
+          row_keys = %i[
+            id
+            orchard_code
+            cultivar_code
+            puc_code
+            description
+            marketing_orchard
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/farms/registered_orchards/new') do
+            Masterfiles::Farms::RegisteredOrchard::New.call(form_values: params[:registered_orchard],
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

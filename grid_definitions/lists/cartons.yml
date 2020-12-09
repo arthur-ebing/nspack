@@ -5,14 +5,30 @@
     :production_run_cartons: Cartons on Production Run
 :conditions:
   :standard:
-    - :col: carton_label_id
-      :op: =
-      :val: $:id$
+  - :col: carton_label_id
+    :op: "="
+    :val: "$:id$"
   :production_run_cartons:
-    - :col: production_run_id
-      :op: =
-      :val: $:id$
+  - :col: production_run_id
+    :op: "="
+    :val: "$:id$"
   :cloned_cartons:
-    - :col: is_virtual
-      :op: =
-      :val: true
+  - :col: is_virtual
+    :op: "="
+    :val: true
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  um:
+  - marketing_puc
+  - marketing_orchard
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  srp:
+  - marketing_puc
+  - marketing_orchard

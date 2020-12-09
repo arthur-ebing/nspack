@@ -227,7 +227,9 @@ module MesscadaApp
           'DN'::text || loads.id::text AS dispatch_note,
           loads.edi_file_name AS po_file_name,
           palletizing_bays.plant_resource_code AS palletizing_bay,
-          pallets.has_individual_cartons
+          pallets.has_individual_cartons,
+          marketing_pucs.puc_code AS marketing_puc,
+          registered_orchards.orchard_code AS marketing_orchard
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
@@ -295,6 +297,8 @@ module MesscadaApp
               FROM pallet_sequences sq
                 JOIN orchard_test_types ON orchard_test_types.id = ANY (sq.failed_otmc_results)
              GROUP BY sq.id) otmc ON otmc.id = pallet_sequences.id
+        LEFT JOIN pucs marketing_pucs ON marketing_pucs.id = pallet_sequences.marketing_puc_id
+        LEFT JOIN registered_orchards ON registered_orchards.id = pallet_sequences.marketing_orchard_id
 
       SQL
     end

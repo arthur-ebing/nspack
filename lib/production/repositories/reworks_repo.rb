@@ -906,5 +906,14 @@ module ProductionApp
       SQL
       DB[query, carton_id].first
     end
+
+    def find_sequence_farm_attrs(sequence_id)
+      query = <<~SQL
+        SELECT farm_id, cultivar_id
+        FROM pallet_sequences
+        WHERE pallet_sequences.id = ?
+      SQL
+      DB[query, sequence_id].first
+    end
   end
 end

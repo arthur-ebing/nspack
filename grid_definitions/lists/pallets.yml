@@ -1,11 +1,11 @@
 ---
 :dataminer_definition: pallets
 :actions:
-  - :url: "/list/pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
-    :text: sequences
-    :title: Pallet sequences for Pallet No $:pallet_number$
-    :icon: list
-    :popup: true
+- :url: "/list/pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+  :text: sequences
+  :title: Pallet sequences for Pallet No $:pallet_number$
+  :icon: list
+  :popup: true
 :captions:
   :conditions:
     :active: Active Pallets
@@ -20,55 +20,71 @@
     :palletizing_bay_pallet: Palletizing Bay Pallet
 :conditions:
   :standard:
-    - :col: id
-      :op: =
-      :val: $:id$
+  - :col: id
+    :op: "="
+    :val: "$:id$"
   :active:
-    - :col: active
-      :op: =
-      :val: $:active$
+  - :col: active
+    :op: "="
+    :val: "$:active$"
   :daily_pack:
-    - :col: in_stock
-      :op: =
-      :val: $:in_stock$
+  - :col: in_stock
+    :op: "="
+    :val: "$:in_stock$"
   :in_stock:
-    - :col: in_stock
-      :op: =
-      :val: $:in_stock$
+  - :col: in_stock
+    :op: "="
+    :val: "$:in_stock$"
   :allocated_stock:
-    - :col: in_stock
-      :op: =
-      :val: $:in_stock$
-    - :col: allocated
-      :op: =
-      :val: $:allocated$
+  - :col: in_stock
+    :op: "="
+    :val: "$:in_stock$"
+  - :col: allocated
+    :op: "="
+    :val: "$:allocated$"
   :unallocated_stock:
-    - :col: in_stock
-      :op: =
-      :val: $:in_stock$
-    - :col: allocated
-      :op: =
-      :val: $:allocated$
+  - :col: in_stock
+    :op: "="
+    :val: "$:in_stock$"
+  - :col: allocated
+    :op: "="
+    :val: "$:allocated$"
   :shipped:
-    - :col: shipped
-      :op: =
-      :val: $:shipped$
+  - :col: shipped
+    :op: "="
+    :val: "$:shipped$"
   :scrapped:
-    - :col: scrapped
-      :op: =
-      :val: $:scrapped$
+  - :col: scrapped
+    :op: "="
+    :val: "$:scrapped$"
   :failed_inspections:
-    - :col: inspected
-      :op: =
-      :val: $:inspected$
-    - :col: govt_inspection_passed
-      :op: =
-      :val: $:govt_inspection_passed$
+  - :col: inspected
+    :op: "="
+    :val: "$:inspected$"
+  - :col: govt_inspection_passed
+    :op: "="
+    :val: "$:govt_inspection_passed$"
   :failed_verifications:
-    - :col: pallet_verification_failed
-      :op: =
-      :val: $:pallet_verification_failed$
+  - :col: pallet_verification_failed
+    :op: "="
+    :val: "$:pallet_verification_failed$"
   :palletizing_bay_pallet:
-    - :col: pallet_id
-      :op: =
-      :val: $:pallet_id$
+  - :col: pallet_id
+    :op: "="
+    :val: "$:pallet_id$"
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  um:
+  - marketing_puc
+  - marketing_orchard
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  srp:
+  - marketing_puc
+  - marketing_orchard

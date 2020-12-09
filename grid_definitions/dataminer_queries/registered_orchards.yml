@@ -1,0 +1,180 @@
+---
+:caption: Registered Orchards
+:sql: "SELECT \"registered_orchards\".\"id\", \"registered_orchards\".\"orchard_code\",
+  \"registered_orchards\".\"cultivar_code\", \"registered_orchards\".\"puc_code\",
+  \"registered_orchards\".\"description\", \"registered_orchards\".\"marketing_orchard\",
+  \"registered_orchards\".\"active\", \"registered_orchards\".\"created_at\", \"registered_orchards\".\"updated_at\"
+  ,\r\nCASE WHEN NOT EXISTS(SELECT id FROM orchards WHERE orchards.orchard_code =
+  registered_orchards.orchard_code) THEN 'error'\r\n         WHEN NOT EXISTS(SELECT
+  id FROM pucs WHERE pucs.puc_code = registered_orchards.puc_code) THEN 'error'\r\n
+  \        WHEN NOT EXISTS(SELECT id FROM cultivars WHERE cultivars.cultivar_name
+  = registered_orchards.cultivar_code) THEN 'warning'\r\n         ELSE NULL::text\r\nEND
+  AS colour_rule\r\nFROM \"registered_orchards\""
+:limit: 
+:offset: 
+:external_settings:
+  :colour_key:
+    error: Missing orchard and/or puc masterfile
+    warning: Missing cultivar masterfile
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: registered_orchards.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  orchard_code:
+    :name: orchard_code
+    :sequence_no: 2
+    :caption: Orchard
+    :namespaced_name: registered_orchards.orchard_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  cultivar_code:
+    :name: cultivar_code
+    :sequence_no: 3
+    :caption: Cultivar
+    :namespaced_name: registered_orchards.cultivar_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 4
+    :caption: Puc
+    :namespaced_name: registered_orchards.puc_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 5
+    :caption: Description
+    :namespaced_name: registered_orchards.description
+    :data_type: :string
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_orchard:
+    :name: marketing_orchard
+    :sequence_no: 6
+    :caption: Marketing orchard?
+    :namespaced_name: registered_orchards.marketing_orchard
+    :data_type: :boolean
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 7
+    :caption: Active
+    :namespaced_name: registered_orchards.active
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 8
+    :caption: Created at
+    :namespaced_name: registered_orchards.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 9
+    :caption: Updated at
+    :namespaced_name: registered_orchards.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  colour_rule:
+    :name: colour_rule
+    :sequence_no: 10
+    :caption: Colour rule
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions: []

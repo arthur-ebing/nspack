@@ -1,11 +1,11 @@
 ---
 :dataminer_definition: fg_pallets
 :actions:
-  - :url: "/list/fg_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
-    :text: sequences
-    :title: Pallet sequences for Pallet No $:pallet_number$
-    :icon: list
-    :popup: true
+- :url: "/list/fg_pallet_sequences/with_params?key=standard&pallet_id=$:pallet_id$"
+  :text: sequences
+  :title: Pallet sequences for Pallet No $:pallet_number$
+  :icon: list
+  :popup: true
 :captions:
   :conditions:
     :active: Active Pallets
@@ -13,28 +13,44 @@
     :shipped: Shipped Pallets
 :conditions:
   :standard:
-    - :col: id
-      :op: =
-      :val: $:id$
+  - :col: id
+    :op: "="
+    :val: "$:id$"
   :active:
-    - :col: active
-      :op: =
-      :val: $:active$
+  - :col: active
+    :op: "="
+    :val: "$:active$"
   :allocated_stock:
-    - :col: in_stock
-      :op: =
-      :val: $:in_stock$
-    - :col: allocated
-      :op: =
-      :val: $:allocated$
+  - :col: in_stock
+    :op: "="
+    :val: "$:in_stock$"
+  - :col: allocated
+    :op: "="
+    :val: "$:allocated$"
   :shipped:
-    - :col: shipped
-      :op: =
-      :val: $:shipped$
+  - :col: shipped
+    :op: "="
+    :val: "$:shipped$"
   :shipped_depot_pallet:
-    - :col: shipped
-      :op: =
-      :val: true
-    - :col: depot_pallet
-      :op: =
-      :val: true
+  - :col: shipped
+    :op: "="
+    :val: true
+  - :col: depot_pallet
+    :op: "="
+    :val: true
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  um:
+  - marketing_puc
+  - marketing_orchard
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  srp:
+  - marketing_puc
+  - marketing_orchard

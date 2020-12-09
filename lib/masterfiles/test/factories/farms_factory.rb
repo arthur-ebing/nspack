@@ -74,5 +74,19 @@ module MasterfilesApp
       }
       DB[:orchards].insert(default.merge(opts))
     end
+
+    def create_registered_orchard(opts = {})
+      default = {
+        orchard_code: Faker::Lorem.unique.word,
+        cultivar_code: Faker::Lorem.word,
+        puc_code: Faker::Lorem.word,
+        description: Faker::Lorem.word,
+        marketing_orchard: false,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:registered_orchards].insert(default.merge(opts))
+    end
   end
 end

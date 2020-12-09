@@ -1,0 +1,116 @@
+---
+:caption: Farm Puc Orgs
+:sql: "SELECT CONCAT(farms_pucs.puc_id, '_', farms_pucs.farm_id) AS id, farms_pucs.puc_id,
+  farms_pucs.farm_id, pucs.puc_code, farms.farm_code\r\nFROM farms_pucs\r\nJOIN pucs
+  ON pucs.id = farms_pucs.puc_id\r\nJOIN farms ON farms.id = farms_pucs.farm_id\r\nLEFT
+  JOIN farm_puc_orgs ON farm_puc_orgs.puc_id = farms_pucs.puc_id AND farm_puc_orgs.farm_id
+  = farms_pucs.farm_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_id:
+    :name: puc_id
+    :sequence_no: 2
+    :caption: Puc
+    :namespaced_name: farms_pucs.puc_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_id:
+    :name: farm_id
+    :sequence_no: 3
+    :caption: Farm
+    :namespaced_name: farms_pucs.farm_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  puc_code:
+    :name: puc_code
+    :sequence_no: 4
+    :caption: Puc code
+    :namespaced_name: pucs.puc_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  farm_code:
+    :name: farm_code
+    :sequence_no: 5
+    :caption: Farm code
+    :namespaced_name: farms.farm_code
+    :data_type: :string
+    :width: 300
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: farm_puc_orgs.puc_id
+  :caption: Puc
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT puc_code, id FROM pucs ORDER BY puc_code
+- :column: farm_puc_orgs.farm_id
+  :caption: Farm
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT farm_code, id FROM farms ORDER BY farm_code
+- :column: farm_puc_orgs.organization_id
+  :caption: Organization
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT short_description, id FROM organizations ORDER BY short_description
