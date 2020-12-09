@@ -5,7 +5,7 @@ module LabelPrintingApp
   class PrintLabel < BaseService
     include LabelContent
 
-    attr_reader :label_name, :instance, :quantity, :printer_id, :host
+    attr_reader :label_name, :instance, :quantity, :printer_id, :host, :repo
 
     def initialize(label_name, instance, params, host = nil)
       @label_name = label_name
@@ -14,6 +14,7 @@ module LabelPrintingApp
       @printer_id = params[:printer]
       @supporting_data = params[:supporting_data] || {}
       @host = host
+      @repo = LabelApp::PrinterRepo.new
       raise ArgumentError, 'No label name provided' if label_name.nil?
       raise ArgumentError, 'Nothing to print' if instance.nil?
     end
@@ -32,16 +33,20 @@ module LabelPrintingApp
       # For a robot printing to an attached printer, we don't know the actual printer code: use 'DEFAULT'
       return 'DEFAULT' if printer_id.nil?
 
-      repo = LabelApp::PrinterRepo.new
       repo.find_hash(:printers, printer)[:printer_code]
     end
 
     def messerver_print(vars, printer_code)
       mes_repo = MesserverApp::MesserverRepo.new
+      host_from_remote_printer(printer_code) if host.nil?
       res = mes_repo.print_published_label(label_name, vars, quantity, printer_code, host)
       raise Crossbeams::InfoError, res.message unless res.success
 
       res
+    end
+
+    def host_from_remote_printer(printer_code)
+      @host = repo.remote_printer_ip(printer_code)
     end
   end
 end

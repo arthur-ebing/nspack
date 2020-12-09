@@ -163,6 +163,18 @@ module LabelApp
       DB[query, printers].select_map(%i[system_resource_code ip_address])
     end
 
+    def remote_printer_ip(printer_code)
+      query = <<~SQL
+        SELECT res.ip_address
+        FROM plant_resources_system_resources ps
+        LEFT JOIN system_resources s ON s.id = ps.system_resource_id
+        LEFT jOIN plant_resources p ON p.id = ps.plant_resource_id
+        LEFT JOIN system_resources res ON res. id = p.system_resource_id
+        WHERE s.system_resource_code = ?
+      SQL
+      DB[query, printer_code].get(:ip_address)
+    end
+
     def refresh_and_add_mes_modules(ip_or_address, module_list) # rubocop:disable Metrics/AbcSize
       server_ip = UtilityFunctions.ip_from_uri(ip_or_address)
       module_codes = module_list.map { |a| a['Code'] }
