@@ -1,0 +1,24 @@
+---
+:dataminer_definition: registered_orchards
+:actions:
+- :url: "/masterfiles/farms/registered_orchards/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/farms/registered_orchards/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/farms/registered_orchards/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/farms/registered_orchards/new"
+  :text: New Registered Orchard
+  :style: :button
+  :behaviour: :popup

@@ -94,7 +94,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { USE_LABEL_ID_ON_BIN_LABEL: 'If CARTON_EQUALS_PALLET is true, use carton_label_id instead of pallet_number to lookup carton_labels existence if USE_LABEL_ID_ON_BIN_LABEL is set to true. Default false' },
     { REQUIRE_EXTENDED_PACKAGING: 'If REQUIRE_EXTENDED_PACKAGING is true, packaging for product setup is extended. Default false' },
     { EST_PALLETS_PACKED_PER_YEAR: 'An estimate of the number of pallets packed in a year (season). Used to report the number of available pallet numbers per GLN.' },
-    { NO_RUN_ALLOCATION: 'Product setups are not allocated to plant resources during run setup.' }
+    { NO_RUN_ALLOCATION: 'Product setups are not allocated to plant resources during run setup.' },
+    { USE_MARKETING_PUC: 'If USE_MARKETING_PUC is true, populate carton_labels and pallet_sequences marketing_puc_id and use marketing organization farm_puc to lookup registered_orchards (marketing_orchard_id). Default false' }
   ].freeze
 
   NO_OVERRIDE = [

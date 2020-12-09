@@ -10,6 +10,7 @@ module MasterfilesApp
       assert_respond_to repo, :for_select_farms
       assert_respond_to repo, :for_select_orchards
       assert_respond_to repo, :for_select_pucs
+      assert_respond_to repo, :for_select_registered_orchards
     end
 
     def test_crud_calls
@@ -18,6 +19,7 @@ module MasterfilesApp
       test_crud_calls_for :farms, name: :farm, wrapper: Farm
       test_crud_calls_for :orchards, name: :orchard, wrapper: Orchard
       test_crud_calls_for :pucs, name: :puc, wrapper: Puc
+      test_crud_calls_for :registered_orchards, name: :registered_orchard, wrapper: RegisteredOrchard
     end
 
     private

@@ -1,0 +1,8 @@
+---
+:dataminer_definition: farm_puc_orgs
+:multiselect:
+  :farm_puc_orgs:
+    :url: "/masterfiles/parties/organizations/$:id$/link_farm_puc_orgs"
+    :preselect: "SELECT CONCAT(puc_id, '_', farm_id) AS id FROM farm_puc_orgs WHERE organization_id = $:id$"
+    :section_caption: "SELECT 'Link ' || long_description || ' farm_pucs' FROM organizations WHERE id = $:id$"
+    :multiselect_save_method: remote

@@ -8,6 +8,18 @@ class Nspack < Roda
     r.on 'organizations', Integer do |id|
       interactor = MasterfilesApp::OrganizationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
+      r.on 'link_farm_puc_orgs' do
+        r.post do
+          res = interactor.associate_farm_puc_orgs(id, multiselect_grid_choices(params, treat_as_integers: false))
+          if fetch?(r)
+            show_json_notice(res.message)
+          else
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        end
+      end
+
       # Check for notfound:
       r.on !interactor.exists?(:organizations, id) do
         handle_not_found(r)

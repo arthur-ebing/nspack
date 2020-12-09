@@ -566,6 +566,35 @@ module MesscadaApp
       end
     end
 
+    def find_marketing_puc(marketing_org_party_role_id, farm_id)
+      DB[:farm_puc_orgs]
+        .where(organization_id: DB[:party_roles]
+                                  .where(id: marketing_org_party_role_id)
+                                  .get(:organization_id))
+        .where(farm_id: farm_id)
+        .get(:puc_id)
+    end
+
+    def find_marketing_orchard(puc_id, cultivar_id)
+      DB[:registered_orchards]
+        .where(puc_code: find_puc_code(puc_id))
+        .where(cultivar_code: find_cultivar_code(cultivar_id))
+        .where(marketing_orchard: true)
+        .get(:id)
+    end
+
+    def find_puc_code(puc_id)
+      DB[:pucs]
+        .where(id: puc_id)
+        .get(:puc_code)
+    end
+
+    def find_cultivar_code(cultivar_id)
+      DB[:cultivars]
+        .where(id: cultivar_id)
+        .get(:cultivar_code)
+    end
+
     def parse_pallet_or_carton_number(res = {}) # rubocop:disable Metrics/AbcSize
       params = res.to_h
       if params[:pallet_number]

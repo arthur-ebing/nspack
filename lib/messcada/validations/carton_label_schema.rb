@@ -49,6 +49,8 @@ module MesscadaApp
       optional(:contract_worker_id).maybe(:integer)
       required(:packing_method_id).filled(:integer)
       optional(:target_market_id).maybe(:integer)
+      optional(:marketing_puc_id).maybe(:integer)
+      optional(:marketing_orchard_id).maybe(:integer)
       optional(:pm_mark_id).maybe(:integer)
     end
 
