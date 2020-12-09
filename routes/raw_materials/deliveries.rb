@@ -643,6 +643,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('deliveries', 'new')
         id = interactor.find_current_delivery
         if id.nil_or_empty?
+          r.redirect('/rmd/rmt_deliveries/rmt_bins/new') if AppConst::USE_PERMANENT_RMT_BIN_BARCODES
+
           flash[:error] = 'Error: There Is No Current Delivery To Add Bins To'
           r.redirect('/list/rmt_deliveries')
         elsif RawMaterialsApp::RmtDeliveryInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {}).delivery_tipped?(id)

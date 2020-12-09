@@ -95,7 +95,7 @@ module RawMaterials
                 elsif AppConst::USE_PERMANENT_RMT_BIN_BARCODES
                   section.add_control(control_type: :link,
                                       text: 'New Rmt Bin',
-                                      url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new",
+                                      url: "/rmd/rmt_deliveries/rmt_bins/#{id}/new_delivery_bin",
                                       style: :button,
                                       grid_id: 'rmt_bins_deliveries',
                                       behaviour: false)

@@ -88,15 +88,30 @@ module RawMaterialsApp
       DB[:rmt_bins].where(bin_asset_number: bin_asset_number).update(bin_fullness: bin_fullness)
     end
 
+    def for_select_delivery_context_info
+      qry = <<~SQL
+        SELECT d.id, d.id || '_' || p.puc_code || '_' || o.orchard_code || '_' || c.cultivar_code || '_' || to_char(d.date_delivered, 'YYYY-MM-DD') as delivery_code
+        FROM rmt_deliveries d
+        join farms f on f.id=d.farm_id
+        join pucs p on p.id=d.puc_id
+        join orchards o on o.id=d.orchard_id
+        join cultivars c on c.id=d.cultivar_id
+        order by id desc
+        limit 20
+      SQL
+      DB[qry].all.map { |p| [p[:delivery_code], p[:id]] }
+    end
+
     def get_bin_delivery(id)
       qry = <<~SQL
-        SELECT d.*,f.farm_code,p.puc_code, o.orchard_code
+        SELECT d.id,f.farm_code,p.puc_code, o.orchard_code, c.cultivar_code, to_char(d.date_delivered, 'YYYY-MM-DD') as date_delivered, to_char(d.date_picked, 'YYYY-MM-DD') as date_picked
         ,(select sum(qty_bins) from rmt_bins where rmt_delivery_id=d.id and bin_tipped is true) as qty_bins_tipped
         ,(select count(id) from rmt_bins where rmt_delivery_id=d.id) as qty_bins_received
         FROM rmt_deliveries d
         join farms f on f.id=d.farm_id
         join pucs p on p.id=d.puc_id
         join orchards o on o.id=d.orchard_id
+        join cultivars c on c.id=d.cultivar_id
         WHERE d.id = ?
       SQL
       DB[qry, id].first
