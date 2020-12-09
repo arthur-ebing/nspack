@@ -3,21 +3,16 @@
 module MesscadaApp
   class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
-                :pallet_number, :personnel_number, :params, :incentivised_labeling
+                :pallet_number, :personnel_number, :params, :system_resource
 
     def initialize(params)
       @params = params
       @repo = MesscadaApp::MesscadaRepo.new
       @hr_repo = MesscadaApp::HrRepo.new
-      @incentivised_labeling = AppConst::INCENTIVISED_LABELING
+      @system_resource = params[:system_resource]
     end
 
     def call
-      if incentivised_labeling && params[:system_resource][:group_incentive]
-        res = validate_packer_incentive_group_combination
-        return res unless res.success
-      end
-
       res = carton_labeling
       raise Crossbeams::InfoError, unwrap_failed_response(res) unless res.success
 
@@ -55,15 +50,7 @@ module MesscadaApp
         .gsub('$:FNC:current_date$', current_date)
     end
 
-    def validate_packer_incentive_group_combination  # rubocop:disable Metrics/AbcSize
-      contract_worker = hr_repo.contract_worker_name(params[:identifier])
-      packer_belongs_to_group = hr_repo.packer_belongs_to_incentive_group?(params[:system_resource][:group_incentive_id], params[:system_resource][:contract_worker_id])
-      raise Crossbeams::InfoError, "No active incentive group for resource #{params[:device]} and contract worker #{contract_worker}" unless packer_belongs_to_group
-
-      ok_response
-    end
-
-    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def carton_labeling  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       res = retrieve_resource_cached_setup_data
       return res unless res.success
 
@@ -72,11 +59,14 @@ module MesscadaApp
       attrs = attrs.merge(pick_ref: pick_ref)
       @personnel_number = nil
 
-      if incentivised_labeling
-        @personnel_number = hr_repo.contract_worker_personnel_number(params[:system_resource][:contract_worker_id])
-        attrs = attrs.merge(personnel_identifier_id: params[:system_resource][:personnel_identifier_id],
-                            contract_worker_id: params[:system_resource][:contract_worker_id])
-        attrs = attrs.merge(group_incentive_id: params[:system_resource][:group_incentive_id]) if params[:system_resource][:group_incentive]
+      if system_resource.group_incentive
+        # Group incentive
+        attrs = attrs.merge(group_incentive_id: system_resource.group_incentive_id)
+      elsif system_resource.login
+        # individual incentive
+        @personnel_number = hr_repo.contract_worker_personnel_number(:system_resource.contract_worker_id)
+        attrs = attrs.merge(personnel_identifier_id: system_resource.personnel_identifier_id,
+                            contract_worker_id: system_resource.contract_worker_id)
       end
 
       if AppConst::USE_MARKETING_PUC

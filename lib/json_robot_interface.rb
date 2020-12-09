@@ -207,7 +207,8 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   def publish_logon # rubocop:disable Metrics/AbcSize
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     params = { device: robot.system_resource_code, identifier: robot_params[:id] }
-    res = interactor.logon(params)
+    res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
+    res = interactor.logon(res.instance) if res.success
 
     feedback = if res.success
                  MesscadaApp::RobotFeedback.new(device: params[:device],
