@@ -172,8 +172,8 @@ module FinishedGoodsApp
           govt_inspection_sheets.inspected AS sheet_inspected,
           pallets.gross_weight,
           pallets.carton_quantity,
-          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_variety,
-          array_agg(distinct target_market_groups.target_market_group_name) AS  packed_tm_group,
+          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_varieties,
+          array_agg(distinct target_market_groups.target_market_group_name) AS packed_tm_groups,
           pallet_bases.pallet_base_code AS pallet_base,
           govt_inspection_pallets.active,
           govt_inspection_pallets.created_at,
@@ -202,7 +202,7 @@ module FinishedGoodsApp
           pallet_bases.id
       SQL
       hash = DB[query, id].first
-      return nil if hash.nil_or_empty?
+      return nil if hash.nil?
 
       GovtInspectionPalletFlat.new(hash)
     end
@@ -213,8 +213,8 @@ module FinishedGoodsApp
           pallets.pallet_number,
           pallets.gross_weight,
           pallets.carton_quantity,
-          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_variety,
-          array_agg(distinct target_market_groups.target_market_group_name) AS  packed_tm_group,
+          array_agg(distinct marketing_varieties.marketing_variety_code) AS marketing_varieties,
+          array_agg(distinct target_market_groups.target_market_group_name) AS packed_tm_groups,
           pallet_bases.pallet_base_code AS pallet_base
 
         FROM pallets
@@ -229,7 +229,7 @@ module FinishedGoodsApp
           pallet_bases.id
       SQL
       hash = DB[query, id].first
-      return nil if hash.nil_or_empty?
+      return nil if hash.nil?
 
       FinishedGoodsApp::PalletFlat.new(hash)
     end

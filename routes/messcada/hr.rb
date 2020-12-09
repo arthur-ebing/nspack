@@ -25,13 +25,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'logon' do
-      res = interactor.logon(params)
+      res = interactor.merge_system_resource_incentive(params, has_button: true)
+      res = interactor.logon(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: true,
                                                   line1: res.instance[:contract_worker],
-                                                  line4: 'Logged on')
+                                                  line3: 'Logged on',
+                                                  line4: res.message)
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,

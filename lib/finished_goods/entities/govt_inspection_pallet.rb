@@ -31,8 +31,8 @@ module FinishedGoodsApp
     attribute :sheet_inspected, Types::Bool
     attribute :gross_weight, Types::Float
     attribute :carton_quantity, Types::Integer
-    attribute :marketing_variety, Types::Array
-    attribute :packed_tm_group, Types::Array
+    attribute :marketing_varieties, Types::Array
+    attribute :packed_tm_groups, Types::Array
     attribute :pallet_base, Types::String
     attribute? :status, Types::String
     attribute? :colour_rule, Types::String
@@ -43,8 +43,8 @@ module FinishedGoodsApp
     attribute :pallet_number, Types::String
     attribute :gross_weight, Types::Float
     attribute :carton_quantity, Types::Integer
-    attribute :marketing_variety, Types::Array
-    attribute :packed_tm_group, Types::Array
+    attribute :marketing_varieties, Types::Array
+    attribute :packed_tm_groups, Types::Array
     attribute :pallet_base, Types::String
   end
 end

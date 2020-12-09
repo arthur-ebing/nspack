@@ -291,11 +291,27 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_govt_inspection_pallet(id, params[:govt_inspection_pallet])
           if res.success
-            row_keys = %i[pallet_number id pallet_id
-                          govt_inspection_sheet_id completed passed inspected inspected_at
-                          failure_reason_id failure_reason description main_factor secondary_factor failure_remarks
-                          sheet_inspected gross_weight carton_quantity marketing_variety packed_tm_group pallet_base
-                          active colour_rule]
+            row_keys = %i[pallet_number
+                          pallet_id
+                          govt_inspection_sheet_id
+                          completed
+                          passed
+                          inspected
+                          inspected_at
+                          failure_reason_id
+                          failure_reason
+                          description
+                          main_factor
+                          secondary_factor
+                          failure_remarks
+                          sheet_inspected
+                          gross_weight
+                          carton_quantity
+                          marketing_varieties
+                          packed_tm_groups
+                          pallet_base
+                          active
+                          colour_rule]
             update_grid_row(id,
                             changes: select_attributes(res.instance, row_keys),
                             grid_id: 'govt_inspection_pallets',
@@ -336,11 +352,28 @@ class Nspack < Roda
       r.post do        # CREATE
         res = interactor.create_govt_inspection_pallet(params[:govt_inspection_pallet])
         if res.success
-          row_keys = %i[pallet_number id pallet_id
-                        govt_inspection_sheet_id completed passed inspected inspected_at
-                        failure_reason_id failure_reason description main_factor secondary_factor failure_remarks
-                        sheet_inspected gross_weight carton_quantity marketing_variety packed_tm_group pallet_base
-                        active colour_rule]
+          row_keys = %i[id
+                        pallet_number
+                        pallet_id
+                        govt_inspection_sheet_id
+                        completed
+                        passed
+                        inspected
+                        inspected_at
+                        failure_reason_id
+                        failure_reason
+                        description
+                        main_factor
+                        secondary_factor
+                        failure_remarks
+                        sheet_inspected
+                        gross_weight
+                        carton_quantity
+                        marketing_varieties
+                        packed_tm_groups
+                        pallet_base
+                        active
+                        colour_rule]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        grid_id: 'govt_inspection_pallets',
                        notice: res.message)
