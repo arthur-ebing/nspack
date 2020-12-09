@@ -814,7 +814,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                         required: false)
         form.add_select(:pallet_label_name,
                         'Pallet Label',
-                        value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]),
+                        value: AppConst::DEFAULT_PALLET_LABEL_NAME,
                         items: interactor.find_pallet_labels,
                         required: false)
         form.add_csrf_tag csrf_tag
