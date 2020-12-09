@@ -90,7 +90,7 @@ module RawMaterialsApp
 
     def for_select_delivery_context_info
       qry = <<~SQL
-        SELECT d.id, d.id || '_' || p.puc_code || '_' || o.orchard_code || '_' || c.cultivar_code || '_' || to_char(d.date_delivered, 'YYYY-MM-DD') as delivery_code
+        SELECT d.id, d.id || '_' || p.puc_code || '_' || o.orchard_code || '_' || c.cultivar_name || '_' || to_char(d.date_delivered, 'YYYY-MM-DD') as delivery_code
         FROM rmt_deliveries d
         join farms f on f.id=d.farm_id
         join pucs p on p.id=d.puc_id
@@ -115,6 +115,15 @@ module RawMaterialsApp
         WHERE d.id = ?
       SQL
       DB[qry, id].first
+    end
+
+    def latest_delivery
+      qry = <<~SQL
+        SELECT d.*
+        FROM rmt_deliveries d
+        ORDER BY id desc
+      SQL
+      DB[qry].first
     end
 
     def all_bins_tipped?(id)
