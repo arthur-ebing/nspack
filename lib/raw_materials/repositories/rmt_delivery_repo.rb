@@ -104,7 +104,7 @@ module RawMaterialsApp
 
     def get_bin_delivery(id)
       qry = <<~SQL
-        SELECT d.id,f.farm_code,p.puc_code, o.orchard_code, c.cultivar_code, to_char(d.date_delivered, 'YYYY-MM-DD') as date_delivered, to_char(d.date_picked, 'YYYY-MM-DD') as date_picked
+        SELECT d.id,f.farm_code,p.puc_code, o.orchard_code, c.cultivar_name, to_char(d.date_delivered, 'YYYY-MM-DD') as date_delivered, to_char(d.date_picked, 'YYYY-MM-DD') as date_picked
         ,(select sum(qty_bins) from rmt_bins where rmt_delivery_id=d.id and bin_tipped is true) as qty_bins_tipped
         ,(select count(id) from rmt_bins where rmt_delivery_id=d.id) as qty_bins_received
         FROM rmt_deliveries d
