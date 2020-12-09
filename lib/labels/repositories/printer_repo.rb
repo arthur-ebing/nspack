@@ -135,6 +135,34 @@ module LabelApp
       DB[:printer_applications].where(application: application, default_printer: true, active: true).get(:printer_id)
     end
 
+    # Does an application have any remote printers associated with it?
+    def any_remote_printers?(application)
+      DB[:printer_applications]
+        .join(:printers, id: :printer_id)
+        .where(application: application, printer_type: %w[remote remote-zebra])
+        .count
+        .positive?
+    end
+
+    # For a given printer application, get a set of printers.
+    # Then find the ip addresses of the resources they are connected to.
+    def select_remote_ips_for_application(application)
+      printers = DB[:printer_applications]
+                 .join(:printers, id: :printer_id)
+                 .where(application: application, printer_type: %w[remote remote-zebra])
+                 .select_map(:printer_code)
+
+      query = <<~SQL
+        SELECT p.plant_resource_code, res.ip_address
+        FROM plant_resources_system_resources ps
+        LEFT JOIN system_resources s ON s.id = ps.system_resource_id
+        LEFT jOIN plant_resources p ON p.id = ps.plant_resource_id
+        LEFT JOIN system_resources res ON res. id = p.system_resource_id
+        WHERE s.system_resource_code IN ?
+      SQL
+      DB[query, printers].select_map(%i[system_resource_code ip_address])
+    end
+
     def refresh_and_add_mes_modules(ip_or_address, module_list) # rubocop:disable Metrics/AbcSize
       server_ip = UtilityFunctions.ip_from_uri(ip_or_address)
       module_codes = module_list.map { |a| a['Code'] }

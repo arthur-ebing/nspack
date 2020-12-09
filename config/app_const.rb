@@ -264,6 +264,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   REWORKS_MOVE_PALLET_BUSINESS_PROCESS = 'MOVE_PALLET'
   REWORKS_BULK_UPDATE_PALLET_DATES = 'REWORKS BULK UPDATE PALLET DATES'
 
+  # farm_puc_orgs and registered_orchards
+  USE_MARKETING_PUC = make_boolean('USE_MARKETING_PUC')
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',

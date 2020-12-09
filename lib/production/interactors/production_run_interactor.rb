@@ -166,7 +166,8 @@ module ProductionApp
 
     def print_pallet_label(pallet_id, params)
       instance = get_pallet_label_data(pallet_id)
-      LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params)
+      host = params[:robot_ip] # can be nil
+      LabelPrintingApp::PrintLabel.call(params[:pallet_label_name], instance, params, host)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e

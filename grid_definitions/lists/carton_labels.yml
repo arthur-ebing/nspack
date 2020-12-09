@@ -1,2 +1,18 @@
 ---
 :dataminer_definition: carton_labels
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  um:
+  - marketing_puc
+  - marketing_orchard
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  srp:
+  - marketing_puc
+  - marketing_orchard

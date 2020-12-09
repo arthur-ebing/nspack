@@ -25,7 +25,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     r.on 'logon' do
-      res = interactor.merge_system_resource_incentive(params, has_button: true)
+      res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
       res = interactor.logon(res.instance) if res.success
 
       feedback = if res.success

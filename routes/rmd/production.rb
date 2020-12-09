@@ -397,6 +397,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.print_pallet_label_from_sequence(id,
                                                             pallet_label_name: params[:pallet][:pallet_label_name],
                                                             no_of_prints: params[:pallet][:qty_to_print],
+                                                            robot_ip: params[:pallet][:robot_ip],
                                                             printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, "Labels For Pallet: #{params[:pallet][:pallet_number]} Printed Successfully")
@@ -427,6 +428,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.print_pallet_label_from_sequence(id,
                                                             pallet_label_name: params[:pallet][:pallet_label_name],
                                                             no_of_prints: params[:pallet][:qty_to_print],
+                                                            robot_ip: params[:pallet][:robot_ip],
                                                             printer: params[:pallet][:printer])
           if res.success
             store_locally(:flash_notice, 'Labels Printed Successfully')
@@ -812,9 +814,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                         value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET),
                         items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET),
                         required: false)
+        if LabelApp::PrinterRepo.new.any_remote_printers?(AppConst::PRINT_APP_PALLET)
+          form.add_select(:robot_ip,
+                          'Remote address',
+                          items: LabelApp::PrinterRepo.new.select_remote_ips_for_application(AppConst::PRINT_APP_PALLET),
+                          prompt: true,
+                          required: false)
+        end
         form.add_select(:pallet_label_name,
                         'Pallet Label',
-                        value: interactor.find_pallet_label_name_by_resource_allocation_id(pallet_sequence[:resource_allocation_id]),
+                        value: AppConst::DEFAULT_PALLET_LABEL_NAME,
                         items: interactor.find_pallet_labels,
                         required: false)
         form.add_csrf_tag csrf_tag
@@ -922,6 +931,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.print_pallet_label_from_sequence(res.instance.pallet_sequence_ids.first,
                                                             pallet_label_name: params[:reprint_pallet_label][:pallet_label_name],
                                                             no_of_prints: params[:reprint_pallet_label][:qty_to_print],
+                                                            robot_ip: params[:reprint_pallet_label][:robot_ip],
                                                             printer: params[:reprint_pallet_label][:printer])
         end
         if res.success
@@ -939,6 +949,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     res = interactor.print_pallet_label_from_sequence(id,
                                                       pallet_label_name: params[:pallet][:pallet_label_name],
                                                       no_of_prints: params[:pallet][:qty_to_print],
+                                                      robot_ip: params[:pallet][:robot_ip],
                                                       printer: params[:pallet][:printer])
     if res.success
       store_locally(:flash_notice, 'Labels Printed Successfully')

@@ -12,7 +12,7 @@ class Nspack < Roda
 
       r.is do
         r.get do
-          res = interactor.merge_system_resource_incentive(params, has_button: true)
+          res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
           res = interactor.carton_labeling(res.instance) if res.success
           if res.success
             res.instance

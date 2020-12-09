@@ -4,18 +4,19 @@
   \   carton_label_created_at,\r\n    label_age_hrs,\r\n    carton_age_hrs,\r\n    contract_worker,\r\n
   \   carton_verified_at,\r\n    packhouse,\r\n    line,\r\n    packpoint,\r\n    palletizing_bay,\r\n
   \   print_device,\r\n    label_name,\r\n    farm_code,\r\n    puc_code,\r\n    orchard_code,\r\n
-  \   commodity_code,\r\n    cultivar_group_code,\r\n    cultivar_name,\r\n    cultivar_code,\r\n
-  \   marketing_variety_code,\r\n    customer_variety_code,\r\n    std_size,\r\n    size_ref,\r\n
-  \   actual_count,\r\n    basic_pack_code,\r\n    standard_pack_code,\r\n    marketer,\r\n
-  \   mark_code,\r\n    inventory_code,\r\n    resource_allocation_id,\r\n    product_setup_template,\r\n
-  \   pm_bom,\r\n    treatment_codes,\r\n    client_size_ref,\r\n    client_product_code,\r\n
-  \   marketing_order_number,\r\n    packed_tm_group,\r\n    target_market,\r\n    season_code,\r\n
-  \   subtype_code,\r\n    pm_type_code,\r\n    cartons_per_pallet,\r\n    product_code,\r\n
-  \   gross_weight,\r\n    nett_weight,\r\n    pick_ref,\r\n    pallet_sequence_id,\r\n
-  \   pallet_number,\r\n    pallet_sequence_number,\r\n    personnel_identifier,\r\n
-  \   personnel_number,\r\n    packing_method_code,\r\n    palletizer_identifier,\r\n
-  \   palletizer_contract_worker,\r\n    palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM
-  vw_cartons \r\nORDER BY carton_label_id DESC"
+  \   marketing_puc,\r\n    marketing_orchard,\r\n    commodity_code,\r\n    cultivar_group_code,\r\n
+  \   cultivar_name,\r\n    cultivar_code,\r\n    marketing_variety_code,\r\n    customer_variety_code,\r\n
+  \   std_size,\r\n    size_ref,\r\n    actual_count,\r\n    basic_pack_code,\r\n
+  \   standard_pack_code,\r\n    marketer,\r\n    mark_code,\r\n    inventory_code,\r\n
+  \   resource_allocation_id,\r\n    product_setup_template,\r\n    pm_bom,\r\n    treatment_codes,\r\n
+  \   client_size_ref,\r\n    client_product_code,\r\n    marketing_order_number,\r\n
+  \   packed_tm_group,\r\n    target_market,\r\n    season_code,\r\n    subtype_code,\r\n
+  \   pm_type_code,\r\n    cartons_per_pallet,\r\n    product_code,\r\n    gross_weight,\r\n
+  \   nett_weight,\r\n    pick_ref,\r\n    pallet_sequence_id,\r\n    pallet_number,\r\n
+  \   pallet_sequence_number,\r\n    personnel_identifier,\r\n    personnel_number,\r\n
+  \   packing_method_code,\r\n    palletizer_identifier,\r\n    palletizer_contract_worker,\r\n
+  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM vw_cartons \r\nORDER
+  BY carton_label_id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -293,9 +294,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  marketing_puc:
+    :name: marketing_puc
+    :sequence_no: 18
+    :caption: Marketing puc
+    :namespaced_name: marketing_puc
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_orchard:
+    :name: marketing_orchard
+    :sequence_no: 19
+    :caption: Marketing orchard
+    :namespaced_name: marketing_orchard
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   commodity_code:
     :name: commodity_code
-    :sequence_no: 18
+    :sequence_no: 20
     :caption: Commodity code
     :namespaced_name: commodity_code
     :data_type: :string
@@ -311,7 +344,7 @@
     :group_max: false
   cultivar_group_code:
     :name: cultivar_group_code
-    :sequence_no: 19
+    :sequence_no: 21
     :caption: Cultivar group code
     :namespaced_name: cultivar_group_code
     :data_type: :string
@@ -327,7 +360,7 @@
     :group_max: false
   cultivar_name:
     :name: cultivar_name
-    :sequence_no: 20
+    :sequence_no: 22
     :caption: Cultivar name
     :namespaced_name: cultivar_name
     :data_type: :string
@@ -343,7 +376,7 @@
     :group_max: false
   cultivar_code:
     :name: cultivar_code
-    :sequence_no: 21
+    :sequence_no: 23
     :caption: Cultivar code
     :namespaced_name: cultivar_code
     :data_type: :string
@@ -359,7 +392,7 @@
     :group_max: false
   marketing_variety_code:
     :name: marketing_variety_code
-    :sequence_no: 22
+    :sequence_no: 24
     :caption: Marketing variety code
     :namespaced_name: marketing_variety_code
     :data_type: :string
@@ -375,7 +408,7 @@
     :group_max: false
   customer_variety_code:
     :name: customer_variety_code
-    :sequence_no: 23
+    :sequence_no: 25
     :caption: Customer variety code
     :namespaced_name: customer_variety_code
     :data_type: :string
@@ -391,7 +424,7 @@
     :group_max: false
   std_size:
     :name: std_size
-    :sequence_no: 24
+    :sequence_no: 26
     :caption: Std size
     :namespaced_name: std_size
     :data_type: :integer
@@ -407,7 +440,7 @@
     :group_max: false
   size_ref:
     :name: size_ref
-    :sequence_no: 25
+    :sequence_no: 27
     :caption: Size ref
     :namespaced_name: size_ref
     :data_type: :string
@@ -423,7 +456,7 @@
     :group_max: false
   actual_count:
     :name: actual_count
-    :sequence_no: 26
+    :sequence_no: 28
     :caption: Actual count
     :namespaced_name: actual_count
     :data_type: :integer
@@ -439,7 +472,7 @@
     :group_max: false
   basic_pack_code:
     :name: basic_pack_code
-    :sequence_no: 27
+    :sequence_no: 29
     :caption: Basic pack code
     :namespaced_name: basic_pack_code
     :data_type: :string
@@ -455,7 +488,7 @@
     :group_max: false
   standard_pack_code:
     :name: standard_pack_code
-    :sequence_no: 28
+    :sequence_no: 30
     :caption: Standard pack code
     :namespaced_name: standard_pack_code
     :data_type: :string
@@ -471,7 +504,7 @@
     :group_max: false
   marketer:
     :name: marketer
-    :sequence_no: 29
+    :sequence_no: 31
     :caption: Marketer
     :namespaced_name: marketer
     :data_type: :string
@@ -487,7 +520,7 @@
     :group_max: false
   mark_code:
     :name: mark_code
-    :sequence_no: 30
+    :sequence_no: 32
     :caption: Mark code
     :namespaced_name: mark_code
     :data_type: :string
@@ -503,7 +536,7 @@
     :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 31
+    :sequence_no: 33
     :caption: Inv Code
     :namespaced_name: inventory_code
     :data_type: :string
@@ -519,7 +552,7 @@
     :group_max: false
   resource_allocation_id:
     :name: resource_allocation_id
-    :sequence_no: 32
+    :sequence_no: 34
     :caption: Resource allocation
     :namespaced_name: resource_allocation_id
     :data_type: :integer
@@ -535,7 +568,7 @@
     :group_max: false
   product_setup_template:
     :name: product_setup_template
-    :sequence_no: 33
+    :sequence_no: 35
     :caption: Product setup template
     :namespaced_name: product_setup_template
     :data_type: :string
@@ -551,7 +584,7 @@
     :group_max: false
   pm_bom:
     :name: pm_bom
-    :sequence_no: 34
+    :sequence_no: 36
     :caption: Pm bom
     :namespaced_name: pm_bom
     :data_type: :string
@@ -567,7 +600,7 @@
     :group_max: false
   treatment_codes:
     :name: treatment_codes
-    :sequence_no: 35
+    :sequence_no: 37
     :caption: Treatment codes
     :namespaced_name: treatment_codes
     :data_type: :string
@@ -583,7 +616,7 @@
     :group_max: false
   client_size_ref:
     :name: client_size_ref
-    :sequence_no: 36
+    :sequence_no: 38
     :caption: Client size ref
     :namespaced_name: client_size_ref
     :data_type: :string
@@ -599,7 +632,7 @@
     :group_max: false
   client_product_code:
     :name: client_product_code
-    :sequence_no: 37
+    :sequence_no: 39
     :caption: Client product code
     :namespaced_name: client_product_code
     :data_type: :string
@@ -615,7 +648,7 @@
     :group_max: false
   marketing_order_number:
     :name: marketing_order_number
-    :sequence_no: 38
+    :sequence_no: 40
     :caption: Marketing order number
     :namespaced_name: marketing_order_number
     :data_type: :string
@@ -631,7 +664,7 @@
     :group_max: false
   packed_tm_group:
     :name: packed_tm_group
-    :sequence_no: 39
+    :sequence_no: 41
     :caption: Packed tm group
     :namespaced_name: packed_tm_group
     :data_type: :string
@@ -647,7 +680,7 @@
     :group_max: false
   target_market:
     :name: target_market
-    :sequence_no: 40
+    :sequence_no: 42
     :caption: Target market
     :namespaced_name: target_market
     :data_type: :string
@@ -663,7 +696,7 @@
     :group_max: false
   season_code:
     :name: season_code
-    :sequence_no: 41
+    :sequence_no: 43
     :caption: Season code
     :namespaced_name: season_code
     :data_type: :string
@@ -679,7 +712,7 @@
     :group_max: false
   subtype_code:
     :name: subtype_code
-    :sequence_no: 42
+    :sequence_no: 44
     :caption: Subtype code
     :namespaced_name: subtype_code
     :data_type: :string
@@ -695,7 +728,7 @@
     :group_max: false
   pm_type_code:
     :name: pm_type_code
-    :sequence_no: 43
+    :sequence_no: 45
     :caption: Pm type code
     :namespaced_name: pm_type_code
     :data_type: :string
@@ -711,7 +744,7 @@
     :group_max: false
   cartons_per_pallet:
     :name: cartons_per_pallet
-    :sequence_no: 44
+    :sequence_no: 46
     :caption: Cartons per pallet
     :namespaced_name: cartons_per_pallet
     :data_type: :integer
@@ -727,7 +760,7 @@
     :group_max: false
   product_code:
     :name: product_code
-    :sequence_no: 45
+    :sequence_no: 47
     :caption: Product code
     :namespaced_name: product_code
     :data_type: :string
@@ -743,7 +776,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 46
+    :sequence_no: 48
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
@@ -759,7 +792,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 47
+    :sequence_no: 49
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -775,7 +808,7 @@
     :group_max: false
   pick_ref:
     :name: pick_ref
-    :sequence_no: 48
+    :sequence_no: 50
     :caption: Pick ref
     :namespaced_name: pick_ref
     :data_type: :string
@@ -791,7 +824,7 @@
     :group_max: false
   pallet_sequence_id:
     :name: pallet_sequence_id
-    :sequence_no: 49
+    :sequence_no: 51
     :caption: Pallet sequence
     :namespaced_name: pallet_sequence_id
     :data_type: :integer
@@ -807,7 +840,7 @@
     :group_max: false
   pallet_number:
     :name: pallet_number
-    :sequence_no: 50
+    :sequence_no: 52
     :caption: Pallet number
     :namespaced_name: pallet_number
     :data_type: :string
@@ -823,7 +856,7 @@
     :group_max: false
   pallet_sequence_number:
     :name: pallet_sequence_number
-    :sequence_no: 51
+    :sequence_no: 53
     :caption: Seq
     :namespaced_name: pallet_sequence_number
     :data_type: :string
@@ -839,7 +872,7 @@
     :group_max: false
   personnel_identifier:
     :name: personnel_identifier
-    :sequence_no: 52
+    :sequence_no: 54
     :caption: Personnel ID
     :namespaced_name: personnel_identifier
     :data_type: :string
@@ -855,7 +888,7 @@
     :group_max: false
   personnel_number:
     :name: personnel_number
-    :sequence_no: 53
+    :sequence_no: 55
     :caption: Personnel No.
     :namespaced_name: personnel_number
     :data_type: :string
@@ -871,7 +904,7 @@
     :group_max: false
   packing_method_code:
     :name: packing_method_code
-    :sequence_no: 54
+    :sequence_no: 56
     :caption: Packing method
     :namespaced_name: packing_method_code
     :data_type: :string
@@ -887,7 +920,7 @@
     :group_max: false
   palletizer_identifier:
     :name: palletizer_identifier
-    :sequence_no: 55
+    :sequence_no: 57
     :caption: Palletizer ID
     :namespaced_name: palletizer_identifier
     :data_type: :string
@@ -903,7 +936,7 @@
     :group_max: false
   palletizer_contract_worker:
     :name: palletizer_contract_worker
-    :sequence_no: 56
+    :sequence_no: 58
     :caption: Palletizer contract worker
     :namespaced_name: palletizer_contract_worker
     :data_type: :string
@@ -919,7 +952,7 @@
     :group_max: false
   palletizer_personnel_number:
     :name: palletizer_personnel_number
-    :sequence_no: 57
+    :sequence_no: 59
     :caption: Palletizer personnel number
     :namespaced_name: palletizer_personnel_number
     :data_type: :string
@@ -935,7 +968,7 @@
     :group_max: false
   is_virtual:
     :name: is_virtual
-    :sequence_no: 58
+    :sequence_no: 60
     :caption: Virtual
     :namespaced_name: is_virtual
     :data_type: :boolean

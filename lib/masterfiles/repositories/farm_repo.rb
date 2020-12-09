@@ -44,7 +44,17 @@ module MasterfilesApp
                      no_active_check: true,
                      order_by: :farm_section_name
 
+    build_for_select :registered_orchards,
+                     label: :orchard_code,
+                     value: :id,
+                     order_by: :orchard_code
+    build_inactive_select :registered_orchards,
+                          label: :orchard_code,
+                          value: :id,
+                          order_by: :orchard_code
+
     crud_calls_for :farm_sections, name: :farm_section, wrapper: FarmSection
+    crud_calls_for :registered_orchards, name: :registered_orchard, wrapper: RegisteredOrchard
 
     def for_select_pucs(opts = {})
       dataset = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)

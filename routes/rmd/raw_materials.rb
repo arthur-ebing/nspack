@@ -235,7 +235,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                     value: bin_delivery[:orchard_code])
           actions << OpenStruct.new(type: :replace_inner_html,
                                     dom_id: 'rmt_bin_cultivar_code_value',
-                                    value: bin_delivery[:cultivar_code])
+                                    value: bin_delivery[:cultivar_name])
           actions << OpenStruct.new(type: :replace_inner_html,
                                     dom_id: 'rmt_bin_date_picked_value',
                                     value: bin_delivery[:date_picked])
@@ -983,7 +983,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       form.add_label(:farm_code, 'Farm', bin_delivery[:farm_code], nil, as_table_cell: true)
       form.add_label(:puc_code, 'PUC', bin_delivery[:puc_code], nil, as_table_cell: true)
       form.add_label(:orchard_code, 'Orchard', bin_delivery[:orchard_code], nil, as_table_cell: true)
-      form.add_label(:cultivar_code, 'Cultivar', bin_delivery[:cultivar_code], nil, as_table_cell: true)
+      form.add_label(:cultivar_code, 'Cultivar', bin_delivery[:cultivar_name], nil, as_table_cell: true)
       form.add_label(:date_picked, 'Date Picked', bin_delivery[:date_picked], nil, as_table_cell: true)
       form.add_label(:date_delivered, 'Date Delivered', bin_delivery[:date_delivered], nil, as_table_cell: true)
       form.add_label(:qty_bins_tipped, 'Qty Bins Tipped', bin_delivery[:qty_bins_tipped], nil, as_table_cell: true)

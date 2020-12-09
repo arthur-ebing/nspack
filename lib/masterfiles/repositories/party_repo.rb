@@ -414,6 +414,40 @@ module MasterfilesApp
         .get(:id)
     end
 
+    def associate_farm_puc_orgs(organization_id, farm_pucs)
+      return { error: 'Choose at least one farm_puc record' } if farm_pucs.empty?
+
+      existing_farm_pucs = DB[:farm_puc_orgs]
+                           .where(organization_id: organization_id)
+                           .select(:puc_id, :farm_id).map { |r| "#{r[:puc_id]}_#{r[:farm_id]}" }
+
+      removed_farm_pucs = existing_farm_pucs - farm_pucs
+      remove_farm_puc_orgs(organization_id, removed_farm_pucs) unless removed_farm_pucs.nil_or_empty?
+
+      new_farm_pucs = farm_pucs - existing_farm_pucs
+      add_farm_puc_orgs(organization_id, new_farm_pucs) unless new_farm_pucs.nil_or_empty?
+    end
+
+    def remove_farm_puc_orgs(organization_id, farm_pucs)
+      farm_pucs.each do |farm_puc|
+        arr = farm_puc.split('_')
+        DB[:farm_puc_orgs]
+          .where(organization_id: organization_id)
+          .where(puc_id: arr[0].to_i)
+          .where(farm_id: arr[1].to_i)
+          .delete
+      end
+    end
+
+    def add_farm_puc_orgs(organization_id, farm_pucs)
+      farm_pucs.each do |farm_puc|
+        arr = farm_puc.split('_')
+        DB[:farm_puc_orgs].insert(puc_id: arr[0].to_i,
+                                  farm_id: arr[1].to_i,
+                                  organization_id: organization_id)
+      end
+    end
+
     private
 
     def add_party_name(hash)
