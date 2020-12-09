@@ -568,7 +568,6 @@ module ProductionApp
 
     def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id)  # rubocop:disable Metrics/AbcSize
       if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
-        standard_pack_code_id = setup_repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         standard_pack_code_id = prod_setup_repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
         return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
       else
@@ -1240,10 +1239,6 @@ module ProductionApp
 
     def mesc_repo
       @mesc_repo ||= MesscadaApp::MesscadaRepo.new
-    end
-
-    def setup_repo
-      @setup_repo ||= ProductionApp::ProductSetupRepo.new
     end
 
     def prod_setup_repo
