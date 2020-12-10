@@ -755,7 +755,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'direct_edit_pallet_sequence_submit', Integer do |id|
-        res = interactor.direct_edit_pallet_sequence(id, params[:pallet][:standard_pack_id], params[:pallet][:basic_pack_id])
+        res = interactor.direct_edit_pallet_sequence(id, params[:pallet])
 
         if res.success
           store_locally(:flash_notice, 'Pallets Sequence Updated Successfully')
@@ -769,7 +769,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         pallet_sequence = messcada_interactor.find_pallet_sequence_attrs(id).to_h
         ps_ids = messcada_interactor.find_pallet_sequences_from_same_pallet(id)
 
-        form_state = retrieve_from_local_store(:errors).to_h
+        form_state = { gross_weight: pallet_sequence[:gross_weight] }
+        form_state.merge!(retrieve_from_local_store(:errors).to_h)
 
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :pallet,
@@ -784,7 +785,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_prev_next_nav('/rmd/production/palletizing/direct_edit_pallet_nav_view/$:id$', ps_ids, id)
 
         hide_fields = %i[carton_quantity std_pack]
-        if AppConst::BASE_PACK_EQUALS_STD_PACK
+        unless AppConst::BASE_PACK_EQUALS_STD_PACK
           hide_fields << :basic_pack
           form.add_select(:basic_pack_id,
                           'Basic Pack',
@@ -798,10 +799,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                         value: pallet_sequence[:standard_pack_code_id],
                         items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
                         required: true)
+
+        form.add_select(:grade_id,
+                        'Grade',
+                        value: pallet_sequence[:grade_id],
+                        items: MasterfilesApp::FruitRepo.new.for_select_grades,
+                        required: true)
+
+        form.add_field(:gross_weight,
+                       'Pallet Gross Weight',
+                       value: pallet_sequence[:gross_weight],
+                       required: true,
+                       prompt: true,
+                       data_type: :number)
+
         form.add_label(:current_carton_quantity,
                        'Current Carton Qty',
                        pallet_sequence[:carton_quantity])
+
         fields_for_rmd_pallet_sequence_display(form, pallet_sequence, hide_fields)
+
         form.add_field(:qty_to_print,
                        'Qty To Print',
                        required: false,

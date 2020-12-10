@@ -54,12 +54,15 @@ module ProductionApp
       ok_response
     end
 
-    def direct_edit_pallet_sequence(pallet_sequence_id, standard_pack_id, basic_pack_id)
-      attrs = { standard_pack_code_id: standard_pack_id }
-      attrs[:basic_pack_code_id] = basic_pack_id unless basic_pack_id.nil_or_empty?
+    def direct_edit_pallet_sequence(pallet_sequence_id, params) # rubocop:disable Metrics/AbcSize
+      attrs = { standard_pack_code_id: params[:standard_pack_id], grade_id: params[:grade_id] }
+      attrs[:basic_pack_code_id] = params[:basic_pack_id] unless params[:basic_pack_id].nil_or_empty?
+      pallet_id = repo.get_value(:pallet_sequences, :pallet_id, id: pallet_sequence_id)
       repo.transaction do
         repo.update(:pallet_sequences, pallet_sequence_id, attrs)
+        repo.update(:pallets, pallet_id, gross_weight: params[:gross_weight])
         repo.update_pallet_sequence_cartons(pallet_sequence_id, attrs) if AppConst::USE_CARTON_PALLETIZING
+        log_status(:pallets, pallet_id, 'DIRECT_PALLET_UPDATE')
       end
 
       ok_response

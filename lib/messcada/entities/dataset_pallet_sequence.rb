@@ -40,6 +40,7 @@ module MesscadaApp
           pallet_sequences.pallet_sequence_number,
           pallet_sequences.standard_pack_code_id,
           pallet_sequences.basic_pack_code_id,
+          pallet_sequences.grade_id,
           pallets.build_status,
           pallet_bases.pallet_base_code AS pallet_base,
           pallet_stack_types.stack_type_code AS stack_type,
