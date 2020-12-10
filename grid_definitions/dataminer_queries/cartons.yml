@@ -15,8 +15,8 @@
   \   nett_weight,\r\n    pick_ref,\r\n    pallet_sequence_id,\r\n    pallet_number,\r\n
   \   pallet_sequence_number,\r\n    personnel_identifier,\r\n    personnel_number,\r\n
   \   packing_method_code,\r\n    palletizer_identifier,\r\n    palletizer_contract_worker,\r\n
-  \   palletizer_personnel_number,\r\n    is_virtual\r\n\r\nFROM vw_cartons WHERE
-  carton_id IS NOT NULL ORDER BY carton_id DESC"
+  \   palletizer_personnel_number,\r\n    is_virtual,\r\n    dp_carton,\r\n    rmt_bin_id\r\n\r\nFROM
+  vw_cartons WHERE carton_id IS NOT NULL ORDER BY carton_id DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -969,12 +969,44 @@
   is_virtual:
     :name: is_virtual
     :sequence_no: 60
-    :caption: Virtual
+    :caption: Virtual?
     :namespaced_name: is_virtual
     :data_type: :boolean
     :width: 80
     :format: 
     :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dp_carton:
+    :name: dp_carton
+    :sequence_no: 61
+    :caption: Dp carton?
+    :namespaced_name: dp_carton
+    :data_type: :boolean
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_bin_id:
+    :name: rmt_bin_id
+    :sequence_no: 62
+    :caption: Rmt bin
+    :namespaced_name: rmt_bin_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
     :pinned: 
     :groupable: false
     :group_by_seq: 

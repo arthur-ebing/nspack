@@ -107,7 +107,13 @@ module MesscadaApp
           cl.phc,
           cl.personnel_identifier_id,
           cl.contract_worker_id,
-          cl.packing_method_id
+          cl.packing_method_id,
+          cl.marketing_puc_id,
+          cl.marketing_orchard_id,
+          cl.group_incentive_id,
+          cl.rmt_bin_id,
+          cl.dp_carton
+
         FROM cartons
         JOIN carton_labels cl ON cl.id = cartons.carton_label_id
         WHERE cartons.id = ?
@@ -529,8 +535,11 @@ module MesscadaApp
       carton_rejected_fields = %i[id carton_label_id pallet_number product_resource_allocation_id fruit_sticker_pm_product_id
                                   gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id palletizer_contract_worker_id
                                   palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id
-                                  palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id]
-      attrs = find_hash(:cartons, carton_id).reject { |k, _| carton_rejected_fields.include?(k) }
+                                  palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
+                                  group_incentive_id rmt_bin_id dp_carton]
+      attrs = find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
+      attrs[:treatment_ids] = array_for_db_col(attrs[:treatment_ids]) if attrs.key?(:treatment_ids)
+
       DB[:pallet_sequences].where(pallet_id: pallet_id).where(attrs).get(:id)
     end
 
@@ -609,6 +618,22 @@ module MesscadaApp
         params[:carton_number] = MesscadaApp::ScannedCartonNumber.new(scanned_carton_number: params[:scanned_number]).carton_number
       end
       params
+    end
+
+    def find_rmt_bin_by_bin_number(bin_number)
+      DB[:rmt_bins]
+        .where(Sequel.lit("legacy_data ->> 'bin_number'") => bin_number)
+        .get(:id)
+    end
+
+    def rmt_bin_exists?(rmt_bin_id)
+      exists?(:rmt_bins, id: rmt_bin_id)
+    end
+
+    def find_rmt_bin_farm(rmt_bin_id)
+      DB[:rmt_bins]
+        .where(id: rmt_bin_id)
+        .get(:farm_id)
     end
   end
 end

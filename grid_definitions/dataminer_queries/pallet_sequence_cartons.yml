@@ -17,10 +17,13 @@
   '_', palletizer_contract_workers.surname) AS palletizer_contract_worker,\r\n             palletizer_contract_workers.personnel_number
   AS palletizer_personnel_number,\r\n             cartons.pallet_sequence_id,\r\n
   \            pallet_sequences.pallet_id,\r\n             cartons.is_virtual,\r\n
-  \            cartons.created_at AS verified_at,\r\n             cartons.updated_at\r\nFROM
-  cartons\r\nJOIN carton_labels ON carton_labels.id = cartons.carton_label_id\r\nJOIN
-  pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN pallets
-  ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
+  \            carton_labels.group_incentive_id,\r\n             carton_labels.marketing_puc_id,\r\n
+  \            marketing_pucs.puc_code AS marketing_puc,\r\n             carton_labels.marketing_orchard_id,\r\n
+  \            registered_orchards.orchard_code AS marketing_orchard,\r\n             carton_labels.rmt_bin_id,\r\n
+  \            carton_labels.dp_carton,\r\n             cartons.created_at AS verified_at,\r\n
+  \            cartons.updated_at\r\nFROM cartons\r\nJOIN carton_labels ON carton_labels.id
+  = cartons.carton_label_id\r\nJOIN pallet_sequences ON pallet_sequences.id = cartons.pallet_sequence_id\r\nJOIN
+  pallets ON pallets.id = pallet_sequences.pallet_id\r\nLEFT JOIN product_resource_allocations
   ON product_resource_allocations.id = carton_labels.product_resource_allocation_id\r\nLEFT
   JOIN product_setups ON product_setups.id = product_resource_allocations.product_setup_id\r\nJOIN
   product_setup_templates ON product_setup_templates.id = product_setups.product_setup_template_id\r\nLEFT
@@ -36,7 +39,10 @@
   ON palletizers.id = cartons.palletizer_identifier_id\r\nLEFT JOIN palletizing_bay_states
   ON cartons.id = palletizing_bay_states.determining_carton_id\r\nLEFT JOIN contract_workers
   palletizer_contract_workers ON palletizer_contract_workers.personnel_identifier_id
-  = cartons.palletizer_identifier_id\r\nORDER BY cartons.created_at DESC"
+  = cartons.palletizer_identifier_id\r\nLEFT JOIN group_incentives ON group_incentives.id
+  = carton_labels.group_incentive_id\r\nLEFT JOIN pucs marketing_pucs ON marketing_pucs.id
+  = carton_labels.marketing_puc_id\r\nLEFT JOIN registered_orchards ON registered_orchards.id
+  = carton_labels.marketing_orchard_id\r\nORDER BY cartons.created_at DESC"
 :limit: 
 :offset: 
 :external_settings:
@@ -463,7 +469,7 @@
   is_virtual:
     :name: is_virtual
     :sequence_no: 27
-    :caption: Virtual
+    :caption: Virtual?
     :namespaced_name: cartons.is_virtual
     :data_type: :boolean
     :width: 80
@@ -476,9 +482,121 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  group_incentive_id:
+    :name: group_incentive_id
+    :sequence_no: 28
+    :caption: Group incentive
+    :namespaced_name: carton_labels.group_incentive_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_puc_id:
+    :name: marketing_puc_id
+    :sequence_no: 29
+    :caption: Marketing puc
+    :namespaced_name: carton_labels.marketing_puc_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_puc:
+    :name: marketing_puc
+    :sequence_no: 30
+    :caption: Marketing puc
+    :namespaced_name: marketing_pucs.puc_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_orchard_id:
+    :name: marketing_orchard_id
+    :sequence_no: 31
+    :caption: Marketing orchard
+    :namespaced_name: carton_labels.marketing_orchard_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  marketing_orchard:
+    :name: marketing_orchard
+    :sequence_no: 32
+    :caption: Marketing orchard
+    :namespaced_name: registered_orchards.orchard_code
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  rmt_bin_id:
+    :name: rmt_bin_id
+    :sequence_no: 33
+    :caption: Rmt bin
+    :namespaced_name: carton_labels.rmt_bin_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  dp_carton:
+    :name: dp_carton
+    :sequence_no: 34
+    :caption: Dp carton?
+    :namespaced_name: carton_labels.dp_carton
+    :data_type: :string
+    :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   verified_at:
     :name: verified_at
-    :sequence_no: 28
+    :sequence_no: 35
     :caption: Verified at
     :namespaced_name: cartons.created_at
     :data_type: :date
@@ -494,7 +612,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 29
+    :sequence_no: 36
     :caption: Updated at
     :namespaced_name: cartons.updated_at
     :data_type: :date

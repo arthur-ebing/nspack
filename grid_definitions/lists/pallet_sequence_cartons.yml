@@ -7,14 +7,35 @@
     :production_run_cartons: Pallet Sequence Cartons
 :conditions:
   :standard:
-    - :col: cartons.id
-      :op: =
-      :val: $:carton_id$
+  - :col: cartons.id
+    :op: "="
+    :val: "$:carton_id$"
   :pallet_cartons:
-    - :col: pallet_sequences.pallet_id
-      :op: =
-      :val: $:pallet_id$
+  - :col: pallet_sequences.pallet_id
+    :op: "="
+    :val: "$:pallet_id$"
   :pallet_sequence_cartons:
-    - :col: cartons.pallet_sequence_id
-      :op: =
-      :val: $:pallet_sequence_id$
+  - :col: cartons.pallet_sequence_id
+    :op: "="
+    :val: "$:pallet_sequence_id$"
+:hide_for_client:
+  hb:
+  - marketing_puc
+  - marketing_orchard
+  - dp_carton
+  um:
+  - marketing_puc
+  - marketing_orchard
+  - dp_carton
+  ud:
+  - marketing_puc
+  - marketing_orchard
+  - dp_carton
+  sr:
+  - marketing_puc
+  - marketing_orchard
+  - dp_carton
+  srp:
+  - marketing_puc
+  - marketing_orchard
+  - dp_carton
