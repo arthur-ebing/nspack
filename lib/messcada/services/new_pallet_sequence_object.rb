@@ -37,7 +37,8 @@ module MesscadaApp
     def pallet_sequence_carton_params
       carton_rejected_fields = %i[id resource_id label_name fruit_sticker_pm_product_id carton_label_id gross_weight nett_weight
                                   phc pallet_label_name active created_at updated_at packing_method_id palletizer_identifier_id palletizer_contract_worker_id
-                                  pallet_sequence_id palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id]
+                                  pallet_sequence_id palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
+                                  group_incentive_id rmt_bin_id dp_carton]
       carton_rejected_fields << :pallet_number unless AppConst::CARTON_EQUALS_PALLET
       repo.find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
     end

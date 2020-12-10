@@ -53,6 +53,8 @@ module MesscadaApp
       optional(:marketing_orchard_id).maybe(:integer)
       optional(:pm_mark_id).maybe(:integer)
       optional(:group_incentive_id).maybe(:integer)
+      optional(:rmt_bin_id).maybe(:integer)
+      optional(:dp_carton).maybe(:bool)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

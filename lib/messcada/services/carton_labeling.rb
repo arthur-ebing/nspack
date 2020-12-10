@@ -3,7 +3,7 @@
 module MesscadaApp
   class CartonLabeling < BaseService # rubocop:disable Metrics/ClassLength
     attr_reader :repo, :hr_repo, :production_run_id, :setup_data, :carton_label_id, :pick_ref,
-                :pallet_number, :personnel_number, :params, :system_resource
+                :pallet_number, :personnel_number, :params, :system_resource, :bin_attrs
 
     def initialize(params)
       @params = params
@@ -69,10 +69,7 @@ module MesscadaApp
                             contract_worker_id: system_resource.contract_worker_id)
       end
 
-      if AppConst::USE_MARKETING_PUC
-        marketing_puc_id = marketing_puc
-        attrs = attrs.merge(marketing_puc_id: marketing_puc_id, marketing_orchard_id: marketing_orchard(marketing_puc_id))
-      end
+      attrs = attrs.merge(resolve_marketing_attrs) if AppConst::USE_MARKETING_PUC
 
       res = validate_carton_label_params(attrs)
       return validation_failed_response(res) if res.failure?
@@ -91,8 +88,39 @@ module MesscadaApp
       repo.find_resource_phc(setup_data[:production_run_data][:production_line_id]) || repo.find_resource_phc(setup_data[:production_run_data][:packhouse_resource_id])
     end
 
-    def marketing_puc
-      repo.find_marketing_puc(setup_data[:production_run_data][:marketing_org_party_role_id], setup_data[:production_run_data][:farm_id])
+    def resolve_marketing_attrs
+      farm_id = params[:bin_number].nil_or_empty? ? setup_data[:production_run_data][:farm_id] : find_bin_farm
+
+      marketing_puc_id = marketing_puc(farm_id)
+      attrs = { farm_id: farm_id,
+                marketing_puc_id: marketing_puc_id,
+                marketing_orchard_id: marketing_orchard(marketing_puc_id) }
+      attrs = attrs.merge(bin_attrs) unless bin_attrs.nil_or_empty?
+      attrs
+    end
+
+    def find_bin_farm
+      res = validate_dp_bin
+      return res unless res.success
+
+      repo.find_rmt_bin_farm(bin_attrs[:rmt_bin_id])
+    end
+
+    def validate_dp_bin
+      rmt_bin = repo.find_rmt_bin_by_bin_number(params[:bin_number])
+      raise Crossbeams::InfoError, "DP Bin #{rmt_bin} not found" unless rmt_bin_exists?(rmt_bin)
+
+      @bin_attrs = { rmt_bin_id: rmt_bin, dp_carton: true }
+
+      ok_response
+    end
+
+    def rmt_bin_exists?(rmt_bin)
+      repo.rmt_bin_exists?(rmt_bin)
+    end
+
+    def marketing_puc(farm_id)
+      repo.find_marketing_puc(setup_data[:production_run_data][:marketing_org_party_role_id], farm_id)
     end
 
     def marketing_orchard(marketing_puc_id)
