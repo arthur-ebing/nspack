@@ -15,6 +15,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { CAPTURE_CONTAINER_MATERIAL_OWNER: 'Capture container material owner at delivery eg. Chep (Required for empty bin control)' },
     { USE_DELIVERY_DESTINATION: 'Intended destination for a delivery of rmt_fruit eg. degreening or PH1' },
     { CAPTURE_DAMAGED_BINS: 'Optional capture at delivery' },
+    { HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET: 'Determines if tripsheet can be created or not' },
     { CAPTURE_EMPTY_BINS: 'Optional capture at delivery' },
     { CAPTURE_TRUCK_AT_FRUIT_RECEPTION: 'Optional capture at delivery' },
     { PALLET_MIX_RULES_SCOPE: 'a list of scope values for pallet_mix_rules.' },
