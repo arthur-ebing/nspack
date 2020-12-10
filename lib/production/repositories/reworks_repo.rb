@@ -280,7 +280,7 @@ module ProductionApp
       pallet_rejected_fields = %i[id pallet_number build_status]
       repack_attrs = { repacked: true, repacked_at: Time.now }
       attrs = pallet.to_h.merge(repack_attrs.to_h).reject { |k, _| pallet_rejected_fields.include?(k) }
-      new_pallet_id = DB[:pallets].insert(attrs)
+      new_pallet_id = create(:pallets, attrs)
       clone_pallet_sequences(pallet[:id], new_pallet_id, sequence_ids)
       new_pallet_id
     end
@@ -291,7 +291,7 @@ module ProductionApp
       ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number]
       sequence_ids.each do |sequence_id|
         attrs = find_hash(:pallet_sequences, sequence_id).to_h.reject { |k, _| ps_rejected_fields.include?(k) }
-        new_sequence_id = DB[:pallet_sequences].insert(attrs.merge(repack_attrs.to_h))
+        new_sequence_id = create(:pallet_sequences, attrs.merge(repack_attrs.to_h))
         DB[:cartons].where(pallet_sequence_id: sequence_id).update({ pallet_sequence_id: new_sequence_id }) if pallet[:has_individual_cartons]
       end
     end
@@ -299,8 +299,7 @@ module ProductionApp
     def clone_pallet_sequence(id)
       ps_rejected_fields = %i[id pallet_sequence_number]
       attrs = find_hash(:pallet_sequences, id).reject { |k, _| ps_rejected_fields.include?(k) }
-      new_id = DB[:pallet_sequences].insert(attrs)
-      new_id
+      create(:pallet_sequences, attrs)
     end
 
     def remove_pallet_sequence(id)
