@@ -82,7 +82,7 @@ module MesserverApp
       res = post_print_or_preview(print_published_label_uri(host), label_template_name, vars, quantity: quantity, printer: printer)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
-                failed_response('The label was not found. Has it been published yet?')
+                failed_response("The label (#{label_template_name}) or printer was not found. Has it been published yet?")
               else
                 res
               end
@@ -95,7 +95,7 @@ module MesserverApp
       res = post_print_or_preview(preview_published_label_uri, label_template_name, vars, printer_type: printer_type)
       unless res.success
         res = if res.instance[:response_code].to_s == '404'
-                failed_response('The label was not found. Has it been published yet?')
+                failed_response("The label (#{label_template_name}) or printer was not found. Has it been published yet?")
               else
                 res
               end

@@ -83,6 +83,10 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     res
   end
 
+  def decorate_mail_message(message)
+    "#{message}\n\nRequest path: #{@request.path}\n\nAction: #{@action_type}\n\nParams: #{@robot_params.inspect}\n\nMAC: #{@mac_addr}"
+  end
+
   private
 
   def validate_params
@@ -176,7 +180,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   rescue NameError => e
     ErrorMailer.send_exception_email(e,
                                      subject: "#{self.class.name} scan handler",
-                                     message: "There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}.")
+                                     message: decorate_mail_message("There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}."))
     puts e.message
     puts e.backtrace.join("\n")
     feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
@@ -194,7 +198,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   rescue NameError => e
     ErrorMailer.send_exception_email(e,
                                      subject: "#{self.class.name} button handler",
-                                     message: "There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}.")
+                                     message: decorate_mail_message("There is no class named #{class_name} to handle #{robot.module_action} for #{robot.system_resource_code}."))
     puts e.message
     puts e.backtrace.join("\n")
     feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
