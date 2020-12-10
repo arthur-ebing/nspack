@@ -12,6 +12,12 @@ require 'nokogiri'
 class App < Roda # rubocop:disable Metrics/ClassLength
   plugin :symbolized_params
 
+  MAF_URL_SET = [
+    '/messcada/maf/bin_tipping/can_dump',
+    '/messcada/maf/bin_tipping/dump',
+    '/messcada/maf/carton_labeling'
+  ].freeze
+
   URL_SET = [
     '/messcada/rmt/bin_tipping',
     '/messcada/rmt/bin_tipping/weighing',
@@ -179,6 +185,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'messcada' do
       response['Content-Type'] = 'application/xml'
+
       r.on 'rmt' do
         r.on 'bin_tipping' do
           r.on 'weighing' do
@@ -190,6 +197,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           respond(request.path, params)
         end
       end
+
       r.on 'production' do
         r.on 'carton_labeling' do
           respond(request.path, params)
@@ -201,9 +209,11 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           respond(request.path, params)
         end
       end
+
       r.on 'fg/pallet_weighing' do
         respond(request.path, params)
       end
+
       r.on 'hr' do
         r.on 'register_id' do
           respond(request.path, params)
@@ -215,6 +225,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           respond(request.path, params)
         end
       end
+
       r.on 'yesnoresponse' do
         r.on 'yes' do
           respond(request.path, params)
@@ -223,6 +234,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
           respond(request.path, params)
         end
       end
+
       r.on 'carton_palletizing' do
         r.on 'scan_carton' do
           respond(request.path, params)
@@ -238,6 +250,68 @@ class App < Roda # rubocop:disable Metrics/ClassLength
         end
         r.on 'complete' do
           respond(request.path, params)
+        end
+      end
+
+      # MAF calls
+      # ----------------
+      r.on 'maf' do
+        r.on 'bin_tipping' do
+          r.on 'can_dump' do
+            '<ContainerMove PID="200" Mode="5" Status="true" RunNumber="2020_AP_20980_1568_21A" Red="false" Yellow="false" Green="true" Msg="WAITING FOR MAF..."  />'
+          end
+          r.on 'dump' do
+            '<ContainerMove PID="200" Mode="6" Status="true" RunNumber="54107" Red="false" Yellow="false" Green="true" Msg="SCAN BIN(118 TPD)" />'
+          end
+        end
+
+        r.on 'carton_labeling' do
+          <<~XML
+            <ProductLabel
+            PID="223"
+            Status="true"
+            Threading="true"
+            RunNumber="2020_AP_20980_1568_21A"
+            Code="41DP41"
+            LabelTemplateFile=”LabelName.nsld”
+            LabelRenderAmount="1"
+            F0="E2"
+            F1="0110041209801568"
+            F2="200009902661"
+            F3="(RGL)  ROYAL GALA (TENROY)"
+            F4="AP"
+            F5="APPLES"
+            F6="GEN"
+            F7="J30J"
+            F8="234"
+            F9="RA"
+            F10="1X"
+            F11="041209801568"
+            F12="7394"
+            F13="E1009"
+            F14="GGN 4049928402653"
+            F15="FV"
+            F16="CLASS 1"
+            F17="100x3kg Bags"
+            F18="*"
+            F19="KR"
+            F20="E0354"
+            F21="DPK-41-A-2020-11-18-07:39:38"
+            F22="(01)(10)041209801568"
+            F23="KROMCO (PTY) LTD, PATRYSLAAGTE, PO Box 133"
+            F24="GRABOUW, 7160        PRODUCE OF SOUTH AFRICA"
+            F25=""
+            F26=""
+            F27="MARKING"
+            F28=""
+            F29="AP_RGL_CL1_1X_234_BL_UL_NOS_100B3.1JB*_BBLCT720_KR_NONE_GEN-K2_GEN_KRF"
+            F30="L_S_BIN"
+            F31="W47-03"
+            F32=""
+            F33=""
+            Msg=""
+            Printer="PRN-41" />
+          XML
         end
       end
     rescue StandardError => e
