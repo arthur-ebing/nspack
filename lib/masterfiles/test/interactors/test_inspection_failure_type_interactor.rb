@@ -4,15 +4,15 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestInspectionFailureTypeInteractor < MiniTestWithHooks
-    include InspectionFailureTypeFactory
+    include InspectionFactory
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::InspectionFailureTypeRepo)
+      assert repo.is_a?(MasterfilesApp::QualityRepo)
     end
 
     def test_inspection_failure_type
-      MasterfilesApp::InspectionFailureTypeRepo.any_instance.stubs(:find_inspection_failure_type).returns(fake_inspection_failure_type)
+      MasterfilesApp::QualityRepo.any_instance.stubs(:find_inspection_failure_type).returns(fake_inspection_failure_type)
       entity = interactor.send(:inspection_failure_type, 1)
       assert entity.is_a?(InspectionFailureType)
     end

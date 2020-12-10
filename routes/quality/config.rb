@@ -79,7 +79,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           actions = []
           commodity_ids = @repo.select_values(:commodities, :id, commodity_group_id: Array(params[:changed_value].split(',')))
-          cultivar_list = @repo.for_select_cultivar_codes(where: { commodity_id: commodity_ids })
+          cultivar_list = MasterfilesApp::CultivarRepo.new.for_select_cultivar_codes(where: { commodity_id: commodity_ids })
           actions << OpenStruct.new(type: :replace_multi_options, dom_id: 'orchard_test_type_applicable_cultivar_ids', options_array: cultivar_list)
           json_actions(actions)
         end

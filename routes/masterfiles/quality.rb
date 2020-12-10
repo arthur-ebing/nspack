@@ -315,10 +315,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               inspection_failure_type_id
+              failure_type_code
               failure_reason
               description
               main_factor
               secondary_factor
+              status
+              active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -350,10 +353,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             inspection_failure_type_id
+            failure_type_code
             failure_reason
             description
             main_factor
             secondary_factor
+            status
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -363,6 +368,121 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             Masterfiles::Quality::InspectionFailureReason::New.call(form_values: params[:inspection_failure_reason],
                                                                     form_errors: res.errors,
                                                                     remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    # INSPECTION TYPES
+    # --------------------------------------------------------------------------
+    r.on 'inspection_types', Integer do |id|
+      interactor = MasterfilesApp::InspectionTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:inspection_types, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('quality', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Quality::InspectionType::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('quality', 'read')
+          show_partial { Masterfiles::Quality::InspectionType::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_inspection_type(id, params[:inspection_type])
+          if res.success
+            row_keys = %i[
+              inspection_type_code
+              description
+              inspection_failure_type_id
+              failure_type_code
+              applicable_tm_group_ids
+              applicable_tm_groups
+              applicable_cultivar_ids
+              applicable_cultivars
+              applicable_orchard_ids
+              applicable_orchards
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Quality::InspectionType::Edit.call(id, form_values: params[:inspection_type], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('quality', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_inspection_type(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'inspection_types' do
+      interactor = MasterfilesApp::InspectionTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'applies_to_all_tm_groups' do
+        actions = []
+        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                  dom_id: 'inspection_type_applicable_tm_group_ids_field_wrapper')
+        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_tm_group_ids', value: [])
+        json_actions(actions)
+      end
+
+      r.on 'applies_to_all_cultivars' do
+        actions = []
+        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                  dom_id: 'inspection_type_applicable_cultivar_ids_field_wrapper')
+        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_cultivar_ids', value: [])
+        json_actions(actions)
+      end
+
+      r.on 'applies_to_all_orchards' do
+        actions = []
+        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                  dom_id: 'inspection_type_applicable_orchard_ids_field_wrapper')
+        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_orchard_ids', value: [])
+        json_actions(actions)
+      end
+
+      r.on 'new' do    # NEW
+        check_auth!('quality', 'new')
+        show_partial_or_page(r) { Masterfiles::Quality::InspectionType::New.call(remote: fetch?(r)) }
+      end
+
+      r.post do        # CREATE
+        res = interactor.create_inspection_type(params[:inspection_type])
+        if res.success
+          row_keys = %i[
+            id
+            inspection_type_code
+            description
+            inspection_failure_type_id
+            failure_type_code
+            applicable_tm_group_ids
+            applicable_tm_groups
+            applicable_cultivar_ids
+            applicable_cultivars
+            applicable_orchard_ids
+            applicable_orchards
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/quality/inspection_types/new') do
+            Masterfiles::Quality::InspectionType::New.call(form_values: params[:inspection_type],
+                                                           form_errors: res.errors,
+                                                           remote: fetch?(r))
           end
         end
       end

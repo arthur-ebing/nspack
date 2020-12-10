@@ -9,12 +9,11 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_inspection_failure_type(res)
-        log_status('inspection_failure_types', id, 'CREATED')
+        log_status(:inspection_failure_types, id, 'CREATED')
         log_transaction
       end
       instance = inspection_failure_type(id)
-      success_response("Created inspection failure type #{instance.failure_type_code}",
-                       instance)
+      success_response("Created inspection failure type #{instance.failure_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { failure_type_code: ['This inspection failure type already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,54 +29,25 @@ module MasterfilesApp
         log_transaction
       end
       instance = inspection_failure_type(id)
-      success_response("Updated inspection failure type #{instance.failure_type_code}",
-                       instance)
+      success_response("Updated inspection failure type #{instance.failure_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def delete_inspection_failure_type(id)
+    def delete_inspection_failure_type(id) # rubocop:disable Metrics/AbcSize
       name = inspection_failure_type(id).failure_type_code
       repo.transaction do
         repo.delete_inspection_failure_type(id)
-        log_status('inspection_failure_types', id, 'DELETED')
+        log_status(:inspection_failure_types, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted inspection failure type #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete inspection failure type. It is still referenced#{e.message.partition('referenced').last}")
     end
-
-    # def complete_a_inspection_failure_type(id, params)
-    #   res = complete_a_record(:inspection_failure_types, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, inspection_failure_type(id))
-    #   else
-    #     failed_response(res.message, inspection_failure_type(id))
-    #   end
-    # end
-
-    # def reopen_a_inspection_failure_type(id, params)
-    #   res = reopen_a_record(:inspection_failure_types, id, params.merge(enqueue_job: false))
-    #   if res.success
-    #     success_response(res.message, inspection_failure_type(id))
-    #   else
-    #     failed_response(res.message, inspection_failure_type(id))
-    #   end
-    # end
-
-    # def approve_or_reject_a_inspection_failure_type(id, params)
-    #   res = if params[:approve_action] == 'a'
-    #           approve_a_record(:inspection_failure_types, id, params.merge(enqueue_job: false))
-    #         else
-    #           reject_a_record(:inspection_failure_types, id, params.merge(enqueue_job: false))
-    #         end
-    #   if res.success
-    #     success_response(res.message, inspection_failure_type(id))
-    #   else
-    #     failed_response(res.message, inspection_failure_type(id))
-    #   end
-    # end
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::InspectionFailureType.call(task, id)
@@ -87,7 +57,7 @@ module MasterfilesApp
     private
 
     def repo
-      @repo ||= InspectionFailureTypeRepo.new
+      @repo ||= QualityRepo.new
     end
 
     def inspection_failure_type(id)

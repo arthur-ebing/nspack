@@ -49,8 +49,8 @@ module UiRules
         inspected_at: { renderer: :input,
                         subtype: :datetime },
         failure_reason_id: { renderer: :select,
-                             options: MasterfilesApp::InspectionFailureReasonRepo.new.for_select_inspection_failure_reasons,
-                             disabled_options: MasterfilesApp::InspectionFailureReasonRepo.new.for_select_inactive_inspection_failure_reasons,
+                             options: MasterfilesApp::QualityRepo.new.for_select_inspection_failure_reasons,
+                             disabled_options: MasterfilesApp::QualityRepo.new.for_select_inactive_inspection_failure_reasons,
                              caption: 'Failure Reason',
                              prompt: true },
         failure_remarks: {}

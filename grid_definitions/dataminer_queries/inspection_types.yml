@@ -1,0 +1,277 @@
+---
+:caption: Inspection Types
+:sql: "SELECT\r\n    inspection_types.id,\r\n    inspection_types.inspection_type_code,\r\n
+  \   inspection_types.description,\r\n    inspection_types.inspection_failure_type_id,\r\n
+  \   inspection_failure_types.failure_type_code,\r\n    coalesced.applicable_tm_group_ids,\r\n
+  \   (\r\n        SELECT\r\n            array_agg(target_market_group_name)\r\n        FROM\r\n
+  \           target_market_groups\r\n        WHERE\r\n            id = ANY (coalesced.applicable_tm_group_ids))
+  applicable_tm_groups,\r\n    coalesced.applicable_cultivar_ids,\r\n    (\r\n        SELECT\r\n
+  \           array_agg(cultivar_name)\r\n        FROM\r\n            cultivars\r\n
+  \       WHERE\r\n            id = ANY (coalesced.applicable_cultivar_ids)) applicable_cultivars,\r\n
+  \   coalesced.applicable_orchard_ids,\r\n    (\r\n        SELECT\r\n            array_agg(orchard_code)\r\n
+  \       FROM\r\n            orchards\r\n        WHERE\r\n            id = ANY (coalesced.applicable_orchard_ids))
+  applicable_orchards,\r\n    inspection_types.active,\r\n    inspection_types.created_at,\r\n
+  \   inspection_types.updated_at,\r\n    fn_current_status ('inspection_types', inspection_types.id)
+  AS status\r\nFROM\r\n    inspection_types\r\n    JOIN inspection_failure_types ON
+  inspection_failure_types.id = inspection_types.inspection_failure_type_id\r\n    JOIN
+  (\r\n        SELECT\r\n            inspection_types.id,\r\n            COALESCE(inspection_types.applicable_tm_group_ids,
+  (\r\n                    SELECT\r\n                        array_agg(id)\r\n                        FROM
+  target_market_groups)) applicable_tm_group_ids,\r\n            COALESCE(inspection_types.applicable_cultivar_ids,
+  (\r\n                    SELECT\r\n                        array_agg(id)\r\n                        FROM
+  cultivars)) applicable_cultivar_ids,\r\n            COALESCE(inspection_types.applicable_orchard_ids,
+  (\r\n                    SELECT\r\n                        array_agg(id)\r\n                        FROM
+  orchards)) applicable_orchard_ids\r\n        FROM\r\n            inspection_types)
+  coalesced ON coalesced.id = inspection_types.id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: inspection_types.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_code:
+    :name: inspection_type_code
+    :sequence_no: 2
+    :caption: Inspection type code
+    :namespaced_name: inspection_types.inspection_type_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 3
+    :caption: Description
+    :namespaced_name: inspection_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_failure_type_id:
+    :name: inspection_failure_type_id
+    :sequence_no: 4
+    :caption: Inspection failure type
+    :namespaced_name: inspection_types.inspection_failure_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_type_code:
+    :name: failure_type_code
+    :sequence_no: 5
+    :caption: Failure type code
+    :namespaced_name: inspection_failure_types.failure_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_tm_group_ids:
+    :name: applicable_tm_group_ids
+    :sequence_no: 6
+    :caption: Applicable tm group ids
+    :namespaced_name: coalesced.applicable_tm_group_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_tm_groups:
+    :name: applicable_tm_groups
+    :sequence_no: 7
+    :caption: Applicable TM groups
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_cultivar_ids:
+    :name: applicable_cultivar_ids
+    :sequence_no: 8
+    :caption: Applicable cultivar ids
+    :namespaced_name: coalesced.applicable_cultivar_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_cultivars:
+    :name: applicable_cultivars
+    :sequence_no: 9
+    :caption: Applicable cultivars
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_orchard_ids:
+    :name: applicable_orchard_ids
+    :sequence_no: 10
+    :caption: Applicable orchard ids
+    :namespaced_name: coalesced.applicable_orchard_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  applicable_orchards:
+    :name: applicable_orchards
+    :sequence_no: 11
+    :caption: Applicable orchards
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 12
+    :caption: Active
+    :namespaced_name: inspection_types.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 13
+    :caption: Created at
+    :namespaced_name: inspection_types.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 14
+    :caption: Updated at
+    :namespaced_name: inspection_types.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 15
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: inspection_types.inspection_failure_type_id
+  :caption: Inspection failure type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT failure_type_code, id FROM inspection_failure_types ORDER BY failure_type_code

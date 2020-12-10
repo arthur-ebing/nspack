@@ -6,7 +6,7 @@ module MasterfilesApp
       attr_reader :task, :entity
       def initialize(task, inspection_failure_type_id = nil)
         @task = task
-        @repo = InspectionFailureTypeRepo.new
+        @repo = QualityRepo.new
         @id = inspection_failure_type_id
         @entity = @id ? @repo.find_inspection_failure_type(@id) : nil
       end
@@ -15,9 +15,6 @@ module MasterfilesApp
         create: :create_check,
         edit: :edit_check,
         delete: :delete_check
-        # complete: :complete_check,
-        # approve: :approve_check,
-        # reopen: :reopen_check
       }.freeze
 
       def call
@@ -36,43 +33,12 @@ module MasterfilesApp
       end
 
       def edit_check
-        # return failed_response 'InspectionFailureType has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'InspectionFailureType has been completed' if completed?
-
         all_ok
       end
-
-      # def complete_check
-      #   return failed_response 'InspectionFailureType has already been completed' if completed?
-
-      #   all_ok
-      # end
-
-      # def approve_check
-      #   return failed_response 'InspectionFailureType has not been completed' unless completed?
-      #   return failed_response 'InspectionFailureType has already been approved' if approved?
-
-      #   all_ok
-      # end
-
-      # def reopen_check
-      #   return failed_response 'InspectionFailureType has not been approved' unless approved?
-
-      #   all_ok
-      # end
-
-      # def completed?
-      #   @entity.completed
-      # end
-
-      # def approved?
-      #   @entity.approved
-      # end
     end
   end
 end

@@ -7,6 +7,7 @@ module MasterfilesApp
     def test_for_selects
       assert_respond_to repo, :for_select_cultivar_groups
       assert_respond_to repo, :for_select_cultivars
+      assert_respond_to repo, :for_select_cultivar_codes
       assert_respond_to repo, :for_select_marketing_varieties
     end
 

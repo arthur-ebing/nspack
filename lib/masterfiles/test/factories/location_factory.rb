@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-# ========================================================= #
-# NB. Scaffolds for test factories should be combined       #
-#     - Otherwise you'll have methods for the same table in #
-#       several factories.                                  #
-#     - Rather create a factory for several related tables  #
-# ========================================================= #
-
 module MasterfilesApp
   module LocationFactory
     def create_location(opts = {})

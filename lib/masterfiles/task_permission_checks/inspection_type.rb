@@ -2,13 +2,13 @@
 
 module MasterfilesApp
   module TaskPermissionCheck
-    class InspectionFailureReason < BaseService
+    class InspectionType < BaseService
       attr_reader :task, :entity
-      def initialize(task, failure_reason_id = nil)
+      def initialize(task, inspection_type_id = nil)
         @task = task
         @repo = QualityRepo.new
-        @id = failure_reason_id
-        @entity = @id ? @repo.find_inspection_failure_reason(@id) : nil
+        @id = inspection_type_id
+        @entity = @id ? @repo.find_inspection_type(@id) : nil
       end
 
       CHECKS = {
@@ -18,7 +18,7 @@ module MasterfilesApp
       }.freeze
 
       def call
-        return failed_response 'Inspection Failure Reason record not found' unless @entity || task == :create
+        return failed_response 'Inspection Type record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

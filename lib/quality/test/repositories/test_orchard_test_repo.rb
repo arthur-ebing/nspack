@@ -7,8 +7,6 @@ module QualityApp
     def test_for_selects
       assert_respond_to repo, :for_select_orchard_test_types
       assert_respond_to repo, :for_select_orchard_test_results
-      assert_respond_to repo, :for_select_cultivar_codes
-      assert_respond_to repo, :for_select_orchards
     end
 
     def test_crud_calls

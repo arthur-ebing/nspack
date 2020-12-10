@@ -16,34 +16,6 @@
   :icon: delete
   :is_delete: true
   :popup: true
-- :url: "/masterfiles/quality/inspection_failure_reasons/$:id$/complete"
-  :text: Complete
-  :icon: toggle-on
-  :popup: true
-  :hide_if_true: completed
-  :auth:
-    :function: Masterfiles
-    :program: quality
-    :permission: edit
-- :url: "/masterfiles/quality/inspection_failure_reasons/$:id$/approve"
-  :text: Approve/Reject
-  :icon: gavel
-  :popup: true
-  :hide_if_false: completed
-  :hide_if_true: approved
-  :auth:
-    :function: Masterfiles
-    :program: quality
-    :permission: approve
-- :url: "/masterfiles/quality/inspection_failure_reasons/$:id$/reopen"
-  :text: Re-open for editing
-  :icon: toggle-off
-  :popup: true
-  :hide_if_false: approved
-  :auth:
-    :function: Masterfiles
-    :program: quality
-    :permission: edit
 - :separator: true
 - :url: "/development/statuses/list/inspection_failure_reasons/$:id$"
   :text: status

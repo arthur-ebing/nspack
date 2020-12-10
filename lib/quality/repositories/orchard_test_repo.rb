@@ -14,26 +14,6 @@ module QualityApp
     crud_calls_for :orchard_test_types, name: :orchard_test_type, wrapper: OrchardTestType
     crud_calls_for :orchard_test_results, name: :orchard_test_result, wrapper: OrchardTestResult
 
-    build_for_select :cultivars,
-                     alias: :cultivar_codes,
-                     label: %i[cultivar_name cultivar_code],
-                     value: :id,
-                     order_by: :cultivar_code
-    build_inactive_select :cultivars,
-                          alias: :cultivar_codes,
-                          label: %i[cultivar_name cultivar_code],
-                          value: :id,
-                          order_by: :cultivar_code
-
-    build_for_select :orchards,
-                     label: :orchard_code,
-                     value: :id,
-                     order_by: :orchard_code
-    build_inactive_select :orchards,
-                          label: :orchard_code,
-                          value: :id,
-                          order_by: :orchard_code
-
     def for_select_orchard_test_results(orchard_test_type_id)
       query = <<~SQL
         SELECT

@@ -20,6 +20,17 @@ module MasterfilesApp
                           value: :id,
                           order_by: :cultivar_name
 
+    build_for_select :cultivars,
+                     alias: :cultivar_codes,
+                     label: %i[cultivar_name cultivar_code],
+                     value: :id,
+                     order_by: :cultivar_code
+    build_inactive_select :cultivars,
+                          alias: :cultivar_codes,
+                          label: %i[cultivar_name cultivar_code],
+                          value: :id,
+                          order_by: :cultivar_code
+
     build_for_select :marketing_varieties,
                      label: :marketing_variety_code,
                      value: :id,
