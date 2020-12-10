@@ -242,7 +242,7 @@ module UiRules
 
     def add_rules # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       rules[:inspected] = @form_object.inspected
-      rules[:create_intake_tripsheet] = @form_object.inspected && !@form_object.tripsheet_created
+      rules[:create_intake_tripsheet] = @form_object.inspected && !@form_object.tripsheet_created && !AppConst::HIDE_INTAKE_TRIP_SHEET_ON_GOVT_INSPECTION_SHEET
       rules[:load_vehicle] = @form_object.tripsheet_created && !@form_object.tripsheet_loaded
       rules[:vehicle_loaded] = @form_object.tripsheet_loaded
       rules[:cancel_tripsheet] = (@form_object.tripsheet_created || @form_object.tripsheet_loaded) && !@form_object.tripsheet_offloaded
