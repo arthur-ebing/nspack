@@ -248,6 +248,25 @@ module MesscadaApp
       failed_response(e.message)
     end
 
+    def xml_carton_labeling(params) # rubocop:disable Metrics/AbcSize
+      cvl_res = nil
+      repo.transaction do
+        cvl_res = MesscadaApp::CartonLabeling.call(params)
+        log_transaction
+      end
+      xml_label_content(params[:system_resource], cvl_res.instance)
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: decorate_mail_message('xml_carton_labeling'))
+      puts e.message
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('xml_carton_labeling'))
+      puts e
+      puts e.backtrace.join("\n")
+      failed_response(e.message)
+    end
+
     def carton_verification(params)  # rubocop:disable Metrics/AbcSize
       res = CartonAndPalletVerificationSchema.call(params)
       return validation_failed_response(res) if res.failure?
@@ -567,6 +586,34 @@ module MesscadaApp
 
     def get_pallet_label_data(pallet_id)
       production_run_repo.get_pallet_label_data(pallet_id)
+    end
+
+    def xml_label_content(system_resource, print_command) # rubocop:disable Metrics/AbcSize
+      schema = Nokogiri::XML(print_command)
+      label_name = schema.xpath('.//label/template').text
+      quantity = schema.xpath('.//label/quantity').text
+      printer = printer_for_robot(system_resource.id)
+      vars = schema.xpath('.//label/fvalue').each_with_index.map { |node, i| %(F#{i + 1}="#{node.text}") }
+      ar = [
+        '<ProductLabel',
+        'PID="223"',
+        'Status="true"',
+        'Threading="true"',
+        %(RunNumber="2020_AP_20980_1568_21A"), # TODO: get production run code
+        %(Code=""),
+        %(LabelTemplateFile="#{label_name}.nsld"),
+        %(LabelRenderAmount="#{quantity}"),
+        'F0=""'
+      ]
+      ar += vars
+      ar << 'Msg=""'
+      ar << %(Printer="#{printer}" />)
+
+      success_response('Label printed', ar.join(' '))
+    end
+
+    def printer_for_robot(id)
+      LabelApp::PrinterRepo.new.printer_code_for_robot(id)
     end
   end
 end

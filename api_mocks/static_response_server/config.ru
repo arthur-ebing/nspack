@@ -13,9 +13,9 @@ class App < Roda # rubocop:disable Metrics/ClassLength
   plugin :symbolized_params
 
   MAF_URL_SET = [
-    '/messcada/maf/bin_tipping/can_dump',
-    '/messcada/maf/bin_tipping/dump',
-    '/messcada/maf/carton_labeling'
+    '/messcada/xml/bin_tipping/can_dump',
+    '/messcada/xml/bin_tipping/dump',
+    '/messcada/xml/carton_labeling'
   ].freeze
 
   URL_SET = [
