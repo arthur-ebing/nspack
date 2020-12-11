@@ -129,7 +129,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def create_rmt_bin(delivery_id, params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       vres = validate_bin_asset_no_format(params)
       return vres unless vres.success
       return failed_response("Scanned Bin Number:#{params[:bin_asset_number]} is already in stock") if AppConst::USE_PERMANENT_RMT_BIN_BARCODES && !bin_asset_number_available?(params[:bin_asset_number])
@@ -143,6 +143,13 @@ module RawMaterialsApp
       id = nil
       repo.transaction do
         id = repo.create_rmt_bin(res)
+
+        options = { force_find_by_id: true, weighed_manually: true, avg_gross_weight: false }
+        bin_number = (AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? res.to_h[:bin_asset_number] : id)
+        attrs = { bin_number: bin_number, gross_weight: params[:gross_weight].to_i }
+        rw_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
+        raise rw_res.message unless rw_res.success
+
         log_status(:rmt_bins, id, 'BIN RECEIVED')
         log_transaction
       end
@@ -152,6 +159,8 @@ module RawMaterialsApp
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { status: ['This rmt bin already exists'] }))
     rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
       failed_response(e.message)
     end
 

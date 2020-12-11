@@ -77,6 +77,7 @@ module UiRules
       fields[:qty_bins] = { renderer: :label }
       fields[:qty_inner_bins] = { renderer: :label, hide_on_load: @rules[:capture_inner_bins] ? false : true }
       fields[:bin_fullness] = { renderer: :label }
+      fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
       fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Rmt Class' }
       fields[:rmt_container_material_type_id] = { renderer: :label, with_value: rmt_container_material_type_id_label, caption: 'Container Material Type' }
@@ -94,7 +95,7 @@ module UiRules
         bin_asset_number: { renderer: :label },
         qty_bins: { required: true },
         bin_fullness: { renderer: :select, options: ['Quarter', 'Half', 'Three Quarters', 'Full'], caption: 'Bin Fullness', required: true, prompt: true },
-        nett_weight: {},
+        gross_weight: {},
         rmt_container_type_id: { renderer: :select, options: MasterfilesApp::RmtContainerTypeRepo.new.for_select_rmt_container_types, required: true, prompt: true },
         rmt_class_id: { renderer: :select, options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes, required: true, prompt: true },
         rmt_container_material_type_id: { renderer: :select, options: !@form_object.rmt_container_type_id.nil_or_empty? ? MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: @form_object.rmt_container_type_id }) : [],

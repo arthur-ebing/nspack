@@ -4,7 +4,7 @@ module RawMaterials
   module Deliveries
     module RmtBin
       class New
-        def self.call(id, form_values: nil, form_errors: nil, remote: true, is_direct_create: false) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+        def self.call(id, form_values: nil, form_errors: nil, remote: true, is_direct_create: false) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:rmt_bin, :new, delivery_id: id, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -22,7 +22,7 @@ module RawMaterials
               form.add_field :qty_bins
               form.add_field :qty_inner_bins
               form.add_field :bin_fullness
-              form.add_field :nett_weight if rules[:show_nett_weight]
+              form.add_field :gross_weight
               form.add_field :rmt_container_material_type_id if rules[:capture_container_material]
               form.add_field :rmt_material_owner_party_role_id if rules[:capture_container_material] && rules[:capture_container_material_owner]
             end

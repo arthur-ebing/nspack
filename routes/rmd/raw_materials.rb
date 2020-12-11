@@ -961,7 +961,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       details = retrieve_from_local_store(:bin) || { bin_fullness: :Full } # cultivar_id: bin_delivery[:cultivar_id],
 
       capture_inner_bins = AppConst::DELIVERY_CAPTURE_INNER_BINS && !default_rmt_container_type[:id].nil? && !MasterfilesApp::RmtContainerTypeRepo.new.find_container_type(default_rmt_container_type[:id])&.rmt_inner_container_type_id
-      capture_nett_weight = AppConst::DELIVERY_CAPTURE_BIN_WEIGHT_AT_FRUIT_RECEPTION
       capture_container_material = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL
       capture_container_material_owner = AppConst::DELIVERY_CAPTURE_CONTAINER_MATERIAL_OWNER
 
@@ -1003,7 +1002,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
       end
       form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
-      form.add_field(:nett_weight, 'Nett Weight', required: false) if capture_nett_weight
+      form.add_field(:gross_weight, 'Gross Weight', required: true)
 
       if capture_container_material
         form.add_select(:rmt_container_material_type_id, 'Container Material Type',
