@@ -49,6 +49,9 @@ class Nspack < Roda
     r.on 'in_stock' do
       show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::PalletsInStock.call }
     end
+    r.on 'in_stock_per_size' do
+      show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::PalletsInStockSize.call }
+    end
 
     # DELIVERIES
     # --------------------------------------------------------------------------

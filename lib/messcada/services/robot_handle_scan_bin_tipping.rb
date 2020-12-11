@@ -28,6 +28,24 @@ module MesscadaApp
       # - supervisor logon
       # - allow: yes: B3, no: B4
       # - or scan valid bin (clears state)
+    rescue Crossbeams::InfoError => e
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: robot_interface.decorate_mail_message('bin_tipping'))
+      puts e.message
+      puts e.backtrace.join("\n")
+      feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
+                                                status: false,
+                                                short1: 'System error',
+                                                short2: e.message)
+      robot_interface.respond(feedback, false)
+    rescue StandardError => e
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: robot_interface.decorate_mail_message('bin_tipping'))
+      puts e
+      puts e.backtrace.join("\n")
+      feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
+                                                status: false,
+                                                short1: 'System error',
+                                                short2: e.message)
+      robot_interface.respond(feedback, false)
     end
   end
 end

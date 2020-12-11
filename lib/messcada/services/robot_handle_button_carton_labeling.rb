@@ -37,7 +37,7 @@ module MesscadaApp
         robot_interface.respond(feedback, false)
       end
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: robot_interface.decorate_mail_message('carton_labeling')) if AppConst::ROBOT_DISPLAY_LINES != 4
+      ErrorMailer.send_exception_email(e, subject: "INFO: #{self.class.name}", message: robot_interface.decorate_mail_message('carton_labeling'))
       puts e.message
       puts e.backtrace.join("\n")
       feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,

@@ -234,6 +234,38 @@ module ProductionApp
       DB[query].all
     end
 
+    def pallets_in_stock_per_size
+      query = <<~SQL
+        SELECT
+          target_market_groups.target_market_group_name AS packed_tm_group,
+          cultivars.cultivar_name,
+          standard_pack_codes.standard_pack_code,
+          CASE
+              WHEN commodities.code::text = 'SC'::text THEN concat_ws('/'::text, fruit_size_references.size_reference, std_fruit_size_counts.size_count_interval_group)
+              ELSE concat_ws('/'::text, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack)
+          END AS count_swap_rule,
+          COUNT(*) AS pallet_count
+        FROM pallets
+        JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+        JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+        JOIN standard_pack_codes ON standard_pack_codes.id = pallet_sequences.standard_pack_code_id
+        JOIN cultivars ON cultivars.id = pallet_sequences.cultivar_id
+        LEFT JOIN commodities ON commodities.id = cultivars.commodity_id
+        LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pallet_sequences.std_fruit_size_count_id
+        LEFT JOIN fruit_size_references ON fruit_size_references.id = pallet_sequences.fruit_size_reference_id
+        LEFT JOIN fruit_actual_counts_for_packs ON fruit_actual_counts_for_packs.id = pallet_sequences.fruit_actual_counts_for_pack_id
+        WHERE pallets.in_stock AND NOT pallets.allocated
+        GROUP BY target_market_groups.target_market_group_name, cultivars.cultivar_name, standard_pack_codes.standard_pack_code,
+              CASE
+                WHEN commodities.code::text = 'SC'::text THEN concat_ws('/'::text, fruit_size_references.size_reference, std_fruit_size_counts.size_count_interval_group)
+                ELSE concat_ws('/'::text, fruit_size_references.size_reference, fruit_actual_counts_for_packs.actual_count_for_pack)
+              END
+        ORDER BY target_market_groups.target_market_group_name, cultivars.cultivar_name, standard_pack_codes.standard_pack_code
+      SQL
+
+      DB[query].all
+    end
+
     def delivery_cultivars_per_week
       query = <<~SQL
         SELECT
