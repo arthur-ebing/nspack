@@ -144,7 +144,7 @@ module RawMaterialsApp
       repo.transaction do
         id = repo.create_rmt_bin(res)
 
-        options = { force_find_by_id: true, weighed_manually: true, avg_gross_weight: false }
+        options = { force_find_by_id: false, weighed_manually: true, avg_gross_weight: false }
         bin_number = (AppConst::USE_PERMANENT_RMT_BIN_BARCODES ? res.to_h[:bin_asset_number] : id)
         attrs = { bin_number: bin_number, gross_weight: params[:gross_weight].to_i }
         rw_res = MesscadaApp::UpdateBinWeights.call(attrs, options)
