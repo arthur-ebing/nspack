@@ -336,6 +336,96 @@ module ProductionApp
       DB[query].all.group_by { |r| r[:delivery_week] }
     end
 
+    def last_bin_received_date
+      query = <<~SQL
+        SELECT DATE(bin_received_date_time) AS last_date
+        FROM rmt_bins
+        ORDER BY id DESC
+        LIMIT 1
+      SQL
+      DB[query].get(:last_date)
+    end
+
+    def tipped_bins_for_day(date)
+      query = <<~SQL
+        SELECT
+        pucs.puc_code,
+        orchards.orchard_code,
+        cultivars.cultivar_name,
+        SUM(rmt_bins.qty_bins) AS qty_bins,
+        SUM(rmt_bins.nett_weight) AS nett_weight
+        FROM rmt_bins
+        LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
+        LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
+        LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
+        WHERE DATE(bin_tipped_date_time) = ?
+        GROUP BY pucs.puc_code,
+        orchards.orchard_code,
+        cultivars.cultivar_name
+        ORDER BY pucs.puc_code,
+                  orchards.orchard_code,
+                  cultivars.cultivar_name
+      SQL
+
+      DB[query, date].all
+    end
+
+    def received_bins_for_day(date)
+      query = <<~SQL
+        SELECT
+        pucs.puc_code,
+        orchards.orchard_code,
+        cultivars.cultivar_name,
+        SUM(rmt_bins.qty_bins) AS qty_bins,
+        SUM(rmt_bins.nett_weight) AS nett_weight
+        FROM rmt_bins
+        LEFT JOIN pucs ON pucs.id = rmt_bins.puc_id
+        LEFT JOIN orchards ON orchards.id = rmt_bins.orchard_id
+        LEFT JOIN cultivars ON cultivars.id = rmt_bins.cultivar_id
+        WHERE DATE(bin_received_date_time) = ?
+          AND NOT bin_tipped
+        GROUP BY pucs.puc_code,
+        orchards.orchard_code,
+        cultivars.cultivar_name
+        ORDER BY pucs.puc_code,
+                  orchards.orchard_code,
+                  cultivars.cultivar_name
+      SQL
+
+      DB[query, date].all
+    end
+
+    def loads_for_day(date)
+      query = <<~SQL
+          SELECT organizations.medium_description AS customer,
+          loads.id AS load_id,
+          pol_port.port_code AS pol,
+          pod_port.port_code AS pod,
+          COUNT(pallets.id) AS qty_pallets,
+          SUM(pallets.nett_weight) AS nett_weight
+          FROM pallets
+          JOIN pallet_sequences ON pallet_sequences.pallet_id = pallets.id
+          JOIN target_market_groups ON target_market_groups.id = pallet_sequences.packed_tm_group_id
+          JOIN loads ON loads.id = pallets.load_id
+          JOIN party_roles ON party_roles.id = loads.customer_party_role_id
+          JOIN organizations ON organizations.id = party_roles.organization_id
+          JOIN voyage_ports pol_voyage_ports ON pol_voyage_ports.id = loads.pol_voyage_port_id
+          JOIN voyage_ports pod_voyage_ports ON pod_voyage_ports.id = loads.pod_voyage_port_id
+          JOIN ports pol_port ON pol_port.id = pol_voyage_ports.port_id
+          JOIN ports pod_port ON pod_port.id = pod_voyage_ports.port_id
+          WHERE DATE(loads.shipped_at) = ?
+        GROUP BY organizations.medium_description,
+        loads.id,
+        pol_port.port_code,
+        pod_port.port_code
+        ORDER BY organizations.medium_description,
+        pol_port.port_code,
+        pod_port.port_code
+      SQL
+
+      DB[query, date].all
+    end
+
     def deliveries_per_day
       query = <<~SQL
         SELECT

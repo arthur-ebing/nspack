@@ -63,6 +63,12 @@ class Nspack < Roda
       show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::DeliveryDays.call }
     end
 
+    # BIN STATE
+    # --------------------------------------------------------------------------
+    r.on 'bin_state' do
+      show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::BinState.call }
+    end
+
     # CARTON-PALLET SUMMARY
     # --------------------------------------------------------------------------
     r.on 'carton_pallet_summary_weeks' do
