@@ -19,8 +19,6 @@ module FinishedGoodsApp
       return res unless res.success
 
       @pallet_numbers = res.instance
-      res = check_pallets(:has_nett_weight, pallet_numbers)
-      return res unless res.success
 
       res = find_tracking_unit
       return failed_response(res.message) unless res.success
@@ -42,10 +40,6 @@ module FinishedGoodsApp
 
     def api
       @api ||= ECertApi.new
-    end
-
-    def check_pallets(check, pallet_numbers)
-      MesscadaApp::TaskPermissionCheck::Pallets.call(check, pallet_numbers)
     end
 
     def find_tracking_unit
