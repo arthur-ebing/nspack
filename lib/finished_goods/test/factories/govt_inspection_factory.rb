@@ -9,7 +9,7 @@ module FinishedGoodsApp
         inspector_party_role_id: party_role_id,
         inspector_code: Faker::Lorem.unique.word,
         tablet_ip_address: Faker::Lorem.unique.word,
-        tablet_port_number: Faker::Number.number(4),
+        tablet_port_number: Faker::Number.number(digits: 4),
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

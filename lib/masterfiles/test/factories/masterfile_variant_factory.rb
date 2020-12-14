@@ -6,7 +6,7 @@ module MasterfilesApp
       default = {
         masterfile_table: 'target_market_groups',
         variant_code: Faker::Lorem.word,
-        masterfile_id: Faker::Number.number(4),
+        masterfile_id: Faker::Number.number(digits: 4),
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'
       }

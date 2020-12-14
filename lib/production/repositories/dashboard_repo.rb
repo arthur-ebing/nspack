@@ -340,6 +340,7 @@ module ProductionApp
       query = <<~SQL
         SELECT DATE(bin_received_date_time) AS last_date
         FROM rmt_bins
+        WHERE bin_received_date_time IS NOT NULL
         ORDER BY id DESC
         LIMIT 1
       SQL

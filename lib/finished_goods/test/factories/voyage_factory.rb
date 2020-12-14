@@ -11,7 +11,7 @@ module FinishedGoodsApp
         voyage_type_id: voyage_type_id,
         voyage_number: Faker::Lorem.unique.word,
         voyage_code: Faker::Lorem.unique.word,
-        year: Faker::Number.number(4),
+        year: Faker::Number.number(digits: 4),
         completed: false,
         completed_at: '2010-01-01 12:00',
         active: true,

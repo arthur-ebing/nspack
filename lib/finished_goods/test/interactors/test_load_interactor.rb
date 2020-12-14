@@ -115,7 +115,7 @@ module FinishedGoodsApp
         voyage_type_id: voyage_type_id,
         vessel_id: vessel_id,
         voyage_id: voyage_id,
-        voyage_number: Faker::Number.number(4),
+        voyage_number: Faker::Lorem.word,
         voyage_code: Faker::Lorem.unique.word,
         year: 2019,
         pol_port_id: pol_port_id,

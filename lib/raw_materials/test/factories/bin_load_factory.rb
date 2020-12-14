@@ -14,7 +14,7 @@ module RawMaterialsApp
     end
 
     def create_bin_load(opts = {}, add_product: true)
-      qty_bins = Faker::Number.number(4)
+      qty_bins = Faker::Number.number(digits: 4)
       bin_load_purpose_id = create_bin_load_purpose
       party_role_id = create_party_role
       depot_id = create_depot
@@ -50,7 +50,7 @@ module RawMaterialsApp
 
       default = {
         bin_load_id: bin_load_id,
-        qty_bins: Faker::Number.number(4),
+        qty_bins: Faker::Number.number(digits: 4),
         cultivar_id: cultivar_id,
         cultivar_group_id: cultivar_group_id,
         rmt_container_material_type_id: rmt_container_material_type_id,

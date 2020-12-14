@@ -195,7 +195,7 @@ module DevelopmentApp
       FAKER_STRING = 'Faker::Lorem.word'
       FAKER_UNIQUE_STRING = 'Faker::Lorem.unique.word'
       FAKER_DATA_LOOKUP = {
-        integer: 'Faker::Number.number(4)',
+        integer: 'Faker::Number.number(digits: 4)',
         string: 'Faker::Lorem.word',
         boolean: 'false',
         float: '1.0',
