@@ -96,6 +96,7 @@ module RawMaterialsApp
         join pucs p on p.id=d.puc_id
         join orchards o on o.id=d.orchard_id
         join cultivars c on c.id=d.cultivar_id
+        where delivery_tipped is false
         order by id desc
         limit 20
       SQL
