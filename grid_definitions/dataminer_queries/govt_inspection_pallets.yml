@@ -1,31 +1,30 @@
 ---
 :caption: Govt Inspection Pallets
-:sql: "        SELECT\r\n          p.pallet_number,\r\n          govt_inspection_pallets.id,\r\n
-  \         govt_inspection_pallets.pallet_id,\r\n          govt_inspection_pallets.govt_inspection_sheet_id,\r\n
-  \         govt_inspection_sheets.completed,\r\n          govt_inspection_pallets.passed,\r\n
-  \         govt_inspection_pallets.inspected,\r\n          govt_inspection_pallets.inspected_at,\r\n
-  \         govt_inspection_pallets.failure_reason_id,\r\n          inspection_failure_reasons.failure_reason,\r\n
-  \         inspection_failure_reasons.description, \r\n          inspection_failure_reasons.main_factor,\r\n
-  \         inspection_failure_reasons.secondary_factor,\r\n          govt_inspection_pallets.failure_remarks,\r\n
-  \         govt_inspection_sheets.inspected AS sheet_inspected,\r\n          p.gross_weight,\r\n
-  \         p.carton_quantity,\r\n          array_agg(distinct marketing_varieties.marketing_variety_code)
-  AS marketing_varieties,\r\n          array_agg(distinct target_market_groups.target_market_group_name)
-  AS  packed_tm_groups,\r\n          pallet_bases.pallet_base_code AS pallet_base,\r\n
-  \         govt_inspection_pallets.active,\r\n          govt_inspection_pallets.created_at,\r\n
-  \         govt_inspection_pallets.updated_at,\r\n          CASE\r\n            WHEN
-  govt_inspection_pallets.inspected AND NOT govt_inspection_pallets.passed THEN 'error'\r\n
-  \           WHEN govt_inspection_pallets.passed THEN 'ok'\r\n          END AS colour_rule\r\n
-  \       \r\n        FROM govt_inspection_pallets\r\n        JOIN govt_inspection_sheets
-  ON govt_inspection_sheets.id = govt_inspection_pallets.govt_inspection_sheet_id\r\n
-  \       LEFT JOIN inspection_failure_reasons ON inspection_failure_reasons.id =
-  govt_inspection_pallets.failure_reason_id\r\n        LEFT JOIN pallets p ON p.id
-  = govt_inspection_pallets.pallet_id\r\n        LEFT JOIN pallet_sequences ps ON
-  p.id = ps.pallet_id\r\n        LEFT JOIN marketing_varieties ON marketing_varieties.id
-  = ps.marketing_variety_id\r\n        LEFT JOIN target_market_groups ON target_market_groups.id
-  = ps.packed_tm_group_id\r\n        LEFT JOIN pallet_formats ON pallet_formats.id
-  = p.pallet_format_id\r\n        LEFT JOIN pallet_bases ON pallet_bases.id = pallet_formats.pallet_base_id\r\n
-  \       \r\n        GROUP BY \r\n          govt_inspection_pallets.id,\r\n          govt_inspection_sheets.id,\r\n
-  \         p.id,\r\n          inspection_failure_reasons.id,\r\n          pallet_bases.id"
+:sql: "SELECT\r\n    p.pallet_number,\r\n    govt_inspection_pallets.id,\r\n    govt_inspection_pallets.pallet_id,\r\n
+  \   govt_inspection_pallets.govt_inspection_sheet_id,\r\n    govt_inspection_sheets.completed,\r\n
+  \   govt_inspection_pallets.passed,\r\n    govt_inspection_pallets.inspected,\r\n
+  \   govt_inspection_pallets.inspected_at,\r\n    govt_inspection_pallets.failure_reason_id,\r\n
+  \   inspection_failure_reasons.failure_reason,\r\n    inspection_failure_reasons.description,\r\n
+  \   inspection_failure_reasons.main_factor,\r\n    inspection_failure_reasons.secondary_factor,\r\n
+  \   govt_inspection_pallets.failure_remarks,\r\n    govt_inspection_sheets.inspected
+  AS sheet_inspected,\r\n    p.gross_weight,\r\n    p.carton_quantity,\r\n    array_agg(DISTINCT
+  marketing_varieties.marketing_variety_code) AS marketing_varieties,\r\n    array_agg(DISTINCT
+  target_market_groups.target_market_group_name) AS packed_tm_groups,\r\n    pallet_bases.pallet_base_code
+  AS pallet_base,\r\n    govt_inspection_pallets.active,\r\n    govt_inspection_pallets.created_at,\r\n
+  \   govt_inspection_pallets.updated_at,\r\n    CASE WHEN govt_inspection_pallets.inspected\r\n
+  \       AND NOT govt_inspection_pallets.passed THEN\r\n        'error'\r\n    WHEN
+  govt_inspection_pallets.passed THEN\r\n        'ok'\r\n    END AS colour_rule\r\nFROM\r\n
+  \   govt_inspection_pallets\r\n    JOIN govt_inspection_sheets ON govt_inspection_sheets.id
+  = govt_inspection_pallets.govt_inspection_sheet_id\r\n    LEFT JOIN inspection_failure_reasons
+  ON inspection_failure_reasons.id = govt_inspection_pallets.failure_reason_id\r\n
+  \   LEFT JOIN pallets p ON p.id = govt_inspection_pallets.pallet_id\r\n    LEFT
+  JOIN pallet_sequences ps ON p.id = ps.pallet_id\r\n    LEFT JOIN marketing_varieties
+  ON marketing_varieties.id = ps.marketing_variety_id\r\n    LEFT JOIN target_market_groups
+  ON target_market_groups.id = ps.packed_tm_group_id\r\n    LEFT JOIN pallet_formats
+  ON pallet_formats.id = p.pallet_format_id\r\n    LEFT JOIN pallet_bases ON pallet_bases.id
+  = pallet_formats.pallet_base_id\r\nGROUP BY\r\n    govt_inspection_pallets.id,\r\n
+  \   govt_inspection_sheets.id,\r\n    p.id,\r\n    inspection_failure_reasons.id,\r\n
+  \   pallet_bases.id\r\nORDER BY\r\n    govt_inspection_pallets.id DESC"
 :limit: 
 :offset: 
 :external_settings:
