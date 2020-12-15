@@ -65,8 +65,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect('/list/rmt_deliveries')
       end
 
-      r.on 'open_delivery' do
-        res = interactor.open_delivery(id)
+      r.on 'keep_delivery_open' do
+        res = interactor.keep_delivery_open(id)
+        if res.success
+          flash[:notice] = res.message
+        else
+          flash[:error] = unwrap_failed_response(res)
+        end
+        r.redirect("/list/rmt_deliveries/with_params?key=standard&id=#{id}")
+      end
+
+      r.on 'reopen_delivery' do
+        res = interactor.reopen_delivery(id)
         if res.success
           flash[:notice] = res.message
         else

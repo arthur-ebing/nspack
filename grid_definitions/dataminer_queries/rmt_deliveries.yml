@@ -1,7 +1,7 @@
 ---
 :caption: Rmt Deliveries
 :sql: "SELECT\r\n    rmt_deliveries.id,\r\n    fn_current_status ('rmt_deliveries',
-  rmt_deliveries.id) AS status,\r\n    rmt_deliveries.reference_number,\r\n    --\r\n
+  rmt_deliveries.id) AS status,\r\n    rmt_deliveries.reference_number,\r\n    CASE\r\n  WHEN rmt_deliveries.keep_open or rmt_deliveries.delivery_tipped THEN false ELSE true END as show_keep_delivery_open,
   \   rmt_deliveries.season_id,\r\n    seasons.season_code,\r\n    --\r\n    rmt_deliveries.farm_id,\r\n
   \   farms.farm_code,\r\n    --\r\n    rmt_deliveries.puc_id,\r\n    pucs.puc_code,\r\n
   \   --\r\n    rmt_deliveries.orchard_id,\r\n    orchards.orchard_code,\r\n    --\r\n

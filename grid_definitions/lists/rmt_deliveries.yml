@@ -39,12 +39,19 @@
   :title: Status
   :popup: true
 - :separator: true
-- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/open_delivery"
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/keep_delivery_open"
   :text: keep delivery open
   :title: Keep open
   :icon: add-outline
   :popup: false
-  :hide_if_true: keep_open
+  :hide_if_false: show_keep_delivery_open
+  :prompt: 'You are about to open this delivery. Are you sure?'
+- :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/reopen_delivery"
+  :text: reopen delivery
+  :title: Keep open
+  :icon: add-outline
+  :popup: false
+  :hide_if_false: delivery_tipped
   :prompt: 'You are about to open this delivery. Are you sure?'
 - :url: "/raw_materials/deliveries/rmt_deliveries/$:id$/close_delivery"
   :text: allow to close

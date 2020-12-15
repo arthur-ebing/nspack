@@ -134,16 +134,28 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def open_delivery(id)
+    def keep_delivery_open(id)
       repo.transaction do
         repo.update_rmt_delivery(id, keep_open: true, delivery_tipped: false)
         log_status(:rmt_deliveries, id, 'DELIVERY OPENED')
         log_transaction
       end
       instance = rmt_delivery(id)
-      return failed_response('Delivery: Could Not Be Opened', instance) unless instance.keep_open
 
       success_response('Delivery: Has Been Opened', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def reopen_delivery(id)
+      repo.transaction do
+        repo.update_rmt_delivery(id, delivery_tipped: false)
+        log_status(:rmt_deliveries, id, 'DELIVERY REOPENED')
+        log_transaction
+      end
+      instance = rmt_delivery(id)
+
+      success_response('Delivery: Has Been Reopened', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
