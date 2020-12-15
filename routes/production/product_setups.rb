@@ -452,7 +452,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'pm_bom_changed' do
         pm_mark_id = params[:product_setup_pm_mark_id]
-        if params[:changed_value].blank?
+        if params[:changed_value].blank? || pm_mark_id.blank?
           pm_bom_description = nil
           pm_bom_erp_bom_code = nil
           pm_bom_products = []
@@ -487,7 +487,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'pm_mark_changed' do
         pm_bom_id = params[:product_setup_pm_bom_id]
-        if pm_bom_id.blank?
+        if pm_bom_id.blank? || params[:changed_value].blank?
           pm_bom_products = []
         else
           pm_mark_id = params[:changed_value]
