@@ -1002,7 +1002,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_label(:qty_inner_bins, 'Qty Inner Bins', '1', '1', hide_on_load: true)
       end
       form.add_select(:bin_fullness, 'Bin Fullness', items: %w[Quarter Half Three\ Quarters Full], prompt: true)
-      form.add_field(:gross_weight, 'Gross Weight', required: true)
+      form.add_field(:gross_weight, 'Gross Weight', required: false)
 
       if capture_container_material
         form.add_select(:rmt_container_material_type_id, 'Container Material Type',
