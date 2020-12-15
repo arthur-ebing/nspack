@@ -26,7 +26,7 @@ module Production
           tipped_recs = repo.tipped_bins_for_day(date)
           received_recs = repo.received_bins_for_day(date)
           load_recs = repo.loads_for_day(date)
-          return 'There is nothing to display' if tipped_recs.empty? && received_recs.empty? && load_recs.empty?
+          return "<h3>#{date.strftime('%A, %d %B %Y')}</h3> There is nothing to display" if tipped_recs.empty? && received_recs.empty? && load_recs.empty?
 
           <<~HTML
             <h3>#{date.strftime('%A, %d %B %Y')}</h3>
@@ -59,7 +59,7 @@ module Production
         end
 
         def self.bin_items(recs)
-          return ['No bins'] if recs.empty?
+          return ['<p class="near-white">No bins</p>'] if recs.empty?
 
           recs.map do |rec|
             <<~HTML
@@ -79,7 +79,7 @@ module Production
         end
 
         def self.loads(recs)
-          return ['No loads'] if recs.empty?
+          return ['<p class="near-white">No loads</p>'] if recs.empty?
 
           recs.map do |rec|
             <<~HTML
