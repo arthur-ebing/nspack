@@ -49,6 +49,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
   URL_BASE = ENV.fetch('URL_BASE')
   APP_CAPTION = ENV.fetch('APP_CAPTION')
 
+  # Load client-specific rules:
+  # NB: these must start with CR_ and the class must start with "Client".
+  CR_RUN = Crossbeams::ClientRunRules.new(CLIENT_CODE)
+
   # labeling cached setup data path
   LABELING_CACHED_DATA_FILEPATH = File.expand_path('../tmp/run_cache', __dir__)
 

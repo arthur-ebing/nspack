@@ -312,11 +312,20 @@ class Nspack < Roda
 
     r.is 'client_settings' do
       require './config/env_var_rules'
+
       en = EnvVarRules.new
       settings = en.client_settings
       @layout = Crossbeams::Layout::Page.build do |page, _|
         page.section do |section|
           section.add_text('Client Settings', wrapper: :h2)
+          AppConst.constants.grep(/CR_/).sort.each do |const|
+            kl = AppConst.const_get(const)
+            next unless kl.class.name.start_with?('Crossbeams::')
+
+            section.add_text("#{kl.rule_name} (AppConst::#{const})", wrapper: :h3)
+            section.add_table(kl.to_table, %i[method value description])
+          end
+          section.add_text('Constants', wrapper: :h3)
           section.add_text('Note: some values have spaces inserted after commas to make the display wrap better. Be aware of this if copying a setting from here.', wrapper: :em)
           section.add_table(settings, %i[key env_val const_val], header_captions: { env_val: 'Environment variable value', const_val: 'Value in AppConst' })
         end
