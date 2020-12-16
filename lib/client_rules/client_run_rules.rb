@@ -4,8 +4,6 @@ module Crossbeams
   class ClientRunRules
     include Crossbeams::AutoDocumentation
 
-    attr_reader :settings
-
     CLIENT_SETTINGS = {
       hb: { run_allocations: false },
       hl: { run_allocations: true },
@@ -19,10 +17,17 @@ module Crossbeams
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
     end
 
+    # Get the setting for a particular key
+    def setting(key)
+      return @settings[key] unless AppConst.test?
+
+      CLIENT_SETTINGS[AppConst::TEST_SETTINGS.client_code.to_sym][key]
+    end
+
     def no_run_allocations?(explain: false)
       return 'Does this client not do allocation of product setup to resource?' if explain
 
-      !settings[:run_allocations]
+      !setting(:run_allocations)
     end
 
     # def without_desc

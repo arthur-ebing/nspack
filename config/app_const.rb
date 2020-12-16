@@ -6,6 +6,10 @@ class AppConst # rubocop:disable Metrics/ClassLength
     ENV['RACK_ENV'] == 'development'
   end
 
+  def self.test?
+    ENV['RACK_ENV'] == 'test'
+  end
+
   # Any value that starts with y, Y, t or T is considered true.
   # All else is false.
   def self.check_true(val)
@@ -48,6 +52,11 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
   URL_BASE = ENV.fetch('URL_BASE')
   APP_CAPTION = ENV.fetch('APP_CAPTION')
+
+  # A struct that can be used to alter the client code while tests are running.
+  # All the CB_ classes will use this value as the client_code, which allows
+  # for testing different values for a setting.
+  TEST_SETTINGS = OpenStruct.new(client_code: CLIENT_CODE)
 
   # Load client-specific rules:
   # NB: these must start with CR_ and the class must start with "Client".

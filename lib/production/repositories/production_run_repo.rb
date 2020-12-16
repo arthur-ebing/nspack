@@ -150,7 +150,7 @@ module ProductionApp
 
     def create_production_run(params)
       attrs = params.to_h
-      # NOTE:The NO_RUN_ALLOCATION should be changed to come from the LINE
+      # NOTE: The NO_RUN_ALLOCATION should be changed to come from the LINE
       attrs = attrs.merge(allocation_required: false) if AppConst::CR_RUN.no_run_allocations? # ENV['NO_RUN_ALLOCATION']
       create(:production_runs, attrs)
     end

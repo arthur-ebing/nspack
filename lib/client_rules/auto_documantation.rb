@@ -22,7 +22,7 @@ module Crossbeams
     end
 
     def to_table
-      rules = public_methods(false) - [:settings]
+      rules = public_methods(false) - [:setting]
       rules.sort.map do |m|
         params = method(m).parameters
         has_explain = params.include?(EXPLAIN_SET)
