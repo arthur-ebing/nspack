@@ -14,6 +14,7 @@ module ProductionApp
         end
       end
 
+      params = params.merge({ gtin_code: gtin_code(params) }) if AppConst::GTINS_REQUIRED
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -56,6 +57,7 @@ module ProductionApp
         # end
       end
 
+      params = params.merge({ gtin_code: gtin_code(params) }) if AppConst::GTINS_REQUIRED
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -206,6 +208,10 @@ module ProductionApp
 
     def product_setup(id)
       repo.find_product_setup(id)
+    end
+
+    def gtin_code(params)
+      repo.find_gtin_code_for_update(params)
     end
 
     def validate_product_setup_params(params)

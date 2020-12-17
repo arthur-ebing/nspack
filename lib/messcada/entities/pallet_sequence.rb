@@ -141,5 +141,6 @@ module MesscadaApp
     attribute :pm_mark_id, Types::Integer
     attribute :target_market_id, Types::Integer
     attribute :target_market_name, Types::String
+    attribute :gtin_code, Types::String
   end
 end

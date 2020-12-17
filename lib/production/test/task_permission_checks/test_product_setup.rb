@@ -44,7 +44,8 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: 1,
         description: 'ABC',
-        erp_bom_code: 'ABC'
+        erp_bom_code: 'ABC',
+        gtin_code: 'ABC'
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end

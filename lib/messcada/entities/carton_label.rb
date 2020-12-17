@@ -46,5 +46,6 @@ module MesscadaApp
     attribute :packing_method_id, Types::Integer
     attribute :target_market_id, Types::Integer
     attribute :pm_mark_id, Types::Integer
+    attribute :gtin_code, Types::String
   end
 end

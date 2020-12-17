@@ -77,6 +77,7 @@ module MesscadaApp
     attribute :group_incentive_id, Types::Integer
     attribute :rmt_bin_id, Types::Integer
     attribute? :dp_carton, Types::Bool
+    attribute :gtin_code, Types::String
   end
 
   class ScannedCartonNumber < Dry::Struct

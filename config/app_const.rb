@@ -267,6 +267,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # farm_puc_orgs and registered_orchards
   USE_MARKETING_PUC = make_boolean('USE_MARKETING_PUC')
 
+  # GTINS
+  GTINS_REQUIRED = make_boolean('GTINS_REQUIRED')
+
   # Routes that do not require login:
   BYPASS_LOGIN_ROUTES = [
     '/masterfiles/config/label_templates/published',

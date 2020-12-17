@@ -233,7 +233,8 @@ module MesscadaApp
           palletizing_bays.plant_resource_code AS palletizing_bay,
           pallets.has_individual_cartons,
           marketing_pucs.puc_code AS marketing_puc,
-          registered_orchards.orchard_code AS marketing_orchard
+          registered_orchards.orchard_code AS marketing_orchard,
+          pallet_sequences.gtin_code
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id

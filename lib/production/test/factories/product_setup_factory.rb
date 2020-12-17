@@ -60,7 +60,8 @@ module ProductionApp
         pallet_label_name: Faker::Lorem.word,
         grade_id: grade_id,
         product_chars: Faker::Lorem.unique.word,
-        active: true
+        active: true,
+        gtin_code: Faker::Lorem.word
       }
       DB[:product_setups].insert(default.merge(opts))
     end
