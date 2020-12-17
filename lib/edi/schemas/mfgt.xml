@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in-map name="mfgt" identifier_size="0" root_identifier="masterfile">
+  <record name="masterfile" identifier="masterfile" size="700" occurence="1..n">
+    <transformer>
+      <action type="ruby" name="apply_masterfile_rec"/>
+    </transformer>
+    <fields>
+      <field name="batch_no" size="5" />
+      <field name="from_type" size="1" />
+      <field name="update_flag" size="1" />
+      <field name="user_name" size="7" />
+      <field name="date_tran" size="8" />
+      <field name="time_tran" size="8" />
+      <field name="act_flag" size="1" required="false" />
+      <field name="gtin13" size="13" required="false" />
+      <field name="tranno" size="9" />
+      <field name="orgzn" size="2" />
+      <field name="commodity" size="2" />
+      <field name="country" size="2" />
+      <field name="variety" size="3" />
+      <field name="pack" size="4" />
+      <field name="grade" size="4" />
+      <field name="mark" size="5" />
+      <field name="inv_code" size="2" required="false" />
+      <field name="size_count" size="5" />
+      <field name="mktspec" size="10" required="false" />
+      <field name="date_strt" size="8" />
+      <field name="date_end" size="8" required="false" />
+      <field name="gtin" size="14" />
+      <field name="season" size="4" required="false" />
+      <field name="diama" size="9" required="false" />
+      <field name="comm_grp" size="2" required="false" />
+      <field name="net_mass" size="10" required="false" />
+      <field name="gros_mass" size="10" required="false" />
+      <field name="eqv_conv" size="8" required="false" />
+      <field name="eqv_size" size="5" required="false" />
+      <field name="eqv_pack" size="4" required="false" />
+      <field name="eqv_var" size="3" required="false" />
+      <field name="upc" size="15" required="false" />
+      <field name="targ_mkt" size="2" required="false" />
+      <field name="pick_typ" size="1" required="false"  />
+      <field name="whitespace" size="505" required="false" />
+    </fields>
+  </record>
+</in-map>
