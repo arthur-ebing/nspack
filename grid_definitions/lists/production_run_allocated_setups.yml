@@ -50,15 +50,20 @@
   hb:
   - system_code
   - fg_marks
+  - gtin_code
   um:
   - system_code
   - fg_marks
+  - gtin_code
   ud:
   - system_code
   - fg_marks
+  - gtin_code
   sr:
   - system_code
   - fg_marks
+  - gtin_code
   srp:
   - system_code
   - fg_marks
+  - gtin_code

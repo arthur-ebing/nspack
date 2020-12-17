@@ -66,6 +66,7 @@ module Production
                     fold.add_field :client_product_code
                     fold.add_field :client_size_reference
                     fold.add_field :marketing_order_number
+                    fold.add_field :gtin_code
                   end
                 end
               end

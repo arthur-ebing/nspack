@@ -15,6 +15,7 @@ module UiRules
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
+      @rules[:gtins_required] = AppConst::GTINS_REQUIRED
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table
@@ -335,6 +336,8 @@ module UiRules
                                   selected: @form_object.treatment_ids,
                                   caption: 'Treatments',
                                   hide_on_load: @rules[:hide_some_fields] ? true : false }
+      fields[:gtin_code] = { renderer: :label,
+                             hide_on_load: !@rules[:gtins_required] ? true : false }
     end
 
     def make_form_object

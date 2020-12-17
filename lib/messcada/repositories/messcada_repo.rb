@@ -112,7 +112,8 @@ module MesscadaApp
           cl.marketing_orchard_id,
           cl.group_incentive_id,
           cl.rmt_bin_id,
-          cl.dp_carton
+          cl.dp_carton,
+          cl.gtin_code
 
         FROM cartons
         JOIN carton_labels cl ON cl.id = cartons.carton_label_id
@@ -536,7 +537,7 @@ module MesscadaApp
                                   gross_weight nett_weight sell_by_code pallet_label_name pick_ref phc packing_method_id palletizer_contract_worker_id
                                   palletizer_identifier_id pallet_sequence_id created_at updated_at personnel_identifier_id contract_worker_id
                                   palletizing_bay_resource_id is_virtual scrapped scrapped_reason scrapped_at scrapped_sequence_id
-                                  group_incentive_id rmt_bin_id dp_carton]
+                                  group_incentive_id rmt_bin_id dp_carton gtin_code]
       attrs = find_carton(carton_id).to_h.reject { |k, _| carton_rejected_fields.include?(k) }
       attrs[:treatment_ids] = array_for_db_col(attrs[:treatment_ids]) if attrs.key?(:treatment_ids)
 

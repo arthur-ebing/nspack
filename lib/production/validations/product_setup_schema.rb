@@ -30,5 +30,6 @@ module ProductionApp
     # required(:active).maybe(:bool)
     required(:target_market_id).maybe(:integer)
     required(:pm_mark_id).maybe(:integer)
+    optional(:gtin_code).maybe(Types::StrippedString)
   end
 end

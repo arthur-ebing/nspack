@@ -58,6 +58,7 @@ module MesscadaApp
       optional(:created_by).maybe(Types::StrippedString)
       optional(:target_market_id).maybe(:integer)
       optional(:pm_mark_id).maybe(:integer)
+      optional(:gtin_code).maybe(Types::StrippedString)
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

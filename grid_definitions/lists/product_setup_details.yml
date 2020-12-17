@@ -78,15 +78,20 @@
   hb:
   - bom_code
   - fg_marks
+  - gtin_code
   um:
   - bom_code
   - fg_marks
+  - gtin_code
   ud:
   - bom_code
   - fg_marks
+  - gtin_code
   sr:
   - bom_code
   - fg_marks
+  - gtin_code
   srp:
   - bom_code
   - fg_marks
+  - gtin_code

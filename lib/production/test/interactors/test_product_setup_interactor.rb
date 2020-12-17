@@ -134,7 +134,8 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: target_market_id,
         description: 'ABC',
-        erp_bom_code: 'ABC'
+        erp_bom_code: 'ABC',
+        gtin_code: 'ABC'
       }
     end
 

@@ -11,6 +11,7 @@ module UiRules
 
       @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
+      @rules[:gtins_required] = AppConst::GTINS_REQUIRED
 
       common_values_for_fields common_fields
 
@@ -81,6 +82,8 @@ module UiRules
       fields[:description] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:erp_bom_code] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:product_chars] = { renderer: :label }
+      fields[:gtin_code] = { renderer: :label,
+                             hide_on_load: !@rules[:gtins_required] ? true : false }
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
@@ -302,7 +305,9 @@ module UiRules
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
                          caption: 'Treatments',
-                         hide_on_load: @rules[:hide_some_fields] ? true : false }
+                         hide_on_load: @rules[:hide_some_fields] ? true : false },
+        gtin_code: { renderer: :label,
+                     hide_on_load: !@rules[:gtins_required] ? true : false }
       }
     end
 
@@ -341,7 +346,8 @@ module UiRules
                                     sell_by_code: nil,
                                     pallet_label_name: nil,
                                     grade_id: nil,
-                                    product_chars: nil)
+                                    product_chars: nil,
+                                    gtin_code: nil)
     end
 
     def treatment_codes

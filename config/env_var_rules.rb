@@ -96,7 +96,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { REQUIRE_EXTENDED_PACKAGING: 'If REQUIRE_EXTENDED_PACKAGING is true, packaging for product setup is extended. Default false' },
     { EST_PALLETS_PACKED_PER_YEAR: 'An estimate of the number of pallets packed in a year (season). Used to report the number of available pallet numbers per GLN.' },
     { NO_RUN_ALLOCATION: 'Product setups are not allocated to plant resources during run setup.' },
-    { USE_MARKETING_PUC: 'If USE_MARKETING_PUC is true, populate carton_labels and pallet_sequences marketing_puc_id and use marketing organization farm_puc to lookup registered_orchards (marketing_orchard_id). Default false' }
+    { USE_MARKETING_PUC: 'If USE_MARKETING_PUC is true, populate carton_labels and pallet_sequences marketing_puc_id and use marketing organization farm_puc to lookup registered_orchards (marketing_orchard_id). Default false' },
+    { GTINS_REQUIRED: 'If GTINS_REQUIRED is true, use masterfile code and/or variants to lookup a gtin_code. Default false' }
   ].freeze
 
   NO_OVERRIDE = [
