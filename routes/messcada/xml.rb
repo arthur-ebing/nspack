@@ -1,22 +1,44 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'xml', 'messcada' do |r|
+    response['Content-Type'] = 'application/xml'
+    xml_interpreter = MesscadaXMLInterpreter.new(request)
+    interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+    # --------------------------------------------------------------------------
+    # BIN TIPPING FROM MAF
+    # --------------------------------------------------------------------------
+    r.on 'bin_tipping' do
+      r.post 'can_dump' do
+        params = xml_interpreter.params_for_can_bin_be_tipped
+        res = interactor.can_tip_bin?(params)
+        if res.success
+          %(<ContainerMove PID="200" Mode="5" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
+        else
+          %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{res.message}" />)
+        end
+      end
+
+      r.post 'dump' do
+        params = xml_interpreter.params_for_tipped_bin
+        res = interactor.tip_rmt_bin(params)
+        if res.success
+          %(<ContainerMove PID="200" Mode="6" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
+        else
+          %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{res.message}" />)
+        end
+      end
+    end
+
     # --------------------------------------------------------------------------
     # CARTON LABELING FROM MAF
     # --------------------------------------------------------------------------
     r.on 'carton_labeling' do
-      response['Content-Type'] = 'application/xml'
-
-      interactor = MesscadaApp::MesscadaInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       r.is do
         r.post do
-          schema = Nokogiri::XML(request.body.gets)
-          device = schema.xpath('.//ProductLabel').attribute('Module').value
-          identifier = schema.xpath('.//ProductLabel').attribute('Input2').value
-          # TODO: Input1 is the scan code representing the "pack button" (if this is in format "B1", we can use it as the button...
-          params = { device: device, card_reader: '', identifier: identifier }
+          params = xml_interpreter.params_for_carton_labeling
           res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
           res = interactor.maf_carton_labeling(res.instance) if res.success
           if res.success
@@ -29,3 +51,4 @@ class Nspack < Roda
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
