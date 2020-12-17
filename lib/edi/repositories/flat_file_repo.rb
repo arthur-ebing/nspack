@@ -49,6 +49,8 @@ module EdiApp
     end
 
     def table_of_contents
+      return @toc = ['masterfile'] if mf_key
+
       rec_seq = @out.map { |m| m[m.keys.first] }
       @toc = []
       rec_seq.each_with_index do |a, i|
