@@ -52,9 +52,15 @@ Metrics/ClassLength:
   Exclude:
     - '**/test_*.rb'
 
+# TODO: Remove the Max option when upgrading beyond 0.89
 Metrics/AbcSize:
+  Max: 15
   Exclude:
     - '**/test_*.rb'
+
+# TODO: Remove the Max option when upgrading beyond 0.89
+Metrics/PerceivedComplexity:
+  Max: 7
 
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
