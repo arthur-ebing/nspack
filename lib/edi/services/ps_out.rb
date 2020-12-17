@@ -37,7 +37,7 @@ module EdiApp
 
       ps_repo.ps_rows(party_role_id).each do |rec|
         hash = build_hash_from_data(rec, 'PS')
-        if AppConst::PS_APPLY_SUBSTITUTES
+        if AppConst::CR_EDI.apply_substitutes_for_ps?
           %i[original_account saftbin1 saftbin2 product_characteristic_code].each do |fld|
             hash[fld] = rec["substitute_for_#{fld}".to_sym]
           end

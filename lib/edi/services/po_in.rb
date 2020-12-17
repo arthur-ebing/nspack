@@ -146,8 +146,8 @@ module EdiApp
     end
 
     def build_pallet(pallet_number, seq) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
-      location_id = MasterfilesApp::LocationRepo.new.location_id_from_short_code(AppConst::INSTALL_LOCATION)
-      raise Crossbeams::InfoError, "There is no INSTALL location named #{AppConst::INSTALL_LOCATION}" if location_id.nil?
+      location_id = MasterfilesApp::LocationRepo.new.location_id_from_short_code(AppConst::CR_EDI.install_location)
+      raise Crossbeams::InfoError, "There is no INSTALL location named #{AppConst::CR_EDI.install_location}" if location_id.nil?
 
       records[pallet_number] = {
         lookup_data: {},  # data looked up from masterfiles.

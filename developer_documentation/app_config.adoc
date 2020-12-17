@@ -84,13 +84,14 @@ These classes must follow the following rules:
 
 1. Part of `Crossbeams` module.
 2. Name is made up of three parts - `Client`, descriptive and `Rules` (e.g. `ClientRunRules`)
-3. `include Crossbeams::AutoDocumentation`.
-4. Implement a constant named `CLIENT_SETTINGS` - hash where keys are the `CLIENT_CODE` as a symbol and the values are hashes of settings and their values.
-5. Initialize method must set `@settings` to the `CLIENT_SETTINGS` value for the passed-in `client_code` converted to a symbol.
-6. The method `setting` must be defined receiving a `key` and returning the value for that key from `@settings`. When running tests, it should return the setting for the key for `AppConst::TEST_SETTINGS.client_code.to_sym`.
-6. Each method must implement the arg: `explain: false`.
-7. Each method must return a string explaning the method if it is called with `explain: true`.
-8. The method body should return something relevant to the calling code otherwise.
+3. Inherit from `BaseClassRules`.
+4. `include Crossbeams::AutoDocumentation`.
+5. Implement a constant named `CLIENT_SETTINGS` - hash where keys are the `CLIENT_CODE` as a symbol and the values are hashes of settings and their values.
+6. Initialize method must set `@settings` to the `CLIENT_SETTINGS` value for the passed-in `client_code` converted to a symbol.
+7. Each method must implement the arg: `explain: false`.
+8. Each method must return a string explaning the method if it is called with `explain: true`.
+9. The method body should return something relevant to the calling code otherwise.
+10. Client settings that just return their value do not have to be defined in methods. They are still called as methods though.
 
 === Testing code that relies on client rules.
 
@@ -119,23 +120,18 @@ end
 [source,ruby]
 ----
 module Crossbeams
-  class ClientRunRules
+  class ClientRunRules < BaseClientRules
     include Crossbeams::AutoDocumentation
 
     CLIENT_SETTINGS = {
-      hb: { run_allocations: false },
-      hl: { run_allocations: true }
+      hb: { run_allocations: false,
+            packing_container: 'CARTON' },
+      hl: { run_allocations: true,
+            packing_container: 'BIN' }
     }.freeze
 
     def initialize(client_code)
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
-    end
-
-    # Get the setting for a particular key
-    def setting(key)
-      return @settings[key] unless AppConst.test?
-
-      CLIENT_SETTINGS[AppConst::TEST_SETTINGS.client_code.to_sym][key]
     end
 
     def no_run_allocations?(explain: false)
@@ -145,4 +141,16 @@ module Crossbeams
     end
   end
 end
+
+> CR_RUN = Crossbeams::ClientRunRules.new('hb')
+# => #<Crossbeams::ClientRunRules:0x000055a76a51d9e0 @settings={:run_allocations=>false, :packing_container=>"CARTON"}>
+> CR_RUN.no_run_allocations?(explain: true)
+# => "Does this client not do allocation of product setup to resource?"
+> CR_RUN.no_run_allocations?
+# => true
+> CR_RUN.packing_container(explain: true)
+# => "Packing container"
+> CR_RUN.packing_container
+# => "CARTON"
+
 ----

@@ -8,7 +8,7 @@ module EdiApp
             loads.id AS load_id,
             loads.shipped_at,
             depots.depot_code destination,
-            '#{AppConst::INSTALL_LOCATION}' AS depot,
+            '#{AppConst::CR_EDI.install_location}' AS depot,
             pallets.pallet_number AS sscc,
             farms.farm_code AS farm,
             pucs.puc_code AS puc,

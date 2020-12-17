@@ -22,18 +22,46 @@ module Crossbeams
     end
 
     def to_table
-      rules = public_methods(false) - [:setting]
-      rules.sort.map do |m|
-        params = method(m).parameters
+      rules = public_methods(false) - %i[setting method_missing]
+      keys = method_missing_keys(rules)
+      (rules + keys).sort.map do |m|
+        build_method_docs(m, keys.include?(m))
+      end
+    end
+
+    def method_missing_keys(rules) # rubocop:disable Metrics/AbcSize
+      # First find the line number of the first method in the file.
+      fn = nil
+      start_line = rules.map do |m|
+        fn, ln = method(m).source_location
+        ln
+      end.min
+      ar = @settings.keys
+      return ar if start_line.nil?
+
+      # Get the body of the class from the earliest method down.
+      body = File.readlines(fn).drop(start_line - 2).join
+
+      # And return only thos keys that are not referenced in a method.
+      # (They are handled by `method_missing`)
+      ar.map { |m| body.include?(m.to_s) ? nil : m }.compact
+    end
+
+    def build_method_docs(meth, from_key)
+      if from_key
+        has_explain = true
+        rest = []
+      else
+        params = method(meth).parameters
         has_explain = params.include?(EXPLAIN_SET)
         rest = params.reject { |k| k == EXPLAIN_SET }
-
-        {
-          method: _method_nm(m, rest),
-          description: _description(m, rest, has_explain),
-          value: _value(m, rest)
-        }
       end
+
+      {
+        method: _method_nm(meth, rest),
+        description: _description(meth, rest, has_explain),
+        value: _value(meth, rest)
+      }
     end
 
     def _description(meth, rest, has_explain)

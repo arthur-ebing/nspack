@@ -294,25 +294,24 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
   end
 
   def default_value_for(code) # rubocop:disable Metrics/CyclomaticComplexity
-    val = case code
-          when '$:NOW$'
-            Time.now
-          when '$TODAY'
-            Date.today
-          when '$:BATCHNO$'
-            seq_no
-          when '$:NETWORK$'
-            AppConst::EDI_NETWORK_ADDRESS
-          when '$:INSTALL_LOCATION$'
-            AppConst::INSTALL_LOCATION
-          when '$:SOLAS_VERIFICATION_METHOD$'
-            AppConst::SOLAS_VERIFICATION_METHOD
-          when '$:SAMSA_ACCREDITATION$'
-            AppConst::SAMSA_ACCREDITATION
-          else
-            raise ArgumentError, "BaseEdiOutService: Default code '#{code}' is unknown"
-          end
-    val
+    case code
+    when '$:NOW$'
+      Time.now
+    when '$TODAY'
+      Date.today
+    when '$:BATCHNO$'
+      seq_no
+    when '$:NETWORK$'
+      AppConst::EDI_NETWORK_ADDRESS
+    when '$:INSTALL_LOCATION$'
+      AppConst::CR_EDI.install_location
+    when '$:SOLAS_VERIFICATION_METHOD$'
+      AppConst::SOLAS_VERIFICATION_METHOD
+    when '$:SAMSA_ACCREDITATION$'
+      AppConst::SAMSA_ACCREDITATION
+    else
+      raise ArgumentError, "BaseEdiOutService: Default code '#{code}' is unknown"
+    end
   end
 
   # Edi fields are placed into fixed-length records as strings. This module provides some shortcut formatting codes.

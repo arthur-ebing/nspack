@@ -317,12 +317,16 @@ class Nspack < Roda
       settings = en.client_settings
       @layout = Crossbeams::Layout::Page.build do |page, _|
         page.section do |section|
-          section.add_text('Client Settings', wrapper: :h2)
+          section.add_text("Client Settings &mdash; for <span class='orange'>#{AppConst::CLIENT_CODE}</span>", wrapper: :h2)
           AppConst.constants.grep(/CR_/).sort.each do |const|
             kl = AppConst.const_get(const)
             next unless kl.class.name.start_with?('Crossbeams::')
 
             section.add_text("#{kl.rule_name} (AppConst::#{const})", wrapper: :h3)
+            kl.check_client_setting_keys.each do |msg|
+              section.add_notice msg, notice_type: :warning
+            end
+            # section.add_text key_problem unless key_problem.nil?
             section.add_table(kl.to_table, %i[method value description])
           end
           section.add_text('Constants', wrapper: :h3)
