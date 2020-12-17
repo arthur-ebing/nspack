@@ -2,10 +2,11 @@
 
 module EdiApp
   class FlatFileRepo # rubocop:disable Metrics/ClassLength
-    attr_accessor :schema, :record_definitions, :rec_type_lookup, :flow_type, :toc
+    attr_accessor :schema, :record_definitions, :rec_type_lookup, :flow_type, :toc, :mf_key
 
     def initialize(flow_type)
       @flow_type = flow_type
+      @mf_key = flow_type == 'MFGT'
       @field_defs = {}
       @record_definitions = Hash.new { |h, k| h[k] = {} } # Hash.new { |h, k| h[k] = [] }
       @rec_type_lookup = {}
@@ -55,7 +56,7 @@ module EdiApp
       end
     end
 
-    def grid_cols_and_rows # rubocop:disable Metrics/AbcSize
+    def grid_cols_and_rows # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
       table_of_contents
       grids = []
       cnt = -1
@@ -63,7 +64,14 @@ module EdiApp
       key = nil
       row_cnt = 0
       @out.each do |rec|
-        if curr != rec[rec.keys.first]
+        if mf_key && curr.nil?
+          curr = 'masterfile'
+          cnt += 1
+          row_cnt = 0
+          key = "#{toc[cnt]}-#{cnt}"
+          coldef = coldef_for(curr)
+          grids << { key => { cols: coldef, rows: [] } }
+        elsif !mf_key && curr != rec[rec.keys.first]
           curr = rec[rec.keys.first]
           cnt += 1
           row_cnt = 0
@@ -87,7 +95,7 @@ module EdiApp
     def missing_required_fields(only_rows: []) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       missing = []
       @out.each do |rec|
-        this_key = rec[:record_type] || rec[:header] || rec[:trailer]
+        this_key = rec[:record_type] || rec[:header] || rec[:trailer] || 'masterfile'
         next unless only_rows.empty? || only_rows.include?(this_key.to_s)
 
         rec.each do |key, val|
@@ -149,9 +157,13 @@ module EdiApp
     end
 
     def find_rule(line)
-      rec_type = line[0, 2]
-      key = rec_type_lookup[rec_type]
-      record_definitions[key]
+      if mf_key
+        record_definitions['masterfile']
+      else
+        rec_type = line[0, 2]
+        key = rec_type_lookup[rec_type]
+        record_definitions[key]
+      end
     end
 
     def build_out(rules, line)
