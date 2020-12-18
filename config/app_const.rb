@@ -37,7 +37,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # Client-specific code
   CLIENT_SET = {
-    'hb' => 'Habata (Loftus and Badlands)',
+    'hb' => 'Habata (Badlands)',
+    'hl' => 'Habata (Loftus)',
     'um' => 'Unifrutti Matroozefontein',
     'ud' => 'Unifrutti Dunbrody',
     'sr' => 'Sitrusrand Kirkwood',
