@@ -1,5 +1,8 @@
 ---
 :dataminer_definition: product_setup_details_on_runs
+:captions:
+  :conditions:
+    :standard: Product Setup Details for run $:production_run_id$
 :actions:
 - :url: "/production/product_setups/product_setups/$:id$"
   :text: view
