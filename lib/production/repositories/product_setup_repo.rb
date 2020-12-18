@@ -310,18 +310,19 @@ module ProductionApp
       find_gtin_code(gtin_id)
     end
 
-    def resolve_gtin_attrs(attrs) # rubocop:disable Metrics/AbcSize
+    def resolve_gtin_attrs(attrs)
       std_fruit_size_count_id = attrs[:std_fruit_size_count_id].nil_or_empty? ? find_setup_std_fruit_size_count_id(attrs[:fruit_size_reference_id], attrs[:fruit_actual_counts_for_pack_id]) : attrs[:std_fruit_size_count_id]
       commodity_id = attrs[:commodity_id].nil_or_empty? ? find_size_count_commodity(std_fruit_size_count_id) : attrs[:commodity_id]
-      { commodity_code: get(:commodities, commodity_id, :code),
-        marketing_variety_code: get(:marketing_varieties, attrs[:marketing_variety_id], :marketing_variety_code),
-        org_code: DB['SELECT fn_party_role_name(?) AS marketing_org FROM party_roles WHERE party_roles.id = ?', attrs[:marketing_org_party_role_id], attrs[:marketing_org_party_role_id]].first[:marketing_org],
-        standard_pack_code: get(:standard_pack_codes, attrs[:standard_pack_code_id], :standard_pack_code),
-        mark_code: get(:marks, attrs[:mark_id], :mark_code),
-        grade_code: get(:grades, attrs[:grade_id], :grade_code),
-        inventory_code: get(:inventory_codes, attrs[:inventory_code_id], :inventory_code),
-        target_market_code: get(:target_market_groups, attrs[:packed_tm_group_id], :target_market_group_name),
-        size_count_code: get(:std_fruit_size_counts, std_fruit_size_count_id, :size_count_value).to_s }
+      attrs = attrs.slice(:marketing_variety_id,
+                          :marketing_org_party_role_id,
+                          :standard_pack_code_id,
+                          :mark_id,
+                          :grade_id,
+                          :inventory_code_id,
+                          :packed_tm_group_id)
+      attrs[:std_fruit_size_count_id] = std_fruit_size_count_id
+      attrs[:commodity_id] = commodity_id
+      attrs
     end
 
     def find_setup_std_fruit_size_count_id(fruit_size_reference_id, fruit_actual_counts_for_pack_id)
@@ -341,13 +342,10 @@ module ProductionApp
     end
 
     def get_gtin_id(attrs)
-      ds = DB[:gtins]
-      if attrs.key?(:date)
-        date = attrs.delete(:date)
-        ds = ds.where(Sequel.lit('? between date_to and date_from', date.nil_or_empty? ? Time.now : date))
-      end
-      ds = ds.where(attrs)
-      ds.get(:id)
+      DB[:gtins]
+        .where(attrs)
+        .where(Sequel.lit('? between date_to and date_from', Time.now))
+        .get(:id)
     end
 
     def find_gtin_code(id)

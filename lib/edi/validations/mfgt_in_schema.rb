@@ -16,5 +16,14 @@ module EdiApp
     required(:size_count_code).maybe(Types::StrippedString)
     required(:inventory_code).maybe(Types::StrippedString)
     required(:target_market_code).maybe(Types::StrippedString)
+    required(:marketing_org_party_role_id).maybe(:integer)
+    required(:commodity_id).maybe(:integer)
+    required(:marketing_variety_id).maybe(:integer)
+    required(:standard_pack_code_id).maybe(:integer)
+    required(:mark_id).maybe(:integer)
+    required(:grade_id).maybe(:integer)
+    required(:inventory_code_id).maybe(:integer)
+    required(:packed_tm_group_id).maybe(:integer)
+    required(:std_fruit_size_count_id).maybe(:integer)
   end
 end
