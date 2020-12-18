@@ -11,7 +11,7 @@ module UiRules
 
       @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
-      @rules[:gtins_required] = AppConst::GTINS_REQUIRED
+      @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
 
       common_values_for_fields common_fields
 

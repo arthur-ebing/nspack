@@ -15,7 +15,7 @@ module UiRules
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
-      @rules[:gtins_required] = AppConst::GTINS_REQUIRED
+      @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table

@@ -6,16 +6,22 @@ module Crossbeams
 
     CLIENT_SETTINGS = {
       hb: { run_allocations: false,
+            use_gtins: false,
             allow_cultivar_group_mix: true },
       hl: { run_allocations: true,
+            use_gtins: false,
             allow_cultivar_group_mix: true },
       kr: { run_allocations: true,
+            use_gtins: true,
             allow_cultivar_group_mix: false },
       um: { run_allocations: true,
+            use_gtins: false,
             allow_cultivar_group_mix: false },
       ud: { run_allocations: true,
+            use_gtins: false,
             allow_cultivar_group_mix: true },
       sr: { run_allocations: true,
+            use_gtins: false,
             allow_cultivar_group_mix: false },
       sr2: { run_allocations: true }
     }.freeze
@@ -58,6 +64,12 @@ module Crossbeams
       return 'Can culivar groups be mixed in a production run?' if explain
 
       setting(:allow_cultivar_group_mix)
+    end
+
+    def use_gtins?(explain: false)
+      return 'Use masterfile codes and/or variants to lookup a gtin_code to store on setups, cartons and sequences.' if explain
+
+      setting(:use_gtins)
     end
   end
 end
