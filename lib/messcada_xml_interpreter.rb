@@ -28,12 +28,29 @@ class MesscadaXMLInterpreter
     # - 5 = Pack station barcode + Packer barcode + mass
     # - 6 = Pack station barcode + undefined length Packer barcode + mass
     # - 7 = Product (carton) label scan (i.e. already labelled and in DBMS) + mass (mode 9 transaction)
+    #         Therefore Mode=
+    #             - 1 = Pack station barcode                       <--- Therefore Input1="Pack station barcode" Input2="" Mass="0.0"
+    #             - 2 = Pack station barcode + Packer barcode      <--- Therefore Input1="Pack station barcode" Input2="Packer barcode" Mass="0.0"
+    #             - 3 = Pack station barcode + any other barcode (undefined length also)    etc.
+    #             - 4 = Pack station barcode + mass
+    #             - 5 = Pack station barcode + Packer barcode + mass
+    #             - 6 = Pack station barcode + undefined length Packer barcode + mass
+    #             - 7 = Product (carton) label scan (i.e. already labelled and in DBMS) + mass (mode 9 transaction)
+    #                         - Mode7/9 became a hybrid for some reason way back
+    #                         - Ie MesScada processes it as Mode=7 and MidWare understands Mode=9 (or vice verse - cannot remember why exactly)
+    #
+    # Mode 10 came much later with Kromco DP and is therefore not listed above but is an automated Dedicated Pack transaction where:
+    #                     Input1="labelLine + DP + two_digit(labelLine)
+    #                     Input2="personnelID"
+    #                     Mass="0.0"
     root = 'ProductLabel'
     validate_root_and_attributes(root)
-    device = schema.xpath(".//#{root}").attribute('Module').value
+    # device = schema.xpath(".//#{root}").attribute('Module').value # should be changed to Input1 (packpoint barcode)
+    packpoint = schema.xpath(".//#{root}").attribute('Input1').value
     identifier = schema.xpath(".//#{root}").attribute('Input2').value
+    # Mass ?
     # TODO: Input1 is the scan code representing the "pack button" (if this is in format "B1", we can use it as the button...
-    { device: device, card_reader: '', identifier: identifier }
+    { device: packpoint, card_reader: '', identifier: identifier }
   end
 
   def params_for_can_bin_be_tipped
@@ -66,11 +83,3 @@ class MesscadaXMLInterpreter
     true
   end
 end
-__END__
-          schema = Nokogiri::XML(request.body.gets)
-          device = schema.xpath('.//ProductLabel').attribute('Module').value
-          identifier = schema.xpath('.//ProductLabel').attribute('Input2').value
-          # TODO: Input1 is the scan code representing the "pack button" (if this is in format "B1", we can use it as the button...
-          params = { device: device, card_reader: '', identifier: identifier }
-          res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
-          res = interactor.maf_carton_labeling(res.instance) if res.success

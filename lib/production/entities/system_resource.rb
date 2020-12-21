@@ -34,7 +34,7 @@ module ProductionApp
     attribute :system_resource_code, Types::String
     attribute :login, Types::Bool
     attribute :logoff, Types::Bool
-    attribute :group_incentive, Types::Bool
+    attribute :group_incentive, Types::Bool # Can line scanning work with group incentive? i.e. do these packers log in somewhere?
   end
 
   class SystemResourceWithIncentive < Dry::Struct

@@ -33,7 +33,7 @@ class Nspack < Roda
     end
 
     # --------------------------------------------------------------------------
-    # CARTON LABELING FROM MAF
+    # CARTON LABELING FROM MAF / ITPC (LINE SCANNING)
     # --------------------------------------------------------------------------
     r.on 'carton_labeling' do
       r.is do

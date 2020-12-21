@@ -13,7 +13,7 @@
   tree_plant_resources AS t1 ON t1.ancestor_plant_resource_id = c.id\r\n       WHERE
   t1.descendant_plant_resource_id = plant_resources.id\r\n       ORDER BY t1.path_length
   DESC) AS cc) AS path_array,\r\n(SELECT MAX(path_length)\r\n   FROM tree_plant_resources\r\n
-  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,\r\nplant_resources.system_resource_id,\r\nsystem_resource_types.peripheral\r\nFROM
+  \  WHERE descendant_plant_resource_id = plant_resources.id) + 1 AS level,\r\nplant_resources.system_resource_id,\r\nsystem_resource_types.peripheral,\r\nplant_resource_types.packpoint\r\nFROM
   plant_resources\r\nJOIN plant_resource_types ON plant_resource_types.id = plant_resources.plant_resource_type_id\r\nLEFT
   OUTER JOIN system_resources ON system_resources.id = plant_resources.system_resource_id\r\nLEFT
   OUTER JOIN system_resource_types ON system_resource_types.id = system_resources.system_resource_type_id\r\nWHERE
@@ -288,6 +288,22 @@
     :sequence_no: 17
     :caption: Peripheral
     :namespaced_name: system_resource_types.peripheral
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packpoint:
+    :name: packpoint
+    :sequence_no: 18
+    :caption: Packpoint
+    :namespaced_name: plant_resource_types.packpoint
     :data_type: :boolean
     :width: 
     :format: 

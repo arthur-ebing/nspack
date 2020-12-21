@@ -137,6 +137,11 @@ module ProductionApp
       success_response('Linked peripherals to resource', linked_items)
     end
 
+    def print_packpoint_barcode(id, params)
+      instance = plant_resource(id)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PACKPOINT_BARCODE, instance, params)
+    end
+
     def get_location_lookup(location_id)
       success_response('ok', MasterfilesApp::LocationRepo.new.find_location(location_id))
     end

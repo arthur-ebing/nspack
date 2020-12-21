@@ -278,10 +278,11 @@ module Crossbeams
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                   icon: { file: 'packing', colour: CLR_D } },
         DROP_STATION => { description: 'Drop station',
-                          allowed_children: [DROP, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
+                          packpoint: true,
+                          allowed_children: [],
                           icon: { file: 'station', colour: CLR_R } },
         DROP_TABLE => { description: 'Drop table',
-                        allowed_children: [CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
+                        allowed_children: [DROP_STATION, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                         icon: { file: 'packing', colour: CLR_N } },
         ROBOT_BUTTON => { description: 'Robot button',
                           allowed_children: [],
@@ -294,6 +295,17 @@ module Crossbeams
                        icon: { file: 'server3', colour: CLR_E },
                        create_with_system_resource: 'MODULE',
                        code_prefix: 'CLM-' },
+        # ITPC => { description: 'ITPC',
+        #           allowed_children: [ITPC_PACKPOINT],
+        #           icon: { file: 'server3', colour: CLR_E },
+        #           create_with_system_resource: 'MODULE',
+        #           code_prefix: 'CLM-' },
+        #  "DTP-"        // Dedicated pack/tipper...
+        # "DPK-"        // Dedicated pack/labelling...
+        # "LBL-"        // Label...
+        # "CMV-"      // Container movement...
+        # "REB-"       // Rebinning (another form of labelling)...
+        # "CLM-"         // CLM Standard...
         QC_ROBOT => { description: 'QC Robot',
                       allowed_children: [],
                       icon: { file: 'server3', colour: CLR_L },
@@ -601,7 +613,8 @@ module Crossbeams
           repo.create(:plant_resource_types,
                       plant_resource_type_code: key,
                       icon: icon,
-                      description: PLANT_RESOURCE_RULES[key][:description])
+                      description: PLANT_RESOURCE_RULES[key][:description],
+                      packpoint: PLANT_RESOURCE_RULES[key][:packpoint] || false)
           cnt += 1
         end
 

@@ -92,6 +92,7 @@
           <% asset_type = assets_paths(:css).any? { |p| p.include?('scss') } ? :bug : :show %>
           <span class="ml4">ASSETS: <%= Crossbeams::Layout::Icon.new(asset_type).render %></span>
           <span class="ml4">DB: <%= AppConst::SHOW_DB_NAME %></span>
+          <span class="ml4">CLIENT: <%= AppConst::CLIENT_CODE %></span>
         <% end %>
     </footer>
 

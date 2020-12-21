@@ -1,23 +1,27 @@
 ---
 :caption: Allocated setups for production run
-:sql: "SELECT a.id, parent.plant_resource_code AS pack_station, sysres.system_resource_code
-  AS module, p.plant_resource_code, \r\na.product_setup_id, fn_product_setup_code(s.id)
-  AS product_setup_code, pm_boms.system_code, CONCAT(marks.mark_code, '_', COALESCE
-  (array_to_string(pm_marks.packaging_marks,'_'), ' ')) AS fg_marks, s.gtin_code,
-  a.label_template_id, l.label_template_name, a.packing_method_id, pm.packing_method_code,
-  a. active, a.production_run_id\r\nFROM production_runs r\r\nJOIN tree_plant_resources
-  t ON t.ancestor_plant_resource_id = r.production_line_id\r\nJOIN plant_resources
-  p ON p.id = t.descendant_plant_resource_id AND p.plant_resource_type_id = (SELECT
-  id from plant_resource_types WHERE plant_resource_type_code = 'ROBOT_BUTTON')\r\nLEFT
-  OUTER JOIN product_resource_allocations a ON a.production_run_id = r.id AND a.plant_resource_id
-  = p.id\r\nLEFT OUTER JOIN product_setups s ON s.id = a.product_setup_id\r\nLEFT
-  OUTER JOIN label_templates l ON l.id = a.label_template_id\r\nLEFT OUTER JOIN tree_plant_resources
-  tpl ON tpl.descendant_plant_resource_id = p.id AND tpl.path_length = 1\r\nLEFT OUTER
-  JOIN plant_resources parent ON parent.id = tpl.ancestor_plant_resource_id\r\nLEFT
-  OUTER JOIN system_resources sysres ON sysres.id = parent.system_resource_id\r\nLEFT
-  OUTER JOIN packing_methods pm ON pm.id = a.packing_method_id\r\nLEFT OUTER JOIN
-  pm_boms ON pm_boms.id = s.pm_bom_id\r\nLEFT OUTER JOIN marks ON marks.id = s.mark_id\r\nLEFT
-  OUTER JOIN pm_marks ON pm_marks.id = s.pm_mark_id"
+:sql: "SELECT\r\n  a.id,\r\n  parent.plant_resource_code AS pack_station,\r\n  sysres.system_resource_code
+  AS module,\r\n  p.plant_resource_code,\r\n  a.product_setup_id,\r\n  fn_product_setup_code
+  (s.id) AS product_setup_code,\r\n  pm_boms.system_code,\r\n  CONCAT(marks.mark_code,
+  '_', COALESCE(array_to_string(pm_marks.packaging_marks, '_'), ' ')) AS fg_marks,\r\n
+  \ s.gtin_code,\r\n  a.label_template_id,\r\n  l.label_template_name,\r\n  a.packing_method_id,\r\n
+  \ pm.packing_method_code,\r\n  a. active,\r\n  a.production_run_id\r\nFROM\r\n  production_runs
+  r\r\n  JOIN tree_plant_resources t ON t.ancestor_plant_resource_id = r.production_line_id\r\n
+  \ JOIN plant_resources p ON p.id = t.descendant_plant_resource_id\r\n    AND (\"p\".\"plant_resource_type_id\"
+  = (\r\n        SELECT\r\n          \"id\"\r\n        FROM\r\n          \"plant_resource_types\"\r\n
+  \     WHERE\r\n        \"plant_resource_type_code\" = 'ROBOT_BUTTON')\r\n      OR
+  \"p\".\"plant_resource_type_id\" = (\r\n        SELECT\r\n          \"id\"\r\n        FROM\r\n
+  \         \"plant_resource_types\"\r\n        WHERE\r\n          \"plant_resource_type_code\"
+  = 'DROP_STATION'))\r\n    LEFT OUTER JOIN product_resource_allocations a ON a.production_run_id
+  = r.id\r\n    AND a.plant_resource_id = p.id\r\n  LEFT OUTER JOIN product_setups
+  s ON s.id = a.product_setup_id\r\n  LEFT OUTER JOIN label_templates l ON l.id =
+  a.label_template_id\r\n  LEFT OUTER JOIN tree_plant_resources tpl ON tpl.descendant_plant_resource_id
+  = p.id\r\n    AND tpl.path_length = 1\r\n  LEFT OUTER JOIN plant_resources parent
+  ON parent.id = tpl.ancestor_plant_resource_id\r\n  LEFT OUTER JOIN system_resources
+  sysres ON sysres.id = parent.system_resource_id\r\n  LEFT OUTER JOIN packing_methods
+  pm ON pm.id = a.packing_method_id\r\n  LEFT OUTER JOIN pm_boms ON pm_boms.id = s.pm_bom_id\r\n
+  \ LEFT OUTER JOIN marks ON marks.id = s.mark_id\r\n  LEFT OUTER JOIN pm_marks ON
+  pm_marks.id = s.pm_mark_id"
 :limit: 
 :offset: 
 :external_settings: {}

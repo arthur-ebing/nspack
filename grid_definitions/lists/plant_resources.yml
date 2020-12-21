@@ -49,6 +49,13 @@
   :popup: true
   :hide_if_null: system_resource_id
   :hide_if_true: peripheral
+- :separator: true
+- :url: "/production/resources/plant_resources/$:id$/print_barcode"
+  :text: Print barcode
+  :icon: printer
+  :title: Print barcode
+  :popup: true
+  :hide_if_false: packpoint
 :page_controls:
 - :control_type: :link
   :url: "/production/resources/plant_resources/new"

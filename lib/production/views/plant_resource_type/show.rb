@@ -15,6 +15,7 @@ module Production
               form.add_field :plant_resource_type_code
               form.add_field :description
               form.add_field :active
+              form.add_field :packpoint
               form.add_text rules[:icon_render]
             end
           end

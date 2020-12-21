@@ -18,13 +18,15 @@ module UiRules
       fields[:plant_resource_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:packpoint] = { renderer: :label, as_boolean: true }
       rules[:icon_render] = render_icon(@form_object.icon)
     end
 
     def common_fields
       {
         plant_resource_type_code: { required: true },
-        description: { required: true }
+        description: { required: true },
+        packpoint: { requred: true }
       }
     end
 

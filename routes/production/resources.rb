@@ -32,6 +32,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               description
               attribute_rules
               behaviour_rules
+              packpoint
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -72,6 +73,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             description
             attribute_rules
             behaviour_rules
+            packpoint
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
@@ -99,6 +101,20 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('resources', 'edit')
         # interactor.assert_permission!(:edit, id)
         show_partial { Production::Resources::PlantResource::Edit.call(id) }
+      end
+
+      r.on 'print_barcode' do   # PRINT PACKPOINT BARCODE
+        r.get do
+          show_partial { Production::Resources::PlantResource::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_packpoint_barcode(id, params[:plant_resource])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { Production::Resources::PlantResource::PrintBarcode.call(id, form_values: params[:plant_resource], form_errors: res.errors) }
+          end
+        end
       end
 
       r.on 'add_child' do   # NEW CHILD

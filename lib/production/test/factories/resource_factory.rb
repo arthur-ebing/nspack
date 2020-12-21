@@ -25,6 +25,7 @@ module ProductionApp
         plant_resource_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         icon: Faker::Lorem.word,
+        packpoint: false,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

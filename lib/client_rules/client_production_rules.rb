@@ -7,21 +7,27 @@ module Crossbeams
     CLIENT_SETTINGS = {
       hb: { run_allocations: false,
             use_gtins: false,
+            print_from_line_scanning: false,
             allow_cultivar_group_mix: true },
       hl: { run_allocations: true,
             use_gtins: false,
+            print_from_line_scanning: false,
             allow_cultivar_group_mix: true },
       kr: { run_allocations: true,
             use_gtins: true,
+            print_from_line_scanning: true,
             allow_cultivar_group_mix: false },
       um: { run_allocations: true,
             use_gtins: false,
+            print_from_line_scanning: false,
             allow_cultivar_group_mix: false },
       ud: { run_allocations: true,
             use_gtins: false,
+            print_from_line_scanning: false,
             allow_cultivar_group_mix: true },
       sr: { run_allocations: true,
             use_gtins: false,
+            print_from_line_scanning: true,   # TEMP TEST...
             allow_cultivar_group_mix: false },
       sr2: { run_allocations: true }
     }.freeze

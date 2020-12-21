@@ -1,8 +1,9 @@
 ---
 :caption: Plant Resource Types
 :sql: "SELECT \"plant_resource_types\".\"id\", \"plant_resource_types\".\"plant_resource_type_code\",
-  \"plant_resource_types\".\"description\",\r\n\"plant_resource_types\".\"icon\",\r\n\"plant_resource_types\".\"active\",
-  \"plant_resource_types\".\"created_at\", \"plant_resource_types\".\"updated_at\"\r\nFROM \"plant_resource_types\""
+  \"plant_resource_types\".\"description\",\r\n\"plant_resource_types\".\"icon\",\r\n\"plant_resource_types\".\"packpoint\",\r\n\"plant_resource_types\".\"active\",
+  \"plant_resource_types\".\"created_at\", \"plant_resource_types\".\"updated_at\"\r\nFROM
+  \"plant_resource_types\""
 :limit: 
 :offset: 
 :external_settings: {}
@@ -57,11 +58,27 @@
     :group_max: false
   icon:
     :name: icon
-    :sequence_no: 5
+    :sequence_no: 4
     :caption: Icon
     :namespaced_name: plant_resource_types.icon
     :data_type: :string
     :width: 80
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packpoint:
+    :name: packpoint
+    :sequence_no: 5
+    :caption: Packpoint
+    :namespaced_name: plant_resource_types.packpoint
+    :data_type: :boolean
+    :width: 
     :format: 
     :hide: false
     :pinned: 

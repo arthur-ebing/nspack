@@ -4,6 +4,7 @@ module UiRules
   class PlantResourceRule < Base
     def generate_rules
       @repo = ProductionApp::ResourceRepo.new
+      @print_repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
 
@@ -11,6 +12,7 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
       set_edit_fields if @mode == :edit
+      set_print_fields if @mode == :print_barcode
 
       add_behaviours if @mode == :new
 
@@ -55,6 +57,14 @@ module UiRules
                                 invisible: !at_ph_level }
     end
 
+    def set_print_fields
+      fields[:plant_reqource_code] = { renderer: :label }
+      fields[:printer] = { renderer: :select,
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_PACKPOINT),
+                           required: true }
+      fields[:no_of_prints] = { renderer: :integer, required: true }
+    end
+
     def common_fields
       type_renderer = if @mode == :new
                         { renderer: :select,
@@ -85,12 +95,14 @@ module UiRules
         return
       end
       @form_object = @repo.find_plant_resource_flat(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_PACKPOINT), no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object
       @form_object = OpenStruct.new(plant_resource_type_id: nil,
                                     system_resource_id: nil,
                                     plant_resource_code: nil,
+                                    packpoint: false,
                                     # plant_resource_attributes: nil,
                                     description: nil)
     end

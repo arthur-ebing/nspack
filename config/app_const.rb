@@ -327,6 +327,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   LABEL_LOCATION_BARCODE = ENV.fetch('LABEL_LOCATION_BARCODE', 'NSPACK_LOCATION')
   LABEL_BIN_BARCODE = ENV.fetch('LABEL_BIN_BARCODE', 'MAIN_BIN')
   LABEL_CARTON_VERIFICATION = ENV.fetch('LABEL_CARTON_VERIFICATION', 'BIN_VERIFICATION')
+  LABEL_PACKPOINT_BARCODE = ENV.fetch('LABEL_PACKPOINT_BARCODE', 'PACKPOINT')
 
   COST_UNITS = %w[BIN PALLET LOAD DELIVERY].freeze
 
@@ -338,12 +339,14 @@ class AppConst # rubocop:disable Metrics/ClassLength
   PRINT_APP_BIN = 'Bin'
   PRINT_APP_CARTON = 'Carton'
   PRINT_APP_PALLET = 'Pallet'
+  PRINT_APP_PACKPOINT = 'Packpoint'
 
   PRINTER_APPLICATIONS = [
     PRINT_APP_LOCATION,
     PRINT_APP_BIN,
     PRINT_APP_CARTON,
-    PRINT_APP_PALLET
+    PRINT_APP_PALLET,
+    PRINT_APP_PACKPOINT
   ].freeze
 
   # These will need to be configured per installation...
