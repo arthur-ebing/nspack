@@ -255,6 +255,7 @@ class App < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'whoami' do
+        response['Content-Type'] = 'text/plain'
         'CLM-01'
       end
 
