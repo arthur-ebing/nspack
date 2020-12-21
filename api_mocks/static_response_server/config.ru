@@ -15,7 +15,8 @@ class App < Roda # rubocop:disable Metrics/ClassLength
   MAF_URL_SET = [
     '/messcada/xml/bin_tipping/can_dump',
     '/messcada/xml/bin_tipping/dump',
-    '/messcada/xml/carton_labeling'
+    '/messcada/xml/carton_labeling',
+    '/messcada/whoami'
   ].freeze
 
   URL_SET = [
@@ -253,9 +254,13 @@ class App < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      # MAF calls
+      r.on 'whoami' do
+        'CLM-01'
+      end
+
+      # XML calls
       # ----------------
-      r.on 'maf' do
+      r.on 'xml' do
         r.on 'bin_tipping' do
           r.on 'can_dump' do
             '<ContainerMove PID="200" Mode="5" Status="true" RunNumber="2020_AP_20980_1568_21A" Red="false" Yellow="false" Green="true" Msg="WAITING FOR MAF..."  />'
