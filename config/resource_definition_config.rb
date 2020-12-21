@@ -193,6 +193,7 @@ module Crossbeams
       WEIGHING_STATION = 'WEIGHING_STATION'
       MES_SERVER = 'MES_SERVER'
       CMS_SERVER = 'CMS_SERVER'
+      ITPC = 'ITPC'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -227,7 +228,8 @@ module Crossbeams
                                               PALLET_FORKLIFT_ROBOT,
                                               PALLETIZING_ROBOT,
                                               BIN_TIPPING_ROBOT,
-                                              STAGING_TIPPING_ROBOT] } },
+                                              STAGING_TIPPING_ROBOT,
+                                              ITPC] } },
         MODULE_BUTTON => { description: 'Module button',
                            computing_device: true,
                            attributes: { ip_address: :string,
@@ -272,7 +274,7 @@ module Crossbeams
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
-                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION],
+                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION, ITPC],
                   icon: { file: 'packline', colour: CLR_S } },
         DROP => { description: 'Drop',
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
@@ -295,11 +297,11 @@ module Crossbeams
                        icon: { file: 'server3', colour: CLR_E },
                        create_with_system_resource: 'MODULE',
                        code_prefix: 'CLM-' },
-        # ITPC => { description: 'ITPC',
-        #           allowed_children: [ITPC_PACKPOINT],
-        #           icon: { file: 'server3', colour: CLR_E },
-        #           create_with_system_resource: 'MODULE',
-        #           code_prefix: 'CLM-' },
+        ITPC => { description: 'ITPC',
+                  allowed_children: [],
+                  icon: { file: 'sitemap', colour: CLR_Q },
+                  create_with_system_resource: 'MODULE',
+                  code_prefix: 'ITPC-' },
         #  "DTP-"        // Dedicated pack/tipper...
         # "DPK-"        // Dedicated pack/labelling...
         # "LBL-"        // Label...

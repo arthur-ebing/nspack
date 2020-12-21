@@ -45,12 +45,10 @@ class MesscadaXMLInterpreter
     #                     Mass="0.0"
     root = 'ProductLabel'
     validate_root_and_attributes(root)
-    # device = schema.xpath(".//#{root}").attribute('Module').value # should be changed to Input1 (packpoint barcode)
+    device = schema.xpath(".//#{root}").attribute('Module').value
     packpoint = schema.xpath(".//#{root}").attribute('Input1').value
     identifier = schema.xpath(".//#{root}").attribute('Input2').value
-    # Mass ?
-    # TODO: Input1 is the scan code representing the "pack button" (if this is in format "B1", we can use it as the button...
-    { device: packpoint, card_reader: '', identifier: identifier }
+    { device: device, packpoint: packpoint, card_reader: '', identifier: identifier, identifier_is_person: true }
   end
 
   def params_for_can_bin_be_tipped

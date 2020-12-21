@@ -129,14 +129,10 @@ module MesscadaApp
 
     def retrieve_resource_cached_setup_data
       @setup_data = search_cache_files
-      raise Crossbeams::InfoError, "No setup data cached for resource #{params[:device]}." if setup_data.empty?
-
-      # return failed_response("No setup data cached for resource #{resource_code}.") if setup_data.empty?
+      raise Crossbeams::InfoError, "No setup data cached for resource #{system_resource[:packpoint]}." if setup_data.empty?
 
       @production_run_id = setup_data[:production_run_data][:production_run_id]
       raise Crossbeams::InfoError, "Production Run:#{production_run_id} could not be found" unless production_run_exists?
-
-      # return failed_response("Production Run:#{production_run_id} could not be found") unless production_run_exists?
 
       ok_response
     end
@@ -149,7 +145,7 @@ module MesscadaApp
         file_data = yaml_data_from_file(f)
         next unless file_data
 
-        return file_data[params[:device]] unless file_data.empty? || file_data[params[:device]].nil?
+        return file_data[system_resource[:packpoint]] unless file_data.empty? || file_data[system_resource[:packpoint]].nil?
       end
 
       {}

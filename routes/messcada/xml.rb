@@ -39,8 +39,8 @@ class Nspack < Roda
       r.is do
         r.post do
           params = xml_interpreter.params_for_carton_labeling
-          res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
-          res = interactor.maf_carton_labeling(res.instance) if res.success
+          res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params)
+          res = interactor.xml_carton_labeling(res.instance) if res.success
           if res.success
             res.instance
           else

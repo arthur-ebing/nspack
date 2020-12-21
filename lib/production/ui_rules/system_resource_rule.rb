@@ -59,7 +59,8 @@ module UiRules
         ['Standard NoSoft RPi robot (robot-nspi)', 'robot-nspi'],
         ['Client-built  RPi robot (robot-rpi)', 'robot-rpi'],
         ['Radical T200/T201 robot - Requires a MAC Address (robot-T200)', 'robot-T200'],
-        ['Radical T210 Java robot (robot-T210)', 'robot-T210']
+        ['Radical T210 Java robot (robot-T210)', 'robot-T210'],
+        ['ITPC server', 'ITPC']
       ]
     end
 
