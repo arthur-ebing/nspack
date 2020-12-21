@@ -4,7 +4,7 @@ module Production
   module Resources
     module PlantResource
       class PrintBarcode
-        def self.call(id, form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(id, form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:plant_resource, :print_barcode, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
