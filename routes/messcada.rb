@@ -9,8 +9,12 @@ class Nspack < Roda
     r.on 'whoami' do
       code = ProductionApp::ResourceRepo.new.get_value(:system_resources, :system_resource_code, ip_address: request.ip)
       if code.nil?
+        # if request.ip == '172.16.145.68'
+        #   'ITPC-901'
+        # else
         response.status = 404
         ''
+        # end
       else
         code
       end

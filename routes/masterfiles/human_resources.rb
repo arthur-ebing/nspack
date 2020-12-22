@@ -214,6 +214,20 @@ class Nspack < Roda
         handle_not_found(r)
       end
 
+      r.on 'print_barcode' do
+        r.get do
+          show_partial { Masterfiles::HumanResources::ContractWorker::PrintBarcode.call(id) }
+        end
+        r.patch do
+          res = interactor.print_contract_worker_barcode(id, params[:contract_worker])
+          if res.success
+            show_json_notice(res.message)
+          else
+            re_show_form(r, res) { Masterfiles::HumanResources::ContractWorker::PrintBarcode.call(id, form_values: params[:contract_worker], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('hr', 'edit')
         interactor.assert_permission!(:edit, id)

@@ -81,6 +81,11 @@ module MasterfilesApp
       success_response('Successfully linked identifier to worker', in_use: true, contract_worker: contract_worker(params[:contract_worker_id])[:contract_worker_name])
     end
 
+    def print_personnel_barcode(id, params)
+      instance = contract_worker(id)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PERSONNEL_BARCODE, instance, params)
+    end
+
     private
 
     def repo

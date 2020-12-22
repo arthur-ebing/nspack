@@ -46,7 +46,7 @@ class MesscadaXMLInterpreter
     root = 'ProductLabel'
     validate_root_and_attributes(root)
     device = schema.xpath(".//#{root}").attribute('Module').value
-    packpoint = schema.xpath(".//#{root}").attribute('Input1').value
+    packpoint = schema.xpath(".//#{root}").attribute('Input1').value # DPK-41-DP-1A
     identifier = schema.xpath(".//#{root}").attribute('Input2').value
     { device: device, packpoint: packpoint, card_reader: '', identifier: identifier, identifier_is_person: true }
   end

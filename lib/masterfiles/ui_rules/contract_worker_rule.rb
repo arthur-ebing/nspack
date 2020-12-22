@@ -4,12 +4,14 @@ module UiRules
   class ContractWorkerRule < Base
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
+      @print_repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
 
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
+      set_print_fields if @mode == :print_barcode
 
       form_name 'contract_worker'
     end
@@ -37,6 +39,14 @@ module UiRules
       fields[:start_date] = { renderer: :label }
       fields[:end_date] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+    end
+
+    def set_print_fields
+      fields[:personnel_number] = { renderer: :label }
+      fields[:printer] = { renderer: :select,
+                           options: @print_repo.select_printers_for_application(AppConst::PRINT_APP_PACKPOINT),
+                           required: true }
+      fields[:no_of_prints] = { renderer: :integer, required: true }
     end
 
     def common_fields
@@ -81,6 +91,7 @@ module UiRules
       end
 
       @form_object = @repo.find_contract_worker(@options[:id])
+      @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_PERSONNEL), no_of_prints: 1)) if @mode == :print_barcode
     end
 
     def make_new_form_object

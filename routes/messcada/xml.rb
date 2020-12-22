@@ -17,7 +17,7 @@ class Nspack < Roda
         if res.success
           %(<ContainerMove PID="200" Mode="5" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
         else
-          %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{res.message}" />)
+          %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
         end
       end
 
@@ -27,7 +27,7 @@ class Nspack < Roda
         if res.success
           %(<ContainerMove PID="200" Mode="6" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
         else
-          %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{res.message}" />)
+          %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
         end
       end
     end

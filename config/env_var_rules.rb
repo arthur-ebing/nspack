@@ -45,6 +45,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { LABEL_LOCATION_BARCODE: 'Label name for Locations' },
     { LABEL_BIN_BARCODE: 'Label name for Bins' },
     { LABEL_CARTON_VERIFICATION: 'Label name for Cartons' },
+    { LABEL_PACKPOINT_BARCODE: 'Label name for Packpoint barcode' },
+    { LABEL_PERSONNEL_BARCODE: 'Label name for Personnel number barcode' },
     { VGM_REQUIRED: 'Sets if verified gross mass as required for RMD load_containers.' },
     { DEFAULT_DEPOT: 'Default Depot for new dispatch loads.' },
     { FROM_DEPOT: 'Sending Depot for PO out EDIs. Defaults to the value of DEFAULT_DEPOT.' },

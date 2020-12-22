@@ -90,11 +90,14 @@ module UiRules
       @form_object = OpenStruct.new(@form_object.to_h.merge(printer: @print_repo.default_printer_for_application(AppConst::PRINT_APP_LOCATION), no_of_prints: 1)) if @mode == :print_barcode
     end
 
-    def make_new_form_object
+    def make_new_form_object # rubocop:disable Metrics/AbcSize
       parent = @options[:id].nil? ? nil : @repo.find_location(@options[:id])
 
+      types = @repo.for_select_location_types(where: { hierarchical: true })
+      raise CrossbeamsInfoError, 'There are no hierarchical location types defined' if types.empty?
+
       @form_object = OpenStruct.new(primary_storage_type_id: initial_storage_type(parent),
-                                    location_type_id: @repo.for_select_location_types(where: { hierarchical: true }).first.last,
+                                    location_type_id: types.first.last,
                                     primary_assignment_id: initial_assignment(parent),
                                     location_storage_definition_id: nil,
                                     location_long_code: initial_code(parent),

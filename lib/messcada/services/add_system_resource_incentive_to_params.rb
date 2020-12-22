@@ -7,7 +7,7 @@ module MesscadaApp
     attr_reader :params, :get_group_incentive, :sys_res, :repo, :resource_repo, :device
 
     def initialize(params, has_button: false, get_group_incentive: true)
-      super
+      super()
       @params = params
       @device = if has_button
                   ar = params[:device].split('-')
