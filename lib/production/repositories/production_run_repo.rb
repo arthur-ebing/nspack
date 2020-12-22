@@ -379,7 +379,7 @@ module ProductionApp
                t.label_template_name, a.packing_method_id
           FROM product_resource_allocations a
           JOIN plant_resources p ON p.id = a.plant_resource_id
-          JOIN system_resources s ON s.id = p.system_resource_id
+          LEFT JOIN system_resources s ON s.id = p.system_resource_id
           JOIN label_templates t ON t.id = a.label_template_id
           WHERE a.production_run_id = ?
             AND a.active
