@@ -14,21 +14,25 @@ class Nspack < Roda
       r.post 'can_dump' do
         params = xml_interpreter.params_for_can_bin_be_tipped
         res = interactor.can_tip_bin?(params)
-        if res.success
-          %(<ContainerMove PID="200" Mode="5" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
-        else
-          %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
-        end
+        s = if res.success
+              %(<ContainerMove PID="200" Mode="5" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
+            else
+              %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
+            end
+        puts "MESSCADA XML - response: #{s}"
+        s
       end
 
       r.post 'dump' do
         params = xml_interpreter.params_for_tipped_bin
         res = interactor.tip_rmt_bin(params)
-        if res.success
-          %(<ContainerMove PID="200" Mode="6" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
-        else
-          %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
-        end
+        s = if res.success
+              %(<ContainerMove PID="200" Mode="6" Status="true" RunNumber="#{res.instance[:run_id]}" Red="false" Yellow="false" Green="true" Msg="#{res.message}" />)
+            else
+              %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
+            end
+        puts "MESSCADA XML - response: #{s}"
+        s
       end
     end
 
@@ -44,7 +48,9 @@ class Nspack < Roda
           if res.success
             res.instance
           else
-            %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{res.message}" />)
+            s = %(<ProductLabel PID="223" Status="false" Threading="true" LabelRenderAmount="0" Msg="#{res.message}" />)
+            puts "MESSCADA XML - response: #{s}"
+            s
           end
         end
       end

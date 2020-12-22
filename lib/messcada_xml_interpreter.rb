@@ -5,9 +5,12 @@ class MesscadaXMLInterpreter
 
   def initialize(request_or_string, as_string: false)
     @schema = if as_string
+                puts "MESSCADA XML - received: #{request_or_string}"
                 Nokogiri::XML(request_or_string)
               else
-                Nokogiri::XML(request_or_string.body.gets)
+                s = request_or_string.body.gets
+                puts "MESSCADA XML - received: #{s}"
+                Nokogiri::XML(s)
               end
   end
 
