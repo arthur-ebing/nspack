@@ -375,7 +375,8 @@ module ProductionApp
     def allocated_setup_keys(production_run_id)
       query = <<~SQL
         SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
-               a.product_setup_id, a.label_template_id, s.system_resource_code, t.label_template_name, a.packing_method_id
+               a.product_setup_id, a.label_template_id, COALESCE(s.system_resource_code, p.plant_resource_code) AS packpoint,
+               t.label_template_name, a.packing_method_id
           FROM product_resource_allocations a
           JOIN plant_resources p ON p.id = a.plant_resource_id
           JOIN system_resources s ON s.id = p.system_resource_id
