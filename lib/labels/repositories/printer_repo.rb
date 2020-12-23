@@ -171,6 +171,7 @@ module LabelApp
         LEFT jOIN plant_resources p ON p.id = ps.plant_resource_id
         LEFT JOIN system_resources res ON res. id = p.system_resource_id
         WHERE s.system_resource_code = ?
+          AND s.equipment_type LIKE 'remote-%'
       SQL
       DB[query, printer_code].get(:ip_address)
     end
