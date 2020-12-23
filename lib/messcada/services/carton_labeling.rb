@@ -64,7 +64,7 @@ module MesscadaApp
         attrs = attrs.merge(group_incentive_id: system_resource.group_incentive_id)
       elsif system_resource.login
         # individual incentive
-        @personnel_number = hr_repo.contract_worker_personnel_number(:system_resource.contract_worker_id)
+        @personnel_number = hr_repo.contract_worker_personnel_number(system_resource.contract_worker_id)
         attrs = attrs.merge(personnel_identifier_id: system_resource.personnel_identifier_id,
                             contract_worker_id: system_resource.contract_worker_id)
       end

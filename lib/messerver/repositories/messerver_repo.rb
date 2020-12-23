@@ -277,7 +277,7 @@ module MesserverApp
       failed_response("There was an error: #{e.message}")
     end
 
-    def format_response(response, context = nil) # rubocop:disable Metrics/AbcSize
+    def format_response(response, context = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
       if response.code == '200'
         if response.body&.include?('204 No content')
           send_error_email(response, context)
@@ -290,6 +290,8 @@ module MesserverApp
       else
         msg = response.code.start_with?('5') ? 'The destination server encountered an error.' : 'The request was not successful.'
         send_error_email(response, context)
+        puts "MesServer Context: #{context}" unless context.nil?
+        puts "MesServer Response: code=#{response.code}, body=#{response.body}"
         failed_response("#{msg} The response code is #{response.code}", response_code: response.code)
       end
     end

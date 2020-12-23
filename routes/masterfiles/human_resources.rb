@@ -219,7 +219,7 @@ class Nspack < Roda
           show_partial { Masterfiles::HumanResources::ContractWorker::PrintBarcode.call(id) }
         end
         r.patch do
-          res = interactor.print_contract_worker_barcode(id, params[:contract_worker])
+          res = interactor.print_personnel_barcode(id, params[:contract_worker])
           if res.success
             show_json_notice(res.message)
           else
