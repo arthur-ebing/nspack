@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-# rubocop:disable Metrics/BlockLength
-
+# rubocop:disable Metrics/ClassLength, Metrics/BlockLength
 class Nspack < Roda
   route 'parties', 'masterfiles' do |r|
     r.on 'organizations', Integer do |id|
@@ -40,7 +38,7 @@ class Nspack < Roda
             update_grid_row(id, changes: { party_id: res.instance[:party_id],
                                            parent: res.instance[:parent_organization],
                                            short_description: res.instance[:short_description],
-                                           medium_description: res.instance[:medium_description],
+                                           organization_code: res.instance[:medium_description],
                                            long_description: res.instance[:long_description],
                                            vat_number: res.instance[:vat_number] },
                                 notice: res.message)
@@ -295,6 +293,4 @@ class Nspack < Roda
     end
   end
 end
-
-# rubocop:enable Metrics/ClassLength
-# rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/ClassLength, Metrics/BlockLength
