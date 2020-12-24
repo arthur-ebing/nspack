@@ -24,5 +24,16 @@ module Crossbeams
                            targetUser: target_user,
                            message: message)
     end
+
+    def send_bus_message_to_page(actions, target_page, message: nil, message_type: :information)
+      ::MessageBus.publish('/terminus',
+                           messageType: message_type,
+                           targetPage: target_page,
+                           actions: actions, # [{ id: 'ping-560', set_bg: 'green' }],
+                           message: message)
+      # toggle_classes: { id: '', remove: [], add: [] }
+      # set_inner_value { id: '', value: '' }
+      # make message optional
+    end
   end
 end

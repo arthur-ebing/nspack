@@ -34,6 +34,12 @@ class Nspack < Roda
       end
     end
 
+    # ROBOT STATES
+    # --------------------------------------------------------------------------
+    r.on 'robot_states' do
+      show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::RobotStates.call }
+    end
+
     # LOADS
     # --------------------------------------------------------------------------
     r.on 'load_weeks' do

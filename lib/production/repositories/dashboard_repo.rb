@@ -2,6 +2,54 @@
 
 module ProductionApp
   class DashboardRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+    def robot_states
+      # Sys res, plant res
+      # robot buttons + allocations
+      # ip
+      # MAC
+      # line, packhouse
+      # type
+      query = <<~SQL
+        SELECT p.id, -- p.plant_resource_type_id, p.system_resource_id,
+        p.plant_resource_code,
+        p.description AS plant_description, -- p.active, p.created_at, p.updated_at,
+        -- p.location_id, p.resource_properties,
+        -- s.plant_resource_type_id,
+        -- s.system_resource_type_id,
+        s.system_resource_code,
+        s.description AS system_description,
+        -- s.active,
+        -- s.created_at,
+        -- s.updated_at,
+        s.equipment_type,
+        s.module_function,
+        s.mac_address,
+        s.ip_address,
+        -- s.port,
+        -- s.ttl,
+        -- s.cycle_time,
+        s.publishing,
+        s.login,
+        s.logoff,
+        s.module_action,
+        -- s.peripheral_model,
+        -- s.connection_type,
+        -- s.printer_language,
+        -- s.print_username,
+        -- s.print_password,
+        -- s.pixels_mm,
+        s.robot_function,
+        s.group_incentive
+
+        FROM plant_resources p
+        JOIN system_resources s ON s.id = p.system_resource_id
+        WHERE s.system_resource_type_id = (SELECT id FROM system_resource_types WHERE system_resource_type_code = 'MODULE')
+          AND s.ip_address IS NOT NULL
+      SQL
+
+      DB[query].all
+    end
+
     def palletizing_bay_states
       query = <<~SQL
         SELECT b.id, r.plant_resource_code,

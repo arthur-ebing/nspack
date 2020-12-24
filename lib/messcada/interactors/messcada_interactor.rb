@@ -599,7 +599,7 @@ module MesscadaApp
         'PID="223"',
         'Status="true"',
         'Threading="true"',
-        %(RunNumber="2020_AP_20980_1568_21A"), # TODO: get production run code
+        %(RunNumber=""),
         %(Code=""),
         %(LabelTemplateFile="#{label_name}.nsld"),
         %(LabelRenderAmount="#{quantity}"),

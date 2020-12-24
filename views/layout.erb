@@ -157,18 +157,41 @@
         if (msg.targetUser && msg.targetUser !== 'broadcast' && msg.targetUser !== logged_in_user) {
           return;
         }
-        switch (msg.messageType) {
-          case 'warning':
-            crossbeamsUtils.showWarning(msg.message);
-            return;
-          case 'success':
-            crossbeamsUtils.showSuccess(msg.message);
-            return;
-          case 'error':
-            crossbeamsUtils.showError(msg.message);
-            return;
-          default:
-            crossbeamsUtils.showInformation(msg.message);
+        if (msg.targetPage && window.location.pathname.match(`${msg.targetPage}$`).length === 0) {
+          return;
+        }
+        if (msg.actions) {
+          msg.actions.forEach((action) => {
+            if (action.toggle_classes) {
+              const el = document.getElementById(action.toggle_classes.id);
+              if (action.toggle_classes.rem_classes.length > 0) {
+                el.classList.remove(...action.toggle_classes.rem_classes);
+              }
+              if (action.toggle_classes.add_classes.length > 0) {
+                el.classList.add(...action.toggle_classes.add_classes);
+              }
+            }
+            if (action.set_inner_value) {
+              const el = document.getElementById(action.set_inner_value.id);
+              el.innerHTML = action.set_inner_value.val;
+            }
+          });
+        }
+
+        if (msg.msg) {
+          switch (msg.messageType) {
+            case 'warning':
+              crossbeamsUtils.showWarning(msg.message);
+              return;
+            case 'success':
+              crossbeamsUtils.showSuccess(msg.message);
+              return;
+            case 'error':
+              crossbeamsUtils.showError(msg.message);
+              return;
+            default:
+              crossbeamsUtils.showInformation(msg.message);
+          }
         }
       });
       // MessageBus handling --- END
