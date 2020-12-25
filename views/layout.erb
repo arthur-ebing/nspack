@@ -157,6 +157,7 @@
         if (msg.targetUser && msg.targetUser !== 'broadcast' && msg.targetUser !== logged_in_user) {
           return;
         }
+        // TargetPage matches the last characters of the URL
         if (msg.targetPage && window.location.pathname.match(`${msg.targetPage}$`).length === 0) {
           return;
         }
@@ -164,16 +165,18 @@
           msg.actions.forEach((action) => {
             if (action.toggle_classes) {
               const el = document.getElementById(action.toggle_classes.id);
-              if (action.toggle_classes.rem_classes.length > 0) {
+              if (el && action.toggle_classes.rem_classes.length > 0) {
                 el.classList.remove(...action.toggle_classes.rem_classes);
               }
-              if (action.toggle_classes.add_classes.length > 0) {
+              if (el && action.toggle_classes.add_classes.length > 0) {
                 el.classList.add(...action.toggle_classes.add_classes);
               }
             }
             if (action.set_inner_value) {
               const el = document.getElementById(action.set_inner_value.id);
-              el.innerHTML = action.set_inner_value.val;
+              if (el) {
+                el.innerHTML = action.set_inner_value.val;
+              }
             }
           });
         }

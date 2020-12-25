@@ -8,8 +8,8 @@ module Production
           layout = Crossbeams::Layout::Page.build({}) do |page|
             page.add_text 'Robot states', wrapper: :h2
             page.add_text draw_states
+            page.add_repeating_request '/production/dashboards/run_robot_state_checks', 100, ''
           end
-          # also ping TCP peripherals
 
           layout
         end
@@ -53,10 +53,10 @@ module Production
                 <p class="fw7 tc">#{rec[:system_resource_code]}</p>
                 <p><table class="thinbordertable" style="width:100%">
                 <tr><td>Ping:</td>
-                <td><div id="ping-#{rec[:id]}" class="bg-orange br4 ba h1 w1"></div></td>
+                <td><div id="ping-#{rec[:system_resource_id]}" class="bg-yellow br4 ba h1 w1"></div></td>
                 <td>Running:</td>
-                <td><div id="run-#{rec[:id]}" class="bg-orange br4 ba h1 w1"></div></td></tr>
-                <tr><th colspan="2">Version</th><td colspan="2" id="ver-#{rec[:id]}"></td></tr>
+                <td><div id="run-#{rec[:system_resource_id]}" class="bg-yellow br4 ba h1 w1"></div></td></tr>
+                <tr><th colspan="2">Version</th><td colspan="2" id="ver-#{rec[:system_resource_id]}"></td></tr>
                 </table></p>
                 <p><table class="thinbordertable" style="width:100%">
                 <tr><th class="tl">IP:</th><td>#{rec[:ip_address]}&nbsp;</td></tr>

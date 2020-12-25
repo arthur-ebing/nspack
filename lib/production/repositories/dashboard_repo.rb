@@ -10,7 +10,7 @@ module ProductionApp
       # line, packhouse
       # type
       query = <<~SQL
-        SELECT p.id, -- p.plant_resource_type_id, p.system_resource_id,
+        SELECT p.id, p.system_resource_id, -- p.plant_resource_type_id
         p.plant_resource_code,
         p.description AS plant_description, -- p.active, p.created_at, p.updated_at,
         -- p.location_id, p.resource_properties,
@@ -43,6 +43,17 @@ module ProductionApp
 
         FROM plant_resources p
         JOIN system_resources s ON s.id = p.system_resource_id
+        WHERE s.system_resource_type_id = (SELECT id FROM system_resource_types WHERE system_resource_type_code = 'MODULE')
+          AND s.ip_address IS NOT NULL
+      SQL
+
+      DB[query].all
+    end
+
+    def robot_system_resources_for_ping
+      query = <<~SQL
+        SELECT s.id, s.ip_address, s.equipment_type
+        FROM system_resources s
         WHERE s.system_resource_type_id = (SELECT id FROM system_resource_types WHERE system_resource_type_code = 'MODULE')
           AND s.ip_address IS NOT NULL
       SQL

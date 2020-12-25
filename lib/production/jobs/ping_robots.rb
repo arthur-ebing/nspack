@@ -7,30 +7,38 @@ module ProductionApp
 
       self.maximum_retry_count = 0
 
-      def run(params) # rubocop:disable Metrics/AbcSize
+      def run # rubocop:disable Metrics/AbcSize
+        robots = ProductionApp::DashboardRepo.new.robot_system_resources_for_ping
         threads = []
-        threads << Thread.new do
-          ht = Crossbeams::HTTPCalls.new
-          if ht.can_ping?(params[:ip])
-            work = { toggle_classes: { id: 'ping-560', rem_classes: ['bg-orange'], add_classes: ['bg-green'] } }
-            send_bus_message_to_page([work], 'robot_states', message: 'IP could be reached', message_type: :success)
-          else
-            send_bus_message('IP could NOT be reached', message_type: :failure)
-          end
-        end
-
-        threads << Thread.new do
-          ht = Crossbeams::HTTPCalls.new
-          res = ht.request_get("http://#{params[:ip]}:2080/?Type=SoftwareRevision")
-          if res.success
-            ver = res.instance.body.split('Version="').last.split('"').first
-            # replace inner html & change orange to green
-            # send_bus_message(ver, message_type: :success)
-            work = [{ toggle_classes: { id: 'run-560', rem_classes: ['bg-orange'], add_classes: ['bg-green'] } },
-                    { set_inner_value: { id: 'ver-560', val: ver } }]
+        robots.each do |robot| # rubocop:disable Metrics/BlockLength
+          id = robot[:id]
+          ip = robot[:ip_address]
+          call_robot = robot[:equipment_type] != 'robot-rpi'
+          threads << Thread.new do
+            ht = Crossbeams::HTTPCalls.new
+            colour = if ht.can_ping?(ip)
+                       'bg-green'
+                     else
+                       'bg-red'
+                     end
+            work = [{ toggle_classes: { id: "ping-#{id}", rem_classes: ['bg-yellow'], add_classes: [colour] } }]
+            work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: [colour] } } unless call_robot
             send_bus_message_to_page(work, 'robot_states')
-          else
-            send_bus_message(res.message, message_type: :failure)
+          end
+
+          next unless call_robot
+
+          threads << Thread.new do
+            ht = Crossbeams::HTTPCalls.new
+            res = ht.request_get("http://#{ip}:2080/?Type=SoftwareRevision")
+            work = if res.success
+                     ver = res.instance.body.split('Version="').last.split('"').first
+                     [{ toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-green'] } },
+                      { set_inner_value: { id: "ver-#{id}", val: ver } }]
+                   else
+                     [{ toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-red'] } }]
+                   end
+            send_bus_message_to_page(work, 'robot_states')
           end
         end
 
