@@ -40,7 +40,7 @@ class Nspack < Roda
       show_page_in_layout(layout_to_use) { Production::Dashboards::Dashboard::RobotStates.call }
     end
     r.on 'run_robot_state_checks' do
-      ProductionApp::Job::PingRobots.enqueue
+      ProductionApp::Job::PingRobots(current_user.user_name).enqueue
       { updateMessage: { content: '', continuePolling: false } }.to_json
     end
 

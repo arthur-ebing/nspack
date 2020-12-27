@@ -29,11 +29,8 @@ module Crossbeams
       ::MessageBus.publish('/terminus',
                            messageType: message_type,
                            targetPage: target_page,
-                           actions: actions, # [{ id: 'ping-560', set_bg: 'green' }],
+                           actions: actions,
                            message: message)
-      # toggle_classes: { id: '', remove: [], add: [] }
-      # set_inner_value { id: '', value: '' }
-      # make message optional
     end
   end
 end

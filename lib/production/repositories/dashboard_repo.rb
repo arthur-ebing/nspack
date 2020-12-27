@@ -52,7 +52,8 @@ module ProductionApp
 
     def robot_system_resources_for_ping
       query = <<~SQL
-        SELECT s.id, s.ip_address, s.equipment_type
+        SELECT s.id, s.ip_address, s.equipment_type,
+        s.module_function, s.mac_address
         FROM system_resources s
         WHERE s.system_resource_type_id = (SELECT id FROM system_resource_types WHERE system_resource_type_code = 'MODULE')
           AND s.ip_address IS NOT NULL
