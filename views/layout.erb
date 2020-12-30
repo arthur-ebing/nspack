@@ -155,6 +155,17 @@
       // @message_bus_client_id
       MessageBus.subscribe("/terminus", function(msg){
         console.log('MSG', msg);
+        if (msg.actions) {
+          msg.actions.forEach((action) => {
+            if (action.toggle_classes) {
+              console.log('CLASS', action.toggle_classes.id);
+            } else if (action.set_inner_value) {
+              console.log('HTML', action.set_inner_value.id);
+            } else {
+              console.log('UNKNOWN', action);
+            }
+          });
+        }
         if (msg.targetUser && msg.targetUser !== 'broadcast' && msg.targetUser !== logged_in_user) {
           return;
         }

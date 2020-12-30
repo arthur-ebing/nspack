@@ -8,7 +8,7 @@ module Production
           layout = Crossbeams::Layout::Page.build({}) do |page|
             page.add_text 'Robot states', wrapper: :h2
             page.add_text draw_states
-            page.add_repeating_request '/production/dashboards/run_robot_state_checks', 1000, ''
+            page.add_repeating_request '/production/dashboards/run_robot_state_checks', 2000, ''
           end
 
           layout
