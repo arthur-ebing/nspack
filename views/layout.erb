@@ -120,7 +120,7 @@
     <script src="/js/choices.min.js?seq=1"></script>
     <script src="/js/multi.min.js"></script>
     <script src="/js/a11y-dialog-cbeam.js"></script>
-    <script src="/js/message-bus.js"></script>
+    <script src="/js/message-bus.js?seq=1"></script>
     <script src="/js/message-bus-ajax.js"></script>
     <script>
       let crossbeamsDialogLevel1;
@@ -152,6 +152,7 @@
       MessageBus.baseUrl = "/terminus/";
       const logged_in_user = '<%= current_user ? current_user.login_name : "unknown" %>';
 
+      // @message_bus_client_id
       MessageBus.subscribe("/terminus", function(msg){
         console.log('MSG', msg);
         if (msg.targetUser && msg.targetUser !== 'broadcast' && msg.targetUser !== logged_in_user) {

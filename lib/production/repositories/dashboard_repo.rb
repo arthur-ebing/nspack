@@ -45,6 +45,7 @@ module ProductionApp
         JOIN system_resources s ON s.id = p.system_resource_id
         WHERE s.system_resource_type_id = (SELECT id FROM system_resource_types WHERE system_resource_type_code = 'MODULE')
           AND s.ip_address IS NOT NULL
+        ORDER BY s.system_resource_code
       SQL
 
       DB[query].all
