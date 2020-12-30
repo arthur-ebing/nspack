@@ -50,23 +50,39 @@ module Production
             <<~HTML
               <div class="outline pa2 mr3 mt2 bg-white" style="min-width:230px">
                 <p class="fw6 f4 mt0 pb1 bb">#{rec[:plant_resource_code]}</p>
-                <p class="fw7 tc">#{rec[:system_resource_code]}</p>
-                <p><table class="thinbordertable" style="width:100%">
-                <tr><td>Ping:</td>
-                <td><div id="ping-#{rec[:system_resource_id]}" class="bg-yellow br4 ba h1 w1"></div></td>
-                <td>Running:</td>
-                <td><div id="run-#{rec[:system_resource_id]}" class="bg-yellow br4 ba h1 w1"></div></td></tr>
-                <tr><th colspan="2">Version</th><td colspan="2" id="ver-#{rec[:system_resource_id]}"></td></tr>
-                </table></p>
-                <p><table class="thinbordertable" style="width:100%">
+                <p>#{rec[:plant_description]}</p>
+                <p class="fw7 tc pv3" style="background-color:#8ABDEA">#{rec[:system_resource_code]}</p>
+                <div class="flex justify-around">
+                  <div id="ping-#{rec[:system_resource_id]}" class="white b pa2 ba br3">Network</div>
+                  <div id="run-#{rec[:system_resource_id]}" class="white b pa2 ba br3">Software</div>
+                </div>
+                <p>Software version: <span id="ver-#{rec[:system_resource_id]}">&nbsp;</span></p>
+                <p><table class="thinbordertable" style="width:100%;background-color:#e6f4f1">
                 <tr><th class="tl">IP:</th><td>#{rec[:ip_address]}&nbsp;</td></tr>
                 <tr><th class="tl">MAC:</th><td>#{rec[:mac_address]}&nbsp;</td></tr>
                 <tr><th class="tl">Type:</th><td>#{rec[:equipment_type]}&nbsp;</td></tr>
                 </table></p>
                 <p>#{rec[:robot_function]}</p>
+                #{buttons(rec[:id])}
               </div>
             HTML
           end
+        end
+
+        def self.buttons(plant_resource_id)
+          list = ProductionApp::DashboardRepo.new.robot_button_states(plant_resource_id)
+          return if list.empty?
+
+          items = list.map do |btn, code, lbl|
+            %(<tr><td>#{btn}</td><td>#{code}</td><td>#{lbl}</td></tr>)
+          end
+          <<~HTML
+            <p><table class="thinbordertable f7" style="width:100%">
+            <caption>Button allocations</caption>
+            <tr><th>Button</th><th>Setup</th><th>Label</th></tr>
+            #{items.join}
+            </table></p>
+          HTML
         end
       end
     end

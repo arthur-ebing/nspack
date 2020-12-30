@@ -63,6 +63,30 @@ module ProductionApp
       DB[query].all
     end
 
+    def robot_button_states(plant_resource_id)
+      query = <<~SQL
+        SELECT r.plant_resource_code,
+          fn_product_setup_code(s.id) AS product_setup_code,
+          l.label_template_name,
+            a.product_setup_id,
+            a.label_template_id,
+          t.descendant_plant_resource_id
+        FROM tree_plant_resources t
+        JOIN plant_resources r ON r.id = t.descendant_plant_resource_id
+        LEFT JOIN product_resource_allocations a ON a.plant_resource_id = t.descendant_plant_resource_id
+        LEFT JOIN production_runs p ON p.id = a.production_run_id
+        LEFT JOIN product_setups s ON s.id = a.product_setup_id
+        LEFT JOIN label_templates l ON l.id = a.label_template_id
+        WHERE t.ancestor_plant_resource_id = ?
+        AND t.path_length = 1
+        AND a.active
+        AND p.labeling
+        ORDER BY r.plant_resource_code
+      SQL
+
+      DB[query, plant_resource_id].select_map(%i[plant_resource_code product_setup_code label_template_name])
+    end
+
     def palletizing_bay_states
       query = <<~SQL
         SELECT b.id, r.plant_resource_code,
