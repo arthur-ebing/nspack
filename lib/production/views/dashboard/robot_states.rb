@@ -51,10 +51,10 @@ module Production
               <div class="outline pa2 mr3 mt2 bg-white" style="min-width:230px">
                 <p class="fw6 f4 mt0 pb1 bb">#{rec[:plant_resource_code]}</p>
                 <p>#{rec[:plant_description]}</p>
-                <p class="fw7 tc pv3" style="background-color:#8ABDEA">#{rec[:system_resource_code]}</p>
-                <div class="flex justify-around">
-                  <div id="ping-#{rec[:system_resource_id]}" class="white b pa2 ba br3">Network</div>
-                  <div id="run-#{rec[:system_resource_id]}" class="white b pa2 ba br3">Software</div>
+                <p class="fw7 tc pv3 mb0" style="background-color:#8ABDEA">#{rec[:system_resource_code]}</p>
+                <div class="flex justify-around bg-light-yellow pv2">
+                  <div id="ping-#{rec[:system_resource_id]}" class="light-yellow flex justify-center items-center br-100 h4 w4 tc">Network</div>
+                  <div id="run-#{rec[:system_resource_id]}" class="ml2 light-yellow flex justify-center items-center br-100 h4 w4 tc">Software</div>
                 </div>
                 <p>Software version: <span id="ver-#{rec[:system_resource_id]}">&nbsp;</span></p>
                 <p><table class="thinbordertable" style="width:100%;background-color:#e6f4f1">

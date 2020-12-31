@@ -6,6 +6,8 @@ module ProductionApp
       attr_reader :repo, :user_name
 
       self.maximum_retry_count = 0
+      GREEN = 'bg-dark-green'
+      RED = 'bg-dark-red'
 
       def run(user_name) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
         robots = ProductionApp::DashboardRepo.new.robot_system_resources_for_ping
@@ -42,7 +44,7 @@ module ProductionApp
             work = []
             if ht.can_ping?(ip)
               sleep 1
-              work << { toggle_classes: { id: "ping-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-green'] } }
+              work << { toggle_classes: { id: "ping-#{id}", rem_classes: ['bg-yellow'], add_classes: [GREEN] } }
               # if json robot...
               # call ip:80/control.cgi
               # - with { requestInformation: { MAC: '...' } }
@@ -61,14 +63,14 @@ module ProductionApp
                       else
                         res.instance.body.split('Version="').last.split('"').first
                       end
-                work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-green'] } }
+                work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: [GREEN] } }
                 work << { set_inner_value: { id: "ver-#{id}", val: ver } }
               else
-                work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-red'] } }
+                work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: [RED] } }
               end
             else
-              work << { toggle_classes: { id: "ping-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-red'] } }
-              work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: ['bg-red'] } }
+              work << { toggle_classes: { id: "ping-#{id}", rem_classes: ['bg-yellow'], add_classes: [RED] } }
+              work << { toggle_classes: { id: "run-#{id}", rem_classes: ['bg-yellow'], add_classes: [RED] } }
             end
 
             send_bus_message_to_page(work, 'robot_states')
