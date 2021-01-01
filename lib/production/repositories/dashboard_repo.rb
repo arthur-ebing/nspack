@@ -63,6 +63,19 @@ module ProductionApp
       DB[query].all
     end
 
+    def robot_group_incentive_details(system_resource_id)
+      query = <<~SQL
+        SELECT w.id, w.first_name, w.surname, w.personnel_number
+          FROM group_incentives
+          JOIN contract_workers w ON w.id = ANY(group_incentives.contract_worker_ids)
+          WHERE group_incentives.system_resource_id = ?
+            AND group_incentives.active
+          ORDER BY w.first_name, w.surname
+      SQL
+
+      DB[query, system_resource_id].all
+    end
+
     def robot_button_states(plant_resource_id)
       query = <<~SQL
         SELECT r.plant_resource_code,

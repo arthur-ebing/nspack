@@ -33,19 +33,7 @@ module Production
           HTML
         end
 
-        def self.robots(recs)
-          # <div class="tc pa2" style="background: linear-gradient(90deg, #8ABDEA #{rec[:percentage].to_i}%, #e6f4f1 #{rec[:percentage].to_i}%);">
-          #   <span class="fw6 f2 mid-gray ">#{rec[:percentage].to_i}%</span><br>
-          # <table style="width:100%"><tr><td>#{rec[:pallet_qty] || 0} cartons</td><td>#{rec[:cartons_per_pallet] || 0} cpp</td></tr></table></div>
-          # .led_light {
-          #   height: 2em;
-          #   width: 2em;
-          #   margin: 1em;
-          #   border-radius: 50%;
-          # }
-          # #led_red {
-          #   background-color: red;
-          # }
+        def self.robots(recs) # rubocop:disable Metrics/AbcSize
           recs.map do |rec|
             <<~HTML
               <div class="outline pa2 mr3 mt2 bg-white" style="min-width:230px">
@@ -64,6 +52,8 @@ module Production
                 </table></p>
                 <p>#{rec[:robot_function]}</p>
                 #{buttons(rec[:id])}
+                #{indiv(rec[:login], rec[:group_incentive])}
+                #{group(rec[:group_incentive], rec[:system_resource_id])}
               </div>
             HTML
           end
@@ -77,12 +67,44 @@ module Production
             %(<tr><td>#{btn}</td><td>#{code}</td><td>#{lbl}</td></tr>)
           end
           <<~HTML
-            <p><table class="thinbordertable f7" style="width:100%">
-            <caption>Button allocations</caption>
-            <tr><th>Button</th><th>Setup</th><th>Label</th></tr>
-            #{items.join}
-            </table></p>
+            <details class="pv2">
+              <summary class="pointer b blue shadow-3 pa1 mr2">Button allocations</summary>
+              <table class="thinbordertable f6 mt3" style="width:100%">
+              <tr><th>Button</th><th>Setup</th><th>Label</th></tr>
+              #{items.join}
+              </table>
+            </details>
           HTML
+        end
+
+        def self.indiv(login, group_incentive)
+          return '' if group_incentive
+          return '' unless login
+
+          '<div class="bg-purple white pa3 tc">Individual Incentive</div>'
+        end
+
+        def self.group(group_incentive, system_resource_id)
+          return '' unless group_incentive
+
+          list = ProductionApp::DashboardRepo.new.robot_group_incentive_details(system_resource_id)
+          if list.empty?
+            '<div class="bg-dark-blue white pa3 tc">Group Incentive</div>'
+          else
+            items = list.map do |item|
+              %(<tr><td>#{item[:first_name]}</td><td>#{item[:surname]}</td><td>#{item[:personnel_number]}</td></tr>)
+            end
+            <<~HTML
+              <div class="bg-dark-blue white pa3 tc">Group Incentive</div>
+              <details class="pv2">
+                <summary class="pointer b blue shadow-3 pa1 mr2">Active group members</summary>
+                <table class="thinbordertable f6 mt3" style="width:100%">
+                <tr><th>First name</th><th>Surname</th><th>Personnel no.</th></tr>
+                #{items.join}
+                </table>
+              </details>
+            HTML
+          end
         end
       end
     end
