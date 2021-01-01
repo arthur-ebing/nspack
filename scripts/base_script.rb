@@ -23,7 +23,9 @@ ENV['RACK_ENV'] ||= 'development'
 require 'bundler'
 Bundler.require(:default, ENV.fetch('RACK_ENV', 'development'))
 
+root = File.expand_path('..', __dir__)
 require_relative '../config/environment'
+Dir["#{root}/lib/client_rules/*.rb"].sort.each { |f| require f }
 require_relative '../config/app_const'
 require_relative '../lib/crossbeams_errors'
 require_relative '../lib/crossbeams_responses'

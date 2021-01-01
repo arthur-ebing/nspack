@@ -12,7 +12,7 @@
 # As well as to check the running MesScada versions.
 #
 class RobotVersions < BaseScript
-  def run # rubocop:disable Metrics/AbcSize
+  def run # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
     # Do some work here...
     # get list of modules grouped per ph
 
@@ -20,21 +20,25 @@ class RobotVersions < BaseScript
       # Print list of modules
       puts 'List of modules and ip addresses per packhouse'
       robot_list.each do |ph, recs|
-        puts "\n#{ph}"
-        puts '-' * ph.length
+        puts "\n#{ph || 'No PH'}"
+        puts '-' * (ph || 'No PH').length
         recs.each do |rec|
-          puts "#{rec[:system_resource_code]}\t#{rec[:ip_address]}"
+          puts "#{rec[:system_resource_code]}\t#{rec[:ip_address] || 'No IP'}"
         end
       end
     else
       # Check MesServer versions & print
       puts 'MesServer status of each robot per packhouse'
       robot_list.each do |ph, recs|
-        puts "\n#{ph}"
-        puts '-' * ph.length
+        puts "\n#{ph || 'No PH'}"
+        puts '-' * (ph || 'No PH').length
         recs.each do |rec|
-          res = `curl -sS http://#{rec[:ip_address]}:2080/?Type=SoftwareRevision`
-          puts "#{rec[:system_resource_code]}\t#{rec[:ip_address]}\t#{res}"
+          if rec[:ip_address]
+            res = `curl -sS http://#{rec[:ip_address]}:2080/?Type=SoftwareRevision`
+            puts "#{rec[:system_resource_code]}\t#{rec[:ip_address]}\t#{res}"
+          else
+            puts "#{rec[:system_resource_code]}\tBlank IP"
+          end
         end
       end
     end
