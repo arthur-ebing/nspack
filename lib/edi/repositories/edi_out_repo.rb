@@ -82,7 +82,7 @@ module EdiApp
 
     def for_select_directory_keys
       config = load_config
-      config[:out_dirs].keys + config[:mail_recipients].keys.map { |m| "mail:#{m}" }
+      config[:out_dirs].keys + (config[:mail_recipients] || {}).keys.map { |m| "mail:#{m}" }
     end
 
     def format_targets(targets) # rubocop:disable Metrics/AbcSize
