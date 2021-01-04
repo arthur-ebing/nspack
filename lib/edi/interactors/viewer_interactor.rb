@@ -143,6 +143,13 @@ module EdiApp
       [config, Pathname.new(config[:root].sub('$HOME', ENV['HOME']))]
     end
 
+    def edi_mail_path(config, root)
+      mail_path = config[:email_dir]
+      return [] if mail_path.nil?
+
+      [Pathname.new(mail_path.sub('$ROOT', root.to_s))]
+    end
+
     def edi_path_list(config, root, key, suffix)
       dirs = config["#{key}_dirs".to_sym].values
 
@@ -152,7 +159,9 @@ module EdiApp
     def edi_paths(for_send: true)
       if for_send
         config, root = edi_config_for_send
-        edi_path_list(config, root, :out, 'transmitted')
+        paths = edi_mail_path(config, root)
+        paths += edi_path_list(config, root, :out, 'transmitted')
+        paths
       else
         [Pathname.new(AppConst::EDI_RECEIVE_DIR).parent + 'processed']
       end
