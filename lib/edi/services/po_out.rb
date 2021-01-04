@@ -21,7 +21,8 @@ module EdiApp
     def call # rubocop:disable Metrics/AbcSize
       log('Starting transform...')
       @oh_count, @ol_count, @oc_count, @ok_count, @op_count = [0, 0, 0, 0, 0] # rubocop:disable Style/ParallelAssignment
-      @total_carton_count, @total_pallet_count = [0, 0] # rubocop:disable Style/ParallelAssignment
+      @total_carton_count = 0
+      @pallet_nos = Set.new
       prepare_bh
       return success_response('No data for PO') if @header_rec.nil?
 
@@ -113,6 +114,8 @@ module EdiApp
       hash[:orig_depot] = AppConst::FROM_DEPOT
 
       add_record('OP', hash)
+      @total_carton_count += row[:ctn_qty]
+      @pallet_nos << row[:sscc]
       @op_count += 1
     end
 
@@ -125,7 +128,7 @@ module EdiApp
                  ok_count: @ok_count,
                  op_count: @op_count,
                  total_carton_count: @total_carton_count,
-                 total_pallet_count: @total_pallet_count)
+                 total_pallet_count: @pallet_nos.length)
     end
   end
 end
