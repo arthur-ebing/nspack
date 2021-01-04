@@ -99,6 +99,28 @@ module ProductionApp
       failed_response(e.message)
     end
 
+    def repack_pallets(params) # rubocop:disable Metrics/AbcSize
+      params.delete_if { |k, v| v.nil_or_empty? || k.to_s.include?('_scan_field') }
+      pallets = { pallet_number1: params[:pallet_number1] }
+      params.find_all { |k, _v| k.to_s.include?('pallet_number') && k != :pallet_number1 }.each do |p|
+        pallets[p[0]] = p[1]
+      end
+      params.delete_if { |k, _v| k.to_s.include?('pallet_number') }
+
+      repo.transaction do
+        res = ProductionApp::RepackPalletsOrBins.call(@user.user_name, params, pallets)
+        return res unless res.success
+
+        log_status(:pallets, res.instance[:pallet_id], AppConst::REPACKED)
+        log_multiple_statuses(:pallets, repo.select_values(:pallets, :id, pallet_number: pallets.values), AppConst::REPACK_SCRAP)
+        res
+      end
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue StandardError => e
+      failed_response(e.message)
+    end
+
     def edit_pallet_validations(pallet_number)
       check_pallet!(:not_have_individual_cartons, pallet_number)
       check_pallet!(:not_scrapped, pallet_number)

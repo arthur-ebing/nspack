@@ -418,7 +418,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'print_pallet_labels_for_edit_pallet_sequence', Integer do |id|
         r.post do
           print_pallet_sequence_label(id, interactor)
-          r.redirect("/rmd/production/palletizing/edit_pallet_sequence_view/#{id}")
+          r.redirect("/rmd/production/palletizing/direct_edit_pallet_nav_view/#{id}")
+        end
+      end
+
+      r.on 'print_pallet_labels_for_repacked_pallet_sequence', Integer do |id|
+        r.post do
+          print_pallet_sequence_label(id, interactor)
+          r.redirect("/rmd/production/palletizing/repacked_pallet_nav_view/#{id}")
         end
       end
 
@@ -722,6 +729,99 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'repack_pallets' do
+        r.get do
+          form_state = retrieve_from_local_store(:errors).to_h
+          # form_state[:qty_to_print] = 4
+          error = retrieve_from_local_store(:error)
+          if error.is_a?(String)
+            form_state.merge!(error_message: error)
+          elsif !error.nil?
+            form_state.merge!(error_message: error.message)
+            form_state.merge!(errors: error.errors) unless error.errors.nil_or_empty?
+          end
+          form = Crossbeams::RMDForm.new(form_state,
+                                         form_name: :pallet,
+                                         scan_with_camera: @rmd_scan_with_camera,
+                                         notes: retrieve_from_local_store(:flash_notice),
+                                         caption: 'Scan Pallets',
+                                         action: '/rmd/production/palletizing/repack_pallets',
+                                         button_caption: 'Submit')
+          form.add_field(:pallet_number1,
+                         'Pallet Number 1',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: false,
+                         data_type: :number,
+                         required: true)
+          form.add_field(:pallet_number2,
+                         'Pallet Number 2',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: false,
+                         data_type: :number,
+                         required: false)
+          form.add_field(:pallet_number3,
+                         'Pallet Number 3',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: false,
+                         data_type: :number,
+                         required: false)
+          form.add_field(:pallet_number4,
+                         'Pallet Number 4',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: false,
+                         data_type: :number,
+                         required: false)
+          form.add_field(:pallet_number5,
+                         'Pallet Number 5',
+                         scan: 'key248_all',
+                         scan_type: :pallet_number,
+                         submit_form: false,
+                         data_type: :number,
+                         required: false)
+          form.add_field(:gross_weight,
+                         'Pallet Gross Weight',
+                         required: true,
+                         prompt: true,
+                         data_type: :number)
+
+          unless AppConst::BASE_PACK_EQUALS_STD_PACK
+            form.add_select(:basic_pack_id,
+                            'Basic Pack',
+                            prompt: true,
+                            items: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes,
+                            required: true)
+          end
+
+          form.add_select(:standard_pack_id,
+                          'Std Basic Pack',
+                          prompt: true,
+                          items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
+                          required: true)
+          form.add_select(:grade_id,
+                          'Grade',
+                          prompt: true,
+                          items: MasterfilesApp::FruitRepo.new.for_select_grades,
+                          required: true)
+
+          form.add_csrf_tag csrf_tag
+          view(inline: form.render, layout: :layout_rmd)
+        end
+
+        r.post do
+          res = interactor.repack_pallets(params[:pallet])
+          unless res.success
+            store_locally(:error, res)
+            r.redirect('/rmd/production/palletizing/repack_pallets')
+          end
+          pallet_sequence_id = MesscadaApp::MesscadaRepo.new.get_value(:pallet_sequences, :id, pallet_id: res.instance[:pallet_id], pallet_sequence_number: 1)
+          r.redirect("/rmd/production/palletizing/repacked_pallet_nav_view/#{pallet_sequence_id}")
+        end
+      end
+
       r.on 'direct_edit_pallet' do
         r.get do
           form_state = retrieve_from_local_store(:errors).to_h
@@ -837,6 +937,51 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_csrf_tag csrf_tag
         form.add_prev_next_nav('/rmd/production/palletizing/direct_edit_pallet_nav_view/$:id$', ps_ids, id)
         form.add_button('Print', "/rmd/production/palletizing/print_pallet_labels_for_direct_edit_pallet_sequence/#{pallet_sequence[:id]}")
+        view(inline: form.render, layout: :layout_rmd)
+      end
+
+      r.on 'repacked_pallet_nav_view', Integer do |id|
+        pallet_sequence = messcada_interactor.find_pallet_sequence_attrs(id).to_h
+        ps_ids = messcada_interactor.find_pallet_sequences_from_same_pallet(id)
+
+        form_state = {}
+        form_state.merge!(retrieve_from_local_store(:errors).to_h)
+
+        form = Crossbeams::RMDForm.new(form_state,
+                                       form_name: :pallet,
+                                       scan_with_camera: @rmd_scan_with_camera,
+                                       caption: 'Print Pallet Sequence',
+                                       notes: retrieve_from_local_store(:flash_notice),
+                                       step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
+                                       reset_button: false,
+                                       no_submit: false,
+                                       action: "/rmd/production/palletizing/print_pallet_labels_for_repacked_pallet_sequence/#{pallet_sequence[:id]}",
+                                       button_caption: 'Print')
+        form.add_prev_next_nav('/rmd/production/palletizing/repacked_pallet_nav_view/$:id$', ps_ids, id)
+
+        form.add_label(:current_carton_quantity,
+                       'Current Carton Qty',
+                       pallet_sequence[:carton_quantity])
+
+        fields_for_rmd_pallet_sequence_display(form, pallet_sequence)
+
+        form.add_field(:qty_to_print,
+                       'Qty To Print',
+                       required: false,
+                       prompt: true,
+                       data_type: :number)
+        form.add_select(:printer,
+                        'Printer',
+                        value: LabelApp::PrinterRepo.new.default_printer_for_application(AppConst::PRINT_APP_PALLET),
+                        items: LabelApp::PrinterRepo.new.select_printers_for_application(AppConst::PRINT_APP_PALLET),
+                        required: false)
+        form.add_select(:pallet_label_name,
+                        'Pallet Label',
+                        value: AppConst::DEFAULT_PALLET_LABEL_NAME,
+                        items: interactor.find_pallet_labels,
+                        required: false)
+        form.add_csrf_tag csrf_tag
+        form.add_prev_next_nav('/rmd/production/palletizing/repacked_pallet_nav_view/$:id$', ps_ids, id)
         view(inline: form.render, layout: :layout_rmd)
       end
 

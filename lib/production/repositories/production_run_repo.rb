@@ -31,6 +31,10 @@ module ProductionApp
       !res.nil? ? res[:rmt_delivery_id] : nil
     end
 
+    def find_pallets_sequences(pallet_number)
+      DB[:pallet_sequences].where(pallet_number: pallet_number).all.sort_by { |p| p[:id] }
+    end
+
     def find_pallet_mix_rule_flat(id)
       find_with_association(:pallet_mix_rules,
                             id,
