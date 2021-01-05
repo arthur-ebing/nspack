@@ -140,6 +140,8 @@ module ProductionApp
     def print_packpoint_barcode(id, params)
       instance = plant_resource(id)
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PACKPOINT_BARCODE, instance, params)
+      # instance = { location_long_code: "1234  12.45kg  aa\n1234 123.04kg  bb", location_short_code: "1234  12.45kg  aa\n1234 123.04kg  bb" }
+      # LabelPrintingApp::PrintLabel.call('JS_TEST', instance, params)
     end
 
     def get_location_lookup(location_id)
