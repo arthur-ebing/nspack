@@ -27,6 +27,8 @@ module FinishedGoodsApp
     attribute :packed_tm_group, Types::String
     attribute :destination_region_id, Types::Integer
     attribute :destination_region, Types::String
+    attribute :destination_country_id, Types::Integer
+    attribute :destination_country, Types::String
     attribute :govt_inspection_api_result_id, Types::Integer
     attribute :reinspection, Types::Bool
     attribute :created_by, Types::String

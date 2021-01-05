@@ -34,6 +34,8 @@ module FinishedGoodsApp
         packed_tm_group: Faker::Lorem.unique.word,
         destination_region_id: 1,
         destination_region: Faker::Lorem.unique.word,
+        destination_country_id: 1,
+        destination_country: Faker::Lorem.unique.word,
         govt_inspection_api_result_id: 1,
         reinspection: false,
         created_by: Faker::Lorem.unique.word,

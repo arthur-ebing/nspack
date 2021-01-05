@@ -2,22 +2,28 @@
 
 module MasterfilesApp
   class DestinationRepo < BaseRepo
-    build_for_select :destination_regions,
-                     label: :destination_region_name,
-                     value: :id,
-                     order_by: :destination_region_name
+    def for_select_destination_regions(active = true, where: nil)
+      ds = DB[:destination_regions].join(:destination_regions_tm_groups, destination_region_id: :id).distinct
+      ds = ds.where(active: active)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[destination_region_name id])
+    end
     build_inactive_select :destination_regions,
                           label: :destination_region_name,
                           value: :id,
                           order_by: :destination_region_name
-    build_for_select :destination_countries,
-                     label: :country_name,
-                     value: :id,
-                     order_by: :country_name
+
+    def for_select_destination_countries(active = true, where: nil)
+      ds = DB[:destination_countries].join(:destination_regions, id: :destination_region_id).distinct
+      ds = ds.where(Sequel[:destination_countries][:active] => active)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map([:country_name, Sequel[:destination_countries][:id]])
+    end
     build_inactive_select :destination_countries,
                           label: :country_name,
                           value: :id,
                           order_by: :country_name
+
     build_for_select :destination_cities,
                      label: :city_name,
                      value: :id,

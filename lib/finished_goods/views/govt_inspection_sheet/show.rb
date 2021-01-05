@@ -106,6 +106,7 @@ module FinishedGoods
                   col.add_field :consignment_note_number
                   col.add_field :inspection_point
                   col.add_field :destination_region_id
+                  col.add_field :destination_country_id
                   col.add_field :use_inspection_destination_for_load_out
                   col.add_field :completed
                   col.add_field :inspected

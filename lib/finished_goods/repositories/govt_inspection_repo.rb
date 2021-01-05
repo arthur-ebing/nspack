@@ -30,7 +30,11 @@ module FinishedGoodsApp
                                                    { parent_table: :destination_regions,
                                                      columns: %i[destination_region_name],
                                                      foreign_key: :destination_region_id,
-                                                     flatten_columns: { destination_region_name: :destination_region } }])
+                                                     flatten_columns: { destination_region_name: :destination_region } },
+                                                   { parent_table: :destination_countries,
+                                                     columns: %i[country_name],
+                                                     foreign_key: :destination_country_id,
+                                                     flatten_columns: { country_name: :destination_country } }])
       return nil unless hash
 
       hash[:allocated] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id)
@@ -43,17 +47,6 @@ module FinishedGoodsApp
       hash[:status] = DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
 
       GovtInspectionSheet.new(hash)
-    end
-
-    def for_select_destination_regions(active = true, where: nil)
-      ds = DB[:destination_regions].join(:destination_regions_tm_groups, destination_region_id: :id).distinct
-      ds = ds.where(active: active)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map(%i[destination_region_name id])
-    end
-
-    def for_select_inactive_destination_regions(where: nil)
-      for_select_destination_regions(false, where: where)
     end
 
     def pallet_in_different_tripsheet?(pallet_id, vehicle_job_id)

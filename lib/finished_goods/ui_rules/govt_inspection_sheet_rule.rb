@@ -11,10 +11,11 @@ module UiRules
       common_values_for_fields common_fields
 
       set_show_fields if %i[show].include? @mode
+      add_behaviours if %i[new edit].include? @mode
+
       add_progress_step
       add_controls
       add_rules
-      add_behaviours
 
       form_name 'govt_inspection_sheet'
     end
@@ -53,6 +54,9 @@ module UiRules
       fields[:destination_region_id] = { renderer: :label,
                                          with_value: @form_object.destination_region,
                                          caption: 'Destination Region' }
+      fields[:destination_country_id] = { renderer: :label,
+                                          with_value: @form_object.destination_country,
+                                          caption: 'Destination Country' }
       fields[:active] = { renderer: :label,
                           as_boolean: true }
       fields[:govt_inspection_api_result_id] = { renderer: :label,
@@ -104,10 +108,16 @@ module UiRules
                               caption: 'Packed TM Group',
                               required: true },
         destination_region_id: { renderer: :select,
-                                 options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { id: valid_destination_region_ids }),
-                                 disabled_options: FinishedGoodsApp::GovtInspectionRepo.new.for_select_inactive_destination_regions,
+                                 options: MasterfilesApp::DestinationRepo.new.for_select_destination_regions(where: { id: valid_destination_region_ids }),
+                                 disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_regions,
                                  caption: 'Destination Region',
                                  required: true },
+        destination_country_id: { renderer: :select,
+                                  options: MasterfilesApp::DestinationRepo.new.for_select_destination_countries(where: { destination_region_id: valid_destination_region_ids }),
+                                  disabled_options: MasterfilesApp::DestinationRepo.new.for_select_inactive_destination_countries,
+                                  caption: 'Destination Country',
+                                  prompt: true,
+                                  required: false },
         govt_inspection_api_result_id: { renderer: :select,
                                          options: @repo.for_select_govt_inspection_api_results,
                                          disabled_options: @repo.for_select_inactive_govt_inspection_api_results,
@@ -148,6 +158,7 @@ module UiRules
                                     awaiting_inspection_results: nil,
                                     packed_tm_group_id: @repo.get_last(:govt_inspection_sheets, :packed_tm_group_id),
                                     destination_region_id: @repo.get_last(:govt_inspection_sheets, :destination_region_id),
+                                    destination_country_id: @repo.get_last(:govt_inspection_sheets, :destination_country_id),
                                     govt_inspection_api_result_id: nil,
                                     reinspection: @mode == :reinspection,
                                     scanned_number: nil)
@@ -236,7 +247,8 @@ module UiRules
 
     def add_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change(:packed_tm_group_id, notify: [{ url: '/finished_goods/inspection/govt_inspection_sheets/packed_tm_group_changed' }]) if %i[new edit].include? @mode
+        behaviour.dropdown_change(:packed_tm_group_id, notify: [{ url: '/finished_goods/inspection/govt_inspection_sheets/packed_tm_group_changed' }])
+        behaviour.dropdown_change(:destination_region_id, notify: [{ url: '/finished_goods/inspection/govt_inspection_sheets/destination_region_changed' }])
       end
     end
 

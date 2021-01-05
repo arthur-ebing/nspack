@@ -71,6 +71,7 @@ module FinishedGoodsApp
       exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
       target_market_group_id = create_target_market_group
       destination_region_id = create_destination_region
+      destination_country_id = create_destination_country
       {
         id: 1,
         inspector_id: inspector_id,
@@ -95,6 +96,8 @@ module FinishedGoodsApp
         packed_tm_group: Faker::Lorem.unique.word,
         destination_region_id: destination_region_id,
         destination_region: Faker::Lorem.unique.word,
+        destination_country_id: destination_country_id,
+        destination_country: Faker::Lorem.unique.word,
         govt_inspection_api_result_id: nil,
         reinspection: false,
         created_by: 'ABC',

@@ -210,10 +210,22 @@ class Nspack < Roda
         region_list = if params[:changed_value].nil_or_empty?
                         []
                       else
-                        FinishedGoodsApp::GovtInspectionRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
+                        MasterfilesApp::DestinationRepo.new.for_select_destination_regions(where: { target_market_group_id: params[:changed_value] })
                       end
         actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_region_id', options_array: region_list)
         actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_region_id', value: region_list.first.last) if region_list.length == 1
+        json_actions(actions)
+      end
+
+      r.on 'destination_region_changed' do
+        actions = []
+        country_list = if params[:changed_value].nil_or_empty?
+                         []
+                       else
+                         MasterfilesApp::DestinationRepo.new.for_select_destination_countries(where: { destination_region_id: params[:changed_value] })
+                       end
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'govt_inspection_sheet_destination_country_id', options_array: country_list)
+        actions << OpenStruct.new(type: :change_select_value, dom_id: 'govt_inspection_sheet_destination_country_id', value: country_list.first.last) if country_list.length == 1
         json_actions(actions)
       end
 
