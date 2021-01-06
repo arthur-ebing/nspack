@@ -31,7 +31,11 @@ module UiRules
         title: { required: true },
         vat_number: {},
         active: { renderer: :checkbox },
-        role_ids: { renderer: :multi, options: @repo.for_select_roles, selected: @form_object.role_ids, required: true  }
+        role_ids: { renderer: :multi,
+                    caption: 'Roles',
+                    options: @repo.for_select_roles,
+                    selected: @form_object.role_ids,
+                    required: true  }
       }
     end
 
