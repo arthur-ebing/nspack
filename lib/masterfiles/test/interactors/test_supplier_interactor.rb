@@ -6,7 +6,7 @@ module MasterfilesApp
   class TestSupplierInteractor < MiniTestWithHooks
     include SupplierFactory
     include PartyFactory
-    include FarmsFactory
+    include FarmFactory
 
     def test_repo
       repo = interactor.send(:repo)

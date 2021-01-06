@@ -8,7 +8,7 @@ module RawMaterialsApp
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::CommodityFactory
     include MasterfilesApp::CultivarFactory
-    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::FarmFactory
     include MasterfilesApp::DepotFactory
     include MasterfilesApp::RmtContainerMaterialTypeFactory
     include RawMaterialsApp::RmtBinFactory

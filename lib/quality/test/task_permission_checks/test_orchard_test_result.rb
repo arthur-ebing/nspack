@@ -9,7 +9,7 @@ module QualityApp
     include MasterfilesApp::TargetMarketFactory
     include MasterfilesApp::CultivarFactory
     include MasterfilesApp::CommodityFactory
-    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::FarmFactory
     include MasterfilesApp::PartyFactory
 
     def entity(attrs = {})

@@ -8,7 +8,7 @@ module RawMaterialsApp
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::CommodityFactory
     include MasterfilesApp::CultivarFactory
-    include MasterfilesApp::FarmsFactory
+    include MasterfilesApp::FarmFactory
     include MasterfilesApp::CalendarFactory
 
     def test_repo

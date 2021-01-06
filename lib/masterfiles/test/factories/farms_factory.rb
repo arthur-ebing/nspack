@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  module FarmsFactory
+  module FarmFactory
     def create_production_region(opts = {})
       default = {
         production_region_code: Faker::Lorem.unique.word,

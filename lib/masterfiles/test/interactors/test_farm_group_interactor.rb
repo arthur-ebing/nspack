@@ -4,7 +4,7 @@ require File.join(File.expand_path('../../../../test', __dir__), 'test_helper')
 
 module MasterfilesApp
   class TestFarmGroupInteractor < MiniTestWithHooks
-    include FarmsFactory
+    include FarmFactory
     include PartyFactory
 
     def test_repo
