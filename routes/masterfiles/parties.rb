@@ -416,12 +416,52 @@ class Nspack < Roda
         check_auth!('parties', 'new')
         show_partial_or_page(r) { Masterfiles::Parties::Supplier::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'supplier_party_role_changed' do
+        actions = []
+        %w[medium_description
+           short_description
+           long_description
+           company_reg_no
+           title
+           first_name
+           surname
+           vat_number].each do |dom_id|
+          actions << OpenStruct.new(type: :hide_element, dom_id: "supplier_#{dom_id}_field_wrapper")
+          actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: false)
+        end
+
+        if params[:changed_value] == 'O'
+          %w[medium_description short_description].each do |dom_id|
+            actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: true)
+          end
+          %w[medium_description
+             short_description
+             long_description
+             company_reg_no
+             vat_number].each do |dom_id|
+            actions << OpenStruct.new(type: :show_element, dom_id: "supplier_#{dom_id}_field_wrapper")
+          end
+        end
+        if params[:changed_value] == 'P'
+          %w[title first_name surname].each do |dom_id|
+            actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: true)
+          end
+          %w[title first_name surname vat_number].each do |dom_id|
+            actions << OpenStruct.new(type: :show_element, dom_id: "supplier_#{dom_id}_field_wrapper")
+          end
+        end
+
+        json_actions(actions)
+      end
+
       r.post do        # CREATE
         res = interactor.create_supplier(params[:supplier])
         if res.success
           row_keys = %i[
             id
             supplier_party_role_id
+            supplier
             supplier_group_ids
             supplier_group_codes
             farm_ids

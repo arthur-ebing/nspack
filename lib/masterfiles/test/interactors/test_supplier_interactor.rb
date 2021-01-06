@@ -28,10 +28,10 @@ module MasterfilesApp
     end
 
     def test_create_supplier_fail
-      attrs = fake_supplier(id: nil).to_h.reject { |k, _| %i[id supplier_party_role_id].include?(k) }
+      attrs = fake_supplier(id: nil).to_h.reject { |k, _| %i[id supplier_group_ids].include?(k) }
       res = interactor.create_supplier(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['is missing'], res.errors[:supplier_party_role_id]
+      assert_equal ['is missing'], res.errors[:supplier_group_ids]
     end
 
     def test_update_supplier

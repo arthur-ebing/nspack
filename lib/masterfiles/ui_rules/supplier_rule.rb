@@ -9,6 +9,7 @@ module UiRules
       apply_form_values
 
       common_values_for_fields common_fields
+      add_approve_behaviours if %i[new].include? @mode
 
       set_show_fields if %i[show reopen].include? @mode
 
@@ -30,11 +31,18 @@ module UiRules
     end
 
     def common_fields
+      party_role_options = @party_repo.for_select_party_roles(AppConst::ROLE_SUPPLIER).sort_by { |e| e[0] }
+      party_role_options << ['Create New Orginization', 'O']
+      party_role_options << ['Create New Person', 'P']
+
       {
         supplier_party_role_id: { renderer: :select,
-                                  options: @party_repo.for_select_party_roles(AppConst::ROLE_SUPPLIER),
+                                  options: party_role_options,
                                   disabled_options: @party_repo.for_select_inactive_party_roles(AppConst::ROLE_SUPPLIER),
                                   caption: 'Supplier',
+                                  sort_items: false,
+                                  searchable: true,
+                                  prompt: true,
                                   required: true },
         supplier_group_ids: { renderer: :multi,
                               options: @repo.for_select_supplier_groups,
@@ -45,7 +53,19 @@ module UiRules
                     options: MasterfilesApp::FarmRepo.new.for_select_farms,
                     selected: @form_object.farm_ids,
                     caption: 'Farms',
-                    required: true }
+                    required: true },
+        # Organization
+        medium_description: { caption: 'Organization Code',
+                              hide_on_load: true },
+        short_description: { hide_on_load: true },
+        long_description: { hide_on_load: true },
+        company_reg_no: { hide_on_load: true },
+
+        # Person
+        title: { hide_on_load: true },
+        surname: { hide_on_load: true },
+        first_name: { hide_on_load: true },
+        vat_number: { hide_on_load: true }
       }
     end
 
@@ -62,6 +82,14 @@ module UiRules
       @form_object = OpenStruct.new(supplier_party_role_id: nil,
                                     supplier_group_ids: nil,
                                     farm_ids: nil)
+    end
+
+    private
+
+    def add_approve_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :supplier_party_role_id, notify: [{ url: '/masterfiles/parties/suppliers/supplier_party_role_changed' }]
+      end
     end
   end
 end

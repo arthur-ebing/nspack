@@ -3,6 +3,13 @@
 module MasterfilesApp
   class SupplierInteractor < BaseInteractor
     def create_supplier(params) # rubocop:disable Metrics/AbcSize
+      unless params[:supplier_party_role_id].to_i.positive?
+        res = CreatePartyRole.call(params[:supplier_party_role_id], AppConst::ROLE_SUPPLIER, params, @user)
+        return res unless res.success
+
+        params[:supplier_party_role_id] = res.instance
+      end
+
       res = validate_supplier_params(params)
       return validation_failed_response(res) if res.failure?
 
