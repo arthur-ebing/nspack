@@ -142,9 +142,16 @@ module MasterfilesApp
     end
 
     def delete_farm(id)
+      query = <<~SQL
+        SELECT suppliers.id
+        FROM farms
+        JOIN suppliers ON farms.id = ANY(suppliers.farm_ids)
+        WHERE farms.id = ?
+      SQL
+      raise Sequel::ForeignKeyConstraintViolation, OpenStruct.new(message: "Key (id)=(#{id}) is still referenced from table suppliers") unless DB[query, id].first.nil?
+
       DB[:farms_pucs].where(farm_id: id).delete
-      DB[:farms].where(id: id).delete
-      { success: true }
+      delete(:farms, id)
     end
 
     def delete_farms_pucs(puc_id)

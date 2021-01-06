@@ -35,7 +35,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_voyage_type(id)
+    def delete_voyage_type(id) # rubocop:disable Metrics/AbcSize
       name = voyage_type(id).voyage_type_code
       repo.transaction do
         repo.delete_voyage_type(id)
@@ -44,6 +44,9 @@ module MasterfilesApp
       success_response("Deleted voyage type #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete voyage type. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)

@@ -49,6 +49,7 @@ module UiRules
         role_ids: { renderer: :multi,
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,
+                    caption: 'Roles',
                     required: true  }
       }
     end

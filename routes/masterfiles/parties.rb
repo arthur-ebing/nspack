@@ -291,6 +291,154 @@ class Nspack < Roda
         redirect_to_last_grid(r)
       end
     end
+
+    r.on 'supplier_groups', Integer do |id|
+      interactor = MasterfilesApp::SupplierGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:supplier_groups, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('parties', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Parties::SupplierGroup::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('parties', 'read')
+          show_partial { Masterfiles::Parties::SupplierGroup::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_supplier_group(id, params[:supplier_group])
+          if res.success
+            row_keys = %i[
+              supplier_group_code
+              description
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Parties::SupplierGroup::Edit.call(id, form_values: params[:supplier_group], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('parties', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_supplier_group(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+    r.on 'supplier_groups' do
+      interactor = MasterfilesApp::SupplierGroupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('parties', 'new')
+        show_partial_or_page(r) { Masterfiles::Parties::SupplierGroup::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_supplier_group(params[:supplier_group])
+        if res.success
+          row_keys = %i[
+            id
+            supplier_group_code
+            description
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/parties/supplier_groups/new') do
+            Masterfiles::Parties::SupplierGroup::New.call(form_values: params[:supplier_group],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
+
+    r.on 'suppliers', Integer do |id|
+      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:suppliers, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('parties', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Parties::Supplier::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('parties', 'read')
+          show_partial { Masterfiles::Parties::Supplier::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_supplier(id, params[:supplier])
+          if res.success
+            row_keys = %i[
+              supplier_party_role_id
+              supplier_group_ids
+              supplier_group_codes
+              farm_ids
+              farm_codes
+              active
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+
+          else
+            re_show_form(r, res) { Masterfiles::Parties::Supplier::Edit.call(id, form_values: params[:supplier], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('parties', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_supplier(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+    r.on 'suppliers' do
+      interactor = MasterfilesApp::SupplierInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('parties', 'new')
+        show_partial_or_page(r) { Masterfiles::Parties::Supplier::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_supplier(params[:supplier])
+        if res.success
+          row_keys = %i[
+            id
+            supplier_party_role_id
+            supplier_group_ids
+            supplier_group_codes
+            farm_ids
+            farm_codes
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/parties/suppliers/new') do
+            Masterfiles::Parties::Supplier::New.call(form_values: params[:supplier],
+                                                     form_errors: res.errors,
+                                                     remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength, Metrics/BlockLength

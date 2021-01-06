@@ -10,12 +10,11 @@ module MasterfilesApp
       repo.transaction do
         response = repo.create_farm(res)
         id = response
-        log_status('farms', id, 'CREATED')
+        log_status(:farms, id, 'CREATED')
         log_transaction
       end
       instance = farm(id)
-      success_response("Created farm #{instance.farm_code}",
-                       instance)
+      success_response("Created farm #{instance.farm_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { farm_code: ['This farm already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -33,22 +32,24 @@ module MasterfilesApp
         log_transaction
       end
       instance = farm(id)
-      success_response("Updated farm #{instance.farm_code}",
-                       instance)
+      success_response("Updated farm #{instance.farm_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def delete_farm(id)
+    def delete_farm(id) # rubocop:disable Metrics/AbcSize
       name = farm(id).farm_code
       repo.transaction do
         repo.delete_farm(id)
-        log_status('farms', id, 'DELETED')
+        log_status(:farms, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted farm #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete farm. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def create_farm_section(farm_id, params) # rubocop:disable Metrics/AbcSize
@@ -63,8 +64,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = farm_section(id)
-      success_response("Created farm section #{instance.farm_section_name}",
-                       instance)
+      success_response("Created farm section #{instance.farm_section_name}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { farm_section_name: ['This farm section already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -85,8 +85,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = farm_section(id)
-      success_response("Updated farm section #{instance.farm_section_name}",
-                       instance)
+      success_response("Updated farm section #{instance.farm_section_name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

@@ -1,0 +1,24 @@
+---
+:dataminer_definition: supplier_groups
+:actions:
+- :url: "/masterfiles/parties/supplier_groups/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/parties/supplier_groups/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/parties/supplier_groups/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/parties/supplier_groups/new"
+  :text: New Supplier Group
+  :style: :button
+  :behaviour: :popup

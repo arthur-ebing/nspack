@@ -6,4 +6,13 @@
   :icon: view-show
   :title: View
   :popup: true
-
+- :url: "/masterfiles/shipping/voyage_types/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/shipping/voyage_types/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
