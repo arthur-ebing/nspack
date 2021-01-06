@@ -44,7 +44,7 @@
         <field name="phyto_no" size="8" map_to="phytowaybill" required="false"/>
         <field name="full_load" size="1" required="false" default="Y"/>
         <field name="instr_type" size="1" required="false" default="D"/>
-        <field name="master_ord" size="6" required="false"/>
+        <field name="master_ord" size="6" required="false" trim="true"/>
         <field name="location_code" size="7" required="false"/>
         <field name="season" size="4" required="false"/>
         <field name="client_ref" size="6" required="false" trim="true" />
