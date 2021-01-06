@@ -120,8 +120,8 @@ Sequel.migration do
         String :desc_long
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
+        unique [:code, :facility_code]
       end
-      # CONSTRAINT unique_code_facility_code UNIQUE (code, facility_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_servers],
                      :created_at,
@@ -147,8 +147,8 @@ Sequel.migration do
         String :facility_code
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
+        unique [:code, :server_code]
       end
-      # CONSTRAINT unique_code_server_code UNIQUE (code, server_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_clusters],
                      :created_at,
@@ -171,9 +171,8 @@ Sequel.migration do
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
 
-        index [:group_id], name: :kr_leg_industry_number
+        index [:group_id], name: :kr_leg_messcada_group_data_idx
       end
-      # CONSTRAINT unique_code_server_code UNIQUE (code, server_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_group_data],
                      :created_at,
@@ -207,8 +206,8 @@ Sequel.migration do
         String :server_code
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
+        unique [:code, :cluster_code]
       end
-      # CONSTRAINT unique_code_cluster_code UNIQUE (code, cluster_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_modules],
                      :created_at,
@@ -229,7 +228,6 @@ Sequel.migration do
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
       end
-      # CONSTRAINT unique_code_cluster_code UNIQUE (code, cluster_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_people_roles],
                      :created_at,
@@ -340,20 +338,8 @@ Sequel.migration do
         Integer :facility_id
         Integer :server_id
         Integer :cluster_id
-        DateTime :created_at, null: false
-        DateTime :updated_at, null: false
+        unique [:code, :module_code]
       end
-      # CONSTRAINT unique_code_module_code UNIQUE (code, module_code),
-
-      pgt_created_at(Sequel[:kromco_legacy][:messcada_peripherals],
-                     :created_at,
-                     function_name: 'kromco_legacy.pgt_messcada_peripherals_set_created_at',
-                     trigger_name: :set_created_at)
-
-      pgt_updated_at(Sequel[:kromco_legacy][:messcada_peripherals],
-                     :updated_at,
-                     function_name: 'kromco_legacy.pgt_messcada_peripherals_set_updated_at',
-                     trigger_name: :set_updated_at)
 
       # messcada_peripheral_printers
       # -----------------------------------------------------
@@ -373,7 +359,6 @@ Sequel.migration do
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
       end
-      # CONSTRAINT unique_code_module_code UNIQUE (code, module_code),
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_peripheral_printers],
                      :created_at,
@@ -427,10 +412,6 @@ Sequel.migration do
       drop_function('kromco_legacy.pgt_messcada_peripheral_printers_set_updated_at')
       drop_table(Sequel[:kromco_legacy][:messcada_peripheral_printers])
 
-      drop_trigger(Sequel[:kromco_legacy][:messcada_peripherals], :set_created_at)
-      drop_function('kromco_legacy.pgt_messcada_peripherals_set_created_at')
-      drop_trigger(Sequel[:kromco_legacy][:messcada_peripherals], :set_updated_at)
-      drop_function('kromco_legacy.pgt_messcada_peripherals_set_updated_at')
       drop_table(Sequel[:kromco_legacy][:messcada_peripherals])
 
       drop_trigger(Sequel[:kromco_legacy][:messcada_people_view_messcada_rfid_allocations], :set_created_at)
