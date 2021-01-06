@@ -19,6 +19,15 @@ module LabelPrintingApp
       (@supporting_data[:packed_date] || Date.today).strftime('%Y-%m-%d')
     end
 
+    def sequence_table(pallet_id)
+      id = instance[pallet_id.to_sym]
+
+      body = AppConst::CR_PROD.sequences_label_variable_for_pallet(id).join(';')
+      return body if body.empty?
+
+      "{NL}#{body}"
+    end
+
     private
 
     # Take a field and format it for barcode printing.
