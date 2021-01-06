@@ -950,7 +950,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form = Crossbeams::RMDForm.new(form_state,
                                        form_name: :pallet,
                                        scan_with_camera: @rmd_scan_with_camera,
-                                       caption: 'Print Pallet Sequence',
+                                       caption: 'Print Pallet Label',
                                        notes: retrieve_from_local_store(:flash_notice),
                                        step_and_total: [ps_ids.index(id) + 1, ps_ids.length],
                                        reset_button: false,
