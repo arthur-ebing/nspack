@@ -41,9 +41,10 @@ module FinishedGoodsApp
       hash[:passed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: true)
       hash[:failed_pallets] = exists?(:govt_inspection_pallets, govt_inspection_sheet_id: id, inspected: true, passed: false)
       hash[:consignment_note_number] = DB.get(Sequel.function(:fn_consignment_note_number, id))
-      hash[:inspection_billing] =      DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
+      hash[:inspection_billing] = DB.get(Sequel.function(:fn_party_role_name, hash[:inspection_billing_party_role_id]))
       hash[:exporter] = DB.get(Sequel.function(:fn_party_role_name, hash[:exporter_party_role_id]))
-      hash[:inspector] = MasterfilesApp::InspectorRepo.new.find_inspector_flat(hash[:inspector_id])&.inspector
+      inspector_party_role_id = get(:inspectors, hash[:inspector_id], :inspector_party_role_id)
+      hash[:inspector] = DB.get(Sequel.function(:fn_party_role_name, inspector_party_role_id))
       hash[:status] = DB.get(Sequel.function(:fn_current_status, 'govt_inspection_sheets', id))
 
       GovtInspectionSheet.new(hash)

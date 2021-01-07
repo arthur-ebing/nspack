@@ -423,9 +423,6 @@ class Nspack < Roda
            short_description
            long_description
            company_reg_no
-           title
-           first_name
-           surname
            vat_number].each do |dom_id|
           actions << OpenStruct.new(type: :hide_element, dom_id: "supplier_#{dom_id}_field_wrapper")
           actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: false)
@@ -440,14 +437,6 @@ class Nspack < Roda
              long_description
              company_reg_no
              vat_number].each do |dom_id|
-            actions << OpenStruct.new(type: :show_element, dom_id: "supplier_#{dom_id}_field_wrapper")
-          end
-        end
-        if params[:changed_value] == 'P'
-          %w[title first_name surname].each do |dom_id|
-            actions << OpenStruct.new(type: :set_required, dom_id: "supplier_#{dom_id}", required: true)
-          end
-          %w[title first_name surname vat_number].each do |dom_id|
             actions << OpenStruct.new(type: :show_element, dom_id: "supplier_#{dom_id}_field_wrapper")
           end
         end
