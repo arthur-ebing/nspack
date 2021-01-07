@@ -24,6 +24,7 @@ module Masterfiles
               form.add_field :short_description
               form.add_field :long_description
               form.add_field :company_reg_no
+              form.add_field :vat_number
 
               form.add_field :supplier_group_ids
               form.add_field :farm_ids

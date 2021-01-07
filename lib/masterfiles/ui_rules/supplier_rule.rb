@@ -58,7 +58,8 @@ module UiRules
                               hide_on_load: true },
         short_description: { hide_on_load: true },
         long_description: { hide_on_load: true },
-        company_reg_no: { hide_on_load: true }
+        company_reg_no: { hide_on_load: true },
+        vat_number: { hide_on_load: true }
       }
     end
 
