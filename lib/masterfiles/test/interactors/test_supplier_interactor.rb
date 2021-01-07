@@ -70,6 +70,7 @@ module MasterfilesApp
       farm_id = create_farm
       {
         id: 1,
+        party_role_id: party_role_id.to_s,
         supplier_party_role_id: party_role_id,
         supplier: Faker::Lorem.unique.word,
         supplier_group_ids: [supplier_group_id],

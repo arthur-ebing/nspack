@@ -3,18 +3,19 @@
 module MasterfilesApp
   class SupplierInteractor < BaseInteractor
     def create_supplier(params) # rubocop:disable Metrics/AbcSize
-      unless params[:supplier_party_role_id].to_i.positive?
-        res = CreatePartyRole.call(params[:supplier_party_role_id], AppConst::ROLE_SUPPLIER, params, @user)
-        return res unless res.success
-
-        params[:supplier_party_role_id] = res.instance
-      end
-
-      res = validate_supplier_params(params)
+      res = CreateSupplierSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
+      params = res.to_h
       id = nil
       repo.transaction do
+        res = CreatePartyRole.call(AppConst::ROLE_SUPPLIER, params, @user)
+        raise Crossbeams::ServiceError unless res.success
+
+        params[:supplier_party_role_id] = res.instance
+        res = SupplierSchema.call(params)
+        raise Crossbeams::ServiceError if res.failure?
+
         id = repo.create_supplier(res)
         log_status(:suppliers, id, 'CREATED')
         log_transaction
@@ -25,6 +26,8 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { id: ['This supplier already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Crossbeams::ServiceError
+      res
     end
 
     def update_supplier(id, params)
@@ -42,13 +45,14 @@ module MasterfilesApp
     end
 
     def delete_supplier(id) # rubocop:disable Metrics/AbcSize
-      name = supplier(id).supplier
+      instance = supplier(id)
       repo.transaction do
         repo.delete_supplier(id)
+        PartyRepo.new.delete_party_role(instance.supplier_party_role_id)
         log_status(:suppliers, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted supplier #{name}")
+      success_response("Deleted supplier #{instance.supplier}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e

@@ -17,7 +17,8 @@ module Masterfiles
               form.action "/masterfiles/parties/suppliers/#{id}"
               form.remote!
               form.method :update
-              form.add_field :supplier_party_role_id
+              form.add_field :supplier
+              form.add_field :party_role_id
               form.add_field :supplier_group_ids
               form.add_field :farm_ids
             end

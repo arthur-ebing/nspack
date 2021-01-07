@@ -41,8 +41,10 @@ module MasterfilesApp
     end
 
     def create_role(opts = {})
-      existing_id = @fixed_table_set[:roles][:"#{opts[:name].downcase}"] if opts[:name]
-      return existing_id unless existing_id.nil?
+      if opts[:name]
+        existing_id = DB[:roles].where(name: opts[:name]).get(:id)
+        return existing_id if existing_id
+      end
 
       default = { name: Faker::Lorem.unique.word, active: true }
       DB[:roles].insert(default.merge(opts))
@@ -58,7 +60,7 @@ module MasterfilesApp
         default[:person_id] = opts[:person_id] || create_person
         default[:party_id] = DB[:people].where(id: default[:person_id]).get(:party_id)
       end
-      default[:role_id] = DB[:roles].where(name: role_name).get(:id) || create_role
+      default[:role_id] = create_role(name: role_name)
 
       DB[:party_roles].insert(default.merge(opts))
     end

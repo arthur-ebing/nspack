@@ -13,7 +13,7 @@ module Masterfiles
             page.form do |form|
               # form.caption 'Supplier'
               form.view_only!
-              form.add_field :supplier_party_role_id
+              form.add_field :supplier
               form.add_field :supplier_group_ids
               form.add_field :farm_ids
               form.add_field :active

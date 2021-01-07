@@ -22,6 +22,8 @@ module MasterfilesApp
     crud_calls_for :people, name: :person, wrapper: Person
     crud_calls_for :addresses, name: :address, wrapper: Address
     crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
+    crud_calls_for :party_roles, name: :party_role, wrapper: PartyRole
+    crud_calls_for :parties, name: :party, wrapper: Party
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -332,6 +334,25 @@ module MasterfilesApp
                               role_id: role_id)
     end
 
+    def append_party_role(party_role_id, role_id)
+      organization_id, person_id = DB[:party_roles].where(id: party_role_id).select_map(%i[organization_id person_id]).first
+      id = organization_id
+      id ||= person_id
+      type = person_id ? 'P' : 'O'
+
+      append_role(id, role_id, type)
+    end
+
+    def delete_party_role(id)
+      party_role = find_hash(:party_roles, id)
+      delete(:party_roles, id)
+      return if exists?(:party_roles, party_id: party_role[:party_id])
+
+      delete_organization(party_role[:organization_id]) if party_role[:organization_id]
+      delete_person(party_role[:person_id]) if party_role[:person_id]
+      delete_party(party_role[:party_id])
+    end
+
     def party_details_by_type(id, type)
       details = { organization_id: nil, person_id: nil }
       if type == 'O'
@@ -354,6 +375,15 @@ module MasterfilesApp
       ds = DB[:party_roles].where(role_id: DB[:roles].where(name: role).select(:id), active: active)
       ds = ds.where(where) unless where.nil?
       ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
+      ds.map { |r| [r[:fn_party_role_name], r[:id]] }
+    end
+
+    def for_select_party_roles_exclude(role, where: nil, active: true)
+      ds = DB[:party_roles].where(active: active).exclude(role_id: DB[:roles].where(name: role).select(:id))
+      ds = ds.where(where) unless where.nil?
+      ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
+             .distinct(Sequel.function(:fn_party_role_name, :id))
+             .order(Sequel.function(:fn_party_role_name, :id))
       ds.map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
