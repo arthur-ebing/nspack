@@ -1,11 +1,15 @@
 ---
 :caption: People
-:sql: SELECT "people"."id", "people"."party_id", "people"."surname", "people"."first_name",
-  "people"."title", "people"."vat_number", "people"."active", "people"."created_at",
-  "people"."updated_at", "parties"."party_type" FROM "people" JOIN "parties" ON "parties"."id"
-  = "people"."party_id"
+:sql: "SELECT\r\n    people.id,\r\n    people.party_id,\r\n    people.surname,\r\n
+  \   people.first_name,\r\n    people.title,\r\n    people.vat_number,\r\n    array_agg(distinct
+  roles.name order by roles.name) AS roles,\r\n--     fn_masterfile_variants('people',
+  people.id) AS variant_codes,\r\n    people.active,\r\n    people.created_at,\r\n
+  \   people.updated_at\r\n\r\nFROM people\r\nLEFT JOIN party_roles ON people.id =
+  party_roles.person_id\r\nLEFT JOIN roles ON party_roles.role_id = roles.id\r\nGROUP
+  BY people.id"
 :limit: 
 :offset: 
+:external_settings: {}
 :columns:
   id:
     :name: id
@@ -16,6 +20,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -31,6 +36,7 @@
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -46,6 +52,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -61,6 +68,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -76,6 +84,7 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -91,7 +100,24 @@
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  roles:
+    :name: roles
+    :sequence_no: 7
+    :caption: Roles
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -99,13 +125,14 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: people.active
     :data_type: :boolean
     :width: 
     :format: 
     :hide: false
+    :pinned: 
     :groupable: true
     :group_by_seq: 
     :group_sum: false
@@ -114,13 +141,14 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: people.created_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
     :group_by_seq: 
     :group_sum: false
@@ -129,29 +157,15 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: people.updated_at
     :data_type: :datetime
     :width: 
     :format: 
     :hide: true
+    :pinned: 
     :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  party_type:
-    :name: party_type
-    :sequence_no: 10
-    :caption: Party type
-    :namespaced_name: parties.party_type
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :groupable: true
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
