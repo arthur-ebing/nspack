@@ -9,6 +9,8 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_person(res)
+        log_status(:people, id, 'CREATED')
+        log_transaction
       end
       instance = person(id)
       success_response("Created person #{instance.party_name}", instance)
@@ -24,6 +26,7 @@ module MasterfilesApp
 
       repo.transaction do
         repo.update_person(id, res)
+        log_transaction
       end
       instance = person(id)
       success_response("Updated person #{instance.party_name}", instance)
@@ -35,10 +38,16 @@ module MasterfilesApp
       name = person(id).party_name
       repo.transaction do
         repo.delete_person(id)
+        log_status(:people, id, 'DELETED')
+        log_transaction
       end
       success_response("Deleted person #{name}")
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      puts e.message
+      failed_response("Unable to delete person. It is still referenced#{e.message.partition('referenced').last}")
     end
-
     private
 
     def repo
