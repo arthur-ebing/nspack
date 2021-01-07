@@ -13,10 +13,11 @@ module MasterfilesApp
                      label: :surname,
                      value: :id,
                      order_by: :surname
-    build_for_select :roles,
-                     label: :name,
-                     value: :id,
-                     order_by: :name
+    def for_select_roles(active = true, where: nil)
+      ds = DB[:roles].where(active: active, specialised: false)
+      ds = ds.where(where) unless where.nil?
+      ds.order(:name).select_map(%i[name id])
+    end
 
     crud_calls_for :organizations, name: :organization, wrapper: Organization
     crud_calls_for :people, name: :person, wrapper: Person

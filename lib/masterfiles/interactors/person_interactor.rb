@@ -2,14 +2,13 @@
 
 module MasterfilesApp
   class PersonInteractor < BaseInteractor
-    def create_person(params)
+    def create_person(params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
       return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
         id = repo.create_person(res)
-        log_status(:people, id, 'CREATED')
         log_transaction
       end
       instance = person(id)
@@ -34,11 +33,10 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_person(id)
+    def delete_person(id) # rubocop:disable Metrics/AbcSize
       name = person(id).party_name
       repo.transaction do
         repo.delete_person(id)
-        log_status(:people, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted person #{name}")
@@ -48,6 +46,7 @@ module MasterfilesApp
       puts e.message
       failed_response("Unable to delete person. It is still referenced#{e.message.partition('referenced').last}")
     end
+
     private
 
     def repo
