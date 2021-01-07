@@ -11,6 +11,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         inspector_party_role_id: 1,
+        inspector: Faker::Lorem.unique.word,
         tablet_ip_address: Faker::Lorem.unique.word,
         tablet_port_number: 1,
         inspector_code: 'ABC',

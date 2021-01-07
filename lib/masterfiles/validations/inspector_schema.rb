@@ -9,15 +9,15 @@ module MasterfilesApp
     required(:inspector_code).filled(Types::StrippedString)
   end
 
-  InspectorPersonSchema = Dry::Schema.Params do
+  CreateInspectorSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:surname).filled(Types::StrippedString)
-    required(:first_name).filled(Types::StrippedString)
-    required(:title).filled(Types::StrippedString)
-    required(:vat_number).maybe(Types::StrippedString)
-    required(:role_ids).filled(:array).each(:integer)
-    required(:tablet_ip_address).filled(Types::StrippedString)
-    required(:tablet_port_number).maybe(:integer)
-    required(:inspector_code).filled(Types::StrippedString)
+    required(:party_role_id).filled(:string)
+    optional(:surname).maybe(Types::StrippedString)
+    optional(:first_name).maybe(Types::StrippedString)
+    optional(:title).maybe(Types::StrippedString)
+    optional(:vat_number).maybe(Types::StrippedString)
+    optional(:tablet_ip_address).maybe(Types::StrippedString)
+    optional(:tablet_port_number).maybe(:integer)
+    optional(:inspector_code).maybe(Types::StrippedString)
   end
 end

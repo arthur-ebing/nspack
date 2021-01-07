@@ -13,34 +13,34 @@ module MasterfilesApp
     end
 
     def test_inspector
-      MasterfilesApp::InspectorRepo.any_instance.stubs(:find_inspector_flat).returns(fake_inspector)
+      MasterfilesApp::InspectorRepo.any_instance.stubs(:find_inspector).returns(fake_inspector)
       entity = interactor.send(:inspector, 1)
-      assert entity.is_a?(InspectorFlat)
+      assert entity.is_a?(Inspector)
     end
 
     def test_create_inspector
       attrs = fake_inspector.to_h.reject { |k, _| k == :id }
       res = interactor.create_inspector(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(InspectorFlat, res.instance)
+      assert_instance_of(Inspector, res.instance)
       assert res.instance.id.nonzero?
     end
 
     def test_create_inspector_fail
       attrs = fake_inspector(tablet_ip_address: nil).to_h.reject { |k, _| k == :id }
       res = interactor.create_inspector(attrs)
-      refute res.success, 'should fail validation'
+      assert res.failure?, 'should fail validation'
       assert_equal ['must be filled'], res.errors[:tablet_ip_address]
     end
 
     def test_update_inspector
       id = create_inspector
-      attrs = interactor.send(:repo).find_inspector_flat(id).to_h.reject { |k, _| k == :id }
+      attrs = interactor.send(:repo).find_inspector(id).to_h.reject { |k, _| k == :id }
       value = attrs[:tablet_ip_address]
       attrs[:tablet_ip_address] = 'a_change'
       res = interactor.update_inspector(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(InspectorFlat, res.instance)
+      assert_instance_of(Inspector, res.instance)
       assert_equal 'a_change', res.instance.tablet_ip_address
       refute_equal value, res.instance.tablet_ip_address
     end
@@ -65,14 +65,9 @@ module MasterfilesApp
 
     def inspector_attrs
       party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
-      role_id = create_role
       {
         id: 1,
-        surname: Faker::Lorem.unique.word,
-        first_name: Faker::Lorem.unique.word,
-        title: Faker::Lorem.unique.word,
-        vat_number: '1234567890',
-        role_ids: [role_id],
+        party_role_id: party_role_id.to_s,
         inspector_party_role_id: party_role_id,
         inspector: Faker::Lorem.unique.word,
         inspector_code: Faker::Lorem.unique.word,
@@ -83,7 +78,7 @@ module MasterfilesApp
     end
 
     def fake_inspector(overrides = {})
-      InspectorFlat.new(inspector_attrs.merge(overrides))
+      Inspector.new(inspector_attrs.merge(overrides))
     end
 
     def interactor

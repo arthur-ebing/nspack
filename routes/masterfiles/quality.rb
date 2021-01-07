@@ -197,6 +197,26 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         check_auth!('quality', 'new')
         show_partial_or_page(r) { Masterfiles::Quality::Inspector::New.call(remote: fetch?(r)) }
       end
+
+      r.on 'inspector_party_role_changed' do
+        actions = []
+        %w[title first_name surname vat_number].each do |dom_id|
+          actions << OpenStruct.new(type: :hide_element, dom_id: "inspector_#{dom_id}_field_wrapper")
+          actions << OpenStruct.new(type: :set_required, dom_id: "inspector_#{dom_id}", required: false)
+        end
+
+        if params[:changed_value] == 'P'
+          %w[title first_name surname].each do |dom_id|
+            actions << OpenStruct.new(type: :set_required, dom_id: "inspector_#{dom_id}", required: true)
+          end
+          %w[title first_name surname vat_number].each do |dom_id|
+            actions << OpenStruct.new(type: :show_element, dom_id: "inspector_#{dom_id}_field_wrapper")
+          end
+        end
+
+        json_actions(actions)
+      end
+
       r.post do        # CREATE
         res = interactor.create_inspector(params[:inspector])
         if res.success
