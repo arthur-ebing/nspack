@@ -301,7 +301,7 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param columns [Symbol,Array] the column (or array of columns) to query.
   # @param where [Hash] the where-clause conditions. Optional.
   # @param order [Symbol] the order by clause.
-  # @param descending [Boolean] return in decending order. Default is false.
+  # @param descending [Boolean] return in descending order. Default is false.
   # @return [Array] the values from the column(s) of each row.
   def select_values_in_order(table_name, columns, where: nil, order:, descending: false)
     ds = DB[table_name]
@@ -316,11 +316,11 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #
   # @param table_name [Symbol] the db table name.
   # @param columns [Symbol,Array] the column (or array of columns) to query.
-  # @param args [Hash] the where-clause conditions. Optional.
+  # @param where [Hash] the where-clause conditions. Optional.
   # @return [Array] the values from the column(s) of each row.
-  def select_values(table_name, columns, args = nil)
+  def select_values(table_name, columns, where = nil)
     ds = DB[table_name]
-    ds = ds.where(args) if args
+    ds = ds.where(where) if where
     ds.select_map(columns)
   end
 
