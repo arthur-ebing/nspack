@@ -465,14 +465,14 @@ module ProductionApp
       Robot.new(hash)
     end
 
-    def system_resource_incentive_settings(device, packpoint)
+    def system_resource_incentive_settings(device, packpoint, card_reader)
       hash = DB[:system_resources]
              .select(:id, :system_resource_code, :login, :logoff, :group_incentive)
              .where(system_resource_code: device)
              .first
       return nil if hash.nil?
 
-      SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint))
+      SystemResourceIncentiveSettings.new(hash.merge(packpoint: packpoint, card_reader: card_reader || '1'))
     end
 
     private

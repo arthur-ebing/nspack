@@ -46,6 +46,39 @@ module MesscadaApp
       DB[:contract_workers].where(personnel_number: personnel_number).get(:id)
     end
 
+    # Record login event to system resource logins
+    def login_worker(name, params) # rubocop:disable Metrics/AbcSize
+      system_resource = params[:system_resource]
+      logout_worker(system_resource[:contract_worker_id])
+
+      if exists?(:system_resource_logins, system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
+        DB[:system_resource_logins]
+          .where(system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
+          .update(contract_worker_id: system_resource[:contract_worker_id], active: true, login_at: Time.now, identifier: system_resource[:identifier])
+      else
+        DB[:system_resource_logins]
+          .insert(system_resource_id: system_resource[:id],
+                  card_reader: system_resource[:card_reader],
+                  contract_worker_id: system_resource[:contract_worker_id],
+                  active: true,
+                  login_at: Time.now,
+                  identifier: system_resource[:identifier])
+      end
+
+      success_response('Logged on', contract_worker: name)
+    end
+
+    def logout_worker(contract_worker_id)
+      DB[:system_resource_logins].where(contract_worker_id: contract_worker_id, active: true).update(last_logout_at: Time.now, active: false)
+      ok_response
+    end
+
+    def logout_device(device)
+      system_resource_id = DB[:system_resources].where(system_resource_code: device).get(:id)
+      DB[:system_resource_logins].where(system_resource_id: system_resource_id).update(last_logout_at: Time.now, active: false)
+      ok_response
+    end
+
     def active_system_resource_group_exists?(system_resource_id)
       exists?(:group_incentives, { system_resource_id: system_resource_id, active: true })
     end

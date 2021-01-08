@@ -21,7 +21,7 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || params[:device])
+      @sys_res = resource_repo.system_resource_incentive_settings(device, params[:packpoint] || params[:device], params[:card_reader])
       return failed_response("#{device} is not configured") if sys_res.nil?
       return success_response('ok', merge_incentive_just_system_resource) if !sys_res.login && !sys_res.group_incentive
       return merge_incentive_contract_worker unless get_group_incentive && sys_res.group_incentive
@@ -51,7 +51,7 @@ module MesscadaApp
       contract_worker_id = repo.contract_worker_id_from_personnel_number(personnel_number)
       return failed_response('This personnel number doess not exist') if contract_worker_id.nil?
 
-      success_response('ok', { personnel_identifier_id: nil, contract_worker_id: contract_worker_id })
+      success_response('ok', { personnel_identifier_id: nil, contract_worker_id: contract_worker_id, identifier: nil })
     end
 
     def validate_device_identifier(identifier)
@@ -61,7 +61,7 @@ module MesscadaApp
       contract_worker_id = repo.contract_worker_id_from_personnel_id(personnel_identifier_id)
       return failed_response('This identifier is not assigned') if contract_worker_id.nil?
 
-      success_response('ok', { personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id })
+      success_response('ok', { personnel_identifier_id: personnel_identifier_id, contract_worker_id: contract_worker_id, identifier: identifier })
     end
 
     def merge_incentive_group_incentive
