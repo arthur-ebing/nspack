@@ -17,7 +17,7 @@ module Masterfiles
               form.action '/masterfiles/quality/inspectors'
               form.remote! if remote
               form.add_field :inspector
-              form.add_field :party_role_id
+              form.add_field :inspector_party_role_id
               # Person
               form.add_field :title
               form.add_field :first_name

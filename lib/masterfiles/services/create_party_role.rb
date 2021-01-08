@@ -2,17 +2,17 @@
 
 module MasterfilesApp
   class CreatePartyRole < BaseService
-    attr_reader :repo, :user, :params, :party_role_id, :role_id, :person_id, :organization_id
+    attr_reader :repo, :user, :params, :party_role_id, :role_id, :person_id, :organization_id, :party_id
 
     def initialize(role, params, user)
       @repo = PartyRepo.new
       @user = user
       @params = params
-      @party_role_id = params[:party_role_id]
-      @role = role
+      @party_role_id = params["#{role.downcase}_party_role_id".to_sym]
+      raise Crossbeams::InfoError, 'party_role_id nil' if party_role_id.nil?
 
-      @role_id = repo.get_id(:roles, name: @role)
-      raise Crossbeams::InfoError, "Role: #{@role} not defined." if role_id.nil?
+      @role_id = repo.get_id(:roles, name: role)
+      raise Crossbeams::InfoError, "Role: #{role} not defined." if role_id.nil?
 
       @params[:role_ids] = [role_id]
     end
@@ -26,22 +26,23 @@ module MasterfilesApp
         res = create_person
         return res unless res.success
       else
-        append_role_to_party_role
+        add_role_to_party
       end
       party_role_id = repo.get_id(:party_roles, role_id: role_id, person_id: person_id, organization_id: organization_id)
+      party_role_id ||= repo.get_id(:party_roles, role_id: role_id, party_id: party_id)
 
-      success_response('Created Party Role', party_role_id)
+      success_response('Created Party Role', OpenStruct.new(party_role_id: party_role_id))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     private
 
-    def append_role_to_party_role
-      @organization_id, @person_id = DB[:party_roles].where(id: party_role_id).select_map(%i[organization_id person_id]).first
+    def add_role_to_party
+      @party_id = DB[:party_roles].where(id: party_role_id).get(:party_id)
       return if repo.exists?(:party_roles, id: party_role_id, role_id: role_id)
 
-      repo.append_party_role(party_role_id, role_id)
+      repo.add_role_to_party(party_id, role_id)
     end
 
     def create_organization

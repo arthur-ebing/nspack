@@ -67,8 +67,7 @@ module MasterfilesApp
       party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
       {
         id: 1,
-        party_role_id: party_role_id.to_s,
-        inspector_party_role_id: party_role_id,
+        inspector_party_role_id: party_role_id.to_s,
         inspector: Faker::Lorem.unique.word,
         inspector_code: Faker::Lorem.unique.word,
         tablet_ip_address: Faker::Lorem.unique.word,

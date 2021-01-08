@@ -317,31 +317,12 @@ module MasterfilesApp
       end
     end
 
-    def append_role(id, role_id, type = 'O')
-      organization_id = nil
-      person_id = nil
-
-      if type == 'P'
-        party_id = DB[:people].where(id: id).get(:party_id)
-        person_id = id
-      end
-      if type == 'O'
-        party_id = DB[:organizations].where(id: id).get(:party_id)
-        organization_id = id
-      end
+    def add_role_to_party(party_id, role_id)
+      organization_id, person_id = DB[:party_roles].where(party_id: party_id).select_map(%i[organization_id person_id]).first
       DB[:party_roles].insert(party_id: party_id,
                               organization_id: organization_id,
                               person_id: person_id,
                               role_id: role_id)
-    end
-
-    def append_party_role(party_role_id, role_id)
-      organization_id, person_id = DB[:party_roles].where(id: party_role_id).select_map(%i[organization_id person_id]).first
-      id = organization_id
-      id ||= person_id
-      type = person_id ? 'P' : 'O'
-
-      append_role(id, role_id, type)
     end
 
     def delete_party_role(id)
@@ -373,14 +354,19 @@ module MasterfilesApp
     end
 
     def for_select_party_roles(role, where: nil, active: true)
-      ds = DB[:party_roles].where(role_id: DB[:roles].where(name: role).select(:id), active: active)
+      ds = DB[:party_roles].where(active: active)
+      ds = ds.where(role_id: get_id(:roles, name: role))
       ds = ds.where(where) unless where.nil?
       ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
+             .order(Sequel.function(:fn_party_role_name, :id))
       ds.map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
     def for_select_party_roles_exclude(role, where: nil, active: true)
-      ds = DB[:party_roles].where(active: active).exclude(role_id: DB[:roles].where(name: role).select(:id))
+      parties_with_role = DB[:party_roles].where(role_id: get_id(:roles, name: role)).where(active: active).select_map(:party_id)
+
+      ds = DB[:party_roles].where(active: active)
+      ds = ds.exclude(party_id: parties_with_role)
       ds = ds.where(where) unless where.nil?
       ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
              .distinct(Sequel.function(:fn_party_role_name, :id))

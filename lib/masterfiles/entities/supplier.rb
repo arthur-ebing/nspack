@@ -3,7 +3,6 @@
 module MasterfilesApp
   class Supplier < Dry::Struct
     attribute :id, Types::Integer
-    attribute? :party_role_id, Types::String
     attribute :supplier_party_role_id, Types::Integer
     attribute :supplier, Types::String
     attribute :supplier_group_ids, Types::Array

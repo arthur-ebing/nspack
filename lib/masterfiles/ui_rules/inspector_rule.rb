@@ -28,19 +28,19 @@ module UiRules
     end
 
     def common_fields
-      party_role_options = @party_repo.for_select_party_roles_exclude(AppConst::ROLE_INSPECTOR, where: { organization_id: nil })
-      party_role_options << ['Create New Person', 'P']
+      party_role_options = [['Create New Person', 'P'], [@form_object.inspector, @form_object.inspector_party_role_id]] - [[nil, nil]]
+      party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_INSPECTOR, where: { organization_id: nil })
       { inspector: { caption: 'Inspector',
                      renderer: :label,
                      hide_on_load: @mode == :new },
-        party_role_id: { caption: 'Inspector',
-                         renderer: :select,
-                         options: party_role_options,
-                         sort_items: false,
-                         searchable: true,
-                         prompt: true,
-                         hide_on_load: @mode == :edit,
-                         required: true },
+        inspector_party_role_id: { caption: 'Inspector',
+                                   renderer: :select,
+                                   options: party_role_options,
+                                   sort_items: false,
+                                   searchable: true,
+                                   prompt: true,
+                                   hide_on_load: @mode == :edit,
+                                   required: true },
         inspector_code: { caption: 'Inspector Code',
                           force_uppercase: true,
                           required: true },
@@ -72,7 +72,7 @@ module UiRules
 
     def add_approve_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :party_role_id, notify: [{ url: '/masterfiles/quality/inspectors/inspector_party_role_changed' }]
+        behaviour.dropdown_change :inspector_party_role_id, notify: [{ url: '/masterfiles/quality/inspectors/inspector_party_role_changed' }]
       end
     end
   end

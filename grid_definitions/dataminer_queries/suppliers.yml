@@ -1,9 +1,9 @@
 ---
 :caption: Suppliers
 :sql: "SELECT\r\n    suppliers.id,\r\n    suppliers.supplier_party_role_id,\r\n    fn_party_role_name(suppliers.supplier_party_role_id)
-  AS supplier,\r\n    suppliers.supplier_group_ids,\r\n    array_agg(distinct supplier_group_code
-  order by supplier_group_code) AS supplier_group_codes,\r\n    suppliers.farm_ids,\r\n
-  \   array_agg(distinct farm_code order by farm_code) AS farm_codes,\r\n    suppliers.active,\r\n
+  AS supplier,\r\n    suppliers.farm_ids,\r\n    array_agg(distinct farm_code order
+  by farm_code) AS farm_codes,\r\n    suppliers.supplier_group_ids,\r\n    array_agg(distinct
+  supplier_group_code order by supplier_group_code) AS supplier_group_codes,\r\n    suppliers.active,\r\n
   \   suppliers.created_at,\r\n    suppliers.updated_at\r\n\r\nFROM suppliers\r\n
   \        LEFT JOIN supplier_groups ON supplier_groups.id = ANY (suppliers.supplier_group_ids)\r\n
   \        LEFT JOIN farms ON farms.id = ANY (suppliers.farm_ids)\r\n\r\nGROUP BY\r\n
@@ -60,41 +60,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  supplier_group_ids:
-    :name: supplier_group_ids
-    :sequence_no: 4
-    :caption: Supplier group ids
-    :namespaced_name: suppliers.supplier_group_ids
-    :data_type: :integer_array
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  supplier_group_codes:
-    :name: supplier_group_codes
-    :sequence_no: 5
-    :caption: Supplier group codes
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   farm_ids:
     :name: farm_ids
-    :sequence_no: 6
+    :sequence_no: 4
     :caption: Farm ids
     :namespaced_name: suppliers.farm_ids
     :data_type: :integer_array
@@ -110,8 +78,40 @@
     :group_max: false
   farm_codes:
     :name: farm_codes
-    :sequence_no: 7
+    :sequence_no: 5
     :caption: Farm codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_group_ids:
+    :name: supplier_group_ids
+    :sequence_no: 6
+    :caption: Supplier group ids
+    :namespaced_name: suppliers.supplier_group_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  supplier_group_codes:
+    :name: supplier_group_codes
+    :sequence_no: 7
+    :caption: Supplier group codes
     :namespaced_name: 
     :data_type: :string
     :width: 

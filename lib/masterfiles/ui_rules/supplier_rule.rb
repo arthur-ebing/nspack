@@ -11,7 +11,7 @@ module UiRules
       common_values_for_fields common_fields
       add_approve_behaviours if %i[new].include? @mode
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'supplier'
     end
@@ -29,25 +29,25 @@ module UiRules
     end
 
     def common_fields
-      party_role_options = @party_repo.for_select_party_roles_exclude(AppConst::ROLE_SUPPLIER, where: { person_id: nil })
-      party_role_options << ['Create New Orginization', 'O']
+      party_role_options = [['Create New Organization', 'O'], [@form_object.supplier, @form_object.supplier_party_role_id]] - [[nil, nil]]
+      party_role_options += @party_repo.for_select_party_roles_exclude(AppConst::ROLE_SUPPLIER, where: { person_id: nil })
       {
         supplier: { caption: 'Supplier',
                     renderer: :label,
                     hide_on_load: @mode == :new },
-        party_role_id: { caption: 'Supplier',
-                         renderer: :select,
-                         options: party_role_options,
-                         sort_items: false,
-                         searchable: true,
-                         prompt: true,
-                         hide_on_load: @mode == :edit,
-                         required: true },
+        supplier_party_role_id: { caption: 'Supplier',
+                                  renderer: :select,
+                                  options: party_role_options,
+                                  sort_items: false,
+                                  searchable: true,
+                                  prompt: true,
+                                  hide_on_load: @mode == :edit,
+                                  required: true },
         supplier_group_ids: { caption: 'Supplier Groups',
                               renderer: :multi,
                               options: @repo.for_select_supplier_groups,
                               selected: @form_object.supplier_group_ids,
-                              required: true },
+                              required: false },
         farm_ids: { caption: 'Farms',
                     renderer: :multi,
                     options: MasterfilesApp::FarmRepo.new.for_select_farms,
@@ -73,8 +73,9 @@ module UiRules
     end
 
     def make_new_form_object
-      @form_object = OpenStruct.new(party_role_id: nil,
-                                    supplier_group_ids: nil,
+      @form_object = OpenStruct.new(supplier_party_role_id: nil,
+                                    supplier: nil,
+                                    supplier_group_ids: [],
                                     farm_ids: nil)
     end
 
@@ -82,7 +83,7 @@ module UiRules
 
     def add_approve_behaviours
       behaviours do |behaviour|
-        behaviour.dropdown_change :party_role_id, notify: [{ url: '/masterfiles/parties/suppliers/supplier_party_role_changed' }]
+        behaviour.dropdown_change :supplier_party_role_id, notify: [{ url: '/masterfiles/parties/suppliers/supplier_party_role_changed' }]
       end
     end
   end

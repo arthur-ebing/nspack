@@ -12,7 +12,7 @@ module MasterfilesApp
         res = CreatePartyRole.call(AppConst::ROLE_SUPPLIER, params, @user)
         raise Crossbeams::ServiceError unless res.success
 
-        params[:supplier_party_role_id] = res.instance
+        params[:supplier_party_role_id] = res.instance.party_role_id
         res = SupplierSchema.call(params)
         raise Crossbeams::ServiceError if res.failure?
 

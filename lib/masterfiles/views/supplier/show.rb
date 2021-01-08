@@ -14,8 +14,8 @@ module Masterfiles
               # form.caption 'Supplier'
               form.view_only!
               form.add_field :supplier
-              form.add_field :supplier_group_ids
               form.add_field :farm_ids
+              form.add_field :supplier_group_ids
               form.add_field :active
             end
           end

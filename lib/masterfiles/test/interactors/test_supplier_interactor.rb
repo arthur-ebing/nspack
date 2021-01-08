@@ -28,10 +28,10 @@ module MasterfilesApp
     end
 
     def test_create_supplier_fail
-      attrs = fake_supplier(id: nil).to_h.reject { |k, _| %i[id supplier_group_ids].include?(k) }
+      attrs = fake_supplier(id: nil).to_h.reject { |k, _| %i[id farm_ids].include?(k) }
       res = interactor.create_supplier(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['is missing'], res.errors[:supplier_group_ids]
+      assert_equal ['is missing'], res.errors[:farm_ids]
     end
 
     def test_update_supplier
@@ -70,8 +70,7 @@ module MasterfilesApp
       farm_id = create_farm
       {
         id: 1,
-        party_role_id: party_role_id.to_s,
-        supplier_party_role_id: party_role_id,
+        supplier_party_role_id: party_role_id.to_s,
         supplier: Faker::Lorem.unique.word,
         supplier_group_ids: [supplier_group_id],
         supplier_group_codes: %i[A B C],

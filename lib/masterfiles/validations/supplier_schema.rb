@@ -4,14 +4,14 @@ module MasterfilesApp
   SupplierSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:supplier_party_role_id).filled(:integer)
-    required(:supplier_group_ids).maybe(:array).each(:integer)
+    optional(:supplier_group_ids).filled(:array).each(:integer)
     required(:farm_ids).maybe(:array).each(:integer)
   end
 
   CreateSupplierSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:party_role_id).filled(:string)
-    required(:supplier_group_ids).maybe(:array).each(:integer)
+    required(:supplier_party_role_id).filled(:string)
+    optional(:supplier_group_ids).maybe(:array).each(:integer)
     required(:farm_ids).maybe(:array).each(:integer)
 
     optional(:short_description).maybe(Types::StrippedString)

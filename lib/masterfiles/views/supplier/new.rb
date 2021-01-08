@@ -17,7 +17,7 @@ module Masterfiles
               form.action '/masterfiles/parties/suppliers'
               form.remote! if remote
               form.add_field :supplier
-              form.add_field :party_role_id
+              form.add_field :supplier_party_role_id
 
               # Organization
               form.add_field :medium_description
@@ -26,8 +26,8 @@ module Masterfiles
               form.add_field :company_reg_no
               form.add_field :vat_number
 
-              form.add_field :supplier_group_ids
               form.add_field :farm_ids
+              form.add_field :supplier_group_ids
             end
           end
 

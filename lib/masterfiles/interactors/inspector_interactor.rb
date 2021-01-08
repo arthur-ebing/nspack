@@ -12,7 +12,7 @@ module MasterfilesApp
         res = CreatePartyRole.call(AppConst::ROLE_INSPECTOR, params, @user)
         raise Crossbeams::ServiceError unless res.success
 
-        params[:inspector_party_role_id] = res.instance
+        params[:inspector_party_role_id] = res.instance.party_role_id
         res = InspectorSchema.call(params)
         raise Crossbeams::ServiceError if res.failure?
 

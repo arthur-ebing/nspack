@@ -11,7 +11,7 @@ module MasterfilesApp
 
   CreateInspectorSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
-    required(:party_role_id).filled(:string)
+    required(:inspector_party_role_id).filled(:string)
     optional(:surname).maybe(Types::StrippedString)
     optional(:first_name).maybe(Types::StrippedString)
     optional(:title).maybe(Types::StrippedString)
