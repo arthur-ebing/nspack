@@ -16,7 +16,7 @@ module Crossbeams
             print_from_line_scanning: false,
             allow_cultivar_group_mix: true },
       kr: { run_allocations: true,
-            pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
+            pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
             print_from_line_scanning: true,
             allow_cultivar_group_mix: false },
@@ -64,6 +64,7 @@ module Crossbeams
     PALLET_LBL_PSEQ_HEADS = {
       puc_code: 'PUC',
       gap_code: 'Gap code',
+      gtin_code: 'GTIN',
       carton_quantity: 'Quantity',
       production_run_id: 'Run id',
       orchard_code: 'Orchard',
