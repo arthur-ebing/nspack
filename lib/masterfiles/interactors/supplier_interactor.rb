@@ -76,6 +76,7 @@ module MasterfilesApp
     end
 
     def validate_supplier_params(params)
+      params[:supplier_group_ids] = '' if params[:supplier_group_ids].nil?
       SupplierSchema.call(params)
     end
   end
