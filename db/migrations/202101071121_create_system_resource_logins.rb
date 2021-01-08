@@ -10,6 +10,7 @@ Sequel.migration do
       String :identifier
       DateTime :login_at
       DateTime :last_logout_at
+      TrueClass :from_external_system, default: false
       TrueClass :active, default: true
       DateTime :created_at, null: false
       DateTime :updated_at, null: false

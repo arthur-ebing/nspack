@@ -61,6 +61,7 @@ Sequel.migration do
         String :default_role
         String :selected_role
         String :abbr_name
+        TrueClass :from_external_system, default: false
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
 

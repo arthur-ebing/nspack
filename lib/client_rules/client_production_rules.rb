@@ -117,7 +117,7 @@ module Crossbeams
               when :carton_quantity
                 value.to_s.rjust(heads[key][:width])
               else
-                value.ljust(heads[key][:width])
+                value.to_s.ljust(heads[key][:width])
               end
           " #{v} |"
         end

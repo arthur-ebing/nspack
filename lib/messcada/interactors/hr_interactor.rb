@@ -16,7 +16,7 @@ module MesscadaApp
       end
       success_response('Registered')
     rescue Crossbeams::InfoError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('register_identifier'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
@@ -42,24 +42,24 @@ module MesscadaApp
       success_response("Module #{mes_module} is out of Bulk Registraion Mode", bulk_registration_mode: false)
     end
 
-    def logon(params) # rubocop:disable Metrics/AbcSize
+    def login(params) # rubocop:disable Metrics/AbcSize
       return ok_response unless params[:system_resource][:login]
 
       name = repo.contract_worker_name(params[:identifier])
 
       if params[:system_resource][:group_incentive]
-        logon_group(name, params)
+        login_group(name, params)
       else
-        logon_individual(name, params)
+        login_individual(name, params)
       end
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('logon'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
-    def logon_individual(name, params)
+    def login_individual(name, params)
       res = nil
       repo.transaction do
         res = repo.login_worker(name, params)
@@ -67,7 +67,7 @@ module MesscadaApp
       res
     end
 
-    def logon_group(name, params)
+    def login_group(name, params)
       res = nil
       group_incentive_id = repo.active_group_incentive_id(params[:system_resource].id)
       system_resource = ProductionApp::SystemResourceWithIncentive.new(params[:system_resource].to_h.merge(group_incentive_id: group_incentive_id))
@@ -115,7 +115,7 @@ module MesscadaApp
       success_response("Packer moved from group #{prev_group_incentive_id} to group #{system_resource[:group_incentive_id]}", contract_worker: contract_worker_name)
     end
 
-    def logoff(params) # rubocop:disable Metrics/AbcSize
+    def logout(params) # rubocop:disable Metrics/AbcSize
       name = repo.contract_worker_name(params[:identifier])
       return failed_response("#{params[:identifier]} not assigned") if name.nil_or_empty?
 
@@ -125,29 +125,29 @@ module MesscadaApp
       end
       res
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('logon'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
-    def logon_with_no(params) # rubocop:disable Metrics/AbcSize
+    def login_with_no(params) # rubocop:disable Metrics/AbcSize
       name = repo.contract_worker_name_by_no(params[:identifier])
       return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
 
       if params[:system_resource][:group_incentive]
-        logon_group(name, params)
+        login_group(name, params)
       else
-        logon_individual(name, params)
+        login_individual(name, params)
       end
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('logon'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
-    def logoff_with_no(params) # rubocop:disable Metrics/AbcSize
+    def logout_with_no(params) # rubocop:disable Metrics/AbcSize
       name = repo.contract_worker_name_by_no(params[:identifier])
       return failed_response("#{params[:identifier]} is not a valid personnel number") if name.nil_or_empty?
 
@@ -157,20 +157,20 @@ module MesscadaApp
       end
       res
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('logon'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
     end
 
-    def logoff_device(params) # rubocop:disable Metrics/AbcSize
+    def logout_device(params) # rubocop:disable Metrics/AbcSize
       res = nil
       repo.transaction do
         res = repo.logout_device(params[:device])
       end
       res
     rescue StandardError => e
-      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message('logon'))
+      ErrorMailer.send_exception_email(e, subject: self.class.name, message: decorate_mail_message(__method__))
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)

@@ -212,7 +212,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     params = { device: robot.system_resource_code, identifier: robot_params[:id], card_reader: '1' }
     res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
-    res = interactor.logon(res.instance) if res.success
+    res = interactor.login(res.instance) if res.success
 
     feedback = if res.success
                  MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -222,7 +222,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                else
                  MesscadaApp::RobotFeedback.new(device: params[:device],
                                                 status: false,
-                                                line1: 'Cannot logon',
+                                                line1: 'Cannot login',
                                                 line4: res.message)
                end
     respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
@@ -231,7 +231,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
   def publish_logoff # rubocop:disable Metrics/AbcSize
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     params = { device: robot.system_resource_code, card_reader: '1' }
-    res = interactor.logoff_device(params)
+    res = interactor.logout_device(params)
 
     feedback = if res.success
                  MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -241,7 +241,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                else
                  MesscadaApp::RobotFeedback.new(device: params[:device],
                                                 status: false,
-                                                line1: 'Cannot logoff',
+                                                line1: 'Cannot logout',
                                                 line4: res.message)
                end
     respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.

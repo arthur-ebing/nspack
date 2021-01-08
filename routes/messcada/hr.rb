@@ -26,7 +26,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'logon' do
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
-      res = interactor.logon(res.instance) if res.success
+      res = interactor.login(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -37,7 +37,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,
-                                                  line1: 'Cannot logon',
+                                                  line1: 'Cannot login',
                                                   line4: res.message)
                  end
       Crossbeams::RobotResponder.new(feedback).render
@@ -45,7 +45,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'logoff' do
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
-      res = interactor.logoff(res.instance) if res.success
+      res = interactor.logout(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -55,7 +55,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,
-                                                  line1: 'Cannot logoff',
+                                                  line1: 'Cannot logout',
                                                   line4: res.message)
                  end
       Crossbeams::RobotResponder.new(feedback).render
@@ -63,7 +63,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'logon_with_no' do
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
-      res = interactor.logon_with_no(res.instance) if res.success
+      res = interactor.login_with_no(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -73,7 +73,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,
-                                                  line1: 'Cannot logon',
+                                                  line1: 'Cannot login',
                                                   line4: res.message)
                  end
       Crossbeams::RobotResponder.new(feedback).render
@@ -81,7 +81,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'logoff_with_no' do
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params.merge(identifier_is_person: true), get_group_incentive: false)
-      res = interactor.logoff_with_no(res.instance) if res.success
+      res = interactor.logout_with_no(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -91,7 +91,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                  else
                    MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: false,
-                                                  line1: 'Cannot logoff',
+                                                  line1: 'Cannot logout',
                                                   line4: res.message)
                  end
       Crossbeams::RobotResponder.new(feedback).render
