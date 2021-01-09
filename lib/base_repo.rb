@@ -316,11 +316,11 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   #
   # @param table_name [Symbol] the db table name.
   # @param columns [Symbol,Array] the column (or array of columns) to query.
-  # @param where [Hash] the where-clause conditions. Optional.
+  # @param args [Hash] the where-clause conditions. Optional.
   # @return [Array] the values from the column(s) of each row.
-  def select_values(table_name, columns, where = nil)
+  def select_values(table_name, columns, args = nil)
     ds = DB[table_name]
-    ds = ds.where(where) if where
+    ds = ds.where(args) if args
     ds.select_map(columns)
   end
 
