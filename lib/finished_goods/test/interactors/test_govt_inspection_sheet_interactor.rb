@@ -67,8 +67,8 @@ module FinishedGoodsApp
 
     def govt_inspection_sheet_attrs
       inspector_id = create_inspector
-      inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
-      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
+      inspection_billing_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_INSPECTION_BILLING)
+      exporter_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_EXPORTER)
       target_market_group_id = create_target_market_group
       destination_region_id = create_destination_region
       destination_country_id = create_destination_country

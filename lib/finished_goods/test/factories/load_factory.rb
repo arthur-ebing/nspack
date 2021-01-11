@@ -7,11 +7,11 @@ module FinishedGoodsApp
       pol_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POL) || create_port_type(port_type_code: AppConst::PORT_TYPE_POL)
       pod_port_type_id = repo.get_id(:port_types, port_type_code: AppConst::PORT_TYPE_POD) || create_port_type(port_type_code: AppConst::PORT_TYPE_POD)
 
-      customer_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
-      consignee_party_role_id = create_party_role('O', AppConst::ROLE_CONSIGNEE)
-      billing_client_party_role_id = create_party_role('O', AppConst::ROLE_BILLING_CLIENT)
-      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
-      final_receiver_party_role_id = create_party_role('O', AppConst::ROLE_FINAL_RECEIVER)
+      customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_INSPECTION_BILLING)
+      consignee_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_CONSIGNEE)
+      billing_client_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_BILLING_CLIENT)
+      exporter_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_EXPORTER)
+      final_receiver_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_FINAL_RECEIVER)
       destination_city_id = create_destination_city
       depot_id = create_depot
       voyage_id = create_voyage

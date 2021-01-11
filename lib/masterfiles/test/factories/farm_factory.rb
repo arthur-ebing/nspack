@@ -21,7 +21,7 @@ module MasterfilesApp
     end
 
     def create_farm_group(opts = {})
-      owner_party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
+      owner_party_role_id = create_party_role(name: AppConst::ROLE_FARM_OWNER)
 
       default = {
         owner_party_role_id: owner_party_role_id,
@@ -33,7 +33,7 @@ module MasterfilesApp
     end
 
     def create_farm(opts = {})
-      owner_party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
+      owner_party_role_id = create_party_role(name: AppConst::ROLE_FARM_OWNER)
       production_region_id = create_production_region
       farm_group_id = create_farm_group
 

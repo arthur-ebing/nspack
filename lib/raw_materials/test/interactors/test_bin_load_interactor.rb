@@ -72,8 +72,8 @@ module RawMaterialsApp
 
     def bin_load_attrs
       bin_load_purpose_id = create_bin_load_purpose
-      customer_party_role_id = create_party_role('O', AppConst::ROLE_CUSTOMER)
-      transporter_party_role_id = create_party_role('O', AppConst::ROLE_TRANSPORTER)
+      customer_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_CUSTOMER)
+      transporter_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_TRANSPORTER)
       depot_id = create_depot
 
       {

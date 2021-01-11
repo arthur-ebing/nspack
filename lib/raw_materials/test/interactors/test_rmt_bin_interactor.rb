@@ -90,7 +90,7 @@ module RawMaterialsApp
       orchard_id = create_orchard
       farm_id = create_farm
       rmt_class_id = create_rmt_class
-      rmt_material_owner_party_role_id = create_party_role('O', AppConst::ROLE_IMPLEMENTATION_OWNER)
+      rmt_material_owner_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
       rmt_container_type_id = create_rmt_container_type
       rmt_container_material_type_id = create_rmt_container_material_type
       cultivar_group_id = create_cultivar_group

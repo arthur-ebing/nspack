@@ -5,7 +5,7 @@ module RawMaterialsApp
     def create_rmt_bin(opts = {}) # rubocop:disable Metrics/AbcSize
       rmt_delivery_id = create_rmt_delivery
       rmt_class_id = create_rmt_class
-      rmt_material_owner_party_role_id = create_party_role('O', AppConst::ROLE_IMPLEMENTATION_OWNER)
+      rmt_material_owner_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_IMPLEMENTATION_OWNER)
       season_id = create_season
       farm_id = create_farm
       puc_id = create_puc
@@ -138,7 +138,7 @@ module RawMaterialsApp
 
     def create_rmt_container_material_owner(opts = {})
       rmt_container_material_type_id = create_rmt_container_material_type
-      rmt_material_owner_party_role_id = create_party_role
+      rmt_material_owner_party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_RMT_BIN_OWNER)
 
       default = {
         rmt_container_material_type_id: rmt_container_material_type_id,

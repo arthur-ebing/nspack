@@ -86,7 +86,7 @@ module ProductionApp
       basic_pack_code_id = create_basic_pack_code
       standard_pack_code_id = create_standard_pack_code
       fruit_size_reference_id = create_fruit_size_reference
-      marketing_org_party_role_id = create_party_role('O', AppConst::ROLE_MARKETER)
+      marketing_org_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_MARKETER)
       packed_tm_group_id = create_target_market_group
       target_market_id = create_target_market
       mark_id = create_mark

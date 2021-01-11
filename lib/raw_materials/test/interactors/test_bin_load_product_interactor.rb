@@ -75,7 +75,7 @@ module RawMaterialsApp
       cultivar_id = create_cultivar
       cultivar_group_id = create_cultivar_group
       rmt_container_material_type_id = create_rmt_container_material_type
-      party_role_id = create_party_role('P', AppConst::ROLE_RMT_BIN_OWNER)
+      party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_RMT_BIN_OWNER)
       farm_id = create_farm
       puc_id = create_puc
       orchard_id = create_orchard

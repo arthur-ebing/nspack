@@ -47,7 +47,7 @@ module MasterfilesApp
     end
 
     def create_inspector(opts = {})
-      inspector_party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
+      inspector_party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_INSPECTOR)
 
       default = {
         inspector_party_role_id: inspector_party_role_id,

@@ -3,15 +3,13 @@
 module MasterfilesApp
   module PartyFactory # rubocop:disable Metrics/ModuleLength
     def create_party(opts = {})
-      default = {
-        party_type: 'O', # || 'P'
-        active: true
-      }
-      DB[:parties].insert(default.merge(opts))
+      opts[:party_type] ||= 'O'
+      DB[:parties].insert(opts)
     end
 
     def create_person(opts = {})
-      party_id = create_party(party_type: 'P')
+      party_id = opts[:party_id] || create_party(party_type: 'P')
+
       default = {
         party_id: party_id,
         title: Faker::Company.name.to_s,
@@ -20,11 +18,13 @@ module MasterfilesApp
         vat_number: Faker::Number.number(digits: 10),
         active: true
       }
-      DB[:people].insert(default.merge(opts))
+      person_id = DB[:people].insert(default.merge(opts))
+      create_party_role(party_id: party_id)
+      person_id
     end
 
     def create_organization(opts = {})
-      party_id = create_party(party_type: 'O')
+      party_id = opts[:party_id] || create_party(party_type: 'O')
       default = {
         party_id: party_id,
         parent_id: nil,
@@ -35,8 +35,7 @@ module MasterfilesApp
         active: true
       }
       organization_id = DB[:organizations].insert(default.merge(opts))
-
-      create_party_role('O', nil, organization_id: organization_id)
+      create_party_role(party_id: party_id)
       organization_id
     end
 
@@ -46,22 +45,26 @@ module MasterfilesApp
         return existing_id if existing_id
       end
 
-      default = { name: Faker::Lorem.unique.word, active: true }
+      default = {
+        name: Faker::Lorem.unique.word,
+        active: true
+      }
       DB[:roles].insert(default.merge(opts))
     end
 
-    def create_party_role(party_type = 'O', role_name = nil, opts = {}) # rubocop:disable Metrics/AbcSize
-      default = { active: true }
-      if party_type == 'O'
-        default[:organization_id] = opts[:organization_id] || create_organization
-        default[:party_id] = DB[:organizations].where(id: default[:organization_id]).get(:party_id)
-      end
-      if party_type == 'P'
-        default[:person_id] = opts[:person_id] || create_person
-        default[:party_id] = DB[:people].where(id: default[:person_id]).get(:party_id)
-      end
-      default[:role_id] = create_role(name: role_name)
+    def create_party_role(opts = {}) # rubocop:disable Metrics/AbcSize
+      opts[:party_id] ||= create_party(party_type: opts.delete(:party_type))
+      opts[:role_id] ||= create_role(name: opts.delete(:name))
+      organization_id = DB[:organizations].where(party_id: opts[:party_id]).get(:id)
+      person_id = DB[:people].where(party_id: opts[:party_id]).get(:id)
 
+      default = {
+        organization_id: organization_id,
+        person_id: person_id,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
       DB[:party_roles].insert(default.merge(opts))
     end
 
@@ -124,6 +127,18 @@ module MasterfilesApp
         contact_method_id: create_contact_method
       }
       DB[:party_contact_methods].insert(default.merge(opts))
+    end
+
+    def party_address_ids(party_id)
+      DB[:party_addresses].where(party_id: party_id).select_map(:address_id).sort
+    end
+
+    def party_contact_method_ids(party_id)
+      DB[:party_contact_methods].where(party_id: party_id).select_map(:contact_method_id).sort
+    end
+
+    def party_role_ids(party_id)
+      DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
     end
   end
 end

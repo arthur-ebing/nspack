@@ -26,7 +26,7 @@ module MasterfilesApp
         res = create_person
         return res unless res.success
       else
-        add_role_to_party
+        create_party_role
       end
       party_role_id = repo.get_id(:party_roles, role_id: role_id, person_id: person_id, organization_id: organization_id)
       party_role_id ||= repo.get_id(:party_roles, role_id: role_id, party_id: party_id)
@@ -38,11 +38,11 @@ module MasterfilesApp
 
     private
 
-    def add_role_to_party
+    def create_party_role
       @party_id = DB[:party_roles].where(id: party_role_id).get(:party_id)
       return if repo.exists?(:party_roles, id: party_role_id, role_id: role_id)
 
-      repo.add_role_to_party(party_id, role_id)
+      repo.create_party_role(party_id, role_id)
     end
 
     def create_organization

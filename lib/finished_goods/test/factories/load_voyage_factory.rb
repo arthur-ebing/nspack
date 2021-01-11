@@ -5,8 +5,8 @@ module FinishedGoodsApp
     def create_load_voyage(opts = {})
       load_id = create_load
       voyage_id = create_voyage
-      shipping_line_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPING_LINE)
-      shipper_party_role_id = create_party_role('O', AppConst::ROLE_SHIPPER)
+      shipping_line_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_SHIPPING_LINE)
+      shipper_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_SHIPPER)
 
       default = {
         load_id: load_id,

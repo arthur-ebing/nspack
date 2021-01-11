@@ -74,7 +74,7 @@ module MasterfilesApp
     private
 
     def farm_attrs
-      party_role_id = create_party_role('O', AppConst::ROLE_FARM_OWNER)
+      party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_FARM_OWNER)
       production_region_id = create_production_region
       farm_group_id = create_farm_group
       puc_id = create_puc

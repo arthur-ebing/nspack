@@ -5,7 +5,7 @@ module FinishedGoodsApp
     def create_load_vehicle(opts = {})
       load_id = create_load
       vehicle_type_id = create_vehicle_type
-      haulier_party_role_id = create_party_role('O', AppConst::ROLE_HAULIER)
+      haulier_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_HAULIER)
 
       default = {
         load_id: load_id,

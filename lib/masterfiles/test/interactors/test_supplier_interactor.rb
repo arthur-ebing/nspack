@@ -65,7 +65,7 @@ module MasterfilesApp
     private
 
     def supplier_attrs
-      party_role_id = create_party_role('O', AppConst::ROLE_SUPPLIER)
+      party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_SUPPLIER)
       supplier_group_id = create_supplier_group
       farm_id = create_farm
       {

@@ -3,7 +3,7 @@
 module FinishedGoodsApp
   module GovtInspectionFactory
     def create_inspector(opts = {})
-      party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
+      party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_INSPECTOR)
 
       default = {
         inspector_party_role_id: party_role_id,
@@ -21,8 +21,8 @@ module FinishedGoodsApp
       inspector_id = create_inspector
       target_market_group_id = create_target_market_group
       destination_region_id = create_destination_region
-      inspection_billing_party_role_id = create_party_role('O', AppConst::ROLE_INSPECTION_BILLING)
-      exporter_party_role_id = create_party_role('O', AppConst::ROLE_EXPORTER)
+      inspection_billing_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_INSPECTION_BILLING)
+      exporter_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_EXPORTER)
 
       default = {
         inspector_id: inspector_id,

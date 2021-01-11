@@ -64,7 +64,7 @@ module MasterfilesApp
     private
 
     def inspector_attrs
-      party_role_id = create_party_role('P', AppConst::ROLE_INSPECTOR)
+      party_role_id = create_party_role(party_type: 'P', name: AppConst::ROLE_INSPECTOR)
       {
         id: 1,
         inspector_party_role_id: party_role_id.to_s,
