@@ -146,6 +146,7 @@ module MesscadaApp
     def update_group_incentive(group_incentive_id, params)
       attrs = params.to_h
       attrs[:contract_worker_ids] = array_for_db_col(attrs[:contract_worker_ids]) if attrs.key?(:contract_worker_ids)
+      attrs[:from_external_system] = false
       DB[:group_incentives].where(id: group_incentive_id).update(attrs)
     end
 

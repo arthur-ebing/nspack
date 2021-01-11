@@ -169,6 +169,7 @@ Sequel.migration do
         String :module_name, null: false
         String :group_id
         String :group_date
+        TrueClass :from_external_system, default: false
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
 
@@ -256,6 +257,7 @@ Sequel.migration do
         String :initials
         String :title
         foreign_key :person_role, Sequel[:kromco_legacy][:messcada_people_roles], key: :code, type: String
+        TrueClass :from_external_system, default: false
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
 
@@ -284,9 +286,6 @@ Sequel.migration do
         DateTime :end_date
         DateTime :created_at, null: false
         DateTime :updated_at, null: false
-
-        index [:reader_id, :group_id, :group_date, :industry_number], name: :kr_leg_messcada_people_view_messcada_rfid_allocations_idx, unique: true
-        index [:group_id], name: :kr_leg_messcada_people_view_messcada_rfid_allocations_idx1
       end
 
       pgt_created_at(Sequel[:kromco_legacy][:messcada_people_view_messcada_rfid_allocations],
