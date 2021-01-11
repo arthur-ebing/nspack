@@ -65,7 +65,7 @@ module MasterfilesApp
     end
 
     def validate_organization_params(params)
-      params[:role_ids] = '' if params[:role_ids].nil?
+      params[:role_ids] ||= ''
       OrganizationSchema.call(params)
     end
   end
