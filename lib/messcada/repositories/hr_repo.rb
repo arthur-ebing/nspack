@@ -50,6 +50,8 @@ module MesscadaApp
     def login_worker(name, params) # rubocop:disable Metrics/AbcSize
       system_resource = params[:system_resource]
       logout_worker(system_resource[:contract_worker_id])
+      # Logout_from_group if applicable
+      remove_login_from_group(system_resource[:contract_worker_id])
 
       if exists?(:system_resource_logins, system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
         DB[:system_resource_logins]
@@ -168,6 +170,14 @@ module MesscadaApp
       DB[:contract_workers]
         .where(personnel_identifier_id: DB[:personnel_identifiers].where(identifier: identifier).get(:id))
         .get(:id)
+    end
+
+    # If a worker logs on as an individual, adjust the group they belong to (if they do belong to one)
+    def remove_login_from_group(contract_worker_id)
+      prev_group_incentive_id = contract_worker_active_group_incentive_id(contract_worker_id)
+      return if prev_group_incentive_id.nil?
+
+      remove_packer_from_incentive_group(prev_group_incentive_id, contract_worker_id)
     end
 
     def remove_packer_from_incentive_group(group_incentive_id, contract_worker_id)

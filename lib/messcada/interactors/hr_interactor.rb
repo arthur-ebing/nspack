@@ -72,6 +72,7 @@ module MesscadaApp
       group_incentive_id = repo.active_group_incentive_id(params[:system_resource].id)
       system_resource = ProductionApp::SystemResourceWithIncentive.new(params[:system_resource].to_h.merge(group_incentive_id: group_incentive_id))
       repo.transaction do
+        repo.logout_worker(system_resource[:contract_worker_id])
         res = group_incentive_login(system_resource, name)
       end
       res
