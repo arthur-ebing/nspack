@@ -57,12 +57,16 @@ module MasterfilesApp
       hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
       hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
-      hash[:variant_codes] = select_values(:masterfile_variants, :variant_code, { masterfile_id: id, masterfile_table: 'organizations' })
+      hash[:variant_codes] = fn_masterfile_variants('organizations', id)
       Organization.new(hash)
     end
 
     def org_code_for_party_role(id)
       DB.get(Sequel.function(:fn_party_role_org_code, id))
+    end
+
+    def fn_masterfile_variants(table_name, id)
+      DB.get(Sequel.function(:fn_masterfile_variants, table_name, id))
     end
 
     def fn_party_name(id)
@@ -88,7 +92,7 @@ module MasterfilesApp
       party_id = create(:parties, party_type: 'O')
       org_id = create(:organizations, params.merge(party_id: party_id))
 
-      assign_roles_to_party(party_id, role_ids)
+      create_party_roles(party_id, role_ids)
       org_id
     end
 
@@ -99,7 +103,7 @@ module MasterfilesApp
       update(:organizations, id, params)
 
       party_id = get(:organizations, id, :party_id)
-      assign_roles_to_party(party_id, role_ids)
+      create_party_roles(party_id, role_ids)
     end
 
     def delete_organization(id)
@@ -107,8 +111,6 @@ module MasterfilesApp
       raise Crossbeams::InfoError, 'This organization is set as a parent' if children.any?
 
       party_id = party_id_from_organization(id)
-      DB[:party_roles].where(party_id: party_id).delete
-      DB[:organizations].where(id: id).delete
       delete_party_dependents(party_id)
     end
 
@@ -129,7 +131,7 @@ module MasterfilesApp
 
       party_id = create(:parties, party_type: 'P')
       person_id = create(:people, params.merge(party_id: party_id))
-      assign_roles_to_party(party_id, role_ids)
+      create_party_roles(party_id, role_ids)
 
       person_id
     end
@@ -141,13 +143,11 @@ module MasterfilesApp
       update(:people, id, params)
 
       party_id = get(:people, id, :party_id)
-      assign_roles_to_party(party_id, role_ids)
+      create_party_roles(party_id, role_ids)
     end
 
     def delete_person(id)
       party_id = party_id_from_person(id)
-      DB[:party_roles].where(party_id: party_id).delete
-      DB[:people].where(id: id).delete
       delete_party_dependents(party_id)
     end
 
@@ -303,7 +303,7 @@ module MasterfilesApp
       PartyRole.new(hash)
     end
 
-    def assign_roles_to_party(party_id, role_ids)
+    def create_party_roles(party_id, role_ids)
       ds = DB[:party_roles].where(party_id: party_id)
       current_role_ids = ds.select_map(:role_id)
 
@@ -312,12 +312,14 @@ module MasterfilesApp
       ds.where(role_id: removed_role_ids).delete
 
       new_role_ids = role_ids - current_role_ids
+      raise Crossbeams::InfoError, 'Party must have at least one role.' if (current_role_ids + new_role_ids - removed_role_ids).empty?
+
       new_role_ids.each do |role_id|
-        add_role_to_party(party_id, role_id)
+        create_party_role(party_id, role_id)
       end
     end
 
-    def add_role_to_party(party_id, role_id)
+    def create_party_role(party_id, role_id)
       DB[:party_roles].insert(party_id: party_id,
                               organization_id: get_id(:organizations, party_id: party_id),
                               person_id: get_id(:people, party_id: party_id),
@@ -481,6 +483,9 @@ module MasterfilesApp
     end
 
     def delete_party_dependents(party_id)
+      DB[:party_roles].where(party_id: party_id).delete
+      DB[:organizations].where(party_id: party_id).delete
+      DB[:people].where(party_id: party_id).delete
       DB[:party_addresses].where(party_id: party_id).delete
       DB[:party_contact_methods].where(party_id: party_id).delete
       DB[:parties].where(id: party_id).delete

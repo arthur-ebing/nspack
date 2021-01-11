@@ -69,16 +69,6 @@ module MasterfilesApp
       assert contact_method_ids.sort, res
     end
 
-    def test_party_role_ids
-      party_id = create_party
-      party_role_ids = []
-      4.times do
-        party_role_ids << create_party_role('O', nil, party_id: party_id)
-      end
-      res = repo.party_role_ids(party_id)
-      assert party_role_ids.sort, res
-    end
-
     def test_assign_roles
       role_ids = []
       4.times do
@@ -88,22 +78,23 @@ module MasterfilesApp
       org_id = create_organization
       party_id = repo.get(:organizations, org_id, :party_id)
 
-      repo.assign_roles_to_party(party_id, role_ids)
-      party_role_created = repo.where_hash(:party_roles, organization_id: org_id)
+      repo.create_party_roles(party_id, role_ids)
+      party_role_created = repo.where_hash(:party_roles, party_id: party_id)
       assert party_role_created
 
       person_id = create_person
       party_id = repo.get(:people, person_id, :party_id)
 
-      repo.assign_roles_to_party(party_id, role_ids)
-      party_role_created = repo.where_hash(:party_roles, person_id: person_id)
+      repo.create_party_roles(party_id, role_ids)
+      party_role_created = repo.where_hash(:party_roles, party_id: party_id)
       assert party_role_created
     end
 
     def test_add_party_name
-      party_role_id = create_party_role('O')
-      party_role = repo.find_hash(:party_roles, party_role_id)
-      hash = repo.find_hash(:parties, party_role[:party_id])
+      party_id = create_party
+      organization_id = create_organization(party_id: party_id)
+      organization = repo.find_hash(:organizations, organization_id)
+      hash = repo.find_hash(:parties, organization[:party_id])
       exp = { party_name: DB['SELECT fn_party_name(?)', party_role[:party_id]].single_value }
       res = repo.send(:add_party_name, hash)
       assert exp[:party_name], res[:party_name]
@@ -120,7 +111,7 @@ module MasterfilesApp
       2.times do
         exp[:contact_method_ids] << create_party_contact_method(party_id: party_id)
         exp[:address_ids] << create_party_address(party_id: party_id)
-        exp[:role_ids] << create_party_role('O', nil, party_id: party_id)
+        exp[:role_ids] << create_party_role(party_id: party_id)
       end
       res_hash = repo.send(:add_dependent_ids, hash)
       assert exp[:contact_method_ids], res_hash[:contact_method_ids]

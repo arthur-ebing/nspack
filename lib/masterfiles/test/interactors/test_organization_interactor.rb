@@ -46,7 +46,7 @@ module MasterfilesApp
 
     def test_update_organization_fail
       id = create_organization
-      attrs = interactor.send(:repo).find_hash(:organizations, id).reject { |k, _| %i[id short_description].include?(k) }
+      attrs = interactor.send(:repo).find_organization(id).to_h.reject { |k, _| %i[id short_description].include?(k) }
       res = interactor.update_organization(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:short_description]
@@ -63,32 +63,31 @@ module MasterfilesApp
     private
 
     def organization_attrs
-      party_role_id = create_party_role('O')
-      hash = interactor.send(:repo).find_hash(:party_roles, party_role_id)
-
+      party_id = create_party(party_type: 'O')
+      role_id = create_role
+      create_party_role(party_id: party_id, role_id: role_id)
       {
         id: 1,
-        party_id: hash[:party_id],
-        parent_id: hash[:organization_id],
-        party_name: Faker::Lorem.unique.word,
+        party_id: party_id,
+        parent_id: nil,
+        parent_organization: nil,
         short_description: Faker::Lorem.unique.word,
-        medium_description: Faker::Lorem.unique.word,
-        long_description: Faker::Lorem.unique.word,
-        company_reg_no: Faker::Lorem.unique.word,
+        medium_description: 'ABC',
+        long_description: 'ABC',
+        party_name: 'ABC',
         vat_number: 'ABC',
-        variants: %w[A B C],
-        role_ids: [hash[:role_id]],
-        role_names: [Faker::Lorem.unique.word],
-        specialised_role_names: [Faker::Lorem.unique.word],
-        variant_codes: [Faker::Lorem.unique.word],
-        parent_organization: Faker::Lorem.unique.word,
+        edi_hub_address: 'ABC',
+        company_reg_no: 'ABC',
+        role_ids: [role_id],
+        role_names: ['ABC'],
+        specialised_role_names: ['ABC'],
+        variant_codes: ['ABC'],
         active: true
       }
     end
 
     def fake_organization(overrides = {})
-      hash = organization_attrs.merge(overrides)
-      Organization.new(hash)
+      Organization.new(organization_attrs.merge(overrides))
     end
 
     def interactor
