@@ -19,7 +19,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_person(id, params)
+    def update_person(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_person_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -29,6 +29,8 @@ module MasterfilesApp
       end
       instance = person(id)
       success_response("Updated person #{instance.party_name}", instance)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to update person. Still referenced #{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -58,6 +60,7 @@ module MasterfilesApp
     end
 
     def validate_person_params(params)
+      params[:role_ids] = '' if params[:role_ids].nil?
       PersonSchema.call(params)
     end
   end

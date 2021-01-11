@@ -18,7 +18,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_organization(id, params)
+    def update_organization(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_organization_params(params)
       return validation_failed_response(res) if res.failure?
 
@@ -27,6 +27,8 @@ module MasterfilesApp
       end
       instance = organization(id)
       success_response("Updated organization #{instance.party_name}", instance)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to update organization. Still referenced #{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -63,6 +65,7 @@ module MasterfilesApp
     end
 
     def validate_organization_params(params)
+      params[:role_ids] = '' if params[:role_ids].nil?
       OrganizationSchema.call(params)
     end
   end

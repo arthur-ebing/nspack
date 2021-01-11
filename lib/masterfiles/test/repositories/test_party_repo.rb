@@ -86,13 +86,16 @@ module MasterfilesApp
       end
 
       org_id = create_organization
-      person_id = create_person
+      party_id = repo.get(:organizations, org_id, :party_id)
 
-      repo.assign_roles(org_id, role_ids, 'O')
+      repo.assign_roles_to_party(party_id, role_ids)
       party_role_created = repo.where_hash(:party_roles, organization_id: org_id)
       assert party_role_created
 
-      repo.assign_roles(person_id, role_ids, 'P')
+      person_id = create_person
+      party_id = repo.get(:people, person_id, :party_id)
+
+      repo.assign_roles_to_party(party_id, role_ids)
       party_role_created = repo.where_hash(:party_roles, person_id: person_id)
       assert party_role_created
     end

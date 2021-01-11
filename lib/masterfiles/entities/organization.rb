@@ -14,6 +14,7 @@ module MasterfilesApp
     attribute :active, Types::Bool
     attribute :role_ids, Types::Array
     attribute :role_names, Types::Array
+    attribute :specialised_role_names, Types::Array
     attribute :variant_codes, Types::Array
     attribute :parent_organization, Types::String
   end

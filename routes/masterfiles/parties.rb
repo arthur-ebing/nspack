@@ -35,13 +35,8 @@ class Nspack < Roda
         r.patch do     # UPDATE
           res = interactor.update_organization(id, params[:organization])
           if res.success
-            update_grid_row(id, changes: { party_id: res.instance[:party_id],
-                                           parent: res.instance[:parent_organization],
-                                           short_description: res.instance[:short_description],
-                                           organization_code: res.instance[:medium_description],
-                                           long_description: res.instance[:long_description],
-                                           vat_number: res.instance[:vat_number] },
-                                notice: res.message)
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
           else
             re_show_form(r, res) { Masterfiles::Parties::Organization::Edit.call(id, params[:organization], res.errors) }
           end
@@ -110,12 +105,8 @@ class Nspack < Roda
         r.patch do
           res = interactor.update_person(id, params[:person])
           if res.success
-            update_grid_row(id,
-                            changes: { title: res.instance[:title],
-                                       first_name: res.instance[:first_name],
-                                       surname: res.instance[:surname],
-                                       vat_number: res.instance[:vat_number] },
-                            notice: res.message)
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
           else
             re_show_form(r, res) { Masterfiles::Parties::Person::Edit.call(id, params[:person], res.errors) }
           end
@@ -123,7 +114,12 @@ class Nspack < Roda
         r.delete do
           check_auth!('parties', 'delete')
           res = interactor.delete_person(id)
-          delete_grid_row(id, notice: res.message)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            flash[:error] = res.message
+            redirect_to_last_grid(r)
+          end
         end
       end
     end

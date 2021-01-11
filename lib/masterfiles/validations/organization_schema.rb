@@ -9,6 +9,6 @@ module MasterfilesApp
     required(:long_description).maybe(Types::StrippedString)
     required(:vat_number).maybe(Types::StrippedString)
     required(:company_reg_no).maybe(Types::StrippedString)
-    required(:role_ids).filled(:array).each(:integer)
+    required(:role_ids).maybe(:array).each(:integer)
   end
 end

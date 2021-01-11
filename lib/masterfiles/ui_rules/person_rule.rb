@@ -7,21 +7,28 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields common_fields if %i[new edit].include?(@mode)
 
       set_show_fields if @mode == :show
 
       form_name 'person'
     end
 
-    def set_show_fields
+    def set_show_fields # rubocop:disable Metrics/AbcSize
       fields[:party_name] = { renderer: :label, caption: 'Full Name' }
       fields[:surname] = { renderer: :label }
       fields[:first_name] = { renderer: :label }
       fields[:title] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:role_names] = { renderer: :list, caption: 'Roles', items: @form_object.role_names.map(&:capitalize!) }
+      fields[:specialised_role_names] = { renderer: :list,
+                                          items: @form_object.specialised_role_names,
+                                          hide_on_load: @form_object.specialised_role_names.empty?,
+                                          caption: 'Specialised Roles' }
+      fields[:role_names] = { renderer: :list,
+                              caption: 'Roles',
+                              hide_on_load: @form_object.role_names.empty?,
+                              items: @form_object.role_names }
     end
 
     def common_fields
@@ -31,11 +38,15 @@ module UiRules
         title: { required: true },
         vat_number: {},
         active: { renderer: :checkbox },
+        specialised_role_names: { renderer: :list,
+                                  items: @form_object.specialised_role_names,
+                                  hide_on_load: @form_object.specialised_role_names.empty?,
+                                  caption: 'Specialised Roles' },
         role_ids: { renderer: :multi,
                     caption: 'Roles',
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,
-                    required: true  }
+                    required: false }
       }
     end
 
@@ -51,6 +62,7 @@ module UiRules
                                     title: nil,
                                     vat_number: nil,
                                     active: true,
+                                    specialised_role_names: [],
                                     role_ids: [])
     end
   end

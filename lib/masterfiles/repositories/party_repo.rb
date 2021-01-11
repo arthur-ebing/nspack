@@ -54,9 +54,10 @@ module MasterfilesApp
 
       hash = add_dependent_ids(hash)
       hash = add_party_name(hash)
-      hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
+      hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
+      hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
-      hash[:variant_codes] = select_values(:masterfile_variants, :variant_code, masterfile_id: id, masterfile_table: 'organizations')
+      hash[:variant_codes] = select_values(:masterfile_variants, :variant_code, { masterfile_id: id, masterfile_table: 'organizations' })
       Organization.new(hash)
     end
 
@@ -87,16 +88,18 @@ module MasterfilesApp
       party_id = create(:parties, party_type: 'O')
       org_id = create(:organizations, params.merge(party_id: party_id))
 
-      assign_roles(org_id, role_ids, 'O')
+      assign_roles_to_party(party_id, role_ids)
       org_id
     end
 
-    def update_organization(org_id, attrs)
+    def update_organization(id, attrs)
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
 
-      update(:organizations, org_id, params)
-      assign_roles(org_id, role_ids, 'O')
+      update(:organizations, id, params)
+
+      party_id = get(:organizations, id, :party_id)
+      assign_roles_to_party(party_id, role_ids)
     end
 
     def delete_organization(id)
@@ -115,7 +118,8 @@ module MasterfilesApp
 
       hash = add_dependent_ids(hash)
       hash = add_party_name(hash)
-      hash[:role_names] = DB[:roles].where(id: hash[:role_ids]).select_map(:name)
+      hash[:role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: false })
+      hash[:specialised_role_names] = select_values(:roles, :name, { id: hash[:role_ids], specialised: true })
       Person.new(hash)
     end
 
@@ -125,7 +129,7 @@ module MasterfilesApp
 
       party_id = create(:parties, party_type: 'P')
       person_id = create(:people, params.merge(party_id: party_id))
-      assign_roles(person_id, role_ids, 'P')
+      assign_roles_to_party(party_id, role_ids)
 
       person_id
     end
@@ -134,8 +138,10 @@ module MasterfilesApp
       params = attrs.to_h
       role_ids = params.delete(:role_ids)
 
-      assign_roles(id, role_ids, 'P')
       update(:people, id, params)
+
+      party_id = get(:people, id, :party_id)
+      assign_roles_to_party(party_id, role_ids)
     end
 
     def delete_person(id)
@@ -297,31 +303,24 @@ module MasterfilesApp
       PartyRole.new(hash)
     end
 
-    def assign_roles(id, role_ids, type = 'O')
-      raise Crossbeams::InfoError, 'Choose at least one role' if role_ids.empty?
-
-      party_details = party_details_by_type(id, type)
-      current_role_ids = party_details[:party_roles].select_map(:role_id)
+    def assign_roles_to_party(party_id, role_ids)
+      ds = DB[:party_roles].where(party_id: party_id)
+      current_role_ids = ds.select_map(:role_id)
 
       removed_role_ids = current_role_ids - role_ids
-      party_details[:party_roles].where(role_id: removed_role_ids).delete
+      removed_role_ids -= DB[:roles].where(specialised: true).select_map(:id) # specialised_rol_ids
+      ds.where(role_id: removed_role_ids).delete
 
       new_role_ids = role_ids - current_role_ids
-      new_role_ids.each do |r_id|
-        DB[:party_roles].insert(
-          party_id: party_details[:party_id],
-          organization_id: party_details[:organization_id],
-          person_id: party_details[:person_id],
-          role_id: r_id
-        )
+      new_role_ids.each do |role_id|
+        add_role_to_party(party_id, role_id)
       end
     end
 
     def add_role_to_party(party_id, role_id)
-      organization_id, person_id = DB[:party_roles].where(party_id: party_id).select_map(%i[organization_id person_id]).first
       DB[:party_roles].insert(party_id: party_id,
-                              organization_id: organization_id,
-                              person_id: person_id,
+                              organization_id: get_id(:organizations, party_id: party_id),
+                              person_id: get_id(:people, party_id: party_id),
                               role_id: role_id)
     end
 

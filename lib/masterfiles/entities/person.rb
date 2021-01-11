@@ -12,6 +12,7 @@ module MasterfilesApp
     attribute :active, Types::Bool
     attribute :role_ids, Types::Array
     attribute :role_names, Types::Array
+    attribute :specialised_role_names, Types::Array
     attribute :address_ids, Types::Array
     attribute :contact_method_ids, Types::Array
   end

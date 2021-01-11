@@ -7,7 +7,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields
+      common_values_for_fields common_fields if %i[new edit].include?(@mode)
 
       set_show_fields if @mode == :show
 
@@ -29,9 +29,14 @@ module UiRules
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:company_reg_no] = { renderer: :label }
+      fields[:specialised_role_names] = { renderer: :list,
+                                          items: @form_object.specialised_role_names,
+                                          hide_on_load: @form_object.specialised_role_names.empty?,
+                                          caption: 'Specialised Roles' }
       fields[:role_names] = { renderer: :list,
                               caption: 'Roles',
-                              items: @form_object.role_names.map(&:capitalize!) }
+                              hide_on_load: @form_object.role_names.empty?,
+                              items: @form_object.role_names }
       # fields[:active] = { renderer: :label, as_boolean: true }
     end
 
@@ -46,11 +51,15 @@ module UiRules
         long_description: {},
         vat_number: {},
         company_reg_no: {},
+        specialised_role_names: { renderer: :list,
+                                  items: @form_object.specialised_role_names,
+                                  hide_on_load: @form_object.specialised_role_names.empty?,
+                                  caption: 'Specialised Roles' },
         role_ids: { renderer: :multi,
                     options: @repo.for_select_roles,
                     selected: @form_object.role_ids,
                     caption: 'Roles',
-                    required: true  }
+                    required: false }
       }
     end
 
@@ -65,6 +74,7 @@ module UiRules
                                     medium_description: nil,
                                     long_description: nil,
                                     vat_number: nil,
+                                    specialised_role_names: [],
                                     role_ids: [])
     end
 

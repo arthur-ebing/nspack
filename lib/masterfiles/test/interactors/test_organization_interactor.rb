@@ -79,6 +79,7 @@ module MasterfilesApp
         variants: %w[A B C],
         role_ids: [hash[:role_id]],
         role_names: [Faker::Lorem.unique.word],
+        specialised_role_names: [Faker::Lorem.unique.word],
         variant_codes: [Faker::Lorem.unique.word],
         parent_organization: Faker::Lorem.unique.word,
         active: true
