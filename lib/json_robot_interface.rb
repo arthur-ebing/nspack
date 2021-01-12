@@ -210,9 +210,9 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
 
   def publish_logon # rubocop:disable Metrics/AbcSize
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-    params = { device: robot.system_resource_code, identifier: robot_params[:id] }
+    params = { device: robot.system_resource_code, identifier: robot_params[:id], card_reader: '1' }
     res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, get_group_incentive: false)
-    res = interactor.logon(res.instance) if res.success
+    res = interactor.login(res.instance) if res.success
 
     feedback = if res.success
                  MesscadaApp::RobotFeedback.new(device: params[:device],
@@ -222,35 +222,29 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                else
                  MesscadaApp::RobotFeedback.new(device: params[:device],
                                                 status: false,
-                                                line1: 'Cannot logon',
+                                                line1: 'Cannot login',
                                                 line4: res.message)
                end
     respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
   end
 
-  def publish_logoff
-    # This wil need to update state for bin tipper and personnel groups for label incentives
-    # This version does nothing because the robot payload does not include the id
-    feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
-                                              status: true,
-                                              line1: 'Logged off')
-    respond(feedback, true, type: :user) # Which type to respond here must depend on the robot use.
-    # interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-    # params = { device: robot.system_resource_code, identifier: robot_params[:id] }
-    # res = interactor.logoff(params)
-    #
-    # feedback = if res.success
-    #              MesscadaApp::RobotFeedback.new(device: params[:device],
-    #                                             status: true,
-    #                                             line1: res.instance[:contract_worker],
-    #                                             line4: 'Logged off')
-    #            else
-    #              MesscadaApp::RobotFeedback.new(device: params[:device],
-    #                                             status: false,
-    #                                             line1: 'Cannot logoff',
-    #                                             line4: res.message)
-    #            end
-    # respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
+  def publish_logoff # rubocop:disable Metrics/AbcSize
+    interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    params = { device: robot.system_resource_code, card_reader: '1' }
+    res = interactor.logout_device(params)
+
+    feedback = if res.success
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: true,
+                                                line1: res.instance[:contract_worker],
+                                                line4: 'Logged off')
+               else
+                 MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                status: false,
+                                                line1: 'Cannot logout',
+                                                line4: res.message)
+               end
+    respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
   end
 
   def publish_status

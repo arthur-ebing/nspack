@@ -36,6 +36,7 @@ module ProductionApp
     attribute :logoff, Types::Bool
     attribute :group_incentive, Types::Bool
     attribute :packpoint, Types::String
+    attribute :card_reader, Types::String
   end
 
   class SystemResourceWithIncentive < Dry::Struct
@@ -45,10 +46,11 @@ module ProductionApp
     attribute :logoff, Types::Bool
     attribute :group_incentive, Types::Bool
     attribute :packpoint, Types::String
+    attribute :card_reader, Types::String
     attribute? :contract_worker_id, Types::Integer
     attribute? :personnel_identifier_id, Types::Integer
     attribute? :group_incentive_id, Types::Integer
-    attribute? :card_reader, Types::String
+    attribute? :identifier, Types::String
   end
 
   class SystemResourceFlat < Dry::Struct

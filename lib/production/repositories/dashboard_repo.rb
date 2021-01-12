@@ -63,6 +63,20 @@ module ProductionApp
       DB[query].all
     end
 
+    def robot_logon_details(system_resource_id)
+      query = <<~SQL
+        SELECT s.card_reader,
+        s.login_at, s.last_logout_at, s.active,
+        w.first_name, w.surname, w.personnel_number
+        FROM system_resource_logins s
+        LEFT OUTER JOIN contract_workers w ON w.id = s.contract_worker_id
+        WHERE s.system_resource_id = ?
+        ORDER BY s.card_reader
+      SQL
+
+      DB[query, system_resource_id].all
+    end
+
     def robot_group_incentive_details(system_resource_id)
       query = <<~SQL
         SELECT w.id, w.first_name, w.surname, w.personnel_number

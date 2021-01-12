@@ -46,6 +46,54 @@ module MesscadaApp
       DB[:contract_workers].where(personnel_number: personnel_number).get(:id)
     end
 
+    # Record login event to system resource logins
+    def login_worker(name, params) # rubocop:disable Metrics/AbcSize
+      system_resource = params[:system_resource]
+      logout_worker(system_resource[:contract_worker_id])
+      # Logout_from_group if applicable
+      remove_login_from_group(system_resource[:contract_worker_id])
+
+      if exists?(:system_resource_logins, system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
+        DB[:system_resource_logins]
+          .where(system_resource_id: system_resource[:id], card_reader: system_resource[:card_reader])
+          .update(contract_worker_id: system_resource[:contract_worker_id],
+                  active: true,
+                  from_external_system: false,
+                  login_at: Time.now,
+                  identifier: system_resource[:identifier])
+      else
+        DB[:system_resource_logins]
+          .insert(system_resource_id: system_resource[:id],
+                  card_reader: system_resource[:card_reader],
+                  contract_worker_id: system_resource[:contract_worker_id],
+                  active: true,
+                  from_external_system: false,
+                  login_at: Time.now,
+                  identifier: system_resource[:identifier])
+      end
+
+      success_response('Logged on', contract_worker: name)
+    end
+
+    def logout_worker(contract_worker_id)
+      DB[:system_resource_logins]
+        .where(contract_worker_id: contract_worker_id, active: true)
+        .update(last_logout_at: Time.now,
+                from_external_system: false,
+                active: false)
+      ok_response
+    end
+
+    def logout_device(device)
+      system_resource_id = DB[:system_resources].where(system_resource_code: device).get(:id)
+      DB[:system_resource_logins]
+        .where(system_resource_id: system_resource_id)
+        .update(last_logout_at: Time.now,
+                from_external_system: false,
+                active: false)
+      ok_response
+    end
+
     def active_system_resource_group_exists?(system_resource_id)
       exists?(:group_incentives, { system_resource_id: system_resource_id, active: true })
     end
@@ -98,6 +146,7 @@ module MesscadaApp
     def update_group_incentive(group_incentive_id, params)
       attrs = params.to_h
       attrs[:contract_worker_ids] = array_for_db_col(attrs[:contract_worker_ids]) if attrs.key?(:contract_worker_ids)
+      attrs[:from_external_system] = false
       DB[:group_incentives].where(id: group_incentive_id).update(attrs)
     end
 
@@ -122,6 +171,14 @@ module MesscadaApp
       DB[:contract_workers]
         .where(personnel_identifier_id: DB[:personnel_identifiers].where(identifier: identifier).get(:id))
         .get(:id)
+    end
+
+    # If a worker logs on as an individual, adjust the group they belong to (if they do belong to one)
+    def remove_login_from_group(contract_worker_id)
+      prev_group_incentive_id = contract_worker_active_group_incentive_id(contract_worker_id)
+      return if prev_group_incentive_id.nil?
+
+      remove_packer_from_incentive_group(prev_group_incentive_id, contract_worker_id)
     end
 
     def remove_packer_from_incentive_group(group_incentive_id, contract_worker_id)

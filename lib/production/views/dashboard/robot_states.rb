@@ -3,7 +3,7 @@
 module Production
   module Dashboards
     module Dashboard
-      class RobotStates
+      class RobotStates # rubocop:disable Metrics/ClassLength
         def self.call
           layout = Crossbeams::Layout::Page.build({}) do |page|
             page.add_text 'Robot states', wrapper: :h2
@@ -52,7 +52,7 @@ module Production
                 </table></p>
                 <p>#{rec[:robot_function]}</p>
                 #{buttons(rec[:id])}
-                #{indiv(rec[:login], rec[:group_incentive])}
+                #{indiv(rec[:login], rec[:group_incentive], rec[:system_resource_id])}
                 #{group(rec[:group_incentive], rec[:system_resource_id])}
               </div>
             HTML
@@ -77,11 +77,37 @@ module Production
           HTML
         end
 
-        def self.indiv(login, group_incentive)
+        def self.indiv(login, group_incentive, system_resource_id) # rubocop:disable Metrics/AbcSize
           return '' if group_incentive
           return '' unless login
 
-          '<div class="bg-purple white pa3 tc">Individual Incentive</div>'
+          list = ProductionApp::DashboardRepo.new.robot_logon_details(system_resource_id)
+          if list.empty?
+            '<div class="bg-purple white pa3 tc">Individual Incentive</div>'
+          else
+            items = list.map do |item|
+              worker = [item[:first_name], item[:surname], "(#{item[:personnel_number]})"].compact.join(' ')
+              if item[:active]
+                <<~HTML
+                  <tr class="bg-green white"><td><span class="b">#{worker}</span></td></tr>
+                  <tr class="bg-green white"><td>Login on reader: <span class="b">#{item[:card_reader]}</span></td>
+                  <tr class="bg-green white"><td>at <span class="b">#{item[:login_at].strftime('%H:%M:%S')}</span> on <span class="b">#{item[:login_at].strftime('%Y-%m-%d')}</span></td>
+                HTML
+              else
+                <<~HTML
+                  <tr class="bg-orange white"><td><span class="b">#{worker}</span></td></tr>
+                  <tr class="bg-orange white"><td>Logout on reader: <span class="b">#{item[:card_reader]}</span></td>
+                  <tr class="bg-orange white"><td>at <span class="b">#{item[:last_logout_at].strftime('%H:%M:%S')}</span> on <span class="b">#{item[:last_logout_at].strftime('%Y-%m-%d')}</span></td>
+                HTML
+              end
+            end
+            <<~HTML
+              <div class="bg-purple white pa3 tc">Individual Incentive</div>
+              <table class="thinbordertable f6 mt3" style="width:100%">
+              #{items.join}
+              </table>
+            HTML
+          end
         end
 
         def self.group(group_incentive, system_resource_id)
