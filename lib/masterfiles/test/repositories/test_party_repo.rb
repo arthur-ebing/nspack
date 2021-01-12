@@ -95,7 +95,7 @@ module MasterfilesApp
       organization_id = create_organization(party_id: party_id)
       organization = repo.find_hash(:organizations, organization_id)
       hash = repo.find_hash(:parties, organization[:party_id])
-      exp = { party_name: DB['SELECT fn_party_name(?)', party_role[:party_id]].single_value }
+      exp = { party_name: DB['SELECT fn_party_name(?)', organization[:party_id]].single_value }
       res = repo.send(:add_party_name, hash)
       assert exp[:party_name], res[:party_name]
     end
