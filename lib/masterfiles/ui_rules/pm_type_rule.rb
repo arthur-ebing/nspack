@@ -7,8 +7,6 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:require_extended_packaging] = AppConst::REQUIRE_EXTENDED_PACKAGING
-
       common_values_for_fields common_fields
 
       set_show_fields if %i[show reopen].include? @mode
@@ -21,12 +19,13 @@ module UiRules
       fields[:pm_composition_level_id] = { renderer: :label,
                                            with_value: pm_composition_level_id_label,
                                            caption: 'Composition Level',
-                                           hide_on_load: @rules[:require_extended_packaging] ? false : true }
+                                           hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
       fields[:pm_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pm_subtypes] = { renderer: :list, items: pm_subtypes }
-      fields[:short_code] = { renderer: :label }
+      fields[:short_code] = { renderer: :label,
+                              hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
     end
 
     def common_fields
@@ -38,12 +37,13 @@ module UiRules
                                    prompt: 'Select Composition Level',
                                    searchable: true,
                                    remove_search_for_small_list: false,
-                                   hide_on_load: @rules[:require_extended_packaging] ? false : true,
-                                   required: true },
+                                   required: AppConst::REQUIRE_EXTENDED_PACKAGING,
+                                   hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING },
         pm_type_code: { required: true,
                         force_uppercase: true },
         description: { required: true },
-        short_code: { required: true,
+        short_code: { required: AppConst::REQUIRE_EXTENDED_PACKAGING,
+                      hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING,
                       force_uppercase: true }
       }
     end

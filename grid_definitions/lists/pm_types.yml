@@ -18,14 +18,14 @@
     :popup: true
   - :separator: true
   - :url: "/list/pm_subtypes/with_params?key=standard&pm_subtypes.pm_type_id=$:id$"
-    :text: pm subtypes
-    :title: Pm subtypes for type $:pm_type_code$
+    :text: PM Subtypes
+    :title: PM Subtypes for $:pm_type_code$
     :icon: list
     :popup: true
 :page_controls:
   - :control_type: :link
     :url: "/masterfiles/packaging/pm_types/new"
-    :text: New Pm Type
+    :text: New PM Type
     :style: :button
     :behaviour: :popup
     :hide_for_key: standard

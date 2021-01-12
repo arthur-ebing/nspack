@@ -10,6 +10,8 @@ INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Email') ON
 -- PM TYPE
 INSERT INTO pm_types (pm_type_code, description) VALUES ('BIN', 'BIN') ON CONFLICT DO NOTHING;
 INSERT INTO pm_types (pm_type_code, description) VALUES ('CARTON', 'CARTON') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description) VALUES ('STICKER', 'STICKER') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description) VALUES ('LABOUR', 'LABOUR') ON CONFLICT DO NOTHING;
 
 -- PORT_TYPES
 INSERT INTO port_types (port_type_code, description) VALUES('POL', 'Port of Loading') ON CONFLICT DO NOTHING;

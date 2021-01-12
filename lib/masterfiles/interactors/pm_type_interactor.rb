@@ -9,14 +9,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_pm_type(res)
-        log_status('pm_types', id, 'CREATED')
+        log_status(:pm_types, id, 'CREATED')
         log_transaction
       end
       instance = pm_type(id)
-      success_response("Created pm type #{instance.pm_type_code}",
-                       instance)
+      success_response("Created PM Type #{instance.pm_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { pm_type_code: ['This pm type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { pm_type_code: ['This PM Type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,20 +29,21 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_type(id)
-      success_response("Updated pm type #{instance.pm_type_code}",
-                       instance)
+      success_response("Updated PM Type #{instance.pm_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def delete_pm_type(id)
+    def delete_pm_type(id) # rubocop:disable Metrics/AbcSize
       name = pm_type(id).pm_type_code
       repo.transaction do
         repo.delete_pm_type(id)
-        log_status('pm_types', id, 'DELETED')
+        log_status(:pm_types, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted pm type #{name}")
+      success_response("Deleted PM Type #{name}")
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete PM Type. It is still referenced#{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
