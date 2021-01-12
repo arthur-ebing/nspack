@@ -6,7 +6,7 @@ module MasterfilesApp
       attr_reader :task, :entity
       def initialize(task, pm_product_id = nil)
         @task = task
-        @repo = BomsRepo.new
+        @repo = BomRepo.new
         @id = pm_product_id
         @entity = @id ? @repo.find_pm_product(@id) : nil
       end

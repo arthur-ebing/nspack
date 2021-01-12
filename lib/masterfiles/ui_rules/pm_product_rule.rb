@@ -3,7 +3,7 @@
 module UiRules
   class PmProductRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules # rubocop:disable Metrics/AbcSize
-      @repo = MasterfilesApp::BomsRepo.new
+      @repo = MasterfilesApp::BomRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values

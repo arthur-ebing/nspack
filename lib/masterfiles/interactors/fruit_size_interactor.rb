@@ -101,7 +101,7 @@ module MasterfilesApp
     end
 
     def boms_repo
-      @boms_repo ||= BomsRepo.new
+      @boms_repo ||= BomRepo.new
     end
 
     def std_fruit_size_count(id)

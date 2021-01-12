@@ -766,7 +766,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           pm_bom = nil
         else
           pm_bom_id = params[:changed_value]
-          pm_bom = MasterfilesApp::BomsRepo.new.find_pm_bom(pm_bom_id)
+          pm_bom = MasterfilesApp::BomRepo.new.find_pm_bom(pm_bom_id)
           pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, pm_mark_id)
         end
         json_actions([OpenStruct.new(type: :replace_input_value,

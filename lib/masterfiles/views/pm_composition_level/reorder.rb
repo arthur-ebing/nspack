@@ -3,7 +3,7 @@ module Masterfiles
     module PmCompositionLevel
       class Reorder
         def self.call
-          composition_levels = MasterfilesApp::BomsRepo.new.composition_levels
+          composition_levels = MasterfilesApp::BomRepo.new.composition_levels
 
           layout = Crossbeams::Layout::Page.build do |page|
             page.form do |form|

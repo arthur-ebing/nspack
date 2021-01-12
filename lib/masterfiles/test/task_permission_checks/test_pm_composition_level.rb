@@ -23,13 +23,13 @@ module MasterfilesApp
     end
 
     def test_edit
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_composition_level).returns(entity)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_composition_level).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PmCompositionLevel.call(:edit, 1)
       assert res.success, 'Should be able to edit a pm_composition_level'
     end
 
     def test_delete
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_composition_level).returns(entity)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_composition_level).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PmCompositionLevel.call(:delete, 1)
       assert res.success, 'Should be able to delete a pm_composition_level'
     end

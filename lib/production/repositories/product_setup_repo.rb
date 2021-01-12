@@ -228,7 +228,7 @@ module ProductionApp
 
     def pm_boms_products(product_setup_id)
       pm_bom = find_product_setup(product_setup_id)
-      MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
+      MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
     end
 
     def product_setup_in_production?(id)

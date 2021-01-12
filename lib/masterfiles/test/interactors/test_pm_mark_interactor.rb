@@ -9,11 +9,11 @@ module MasterfilesApp
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::BomsRepo)
+      assert repo.is_a?(MasterfilesApp::BomRepo)
     end
 
     def test_pm_mark
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_mark).returns(fake_pm_mark)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_mark).returns(fake_pm_mark)
       entity = interactor.send(:pm_mark, 1)
       assert entity.is_a?(PmMark)
     end

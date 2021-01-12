@@ -220,12 +220,12 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if AppConst::REQUIRE_FRUIT_STICKER_AT_PALLET_VERIFICATION && pallet_sequence[:pallet_sequence_number] == 1
           form.add_select(:fruit_sticker_pm_product_id,
                           'Fruit Sticker',
-                          items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'),
+                          items: MasterfilesApp::BomRepo.new.find_pm_products_by_pm_type('fruit_sticker'),
                           value: pallet_sequence[:fruit_sticker_pm_product_id],
                           prompt: true)
           form.add_select(:fruit_sticker_pm_product_2_id,
                           'Fruit Sticker 2',
-                          items: MasterfilesApp::BomsRepo.new.find_pm_products_by_pm_type('fruit_sticker'),
+                          items: MasterfilesApp::BomRepo.new.find_pm_products_by_pm_type('fruit_sticker'),
                           value: pallet_sequence[:fruit_sticker_pm_product_2_id],
                           prompt: true)
         end

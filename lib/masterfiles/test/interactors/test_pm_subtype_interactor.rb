@@ -8,11 +8,11 @@ module MasterfilesApp
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::BomsRepo)
+      assert repo.is_a?(MasterfilesApp::BomRepo)
     end
 
     def test_pm_subtype
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
       entity = interactor.send(:pm_subtype, 1)
       assert entity.is_a?(PmSubtype)
     end

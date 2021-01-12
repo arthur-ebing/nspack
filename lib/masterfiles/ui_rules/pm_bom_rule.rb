@@ -3,7 +3,7 @@
 module UiRules
   class PmBomRule < Base
     def generate_rules  # rubocop:disable Metrics/AbcSize
-      @repo = MasterfilesApp::BomsRepo.new
+      @repo = MasterfilesApp::BomRepo.new
       make_form_object
       apply_form_values
 

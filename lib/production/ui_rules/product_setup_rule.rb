@@ -35,11 +35,11 @@ module UiRules
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
       target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)&.target_market_name
       mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
-      pm_mark_id_label = MasterfilesApp::BomsRepo.new.find_pm_mark(@form_object.pm_mark_id)&.packaging_marks
+      pm_mark_id_label = MasterfilesApp::BomRepo.new.find_pm_mark(@form_object.pm_mark_id)&.packaging_marks
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
       cartons_per_pallet_id_label = @repo.find_hash(:cartons_per_pallet, @form_object.cartons_per_pallet_id)[:cartons_per_pallet]
-      pm_bom_id_label = MasterfilesApp::BomsRepo.new.find_pm_bom(@form_object.pm_bom_id)&.bom_code
+      pm_bom_id_label = MasterfilesApp::BomRepo.new.find_pm_bom(@form_object.pm_bom_id)&.bom_code
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
@@ -112,7 +112,7 @@ module UiRules
       pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
                 else
-                  MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id)
+                  MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id)
                 end
 
       actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
@@ -124,7 +124,7 @@ module UiRules
       pm_marks = if @form_object.mark_id.nil_or_empty?
                    []
                  else
-                   MasterfilesApp::BomsRepo.new.for_select_fruitspec_pm_marks(@form_object.mark_id)
+                   MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(@form_object.mark_id)
                  end
 
       {
@@ -227,7 +227,7 @@ module UiRules
                    remove_search_for_small_list: false },
         pm_mark_id: { renderer: :select,
                       options: pm_marks,
-                      disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_marks,
+                      disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
                       caption: 'PM Mark',
                       prompt: 'Select PM Mark',
                       searchable: true,
@@ -289,7 +289,7 @@ module UiRules
                                  remove_search_for_small_list: false },
         pm_bom_id: { renderer: :select,
                      options: pm_boms,
-                     disabled_options: MasterfilesApp::BomsRepo.new.for_select_inactive_pm_boms,
+                     disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_boms,
                      caption: 'PM BOM',
                      prompt: 'Select PM BOM',
                      searchable: true,

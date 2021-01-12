@@ -131,15 +131,15 @@ module ProductionApp
     end
 
     def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
-      MasterfilesApp::BomsRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
+      MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
     end
 
     def for_select_fruitspec_pm_marks(mark_id)
-      MasterfilesApp::BomsRepo.new.for_select_fruitspec_pm_marks(mark_id)
+      MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(mark_id)
     end
 
     def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)
-      pm_bom_products = MasterfilesApp::BomsRepo.new.pm_bom_products(pm_bom_id)
+      pm_bom_products = MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom_id)
       add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) unless pm_mark_id.nil_or_empty?
 
       Crossbeams::Layout::Table.new([], pm_bom_products, [],
@@ -148,7 +148,7 @@ module ProductionApp
     end
 
     def add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) # rubocop:disable Metrics/AbcSize
-      packaging_marks = MasterfilesApp::BomsRepo.new.find_packaging_marks_by_fruitspec_mark(pm_mark_id)
+      packaging_marks = MasterfilesApp::BomRepo.new.find_packaging_marks_by_fruitspec_mark(pm_mark_id)
       return pm_bom_products if packaging_marks.nil_or_empty?
 
       items = repo.array_of_text_for_db_col(packaging_marks)

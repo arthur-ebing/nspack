@@ -33,13 +33,13 @@ module MasterfilesApp
     end
 
     def test_edit
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_product).returns(entity)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_product).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PmProduct.call(:edit, 1)
       assert res.success, 'Should be able to edit a pm_product'
     end
 
     def test_delete
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_product).returns(entity)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_product).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::PmProduct.call(:delete, 1)
       assert res.success, 'Should be able to delete a pm_product'
     end

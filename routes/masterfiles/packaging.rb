@@ -539,7 +539,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         actions = []
         unless params[:changed_value].nil_or_empty?
           pm_subtype_id = params[:changed_value]
-          repo = MasterfilesApp::BomsRepo.new
+          repo = MasterfilesApp::BomRepo.new
           show_product_extra_fields = repo.fruit_composition_level?(pm_subtype_id)
           show_one_level_up_fields = repo.one_level_up_fruit_composition?(pm_subtype_id)
           actions = [OpenStruct.new(type: :replace_inner_html,

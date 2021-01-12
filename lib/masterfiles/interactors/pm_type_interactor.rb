@@ -56,7 +56,7 @@ module MasterfilesApp
     private
 
     def repo
-      @repo ||= BomsRepo.new
+      @repo ||= BomRepo.new
     end
 
     def pm_type(id)

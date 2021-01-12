@@ -8,11 +8,11 @@ module MasterfilesApp
 
     def test_repo
       repo = interactor.send(:repo)
-      assert repo.is_a?(MasterfilesApp::BomsRepo)
+      assert repo.is_a?(MasterfilesApp::BomRepo)
     end
 
     def test_pm_composition_level
-      MasterfilesApp::BomsRepo.any_instance.stubs(:find_pm_composition_level).returns(fake_pm_composition_level)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_composition_level).returns(fake_pm_composition_level)
       entity = interactor.send(:pm_composition_level, 1)
       assert entity.is_a?(PmCompositionLevel)
     end

@@ -3,7 +3,7 @@
 module UiRules
   class PmMarkRule < Base
     def generate_rules
-      @repo = MasterfilesApp::BomsRepo.new
+      @repo = MasterfilesApp::BomRepo.new
       make_form_object
       apply_form_values
 

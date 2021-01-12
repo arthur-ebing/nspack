@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  class BomsRepo < BaseRepo # rubocop:disable Metrics/ClassLength
+  class BomRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :pm_types,
                      label: :pm_type_code,
                      value: :id,

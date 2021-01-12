@@ -63,7 +63,7 @@ module MasterfilesApp
     end
 
     def for_select_subtype_products(pm_subtype_id)
-      MasterfilesApp::BomsRepo.new.for_select_pm_products(where: { pm_subtype_id: pm_subtype_id })
+      MasterfilesApp::BomRepo.new.for_select_pm_products(where: { pm_subtype_id: pm_subtype_id })
     end
 
     def inline_edit_bom_product(bom_product_id, params)
@@ -103,7 +103,7 @@ module MasterfilesApp
     private
 
     def repo
-      @repo ||= BomsRepo.new
+      @repo ||= BomRepo.new
     end
 
     def pm_boms_product(id)

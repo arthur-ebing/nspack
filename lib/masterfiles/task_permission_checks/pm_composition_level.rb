@@ -6,7 +6,7 @@ module MasterfilesApp
       attr_reader :task, :entity
       def initialize(task, pm_composition_level_id = nil)
         @task = task
-        @repo = BomsRepo.new
+        @repo = BomRepo.new
         @id = pm_composition_level_id
         @entity = @id ? @repo.find_pm_composition_level(@id) : nil
       end
