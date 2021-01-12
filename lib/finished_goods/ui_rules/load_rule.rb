@@ -216,7 +216,6 @@ module UiRules
                                    hide_on_load: @mode != :temp_tail,
                                    required: true },
         temp_tail: { renderer: :input,
-                     subtype: :integer,
                      hide_on_load: @mode != :temp_tail,
                      required: true },
         spacer: { hide_on_load: true }
