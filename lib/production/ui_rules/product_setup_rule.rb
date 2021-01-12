@@ -66,7 +66,7 @@ module UiRules
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
       fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'Pm Bom', hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:extended_columns] = { renderer: :label }
       fields[:client_size_reference] = { renderer: :label }
       fields[:client_product_code] = { renderer: :label }

@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/pm_marks/new"
-  :text: New Pm Mark
+  :text: New PM Mark
   :style: :button
   :behaviour: :popup

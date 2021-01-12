@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Pm Bom'
+              form.caption 'New PM BOM'
               form.action '/masterfiles/packaging/pm_boms'
               form.remote! if remote
               form.add_field :bom_code

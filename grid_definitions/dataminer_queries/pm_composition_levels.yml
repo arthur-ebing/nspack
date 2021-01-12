@@ -1,5 +1,5 @@
 ---
-:caption: Pm Composition Levels
+:caption: PM Composition Levels
 :sql: "SELECT \"pm_composition_levels\".\"id\", \"pm_composition_levels\".\"composition_level\",
   \"pm_composition_levels\".\"description\", \"pm_composition_levels\".\"active\",
   \"pm_composition_levels\".\"created_at\", \"pm_composition_levels\".\"updated_at\"\r\nFROM

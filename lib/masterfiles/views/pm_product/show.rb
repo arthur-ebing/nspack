@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form do |form| # rubocop:disable Metrics/BlockLength
-              # form.caption 'Pm Product'
+              # form.caption 'PM Product'
               form.view_only!
               form.row do |row|
                 row.column do |col|

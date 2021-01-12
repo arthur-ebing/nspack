@@ -1,5 +1,5 @@
 ---
-:caption: Pm Boms
+:caption: PM BOMs
 :sql: "SELECT \"pm_boms\".\"id\", \"pm_boms\".\"bom_code\", \"pm_boms\".\"erp_bom_code\",
   \"pm_boms\".\"description\", \"pm_boms\".\"gross_weight\",\r\n\"pm_boms\".\"nett_weight\",
   \"pm_boms\".\"active\", \"pm_boms\".\"created_at\", \"pm_boms\".\"updated_at\" FROM

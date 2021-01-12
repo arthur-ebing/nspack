@@ -31,7 +31,7 @@ module Masterfiles
             end
 
             page.form do |form|
-              form.caption 'Edit Pm Bom'
+              form.caption 'Edit PM BOM'
               form.action "/masterfiles/packaging/pm_boms/#{id}"
               form.remote!
               form.method :update
@@ -53,7 +53,7 @@ module Masterfiles
 
               page.section do |section|
                 section.add_control(control_type: :link,
-                                    text: 'New Pm Boms Products',
+                                    text: 'New PM BOMs Products',
                                     url: "/masterfiles/packaging/pm_boms/#{id}/pm_boms_products/new",
                                     behaviour: :popup,
                                     style: :button)

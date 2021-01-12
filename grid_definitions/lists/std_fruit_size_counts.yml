@@ -32,6 +32,6 @@
   :behaviour: :popup
 - :control_type: :link
   :url: "/masterfiles/fruit/std_fruit_size_counts/sync_pm_boms"
-  :text: Sync Pm Boms
+  :text: Sync PM BOMs
   :style: :button
   :prompt: Create missing pm boms?

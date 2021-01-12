@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Pm Bom'
+              # form.caption 'PM BOM'
               form.view_only!
               form.add_field :bom_code
               form.add_field :system_code

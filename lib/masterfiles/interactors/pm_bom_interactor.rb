@@ -69,7 +69,7 @@ module MasterfilesApp
     end
 
     def multiselect_pm_products(multiselect_list)  # rubocop:disable Metrics/AbcSize
-      return failed_response('Pm Product selection cannot be empty') if multiselect_list.nil_or_empty?
+      return failed_response('PM Product selection cannot be empty') if multiselect_list.nil_or_empty?
 
       res = validate_duplicate_subtypes(pm_product_subtypes(multiselect_list))
       return failed_response(unwrap_failed_response(res)) unless res.success
@@ -88,7 +88,7 @@ module MasterfilesApp
         repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
       end
       instance = pm_bom(pm_bom_id)
-      success_response("Pm bom #{instance.system_code} created successfully",
+      success_response("PM BOM #{instance.system_code} created successfully",
                        instance)
     rescue Sequel::UniqueConstraintViolation
       failed_response('This pm bom already exists')
@@ -101,7 +101,7 @@ module MasterfilesApp
         repo.refresh_system_codes
       end
 
-      success_response('Pm bom system codes were updated successfully')
+      success_response('PM BOM system codes were updated successfully')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

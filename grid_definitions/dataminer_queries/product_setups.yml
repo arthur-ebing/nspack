@@ -68,7 +68,7 @@
   system_code:
     :name: system_code
     :sequence_no: 4
-    :caption: Pm Bom System code
+    :caption: PM BOM System code
     :namespaced_name: pm_boms.system_code
     :data_type: :string
     :width: 200

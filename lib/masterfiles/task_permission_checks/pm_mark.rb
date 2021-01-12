@@ -18,7 +18,7 @@ module MasterfilesApp
       }.freeze
 
       def call
-        return failed_response 'Pm Mark record not found' unless @entity || task == :create
+        return failed_response 'PM Mark record not found' unless @entity || task == :create
 
         check = CHECKS[task]
         raise ArgumentError, "Task \"#{task}\" is unknown for #{self.class}" if check.nil?

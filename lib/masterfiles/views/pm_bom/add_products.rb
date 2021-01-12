@@ -30,7 +30,7 @@ module Masterfiles
               section.add_grid('pm_products',
                                '/list/pm_products_view/grid_multi/standard',
                                height: 35,
-                               caption: 'Choose Pm Products',
+                               caption: 'Choose PM Products',
                                is_multiselect: true,
                                multiselect_url: '/masterfiles/packaging/pm_boms/multiselect_pm_products',
                                multiselect_key: 'standard',

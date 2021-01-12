@@ -1,5 +1,5 @@
 ---
-:caption: Pm Marks
+:caption: PM Marks
 :sql: "SELECT \"pm_marks\".\"id\", \"pm_marks\".\"mark_id\" , \"marks\".\"mark_code\",
   \"pm_marks\".\"packaging_marks\", \"pm_marks\".\"description\", \"pm_marks\".\"active\",
   \"pm_marks\".\"created_at\", \"pm_marks\".\"updated_at\"\r\nFROM \"pm_marks\" \r\nJOIN

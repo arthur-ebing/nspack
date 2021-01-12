@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New Pm Type'
+              form.caption 'New PM Type'
               form.action '/masterfiles/packaging/pm_types'
               form.remote! if remote
               form.add_field :pm_composition_level_id

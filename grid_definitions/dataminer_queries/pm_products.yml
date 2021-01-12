@@ -1,5 +1,5 @@
 ---
-:caption: Pm Products
+:caption: PM Products
 :sql: "SELECT \"pm_products\".\"id\", \"pm_products\".\"pm_subtype_id\",  \"pm_products\".\"product_code\",
   \"pm_products\".\"description\", \"pm_products\".\"erp_code\", \"pm_products\".\"created_at\",
   \"pm_products\".\"updated_at\", \"pm_composition_levels\".\"composition_level\"
@@ -34,7 +34,7 @@
   pm_subtype_id:
     :name: pm_subtype_id
     :sequence_no: 2
-    :caption: Pm subtype
+    :caption: PM Subtype
     :namespaced_name: pm_products.pm_subtype_id
     :data_type: :integer
     :width: 
@@ -289,7 +289,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_products.pm_subtype_id
-  :caption: Pm subtype
+  :caption: PM Subtype
   :data_type: :integer
   :control_type: :list
   :default_value: 

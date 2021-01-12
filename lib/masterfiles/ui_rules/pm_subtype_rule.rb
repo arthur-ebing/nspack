@@ -16,7 +16,7 @@ module UiRules
 
     def set_show_fields
       pm_type_id_label = @repo.find_hash(:pm_types, @form_object.pm_type_id)[:pm_type_code]
-      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'Pm Type' }
+      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
       fields[:subtype_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }

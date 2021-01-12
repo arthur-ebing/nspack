@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Pm Product'
+              form.caption 'Edit PM Product'
               form.action "/masterfiles/packaging/pm_products/#{id}"
               form.remote!
               form.method :update

@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Pm Composition Level'
+              form.caption 'Edit PM Composition Level'
               form.action "/masterfiles/packaging/pm_composition_levels/#{id}"
               form.remote!
               form.method :update

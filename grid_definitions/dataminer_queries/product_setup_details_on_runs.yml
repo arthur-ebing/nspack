@@ -89,7 +89,7 @@
   bom_code:
     :name: bom_code
     :sequence_no: 3
-    :caption: Pm Bom code
+    :caption: PM BOM code
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
     :width: 200

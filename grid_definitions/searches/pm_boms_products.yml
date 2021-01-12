@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/pm_boms_products/new"
-  :text: New Pm Boms Product
+  :text: New PM BOMs Product
   :style: :button
   :behaviour: :popup
