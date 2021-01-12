@@ -24,9 +24,9 @@ module UiRules
       pm_product_id_label = @repo.find_hash(:pm_products,  @form_object.pm_product_id)[:erp_code]
       pm_bom_id_label = @repo.find_hash(:pm_boms, @form_object.pm_bom_id)[:bom_code]
       uom_id_label = @repo.find_hash(:uoms, @form_object.uom_id)[:uom_code]
-      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'Pm Subtype' }
-      fields[:pm_product_id] = { renderer: :label, with_value: pm_product_id_label, caption: 'Pm Product' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'Pm Bom' }
+      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype' }
+      fields[:pm_product_id] = { renderer: :label, with_value: pm_product_id_label, caption: 'PM Product' }
+      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM' }
       fields[:uom_id] = { renderer: :label, with_value: uom_id_label, caption: 'Unit Of Measure' }
       fields[:quantity] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -38,7 +38,7 @@ module UiRules
       subtypes = @rules[:is_edit] ? @repo.for_select_pm_type_subtypes : @repo.for_select_pm_type_subtypes(pm_bom_id)
       {
         pm_bom_id: { renderer: :hidden, value: pm_bom_id },
-        pm_bom: { renderer: :label, with_value: pm_bom_id_label, caption: 'PM Bom', readonly: true },
+        pm_bom: { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', readonly: true },
         pm_subtype_id: { renderer: :select,
                          options: subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,

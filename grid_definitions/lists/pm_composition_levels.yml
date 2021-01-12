@@ -18,8 +18,8 @@
   :popup: true
 - :separator: true
 - :url: "/list/pm_types/with_params?key=standard&pm_types.pm_composition_level_id=$:id$"
-  :text: pm types
-  :title: Pm types for composition level $:description$
+  :text: PM Types
+  :title: PM Types for composition level $:description$
   :icon: list
   :popup: true
 :page_controls:

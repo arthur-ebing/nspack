@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Pm Subtype'
+              # form.caption 'PM Subtype'
               form.view_only!
               form.add_field :pm_type_id
               form.add_field :subtype_code

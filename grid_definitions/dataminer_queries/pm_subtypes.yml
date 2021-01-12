@@ -154,7 +154,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_subtypes.pm_type_id
-  :caption: Pm type
+  :caption: PM Type
   :data_type: :integer
   :control_type: :list
   :default_value: 

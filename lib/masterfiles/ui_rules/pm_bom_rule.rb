@@ -46,7 +46,7 @@ module UiRules
       fields[:pm_subtype_ids] = { renderer: :multi,
                                   options: @repo.for_select_pm_type_subtypes,
                                   selected: @rules[:pm_subtype_ids],
-                                  caption: 'Pm Subtypes' }
+                                  caption: 'PM Subtypes' }
     end
 
     def set_add_products_fields
@@ -54,7 +54,7 @@ module UiRules
       fields[:pm_subtypes] = { renderer: :list,
                                items: pm_subtypes,
                                filled_background: true,
-                               caption: 'Pm Subtypes' }
+                               caption: 'PM Subtypes' }
     end
 
     def make_form_object

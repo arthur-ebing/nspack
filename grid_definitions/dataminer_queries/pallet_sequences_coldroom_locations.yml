@@ -1269,7 +1269,7 @@
   pm_type:
     :name: pm_type
     :sequence_no: 77
-    :caption: Pm type
+    :caption: PM Type
     :namespaced_name: pm_type
     :data_type: :string
     :width: 100
@@ -1285,7 +1285,7 @@
   pm_subtype:
     :name: pm_subtype
     :sequence_no: 78
-    :caption: Pm subtype
+    :caption: PM Subtype
     :namespaced_name: pm_subtype
     :data_type: :string
     :width: 100

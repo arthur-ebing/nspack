@@ -30,8 +30,8 @@ module UiRules
       pm_type_id_label = @repo.find_hash(:pm_types, pm_type_id)[:pm_type_code]
       pm_subtype_id_label = @repo.find_hash(:pm_subtypes, @form_object.pm_subtype_id)[:subtype_code]
       basic_pack_id_label = @fruit_size_repo.find_basic_pack_code(@form_object.basic_pack_id)&.basic_pack_code
-      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'Pm Type' }
-      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'Pm Subtype' }
+      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
+      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype' }
       fields[:erp_code] = { renderer: :label }
       fields[:product_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
@@ -73,7 +73,7 @@ module UiRules
         pm_subtype_id: { renderer: :select,
                          options: pm_subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
-                         caption: 'Type and Subtype',
+                         caption: 'PM Type and Subtype',
                          prompt: 'Select Type and Subtype',
                          searchable: true,
                          remove_search_for_small_list: false,

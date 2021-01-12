@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Pm Subtype'
+              form.caption 'Edit PM Subtype'
               form.action "/masterfiles/packaging/pm_subtypes/#{id}"
               form.remote!
               form.method :update

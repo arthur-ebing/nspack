@@ -19,7 +19,7 @@ module Masterfiles
                                   style: :back_button)
             end
             page.form do |form|
-              form.caption 'Select Pm Subtypes'
+              form.caption 'Select PM Subtypes'
               form.submit_captions 'Next'
               form.action '/masterfiles/packaging/pm_boms/select_subtypes'
               form.remote! if remote
