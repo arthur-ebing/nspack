@@ -2,25 +2,21 @@
 
 module ProductionApp
   class ProductSetupRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :product_setup_templates,
-                     label: :template_name,
-                     value: :id,
-                     order_by: :template_name
-    build_inactive_select :product_setup_templates,
-                          label: :template_name,
-                          value: :id,
-                          order_by: :template_name
-
-    build_for_select :product_setups,
-                     label: :client_size_reference,
-                     value: :id,
-                     order_by: :client_size_reference
-    build_inactive_select :product_setups,
-                          label: :client_size_reference,
-                          value: :id,
-                          order_by: :client_size_reference
-
+    build_for_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
+    build_inactive_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
     crud_calls_for :product_setup_templates, name: :product_setup_template, wrapper: ProductSetupTemplate
+
+    def for_select_product_setups(where: nil, active: true)
+      ds = DB[:product_setups].where(active)
+      ds = ds.where(where) unless where.nil?
+      ds = ds.select(:id, Sequel.function(:fn_product_setup_code, :id))
+      ds.map { |r| [r[:fn_product_setup_code], r[:id]] }
+    end
+
+    def for_select_inactive_product_setups(where: nil)
+      for_select_product_setups(where: where, active: false)
+    end
+
     crud_calls_for :product_setups, name: :product_setup, wrapper: ProductSetup
 
     def find_product_setup_template(id)

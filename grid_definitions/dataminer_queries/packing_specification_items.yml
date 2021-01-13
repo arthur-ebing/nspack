@@ -1,0 +1,496 @@
+---
+:caption: Packing Specification Items
+:sql: "SELECT\r\n    packing_specification_items.id,\r\n    packing_specification_items.packing_specification_id,\r\n
+  \   packing_specifications.packing_specification_code,\r\n    packing_specification_items.description,\r\n
+  \   packing_specification_items.pm_bom_id,\r\n    pm_boms.bom_code AS pm_bom,\r\n
+  \   packing_specification_items.pm_mark_id,\r\n    pm_marks.description AS pm_mark,\r\n
+  \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
+  AS product_setup,\r\n    packing_specification_items.tu_labour_product_id,\r\n    pm_products_tu.erp_code
+  AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
+  \   pm_products_ru.erp_code AS ru_labour_product,\r\n    packing_specification_items.ri_labour_product_id,\r\n
+  \   pm_products_ri.erp_code AS ri_labour_product,\r\n    packing_specification_items.fruit_sticker_ids,\r\n
+  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.fruit_sticker_ids)
+  GROUP BY packing_specification_items.id) AS fruit_stickers,\r\n    packing_specification_items.tu_sticker_ids,\r\n
+  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.tu_sticker_ids)
+  GROUP BY packing_specification_items.id) AS tu_stickers,\r\n    packing_specification_items.ru_sticker_ids,\r\n
+  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.ru_sticker_ids)
+  GROUP BY packing_specification_items.id) AS ru_stickers,\r\n    packing_specification_items.active,\r\n
+  \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
+  \   fn_current_status('packing_specification_items', packing_specification_items.id)
+  AS status\r\nFROM packing_specification_items\r\n         JOIN packing_specifications
+  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\n
+  \        JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
+  \        JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
+  \        LEFT JOIN pm_products pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\n
+  \        LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\n
+  \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: packing_specification_items.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_specification_id:
+    :name: packing_specification_id
+    :sequence_no: 2
+    :caption: Packing specification id
+    :namespaced_name: packing_specification_items.packing_specification_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packing_specification_code:
+    :name: packing_specification_code
+    :sequence_no: 3
+    :caption: Packing specification code
+    :namespaced_name: packing_specifications.packing_specification_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 4
+    :caption: Description
+    :namespaced_name: packing_specification_items.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 5
+    :caption: PM BOM id
+    :namespaced_name: packing_specification_items.pm_bom_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom:
+    :name: pm_bom
+    :sequence_no: 6
+    :caption: PM BOM
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark_id:
+    :name: pm_mark_id
+    :sequence_no: 7
+    :caption: PM Mark id
+    :namespaced_name: packing_specification_items.pm_mark_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark:
+    :name: pm_mark
+    :sequence_no: 8
+    :caption: PM Mark
+    :namespaced_name: pm_marks.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup_id:
+    :name: product_setup_id
+    :sequence_no: 9
+    :caption: Product setup id
+    :namespaced_name: packing_specification_items.product_setup_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_setup:
+    :name: product_setup
+    :sequence_no: 10
+    :caption: Product setup
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_labour_product_id:
+    :name: tu_labour_product_id
+    :sequence_no: 11
+    :caption: TU Labour product id
+    :namespaced_name: packing_specification_items.tu_labour_product_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_labour_product:
+    :name: tu_labour_product
+    :sequence_no: 12
+    :caption: TU Labour product
+    :namespaced_name: pm_products_tu.erp_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ru_labour_product_id:
+    :name: ru_labour_product_id
+    :sequence_no: 13
+    :caption: RU Labour product id
+    :namespaced_name: packing_specification_items.ru_labour_product_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ru_labour_product:
+    :name: ru_labour_product
+    :sequence_no: 14
+    :caption: RU Labour product
+    :namespaced_name: pm_products_ru.erp_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ri_labour_product_id:
+    :name: ri_labour_product_id
+    :sequence_no: 15
+    :caption: RI Labour product id
+    :namespaced_name: packing_specification_items.ri_labour_product_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ri_labour_product:
+    :name: ri_labour_product
+    :sequence_no: 16
+    :caption: RI Labour product
+    :namespaced_name: pm_products_ri.erp_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker_ids:
+    :name: fruit_sticker_ids
+    :sequence_no: 17
+    :caption: Fruit sticker ids
+    :namespaced_name: packing_specification_items.fruit_sticker_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_stickers:
+    :name: fruit_stickers
+    :sequence_no: 18
+    :caption: Fruit Stickers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_sticker_ids:
+    :name: tu_sticker_ids
+    :sequence_no: 19
+    :caption: TU sticker ids
+    :namespaced_name: packing_specification_items.tu_sticker_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_stickers:
+    :name: tu_stickers
+    :sequence_no: 20
+    :caption: TU Stickers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ru_sticker_ids:
+    :name: ru_sticker_ids
+    :sequence_no: 21
+    :caption: RU Sticker ids
+    :namespaced_name: packing_specification_items.ru_sticker_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  ru_stickers:
+    :name: ru_stickers
+    :sequence_no: 22
+    :caption: RU Stickers
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 23
+    :caption: Active
+    :namespaced_name: packing_specification_items.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 24
+    :caption: Created at
+    :namespaced_name: packing_specification_items.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 25
+    :caption: Updated at
+    :namespaced_name: packing_specification_items.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 26
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: packing_specification_items.packing_specification_id
+  :caption: Packing specification
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT packing_specification_code, id FROM packing_specifications ORDER
+    BY packing_specification_code
+- :column: packing_specification_items.pm_bom_id
+  :caption: Pm bom
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT bom_code, id FROM pm_boms ORDER BY bom_code
+- :column: packing_specification_items.pm_mark_id
+  :caption: Pm mark
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT description, id FROM pm_marks ORDER BY description
+- :column: packing_specification_items.product_setup_id
+  :caption: Product setup
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT client_size_reference, id FROM product_setups ORDER BY client_size_reference
+- :column: packing_specification_items.tu_labour_product_id
+  :caption: Tu labour product
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT erp_code, id FROM pm_products ORDER BY erp_code
+- :column: packing_specification_items.ru_labour_product_id
+  :caption: Ru labour product
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT erp_code, id FROM pm_products ORDER BY erp_code

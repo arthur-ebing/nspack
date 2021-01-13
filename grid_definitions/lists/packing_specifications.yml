@@ -1,0 +1,35 @@
+---
+:dataminer_definition: packing_specifications
+:actions:
+- :url: "/production/packing_specifications/packing_specifications/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/packing_specifications/packing_specifications/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/production/packing_specifications/packing_specifications/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/list/packing_specification_items/with_params?key=packing_specification&id=$:id$&packing_specification=$:packing_specification_code$"
+  :text: items
+  :icon: list
+  :title: items
+- :separator: true
+- :url: "/development/statuses/list/packing_specifications/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/production/packing_specifications/packing_specifications/new"
+  :text: New Packing Specification
+  :style: :button
+  :behaviour: :popup
