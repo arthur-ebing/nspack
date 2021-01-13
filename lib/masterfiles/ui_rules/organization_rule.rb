@@ -7,7 +7,7 @@ module UiRules
       make_form_object
       apply_form_values
 
-      common_values_for_fields common_fields if %i[new edit].include?(@mode)
+      common_values_for_fields common_fields
 
       set_show_fields if @mode == :show
 
@@ -24,18 +24,18 @@ module UiRules
       fields[:variant_codes] = { renderer: :list,
                                  caption: 'Variant Codes',
                                  items: @form_object.variant_codes,
-                                 hide_on_load: @form_object.variant_codes.empty? }
+                                 hide_on_load: @form_object.variant_codes&.empty? }
       fields[:short_description] = { renderer: :label }
       fields[:long_description] = { renderer: :label }
       fields[:vat_number] = { renderer: :label }
       fields[:company_reg_no] = { renderer: :label }
       fields[:specialised_role_names] = { renderer: :list,
                                           items: @form_object.specialised_role_names,
-                                          hide_on_load: @form_object.specialised_role_names.empty?,
+                                          hide_on_load: @form_object.specialised_role_names&.empty?,
                                           caption: 'Specialised Roles' }
       fields[:role_names] = { renderer: :list,
                               caption: 'Roles',
-                              hide_on_load: @form_object.role_names.empty?,
+                              hide_on_load: @form_object.role_names&.empty?,
                               items: @form_object.role_names }
       # fields[:active] = { renderer: :label, as_boolean: true }
     end
