@@ -19,8 +19,11 @@ module ProductionApp
     attribute :ri_labour_product_id, Types::Integer
     attribute :ri_labour_product, Types::String
     attribute :fruit_sticker_ids, Types::Array
+    attribute :fruit_stickers, Types::Array
     attribute :tu_sticker_ids, Types::Array
+    attribute :tu_stickers, Types::Array
     attribute :ru_sticker_ids, Types::Array
+    attribute :ru_stickers, Types::Array
     attribute? :status, Types::Bool
     attribute? :active, Types::Bool
   end
