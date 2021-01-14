@@ -235,22 +235,6 @@ module ProductionApp
       DB[Sequel.function(:fn_product_setup_template_in_production, id)].single_value
     end
 
-    def disable_cultivar_fields(product_setup_template_id)
-      referenced_by_closed_or_inspected_runs?(product_setup_template_id)
-    end
-
-    def referenced_by_closed_or_inspected_runs?(_id)
-      # query = <<~SQL
-      #   SELECT EXISTS(
-      #     SELECT id from production_runs WHERE product_setup_template_id = ? AND is_closed
-      #     UNION ALL
-      #     SELECT id from production_runs WHERE product_setup_template_id = ? AND govt_inspection_id IS NOT NULL
-      #   )
-      # SQL
-      # DB[query, id].single_value
-      false
-    end
-
     def invalidates_any_product_setups_marketing_varieties?(template_name, where_clause)
       query = <<~SQL
         SELECT EXISTS(

@@ -1,17 +1,14 @@
-# rubocop:disable Metrics/CyclomaticComplexity
 # frozen_string_literal: true
 
 module UiRules
   class ProductSetupTemplateRule < Base # rubocop:disable Metrics/ClassLength
-    def generate_rules  # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+    def generate_rules  # rubocop:disable Metrics/AbcSize
       @repo = ProductionApp::ProductSetupRepo.new
       make_form_object
       apply_form_values
 
-      disable_cultivar_fields = disable_cultivar_fields(@options[:id]) if %i[edit clone].include? @mode
       common_values_for_fields common_fields
       set_clone_fields if %i[clone].include? @mode
-      set_disable_cultivar_fields if disable_cultivar_fields
 
       set_show_fields if %i[show reopen].include? @mode
       set_manage_template_setups if @mode == :manage
@@ -97,13 +94,6 @@ module UiRules
       fields[:cultivar_group_code] = { renderer: :label, with_value: @form_object[:cultivar_group_code], caption: 'Cultivar Group' }
     end
 
-    def set_disable_cultivar_fields
-      fields[:cultivar_group_id] = { renderer: :hidden, value: @form_object[:cultivar_group_id] }
-      fields[:cultivar_group_code] = { renderer: :label, with_value: @form_object[:cultivar_group_code], caption: 'Cultivar Group' }
-      fields[:cultivar_id] = { renderer: :hidden, value: @form_object[:cultivar_id] }
-      fields[:cultivar_name] = { renderer: :label, with_value: @form_object[:cultivar_name], caption: 'Cultivar' }
-    end
-
     def set_manage_template_setups
       compact_header(columns: %i[template_name description cultivar_group_code cultivar_name
                                  packhouse_resource_code production_line_code
@@ -173,10 +163,5 @@ module UiRules
                                   notify: [{ url: '/production/product_setups/product_setup_templates/season_group_changed' }]
       end
     end
-
-    def disable_cultivar_fields(product_setup_template_id)
-      @repo.disable_cultivar_fields(product_setup_template_id)
-    end
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity
