@@ -1168,10 +1168,6 @@ module ProductionApp
       MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
     end
 
-    def for_select_fruitspec_pm_marks(mark_id)
-      MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(where: { mark_id: mark_id })
-    end
-
     def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)
       pm_bom_products = MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom_id)
       add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) unless pm_mark_id.nil_or_empty?

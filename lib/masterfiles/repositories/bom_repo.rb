@@ -175,6 +175,8 @@ module MasterfilesApp
     end
 
     def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
+      return [] if commodity_id.nil? || std_fruit_size_count_id.nil? || basic_pack_code_id.nil?
+
       commodity_code = DB[:commodities].where(id: commodity_id).get(:code)
       size_count = DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).get(:size_count_value)
 

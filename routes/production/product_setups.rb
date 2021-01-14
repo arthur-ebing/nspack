@@ -472,11 +472,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'mark_changed' do
-        pm_marks = if params[:changed_value].blank?
-                     []
-                   else
-                     interactor.for_select_fruitspec_pm_marks(params[:changed_value])
-                   end
+        pm_marks = MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(where: { mark_id: params[:changed_value] })
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_pm_mark_id',
                                      options_array: pm_marks)])
@@ -497,3 +493,4 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

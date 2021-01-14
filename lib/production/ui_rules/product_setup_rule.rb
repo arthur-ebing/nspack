@@ -4,6 +4,7 @@ module UiRules
   class ProductSetupRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = ProductionApp::ProductSetupRepo.new
+      @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -24,11 +25,11 @@ module UiRules
       product_setup_template_id_label = @repo.find_hash(:product_setup_templates, @form_object.product_setup_template_id)[:template_name]
       marketing_variety_id_label = @repo.find_hash(:marketing_varieties, @form_object.marketing_variety_id)[:marketing_variety_code]
       customer_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_id)&.variety_as_customer_variety
-      std_fruit_size_count_id_label = MasterfilesApp::FruitSizeRepo.new.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
+      std_fruit_size_count_id_label = @fruit_size_repo.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
       basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
       standard_pack_code_id_label = @repo.find_hash(:standard_pack_codes, @form_object.standard_pack_code_id)[:standard_pack_code]
-      fruit_actual_counts_for_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
-      fruit_size_reference_id_label = MasterfilesApp::FruitSizeRepo.new.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
+      fruit_actual_counts_for_pack_id_label = @fruit_size_repo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
+      fruit_size_reference_id_label = @fruit_size_repo.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
       marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
       target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)&.target_market_name
@@ -53,18 +54,18 @@ module UiRules
       fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
       fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
-      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code', hide_on_load: @rules[:hide_some_fields] ? true : false }
+      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code', hide_on_load: @rules[:hide_some_fields] }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
       fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org Party Role' }
       fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed TM Group' }
       fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
-      fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark', hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark', hide_on_load: !@rules[:require_packaging_bom] }
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
       fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', hide_on_load: !@rules[:require_packaging_bom] }
       fields[:extended_columns] = { renderer: :label }
       fields[:client_size_reference] = { renderer: :label }
       fields[:client_product_code] = { renderer: :label }
@@ -72,16 +73,15 @@ module UiRules
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_label_name] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments', hide_on_load: @rules[:hide_some_fields] ? true : false  }
+      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments', hide_on_load: @rules[:hide_some_fields]  }
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
       fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
-      fields[:description] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
-      fields[:erp_bom_code] = { renderer: :label, hide_on_load: @rules[:require_packaging_bom] ? false : true }
+      fields[:description] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
+      fields[:erp_bom_code] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] = { renderer: :label }
-      fields[:gtin_code] = { renderer: :label,
-                             hide_on_load: !@rules[:gtins_required] ? true : false }
+      fields[:gtin_code] = { renderer: :label, hide_on_load: !@rules[:gtins_required] }
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
@@ -92,7 +92,7 @@ module UiRules
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id = product_setup_template&.cultivar_id
       cultivar_id_label = product_setup_template&.cultivar_name
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
@@ -115,40 +115,42 @@ module UiRules
                                 searchable: true,
                                 remove_search_for_small_list: false },
         std_fruit_size_count_id: { renderer: :select,
-                                   options: MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
-                                   disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_std_fruit_size_counts,
+                                   options: @fruit_size_repo.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
+                                   disabled_options: @fruit_size_repo.for_select_inactive_std_fruit_size_counts,
                                    caption: 'Std Size Count',
                                    prompt: 'Select Size Count',
                                    searchable: true,
                                    remove_search_for_small_list: false },
         basic_pack_code_id: { renderer: :select,
-                              options: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes,
-                              disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_basic_pack_codes,
+                              options: @fruit_size_repo.for_select_basic_pack_codes,
+                              disabled_options: @fruit_size_repo.for_select_inactive_basic_pack_codes,
                               caption: 'Basic Pack',
                               required: true,
                               prompt: 'Select Basic Pack',
                               searchable: true,
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
-                                 options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
-                                 disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
+                                 options: @fruit_size_repo.for_select_standard_pack_codes,
+                                 disabled_options: @fruit_size_repo.for_select_inactive_standard_pack_codes,
                                  caption: 'Standard Pack',
                                  required: true,
                                  prompt: 'Select Standard Pack',
                                  searchable: true,
                                  remove_search_for_small_list: false,
-                                 hide_on_load: @rules[:hide_some_fields] ? true : false },
+                                 hide_on_load: @rules[:hide_some_fields] },
         fruit_actual_counts_for_pack_id: { renderer: :select,
-                                           options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
-                                                                                                                                        std_fruit_size_count_id: @form_object.std_fruit_size_count_id }),
-                                           disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_actual_counts_for_packs,
+                                           options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs(
+                                             where: { basic_pack_code_id: @form_object.basic_pack_code_id,
+                                                      std_fruit_size_count_id: @form_object.std_fruit_size_count_id }
+                                           ),
+                                           disabled_options: @fruit_size_repo.for_select_inactive_fruit_actual_counts_for_packs,
                                            caption: 'Actual Count',
                                            prompt: 'Select Actual Count',
                                            searchable: true,
                                            remove_search_for_small_list: false },
         fruit_size_reference_id: { renderer: :select,
-                                   options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references,
-                                   disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_size_references,
+                                   options: @fruit_size_repo.for_select_fruit_size_references,
+                                   disabled_options: @fruit_size_repo.for_select_inactive_fruit_size_references,
                                    caption: 'Size Reference',
                                    prompt: 'Select Size Reference',
                                    searchable: true,
@@ -178,7 +180,9 @@ module UiRules
                               searchable: true,
                               remove_search_for_small_list: false },
         target_market_id: { renderer: :select,
-                            options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: @form_object.packed_tm_group_id }),
+                            options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(
+                              where: { target_market_group_id: @form_object.packed_tm_group_id }
+                            ),
                             disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
                             caption: 'Target Market',
                             prompt: 'Select Target Market',
@@ -194,13 +198,15 @@ module UiRules
                    searchable: true,
                    remove_search_for_small_list: false },
         pm_mark_id: { renderer: :select,
-                      options: pm_marks,
+                      options: MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(
+                        where: { mark_id: @form_object.mark_id }
+                      ),
                       disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
                       caption: 'PM Mark',
                       prompt: 'Select PM Mark',
                       searchable: true,
                       remove_search_for_small_list: false,
-                      hide_on_load: @rules[:require_packaging_bom] ? false : true },
+                      hide_on_load: !@rules[:require_packaging_bom] },
         product_chars: {},
         inventory_code_id: { renderer: :select,
                              options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
@@ -211,7 +217,10 @@ module UiRules
                              remove_search_for_small_list: false,
                              required: true },
         customer_variety_id: { renderer: :select,
-                               options: MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: @form_object.packed_tm_group_id, marketing_variety_id: @form_object.marketing_variety_id }),
+                               options: MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(
+                                 where: { packed_tm_group_id: @form_object.packed_tm_group_id,
+                                          marketing_variety_id: @form_object.marketing_variety_id }
+                               ),
                                disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
                                caption: 'Customer Variety',
                                prompt: 'Select Customer Variety',
@@ -242,7 +251,9 @@ module UiRules
                             searchable: true,
                             remove_search_for_small_list: false },
         pallet_label_name: { renderer: :select,
-                             options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_PALLET }),
+                             options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(
+                               where: { application: AppConst::PRINT_APP_PALLET }
+                             ),
                              caption: 'Pallet Label Name',
                              prompt: 'Select Pallet Label Name',
                              searchable: true,
@@ -256,26 +267,28 @@ module UiRules
                                  searchable: true,
                                  remove_search_for_small_list: false },
         pm_bom_id: { renderer: :select,
-                     options: pm_boms,
+                     options: MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(
+                       @form_object.commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id
+                     ),
                      disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_boms,
                      caption: 'PM BOM',
                      prompt: 'Select PM BOM',
                      searchable: true,
                      remove_search_for_small_list: false,
-                     hide_on_load: @rules[:require_packaging_bom] ? false : true },
+                     hide_on_load: !@rules[:require_packaging_bom] },
         description: { readonly: true,
-                       hide_on_load: @rules[:require_packaging_bom] ? false : true },
+                       hide_on_load: !@rules[:require_packaging_bom] },
         erp_bom_code: { readonly: true,
-                        hide_on_load: @rules[:require_packaging_bom] ? false : true },
+                        hide_on_load: !@rules[:require_packaging_bom] },
         active: { renderer: :checkbox },
         # extended_columns: {},
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
                          caption: 'Treatments',
-                         hide_on_load: @rules[:hide_some_fields] ? true : false },
+                         hide_on_load: @rules[:hide_some_fields] },
         gtin_code: { renderer: :label,
-                     hide_on_load: !@rules[:gtins_required] ? true : false }
+                     hide_on_load: !@rules[:gtins_required] }
       }
     end
 
@@ -325,7 +338,7 @@ module UiRules
     private
 
     def add_behaviours
-      behaviours do |behaviour|
+      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
         behaviour.dropdown_change :commodity_id,
                                   notify: [{ url: '/production/product_setups/product_setups/commodity_changed',
                                              param_keys: %i[product_setup_product_setup_template_id] }]

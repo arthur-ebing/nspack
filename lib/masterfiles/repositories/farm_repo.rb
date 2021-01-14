@@ -199,6 +199,8 @@ module MasterfilesApp
     end
 
     def selected_farm_orchard_codes(farm_id, puc_id)
+      return [] if farm_id.nil? || puc_id.nil?
+
       DB[:orchards]
         .where(farm_id: farm_id)
         .where(puc_id: puc_id)

@@ -132,14 +132,10 @@ module UiRules
           caption: 'Puc',
           required: true
         }
-        orchards = if @form_object.farm_id.nil_or_empty? || @form_object.puc_id.nil_or_empty?
-                     []
-                   else
-                     @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id)
-                   end
+
         orchard_renderer = {
           renderer: :select,
-          options: orchards,
+          options: @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id),
           disabled_options: @farm_repo.for_select_inactive_orchards,
           caption: 'Orchard'
         }

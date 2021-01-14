@@ -173,11 +173,11 @@ module MasterfilesApp
         ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
 
-    def for_select_customer_varieties(where: nil) # rubocop:disable Metrics/AbcSize
+    def for_select_customer_varieties(where: nil)
       ds = DB[:marketing_varieties]
            .join(:customer_varieties, variety_as_customer_variety_id: :id)
            .join(:customer_variety_varieties, customer_variety_id: :id)
-           .distinct(Sequel[:marketing_varieties][:id])
+           .distinct(:marketing_variety_code)
            .order(:marketing_variety_code)
       ds = ds.where(where) unless where.nil?
       ds.select(
