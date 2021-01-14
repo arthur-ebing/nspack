@@ -17,11 +17,13 @@ module Production
               form.action "/production/packing_specifications/packing_specification_items/#{id}"
               form.remote!
               form.method :update
-              form.add_field :packing_specification_id
+              form.add_field :packing_specification_code
+              form.add_field :product_setup
               form.add_field :description
+              form.add_field :packing_specification_id
+              form.add_field :product_setup_id
               form.add_field :pm_bom_id
               form.add_field :pm_mark_id
-              form.add_field :product_setup_id
               form.add_field :tu_labour_product_id
               form.add_field :ru_labour_product_id
               form.add_field :ri_labour_product_id

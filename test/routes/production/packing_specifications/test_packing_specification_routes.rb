@@ -95,7 +95,7 @@ class TestPackingSpecificationRoutes < RouteTester
     row_vals = Hash.new(1)
     INTERACTOR.any_instance.stubs(:create_packing_specification).returns(ok_response(instance: row_vals))
     post_as_fetch 'production/packing_specifications/packing_specifications', {}, 'rack.session' => { user_id: 1, last_grid_url: DEFAULT_LAST_GRID_URL }
-    expect_json_add_to_grid(has_notice: true)
+    expect_ok_json_redirect
   end
 
   def test_create_remotely_fail

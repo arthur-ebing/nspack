@@ -2,20 +2,12 @@
 
 module ProductionApp
   class PackingSpecificationItemInteractor < BaseInteractor
-    def create_packing_specification_item(params) # rubocop:disable Metrics/AbcSize
-      res = validate_packing_specification_item_params(params)
-      return validation_failed_response(res) if res.failure?
-
-      id = nil
+    def refresh_packing_specification_items
       repo.transaction do
-        id = repo.create_packing_specification_item(res)
-        log_status(:packing_specification_items, id, 'CREATED')
+        repo.refresh_packing_specification_items(@user)
         log_transaction
       end
-      instance = packing_specification_item(id)
-      success_response("Created packing specification item #{instance.description}", instance)
-    rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This packing specification item already exists'] }))
+      success_response('Created packing specification items')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

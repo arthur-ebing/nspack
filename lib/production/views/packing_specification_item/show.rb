@@ -13,11 +13,11 @@ module Production
             page.form do |form|
               # form.caption 'Packing Specification Item'
               form.view_only!
-              form.add_field :packing_specification
+              form.add_field :packing_specification_code
+              form.add_field :product_setup
               form.add_field :description
               form.add_field :pm_bom
               form.add_field :pm_mark
-              form.add_field :product_setup
               form.add_field :tu_labour_product
               form.add_field :ru_labour_product
               form.add_field :ri_labour_product

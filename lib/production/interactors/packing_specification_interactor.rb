@@ -10,6 +10,8 @@ module ProductionApp
       repo.transaction do
         id = repo.create_packing_specification(res)
         log_status(:packing_specifications, id, 'CREATED')
+
+        repo.refresh_packing_specification_items(@user)
         log_transaction
       end
       instance = packing_specification(id)
@@ -37,6 +39,12 @@ module ProductionApp
     def delete_packing_specification(id) # rubocop:disable Metrics/AbcSize
       name = packing_specification(id).packing_specification_code
       repo.transaction do
+        item_ids = repo.select_values(:packing_specification_items, :id, packing_specification_id: id)
+        item_ids.each do |item_id|
+          item_id = repo.delete_packing_specification_item(item_id)
+          log_status(:packing_specification_items, item_id, 'DELETED')
+        end
+
         repo.delete_packing_specification(id)
         log_status(:packing_specifications, id, 'DELETED')
         log_transaction

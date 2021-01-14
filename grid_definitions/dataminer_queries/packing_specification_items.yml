@@ -1,12 +1,12 @@
 ---
 :caption: Packing Specification Items
 :sql: "SELECT\r\n    packing_specification_items.id,\r\n    packing_specification_items.packing_specification_id,\r\n
-  \   packing_specifications.packing_specification_code,\r\n    packing_specification_items.description,\r\n
-  \   packing_specification_items.pm_bom_id,\r\n    pm_boms.bom_code AS pm_bom,\r\n
-  \   packing_specification_items.pm_mark_id,\r\n    pm_marks.description AS pm_mark,\r\n
-  \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
-  AS product_setup,\r\n    packing_specification_items.tu_labour_product_id,\r\n    pm_products_tu.erp_code
-  AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
+  \   packing_specifications.packing_specification_code,\r\n    packing_specification_items.product_setup_id,\r\n
+  \   fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,\r\n
+  \   packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
+  \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
+  \   pm_marks.description AS pm_mark,\r\n    packing_specification_items.tu_labour_product_id,\r\n
+  \   pm_products_tu.erp_code AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
   \   pm_products_ru.erp_code AS ru_labour_product,\r\n    packing_specification_items.ri_labour_product_id,\r\n
   \   pm_products_ri.erp_code AS ri_labour_product,\r\n    packing_specification_items.fruit_sticker_ids,\r\n
   \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.fruit_sticker_ids)
@@ -19,8 +19,8 @@
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
   AS status\r\nFROM packing_specification_items\r\n         JOIN packing_specifications
   ON packing_specifications.id = packing_specification_items.packing_specification_id\r\n
-  \        JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
-  \        JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
+  \        LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
+  \        LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
   \        LEFT JOIN pm_products pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\n
   \        LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\n
   \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id"
@@ -76,89 +76,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  description:
-    :name: description
-    :sequence_no: 4
-    :caption: Description
-    :namespaced_name: packing_specification_items.description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_bom_id:
-    :name: pm_bom_id
-    :sequence_no: 5
-    :caption: PM BOM id
-    :namespaced_name: packing_specification_items.pm_bom_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_bom:
-    :name: pm_bom
-    :sequence_no: 6
-    :caption: PM BOM
-    :namespaced_name: pm_boms.bom_code
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: true
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_mark_id:
-    :name: pm_mark_id
-    :sequence_no: 7
-    :caption: PM Mark id
-    :namespaced_name: packing_specification_items.pm_mark_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  pm_mark:
-    :name: pm_mark
-    :sequence_no: 8
-    :caption: PM Mark
-    :namespaced_name: pm_marks.description
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   product_setup_id:
     :name: product_setup_id
-    :sequence_no: 9
+    :sequence_no: 4
     :caption: Product setup id
     :namespaced_name: packing_specification_items.product_setup_id
     :data_type: :integer
@@ -174,9 +94,89 @@
     :group_max: false
   product_setup:
     :name: product_setup
-    :sequence_no: 10
+    :sequence_no: 5
     :caption: Product setup
     :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  description:
+    :name: description
+    :sequence_no: 6
+    :caption: Description
+    :namespaced_name: packing_specification_items.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_id:
+    :name: pm_bom_id
+    :sequence_no: 7
+    :caption: PM BOM id
+    :namespaced_name: packing_specification_items.pm_bom_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom:
+    :name: pm_bom
+    :sequence_no: 8
+    :caption: PM BOM
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark_id:
+    :name: pm_mark_id
+    :sequence_no: 9
+    :caption: PM Mark id
+    :namespaced_name: packing_specification_items.pm_mark_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_mark:
+    :name: pm_mark
+    :sequence_no: 10
+    :caption: PM Mark
+    :namespaced_name: pm_marks.description
     :data_type: :string
     :width: 
     :format: 

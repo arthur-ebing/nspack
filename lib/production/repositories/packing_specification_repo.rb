@@ -54,8 +54,8 @@ module ProductionApp
           fn_current_status('packing_specification_items', packing_specification_items.id) AS status
         FROM packing_specification_items
         JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
-        JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id
-        JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id
+        LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id
+        LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id
         LEFT JOIN pm_products pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id
         LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id
         LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id
@@ -66,6 +66,28 @@ module ProductionApp
       return nil if hash.nil?
 
       PackingSpecificationItem.new(hash)
+    end
+
+    def refresh_packing_specification_items(user)
+      packing_specifications = select_values(:packing_specifications,
+                                             %i[id product_setup_template_id])
+      packing_specifications.each do |packing_specification_id, product_setup_template_id|
+        product_setup_ids = select_values(:product_setups,
+                                          :id,
+                                          { product_setup_template_id: product_setup_template_id })
+        existing_ids = select_values(:packing_specification_items,
+                                     :product_setup_id,
+                                     { packing_specification_id: packing_specification_id })
+        (product_setup_ids - existing_ids).each do |product_setup_id|
+          item_id = create_packing_specification_item(
+            packing_specification_id: packing_specification_id,
+            product_setup_id: product_setup_id,
+            pm_bom_id: get(:product_setups, product_setup_id, :pm_bom_id),
+            pm_mark_id: get(:product_setups, product_setup_id, :pm_mark_id)
+          )
+          log_status(:packing_specification_items, item_id, 'CREATED', user_name: user.user_name)
+        end
+      end
     end
   end
 end
