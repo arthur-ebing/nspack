@@ -125,14 +125,9 @@ module UiRules
           prompt: true,
           required: true
         }
-        pucs = if @form_object.farm_id.nil_or_empty?
-                 []
-               else
-                 @farm_repo.selected_farm_pucs(@form_object.farm_id)
-               end
         puc_renderer = {
           renderer: :select,
-          options: pucs,
+          options: @farm_repo.selected_farm_pucs(where: { farm_id: @form_object.farm_id }),
           disabled_options: @farm_repo.for_select_inactive_pucs,
           caption: 'Puc',
           required: true

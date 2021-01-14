@@ -11,8 +11,6 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
 
-      # add_behaviours if @options[:id]
-
       form_name 'farm'
     end
 
@@ -26,13 +24,13 @@ module UiRules
                                        caption: 'Farm Owner' }
       fields[:pdn_region_id] = { renderer: :label,
                                  with_value: pdn_region_id_label,
-                                 caption: 'Pdn Region' }
+                                 caption: 'PDN Region' }
       fields[:farm_group_id] = { renderer: :label,
                                  with_value: farm_group_id_label,
                                  caption: 'Farm Group' }
       fields[:puc_id] = { renderer: :label,
                           with_value: puc_id_label,
-                          caption: 'Primary Puc' }
+                          caption: 'Primary PUC' }
       fields[:farm_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -41,18 +39,13 @@ module UiRules
     end
 
     def common_fields
-      farm_pucs = @options[:id] ? @repo.selected_farm_pucs(@options[:id]) : @repo.select_unallocated_pucs
-      puc_renderer = if @mode == :new
-                       { renderer: :select,
-                         options: farm_pucs,
-                         disabled_options: @repo.for_select_inactive_pucs,
-                         caption: 'Primary Puc',
-                         required: true }
-                     else
-                       { renderer: :label,
-                         with_value: farm_pucs.first.first,
-                         caption: 'Primary Puc' }
-                     end
+      farm_pucs = @options[:id] ? @repo.selected_farm_pucs(where: { farm_id: @options[:id] }) : @repo.select_unallocated_pucs
+      puc_renderer = { renderer: @mode == :new ? :select : :label,
+                       options: farm_pucs,
+                       disabled_options: @repo.for_select_inactive_pucs,
+                       caption: 'Primary PUC',
+                       with_value: farm_pucs.first.first,
+                       required: true }
       {
         owner_party_role_id: { renderer: :select,
                                options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_FARM_OWNER),
@@ -91,6 +84,8 @@ module UiRules
                                     active: true,
                                     puc_id: nil)
     end
+
+    private
 
     def add_behaviours
       behaviours do |behaviour|

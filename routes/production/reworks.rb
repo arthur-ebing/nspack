@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/BlockLength
-
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'reworks', 'production' do |r|
     # REWORKS RUNS
@@ -688,12 +687,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'packed_tm_group_changed' do
-        target_markets = if params[:changed_value].blank?
-                           []
-                         else
-                           MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(params[:changed_value])
-                         end
-
+        target_markets = MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: params[:changed_value] })
         if params[:changed_value].blank? || params[:reworks_run_sequence_marketing_variety_id].blank?
           customer_varieties = []
         else

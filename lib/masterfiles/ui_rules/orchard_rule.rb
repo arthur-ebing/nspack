@@ -37,7 +37,7 @@ module UiRules
         farm: { renderer: :label, with_value: farm_id_label, caption: 'Farm', readonly: true },
         farm_id: { renderer: :hidden, value: farm_id },
         puc_id: { renderer: :select,
-                  options: @repo.selected_farm_pucs(farm_id),
+                  options: @repo.selected_farm_pucs(where: { farm_id: farm_id }),
                   disabled_options: @repo.for_select_inactive_pucs,
                   caption: 'Puc',
                   required: true },

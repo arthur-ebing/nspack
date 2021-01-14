@@ -476,7 +476,7 @@ module ProductionApp
       instance = { pucs: [], orchards: [], cultivar_groups: [], cultivars: [], seasons: [] }
       return success_response('ok', instance) if res[:changed_value].nil?
 
-      instance[:pucs] = farm_repo.selected_farm_pucs(res[:changed_value])
+      instance[:pucs] = farm_repo.selected_farm_pucs(where: { farm_id: res[:changed_value] })
 
       success_response('ok', instance)
     end

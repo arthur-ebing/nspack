@@ -13,7 +13,7 @@ module MasterfilesApp
                      label: :surname,
                      value: :id,
                      order_by: :surname
-    def for_select_roles(active = true, where: nil)
+    def for_select_roles(where: nil, active: true)
       ds = DB[:roles].where(active: active, specialised: false)
       ds = ds.where(where) unless where.nil?
       ds.order(:name).select_map(%i[name id])

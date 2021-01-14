@@ -243,10 +243,10 @@ module MasterfilesApp
         FROM pm_subtypes
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
-        WHERE pm_composition_levels.composition_level != #{fruit_composition_level}
-        ORDER BY 1
+        WHERE pm_composition_levels.composition_level != ?
+
       SQL
-      DB[query]
+      DB[query, fruit_composition_level]
         .select_map(%i[subtype id])
     end
 
@@ -506,10 +506,10 @@ module MasterfilesApp
         .get(:id)
     end
 
-    def for_select_fruitspec_pm_marks(mark_id)
-      DB["SELECT id, packaging_marks
-          FROM pm_marks
-          WHERE mark_id = #{mark_id}"].map { |r| [r[:packaging_marks], r[:id]] }
+    def for_select_fruitspec_pm_marks(where: nil)
+      ds = DB[:pm_marks].order(:packaging_marks)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[packaging_marks id])
     end
 
     def subtype_composition_level(pm_subtype_id)

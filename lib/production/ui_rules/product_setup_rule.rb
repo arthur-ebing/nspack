@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/CyclomaticComplexity
-# rubocop:disable Metrics/PerceivedComplexity
 # frozen_string_literal: true
 
 module UiRules
@@ -15,7 +13,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       add_behaviours if %i[new edit].include? @mode
 
@@ -59,7 +57,7 @@ module UiRules
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
       fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org Party Role' }
-      fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed Tm Group' }
+      fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed TM Group' }
       fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
       fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark', hide_on_load: @rules[:require_packaging_bom] ? false : true }
@@ -96,37 +94,6 @@ module UiRules
       cultivar_id_label = product_setup_template&.cultivar_name
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
-
-      customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
-                             []
-                           else
-                             MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
-                           end
-
-      target_markets = if @form_object.packed_tm_group_id.nil_or_empty?
-                         []
-                       else
-                         MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(@form_object.packed_tm_group_id)
-                       end
-
-      pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
-                  []
-                else
-                  MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id)
-                end
-
-      actual_counts = if @form_object.basic_pack_code_id.nil_or_empty? || @form_object.std_fruit_size_count_id.nil_or_empty?
-                        []
-                      else
-                        MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
-                                                                                                            std_fruit_size_count_id: @form_object.std_fruit_size_count_id })
-                      end
-      pm_marks = if @form_object.mark_id.nil_or_empty?
-                   []
-                 else
-                   MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(@form_object.mark_id)
-                 end
-
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
         product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
@@ -172,7 +139,8 @@ module UiRules
                                  remove_search_for_small_list: false,
                                  hide_on_load: @rules[:hide_some_fields] ? true : false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
-                                           options: actual_counts,
+                                           options: MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
+                                                                                                                                        std_fruit_size_count_id: @form_object.std_fruit_size_count_id }),
                                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_fruit_actual_counts_for_packs,
                                            caption: 'Actual Count',
                                            prompt: 'Select Actual Count',
@@ -210,7 +178,7 @@ module UiRules
                               searchable: true,
                               remove_search_for_small_list: false },
         target_market_id: { renderer: :select,
-                            options: target_markets,
+                            options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: @form_object.packed_tm_group_id }),
                             disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
                             caption: 'Target Market',
                             prompt: 'Select Target Market',
@@ -243,7 +211,7 @@ module UiRules
                              remove_search_for_small_list: false,
                              required: true },
         customer_variety_id: { renderer: :select,
-                               options: customer_varieties,
+                               options: MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: @form_object.packed_tm_group_id, marketing_variety_id: @form_object.marketing_variety_id }),
                                disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
                                caption: 'Customer Variety',
                                prompt: 'Select Customer Variety',
@@ -357,7 +325,7 @@ module UiRules
     private
 
     def add_behaviours
-      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
+      behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
                                   notify: [{ url: '/production/product_setups/product_setups/commodity_changed',
                                              param_keys: %i[product_setup_product_setup_template_id] }]
@@ -393,5 +361,3 @@ module UiRules
     end
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/PerceivedComplexity

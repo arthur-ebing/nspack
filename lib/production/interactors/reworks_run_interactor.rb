@@ -1120,7 +1120,7 @@ module ProductionApp
     end
 
     def farm_pucs(farm_id)
-      MasterfilesApp::FarmRepo.new.selected_farm_pucs(farm_id)
+      MasterfilesApp::FarmRepo.new.selected_farm_pucs(where: { farm_id: farm_id })
     end
 
     def puc_orchards(farm_id, puc_id)
@@ -1147,7 +1147,7 @@ module ProductionApp
     end
 
     def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
-      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
+      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: packed_tm_group_id, marketing_variety_id: marketing_variety_id })
     end
 
     def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
@@ -1169,7 +1169,7 @@ module ProductionApp
     end
 
     def for_select_fruitspec_pm_marks(mark_id)
-      MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(mark_id)
+      MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(where: { mark_id: mark_id })
     end
 
     def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)

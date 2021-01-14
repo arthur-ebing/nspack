@@ -7,6 +7,7 @@ module UiRules
       @farm_repo = MasterfilesApp::FarmRepo.new
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
+      @fruit_repo = MasterfilesApp::FruitRepo.new
 
       make_form_object
       apply_form_values
@@ -57,11 +58,6 @@ module UiRules
 
     def set_pallet_sequence_fields  # rubocop:disable Metrics/AbcSize
       cultivar_group_id_label = @cultivar_repo.find_cultivar_group(@form_object.cultivar_group_id)&.cultivar_group_code
-      pucs = if @form_object.farm_id.nil_or_empty?
-               []
-             else
-               @farm_repo.selected_farm_pucs(@form_object.farm_id)
-             end
       orchards = if @form_object.farm_id.nil_or_empty? || @form_object.puc_id.nil_or_empty?
                    []
                  else
@@ -76,7 +72,7 @@ module UiRules
                            prompt: true,
                            required: true }
       fields[:puc_id] = { renderer: :select,
-                          options: pucs,
+                          options: @farm_repo.selected_farm_pucs(where: { farm_id: @form_object.farm_id }),
                           disabled_options: @farm_repo.for_select_inactive_pucs,
                           caption: 'Puc',
                           required: true }
@@ -101,23 +97,9 @@ module UiRules
 
     def edit_sequence_fields  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity,  Metrics/PerceivedComplexity
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      cultivar_group_id = @form_object[:cultivar_group_id]
-      cultivar_id = @form_object[:cultivar_id]
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(cultivar_group_id, cultivar_id) : @form_object[:commodity_id]
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? ProductionApp::ProductSetupRepo.new.commodity_id(@form_object.cultivar_group_id, @form_object.cultivar_id) : @form_object[:commodity_id]
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       default_pm_type_id = @form_object[:pm_type_id].nil_or_empty? ? MasterfilesApp::BomRepo.new.find_pm_type(DB[:pm_types].where(pm_type_code: AppConst::DEFAULT_FG_PACKAGING_TYPE).select_map(:id))&.id : @form_object[:pm_type_id]
-
-      customer_varieties = if @form_object.packed_tm_group_id.nil_or_empty? || @form_object.marketing_variety_id.nil_or_empty?
-                             []
-                           else
-                             MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(@form_object.packed_tm_group_id, @form_object.marketing_variety_id)
-                           end
-
-      target_markets = if @form_object.packed_tm_group_id.nil_or_empty?
-                         []
-                       else
-                         MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(@form_object.packed_tm_group_id)
-                       end
 
       pm_boms = if @form_object.std_fruit_size_count_id.nil_or_empty? || @form_object.basic_pack_code_id.nil_or_empty?
                   []
@@ -131,12 +113,6 @@ module UiRules
                         @fruit_size_repo.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: @form_object.basic_pack_code_id,
                                                                                            std_fruit_size_count_id: @form_object.std_fruit_size_count_id })
                       end
-
-      pm_marks = if @form_object.mark_id.nil_or_empty?
-                   []
-                 else
-                   MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(@form_object.mark_id)
-                 end
 
       fields[:pallet_number] =  { renderer: :label,
                                   with_value: @form_object[:pallet_number],
@@ -197,8 +173,8 @@ module UiRules
                                             searchable: true,
                                             remove_search_for_small_list: false }
       fields[:grade_id] =  { renderer: :select,
-                             options: MasterfilesApp::FruitRepo.new.for_select_grades,
-                             disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_grades,
+                             options: @fruit_repo.for_select_grades,
+                             disabled_options: @fruit_repo.for_select_inactive_grades,
                              caption: 'Grade',
                              required: true,
                              prompt: 'Select Grade',
@@ -221,7 +197,7 @@ module UiRules
                                        searchable: true,
                                        remove_search_for_small_list: false }
       fields[:target_market_id] = { renderer: :select,
-                                    options: target_markets,
+                                    options: MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: @form_object.packed_tm_group_id }),
                                     disabled_options: MasterfilesApp::TargetMarketRepo.new.for_select_inactive_target_markets,
                                     caption: 'Target Market',
                                     prompt: 'Select Target Market',
@@ -238,7 +214,7 @@ module UiRules
                             searchable: true,
                             remove_search_for_small_list: false }
       fields[:pm_mark_id] =  { renderer: :select,
-                               options: pm_marks,
+                               options: MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(where: { mark_id: @form_object.mark_id }),
                                disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
                                caption: 'PM Mark',
                                prompt: 'Select PM Mark',
@@ -247,15 +223,15 @@ module UiRules
                                hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:product_chars] =  {}
       fields[:inventory_code_id] =  { renderer: :select,
-                                      options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
-                                      disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_inventory_codes,
+                                      options: @fruit_repo.for_select_inventory_codes,
+                                      disabled_options: @fruit_repo.for_select_inactive_inventory_codes,
                                       caption: 'Inventory Code',
                                       prompt: 'Select Inventory Code',
                                       searchable: true,
                                       remove_search_for_small_list: false,
                                       required: true }
       fields[:customer_variety_id] =  { renderer: :select,
-                                        options: customer_varieties,
+                                        options: MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: @form_object.packed_tm_group_id, marketing_variety_id: @form_object.marketing_variety_id }),
                                         disabled_options: MasterfilesApp::MarketingRepo.new.for_select_inactive_customer_varieties,
                                         caption: 'Customer Variety',
                                         prompt: 'Select Customer Variety',
@@ -332,7 +308,7 @@ module UiRules
                                  hide_on_load: @rules[:require_packaging_bom] ? false : true }
       fields[:active] =  { renderer: :checkbox }
       fields[:treatment_ids] =  { renderer: :multi,
-                                  options: MasterfilesApp::FruitRepo.new.for_select_treatments,
+                                  options: @fruit_repo.for_select_treatments,
                                   selected: @form_object.treatment_ids,
                                   caption: 'Treatments',
                                   hide_on_load: @rules[:hide_some_fields] ? true : false }

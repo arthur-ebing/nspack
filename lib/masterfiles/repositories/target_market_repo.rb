@@ -116,15 +116,10 @@ module MasterfilesApp
       ds.select_map(%i[target_market_group_name id])
     end
 
-    def for_select_packed_group_tms(packed_tm_group_id)
-      DB[:target_markets]
-        .join(:target_markets_for_groups, target_market_id: :id)
-        .where(target_market_group_id: packed_tm_group_id)
-        .distinct(:target_market_id)
-        .select(
-          :target_market_id,
-          :target_market_name
-        ).map { |r| [r[:target_market_name], r[:target_market_id]] }
+    def for_select_packed_group_tms(where: nil)
+      ds = DB[:target_markets].join(:target_markets_for_groups, target_market_id: :id).distinct(:target_market_id)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[target_market_name target_market_id])
     end
 
     def find_tm_group_regions(id)

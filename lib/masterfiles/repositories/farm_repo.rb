@@ -214,8 +214,10 @@ module MasterfilesApp
         .select_map(%i[orchard_code id])
     end
 
-    def selected_farm_pucs(farm_id)
-      DB[:pucs].join(:farms_pucs, puc_id: :id).where(farm_id: farm_id).order(:puc_code).select_map(%i[puc_code puc_id])
+    def selected_farm_pucs(where: nil)
+      ds = DB[:pucs].join(:farms_pucs, puc_id: :id).order(:puc_code)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map(%i[puc_code puc_id])
     end
 
     def farm_primary_puc_id(farm_id)

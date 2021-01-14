@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'product_setups', 'production' do |r| # rubocop:disable Metrics/BlockLength
+  route 'product_setups', 'production' do |r|
     # PRODUCT SETUP TEMPLATES
     # --------------------------------------------------------------------------
-    r.on 'product_setup_templates', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'product_setup_templates', Integer do |id|
       interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -83,7 +84,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('product setups', 'read')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetupTemplate::Show.call(id) }
@@ -120,7 +121,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'product_setup_templates' do # rubocop:disable Metrics/BlockLength
+    r.on 'product_setup_templates' do
       interactor = ProductionApp::ProductSetupTemplateInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'cultivar_group_changed' do
@@ -220,7 +221,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PRODUCT SETUPS
     # --------------------------------------------------------------------------
-    r.on 'product_setups', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'product_setups', Integer do |id|
       interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -264,7 +265,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.redirect(back_button_url)
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('product setups', 'read')
           show_partial_or_page(r) { Production::ProductSetups::ProductSetup::Show.call(id, back_url: back_button_url) }
@@ -296,7 +297,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'product_setups' do # rubocop:disable Metrics/BlockLength
+    r.on 'product_setups' do
       interactor = ProductionApp::ProductSetupInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'commodity_changed' do
         commodity_id = params[:changed_value]
@@ -391,17 +392,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'packed_tm_group_changed' do
-        target_markets = if params[:changed_value].blank?
-                           []
-                         else
-                           MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(params[:changed_value])
-                         end
         if params[:changed_value].blank? || params[:product_setup_marketing_variety_id].blank?
           customer_varieties = []
         else
           packed_tm_group_id = params[:changed_value]
           marketing_variety_id = params[:product_setup_marketing_variety_id]
           customer_varieties = interactor.for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
+          target_markets = MasterfilesApp::TargetMarketRepo.new.for_select_packed_group_tms(where: { target_market_group_id: packed_tm_group_id })
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_customer_variety_id',

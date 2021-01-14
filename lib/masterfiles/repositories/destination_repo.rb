@@ -2,7 +2,7 @@
 
 module MasterfilesApp
   class DestinationRepo < BaseRepo
-    def for_select_destination_regions(active = true, where: nil)
+    def for_select_destination_regions(where: nil, active: true)
       ds = DB[:destination_regions].join(:destination_regions_tm_groups, destination_region_id: :id).distinct
       ds = ds.where(active: active)
       ds = ds.where(where) unless where.nil?
@@ -13,7 +13,7 @@ module MasterfilesApp
                           value: :id,
                           order_by: :destination_region_name
 
-    def for_select_destination_countries(active = true, where: nil)
+    def for_select_destination_countries(where: nil, active: true)
       ds = DB[:destination_countries].join(:destination_regions, id: :destination_region_id).distinct
       ds = ds.where(Sequel[:destination_countries][:active] => active)
       ds = ds.where(where) unless where.nil?

@@ -54,11 +54,7 @@ module MasterfilesApp
     end
 
     def selected_farm_pucs(farm_id)
-      repo.selected_farm_pucs(farm_id)
-    end
-
-    def farm_orchards(farm_id)
-      @repo.find_farm_orchard_codes(farm_id)
+      repo.selected_farm_pucs(where: { farm_id: farm_id })
     end
 
     private
