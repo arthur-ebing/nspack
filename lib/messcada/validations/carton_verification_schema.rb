@@ -30,16 +30,29 @@ module MesscadaApp
     required(:measurement_unit).filled(Types::StrippedString)
   end
 
-  CartonPalletizingScanSchema = Dry::Schema.Params do
+  CartonPalletizingScanIncentiveSchema = Dry::Schema.Params do
     required(:device).filled(Types::StrippedString)
     required(:reader_id).filled(Types::StrippedString)
     required(:identifier).filled(Types::StrippedString)
     required(:carton_number).filled(:integer)
   end
 
-  CartonPalletizingSchema = Dry::Schema.Params do
+  CartonPalletizingIncentiveSchema = Dry::Schema.Params do
     required(:device).filled(Types::StrippedString)
     required(:reader_id).filled(Types::StrippedString)
     required(:identifier).filled(Types::StrippedString)
+  end
+
+  CartonPalletizingScanSchema = Dry::Schema.Params do
+    required(:device).filled(Types::StrippedString)
+    required(:reader_id).filled(Types::StrippedString)
+    required(:identifier).maybe(Types::StrippedString)
+    required(:carton_number).filled(:integer)
+  end
+
+  CartonPalletizingSchema = Dry::Schema.Params do
+    required(:device).filled(Types::StrippedString)
+    required(:reader_id).filled(Types::StrippedString)
+    required(:identifier).maybe(Types::StrippedString)
   end
 end

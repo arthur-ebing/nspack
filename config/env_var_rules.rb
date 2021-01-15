@@ -133,7 +133,8 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { INSTALL_LOCATION: 'A maximum 7-character name for the location - required by EDI transformers' },
     { IN_TRANSIT_LOCATION: 'Long location code for pallets after shipped ' },
     { EDI_NETWORK_ADDRESS: 'Network address for sending EDI documents' },
-    { URL_BASE: 'Base URL for this website - in the format http://xxxx' }
+    { URL_BASE: 'Base URL for this website - in the format http://xxxx (where xxxx is an IP address or DNS name).' },
+    { URL_BASE_IP: 'Base URL IP address for this website - in the format http://999.999.999.999 (where 999.999.999.999 is an IP address).' }
   ].freeze
 
   def print

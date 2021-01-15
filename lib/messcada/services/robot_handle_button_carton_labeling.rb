@@ -16,6 +16,7 @@ module MesscadaApp
     def call # rubocop:disable Metrics/AbcSize
       params = { device: "#{robot.system_resource_code}-#{robot_params[:button]}", card_reader: '', identifier: robot_params[:id] }
       res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params, has_button: true)
+      # if not logged in or no active group, cannot print...
 
       if res.success
         cvl_res = nil
@@ -28,7 +29,7 @@ module MesscadaApp
         feedback = MesscadaApp::RobotFeedback.new(device: params[:device],
                                                   status: true,
                                                   short1: 'Label printed')
-        robot_interface.respond(feedback, true, type: :user)
+        robot_interface.respond(feedback, true)
       else
         feedback = MesscadaApp::RobotFeedback.new(device: robot.system_resource_code,
                                                   status: false,

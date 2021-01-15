@@ -771,9 +771,11 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   #
   # @param res [Crossbeams::Response] the response object.
   # @return [String] the formatted message.
-  def unwrap_failed_response(res)
+  def unwrap_failed_response(res) # rubocop:disable Metrics/AbcSize
     if res.errors.empty?
       CGI.escapeHTML(res.message)
+    elsif res.message == 'Validation error'
+      res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')
     else
       "#{CGI.escapeHTML(res.message)} - #{res.errors.map { |fld, errs| p "#{fld} #{errs.map { |e| CGI.escapeHTML(e.to_s) }.join(', ')}" }.join('; ')}"
     end

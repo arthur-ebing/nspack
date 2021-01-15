@@ -185,15 +185,10 @@ module MesscadaApp
       # 1. Disable incentive_group
       # 2. Clone incentive_group and remove contract_worker
       rec = find_hash(:group_incentives, group_incentive_id)
-      contract_worker_ids = remove_contract_worker_from_group(rec[:contract_worker_ids], contract_worker_id)
-      update_group_incentive(group_incentive_id, { active: false })
-      create_group_incentive({ system_resource_id: rec[:system_resource_id], contract_worker_ids: contract_worker_ids })
-    end
-
-    def remove_contract_worker_from_group(contract_worker_ids, contract_worker_id)
-      arr = Array(contract_worker_ids)
-      arr.delete(contract_worker_id)
-      arr
+      contract_worker_ids = Array(rec[:contract_worker_ids])
+      contract_worker_ids -= [contract_worker_id]
+      update_group_incentive(group_incentive_id, active: false)
+      create_group_incentive({ system_resource_id: rec[:system_resource_id], contract_worker_ids: contract_worker_ids }) unless contract_worker_ids.empty?
     end
 
     def contract_worker_personnel_number(contract_worker_id)

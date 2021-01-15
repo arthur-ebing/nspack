@@ -42,6 +42,22 @@ module MesscadaApp
       success_response("Module #{mes_module} is out of Bulk Registraion Mode", bulk_registration_mode: false)
     end
 
+    def change_resource_to_group_login_mode(params)
+      id = resource_repo.get(:system_resources, system_resource_code: params[:device])
+      return failed_response("Resource #{params[:device]} not found") if id.nil?
+
+      resource_repo.update_system_resource(id, group_incentive: true)
+      success_response('Changed to group login mode')
+    end
+
+    def change_resource_to_individual_login_mode(params)
+      id = resource_repo.get(:system_resources, system_resource_code: params[:device])
+      return failed_response("Resource #{params[:device]} not found") if id.nil?
+
+      resource_repo.update_system_resource(id, group_incentive: false, login: true)
+      success_response('Changed to individual login mode')
+    end
+
     def login(params) # rubocop:disable Metrics/AbcSize
       return ok_response unless params[:system_resource][:login]
 

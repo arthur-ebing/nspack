@@ -3,7 +3,7 @@
 module MesscadaApp
   class PalletizingInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def scan_carton(params) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      res = CartonPalletizingScanSchema.call(params)
+      res = validate_scan(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -64,7 +64,7 @@ module MesscadaApp
     end
 
     def return_to_bay(params) # rubocop:disable Metrics/AbcSize
-      res = CartonPalletizingSchema.call(params)
+      res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -89,7 +89,7 @@ module MesscadaApp
     end
 
     def refresh(params) # rubocop:disable Metrics/AbcSize
-      res = CartonPalletizingSchema.call(params)
+      res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -114,7 +114,7 @@ module MesscadaApp
     end
 
     def complete(params) # rubocop:disable Metrics/AbcSize
-      res = CartonPalletizingSchema.call(params)
+      res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -127,7 +127,7 @@ module MesscadaApp
 
       confirm = {
         confirm_text: "Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
+        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
         cancel_url: 'noop'
       }
 
@@ -175,7 +175,7 @@ module MesscadaApp
     end
 
     def complete_autopack_pallet(params) # rubocop:disable Metrics/AbcSize
-      res = CartonPalletizingSchema.call(params)
+      res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -188,7 +188,7 @@ module MesscadaApp
 
       confirm = {
         confirm_text: "Complete Autopack pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=true"),
+        confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=true"),
         cancel_url: 'noop'
       }
 
@@ -221,7 +221,7 @@ module MesscadaApp
     end
 
     def transfer_carton(params) # rubocop:disable Metrics/AbcSize
-      res = CartonPalletizingSchema.call(params)
+      res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 
       check_res = validate_params_input(params)
@@ -329,7 +329,7 @@ module MesscadaApp
         return failed_response("Carton of bay #{carton_bay_name}", current_bay_attributes(state_machine, { carton_number: carton_number }))
         # confirm = {
         #   confirm_text: "Carton of bay: #{carton_bay_name}.Transfer carton?",
-        #   confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/empty_bay_carton_transfer?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+        #   confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/empty_bay_carton_transfer?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
         #   cancel_url: 'noop'
         # }
         # repo.transaction do
@@ -380,7 +380,7 @@ module MesscadaApp
         carton_bay_name = palletizing_bay_attributes(repo.carton_palletizing_bay_state(carton_id))[:bay_name]
         confirm = {
           confirm_text: "Carton of bay: #{carton_bay_name}.Transfer carton?",
-          confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/transfer_carton?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
+          confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/transfer_carton?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}"),
           cancel_url: 'noop'
         }
         repo.transaction do
@@ -407,7 +407,7 @@ module MesscadaApp
 
           confirm = {
             confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-            confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
+            confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
             cancel_url: 'noop'
           }
         else
@@ -437,7 +437,7 @@ module MesscadaApp
       confirm = if last_carton
                   {
                     confirm_text: "Pallet size reached. Complete pallet #{current_bay_attributes(state_machine)[:pallet_number]}?",
-                    confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
+                    confirm_url: URI.encode_www_form_component("#{AppConst::URL_BASE_IP}/messcada/carton_palletizing/complete_pallet?device=#{params[:device]}&reader_id=#{params[:reader_id]}&identifier=#{params[:identifier]}&autopack=false"),
                     cancel_url: 'noop'
                   }
                 else
@@ -522,8 +522,10 @@ module MesscadaApp
       check_res = validate_device_exists(params[:device])
       return check_res unless check_res.success
 
-      check_res = validate_identifier_exists(params[:identifier])
-      return check_res unless check_res.success
+      if AppConst::CR_PROD.incentive_palletizing
+        check_res = validate_identifier_exists(params[:identifier])
+        return check_res unless check_res.success
+      end
 
       ok_response
     end
@@ -644,6 +646,22 @@ module MesscadaApp
 
     def carton_carton_label(carton_id)
       mesc_repo.carton_carton_label(carton_id).to_s
+    end
+
+    def validate_scan(params)
+      if AppConst::CR_PROD.incentive_palletizing
+        CartonPalletizingScanIncentiveSchema.call(params)
+      else
+        CartonPalletizingScanSchema.call(params)
+      end
+    end
+
+    def validate_button(params)
+      if AppConst::CR_PROD.incentive_palletizing
+        CartonPalletizingIncentiveSchema.call(params)
+      else
+        CartonPalletizingSchema.call(params)
+      end
     end
   end
 end
