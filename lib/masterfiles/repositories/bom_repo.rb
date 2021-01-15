@@ -246,7 +246,7 @@ module MasterfilesApp
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         WHERE pm_composition_levels.composition_level != ?
-
+        ORDER BY 1
       SQL
       DB[query, fruit_composition_level]
         .select_map(%i[subtype id])
