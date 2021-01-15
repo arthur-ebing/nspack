@@ -225,7 +225,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                                                 line1: 'Cannot login',
                                                 line4: res.message)
                end
-    respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
+    respond(feedback, res.success)
   end
 
   def publish_logoff # rubocop:disable Metrics/AbcSize
@@ -244,7 +244,7 @@ class JsonRobotInterface # rubocop:disable Metrics/ClassLength
                                                 line1: 'Cannot logout',
                                                 line4: res.message)
                end
-    respond(feedback, res.success, type: :user) # Which type to respond here must depend on the robot use.
+    respond(feedback, res.success)
   end
 
   def publish_status

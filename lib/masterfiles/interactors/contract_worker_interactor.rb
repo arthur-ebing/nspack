@@ -83,7 +83,8 @@ module MasterfilesApp
 
     def print_personnel_barcode(id, params)
       instance = contract_worker(id)
-      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PERSONNEL_BARCODE, instance, params)
+      ident = repo.get_value(:personnel_identifiers, :identifier, id: instance.personnel_identifier_id)
+      LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PERSONNEL_BARCODE, instance.to_h.merge(identifier: ident, personnel_name: "#{instance.first_name} #{instance.surname}"), params)
     end
 
     private

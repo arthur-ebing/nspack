@@ -4,6 +4,45 @@
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
   route 'hr', 'messcada' do |r|
     interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+    # CHANGE DEVICE TO GROUP LOGIN MODE
+    # --------------------------------------------------------------------------
+    r.on 'system_resource' do
+      r.on 'change_to_group_login' do
+        res = interactor.change_resource_to_group_login_mode(params)
+
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.message)
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot change to group mode',
+                                                    line4: res.message)
+                   end
+        Crossbeams::RobotResponder.new(feedback).render
+      end
+
+      # CHANGE DEVICE TO INDIVIDUAL LOGIN MODE
+      # --------------------------------------------------------------------------
+      r.on 'change_to_individual_login' do
+        res = interactor.change_resource_to_individual_login_mode(params)
+
+        feedback = if res.success
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: true,
+                                                    line1: res.message)
+                   else
+                     MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                    status: false,
+                                                    line1: 'Cannot change to individual mode',
+                                                    line4: res.message)
+                   end
+        Crossbeams::RobotResponder.new(feedback).render
+      end
+    end
+
     # REGISTER PERSONNEL IDENTIFIERS
     # --------------------------------------------------------------------------
     r.on 'register_id' do

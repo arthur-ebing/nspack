@@ -47,8 +47,8 @@ module MesscadaApp
 
     def bintip_criteria_passed? # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       run = ProductionApp::ProductionRunRepo.new.find_production_run_flat(run_id)
-      return failed_response("Bintiping Criteria Not Setup For Run:#{run_id}") unless run.legacy_bintip_criteria
-      return failed_response("Bintiping Legacy Data Not Setup For Run:#{run_id}") unless run.legacy_data
+      return failed_response("Bin Tipping Criteria Not Setup For Run:#{run_id}") unless run.legacy_bintip_criteria
+      return failed_response("Bin Tipping Legacy Data Not Setup For Run:#{run_id}") unless run.legacy_data
 
       res = repo.fetch_bin_from_external_system(bin_number)
       return res unless res.success

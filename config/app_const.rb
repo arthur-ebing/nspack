@@ -52,6 +52,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   IMPLEMENTATION_OWNER = ENV.fetch('IMPLEMENTATION_OWNER')
   SHOW_DB_NAME = ENV.fetch('DATABASE_URL').rpartition('@').last
   URL_BASE = ENV.fetch('URL_BASE')
+  URL_BASE_IP = ENV.fetch('URL_BASE_IP')
   APP_CAPTION = ENV.fetch('APP_CAPTION')
 
   # A struct that can be used to alter the client code while tests are running.
@@ -303,6 +304,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
 
   # MesServer
   LABEL_SERVER_URI = ENV.fetch('LABEL_SERVER_URI')
+  raise 'LABEL_SERVER_URI must end with a "/"' unless LABEL_SERVER_URI.end_with?('/')
+
   POST_FORM_BOUNDARY = 'AaB03x'
 
   # Labels

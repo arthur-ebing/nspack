@@ -66,7 +66,7 @@ module MesscadaApp
 
     def merge_incentive_group_incentive
       group_incentive_id = repo.active_group_incentive_id(sys_res.id)
-      return failed_response('There is no active group') if group_incentive_id.nil?
+      return failed_response('No active group') if group_incentive_id.nil?
 
       attrs = params.merge(system_resource: ProductionApp::SystemResourceWithIncentive.new(sys_res.to_h.merge(group_incentive_id: group_incentive_id)))
       success_response('ok', attrs)
