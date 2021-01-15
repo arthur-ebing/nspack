@@ -40,6 +40,7 @@ module Production
                   col.add_field :login
                   col.add_field :logoff
                   col.add_field :group_incentive
+                  col.add_field :legacy_messcada
                 end
               end
             end

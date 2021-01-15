@@ -35,6 +35,7 @@ module UiRules
         login: { renderer: :checkbox },
         logoff: { renderer: :checkbox },
         group_incentive: { renderer: :checkbox },
+        legacy_messcada: { renderer: :checkbox },
         module_action: { renderer: :select, options: Crossbeams::Config::ResourceDefinitions::MODULE_ACTIONS.keys },
         peripheral_model: { renderer: :select, options: peripheral_models },
         connection_type: { renderer: :select, options: connection_types },

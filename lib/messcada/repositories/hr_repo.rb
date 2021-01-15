@@ -76,22 +76,45 @@ module MesscadaApp
     end
 
     def logout_worker(contract_worker_id)
+      # 1. find the resource
+      system_resource_id = DB[:system_resource_logins].where(contract_worker_id: contract_worker_id, active: true).get(:system_resource_id)
+
+      # 2. Logout
       DB[:system_resource_logins]
         .where(contract_worker_id: contract_worker_id, active: true)
         .update(last_logout_at: Time.now,
                 from_external_system: false,
                 active: false)
+
+      logout_from_messcada(system_resource_id, contract_worker_id)
+
       ok_response
     end
 
     def logout_device(device)
+      # 1. find the logged-in worker idS
+      contract_worker_ids = DB[:system_resource_logins].where(system_resource_id: system_resource_id, active: true).select_map(:contract_worker_id)
+
+      # 2. Logout
       system_resource_id = DB[:system_resources].where(system_resource_code: device).get(:id)
       DB[:system_resource_logins]
         .where(system_resource_id: system_resource_id)
         .update(last_logout_at: Time.now,
                 from_external_system: false,
                 active: false)
+
+      contract_worker_ids.each do |contract_worker_id|
+        logout_from_messcada(system_resource_id, contract_worker_id)
+      end
+
       ok_response
+    end
+
+    def logout_from_messcada(system_resource_id, contract_worker_id)
+      opts = DB[:system_resources].where(id: system_resource_id).select(:system_resource_code, :ip_address, :legacy_messcada).first
+      return unless opts[:legacy_messcada]
+
+      Job::LogoutFromMesScadaRobot.enqueue(system_resource_id, opts[:system_resource_code], opts[:ip_address], contract_worker_id)
     end
 
     def active_system_resource_group_exists?(system_resource_id)
