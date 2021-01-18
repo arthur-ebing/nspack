@@ -1483,7 +1483,7 @@
   edi_size_count:
     :name: edi_size_count
     :sequence_no: 91
-    :caption: Edi size count
+    :caption: EDI size count
     :namespaced_name: edi_size_count
     :data_type: :string
     :width: 120

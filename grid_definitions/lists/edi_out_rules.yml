@@ -19,6 +19,6 @@
 :page_controls:
   - :control_type: :link
     :url: "/edi/config/edi_out_rules"
-    :text: New Edi Out Rule
+    :text: New EDI Out Rule
     :style: :button
     :behaviour: :popup

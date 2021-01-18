@@ -14,10 +14,9 @@ module EdiApp
         log_transaction
       end
       instance = edi_out_rule(id)
-      success_response('Created edi out rule',
-                       instance)
+      success_response('Created EDI out rule', instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { flow_type: ['This edi out rule already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { flow_type: ['This EDI out rule already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -33,8 +32,7 @@ module EdiApp
         log_transaction
       end
       instance = edi_out_rule(id)
-      success_response('Updated edi out rule',
-                       instance)
+      success_response('Updated EDI out rule', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -45,7 +43,7 @@ module EdiApp
         log_status(:edi_out_rules, id, 'DELETED')
         log_transaction
       end
-      success_response('Deleted edi out rule')
+      success_response('Deleted EDI out rule')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

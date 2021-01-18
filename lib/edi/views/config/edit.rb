@@ -13,7 +13,7 @@ module Edi
           page.form_values form_values
           page.form_errors form_errors
           page.form do |form|
-            form.caption 'Edit Edi Out Rule'
+            form.caption 'Edit EDI Out Rule'
             form.action "/edi/config/edi_out_rules/#{id}"
             form.remote!
             form.method :update

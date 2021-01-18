@@ -314,7 +314,7 @@ class BaseEdiOutService < BaseService # rubocop:disable Metrics/ClassLength
     end
   end
 
-  # Edi fields are placed into fixed-length records as strings. This module provides some shortcut formatting codes.
+  # EDI fields are placed into fixed-length records as strings. This module provides some shortcut formatting codes.
   # eg. +ZEROS+: left pads a field with zeroes up to the expected length.
   #
   # The format code is specified in the <tt>format=""</tt> attribute of the EDI in-transformer XML schema.

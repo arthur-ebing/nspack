@@ -92,7 +92,7 @@
   edi_in_pallet_base:
     :name: edi_in_pallet_base
     :sequence_no: 6
-    :caption: Edi in pallet base
+    :caption: EDI in pallet base
     :namespaced_name: pallet_bases.edi_in_pallet_base
     :data_type: :string
     :width: 
@@ -108,7 +108,7 @@
   edi_out_pallet_base:
     :name: edi_out_pallet_base
     :sequence_no: 7
-    :caption: Edi out pallet base
+    :caption: EDI out pallet base
     :namespaced_name: pallet_bases.edi_out_pallet_base
     :data_type: :string
     :width: 

@@ -1,5 +1,5 @@
 ---
-:caption: Edi In Transactions
+:caption: EDI In Transactions
 :sql: "SELECT\r\n    id,\r\n    flow_type,\r\n    file_name,\r\n    created_at,\r\n
   \   complete,\r\n    schema_valid,\r\n    valid,\r\n    reprocessed,\r\n    newer_edi_received,\r\n
   \   has_missing_master_files AS missing_master_files,\r\n    has_discrepancies AS

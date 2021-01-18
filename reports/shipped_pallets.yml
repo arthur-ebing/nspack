@@ -299,7 +299,7 @@
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
     :sequence_no: 18
-    :caption: Edi in consignment note number
+    :caption: EDI in consignment note number
     :namespaced_name: edi_in_consignment_note_number
     :data_type: :string
     :width: 

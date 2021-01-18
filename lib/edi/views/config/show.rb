@@ -11,7 +11,7 @@ module Edi
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Edi Out Rule'
+              # form.caption 'EDI Out Rule'
               form.view_only!
               form.add_field :flow_type
               form.add_field :depot_id

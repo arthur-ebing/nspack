@@ -497,7 +497,7 @@
   edi_file_name:
     :name: edi_file_name
     :sequence_no: 29
-    :caption: Edi file name
+    :caption: EDI file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
     :width: 150
@@ -721,7 +721,7 @@
   edi_out_transactions:
     :name: edi_out_transactions
     :sequence_no: 43
-    :caption: Edi out transactions
+    :caption: EDI out transactions
     :namespaced_name: 
     :data_type: :boolean
     :width: 110

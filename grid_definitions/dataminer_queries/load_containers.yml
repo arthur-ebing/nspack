@@ -339,7 +339,7 @@
   edi_file_name:
     :name: edi_file_name
     :sequence_no: 21
-    :caption: Edi file name
+    :caption: EDI file name
     :namespaced_name: loads.edi_file_name
     :data_type: :string
     :width: 

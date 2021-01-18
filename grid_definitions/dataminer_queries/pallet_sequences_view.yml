@@ -808,7 +808,7 @@
   edi_size_count:
     :name: edi_size_count
     :sequence_no: 45
-    :caption: Edi size count
+    :caption: EDI size count
     :namespaced_name: vw_pallet_sequences.edi_size_count
     :data_type: :string
     :width: 
@@ -2776,7 +2776,7 @@
   edi_in_file:
     :name: edi_in_file
     :sequence_no: 168
-    :caption: Edi in file
+    :caption: EDI in file
     :namespaced_name: vw_pallets.edi_in_file
     :data_type: :string
     :width: 
@@ -2792,7 +2792,7 @@
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
     :sequence_no: 169
-    :caption: Edi in consignment note number
+    :caption: EDI in consignment note number
     :namespaced_name: vw_pallets.edi_in_consignment_note_number
     :data_type: :string
     :width: 
@@ -2808,7 +2808,7 @@
   edi_in_inspection_point:
     :name: edi_in_inspection_point
     :sequence_no: 170
-    :caption: Edi in inspection point
+    :caption: EDI in inspection point
     :namespaced_name: vw_pallets.edi_in_inspection_point
     :data_type: :string
     :width: 
@@ -3448,7 +3448,7 @@
   edi_file_name:
     :name: edi_file_name
     :sequence_no: 210
-    :caption: Edi file name
+    :caption: EDI file name
     :namespaced_name: vw_loads.edi_file_name
     :data_type: :string
     :width: 

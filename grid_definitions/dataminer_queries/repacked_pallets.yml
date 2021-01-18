@@ -1256,7 +1256,7 @@
   edi_in_file:
     :name: edi_in_file
     :sequence_no: 77
-    :caption: Edi in file
+    :caption: EDI in file
     :namespaced_name: edi_in_file
     :data_type: :string
     :width: 120
@@ -1352,7 +1352,7 @@
   edi_size_count:
     :name: edi_size_count
     :sequence_no: 83
-    :caption: Edi size count
+    :caption: EDI size count
     :namespaced_name: edi_size_count
     :data_type: :string
     :width: 120

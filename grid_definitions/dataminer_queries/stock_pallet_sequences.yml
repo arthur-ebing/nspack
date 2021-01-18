@@ -1678,7 +1678,7 @@
   edi_in_file:
     :name: edi_in_file
     :sequence_no: 103
-    :caption: Edi in file
+    :caption: EDI in file
     :namespaced_name: edi_in_file
     :data_type: :string
     :width: 120
@@ -1694,7 +1694,7 @@
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
     :sequence_no: 104
-    :caption: Edi in consignment note number
+    :caption: EDI in consignment note number
     :namespaced_name: edi_in_consignment_note_number
     :data_type: :string
     :width: 120
@@ -1870,7 +1870,7 @@
   edi_size_count:
     :name: edi_size_count
     :sequence_no: 115
-    :caption: Edi size count
+    :caption: EDI size count
     :namespaced_name: edi_size_count
     :data_type: :string
     :width: 120
