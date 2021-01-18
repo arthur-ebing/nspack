@@ -133,9 +133,9 @@ module MasterfilesApp
         SELECT pm_products.*, pm_subtypes.subtype_code, pm_types.pm_type_code, basic_pack_codes.basic_pack_code,
         pm_composition_levels.composition_level
         FROM pm_products
-        JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
-        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+        LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
+        LEFT JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
+        LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         LEFT JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
         WHERE pm_products.id = #{id}
       SQL

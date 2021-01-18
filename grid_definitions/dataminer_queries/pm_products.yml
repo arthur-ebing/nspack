@@ -1,16 +1,16 @@
 ---
 :caption: PM Products
-:sql: "SELECT \"pm_products\".\"id\", \"pm_products\".\"pm_subtype_id\",  \"pm_products\".\"product_code\",
-  \"pm_products\".\"description\", \"pm_products\".\"erp_code\", \"pm_products\".\"created_at\",
-  \"pm_products\".\"updated_at\", \"pm_composition_levels\".\"composition_level\"
-  , \"pm_types\".\"pm_type_code\" , \"pm_subtypes\".\"subtype_code\" , \"basic_pack_codes\".\"basic_pack_code\",
-  \"pm_products\".\"material_mass\", \"pm_products\".\"height_mm\", \"pm_products\".\"gross_weight_per_unit\",
-  \"pm_products\".\"items_per_unit\", \"pm_products\".\"basic_pack_id\", \"pm_products\".\"active\"\r\nFROM
-  \"pm_products\" \r\nLEFT JOIN \"pm_subtypes\" ON \"pm_subtypes\".\"id\" = \"pm_products\".\"pm_subtype_id\"\r\nLEFT
-  JOIN \"pm_types\" ON \"pm_types\".\"id\" = \"pm_subtypes\".\"pm_type_id\"\r\nLEFT
-  JOIN \"pm_composition_levels\" ON \"pm_composition_levels\".\"id\" = \"pm_types\".\"pm_composition_level_id\"\r\nLEFT
-  JOIN \"basic_pack_codes\" ON \"basic_pack_codes\".\"id\" = \"pm_products\".\"basic_pack_id\"\r\nORDER
-  BY \"pm_products\".\"product_code\""
+:sql: "SELECT \r\n    pm_products.id,\r\n    pm_products.pm_subtype_id,\r\n    pm_products.product_code,\r\n
+  \   pm_products.description,\r\n    pm_products.erp_code,\r\n    pm_products.created_at,\r\n
+  \   pm_products.updated_at,\r\n    pm_composition_levels.composition_level,\r\n
+  \   pm_types.pm_type_code,\r\n    pm_subtypes.subtype_code,\r\n    basic_pack_codes.basic_pack_code,\r\n
+  \   pm_products.material_mass,\r\n    pm_products.height_mm,\r\n    pm_products.gross_weight_per_unit,\r\n
+  \   pm_products.items_per_unit,\r\n    pm_products.items_per_unit_client_description,\r\n
+  \   pm_products.basic_pack_id,\r\n    pm_products.active\r\nFROM pm_products\r\nLEFT
+  JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id\r\nLEFT JOIN pm_types
+  ON pm_types.id = pm_subtypes.pm_type_id\r\nLEFT JOIN pm_composition_levels ON pm_composition_levels.id
+  = pm_types.pm_composition_level_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
+  = pm_products.basic_pack_id\r\nORDER BY pm_products.product_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -82,7 +82,7 @@
   erp_code:
     :name: erp_code
     :sequence_no: 5
-    :caption: Erp code
+    :caption: ERP code
     :namespaced_name: pm_products.erp_code
     :data_type: :string
     :width: 100
@@ -255,9 +255,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  items_per_unit_client_description:
+    :name: items_per_unit_client_description
+    :sequence_no: 16
+    :caption: Items per unit client description
+    :namespaced_name: pm_products.items_per_unit_client_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   basic_pack_id:
     :name: basic_pack_id
-    :sequence_no: 16
+    :sequence_no: 17
     :caption: Basic pack
     :namespaced_name: pm_products.basic_pack_id
     :data_type: :integer
@@ -273,7 +289,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 17
+    :sequence_no: 18
     :caption: Active
     :namespaced_name: pm_products.active
     :data_type: :boolean

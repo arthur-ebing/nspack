@@ -7,6 +7,7 @@ module MasterfilesApp
     required(:erp_code).filled(Types::StrippedString)
     required(:product_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:items_per_unit_client_description).maybe(Types::StrippedString)
   end
 
   ExtendedPmProductSchema = Dry::Schema.Params do
@@ -15,6 +16,7 @@ module MasterfilesApp
     required(:erp_code).filled(Types::StrippedString)
     required(:product_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:items_per_unit_client_description).maybe(Types::StrippedString)
     required(:material_mass).maybe(:decimal)
     required(:basic_pack_id).maybe(:integer)
     required(:height_mm).maybe(:integer)
@@ -29,6 +31,7 @@ module MasterfilesApp
       required(:erp_code).filled(Types::StrippedString)
       optional(:product_code).filled(Types::StrippedString)
       required(:description).maybe(Types::StrippedString)
+      required(:items_per_unit_client_description).maybe(Types::StrippedString)
       required(:material_mass).maybe(:decimal)
       required(:basic_pack_id).maybe(:integer)
       required(:height_mm).maybe(:integer)

@@ -22,6 +22,7 @@ module MasterfilesApp
         pm_type_code: 'ABC',
         gross_weight_per_unit: nil,
         items_per_unit: 1,
+        items_per_unit_client_description: 'ABC',
         composition_level: 1
       }
       MasterfilesApp::PmProduct.new(base_attrs.merge(attrs))

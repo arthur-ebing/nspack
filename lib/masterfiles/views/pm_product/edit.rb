@@ -27,6 +27,7 @@ module Masterfiles
               form.add_field :basic_pack_id
               form.add_field :gross_weight_per_unit
               form.add_field :items_per_unit
+              form.add_field :items_per_unit_client_description
             end
           end
 

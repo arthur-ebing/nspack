@@ -509,6 +509,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               composition_level
               gross_weight_per_unit
               items_per_unit
+              items_per_unit_client_description
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -556,7 +557,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
                                     dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_items_per_unit_field_wrapper')]
+                                    dom_id: 'pm_product_items_per_unit_field_wrapper'),
+                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                    dom_id: 'pm_product_items_per_unit_client_description_field_wrapper')]
         end
         json_actions(actions)
       end
@@ -578,6 +581,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             composition_level
             gross_weight_per_unit
             items_per_unit
+            items_per_unit_client_description
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)

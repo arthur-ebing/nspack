@@ -7,7 +7,6 @@ module MasterfilesApp
     attribute :erp_code, Types::String
     attribute :product_code, Types::String
     attribute :description, Types::String
-    attribute? :active, Types::Bool
     attribute :pm_type_code, Types::String
     attribute :subtype_code, Types::String
     attribute :material_mass, Types::Decimal
@@ -17,5 +16,7 @@ module MasterfilesApp
     attribute :composition_level, Types::String
     attribute :gross_weight_per_unit, Types::Decimal
     attribute :items_per_unit, Types::Integer
+    attribute :items_per_unit_client_description, Types::String
+    attribute? :active, Types::Bool
   end
 end

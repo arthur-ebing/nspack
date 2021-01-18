@@ -21,6 +21,7 @@ module Masterfiles
                   col.add_field :material_mass
                   col.add_field :basic_pack_id
                   col.add_field :items_per_unit
+                  col.add_field :items_per_unit_client_description
                   col.add_field :marketing_size_range_mm
                   col.add_field :minimum_size_mm
                   col.add_field :average_size_mm
