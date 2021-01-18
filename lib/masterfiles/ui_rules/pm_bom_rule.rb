@@ -12,7 +12,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
       set_select_subtypes_fields if @mode == :select_subtypes
       set_add_products_fields if @mode == :add_products
 
@@ -20,9 +20,10 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:bom_code] = { renderer: :label }
-      fields[:erp_bom_code] = { renderer: :label }
+      fields[:bom_code] = { renderer: :label, caption: 'BOM Code' }
+      fields[:erp_bom_code] = { renderer: :label, caption: 'ERP BOM Code' }
       fields[:description] = { renderer: :label }
+      fields[:label_description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:system_code] = { renderer: :label }
       fields[:pm_boms_products] = { renderer: :list, items: pm_boms_products }
@@ -32,11 +33,11 @@ module UiRules
 
     def common_fields
       {
-        bom_code: { required: true },
-        erp_bom_code: {},
+        bom_code: { required: true, caption: 'BOM Code' },
+        erp_bom_code: { caption: 'ERP BOM Code' },
         description: {},
+        label_description: {},
         system_code: { renderer: :label },
-
         gross_weight: { renderer: :numeric },
         nett_weight: { renderer: :numeric }
       }
@@ -81,6 +82,7 @@ module UiRules
       @form_object = OpenStruct.new(bom_code: nil,
                                     erp_bom_code: nil,
                                     description: nil,
+                                    label_description: nil,
                                     system_code: nil,
                                     pm_subtype_ids: nil,
                                     gross_weight: nil,

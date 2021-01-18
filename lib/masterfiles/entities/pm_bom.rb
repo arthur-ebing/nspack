@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :bom_code, Types::String
     attribute :erp_bom_code, Types::String
     attribute :description, Types::String
+    attribute :label_description, Types::String
     attribute? :active, Types::Bool
     attribute :system_code, Types::String
     attribute :gross_weight, Types::Decimal

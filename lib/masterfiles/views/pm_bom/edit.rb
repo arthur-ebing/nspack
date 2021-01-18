@@ -44,6 +44,7 @@ module Masterfiles
                 row.column do |col|
                   col.add_field :system_code
                   col.add_field :description
+                  col.add_field :label_description
                   col.add_field :nett_weight
                 end
               end

@@ -76,6 +76,7 @@ module MasterfilesApp
         bom_code: Faker::Lorem.unique.word,
         erp_bom_code: 'ABC',
         description: 'ABC',
+        label_description: 'ABC',
         active: true,
         system_code: 'ABC',
         gross_weight: 1.0,
