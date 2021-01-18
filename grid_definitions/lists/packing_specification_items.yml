@@ -11,6 +11,16 @@
   :icon: edit
   :title: Edit
   :popup: true
+- :url: "/production/packing_specifications/packing_specification_items/$:id$/clone"
+  :text: clone
+  :icon: copy
+  :title: Clone
+  :popup: true
+- :url: "/production/packing_specifications/packing_specification_items/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
 - :separator: true
 - :url: "/development/statuses/list/packing_specification_items/$:id$"
   :text: status

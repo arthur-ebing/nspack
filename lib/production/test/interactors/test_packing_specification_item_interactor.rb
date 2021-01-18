@@ -27,6 +27,21 @@ module ProductionApp
       assert entity.is_a?(PackingSpecificationItem)
     end
 
+    def test_create_packing_specification_item
+      attrs = fake_packing_specification_item.to_h.reject { |k, _| k == :id }
+      res = interactor.create_packing_specification_item(attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(PackingSpecificationItem, res.instance)
+      assert res.instance.id.nonzero?
+    end
+
+    def test_create_packing_specification_item_fail
+      attrs = fake_packing_specification_item(packing_specification_id: nil).to_h.reject { |k, _| k == :id }
+      res = interactor.create_packing_specification_item(attrs)
+      refute res.success, 'should fail validation'
+      assert_equal ['must be filled'], res.errors[:packing_specification_id]
+    end
+
     def test_update_packing_specification_item
       id = create_packing_specification_item
       attrs = interactor.send(:repo).find_hash(:packing_specification_items, id).reject { |k, _| k == :id }
@@ -45,6 +60,14 @@ module ProductionApp
       res = interactor.update_packing_specification_item(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:description]
+    end
+
+    def test_delete_packing_specification_item
+      id = create_packing_specification_item
+      assert_count_changed(:packing_specification_items, -1) do
+        res = interactor.delete_packing_specification_item(id)
+        assert res.success, res.message
+      end
     end
 
     private
