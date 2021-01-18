@@ -1260,7 +1260,7 @@
   pol:
     :name: pol
     :sequence_no: 77
-    :caption: Pol
+    :caption: POL
     :namespaced_name: pol
     :data_type: :string
     :width: 100
@@ -1276,7 +1276,7 @@
   pod:
     :name: pod
     :sequence_no: 78
-    :caption: Pod
+    :caption: POD
     :namespaced_name: pod
     :data_type: :string
     :width: 80

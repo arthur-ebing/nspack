@@ -3272,7 +3272,7 @@
   pol_voyage_port_id:
     :name: pol_voyage_port_id
     :sequence_no: 199
-    :caption: Pol voyage port id
+    :caption: POL voyage port id
     :namespaced_name: vw_loads.pol_voyage_port_id
     :data_type: :integer
     :width: 
@@ -3288,7 +3288,7 @@
   pol:
     :name: pol
     :sequence_no: 200
-    :caption: Pol
+    :caption: POL
     :namespaced_name: vw_loads.pol
     :data_type: :string
     :width: 
@@ -3352,7 +3352,7 @@
   pod_voyage_port_id:
     :name: pod_voyage_port_id
     :sequence_no: 204
-    :caption: Pod voyage port id
+    :caption: POD voyage port id
     :namespaced_name: vw_loads.pod_voyage_port_id
     :data_type: :integer
     :width: 
@@ -3368,7 +3368,7 @@
   pod:
     :name: pod
     :sequence_no: 205
-    :caption: Pod
+    :caption: POD
     :namespaced_name: vw_loads.pod
     :data_type: :string
     :width: 
