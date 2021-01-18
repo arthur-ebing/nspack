@@ -1230,7 +1230,7 @@
   phc:
     :name: phc
     :sequence_no: 75
-    :caption: Phc
+    :caption: PHC
     :namespaced_name: phc
     :data_type: :string
     :width: 80

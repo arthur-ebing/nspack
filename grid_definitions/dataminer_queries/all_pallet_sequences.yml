@@ -1046,7 +1046,7 @@
   phc:
     :name: phc
     :sequence_no: 63
-    :caption: Phc
+    :caption: PHC
     :namespaced_name: phc
     :data_type: :string
     :width: 80
