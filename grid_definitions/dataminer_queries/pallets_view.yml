@@ -2250,7 +2250,7 @@
   bom_codes:
     :name: bom_codes
     :sequence_no: 135
-    :caption: BOMcodes
+    :caption: BOM codes
     :namespaced_name: aggregated.bom_codes
     :data_type: :string
     :width: 

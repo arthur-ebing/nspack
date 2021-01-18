@@ -162,7 +162,7 @@
   bom_code:
     :name: bom_code
     :sequence_no: 10
-    :caption: BOMcode
+    :caption: BOM code
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
     :width: 
