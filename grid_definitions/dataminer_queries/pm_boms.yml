@@ -170,7 +170,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_boms.bom_code
-  :caption: Bom code
+  :caption: BOMcode
   :data_type: :string
   :control_type: :text
   :default_value: 

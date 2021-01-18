@@ -1133,10 +1133,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     form.add_label(:std_size, 'Std Size', pallet_sequence[:std_size])
     form.add_label(:size_ref, 'Size Reference', pallet_sequence[:size_ref])
     form.add_label(:marketing_org, 'Marketing Org', pallet_sequence[:marketing_org])
-    form.add_label(:packed_tm_group, 'Packed Tm Group', pallet_sequence[:packed_tm_group])
+    form.add_label(:packed_tm_group, 'Packed TM Group', pallet_sequence[:packed_tm_group])
     form.add_label(:mark, 'Mark', pallet_sequence[:mark])
     form.add_label(:inventory_code, 'Inventory Code', pallet_sequence[:inventory_code])
-    form.add_label(:bom, 'Bom Code', pallet_sequence[:bom])
+    form.add_label(:bom, 'BOM Code', pallet_sequence[:bom])
   end
 
   def fields_for_rmd_allocated_pallet_sequence_display(form, pallet_sequence) # rubocop:disable Metrics/AbcSize
