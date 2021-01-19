@@ -68,6 +68,14 @@ module ProductionApp
       PackingSpecificationItem.new(hash)
     end
 
+    def create_packing_specification_item(res)
+      params = res.to_h.transform_values { |v| v.is_a?(Array) ? Sequel.pg_array(v, :integer) : v }
+      id = get_id(:packing_specification_items, params)
+      raise Crossbeams::InfoError, 'This packing specification item already exists' if id
+
+      create(:packing_specification_items, params)
+    end
+
     def refresh_packing_specification_items(user)
       packing_specifications = select_values(:packing_specifications,
                                              %i[id product_setup_template_id])
@@ -83,7 +91,10 @@ module ProductionApp
             packing_specification_id: packing_specification_id,
             product_setup_id: product_setup_id,
             pm_bom_id: get(:product_setups, product_setup_id, :pm_bom_id),
-            pm_mark_id: get(:product_setups, product_setup_id, :pm_mark_id)
+            pm_mark_id: get(:product_setups, product_setup_id, :pm_mark_id),
+            fruit_sticker_ids: [],
+            tu_sticker_ids: [],
+            ru_sticker_ids: []
           )
           log_status(:packing_specification_items, item_id, 'CREATED', user_name: user.user_name)
         end
