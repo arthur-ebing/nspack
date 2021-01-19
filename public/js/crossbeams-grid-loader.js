@@ -1010,8 +1010,42 @@ const crossbeamsGridEvents = {
 function SearchableSelectCellEditor() {}
 
 // SearchableSelectCellEditor.prototype.build = function build() {
+this.buildFromServer = function buildFromServer() {
+  const url = this.lookupUrl.replace(/\$:(.*?)\$/g, match => this.params.node[match.replace('$:', '').replace('$', '')]);
+
+  fetch(url, {
+    method: 'GET',
+    credentials: 'same-origin',
+    headers: new Headers({
+      'X-Custom-Request-Type': 'Fetch',
+    }),
+  }).then((response) => {
+    if (response.status === 404) {
+      crossbeamsUtils.showError('The requested resource was not found');
+      return {};
+    }
+    return response.json();
+  }).then((data) => {
+    this.filtered_params = data.items;
+    this.origValues = data.items;
+    this.buildFiltered();
+  }).catch((data) => {
+    crossbeamsUtils.fetchErrorHandler(data);
+  });
+};
+
 this.build = function build() {
+  if (this.lookupUrl) {
+    this.buildFromServer();
+    return;
+  }
+
+  this.buildFiltered();
+};
+
+this.buildFiltered = function buildFiltered() {
   this.eList.innerHTML = '';
+
   this.filtered_params.forEach((param) => {
     const li = document.createElement('li');
     li.textContent = param;
@@ -1029,6 +1063,8 @@ SearchableSelectCellEditor.prototype.init = (params) => {
   this.container.setAttribute('class', 'ag-editor-popup');
   this.params = params;
   this.filtered_params = params.values;
+  this.origValues = params.values;
+  this.lookupUrl = params.lookupUrl;
   this.eInput = document.createElement('input');
   this.eInput.placeholder = 'Filter options';
   this.container.appendChild(this.eInput);
@@ -1047,11 +1083,11 @@ SearchableSelectCellEditor.prototype.init = (params) => {
   this.eInput.addEventListener('keyup', () => {
     const searchTerm = that.eInput.value.toUpperCase();
     if (searchTerm === '') {
-      that.filtered_params = that.params.values;
+      that.filtered_params = that.origValues;
     } else {
-      that.filtered_params = that.params.values.filter(item => item && item.toUpperCase().includes(searchTerm));
+      that.filtered_params = that.origValues.filter(item => item && item.toUpperCase().includes(searchTerm));
     }
-    that.build();
+    that.buildFiltered();
   });
 };
 
@@ -1480,12 +1516,21 @@ const crossbeamsGridStaticLoader = {
           }
         } else if (attr === 'cellEditorParams') {
           if (col[attr].selectWidth) {
-            newCol.cellEditorParams = {
-              values: col[attr].values,
-              cellRenderer: function cellRenderer(params) {
-                return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`; // eslint-disable-line max-len
-              },
-            };
+            if (col[attr].lookupUrl) {
+              newCol.cellEditorParams = {
+                lookupUrl: col[attr].lookupUrl,
+                cellRenderer: function cellRenderer(params) {
+                  return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`; // eslint-disable-line max-len
+                },
+              };
+            } else {
+              newCol.cellEditorParams = {
+                values: col[attr].values,
+                cellRenderer: function cellRenderer(params) {
+                  return `<div style="display:inline-block;width:${col[attr].selectWidth}px;" title="${params.value || ''}">${params.value || ''}</div>`; // eslint-disable-line max-len
+                },
+              };
+            }
           } else {
             newCol[attr] = col[attr];
           }
