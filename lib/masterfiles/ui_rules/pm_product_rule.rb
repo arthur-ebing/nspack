@@ -39,19 +39,19 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:composition_level] = { renderer: :label }
       fields[:basic_pack_id] = { renderer: :label, with_value: basic_pack_id_label, caption: 'Basic Pack' }
-      fields[:material_mass] = { renderer: :label }
-      fields[:height_mm] = { renderer: :label }
-      fields[:gross_weight_per_unit] = { renderer: :label }
+      fields[:material_mass] = { renderer: :label, caption: 'Material Mass - g' }
+      fields[:height_mm] = { renderer: :label, caption: 'Height - mm' }
+      fields[:gross_weight_per_unit] = { renderer: :label, caption: 'Gross Weight per Unit - g' }
       fields[:items_per_unit] = { renderer: :label }
       fields[:items_per_unit_client_description] = { renderer: :label }
-      fields[:marketing_size_range_mm] = { renderer: :label }
-      fields[:minimum_size_mm] = { renderer: :label }
-      fields[:maximum_size_mm] = { renderer: :label }
-      fields[:average_size_mm] = { renderer: :label }
-      fields[:marketing_weight_range] = { renderer: :label }
-      fields[:minimum_weight_gm] = { renderer: :label }
-      fields[:maximum_weight_gm] = { renderer: :label }
-      fields[:average_weight_gm] = { renderer: :label }
+      fields[:marketing_size_range_mm] = { renderer: :label, caption: 'Marketing Size Range - mm' }
+      fields[:minimum_size_mm] = { renderer: :label, caption: 'Minimum Size - mm' }
+      fields[:maximum_size_mm] = { renderer: :label, caption: 'Maximum Size - mm' }
+      fields[:average_size_mm] = { renderer: :label, caption: 'Average Size - mm' }
+      fields[:marketing_weight_range] = { renderer: :label, caption: 'Marketing Weight Range - mm' }
+      fields[:minimum_weight_gm] = { renderer: :label, caption: 'Minimum Weight - g' }
+      fields[:maximum_weight_gm] = { renderer: :label, caption: 'Maximum Weight - g' }
+      fields[:average_weight_gm] = { renderer: :label, caption: 'Average Weight - g' }
     end
 
     def common_fields
@@ -77,9 +77,9 @@ module UiRules
                          prompt: 'Select Basic Pack',
                          searchable: true,
                          remove_search_for_small_list: false },
-        material_mass: { renderer: :numeric },
-        height_mm: { renderer: :integer },
-        gross_weight_per_unit: { renderer: :numeric },
+        material_mass: { renderer: :numeric, caption: 'Material Mass - g' },
+        height_mm: { renderer: :integer, caption: 'Height - mm' },
+        gross_weight_per_unit: { renderer: :numeric, caption: 'Gross Weight per Unit - g' },
         items_per_unit: { renderer: :integer },
         items_per_unit_client_description: {}
       }
