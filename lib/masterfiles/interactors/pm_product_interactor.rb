@@ -3,40 +3,33 @@
 module MasterfilesApp
   class PmProductInteractor < BaseInteractor
     def create_pm_product(params) # rubocop:disable Metrics/AbcSize
-      params[:product_code] = params[:erp_code]
       res = validate_pm_product_params(params)
       return validation_failed_response(res) if res.failure?
 
       id = nil
       repo.transaction do
         id = repo.create_pm_product(res)
-        product_code = repo.pm_product_product_code(pm_product(id))
-        repo.update_pm_product(id, { product_code: product_code })
-        log_status('pm_products', id, 'CREATED')
+        log_status(:pm_products, id, 'CREATED')
         log_transaction
       end
       instance = pm_product(id)
-      success_response("Created pm product #{instance.product_code}",
-                       instance)
+      success_response("Created PM Product #{instance.product_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { product_code: ['This pm product already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { product_code: ['This PM Product already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def update_pm_product(id, params) # rubocop:disable Metrics/AbcSize
+    def update_pm_product(id, params)
       res = validate_pm_product_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
         repo.update_pm_product(id, res)
-        product_code = repo.pm_product_product_code(pm_product(id))
-        repo.update_pm_product(id, { product_code: product_code })
         log_transaction
       end
       instance = pm_product(id)
-      success_response("Updated pm product #{instance.product_code}",
-                       instance)
+      success_response("Updated PM Product #{instance.product_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -45,10 +38,10 @@ module MasterfilesApp
       name = pm_product(id).product_code
       repo.transaction do
         repo.delete_pm_product(id)
-        log_status('pm_products', id, 'DELETED')
+        log_status(:pm_products, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted pm product #{name}")
+      success_response("Deleted PM Product #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -72,9 +65,7 @@ module MasterfilesApp
       return PmProductSchema.call(params) unless AppConst::REQUIRE_EXTENDED_PACKAGING
 
       # ExtendedPmProductSchema.call(params)
-
-      contract = ExtendedPmProductContract.new
-      contract.call(params)
+      ExtendedPmProductContract.new.call(params)
     end
   end
 end

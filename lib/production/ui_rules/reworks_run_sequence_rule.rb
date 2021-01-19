@@ -204,7 +204,7 @@ module UiRules
                             searchable: true,
                             remove_search_for_small_list: false }
       fields[:pm_mark_id] =  { renderer: :select,
-                               options: MasterfilesApp::BomRepo.new.for_select_fruitspec_pm_marks(
+                               options: MasterfilesApp::BomRepo.new.for_select_pm_marks(
                                  where: { mark_id: @form_object.mark_id }
                                ),
                                disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,

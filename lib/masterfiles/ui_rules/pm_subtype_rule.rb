@@ -20,7 +20,9 @@ module UiRules
       fields[:subtype_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:pm_products] = { renderer: :list, items: pm_products }
+      fields[:pm_products] = { renderer: :list,
+                               items: @repo.for_select_pm_products(where: { pm_subtype_id: @options[:id] }),
+                               caption: 'PM Products' }
       fields[:short_code] = { renderer: :label }
     end
 
@@ -53,10 +55,6 @@ module UiRules
                                     subtype_code: nil,
                                     description: nil,
                                     short_code: nil)
-    end
-
-    def pm_products
-      @repo.find_pm_subtype_products(@options[:id])
     end
   end
 end

@@ -106,13 +106,17 @@ module UiRules
       fields[:pallet_number] = { renderer: :hidden }
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:fruit_sticker_pm_product_id] = { renderer: :select,
-                                               options: MasterfilesApp::BomRepo.new.find_pm_products_by_pm_type(AppConst::PM_TYPE_FRUIT_STICKER),
+                                               options: MasterfilesApp::BomRepo.new.for_select_pm_products(
+                                                 where: { pm_type_code: AppConst::PM_TYPE_FRUIT_STICKER }
+                                               ),
                                                caption: 'Fruit Sticker',
                                                prompt: 'Select Fruit Sticker',
                                                searchable: true,
                                                remove_search_for_small_list: false }
       fields[:fruit_sticker_pm_product_2_id] = { renderer: :select,
-                                                 options: MasterfilesApp::BomRepo.new.find_pm_products_by_pm_type(AppConst::PM_TYPE_FRUIT_STICKER),
+                                                 options: MasterfilesApp::BomRepo.new.for_select_pm_products(
+                                                   where: { pm_type_code: AppConst::PM_TYPE_FRUIT_STICKER }
+                                                 ),
                                                  caption: 'Fruit Sticker 2',
                                                  prompt: 'Select Fruit Sticker 2',
                                                  searchable: true,

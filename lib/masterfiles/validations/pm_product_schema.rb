@@ -5,7 +5,7 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:pm_subtype_id).filled(:integer)
     required(:erp_code).filled(Types::StrippedString)
-    required(:product_code).filled(Types::StrippedString)
+    optional(:product_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     required(:items_per_unit_client_description).maybe(Types::StrippedString)
   end
@@ -14,7 +14,7 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:pm_subtype_id).filled(:integer)
     required(:erp_code).filled(Types::StrippedString)
-    required(:product_code).filled(Types::StrippedString)
+    optional(:product_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
     required(:items_per_unit_client_description).maybe(Types::StrippedString)
     required(:material_mass).maybe(:decimal)

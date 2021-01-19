@@ -26,8 +26,8 @@ module MasterfilesApp
     build_inactive_select :pm_composition_levels, label: :description, value: :id, order_by: :description
     crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
 
-    build_for_select :pm_marks, label: :description, value: :id, order_by: :description
-    build_inactive_select :pm_marks, label: :description, value: :id, order_by: :description
+    build_for_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
+    build_inactive_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
     crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
 
     def pm_subtypes(pm_subtype_ids)
@@ -41,90 +41,68 @@ module MasterfilesApp
         ).map { |r| ["#{r[:pm_type_code]} - #{r[:subtype_code]}"] }
     end
 
-    def find_pm_subtype_products(id)
-      DB[:pm_products]
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .where(pm_subtype_id: id)
-        .order(:product_code)
-        .select_map(:product_code)
-    end
-
-    def for_select_pm_uoms(uom_type)
-      DB[:uoms]
-        .where(uom_type_id: DB[:uom_types].where(code: uom_type).select(:id))
-        .select_map(%i[uom_code id])
-    end
-
     def find_pm_type(id)
-      hash = find_with_association(:pm_types,
-                                   id,
-                                   parent_tables: [{ parent_table: :pm_composition_levels,
-                                                     columns: [:description],
-                                                     flatten_columns: { description: :composition_level } }])
-      return nil if hash.nil?
-
-      PmType.new(hash)
+      find_with_association(:pm_types,
+                            id,
+                            parent_tables: [{ parent_table: :pm_composition_levels,
+                                              columns: [:description],
+                                              flatten_columns: { description: :composition_level } }],
+                            wrapper: PmType)
     end
 
     def find_pm_subtype(id)
-      hash = find_with_association(:pm_subtypes,
-                                   id,
-                                   parent_tables: [{ parent_table: :pm_types,
-                                                     columns: [:pm_type_code],
-                                                     flatten_columns: { pm_type_code: :pm_type_code } }])
-      return nil if hash.nil?
-
-      PmSubtype.new(hash)
+      find_with_association(:pm_subtypes,
+                            id,
+                            parent_tables: [{ parent_table: :pm_types,
+                                              columns: [:pm_type_code],
+                                              flatten_columns: { pm_type_code: :pm_type_code } }],
+                            wrapper: PmSubtype)
     end
 
     def find_pm_product(id)
-      query = <<~SQL
-        SELECT
-            pm_products.*,
-            pm_subtypes.subtype_code,
-            pm_types.pm_type_code,
-            basic_pack_codes.basic_pack_code,
-            pm_composition_levels.composition_level
-        FROM pm_products
-        LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
-        LEFT JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
-        LEFT JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
-        WHERE pm_products.id = ?
-      SQL
-      hash = DB[query, id].first
-      return nil if hash.nil?
-
-      PmProduct.new(hash)
+      find_with_association(:pm_products,
+                            id,
+                            parent_tables: [{ parent_table: :pm_subtypes,
+                                              columns: %i[subtype_code pm_type_id],
+                                              flatten_columns: { subtype_code: :subtype_code, pm_type_id: :pm_type_id } },
+                                            { parent_table: :pm_types,
+                                              foreign_key: :pm_type_id,
+                                              columns: %i[pm_type_code pm_composition_level_id],
+                                              flatten_columns: { pm_type_code: :pm_type_code, pm_composition_level_id: :pm_composition_level_id } },
+                                            { parent_table: :pm_composition_levels,
+                                              foreign_key: :pm_composition_level_id,
+                                              columns: [:composition_level],
+                                              flatten_columns: { composition_level: :composition_level } },
+                                            { parent_table: :basic_pack_codes,
+                                              foreign_key: :basic_pack_id,
+                                              columns: [:basic_pack_code],
+                                              flatten_columns: { basic_pack_code: :basic_pack_code } }],
+                            wrapper: PmProduct)
     end
 
     def find_pm_boms_product(id)
-      hash = find_with_association(:pm_boms_products,
-                                   id,
-                                   parent_tables: [{ parent_table: :pm_products,
-                                                     columns: [:product_code],
-                                                     flatten_columns: { product_code: :product_code } },
-                                                   { parent_table: :pm_boms,
-                                                     columns: [:bom_code],
-                                                     flatten_columns: { bom_code: :bom_code } },
-                                                   { parent_table: :uoms,
-                                                     columns: [:uom_code],
-                                                     foreign_key: :uom_id,
-                                                     flatten_columns: { uom_code: :uom_code } }])
-      return nil if hash.nil?
-
-      PmBomsProduct.new(hash)
+      find_with_association(:pm_boms_products,
+                            id,
+                            parent_tables: [{ parent_table: :pm_products,
+                                              columns: [:product_code],
+                                              flatten_columns: { product_code: :product_code } },
+                                            { parent_table: :pm_boms,
+                                              columns: [:bom_code],
+                                              flatten_columns: { bom_code: :bom_code } },
+                                            { parent_table: :uoms,
+                                              columns: [:uom_code],
+                                              foreign_key: :uom_id,
+                                              flatten_columns: { uom_code: :uom_code } }],
+                            wrapper: PmBomsProduct)
     end
 
     def find_pm_mark(id)
-      hash = find_with_association(:pm_marks,
-                                   id,
-                                   parent_tables: [{ parent_table: :marks,
-                                                     columns: [:mark_code],
-                                                     flatten_columns: { mark_code: :mark_code } }])
-      return nil if hash.nil?
-
-      PmMarkFlat.new(hash)
+      find_with_association(:pm_marks,
+                            id,
+                            parent_tables: [{ parent_table: :marks,
+                                              columns: [:mark_code],
+                                              flatten_columns: { mark_code: :mark_code } }],
+                            wrapper: PmMarkFlat)
     end
 
     def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
@@ -163,20 +141,21 @@ module MasterfilesApp
       DB[query].all unless id.nil?
     end
 
-    def find_pm_products_by_pm_type(pm_type)
-      DB["select p.id, p.product_code
-          from pm_products p
-          join pm_subtypes s on s.id=p.pm_subtype_id
-          join pm_types t on t.id=s.pm_type_id
-          where t.pm_type_code = '#{pm_type}'"].map { |r| [r[:product_code], r[:id]] }
+    def for_select_pm_products(where: nil, active: true)
+      ds = DB[:pm_products]
+           .join(:pm_subtypes, id: :pm_subtype_id)
+           .join(:pm_types, id: :pm_type_id).distinct
+      ds = ds.where(Sequel[:pm_products][:active] => active)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map([:product_code, Sequel[:pm_products][:id]])
     end
 
-    def find_composition_level_pm_types(id)
-      DB[:pm_types]
-        .join(:pm_composition_levels, id: :pm_composition_level_id)
-        .where(pm_composition_level_id: id)
-        .order(:pm_type_code)
-        .select_map(:pm_type_code)
+    def for_select_pm_types(where: nil, active: true)
+      ds = DB[:pm_types]
+           .join(:pm_composition_levels, id: :pm_composition_level_id).distinct
+      ds = ds.where(Sequel[:pm_types][:active] => active)
+      ds = ds.where(where) unless where.nil?
+      ds.select_map([:pm_type_code, Sequel[:pm_types][:id]])
     end
 
     def for_select_pm_type_subtypes(pm_bom_id = nil)
@@ -268,12 +247,6 @@ module MasterfilesApp
       DB[:pm_products].where(id: pm_product_ids).select_map(:pm_subtype_id)
     end
 
-    def find_pm_type_by_subtype(subtype_id)
-      DB[:pm_subtypes]
-        .where(id: subtype_id)
-        .get(:pm_type_id)
-    end
-
     def find_uom_by_code(uom_code)
       DB[:uoms].where(uom_code: uom_code).get(:id)
     end
@@ -289,7 +262,6 @@ module MasterfilesApp
     def delete_pm_bom(id)
       DB[:pm_boms_products].where(pm_bom_id: id).delete
       DB[:pm_boms].where(id: id).delete
-      { success: true }
     end
 
     def pm_bom_system_code(bom_id)
@@ -341,7 +313,7 @@ module MasterfilesApp
     end
 
     def fruit_composition_level
-      DB[:pm_composition_levels].where(description: AppConst::FRUIT_PM_TYPE).get(:composition_level)
+      DB[:pm_composition_levels].where(description: AppConst::FRUIT_PM_TYPE).get(:composition_level) || AppConst::FRUIT_COMPOSITION_LEVEL
     end
 
     def fruit_composition_level?(pm_subtype_id)
@@ -378,7 +350,6 @@ module MasterfilesApp
       end
 
       update(:pm_boms, pm_bom_id, { gross_weight: gross_weight, nett_weight: nett_weight })
-      { success: true }
     end
 
     def bom_products(pm_bom_id)
@@ -408,23 +379,11 @@ module MasterfilesApp
 
     def fruit_average_weight(product_code)
       res = product_code.split('_')
-      commodity_id = find_commodity_by_code(res[0])
+      commodity_id = get_id(:commodities, code: res[0])
       DB[:std_fruit_size_counts]
         .where(size_count_value: res[1])
         .where(commodity_id: commodity_id)
         .get(:average_weight_gm)
-    end
-
-    def find_commodity_by_code(commodity_code)
-      DB[:commodities]
-        .where(code: commodity_code)
-        .get(:id)
-    end
-
-    def for_select_fruitspec_pm_marks(where: nil)
-      ds = DB[:pm_marks].order(:packaging_marks)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map(%i[packaging_marks id])
     end
 
     def subtype_composition_level(pm_subtype_id)
@@ -435,50 +394,33 @@ module MasterfilesApp
         .get(:composition_level)
     end
 
-    def pm_product_basic_pack(basic_pack_id)
-      DB[:basic_pack_codes]
-        .where(id: basic_pack_id)
-        .get(:basic_pack_code)
+    def create_pm_product(res)
+      attrs = compile_product_code(res.to_h)
+      create(:pm_products, attrs)
     end
 
-    def pm_product_product_code(pm_product) # rubocop:disable Metrics/AbcSize
-      type_short_code = find_type_short_code(find_pm_type_by_subtype(pm_product[:pm_subtype_id]))
-      subtype_short_code = find_subtype_short_code(pm_product[:pm_subtype_id])
-      product_code = case pm_product[:composition_level]
-                     when minimum_composition_level
-                       "#{type_short_code}_#{pm_product[:basic_pack_code]}_#{subtype_short_code}_#{pm_product[:height_mm]}"
-                     when fruit_composition_level - 1
-                       gross_weight_per_unit = pm_product[:gross_weight_per_unit].nil_or_empty? ? '*' : pm_product[:gross_weight_per_unit].to_f
-                       items_per_unit = pm_product[:items_per_unit].nil_or_empty? ? '*' : pm_product[:items_per_unit]
-                       "#{type_short_code}_#{gross_weight_per_unit}_#{subtype_short_code}_#{items_per_unit}"
-                     else
-                       pm_product[:product_code]
-                     end
-      product_code
+    def update_pm_product(id, res)
+      existing = find_hash(:pm_products, id).reject { |k, _| %i[id created_at updated_at].include?(k) }
+      attrs = compile_product_code(existing.merge(res.to_h))
+      update(:pm_products, id, attrs)
     end
 
-    def find_type_short_code(pm_type_id)
-      DB[:pm_types]
-        .where(id: pm_type_id)
-        .get(:short_code)
-    end
+    def compile_product_code(attrs) # rubocop:disable Metrics/AbcSize
+      pm_type_id = get(:pm_subtypes, attrs[:pm_subtype_id], :pm_type_id)
+      type_short_code = get(:pm_types, pm_type_id, :short_code)
+      subtype_short_code = get(:pm_subtypes, attrs[:pm_subtype_id], :short_code)
 
-    def find_subtype_short_code(pm_subtype_id)
-      DB[:pm_subtypes]
-        .where(id: pm_subtype_id)
-        .get(:short_code)
-    end
-
-    def find_std_fruit_size_by_product_code(product_code)
-      arr = product_code.split('_')
-      std_fruit_size_count_id =  DB[:std_fruit_size_counts]
-                                 .where(size_count_value: arr[1])
-                                 .where(commodity_id: DB[:commodities]
-                                                        .where(code: arr[0])
-                                                        .get(:id))
-                                 .get(:id)
-
-      DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).first
+      attrs[:product_code] = case find_pm_type(pm_type_id).composition_level
+                             when minimum_composition_level
+                               "#{type_short_code}_#{attrs[:basic_pack_code]}_#{subtype_short_code}_#{attrs[:height_mm]}"
+                             when fruit_composition_level - 1
+                               gross_weight_per_unit = attrs[:gross_weight_per_unit].nil_or_empty? ? '*' : attrs[:gross_weight_per_unit].to_f
+                               items_per_unit = attrs[:items_per_unit].nil_or_empty? ? '*' : attrs[:items_per_unit]
+                               "#{type_short_code}_#{gross_weight_per_unit}_#{subtype_short_code}_#{items_per_unit}"
+                             else
+                               attrs[:erp_code]
+                             end
+      attrs
     end
 
     def sync_pm_boms # rubocop:disable Metrics/AbcSize

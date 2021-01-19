@@ -18,7 +18,11 @@ module UiRules
       fields[:composition_level] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:pm_types] = { renderer: :list, items: pm_types }
+      fields[:pm_types] = { renderer: :list,
+                            items: @repo.for_select_pm_types(
+                              where: { pm_composition_level_id: @options[:id] }
+                            ),
+                            caption: 'PM Types' }
     end
 
     def common_fields
@@ -41,10 +45,6 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(composition_level: nil,
                                     description: nil)
-    end
-
-    def pm_types
-      @repo.find_composition_level_pm_types(@options[:id])
     end
   end
 end
