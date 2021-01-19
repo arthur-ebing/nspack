@@ -20,12 +20,13 @@ module UiRules
                                            with_value: pm_composition_level_id_label,
                                            caption: 'Composition Level',
                                            hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
-      fields[:pm_type_code] = { renderer: :label }
+      fields[:pm_type_code] = { renderer: :label,
+                                caption: 'PM Type Code' }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pm_subtypes] = { renderer: :list,
-                               items: @repo.for_select_pm_subtypes(where:{pm_type_id: @options[:id]}),
-                               caption: 'PM Subtypes'}
+                               items: @repo.for_select_pm_subtypes(where: { pm_type_id: @options[:id] }),
+                               caption: 'PM Subtypes' }
       fields[:short_code] = { renderer: :label,
                               hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
     end
