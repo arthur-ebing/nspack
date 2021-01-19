@@ -25,7 +25,7 @@ module UiRules
                                         caption: 'Test Type' }
       fields[:puc_id] = { renderer: :label,
                           with_value: @form_object.puc_code,
-                          caption: 'Puc',
+                          caption: 'PUC',
                           required: true }
       fields[:orchard_id] = { renderer: :label,
                               with_value: @form_object.orchard_code,
@@ -59,7 +59,7 @@ module UiRules
         puc_id: { renderer: :select,
                   options: @farm_repo.for_select_pucs(where: { id: puc_ids }),
                   disabled_options: @farm_repo.for_select_inactive_pucs,
-                  caption: 'Puc',
+                  caption: 'PUC',
                   required: true,
                   prompt: true }
       }
@@ -72,7 +72,7 @@ module UiRules
                                 caption: 'Test Type' },
         puc_id: { renderer: :label,
                   with_value: @form_object.puc_code,
-                  caption: 'Puc' },
+                  caption: 'PUC' },
         orchard_id: { renderer: :label,
                       with_value: @form_object.orchard_code,
                       caption: 'Orchard' },

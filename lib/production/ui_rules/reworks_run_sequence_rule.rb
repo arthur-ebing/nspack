@@ -70,7 +70,7 @@ module UiRules
       fields[:puc_id] = { renderer: :select,
                           options: @farm_repo.selected_farm_pucs(where: { farm_id: @form_object.farm_id }),
                           disabled_options: @farm_repo.for_select_inactive_pucs,
-                          caption: 'Puc',
+                          caption: 'PUC',
                           required: true }
       fields[:orchard_id] = { renderer: :select,
                               options: @farm_repo.selected_farm_orchard_codes(@form_object.farm_id, @form_object.puc_id),

@@ -21,7 +21,7 @@ module UiRules
       puc_id_label = @repo.find_puc(@form_object.puc_id)&.puc_code
       farm_manager_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.farm_manager_party_role_id)&.party_name
       fields[:farm_id] = { renderer: :label, with_value: farm_id_label, caption: 'Farm' }
-      fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'Puc' }
+      fields[:puc_id] = { renderer: :label, with_value: puc_id_label, caption: 'PUC' }
       fields[:orchard_code] = { renderer: :label }
       fields[:farm_section_name] = { renderer: :label }
       fields[:farm_manager_party_role_id] = { renderer: :label, with_value: farm_manager_party_role_id_label, caption: 'Farm Manager' }
@@ -39,7 +39,7 @@ module UiRules
         puc_id: { renderer: :select,
                   options: @repo.selected_farm_pucs(where: { farm_id: farm_id }),
                   disabled_options: @repo.for_select_inactive_pucs,
-                  caption: 'Puc',
+                  caption: 'PUC',
                   required: true },
         orchard_code: { required: true },
         description: {},

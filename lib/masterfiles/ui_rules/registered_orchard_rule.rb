@@ -17,7 +17,7 @@ module UiRules
     def set_show_fields
       fields[:orchard_code] = { renderer: :label }
       fields[:cultivar_code] = { renderer: :label }
-      fields[:puc_code] = { renderer: :label }
+      fields[:puc_code] = { renderer: :label, caption: 'PUC' }
       fields[:description] = { renderer: :label }
       fields[:marketing_orchard] = { renderer: :label, as_boolean: true }
       fields[:active] = { renderer: :label, as_boolean: true }

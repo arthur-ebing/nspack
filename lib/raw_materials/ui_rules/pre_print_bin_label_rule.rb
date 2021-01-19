@@ -19,7 +19,7 @@ module UiRules
       fields = {
         farm_id: { renderer: :select, options: MasterfilesApp::FarmRepo.new.for_select_farms, disabled_options: MasterfilesApp::FarmRepo.new.for_select_inactive_farms, caption: 'Farm',
                    required: false, prompt: true },
-        puc_id: { renderer: :select, options: [], caption: 'Puc', required: false, prompt: true },
+        puc_id: { renderer: :select, options: [], caption: 'PUC', required: false, prompt: true },
         orchard_id: { renderer: :select, options: [], caption: 'Orchard', required: false, prompt: true  },
         cultivar_id: { renderer: :select, options: [], caption: 'Cultivar', required: false, prompt: true },
         no_of_prints: { required: true },
