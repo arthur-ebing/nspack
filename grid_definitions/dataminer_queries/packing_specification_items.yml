@@ -6,9 +6,9 @@
   \   packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
   \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
   \   pm_marks.description AS pm_mark,\r\n    packing_specification_items.tu_labour_product_id,\r\n
-  \   pm_products_tu.erp_code AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
-  \   pm_products_ru.erp_code AS ru_labour_product,\r\n    packing_specification_items.ri_labour_product_id,\r\n
-  \   pm_products_ri.erp_code AS ri_labour_product,\r\n    packing_specification_items.fruit_sticker_ids,\r\n
+  \   pm_products_tu.product_code AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
+  \   pm_products_ru.product_code AS ru_labour_product,\r\n    packing_specification_items.ri_labour_product_id,\r\n
+  \   pm_products_ri.product_code AS ri_labour_product,\r\n    packing_specification_items.fruit_sticker_ids,\r\n
   \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.fruit_sticker_ids)
   GROUP BY packing_specification_items.id) AS fruit_stickers,\r\n    packing_specification_items.tu_sticker_ids,\r\n
   \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.tu_sticker_ids)
@@ -208,7 +208,7 @@
     :name: tu_labour_product
     :sequence_no: 12
     :caption: TU Labour product
-    :namespaced_name: pm_products_tu.erp_code
+    :namespaced_name: pm_products_tu.product_code
     :data_type: :string
     :width: 
     :format: 
@@ -240,7 +240,7 @@
     :name: ru_labour_product
     :sequence_no: 14
     :caption: RU Labour product
-    :namespaced_name: pm_products_ru.erp_code
+    :namespaced_name: pm_products_ru.product_code
     :data_type: :string
     :width: 
     :format: 
@@ -272,7 +272,7 @@
     :name: ri_labour_product
     :sequence_no: 16
     :caption: RI Labour product
-    :namespaced_name: pm_products_ri.erp_code
+    :namespaced_name: pm_products_ri.product_code
     :data_type: :string
     :width: 
     :format: 

@@ -70,10 +70,17 @@ module ProductionApp
 
     def create_packing_specification_item(res)
       params = res.to_h.transform_values { |v| v.is_a?(Array) ? Sequel.pg_array(v, :integer) : v }
-      id = get_id(:packing_specification_items, params)
-      raise Crossbeams::InfoError, 'This packing specification item already exists' if id
+      raise Crossbeams::InfoError, 'This packing specification item already exists' if exists?(:packing_specification_items, params)
 
-      create(:packing_specification_items, params)
+      create(:packing_specification_items, res)
+    end
+
+    def update_packing_specification_item(id, res)
+      existing = find_hash(:packing_specification_items, id).reject { |k, _| %i[id created_at updated_at].include?(k) }
+      params = existing.merge(res.to_h).transform_values { |v| v.is_a?(Array) ? Sequel.pg_array(v, :integer) : v }
+      raise Crossbeams::InfoError, 'This packing specification item already exists' if exists?(:packing_specification_items, params)
+
+      update(:packing_specification_items, id, res)
     end
 
     def refresh_packing_specification_items(user)

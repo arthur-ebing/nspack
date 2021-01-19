@@ -36,10 +36,31 @@ module ProductionApp
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)
+        log_status(:packing_specification_items, id, 'UPDATED')
         log_transaction
       end
       instance = packing_specification_item(id)
       success_response("Updated packing specification item #{instance.description}", instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def inline_update_packing_specification_item(id, params) # rubocop:disable Metrics/AbcSize
+      repo.transaction do
+        if params[:column_name] == 'description'
+          repo.update_packing_specification_item(id, description: params[:column_value])
+        elsif params[:column_name] == 'pm_mark'
+          repo.update_packing_specification_item(id, pm_mark_id: repo.get_id(:pm_marks, description: params[:column_value]))
+        elsif params[:column_name] == 'pm_bom'
+          repo.update_packing_specification_item(id, pm_bom_id: repo.get_id(:pm_boms, bom_code: params[:column_value]))
+        else
+          raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
+        end
+        log_status(:packing_specification_items, id, 'UPDATED')
+        log_transaction
+      end
+      instance = packing_specification_item(id)
+      success_response('Updated packing specification item', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

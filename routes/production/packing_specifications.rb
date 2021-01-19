@@ -97,6 +97,39 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'inline_edit' do
+        res = interactor.inline_update_packing_specification_item(id, params)
+        if res.success
+          row_keys = %i[
+            packing_specification_id
+            packing_specification_code
+            description
+            pm_bom_id
+            pm_bom
+            pm_mark_id
+            pm_mark
+            product_setup_id
+            product_setup
+            tu_labour_product_id
+            tu_labour_product
+            ru_labour_product_id
+            ru_labour_product
+            ri_labour_product_id
+            ri_labour_product
+            fruit_sticker_ids
+            fruit_stickers
+            tu_sticker_ids
+            tu_stickers
+            ru_sticker_ids
+            ru_stickers
+            status
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+        else
+          undo_grid_inline_edit(message: res.message, message_type: :error)
+        end
+      end
+
       r.is do
         r.get do       # SHOW
           check_auth!('packing specifications', 'read')
@@ -127,6 +160,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               tu_stickers
               ru_sticker_ids
               ru_stickers
+              status
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -185,6 +219,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             tu_stickers
             ru_sticker_ids
             ru_stickers
+            status
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

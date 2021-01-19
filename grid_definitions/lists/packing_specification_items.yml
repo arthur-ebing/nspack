@@ -40,3 +40,35 @@
     - :col: packing_specification_items.packing_specification_id
       :op: "="
       :val: "$:id$"
+:edit_rules:
+  :url: "/production/packing_specifications/packing_specification_items/$:id$/inline_edit"
+  :editable_fields:
+    description:
+      :editor: :textarea
+      :width: 200
+    pm_mark:
+      :editor: :search_select
+      :value_sql: SELECT description
+                  FROM pm_marks
+    pm_bom:
+      :editor: :search_select
+      :value_sql: SELECT bom_code
+                  FROM pm_boms
+    tu_labour_product:
+      :editor: :search_select
+      :value_sql: SELECT product_code
+                  FROM pm_products
+                  JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
+                  WHERE pm_subtypes.subtype_code = 'TU_LABOUR'
+    ru_labour_product:
+      :editor: :search_select
+      :value_sql: SELECT product_code
+                  FROM pm_products
+                  JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
+                  WHERE pm_subtypes.subtype_code = 'RU_LABOUR'
+    ri_labour_product:
+      :editor: :search_select
+      :value_sql: SELECT product_code
+                  FROM pm_products
+                  JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
+                  WHERE pm_subtypes.subtype_code = 'RI_LABOUR'
