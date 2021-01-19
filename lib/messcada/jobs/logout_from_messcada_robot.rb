@@ -10,13 +10,9 @@ module MesscadaApp
         return unless opts[:legacy_messcada]
 
         worker = DB[:contract_workers].where(id: contract_worker_id).select(:first_name, :surname, :industry_number).first
-        request = if opts[:group_incentive]
-                    new_group = DB[Sequel[:kromco_legacy][:messcada_group_data]].where(module_name: system_resource_code).get(:system_resource_code)
-                    "Logout:group:#{new_group}worker:#{worker[:first_name]} #{worker[:surname]}:no:#{worker[:industry_number]}"
-                  else
-                    "Logout:worker:#{worker[:first_name]} #{worker[:surname]}:no:#{worker[:industry_number]}"
-                  end
-        sock = TCPSocket.open(ip_address, 2172)
+        new_group = DB[Sequel[:kromco_legacy][:messcada_group_data]].where(module_name: system_resource_code).get(:system_resource_code) if opts[:group_incentive]
+        request = %(<LogoffMes PID="430" Group="#{new_group}" IndustryNumber="#{worker[:industry_number]}" FirstName="#{worker[:first_name]}" LastName="#{worker[:surname]}" />)
+        sock = TCPSocket.open(ip_address, 2071)
         puts "MESSCADA LOGOUT AT #{system_resource_code} (#{ip_address}) : #{worker[:first_name]} #{worker[:surname]} (#{worker[:industry_number]})"
 
         sock.puts request

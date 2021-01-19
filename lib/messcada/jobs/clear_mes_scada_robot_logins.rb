@@ -5,8 +5,8 @@ module MesscadaApp
   module Job
     class ClearMesScadaRobotLogins < BaseQueJob
       def run(system_resource_code, ip_address)
-        sock = TCPSocket.open(ip_address, 2172)
-        request = 'ClearLogins'
+        sock = TCPSocket.open(ip_address, 2071)
+        request = '<LogoffMes PID="435" />'
         puts "CLEAR MESSCADA LOGINS AT #{system_resource_code} (#{ip_address})"
 
         sock.puts request
