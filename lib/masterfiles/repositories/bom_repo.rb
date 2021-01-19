@@ -2,84 +2,33 @@
 
 module MasterfilesApp
   class BomRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :pm_types,
-                     label: :pm_type_code,
-                     value: :id,
-                     order_by: :pm_type_code
-    build_inactive_select :pm_types,
-                          label: :pm_type_code,
-                          value: :id,
-                          order_by: :pm_type_code
-
-    build_for_select :pm_subtypes,
-                     label: :subtype_code,
-                     value: :id,
-                     order_by: :subtype_code
-    build_inactive_select :pm_subtypes,
-                          label: :subtype_code,
-                          value: :id,
-                          order_by: :subtype_code
-
-    build_for_select :pm_products,
-                     label: :product_code,
-                     value: :id,
-                     order_by: :product_code
-    build_inactive_select :pm_products,
-                          label: :product_code,
-                          value: :id,
-                          order_by: :product_code
-
-    build_for_select :pm_boms,
-                     label: :bom_code,
-                     value: :id,
-                     order_by: :bom_code
-    build_inactive_select :pm_boms,
-                          label: :bom_code,
-                          value: :id,
-                          order_by: :bom_code
-
-    build_for_select :pm_boms_products,
-                     label: :quantity,
-                     value: :id,
-                     order_by: :quantity
-    build_inactive_select :pm_boms_products,
-                          label: :quantity,
-                          value: :id,
-                          order_by: :quantity
-
-    build_for_select :pm_composition_levels,
-                     label: :description,
-                     value: :id,
-                     order_by: :description
-    build_inactive_select :pm_composition_levels,
-                          label: :description,
-                          value: :id,
-                          order_by: :description
-
-    build_for_select :pm_marks,
-                     label: :description,
-                     value: :id,
-                     order_by: :description
-    build_inactive_select :pm_marks,
-                          label: :description,
-                          value: :id,
-                          order_by: :description
-
+    build_for_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
+    build_inactive_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
     crud_calls_for :pm_types, name: :pm_type, wrapper: PmType
-    crud_calls_for :pm_subtypes, name: :pm_subtype, wrapper: PmSubtype
-    crud_calls_for :pm_products, name: :pm_product, wrapper: PmProduct
-    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom
-    crud_calls_for :pm_boms_products, name: :pm_boms_product, wrapper: PmBomsProduct
-    crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
-    crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
 
-    def find_pm_type_subtypes(id)
-      DB[:pm_subtypes]
-        .join(:pm_types, id: :pm_type_id)
-        .where(pm_type_id: id)
-        .order(:subtype_code)
-        .select_map(:subtype_code)
-    end
+    build_for_select :pm_subtypes, label: :subtype_code, value: :id, order_by: :subtype_code
+    build_inactive_select :pm_subtypes, label: :subtype_code, value: :id, order_by: :subtype_code
+    crud_calls_for :pm_subtypes, name: :pm_subtype, wrapper: PmSubtype
+
+    build_for_select :pm_products, label: :product_code, value: :id, order_by: :product_code
+    build_inactive_select :pm_products, label: :product_code, value: :id, order_by: :product_code
+    crud_calls_for :pm_products, name: :pm_product, wrapper: PmProduct
+
+    build_for_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
+    build_inactive_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
+    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom
+
+    build_for_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
+    build_inactive_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
+    crud_calls_for :pm_boms_products, name: :pm_boms_product, wrapper: PmBomsProduct
+
+    build_for_select :pm_composition_levels, label: :description, value: :id, order_by: :description
+    build_inactive_select :pm_composition_levels, label: :description, value: :id, order_by: :description
+    crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
+
+    build_for_select :pm_marks, label: :description, value: :id, order_by: :description
+    build_inactive_select :pm_marks, label: :description, value: :id, order_by: :description
+    crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
 
     def pm_subtypes(pm_subtype_ids)
       DB[:pm_subtypes]

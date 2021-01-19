@@ -23,7 +23,9 @@ module UiRules
       fields[:pm_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:pm_subtypes] = { renderer: :list, items: pm_subtypes }
+      fields[:pm_subtypes] = { renderer: :list,
+                               items: @repo.for_select_pm_subtypes(where:{pm_type_id: @options[:id]}),
+                               caption: 'PM Subtypes'}
       fields[:short_code] = { renderer: :label,
                               hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
     end
@@ -63,10 +65,6 @@ module UiRules
                                     pm_type_code: nil,
                                     description: nil,
                                     short_code: nil)
-    end
-
-    def pm_subtypes
-      @repo.find_pm_type_subtypes(@options[:id])
     end
   end
 end
