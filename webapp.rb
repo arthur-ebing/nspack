@@ -383,6 +383,8 @@ class Nspack < Roda
           changeset = { label_json: params[:label],
                         variable_xml: params[:XMLString],
                         png_image: Sequel.blob(interactor.image_from_param(params[:imageString])) }
+          # png_image: Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString])) }
+
           DB.transaction do
             repo.update_label(id, interactor.include_updated_by_in_changeset(changeset))
             repo.log_action(user_name: current_user.user_name, context: 'update label', route_url: request.path, request_ip: request.ip)

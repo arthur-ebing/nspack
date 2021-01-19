@@ -324,6 +324,21 @@ module LabelApp
       Base64.decode64(data_uri_parts[2])
     end
 
+    # Use Imagemagick to convert transparent background to white.
+    def image_from_param_without_alpha(param)
+      outfile = Tempfile.new(['lbl', '.png'])
+
+      Tempfile.open(['lbl', '.png']) do |f|
+        f.write(image_from_param(param))
+        res = system("convert #{f.path} -background white -alpha remove -flatten -alpha off #{outfile.path}")
+        raise Crossbeams::InfoError, 'Unable to remove transparency from image' unless res
+      end
+
+      File.read(outfile.path)
+    ensure
+      outfile.close
+    end
+
     def complete_a_label(id, params)
       res = complete_a_record(:labels, id, params.merge(enqueue_job: false))
       # Use params to trigger alert...
