@@ -6,6 +6,8 @@ module MasterfilesApp
   class TestPmProductInteractor < MiniTestWithHooks
     include PackagingFactory
     include FruitFactory
+    include CommodityFactory
+    include GeneralFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -75,10 +77,11 @@ module MasterfilesApp
     def pm_product_attrs
       pm_subtype_id = create_pm_subtype
       basic_pack_id = create_basic_pack_code
-
+      std_fruit_size_count_id = create_std_fruit_size_count
       {
         id: 1,
         pm_subtype_id: pm_subtype_id,
+        std_fruit_size_count_id: std_fruit_size_count_id,
         erp_code: Faker::Lorem.unique.word,
         product_code: 'ABC',
         description: 'ABC',

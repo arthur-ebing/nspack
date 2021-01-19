@@ -29,7 +29,7 @@ module UiRules
         pm_type_id: { renderer: :select,
                       options: @repo.for_select_pm_types,
                       disabled_options: @repo.for_select_inactive_pm_types,
-                      caption: 'pm_type',
+                      caption: 'PM Type',
                       required: true },
         subtype_code: { required: true,
                         force_uppercase: true },

@@ -10,6 +10,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         pm_subtype_id: 1,
+        std_fruit_size_count_id: 1,
         erp_code: Faker::Lorem.unique.word,
         product_code: 'ABC',
         description: 'ABC',

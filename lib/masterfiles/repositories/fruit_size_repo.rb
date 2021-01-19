@@ -91,6 +91,25 @@ module MasterfilesApp
                             wrapper: StandardPackCodeFlat)
     end
 
+    def find_std_fruit_size_count(id)
+      query = <<~SQL
+        SELECT
+          std_fruit_size_counts.*,
+          commodities.code AS commodity_code,
+          commodities.code || '_' || std_fruit_size_counts.size_count_value AS product_code,
+          commodities.code || '_' || uoms.uom_code || '_' || std_fruit_size_counts.size_count_value AS system_code,
+          commodities.code || ' - ' || std_fruit_size_counts.size_count_value AS extended_description
+        FROM std_fruit_size_counts
+        JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id
+        JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
+        WHERE std_fruit_size_counts.id = ?
+      SQL
+      hash = DB[query, id].first
+      return nil if hash.nil?
+
+      StdFruitSizeCount.new(hash)
+    end
+
     def delete_basic_pack_code(id)
       dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)
       return { error: 'This pack code is in use.' } unless dependents.empty?
@@ -235,21 +254,6 @@ module MasterfilesApp
       DB[:standard_product_weights]
         .where(is_standard_carton: true)
         .all
-    end
-
-    def find_std_fruit_size_counts
-      query = <<~SQL
-        SELECT commodities.code AS commodity_code,
-               std_fruit_size_counts.size_count_value,
-               std_fruit_size_counts.uom_id,
-               commodities.code || '_' || std_fruit_size_counts.size_count_value AS product_code,
-               commodities.code || '_' || uoms.uom_code || '_' || std_fruit_size_counts.size_count_value AS system_code,
-               commodities.code || ' - ' || std_fruit_size_counts.size_count_value AS description
-        FROM std_fruit_size_counts
-        JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id
-        JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id
-      SQL
-      DB[query].all
     end
   end
 end

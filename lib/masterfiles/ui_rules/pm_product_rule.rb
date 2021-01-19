@@ -91,9 +91,10 @@ module UiRules
         return
       end
 
-      res = @repo.find_pm_product(@options[:id])
-      attrs = @repo.fruit_composition_level?(res.pm_subtype_id) ? @repo.find_std_fruit_size_by_product_code(res.product_code) : {}
-      @form_object = OpenStruct.new(res.to_h.merge(attrs))
+      pm_product = @repo.find_pm_product(@options[:id])
+      extended_attrs = {}
+      extended_attrs = @fruit_size_repo.find_std_fruit_size_count(pm_product.std_fruit_size_count_id).to_h if @repo.fruit_composition_level?(pm_product.pm_subtype_id)
+      @form_object = OpenStruct.new(pm_product.to_h.merge(extended_attrs))
     end
 
     def make_new_form_object

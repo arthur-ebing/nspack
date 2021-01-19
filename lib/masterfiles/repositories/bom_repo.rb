@@ -130,16 +130,20 @@ module MasterfilesApp
 
     def find_pm_product(id)
       query = <<~SQL
-        SELECT pm_products.*, pm_subtypes.subtype_code, pm_types.pm_type_code, basic_pack_codes.basic_pack_code,
-        pm_composition_levels.composition_level
+        SELECT
+            pm_products.*,
+            pm_subtypes.subtype_code,
+            pm_types.pm_type_code,
+            basic_pack_codes.basic_pack_code,
+            pm_composition_levels.composition_level
         FROM pm_products
         LEFT JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
         LEFT JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         LEFT JOIN basic_pack_codes ON basic_pack_codes.id = pm_products.basic_pack_id
-        WHERE pm_products.id = #{id}
+        WHERE pm_products.id = ?
       SQL
-      hash = DB[query].first
+      hash = DB[query, id].first
       return nil if hash.nil?
 
       PmProduct.new(hash)
@@ -260,46 +264,6 @@ module MasterfilesApp
         .where(pm_bom_id: pm_bom_id)
         .distinct(Sequel[:pm_types][:id])
         .select_map(Sequel[:pm_types][:id])
-    end
-
-    def pm_composition_level_exists?(description)
-      exists?(:pm_composition_levels, description: description)
-    end
-
-    def find_pm_composition_level_by_code(description)
-      DB[:pm_composition_levels].where(description: description).get(:id)
-    end
-
-    def pm_type_code_exists?(pm_type_code)
-      exists?(:pm_types, pm_type_code: pm_type_code)
-    end
-
-    def find_pm_type_by_code(pm_type_code)
-      DB[:pm_types].where(pm_type_code: pm_type_code).get(:id)
-    end
-
-    def pm_subtype_code_exists?(subtype_code)
-      exists?(:pm_subtypes, subtype_code: subtype_code)
-    end
-
-    def find_pm_subtype_by_code(subtype_code)
-      DB[:pm_subtypes].where(subtype_code: subtype_code).get(:id)
-    end
-
-    def pm_bom_code_exists?(bom_code)
-      exists?(:pm_boms, bom_code: bom_code)
-    end
-
-    def find_pm_bom_by_code(bom_code)
-      DB[:pm_boms].where(bom_code: bom_code).get(:id)
-    end
-
-    def pm_product_code_exists?(product_code)
-      exists?(:pm_products, product_code: product_code)
-    end
-
-    def find_pm_product_by_code(product_code)
-      DB[:pm_products].where(product_code: product_code).get(:id)
     end
 
     def composition_levels
@@ -566,6 +530,33 @@ module MasterfilesApp
                                  .get(:id)
 
       DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).first
+    end
+
+    def sync_pm_boms # rubocop:disable Metrics/AbcSize
+      pm_composition_level_id = get_id_or_create(:pm_composition_levels,
+                                                 composition_level: AppConst::FRUIT_COMPOSITION_LEVEL,
+                                                 description: AppConst::FRUIT_PM_TYPE)
+      pm_type_id = get_id_or_create(:pm_types,
+                                    pm_composition_level_id: pm_composition_level_id,
+                                    pm_type_code: AppConst::FRUIT_PM_TYPE,
+                                    description: AppConst::FRUIT_PM_TYPE)
+
+      select_values(:std_fruit_size_counts, :id).each do |id|
+        rec = FruitSizeRepo.new.find_std_fruit_size_count(id).to_h
+        pm_subtype_id = get_id_or_create(:pm_subtypes,
+                                         pm_type_id: pm_type_id,
+                                         subtype_code: rec[:commodity_code],
+                                         description: rec[:commodity_code])
+        next if exists?(:pm_products, product_code: rec[:product_code])
+
+        create_pm_product(
+          pm_subtype_id: pm_subtype_id,
+          std_fruit_size_count_id: id,
+          product_code: rec[:product_code],
+          erp_code: rec[:product_code],
+          description: rec[:description]
+        )
+      end
     end
   end
 end
