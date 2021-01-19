@@ -21,14 +21,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_uom_type(res)
-        log_status('uom_types', id, 'CREATED')
+        log_status(:uom_types, id, 'CREATED')
         log_transaction
       end
       instance = uom_type(id)
-      success_response("Created uom type #{instance.code}",
-                       instance)
+      success_response("Created UOM type #{instance.code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { code: ['This uom type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { code: ['This UOM type already exists'] }))
     end
 
     def update_uom_type(id, params)
@@ -40,18 +39,17 @@ module MasterfilesApp
         log_transaction
       end
       instance = uom_type(id)
-      success_response("Updated uom type #{instance.code}",
-                       instance)
+      success_response("Updated UOM type #{instance.code}", instance)
     end
 
     def delete_uom_type(id)
       name = uom_type(id).code
       repo.transaction do
         repo.delete_uom_type(id)
-        log_status('uom_types', id, 'DELETED')
+        log_status(:uom_types, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted uom type #{name}")
+      success_response("Deleted UOM type #{name}")
     end
   end
 end

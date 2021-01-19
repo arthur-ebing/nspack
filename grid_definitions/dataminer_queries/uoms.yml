@@ -90,7 +90,7 @@
   uom_type_code:
     :name: uom_type_code
     :sequence_no: 6
-    :caption: Uoms type code
+    :caption: UOM type code
     :namespaced_name: uom_types.code
     :data_type: :string
     :width:

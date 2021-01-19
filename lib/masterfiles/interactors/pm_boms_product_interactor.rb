@@ -11,14 +11,13 @@ module MasterfilesApp
         id = repo.create_pm_boms_product(res)
         system_code = repo.pm_bom_system_code(res[:pm_bom_id])
         repo.update_pm_bom(res[:pm_bom_id], { bom_code: system_code, system_code: system_code })
-        log_status('pm_boms_products', id, 'CREATED')
+        log_status(:pm_boms_products, id, 'CREATED')
         log_transaction
       end
       instance = pm_boms_product(id)
-      success_response("Created pm boms product #{instance.id}",
-                       instance)
+      success_response("Created PM BOM product #{instance.id}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { uom_id: ['This pm boms product already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { uom_id: ['This PM BOM product already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -34,8 +33,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_boms_product(id)
-      success_response("Updated pm boms product #{instance.id}",
-                       instance)
+      success_response("Updated PM BOM product #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -48,11 +46,11 @@ module MasterfilesApp
         repo.delete_pm_boms_product(id)
         system_code = repo.pm_bom_system_code(pm_bom_id)
         repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
-        log_status('pm_boms_products', id, 'DELETED')
+        log_status(:pm_boms_products, id, 'DELETED')
         log_transaction
       end
       instance = pm_bom(pm_bom_id)
-      success_response("Deleted pm boms product #{name}", instance)
+      success_response("Deleted PM BOM product #{name}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
