@@ -13,10 +13,12 @@ module MasterfilesApp
                      label: :surname,
                      value: :id,
                      order_by: :surname
-    def for_select_roles(where: nil, active: true)
-      ds = DB[:roles].where(active: active, specialised: false)
-      ds = ds.where(where) unless where.nil?
-      ds.order(:name).select_map(%i[name id])
+    def for_select_roles(where: {}, active: true)
+      DB[:roles]
+        .where(active: active, specialised: false)
+        .where(where)
+        .order(:name)
+        .select_map(%i[name id])
     end
 
     crud_calls_for :organizations, name: :organization, wrapper: Organization
@@ -354,34 +356,35 @@ module MasterfilesApp
       for_select_party_roles(role, active: false)
     end
 
-    def for_select_party_roles(role, where: nil, active: true)
-      ds = DB[:party_roles].where(active: active)
-      ds = ds.where(role_id: get_id(:roles, name: role))
-      ds = ds.where(where) unless where.nil?
-      ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
-             .order(Sequel.function(:fn_party_role_name, :id))
-      ds.map { |r| [r[:fn_party_role_name], r[:id]] }
+    def for_select_party_roles(role, where: {}, active: true)
+      DB[:party_roles]
+        .where(active: active)
+        .where(role_id: get_id(:roles, name: role))
+        .where(where)
+        .select(:id, Sequel.function(:fn_party_role_name, :id))
+        .order(Sequel.function(:fn_party_role_name, :id))
+        .map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
-    def for_select_party_roles_exclude(role, where: nil, active: true)
+    def for_select_party_roles_exclude(role, where: {}, active: true)
       parties_with_role = DB[:party_roles].where(role_id: get_id(:roles, name: role)).where(active: active).select_map(:party_id)
 
-      ds = DB[:party_roles].where(active: active)
-      ds = ds.exclude(party_id: parties_with_role)
-      ds = ds.where(where) unless where.nil?
-      ds = ds.select(:id, Sequel.function(:fn_party_role_name, :id))
-             .distinct(Sequel.function(:fn_party_role_name, :id))
-             .order(Sequel.function(:fn_party_role_name, :id))
-      ds.map { |r| [r[:fn_party_role_name], r[:id]] }
+      DB[:party_roles]
+        .where(active: active)
+        .exclude(party_id: parties_with_role)
+        .where(where)
+        .distinct(Sequel.function(:fn_party_role_name, :id))
+        .order(Sequel.function(:fn_party_role_name, :id))
+        .select(:id, Sequel.function(:fn_party_role_name, :id))
+        .map { |r| [r[:fn_party_role_name], r[:id]] }
     end
 
-    def for_select_party_roles_org_code(role, active: true)
-      DB[:party_roles].where(
-        role_id: DB[:roles].where(name: role).select(:id), active: active
-      ).select(
-        :id,
-        Sequel.function(:fn_party_role_org_code, :id)
-      ).map { |r| [r[:fn_party_role_org_code], r[:id]] }
+    def for_select_party_roles_org_code(role, where: {}, active: true)
+      DB[:party_roles]
+        .where(role_id: DB[:roles].where(name: role).select(:id), active: active)
+        .where(where)
+        .select(Sequel.function(:fn_party_role_org_code, :id), :id)
+        .map { |r| [r[:fn_party_role_org_code], r[:id]] }
     end
 
     def find_role_by_party_role(party_role_id)

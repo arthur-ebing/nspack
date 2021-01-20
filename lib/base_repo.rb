@@ -303,9 +303,9 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @param order [Symbol] the order by clause.
   # @param descending [Boolean] return in descending order. Default is false.
   # @return [Array] the values from the column(s) of each row.
-  def select_values_in_order(table_name, columns, where: nil, order:, descending: false)
+  def select_values_in_order(table_name, columns, where: {}, order:, descending: false)
     ds = DB[table_name]
-    ds = ds.where(where) if where
+    ds = ds.where(where)
     ds = ds.order(order) if order && !descending
     ds = ds.reverse(order) if order && descending
     ds.select_map(columns)

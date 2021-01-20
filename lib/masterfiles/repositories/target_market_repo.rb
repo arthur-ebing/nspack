@@ -109,17 +109,21 @@ module MasterfilesApp
       DB[:target_markets_for_countries].join(:destination_countries, id: :destination_country_id).where(target_market_id: target_market_id).select_map(:country_name).sort
     end
 
-    def for_select_packed_tm_groups(where: nil)
-      ds = DB[:target_market_groups]
-      ds.where(target_market_group_type_id: get_id(:target_market_group_types, target_market_group_type_code: AppConst::PACKED_TM_GROUP))
-      ds = ds.where(where) unless where.nil?
-      ds.select_map(%i[target_market_group_name id])
+    def for_select_packed_tm_groups(where: {}, active: true)
+      DB[:target_market_groups]
+        .where(target_market_group_type_id: get_id(:target_market_group_types, target_market_group_type_code: AppConst::PACKED_TM_GROUP))
+        .where(active: active)
+        .where(where)
+        .select_map(%i[target_market_group_name id])
     end
 
-    def for_select_packed_group_tms(where: nil)
-      ds = DB[:target_markets].join(:target_markets_for_groups, target_market_id: :id).distinct(:target_market_id)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map(%i[target_market_name target_market_id])
+    def for_select_packed_group_tms(where: {}, active: true)
+      DB[:target_markets]
+        .join(:target_markets_for_groups, target_market_id: :id)
+        .where(active: active)
+        .where(where)
+        .distinct(:target_market_id)
+        .select_map(%i[target_market_name target_market_id])
     end
 
     def find_tm_group_regions(id)

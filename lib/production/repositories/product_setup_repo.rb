@@ -6,14 +6,15 @@ module ProductionApp
     build_inactive_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
     crud_calls_for :product_setup_templates, name: :product_setup_template, wrapper: ProductSetupTemplate
 
-    def for_select_product_setups(where: nil, active: true)
-      ds = DB[:product_setups].where(active)
-      ds = ds.where(where) unless where.nil?
-      ds = ds.select(:id, Sequel.function(:fn_product_setup_code, :id))
-      ds.map { |r| [r[:fn_product_setup_code], r[:id]] }
+    def for_select_product_setups(where: {}, active: true)
+      DB[:product_setups]
+        .where(active: active)
+        .where(where)
+        .select(:id, Sequel.function(:fn_product_setup_code, :id))
+        .map { |r| [r[:fn_product_setup_code], r[:id]] }
     end
 
-    def for_select_inactive_product_setups(where: nil)
+    def for_select_inactive_product_setups(where: {})
       for_select_product_setups(where: where, active: false)
     end
 
