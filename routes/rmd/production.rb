@@ -221,14 +221,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_select(:fruit_sticker_pm_product_id,
                           'Fruit Sticker',
                           items: MasterfilesApp::BomRepo.new.for_select_pm_products(
-                            where: { pm_type_code: AppConst::PM_TYPE_FRUIT_STICKER }
+                            where: { subtype_code: AppConst::PM_SUBTYPE_FRUIT_STICKER }
                           ),
                           value: pallet_sequence[:fruit_sticker_pm_product_id],
                           prompt: true)
           form.add_select(:fruit_sticker_pm_product_2_id,
                           'Fruit Sticker 2',
                           items: MasterfilesApp::BomRepo.new.for_select_pm_products(
-                            where: { pm_type_code: AppConst::PM_TYPE_FRUIT_STICKER }
+                            where: { subtype_code: AppConst::PM_SUBTYPE_FRUIT_STICKER }
                           ),
                           value: pallet_sequence[:fruit_sticker_pm_product_2_id],
                           prompt: true)

@@ -1192,7 +1192,7 @@ module ProductionApp
     end
 
     def second_fruit_stickers(fruit_sticker_pm_product_id)
-      repo.for_selected_second_pm_products(AppConst::PM_TYPE_FRUIT_STICKER, fruit_sticker_pm_product_id)
+      repo.for_selected_second_pm_products(AppConst::PM_SUBTYPE_FRUIT_STICKER, fruit_sticker_pm_product_id)
     end
 
     def for_select_to_orchards(from_orchard_id)

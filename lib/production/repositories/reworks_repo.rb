@@ -627,13 +627,13 @@ module ProductionApp
         ).map { |r| [r[:marketing_variety_code], r[:id]] }
     end
 
-    def for_selected_second_pm_products(pm_type, fruit_sticker_pm_product_id)
+    def for_selected_second_pm_products(subtype_code, fruit_sticker_pm_product_id)
       query = <<~SQL
         SELECT p.id, p.product_code
         FROM pm_products p
         JOIN pm_subtypes s on s.id = p.pm_subtype_id
         JOIN pm_types t on t.id = s.pm_type_id
-        WHERE t.pm_type_code = '#{pm_type}' AND p.id != #{fruit_sticker_pm_product_id}
+        WHERE s.subtype_code = '#{subtype_code}' AND p.id != #{fruit_sticker_pm_product_id}
       SQL
       DB[query].map { |r| [r[:product_code], r[:id]] }
     end

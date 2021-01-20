@@ -16,7 +16,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:packing_specification_code] = { renderer: :label, caption: 'Packing Specification Code' }
+      fields[:packing_specification_code] = { renderer: :label, caption: 'Packing Specification' }
       fields[:product_setup] = { renderer: :label,  caption: 'Product Setup' }
       fields[:description] = { renderer: :label }
       fields[:pm_bom] = { renderer: :label,  caption: 'PM BOM' }
@@ -33,7 +33,7 @@ module UiRules
     def common_fields # rubocop:disable Metrics/AbcSize
       {
         packing_specification_code: { renderer: :label,
-                                      caption: 'Packing Specification Code' },
+                                      caption: 'Packing Specification' },
         product_setup: { renderer: :label,
                          caption: 'Product Setup' },
         description: {},
@@ -62,7 +62,7 @@ module UiRules
         tu_labour_product_id: { renderer: :select,
                                 caption: 'TU Labour Product',
                                 options: @bom_repo.for_select_pm_products(
-                                  where: { pm_subtype_id: get_subtype_id('TU_LABOUR') }
+                                  where: { subtype_code: AppConst::PM_SUBTYPE_TU_LABOUR }
                                 ),
                                 disabled_options: @bom_repo.for_select_inactive_pm_products,
                                 prompt: true,
@@ -70,7 +70,7 @@ module UiRules
         ru_labour_product_id: { renderer: :select,
                                 caption: 'RU Labour Product',
                                 options: @bom_repo.for_select_pm_products(
-                                  where: { pm_subtype_id: get_subtype_id('RU_LABOUR') }
+                                  where: { subtype_code: AppConst::PM_SUBTYPE_RU_LABOUR }
                                 ),
                                 disabled_options: @bom_repo.for_select_inactive_pm_products,
                                 prompt: true,
@@ -78,7 +78,7 @@ module UiRules
         ri_labour_product_id: { renderer: :select,
                                 caption: 'RI Labour Product',
                                 options: @bom_repo.for_select_pm_products(
-                                  where: { pm_subtype_id: get_subtype_id('RI_LABOUR') }
+                                  where: { subtype_code: AppConst::PM_SUBTYPE_RI_LABOUR }
                                 ),
                                 disabled_options: @bom_repo.for_select_inactive_pm_products,
                                 prompt: true,
@@ -86,21 +86,21 @@ module UiRules
         fruit_sticker_ids: { renderer: :multi,
                              caption: 'Fruit Stickers',
                              options: @bom_repo.for_select_pm_products(
-                               where: { pm_subtype_id: get_subtype_id('FRUIT_STICKER') }
+                               where: { subtype_code: AppConst::PM_SUBTYPE_FRUIT_STICKER }
                              ),
                              selected: @form_object.fruit_sticker_ids,
                              required: false },
         tu_sticker_ids: { renderer: :multi,
                           caption: 'TU Stickers',
                           options: @bom_repo.for_select_pm_products(
-                            where: { pm_subtype_id: get_subtype_id('TU_STICKER') }
+                            where: { subtype_code: AppConst::PM_SUBTYPE_TU_STICKER }
                           ),
                           selected: @form_object.tu_sticker_ids,
                           required: false },
         ru_sticker_ids: { renderer: :multi,
                           caption: 'RU Stickers',
                           options: @bom_repo.for_select_pm_products(
-                            where: { pm_subtype_id: get_subtype_id('RU_STICKER') }
+                            where: { subtype_code: AppConst::PM_SUBTYPE_RU_STICKER }
                           ),
                           selected: @form_object.ru_sticker_ids,
                           required: false }
@@ -127,12 +127,6 @@ module UiRules
                                     fruit_sticker_ids: nil,
                                     tu_sticker_ids: nil,
                                     ru_sticker_ids: nil)
-    end
-
-    private
-
-    def get_subtype_id(subtype_code)
-      @repo.get_id(:pm_subtypes, subtype_code: subtype_code)
     end
   end
 end

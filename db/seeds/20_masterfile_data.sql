@@ -7,11 +7,19 @@ INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Fax') ON C
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Cell') ON CONFLICT DO NOTHING;
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Email') ON CONFLICT DO NOTHING;
 
--- PM TYPE
+-- PM TYPES
 INSERT INTO pm_types (pm_type_code, description) VALUES ('BIN', 'BIN') ON CONFLICT DO NOTHING;
 INSERT INTO pm_types (pm_type_code, description) VALUES ('CARTON', 'CARTON') ON CONFLICT DO NOTHING;
 INSERT INTO pm_types (pm_type_code, description) VALUES ('STICKER', 'STICKER') ON CONFLICT DO NOTHING;
 INSERT INTO pm_types (pm_type_code, description) VALUES ('LABOUR', 'LABOUR') ON CONFLICT DO NOTHING;
+
+-- PM SUBTYPES
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('FRUIT_STICKER', 'FRUIT_STICKER', (SELECT id FROM pm_types WHERE pm_type_code = 'STICKER')) ON CONFLICT DO NOTHING;
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('TU_STICKER', 'TU_STICKER', (SELECT id FROM pm_types WHERE pm_type_code = 'STICKER')) ON CONFLICT DO NOTHING;
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('RU_STICKER', 'RU_STICKER', (SELECT id FROM pm_types WHERE pm_type_code = 'STICKER')) ON CONFLICT DO NOTHING;
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('TU_LABOUR', 'TU_LABOUR', (SELECT id FROM pm_types WHERE pm_type_code = 'LABOUR')) ON CONFLICT DO NOTHING;
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('RU_LABOUR', 'RU_LABOUR', (SELECT id FROM pm_types WHERE pm_type_code = 'LABOUR')) ON CONFLICT DO NOTHING;
+INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('RI_LABOUR', 'RI_LABOUR', (SELECT id FROM pm_types WHERE pm_type_code = 'LABOUR')) ON CONFLICT DO NOTHING;
 
 -- PORT_TYPES
 INSERT INTO port_types (port_type_code, description) VALUES('POL', 'Port of Loading') ON CONFLICT DO NOTHING;
