@@ -83,7 +83,7 @@ module ProductionApp
       {
         id: 1,
         packing_specification_id: packing_specification_id,
-        packing_specification_code: 'ABC',
+        packing_specification: 'ABC',
         description: Faker::Lorem.unique.word,
         pm_bom_id: pm_bom_id,
         pm_bom: 'ABC',
@@ -99,10 +99,16 @@ module ProductionApp
         ri_labour_product: 'ABC',
         fruit_sticker_ids: [1, 2, 3],
         fruit_stickers: %w[A B C],
+        fruit_sticker_1: 'ABC',
+        fruit_sticker_2: 'ABC',
         tu_sticker_ids: [1, 2, 3],
         tu_stickers: %w[A B C],
+        tu_sticker_1: 'ABC',
+        tu_sticker_2: 'ABC',
         ru_sticker_ids: [1, 2, 3],
         ru_stickers: %w[A B C],
+        ru_sticker_1: 'ABC',
+        ru_sticker_2: 'ABC',
         active: true
       }
     end

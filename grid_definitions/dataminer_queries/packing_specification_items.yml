@@ -1,29 +1,30 @@
 ---
 :caption: Packing Specification Items
 :sql: "SELECT\r\n    packing_specification_items.id,\r\n    packing_specification_items.packing_specification_id,\r\n
-  \   packing_specifications.packing_specification_code,\r\n    packing_specification_items.product_setup_id,\r\n
-  \   fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,\r\n
-  \   packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
+  \   packing_specifications.packing_specification_code AS packing_specification,\r\n
+  \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
+  AS product_setup,\r\n    packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
   \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
-  \   pm_marks.description AS pm_mark,\r\n    packing_specification_items.tu_labour_product_id,\r\n
-  \   pm_products_tu.product_code AS tu_labour_product,\r\n    packing_specification_items.ru_labour_product_id,\r\n
-  \   pm_products_ru.product_code AS ru_labour_product,\r\n    packing_specification_items.ri_labour_product_id,\r\n
-  \   pm_products_ri.product_code AS ri_labour_product,\r\n    packing_specification_items.fruit_sticker_ids,\r\n
-  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.fruit_sticker_ids)
-  GROUP BY packing_specification_items.id) AS fruit_stickers,\r\n    packing_specification_items.tu_sticker_ids,\r\n
-  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.tu_sticker_ids)
-  GROUP BY packing_specification_items.id) AS tu_stickers,\r\n    packing_specification_items.ru_sticker_ids,\r\n
-  \   (SELECT array_agg(product_code) FROM pm_products WHERE pm_products.id = ANY(packing_specification_items.ru_sticker_ids)
-  GROUP BY packing_specification_items.id) AS ru_stickers,\r\n    packing_specification_items.active,\r\n
+  \   pm_marks.description AS pm_mark,\r\n\r\n    pm_products_tu.product_code AS tu_labour_product,\r\n
+  \   pm_products_ru.product_code AS ru_labour_product,\r\n    pm_products_ri.product_code
+  AS ri_labour_product,\r\n\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
+  = fruit_sticker_ids[1] ) AS fruit_sticker_1,\r\n    (SELECT product_code FROM pm_products
+  WHERE pm_products.id = fruit_sticker_ids[2] ) AS fruit_sticker_2,\r\n\r\n    (SELECT
+  product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[1] ) AS tu_sticker_1,\r\n
+  \   (SELECT product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[2]
+  ) AS tu_sticker_2,\r\n\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
+  = ru_sticker_ids[1] ) AS ru_sticker_1,\r\n    (SELECT product_code FROM pm_products
+  WHERE pm_products.id = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
   \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
-  AS status\r\nFROM packing_specification_items\r\n         JOIN packing_specifications
-  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\n
-  \        LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\n
-  \        LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\n
-  \        LEFT JOIN pm_products pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\n
-  \        LEFT JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\n
-  \        LEFT JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id"
+  AS status\r\n\r\nFROM packing_specification_items\r\nJOIN packing_specifications
+  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\nLEFT
+  JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
+  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN pm_products
+  pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\nLEFT
+  JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
+  JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
+  BY packing_specification_items.updated_at DESC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -60,17 +61,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packing_specification_code:
-    :name: packing_specification_code
+  packing_specification:
+    :name: packing_specification
     :sequence_no: 3
-    :caption: Packing specification code
+    :caption: Packing specification
     :namespaced_name: packing_specifications.packing_specification_code
     :data_type: :string
-    :width: 
+    :width: 160
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -188,25 +189,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  tu_labour_product_id:
-    :name: tu_labour_product_id
-    :sequence_no: 11
-    :caption: TU Labour product id
-    :namespaced_name: packing_specification_items.tu_labour_product_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   tu_labour_product:
     :name: tu_labour_product
-    :sequence_no: 12
+    :sequence_no: 11
     :caption: TU Labour product
     :namespaced_name: pm_products_tu.product_code
     :data_type: :string
@@ -220,25 +205,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  ru_labour_product_id:
-    :name: ru_labour_product_id
-    :sequence_no: 13
-    :caption: RU Labour product id
-    :namespaced_name: packing_specification_items.ru_labour_product_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   ru_labour_product:
     :name: ru_labour_product
-    :sequence_no: 14
+    :sequence_no: 12
     :caption: RU Labour product
     :namespaced_name: pm_products_ru.product_code
     :data_type: :string
@@ -252,25 +221,9 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  ri_labour_product_id:
-    :name: ri_labour_product_id
-    :sequence_no: 15
-    :caption: RI Labour product id
-    :namespaced_name: packing_specification_items.ri_labour_product_id
-    :data_type: :integer
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
   ri_labour_product:
     :name: ri_labour_product
-    :sequence_no: 16
+    :sequence_no: 13
     :caption: RI Labour product
     :namespaced_name: pm_products_ri.product_code
     :data_type: :string
@@ -284,15 +237,63 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fruit_sticker_ids:
-    :name: fruit_sticker_ids
+  fruit_sticker_1:
+    :name: fruit_sticker_1
+    :sequence_no: 14
+    :caption: Fruit Sticker 1
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  fruit_sticker_2:
+    :name: fruit_sticker_2
+    :sequence_no: 15
+    :caption: Fruit Sticker 2
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_sticker_1:
+    :name: tu_sticker_1
+    :sequence_no: 16
+    :caption: TU Sticker 1
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  tu_sticker_2:
+    :name: tu_sticker_2
     :sequence_no: 17
-    :caption: Fruit sticker ids
-    :namespaced_name: packing_specification_items.fruit_sticker_ids
-    :data_type: :integer_array
+    :caption: TU Sticker 2
+    :namespaced_name: 
+    :data_type: :string
     :width: 
     :format: 
-    :hide: true
+    :hide: false
     :pinned: 
     :groupable: false
     :group_by_seq: 
@@ -300,10 +301,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  fruit_stickers:
-    :name: fruit_stickers
+  ru_sticker_1:
+    :name: ru_sticker_1
     :sequence_no: 18
-    :caption: Fruit Stickers
+    :caption: RU Sticker 1
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -316,58 +317,10 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  tu_sticker_ids:
-    :name: tu_sticker_ids
+  ru_sticker_2:
+    :name: ru_sticker_2
     :sequence_no: 19
-    :caption: TU sticker ids
-    :namespaced_name: packing_specification_items.tu_sticker_ids
-    :data_type: :integer_array
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  tu_stickers:
-    :name: tu_stickers
-    :sequence_no: 20
-    :caption: TU Stickers
-    :namespaced_name: 
-    :data_type: :string
-    :width: 
-    :format: 
-    :hide: false
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  ru_sticker_ids:
-    :name: ru_sticker_ids
-    :sequence_no: 21
-    :caption: RU Sticker ids
-    :namespaced_name: packing_specification_items.ru_sticker_ids
-    :data_type: :integer_array
-    :width: 
-    :format: 
-    :hide: true
-    :pinned: 
-    :groupable: false
-    :group_by_seq: 
-    :group_sum: false
-    :group_avg: false
-    :group_min: false
-    :group_max: false
-  ru_stickers:
-    :name: ru_stickers
-    :sequence_no: 22
-    :caption: RU Stickers
+    :caption: RU Sticker 2
     :namespaced_name: 
     :data_type: :string
     :width: 
@@ -382,7 +335,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 23
+    :sequence_no: 20
     :caption: Active
     :namespaced_name: packing_specification_items.active
     :data_type: :boolean
@@ -398,7 +351,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 24
+    :sequence_no: 21
     :caption: Created at
     :namespaced_name: packing_specification_items.created_at
     :data_type: :datetime
@@ -414,7 +367,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 25
+    :sequence_no: 22
     :caption: Updated at
     :namespaced_name: packing_specification_items.updated_at
     :data_type: :datetime
@@ -430,7 +383,7 @@
     :group_max: false
   status:
     :name: status
-    :sequence_no: 26
+    :sequence_no: 23
     :caption: Status
     :namespaced_name: 
     :data_type: :string

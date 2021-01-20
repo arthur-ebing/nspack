@@ -102,7 +102,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         if res.success
           row_keys = %i[
             packing_specification_id
-            packing_specification_code
+            packing_specification
             description
             pm_bom_id
             pm_bom
@@ -110,18 +110,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             pm_mark
             product_setup_id
             product_setup
-            tu_labour_product_id
             tu_labour_product
-            ru_labour_product_id
             ru_labour_product
-            ri_labour_product_id
             ri_labour_product
-            fruit_sticker_ids
-            fruit_stickers
-            tu_sticker_ids
-            tu_stickers
-            ru_sticker_ids
-            ru_stickers
+            fruit_sticker_1
+            fruit_sticker_2
+            tu_sticker_1
+            tu_sticker_2
+            ru_sticker_1
+            ru_sticker_2
             status
           ]
           update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -140,7 +137,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               packing_specification_id
-              packing_specification_code
+              packing_specification
               description
               pm_bom_id
               pm_bom
@@ -148,18 +145,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               pm_mark
               product_setup_id
               product_setup
-              tu_labour_product_id
               tu_labour_product
-              ru_labour_product_id
               ru_labour_product
-              ri_labour_product_id
               ri_labour_product
-              fruit_sticker_ids
-              fruit_stickers
-              tu_sticker_ids
-              tu_stickers
-              ru_sticker_ids
-              ru_stickers
+              fruit_sticker_1
+              fruit_sticker_2
+              tu_sticker_1
+              tu_sticker_2
+              ru_sticker_1
+              ru_sticker_2
               status
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
@@ -199,7 +193,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             packing_specification_id
-            packing_specification_code
+            packing_specification
             description
             pm_bom_id
             pm_bom
@@ -207,18 +201,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             pm_mark
             product_setup_id
             product_setup
-            tu_labour_product_id
             tu_labour_product
-            ru_labour_product_id
             ru_labour_product
-            ri_labour_product_id
             ri_labour_product
-            fruit_sticker_ids
-            fruit_stickers
-            tu_sticker_ids
-            tu_stickers
-            ru_sticker_ids
-            ru_stickers
+            fruit_sticker_1
+            fruit_sticker_2
+            tu_sticker_1
+            tu_sticker_2
+            ru_sticker_1
+            ru_sticker_2
             status
             active
           ]
