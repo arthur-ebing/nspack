@@ -335,6 +335,8 @@ module MasterfilesApp
     end
 
     def can_edit_product_code?(pm_subtype_id)
+      return true unless pm_subtype_id
+
       fruit_composition = fruit_composition_level
       subtype_composition_level = find_pm_subtype(pm_subtype_id).composition_level
       return false if [minimum_composition_level, fruit_composition, fruit_composition - 1].include?(subtype_composition_level)
