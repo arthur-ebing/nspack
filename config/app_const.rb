@@ -173,8 +173,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Constants for PM Types
   PM_TYPE_STICKER = 'STICKER'
   PM_TYPE_LABOUR = 'LABOUR'
-  PM_TYPE_LABOUR = 'BIN'
-  PM_TYPE_LABOUR = 'CARTON'
+  PM_TYPE_BIN = 'BIN'
+  PM_TYPE_CARTON = 'CARTON'
 
   # Constants for PM Subtypes
   PM_SUBTYPE_FRUIT_STICKER = 'FRUIT_STICKER'
