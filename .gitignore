@@ -68,3 +68,4 @@ pdf_documentation/*.png
 /ftp_transfer/
 /edi/
 /edi_filedrop/
+/.env.local*

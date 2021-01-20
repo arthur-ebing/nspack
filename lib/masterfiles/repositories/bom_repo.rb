@@ -333,11 +333,11 @@ module MasterfilesApp
     end
 
     def fruit_composition_level
-      DB[:pm_composition_levels].where(description: AppConst::FRUIT_PM_TYPE).get(:composition_level) || AppConst::FRUIT_COMPOSITION_LEVEL
+      DB[:pm_composition_levels].where(description: AppConst::PM_TYPE_FRUIT).get(:composition_level)
     end
 
     def fruit_composition_level?(pm_subtype_id)
-      subtype_composition_description(pm_subtype_id) == AppConst::FRUIT_PM_TYPE
+      subtype_composition_description(pm_subtype_id) == AppConst::PM_TYPE_FRUIT
     end
 
     def one_level_up_fruit_composition?(pm_subtype_id)
@@ -438,13 +438,9 @@ module MasterfilesApp
     end
 
     def sync_pm_boms # rubocop:disable Metrics/AbcSize
-      pm_composition_level_id = get_id_or_create(:pm_composition_levels,
-                                                 composition_level: AppConst::FRUIT_COMPOSITION_LEVEL,
-                                                 description: AppConst::FRUIT_PM_TYPE)
-      pm_type_id = get_id_or_create(:pm_types,
-                                    pm_composition_level_id: pm_composition_level_id,
-                                    pm_type_code: AppConst::FRUIT_PM_TYPE,
-                                    description: AppConst::FRUIT_PM_TYPE)
+      pm_type_id = get_id(:pm_types, pm_type_code: AppConst::PM_TYPE_FRUIT)
+      pm_composition_level_id = get(:pm_types, pm_type_id, :pm_composition_level_id)
+      raise Crossbeams::InfoError, "Please define a PM Type with a composition level for #{AppConst::PM_TYPE_FRUIT}" if pm_type_id.nil? || pm_composition_level_id.nil?
 
       select_values(:std_fruit_size_counts, :id).each do |id|
         rec = FruitSizeRepo.new.find_std_fruit_size_count(id).to_h
