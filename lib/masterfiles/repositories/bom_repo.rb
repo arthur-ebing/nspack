@@ -135,6 +135,16 @@ module MasterfilesApp
       DB[query].all unless id.nil?
     end
 
+    def for_select_pm_marks(where: {}, active: true) # rubocop:disable Metrics/AbcSize
+      DB[:pm_marks]
+        .join(:marks, id: :mark_id)
+        .where(Sequel[:pm_marks][:active] => active)
+        .where(where)
+        .order(:description)
+        .select(:mark_code, Sequel[:pm_marks][:description], Sequel[:pm_marks][:id])
+        .map { |r| ["#{r[:description]} - #{r[:mark_code]}", r[:id]] }
+    end
+
     def for_select_pm_boms_products(where: {}, active: true)
       DB[:pm_boms_products]
         .join(:pm_products, id: :pm_product_id)

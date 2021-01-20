@@ -16,7 +16,7 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:packing_specification_code] = { renderer: :label, caption: 'Packing Specification' }
+      fields[:packing_specification] = { renderer: :label, caption: 'Packing Specification' }
       fields[:product_setup] = { renderer: :label,  caption: 'Product Setup' }
       fields[:description] = { renderer: :label }
       fields[:pm_bom] = { renderer: :label,  caption: 'PM BOM' }
@@ -32,8 +32,8 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        packing_specification_code: { renderer: :label,
-                                      caption: 'Packing Specification' },
+        packing_specification: { renderer: :label,
+                                 caption: 'Packing Specification' },
         product_setup: { renderer: :label,
                          caption: 'Product Setup' },
         description: {},

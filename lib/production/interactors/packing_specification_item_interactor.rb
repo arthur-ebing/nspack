@@ -19,6 +19,8 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_packing_specification_item(res)
+        check!(:duplicates, id)
+
         log_status(:packing_specification_items, id, 'CREATED')
         log_transaction
       end
@@ -36,7 +38,8 @@ module ProductionApp
 
       repo.transaction do
         repo.update_packing_specification_item(id, res)
-        log_status(:packing_specification_items, id, 'UPDATED')
+        check!(:duplicates, id)
+
         log_transaction
       end
       instance = packing_specification_item(id)
@@ -45,20 +48,14 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def inline_update_packing_specification_item(id, params) # rubocop:disable Metrics/AbcSize
+    def inline_update_packing_specification_item(id, params)
       repo.transaction do
-        if params[:column_name] == 'description'
-          repo.update_packing_specification_item(id, description: params[:column_value])
-        elsif params[:column_name] == 'pm_mark'
-          repo.update_packing_specification_item(id, pm_mark_id: repo.get_id(:pm_marks, description: params[:column_value]))
-        elsif params[:column_name] == 'pm_bom'
-          repo.update_packing_specification_item(id, pm_bom_id: repo.get_id(:pm_boms, bom_code: params[:column_value]))
-        else
-          raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
-        end
-        log_status(:packing_specification_items, id, 'UPDATED')
+        repo.inline_update_packing_specification_item(id, params)
+        check!(:duplicates, id)
+
         log_transaction
       end
+
       instance = packing_specification_item(id)
       success_response('Updated packing specification item', instance)
     rescue Crossbeams::InfoError => e
@@ -82,6 +79,11 @@ module ProductionApp
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::PackingSpecificationItem.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def check!(task, id = nil)
+      res = TaskPermissionCheck::PackingSpecificationItem.call(task, id)
+      raise Crossbeams::InfoError, res.message unless res.success
     end
 
     def packing_specification_item(id)

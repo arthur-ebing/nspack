@@ -4,7 +4,7 @@ module ProductionApp
   class PackingSpecificationItem < Dry::Struct
     attribute :id, Types::Integer
     attribute :packing_specification_id, Types::Integer
-    attribute :packing_specification_code, Types::String
+    attribute :packing_specification, Types::String
     attribute :description, Types::String
     attribute :pm_bom_id, Types::Integer
     attribute :pm_bom, Types::String
@@ -20,10 +20,16 @@ module ProductionApp
     attribute :ri_labour_product, Types::String
     attribute :fruit_sticker_ids, Types::Array
     attribute :fruit_stickers, Types::Array
+    attribute :fruit_sticker_1, Types::String
+    attribute :fruit_sticker_2, Types::String
     attribute :tu_sticker_ids, Types::Array
     attribute :tu_stickers, Types::Array
+    attribute :tu_sticker_1, Types::String
+    attribute :tu_sticker_2, Types::String
     attribute :ru_sticker_ids, Types::Array
     attribute :ru_stickers, Types::Array
+    attribute :ru_sticker_1, Types::String
+    attribute :ru_sticker_2, Types::String
     attribute? :status, Types::Bool
     attribute? :active, Types::Bool
   end
