@@ -545,7 +545,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           show_one_level_up_fields = repo.one_level_up_fruit_composition?(pm_subtype_id)
           actions = [OpenStruct.new(type: :replace_inner_html,
                                     dom_id: 'pm_product_composition_level',
-                                    value: repo.subtype_composition_level(pm_subtype_id)),
+                                    value: repo.find_pm_subtype(pm_subtype_id).composition_level),
                      OpenStruct.new(type: repo.can_edit_product_code?(pm_subtype_id) ? :show_element : :hide_element,
                                     dom_id: 'pm_product_product_code_field_wrapper'),
                      OpenStruct.new(type: repo.minimum_composition_level?(pm_subtype_id) ? :show_element : :hide_element,

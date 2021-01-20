@@ -26,7 +26,9 @@ module UiRules
       fields[:label_description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:system_code] = { renderer: :label }
-      fields[:pm_boms_products] = { renderer: :list, items: pm_boms_products }
+      fields[:pm_boms_products] = { renderer: :list,
+                                    items: @repo.for_select_pm_boms_products(where: { pm_bom_id: @options[:id] }),
+                                    caption: 'PM BOM Products' }
       fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
     end
@@ -53,7 +55,7 @@ module UiRules
     def set_add_products_fields
       fields[:pm_subtype_ids] = { renderer: :hidden }
       fields[:pm_subtypes] = { renderer: :list,
-                               items: pm_subtypes,
+                               items: @repo.for_select_pm_subtypes(where: { id: @options[:attrs][:pm_subtype_ids] }),
                                filled_background: true,
                                caption: 'PM Subtypes' }
     end
@@ -65,7 +67,7 @@ module UiRules
       end
 
       if @mode == :select_subtypes
-        @form_object = OpenStruct.new(pm_subtype_ids: nil)
+        @form_object = OpenStruct.new(pm_subtype_ids: [])
         return
       end
 
@@ -87,14 +89,6 @@ module UiRules
                                     pm_subtype_ids: nil,
                                     gross_weight: nil,
                                     nett_weight: nil)
-    end
-
-    def pm_subtypes
-      @repo.pm_subtypes(@options[:attrs][:pm_subtype_ids])
-    end
-
-    def pm_boms_products
-      @repo.find_pm_bom_products(@options[:id])
     end
   end
 end

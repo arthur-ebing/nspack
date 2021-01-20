@@ -30,23 +30,12 @@ module MasterfilesApp
     build_inactive_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
     crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
 
-    def pm_subtypes(pm_subtype_ids)
-      DB[:pm_subtypes]
-        .join(:pm_types, id: :pm_type_id)
-        .where(Sequel[:pm_subtypes][:id] => pm_subtype_ids)
-        .order(:pm_type_code)
-        .select(
-          :pm_type_code,
-          :subtype_code
-        ).map { |r| ["#{r[:pm_type_code]} - #{r[:subtype_code]}"] }
-    end
-
     def find_pm_type(id)
       find_with_association(:pm_types,
                             id,
                             parent_tables: [{ parent_table: :pm_composition_levels,
-                                              columns: [:description],
-                                              flatten_columns: { description: :composition_level } }],
+                                              columns: [:composition_level],
+                                              flatten_columns: { composition_level: :composition_level } }],
                             wrapper: PmType)
     end
 
@@ -54,8 +43,13 @@ module MasterfilesApp
       find_with_association(:pm_subtypes,
                             id,
                             parent_tables: [{ parent_table: :pm_types,
-                                              columns: [:pm_type_code],
-                                              flatten_columns: { pm_type_code: :pm_type_code } }],
+                                              foreign_key: :pm_type_id,
+                                              columns: %i[pm_type_code pm_composition_level_id],
+                                              flatten_columns: { pm_type_code: :pm_type_code, pm_composition_level_id: :pm_composition_level_id } },
+                                            { parent_table: :pm_composition_levels,
+                                              foreign_key: :pm_composition_level_id,
+                                              columns: [:composition_level],
+                                              flatten_columns: { composition_level: :composition_level } }],
                             wrapper: PmSubtype)
     end
 
@@ -141,21 +135,45 @@ module MasterfilesApp
       DB[query].all unless id.nil?
     end
 
-    def for_select_pm_products(where: nil, active: true)
-      ds = DB[:pm_products]
-           .join(:pm_subtypes, id: :pm_subtype_id)
-           .join(:pm_types, id: :pm_type_id).distinct
-      ds = ds.where(Sequel[:pm_products][:active] => active)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map([:product_code, Sequel[:pm_products][:id]])
+    def for_select_pm_boms_products(where: {}, active: true)
+      DB[:pm_boms_products]
+        .join(:pm_products, id: :pm_product_id)
+        .where(Sequel[:pm_boms_products][:active] => active)
+        .where(where)
+        .order(:product_code)
+        .select_map([:product_code, Sequel[:pm_boms_products][:id]])
     end
 
-    def for_select_pm_types(where: nil, active: true)
-      ds = DB[:pm_types]
-           .join(:pm_composition_levels, id: :pm_composition_level_id).distinct
-      ds = ds.where(Sequel[:pm_types][:active] => active)
-      ds = ds.where(where) unless where.nil?
-      ds.select_map([:pm_type_code, Sequel[:pm_types][:id]])
+    def for_select_pm_products(where: {}, active: true)
+      DB[:pm_products]
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .join(:pm_types, id: :pm_type_id).distinct
+        .where(Sequel[:pm_products][:active] => active)
+        .where(where)
+        .order(:product_code)
+        .select_map([:product_code, Sequel[:pm_products][:id]])
+    end
+
+    def for_select_pm_types(where: {}, active: true)
+      DB[:pm_types]
+        .join(:pm_composition_levels, id: :pm_composition_level_id)
+        .distinct
+        .where(Sequel[:pm_types][:active] => active)
+        .where(where)
+        .order(:pm_type_code)
+        .select_map([:pm_type_code, Sequel[:pm_types][:id]])
+    end
+
+    def for_select_pm_subtypes(where: {}, active: true) # rubocop:disable Metrics/AbcSize
+      where.merge!({ Sequel[:pm_subtypes][:id] => where.delete(:id) }) if where[:id]
+
+      DB[:pm_subtypes]
+        .join(:pm_types, id: :pm_type_id)
+        .where(Sequel[:pm_subtypes][:active] => active)
+        .where(where)
+        .order(:pm_type_code)
+        .select(:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id])
+        .map { |r| ["#{r[:pm_type_code]} - #{r[:subtype_code]}", r[:id]] }
     end
 
     def for_select_pm_type_subtypes(pm_bom_id = nil)
@@ -251,14 +269,6 @@ module MasterfilesApp
       DB[:uoms].where(uom_code: uom_code).get(:id)
     end
 
-    def find_pm_bom_products(id)
-      DB[:pm_boms_products]
-        .join(:pm_products, id: :pm_product_id)
-        .where(pm_bom_id: id)
-        .order(:product_code)
-        .select_map(:product_code)
-    end
-
     def delete_pm_bom(id)
       DB[:pm_boms_products].where(pm_bom_id: id).delete
       DB[:pm_boms].where(id: id).delete
@@ -326,7 +336,7 @@ module MasterfilesApp
 
     def can_edit_product_code?(pm_subtype_id)
       fruit_composition = fruit_composition_level
-      subtype_composition_level = subtype_composition_level(pm_subtype_id)
+      subtype_composition_level = find_pm_subtype(pm_subtype_id).composition_level
       return false if [minimum_composition_level, fruit_composition, fruit_composition - 1].include?(subtype_composition_level)
 
       true
@@ -384,14 +394,6 @@ module MasterfilesApp
         .where(size_count_value: res[1])
         .where(commodity_id: commodity_id)
         .get(:average_weight_gm)
-    end
-
-    def subtype_composition_level(pm_subtype_id)
-      DB[:pm_subtypes]
-        .join(:pm_types, id: :pm_type_id)
-        .join(:pm_composition_levels, id: :pm_composition_level_id)
-        .where(Sequel[:pm_subtypes][:id] => pm_subtype_id)
-        .get(:composition_level)
     end
 
     def create_pm_product(res)

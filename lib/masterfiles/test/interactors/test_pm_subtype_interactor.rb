@@ -81,7 +81,8 @@ module MasterfilesApp
         description: 'ABC',
         active: true,
         pm_type_code: 'ABC',
-        short_code: 'ABC'
+        short_code: 'ABC',
+        composition_level: 1
       }
     end
 
