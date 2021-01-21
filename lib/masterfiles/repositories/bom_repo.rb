@@ -34,8 +34,8 @@ module MasterfilesApp
       find_with_association(:pm_types,
                             id,
                             parent_tables: [{ parent_table: :pm_composition_levels,
-                                              columns: [:composition_level],
-                                              flatten_columns: { composition_level: :composition_level } }],
+                                              columns: %i[composition_level description],
+                                              flatten_columns: { composition_level: :composition_level, description: :composition_level_description } }],
                             wrapper: PmType)
     end
 
@@ -166,7 +166,7 @@ module MasterfilesApp
 
     def for_select_pm_types(where: {}, active: true)
       DB[:pm_types]
-        .join(:pm_composition_levels, id: :pm_composition_level_id)
+        .left_outer_join(:pm_composition_levels, id: :pm_composition_level_id)
         .distinct
         .where(Sequel[:pm_types][:active] => active)
         .where(where)
@@ -204,7 +204,7 @@ module MasterfilesApp
         SELECT pm_types.pm_type_code || ' - ' || pm_subtypes.subtype_code AS subtype, pm_subtypes.id
         FROM pm_subtypes
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+        LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
         WHERE pm_composition_levels.composition_level != ?
         ORDER BY 1
       SQL

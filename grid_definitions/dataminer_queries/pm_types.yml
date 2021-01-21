@@ -1,10 +1,11 @@
 ---
 :caption: PM Types
 :sql: "SELECT \r\n       pm_types.id,\r\n       pm_types.pm_type_code,\r\n       pm_types.description,\r\n
-  \      pm_types.short_code,\r\n       pm_types.pm_composition_level_id,\r\n       pm_composition_levels.description
-  AS composition_level,\r\n       pm_types.active,\r\n       pm_types.created_at,\r\n
-  \      pm_types.updated_at\r\nFROM pm_types\r\nLEFT JOIN pm_composition_levels ON
-  pm_composition_levels.id = pm_types.pm_composition_level_id\r\nORDER BY pm_composition_levels.composition_level"
+  \      pm_types.short_code,\r\n       pm_types.pm_composition_level_id,\r\n       pm_composition_levels.composition_level
+  AS composition_level,\r\n       pm_composition_levels.description AS composition_level_description,\r\n
+  \      pm_types.active,\r\n       pm_types.created_at,\r\n       pm_types.updated_at\r\nFROM
+  pm_types\r\nLEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id\r\nORDER
+  BY pm_composition_levels.composition_level"
 :limit: 
 :offset: 
 :external_settings:
@@ -94,7 +95,7 @@
     :name: composition_level
     :sequence_no: 6
     :caption: Composition level
-    :namespaced_name: pm_composition_levels.description
+    :namespaced_name: pm_composition_levels.composition_level
     :data_type: :string
     :width: 150
     :format: 
@@ -106,9 +107,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  composition_level_description:
+    :name: composition_level_description
+    :sequence_no: 7
+    :caption: Composition level description
+    :namespaced_name: pm_composition_levels.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   active:
     :name: active
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Active
     :namespaced_name: pm_types.active
     :data_type: :boolean
@@ -124,7 +141,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: pm_types.created_at
     :data_type: :datetime
@@ -140,7 +157,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: pm_types.updated_at
     :data_type: :datetime

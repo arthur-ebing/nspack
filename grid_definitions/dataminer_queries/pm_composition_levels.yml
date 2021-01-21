@@ -30,7 +30,7 @@
     :caption: Composition level
     :namespaced_name: pm_composition_levels.composition_level
     :data_type: :integer
-    :width: 100
+    :width: 150
     :format: 
     :hide: false
     :pinned: 

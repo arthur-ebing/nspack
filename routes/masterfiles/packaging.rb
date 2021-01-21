@@ -345,12 +345,16 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.patch do     # UPDATE
           res = interactor.update_pm_type(id, params[:pm_type])
           if res.success
-            update_grid_row(id,
-                            changes: { short_code: res.instance[:short_code],
-                                       pm_type_code: res.instance[:pm_type_code],
-                                       description: res.instance[:description],
-                                       composition_level: res.instance[:composition_level] },
-                            notice: res.message)
+            row_keys = %i[
+              id
+              pm_type_code
+              description
+              composition_level
+              composition_level_description
+              short_code
+              active
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Packaging::PmType::Edit.call(id, form_values: params[:pm_type], form_errors: res.errors) }
           end
@@ -381,9 +385,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             id
             pm_type_code
             description
-            active
             composition_level
+            composition_level_description
             short_code
+            active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
                        notice: res.message)
