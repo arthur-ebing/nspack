@@ -14,6 +14,7 @@ module MasterfilesApp
         description: 'ABC',
         active: true,
         composition_level: 'ABC',
+        composition_level_description: 'ABC',
         short_code: 'ABC'
       }
       MasterfilesApp::PmType.new(base_attrs.merge(attrs))
