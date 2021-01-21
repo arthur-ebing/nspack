@@ -325,12 +325,23 @@ module LabelApp
     end
 
     # Use Imagemagick to convert transparent background to white.
+    #
+    # NOTES for the Imagemagick convert command options:
+    #   +antialias            :: Darken font edges (otherwise a lot of information is lost when printing)
+    #   -background '#fffffe' :: Make the background off-white, not white exactly. This improves the definition of fonts.
+    #   -alpha remove         :: Remove the alpha layer (transparency).
+    #   -flatten              :: Flatten all layers to one.
+    #   -alpha off            :: Switch off transparency.
+    #   png24::               :: Force the png to non-grayscale (also to improve rendering of fonts)
+    #
     def image_from_param_without_alpha(param)
       outfile = Tempfile.new(['lbl', '.png'])
 
       Tempfile.open(['lbl', '.png']) do |f|
         f.write(image_from_param(param))
-        res = system("convert #{f.path} -background white -alpha remove -flatten -alpha off #{outfile.path}")
+        f.flush
+        # res = system("convert #{f.path} +antialias -background '#fffffe' -alpha remove -flatten -alpha off #{outfile.path}")
+        res = system("convert #{f.path} +antialias -background '#fffffe' -alpha remove -flatten -alpha off png24:#{outfile.path}")
         raise Crossbeams::InfoError, 'Unable to remove transparency from image' unless res
       end
 

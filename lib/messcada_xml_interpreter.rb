@@ -20,6 +20,14 @@ class MesscadaXMLInterpreter
     puts schema.children.first.attributes.map { |k, v| "#{k} = #{v.value}" }.join("\n")
   end
 
+  def params_for_login_mode_switch
+    # <XMLData device="LBL-3A" />
+    root = 'XMLData'
+    validate_root_and_attributes(root)
+    device = schema.xpath(".//#{root}").attribute('device').value
+    { device: device }
+  end
+
   def params_for_carton_labeling
     # mode = schema.xpath('.//ProductLabel').attribute('Mode').value
     # mode 6: 10:

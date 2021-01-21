@@ -43,7 +43,7 @@ module MesscadaApp
     end
 
     def change_resource_to_group_login_mode(params)
-      id = resource_repo.get(:system_resources, system_resource_code: params[:device])
+      id = resource_repo.get_value(:system_resources, :id, system_resource_code: params[:device])
       return failed_response("Resource #{params[:device]} not found") if id.nil?
 
       resource_repo.update_system_resource(id, group_incentive: true)
@@ -51,7 +51,7 @@ module MesscadaApp
     end
 
     def change_resource_to_individual_login_mode(params)
-      id = resource_repo.get(:system_resources, system_resource_code: params[:device])
+      id = resource_repo.get_value(:system_resources, :id, system_resource_code: params[:device])
       return failed_response("Resource #{params[:device]} not found") if id.nil?
 
       resource_repo.update_system_resource(id, group_incentive: false, login: true)

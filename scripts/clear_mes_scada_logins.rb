@@ -23,7 +23,7 @@ class ClearMesScadaLogins < BaseScript
       puts "MesScada Robots to clear:\n-------------------------\n#{robots.map { |_, c, i| "#{c} (#{i})" }.join("\n")}"
     else
       robots.each do |_, code, ip|
-        Que.enqueue code, ip, job_class: 'MesscadaApp::Job::ClearMesScadaLogins', queue: AppConst::QUEUE_NAME
+        Que.enqueue code, ip, job_class: 'MesscadaApp::Job::ClearMesScadaRobotLogins', queue: AppConst::QUEUE_NAME
       end
     end
 
