@@ -327,7 +327,9 @@ class Nspack < Roda
               section.add_notice msg, notice_type: :warning
             end
             # section.add_text key_problem unless key_problem.nil?
-            section.add_table(kl.to_table, %i[method value description])
+            section.add_table(kl.to_table, %i[method value description], cell_classes: { method: ->(_) { 'pad' },
+                                                                                         value: ->(_) { 'pad' },
+                                                                                         description: ->(_) { 'pad' } })
           end
           section.add_text('Constants', wrapper: :h3)
           section.add_text('Note: some values have spaces inserted after commas to make the display wrap better. Be aware of this if copying a setting from here.', wrapper: :em)

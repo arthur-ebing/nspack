@@ -34,7 +34,8 @@ module MesscadaApp
         return 'Not in use' if rec[:product_setup_id].nil_or_empty?
         return 'No template' if rec[:label_template_id].nil_or_empty?
 
-        ar = AppConst::CLM_BUTTON_CAPTION_FORMAT.split('$')
+        # ar = AppConst::CLM_BUTTON_CAPTION_FORMAT.split('$')
+        ar = AppConst::CR_PROD.button_caption_spec.split('$')
         ar.map { |s| s.start_with?(':') ? rec[s.delete_prefix(':').to_sym] : s }.compact.join
       end
 
@@ -86,14 +87,16 @@ module MesscadaApp
       end
 
       def clm_modules
-        return {} unless AppConst::CLM_BUTTON_CAPTION_FORMAT
+        # return {} unless AppConst::CLM_BUTTON_CAPTION_FORMAT
+        return {} unless CR_PROD.button_caption_spec
 
         lbl_modules = repo.button_allocations(production_run_id)
         lbl_modules.group_by { |r| [r[:module], r[:alias]] }
       end
 
       def bvm_modules
-        return {} unless AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
+        # return {} unless AppConst::PROVIDE_PACK_TYPE_AT_VERIFICATION
+        return {} unless AppConst::CR_PROD.provide_pack_type_at_carton_verification?
 
         repo.bin_verification_settings(production_run_id)
       end

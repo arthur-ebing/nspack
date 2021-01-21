@@ -42,7 +42,7 @@ module Crossbeams
       # Get the body of the class from the earliest method down.
       body = File.readlines(fn).drop(start_line - 2).join
 
-      # And return only thos keys that are not referenced in a method.
+      # And return only those keys that are not referenced in a method.
       # (They are handled by `method_missing`)
       ar.map { |m| body.include?(m.to_s) ? nil : m }.compact
     end
