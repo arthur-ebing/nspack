@@ -69,14 +69,14 @@ module MasterfilesApp
     def multiselect_pm_products(multiselect_list)  # rubocop:disable Metrics/AbcSize
       return failed_response('PM Product selection cannot be empty') if multiselect_list.nil_or_empty?
 
-      pm_subtype_ids = @repo.select_values(:pm_products, :pm_subtype_id, id: multiselect_list)
+      pm_subtype_ids = repo.select_values(:pm_products, :pm_subtype_id, id: multiselect_list)
       res = validate_duplicate_subtypes(pm_subtype_ids)
       return failed_response(unwrap_failed_response(res)) unless res.success
 
       pm_bom_id = nil
       repo.transaction do
         pm_bom_id = repo.create_pm_bom({ bom_code: 'TEST' })
-        uom_id = @repo.get_id(:uoms, uom_code: :AppConst::DEFAULT_UOM_CODE)
+        uom_id = repo.get_id(:uoms, uom_code: :AppConst::DEFAULT_UOM_CODE)
         multiselect_list.each do |pm_product_id|
           repo.create(:pm_boms_products,
                       pm_product_id: pm_product_id,
@@ -141,9 +141,9 @@ module MasterfilesApp
     end
 
     def validate_duplicate_types(pm_subtype_ids)
-      pm_type_ids = @repo.select_values(:pm_subtypes, :pm_type_id, id: pm_subtype_ids)
+      pm_type_ids = repo.select_values(:pm_subtypes, :pm_type_id, id: pm_subtype_ids)
       duplicate_types = pm_type_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
-      pm_type_codes = @repo.select_values(:pm_types, :pm_type_code, id: duplicate_types)
+      pm_type_codes = repo.select_values(:pm_types, :pm_type_code, id: duplicate_types)
       return OpenStruct.new(success: false, messages: { pm_subtype_ids: ["Duplicate pm types: #{pm_type_codes.join(', ')}"] }, pm_subtype_ids: pm_subtype_ids) unless duplicate_types.nil_or_empty?
 
       OpenStruct.new(success: true, instance: { pm_subtype_ids: pm_subtype_ids })
@@ -151,7 +151,7 @@ module MasterfilesApp
 
     def validate_duplicate_subtypes(pm_subtype_ids)
       duplicate_subtypes = pm_subtype_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
-      pm_subtype_codes = @repo.select_values(:pm_subtypes, :subtype_code, id: duplicate_subtypes)
+      pm_subtype_codes = repo.select_values(:pm_subtypes, :subtype_code, id: duplicate_subtypes)
       return failed_response("Duplicate pm subtypes: #{pm_subtype_codes.join(', ')}") unless duplicate_subtypes.nil_or_empty?
 
       ok_response
