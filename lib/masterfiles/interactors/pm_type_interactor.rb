@@ -64,8 +64,6 @@ module MasterfilesApp
     end
 
     def validate_pm_type_params(params)
-      return ExtendedPmTypeSchema.call(params) if AppConst::REQUIRE_EXTENDED_PACKAGING
-
       PmTypeSchema.call(params)
     end
   end

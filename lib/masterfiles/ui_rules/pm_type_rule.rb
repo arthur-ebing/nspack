@@ -15,11 +15,10 @@ module UiRules
     end
 
     def set_show_fields
-      pm_composition_level_id_label = @repo.find_pm_composition_level(@form_object.pm_composition_level_id)&.description
-      fields[:pm_composition_level_id] = { renderer: :label,
-                                           with_value: pm_composition_level_id_label,
-                                           caption: 'Composition Level',
-                                           hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
+      fields[:pm_composition_level] = { renderer: :label,
+                                        with_value: @form_object.composition_level_description,
+                                        caption: 'Composition Level',
+                                        hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
       fields[:pm_type_code] = { renderer: :label,
                                 caption: 'PM Type Code' }
       fields[:description] = { renderer: :label }
@@ -40,15 +39,14 @@ module UiRules
                                    prompt: 'Select Composition Level',
                                    searchable: true,
                                    remove_search_for_small_list: false,
-                                   required: AppConst::REQUIRE_EXTENDED_PACKAGING,
+                                   required: false,
                                    hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING },
         pm_type_code: { caption: 'PM Type Code',
                         required: true,
                         force_uppercase: true },
         description: { required: true },
-        short_code: { required: AppConst::REQUIRE_EXTENDED_PACKAGING,
-                      hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING,
-                      force_uppercase: true }
+        short_code: { force_uppercase: true,
+                      hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
       }
     end
 
