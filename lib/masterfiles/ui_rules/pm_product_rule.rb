@@ -39,30 +39,33 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:composition_level] = { renderer: :label }
       fields[:basic_pack_id] = { renderer: :label, with_value: basic_pack_id_label, caption: 'Basic Pack' }
-      fields[:material_mass] = { renderer: :label, caption: 'Material Mass - g' }
-      fields[:height_mm] = { renderer: :label, caption: 'Height - mm' }
-      fields[:gross_weight_per_unit] = { renderer: :label, caption: 'Gross Weight per Unit - g' }
+      fields[:material_mass] = { renderer: :label, caption: 'Material Mass (kg)' }
+      fields[:height_mm] = { renderer: :label, caption: 'Height (mm)' }
+      fields[:gross_weight_per_unit] = { renderer: :label, caption: 'Gross Weight per Unit (kg)' }
       fields[:items_per_unit] = { renderer: :label }
       fields[:items_per_unit_client_description] = { renderer: :label }
-      fields[:marketing_size_range_mm] = { renderer: :label, caption: 'Marketing Size Range - mm' }
-      fields[:minimum_size_mm] = { renderer: :label, caption: 'Minimum Size - mm' }
-      fields[:maximum_size_mm] = { renderer: :label, caption: 'Maximum Size - mm' }
-      fields[:average_size_mm] = { renderer: :label, caption: 'Average Size - mm' }
-      fields[:marketing_weight_range] = { renderer: :label, caption: 'Marketing Weight Range - mm' }
-      fields[:minimum_weight_gm] = { renderer: :label, caption: 'Minimum Weight - g' }
-      fields[:maximum_weight_gm] = { renderer: :label, caption: 'Maximum Weight - g' }
-      fields[:average_weight_gm] = { renderer: :label, caption: 'Average Weight - g' }
+      fields[:marketing_size_range_mm] = { renderer: :label, caption: 'Marketing Size Range (mm)' }
+      fields[:minimum_size_mm] = { renderer: :label, caption: 'Minimum Size (mm)' }
+      fields[:maximum_size_mm] = { renderer: :label, caption: 'Maximum Size (mm)' }
+      fields[:average_size_mm] = { renderer: :label, caption: 'Average Size (mm)' }
+      fields[:marketing_weight_range] = { renderer: :label, caption: 'Marketing Weight Range (mm)' }
+      fields[:minimum_weight_gm] = { renderer: :label, caption: 'Minimum Weight (kg)' }
+      fields[:maximum_weight_gm] = { renderer: :label, caption: 'Maximum Weight (kg)' }
+      fields[:average_weight_gm] = { renderer: :label, caption: 'Average Weight (kg)' }
     end
 
     def common_fields
       pm_subtypes = @repo.for_select_pm_subtypes(exclude: { pm_bom_id: nil })
-      pm_subtypes = @repo.for_select_non_fruit_composition_subtypes if @mode == :new
+      if @mode == :new
+        fruit_composition_level = @repo.get_value(:pm_composition_levels, :composition_level, description: AppConst::PM_TYPE_FRUIT)
+        pm_subtypes = @repo.for_select_pm_subtypes(exclude: { composition_level: fruit_composition_level })
+      end
       {
         pm_subtype_id: { renderer: :select,
                          options: pm_subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
-                         caption: 'PM Type and Subtype',
-                         prompt: 'Select Type and Subtype',
+                         caption: 'PM Subtype',
+                         prompt: true,
                          searchable: true,
                          remove_search_for_small_list: false,
                          required: true },
@@ -77,9 +80,9 @@ module UiRules
                          prompt: 'Select Basic Pack',
                          searchable: true,
                          remove_search_for_small_list: false },
-        material_mass: { renderer: :numeric, caption: 'Material Mass - g' },
-        height_mm: { renderer: :integer, caption: 'Height - mm' },
-        gross_weight_per_unit: { renderer: :numeric, caption: 'Gross Weight per Unit - g' },
+        material_mass: { renderer: :numeric, caption: 'Material Mass (kg)' },
+        height_mm: { renderer: :integer, caption: 'Height (mm)' },
+        gross_weight_per_unit: { renderer: :numeric, caption: 'Gross Weight per Unit (kg)' },
         items_per_unit: { renderer: :integer },
         items_per_unit_client_description: {}
       }
@@ -93,7 +96,7 @@ module UiRules
 
       pm_product = @repo.find_pm_product(@options[:id])
       extended_attrs = {}
-      extended_attrs = @fruit_size_repo.find_std_fruit_size_count(pm_product.std_fruit_size_count_id).to_h if @repo.fruit_composition_level?(pm_product.pm_subtype_id)
+      extended_attrs = @fruit_size_repo.find_std_fruit_size_count(pm_product.std_fruit_size_count_id).to_h if @rules[:fruit_composition_level]
       @form_object = OpenStruct.new(pm_product.to_h.merge(extended_attrs))
     end
 

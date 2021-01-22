@@ -4,15 +4,14 @@ module MasterfilesApp
   class BomRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
     build_inactive_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
-    crud_calls_for :pm_types, name: :pm_type, wrapper: PmType
+    crud_calls_for :pm_types, name: :pm_type
 
-    build_for_select :pm_subtypes, label: :subtype_code, value: :id, order_by: :subtype_code
     build_inactive_select :pm_subtypes, label: :subtype_code, value: :id, order_by: :subtype_code
-    crud_calls_for :pm_subtypes, name: :pm_subtype, wrapper: PmSubtype
+    crud_calls_for :pm_subtypes, name: :pm_subtype
 
     build_for_select :pm_products, label: :product_code, value: :id, order_by: :product_code
     build_inactive_select :pm_products, label: :product_code, value: :id, order_by: :product_code
-    crud_calls_for :pm_products, name: :pm_product, wrapper: PmProduct
+    crud_calls_for :pm_products, name: :pm_product
 
     build_for_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
     build_inactive_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
@@ -20,7 +19,7 @@ module MasterfilesApp
 
     build_for_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
     build_inactive_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
-    crud_calls_for :pm_boms_products, name: :pm_boms_product, wrapper: PmBomsProduct
+    crud_calls_for :pm_boms_products, name: :pm_boms_product
 
     build_for_select :pm_composition_levels, label: :description, value: :id, order_by: :description
     build_inactive_select :pm_composition_levels, label: :description, value: :id, order_by: :description
@@ -35,7 +34,8 @@ module MasterfilesApp
                             id,
                             parent_tables: [{ parent_table: :pm_composition_levels,
                                               columns: %i[composition_level description],
-                                              flatten_columns: { composition_level: :composition_level, description: :composition_level_description } }],
+                                              flatten_columns: { composition_level: :composition_level,
+                                                                 description: :composition_level_description } }],
                             wrapper: PmType)
     end
 
@@ -45,7 +45,8 @@ module MasterfilesApp
                             parent_tables: [{ parent_table: :pm_types,
                                               foreign_key: :pm_type_id,
                                               columns: %i[pm_type_code pm_composition_level_id],
-                                              flatten_columns: { pm_type_code: :pm_type_code, pm_composition_level_id: :pm_composition_level_id } },
+                                              flatten_columns: { pm_type_code: :pm_type_code,
+                                                                 pm_composition_level_id: :pm_composition_level_id } },
                                             { parent_table: :pm_composition_levels,
                                               foreign_key: :pm_composition_level_id,
                                               columns: [:composition_level],
@@ -62,7 +63,8 @@ module MasterfilesApp
                                             { parent_table: :pm_types,
                                               foreign_key: :pm_type_id,
                                               columns: %i[pm_type_code pm_composition_level_id],
-                                              flatten_columns: { pm_type_code: :pm_type_code, pm_composition_level_id: :pm_composition_level_id } },
+                                              flatten_columns: { pm_type_code: :pm_type_code,
+                                                                 pm_composition_level_id: :pm_composition_level_id } },
                                             { parent_table: :pm_composition_levels,
                                               foreign_key: :pm_composition_level_id,
                                               columns: [:composition_level],
@@ -181,26 +183,14 @@ module MasterfilesApp
         .join(:pm_types, id: :pm_type_id)
         .left_outer_join(:pm_products, pm_subtype_id: Sequel[:pm_subtypes][:id])
         .left_outer_join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
+        .left_outer_join(:pm_composition_levels, id: Sequel[:pm_types][:pm_composition_level_id])
         .where(Sequel[:pm_subtypes][:active] => active)
         .where(where)
         .exclude(exclude)
         .distinct
         .order(:pm_type_code)
-        .select(:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id])
-        .map { |r| ["#{r[:pm_type_code]} - #{r[:subtype_code]}", r[:id]] }
-    end
-
-    def for_select_non_fruit_composition_subtypes
-      query = <<~SQL
-        SELECT pm_types.pm_type_code || ' - ' || pm_subtypes.subtype_code AS subtype, pm_subtypes.id
-        FROM pm_subtypes
-        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        LEFT JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
-        WHERE pm_composition_levels.composition_level != ?
-        ORDER BY 1
-      SQL
-      DB[query, fruit_composition_level]
-        .select_map(%i[subtype id])
+        .select_map([:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id]])
+        .group_by { |rec| rec.shift.to_sym }
     end
 
     def composition_levels

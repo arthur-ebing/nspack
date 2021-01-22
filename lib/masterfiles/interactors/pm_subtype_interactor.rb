@@ -16,7 +16,7 @@ module MasterfilesApp
       success_response("Created pm subtype #{instance.subtype_code}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { subtype_code: ['This pm subtype already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { subtype_code: ['This PM Subtype already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

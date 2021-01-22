@@ -8,10 +8,10 @@ INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Cell') ON 
 INSERT INTO public.contact_method_types(contact_method_type) VALUES ('Email') ON CONFLICT DO NOTHING;
 
 -- PM TYPES
-INSERT INTO pm_types (pm_type_code, description) VALUES ('BIN', 'BIN') ON CONFLICT DO NOTHING;
-INSERT INTO pm_types (pm_type_code, description) VALUES ('CARTON', 'CARTON') ON CONFLICT DO NOTHING;
-INSERT INTO pm_types (pm_type_code, description) VALUES ('STICKER', 'STICKER') ON CONFLICT DO NOTHING;
-INSERT INTO pm_types (pm_type_code, description) VALUES ('LABOUR', 'LABOUR') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description, short_code) VALUES ('BIN', 'BIN', 'BIN') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description, short_code) VALUES ('CARTON', 'CARTON', 'CARTON') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description, short_code) VALUES ('STICKER', 'STICKER', 'STICKER') ON CONFLICT DO NOTHING;
+INSERT INTO pm_types (pm_type_code, description, short_code) VALUES ('LABOUR', 'LABOUR', 'LABOUR') ON CONFLICT DO NOTHING;
 
 -- PM SUBTYPES
 INSERT INTO pm_subtypes (subtype_code, description, pm_type_id) VALUES ('FRUIT_STICKER', 'FRUIT_STICKER', (SELECT id FROM pm_types WHERE pm_type_code = 'STICKER')) ON CONFLICT DO NOTHING;
