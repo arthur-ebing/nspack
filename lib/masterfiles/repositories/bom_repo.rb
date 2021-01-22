@@ -174,8 +174,8 @@ module MasterfilesApp
         .select_map([:pm_type_code, Sequel[:pm_types][:id]])
     end
 
-    def for_select_pm_subtypes(where: {}, active: true) # rubocop:disable Metrics/AbcSize
-      where.merge!({ Sequel[:pm_subtypes][:id] => where.delete(:id) }) if where.is_a?(Hash) && where[:id]
+    def for_select_pm_subtypes(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
+      where.merge!({ Sequel[:pm_subtypes][:id] => where.delete(:id) }) if where[:id]
 
       DB[:pm_subtypes]
         .join(:pm_types, id: :pm_type_id)
@@ -183,6 +183,7 @@ module MasterfilesApp
         .left_outer_join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
         .where(Sequel[:pm_subtypes][:active] => active)
         .where(where)
+        .exclude(exclude)
         .distinct
         .order(:pm_type_code)
         .select(:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id])

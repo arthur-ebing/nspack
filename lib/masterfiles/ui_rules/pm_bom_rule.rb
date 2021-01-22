@@ -46,9 +46,7 @@ module UiRules
 
     def set_select_subtypes_fields
       fields[:pm_subtype_ids] = { renderer: :multi,
-                                  options: @repo.for_select_pm_subtypes(
-                                    where: Sequel.lit('pm_bom_id IS NOT NULL')
-                                  ),
+                                  options: @repo.for_select_pm_subtypes(exclude: { pm_bom_id: nil }),
                                   selected: @form_object[:pm_subtype_ids],
                                   caption: 'PM Subtypes' }
     end
