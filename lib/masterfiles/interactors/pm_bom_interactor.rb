@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_bom(id)
-      success_response("Created pm bom #{instance.bom_code}", instance)
+      success_response("Created PM BOM #{instance.bom_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { bom_code: ['This pm bom already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { bom_code: ['This PM BOM already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -32,7 +32,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_bom(id)
-      success_response("Updated pm bom #{instance.bom_code}", instance)
+      success_response("Updated PM BOM #{instance.bom_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -44,7 +44,7 @@ module MasterfilesApp
         log_status(:pm_boms, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted pm bom #{name}")
+      success_response("Deleted PM BOM #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -88,10 +88,9 @@ module MasterfilesApp
         repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
       end
       instance = pm_bom(pm_bom_id)
-      success_response("PM BOM #{instance.system_code} created successfully",
-                       instance)
+      success_response("PM BOM #{instance.system_code} created successfully", instance)
     rescue Sequel::UniqueConstraintViolation
-      failed_response('This pm bom already exists')
+      failed_response('This PM BOM already exists')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -116,8 +115,7 @@ module MasterfilesApp
       end
 
       instance = pm_bom(id)
-      success_response('BOM weights updated successfully',
-                       instance)
+      success_response('BOM weights updated successfully', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -144,7 +142,7 @@ module MasterfilesApp
       pm_type_ids = repo.select_values(:pm_subtypes, :pm_type_id, id: pm_subtype_ids)
       duplicate_types = pm_type_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
       pm_type_codes = repo.select_values(:pm_types, :pm_type_code, id: duplicate_types)
-      return OpenStruct.new(success: false, messages: { pm_subtype_ids: ["Duplicate pm types: #{pm_type_codes.join(', ')}"] }, pm_subtype_ids: pm_subtype_ids) unless duplicate_types.nil_or_empty?
+      return OpenStruct.new(success: false, messages: { pm_subtype_ids: ["Duplicate PM Types: #{pm_type_codes.join(', ')}"] }, pm_subtype_ids: pm_subtype_ids) unless duplicate_types.nil_or_empty?
 
       OpenStruct.new(success: true, instance: { pm_subtype_ids: pm_subtype_ids })
     end
@@ -152,7 +150,7 @@ module MasterfilesApp
     def validate_duplicate_subtypes(pm_subtype_ids)
       duplicate_subtypes = pm_subtype_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
       pm_subtype_codes = repo.select_values(:pm_subtypes, :subtype_code, id: duplicate_subtypes)
-      return failed_response("Duplicate pm subtypes: #{pm_subtype_codes.join(', ')}") unless duplicate_subtypes.nil_or_empty?
+      return failed_response("Duplicate PM Subtypes: #{pm_subtype_codes.join(', ')}") unless duplicate_subtypes.nil_or_empty?
 
       ok_response
     end
