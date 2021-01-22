@@ -245,7 +245,7 @@ module MasterfilesApp
       DB[:pm_boms].where(id: id).delete
     end
 
-    def pm_bom_system_code(bom_id)
+    def pm_bom_system_code(pm_bom_id)
       query = <<~SQL
         SELECT string_agg(product_codes.product_code, '_'::text) AS system_code
         FROM (
@@ -261,16 +261,7 @@ module MasterfilesApp
           ORDER BY pm_composition_levels.composition_level
         ) product_codes
       SQL
-      DB[query, bom_id].first[:system_code]
-    end
-
-    def refresh_system_codes
-      ar = []
-      DB[:pm_boms].all.map { |b| b[:id] }.each do |bom_id|
-        system_code = pm_bom_system_code(bom_id)
-        ar << "UPDATE pm_boms SET bom_code = '#{system_code}', system_code = '#{system_code}' WHERE id = #{bom_id};"
-      end
-      DB[ar.join].update
+      DB[query, pm_bom_id].first[:system_code]
     end
 
     def minimum_composition_level?(pm_subtype_id)

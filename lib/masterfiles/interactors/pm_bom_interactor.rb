@@ -98,7 +98,11 @@ module MasterfilesApp
 
     def refresh_system_codes
       repo.transaction do
-        repo.refresh_system_codes
+          pm_bom_ids = repo.select_values(:pm_boms, :id)
+          pm_bom_ids.each do |id|
+            system_code = repo.pm_bom_system_code(id)
+            repo.update_pm_bom(id, bom_code: system_code, system_code: system_code)
+        end
       end
 
       success_response('PM BOM system codes were updated successfully')
