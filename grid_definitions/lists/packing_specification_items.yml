@@ -29,6 +29,11 @@
   :popup: true
 :page_controls:
 - :control_type: :link
+  :url: "/production/packing_specifications/packing_specification_items/new"
+  :text: New Packing Specification Item
+  :style: :button
+  :behaviour: :popup
+- :control_type: :link
   :url: "/production/packing_specifications/packing_specification_items/refresh"
   :text: Refresh Packing Specification Items
   :style: :button
