@@ -19,8 +19,8 @@ module Masterfiles
               form.method :update
               form.add_field :mark_id
               form.add_field :description
-              rules[:composition_levels].each do |key, _val|
-                form.add_field key.to_s.to_sym
+              rules[:composition_levels].each do |_, v|
+                form.add_field v.to_sym
               end
             end
           end

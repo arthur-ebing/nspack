@@ -11,6 +11,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         mark_id: 1,
+        mark_code: 'ABC',
         packaging_marks: %w[A B C],
         description: Faker::Lorem.unique.word,
         active: true

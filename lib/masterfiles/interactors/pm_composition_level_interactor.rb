@@ -16,7 +16,7 @@ module MasterfilesApp
       success_response("Created pm composition level #{instance.description}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This pm composition level already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { description: ['This PM Composition level already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

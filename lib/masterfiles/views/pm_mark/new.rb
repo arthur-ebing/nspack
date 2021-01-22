@@ -17,10 +17,9 @@ module Masterfiles
               form.action '/masterfiles/packaging/pm_marks'
               form.remote! if remote
               form.add_field :mark_id
-              # form.add_field :packaging_marks
               form.add_field :description
-              rules[:composition_levels].each do |key, _val|
-                form.add_field key.to_s.to_sym
+              rules[:composition_levels].each do |_key, val|
+                form.add_field val.to_sym
               end
             end
           end

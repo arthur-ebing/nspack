@@ -22,7 +22,7 @@ module MasterfilesApp
       attrs = fake_pm_mark.to_h.reject { |k, _| k == :id }
       res = interactor.create_pm_mark(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(PmMarkFlat, res.instance)
+      assert_instance_of(PmMark, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -40,7 +40,7 @@ module MasterfilesApp
       attrs[:description] = 'a_change'
       res = interactor.update_pm_mark(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(PmMarkFlat, res.instance)
+      assert_instance_of(PmMark, res.instance)
       assert_equal 'a_change', res.instance.description
       refute_equal value, res.instance.description
     end
@@ -69,6 +69,7 @@ module MasterfilesApp
       {
         id: 1,
         mark_id: mark_id,
+        mark_code: 'ABC',
         packaging_marks: %w[1 2 3],
         description: Faker::Lorem.unique.word,
         active: true

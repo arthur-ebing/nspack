@@ -4,29 +4,26 @@ module UiRules
   class PmMarkRule < Base
     def generate_rules
       @repo = MasterfilesApp::BomRepo.new
+      @rules[:composition_levels] = @repo.list_pm_composition_levels
       make_form_object
       apply_form_values
 
-      @rules[:composition_levels] = composition_levels
-      @rules[:items] = @form_object.packaging_marks.nil_or_empty? ? [] : @form_object.packaging_marks
-
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'pm_mark'
     end
 
-    def set_show_fields # rubocop:disable Metrics/AbcSize
-      mark_id_label = @repo.find(:marks, MasterfilesApp::Mark, @form_object.mark_id)&.mark_code
+    def set_show_fields
       fields[:mark_id] = { renderer: :label,
-                           with_value: mark_id_label,
+                           with_value: @form_object.mark_code,
                            caption: 'Fruitspec Mark' }
       fields[:description] = { renderer: :label }
-      rules[:composition_levels].each do |key, val|
-        fields[key.to_s.to_sym] = { renderer: :label,
-                                    caption: "#{val} Mark",
-                                    with_value: rules[:items][key - 1].to_s }
+      rules[:composition_levels].each do |k, v|
+        fields[v.to_sym] = { renderer: :label,
+                             caption: "#{v} Mark",
+                             with_value: @form_object.packaging_marks[k - 1].to_s }
       end
       fields[:active] = { renderer: :label,
                           as_boolean: true }
@@ -41,10 +38,10 @@ module UiRules
                    required: true },
         description: { required: true }
       }
-      rules[:composition_levels].each do |key, val|
-        fields[key.to_s.to_sym] = { force_uppercase: true,
-                                    caption: "#{val} Mark",
-                                    value: rules[:items][key - 1].to_s }
+      rules[:composition_levels].each do |k, v|
+        fields[v.to_sym] = { force_uppercase: true,
+                             caption: "#{v} Mark",
+                             value: @form_object.packaging_marks[k - 1].to_s }
       end
       fields
     end
@@ -55,23 +52,15 @@ module UiRules
         return
       end
 
-      res = @repo.find_pm_mark(@options[:id])
-      items = @repo.array_of_text_for_db_col(res.packaging_marks)
-      extra = {}
-      composition_levels.each do |key, _val|
-        extra[key.to_s] = items[key - 1].to_s
-      end
-      @form_object = OpenStruct.new(res.to_h.merge(extra))
+      hash = @repo.find_pm_mark(@options[:id]).to_h
+      rules[:composition_levels].each { |k, v| hash[v] = hash[:packaging_marks][k - 1] }
+      @form_object = OpenStruct.new(hash)
     end
 
     def make_new_form_object
       @form_object = OpenStruct.new(mark_id: nil,
-                                    packaging_marks: nil,
+                                    packaging_marks: [],
                                     description: nil)
-    end
-
-    def composition_levels
-      @repo.pm_composition_levels
     end
   end
 end

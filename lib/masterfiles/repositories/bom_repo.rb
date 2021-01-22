@@ -28,7 +28,7 @@ module MasterfilesApp
 
     build_for_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
     build_inactive_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
-    crud_calls_for :pm_marks, name: :pm_mark, wrapper: PmMark
+    crud_calls_for :pm_marks, name: :pm_mark
 
     def find_pm_type(id)
       find_with_association(:pm_types,
@@ -96,7 +96,7 @@ module MasterfilesApp
                             parent_tables: [{ parent_table: :marks,
                                               columns: [:mark_code],
                                               flatten_columns: { mark_code: :mark_code } }],
-                            wrapper: PmMarkFlat)
+                            wrapper: PmMark)
     end
 
     def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
@@ -209,7 +209,7 @@ module MasterfilesApp
         .select_map(%i[description id])
     end
 
-    def pm_composition_levels
+    def list_pm_composition_levels
       DB[:pm_composition_levels]
         .order(:composition_level)
         .select_map(%i[composition_level description])

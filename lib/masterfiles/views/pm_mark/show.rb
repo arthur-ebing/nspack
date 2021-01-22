@@ -4,7 +4,7 @@ module Masterfiles
   module Packaging
     module PmMark
       class Show
-        def self.call(id) # rubocop:disable Metrics/AbcSize
+        def self.call(id)
           ui_rule = UiRules::Compiler.new(:pm_mark, :show, id: id)
           rules   = ui_rule.compile
 
@@ -14,11 +14,10 @@ module Masterfiles
               # form.caption 'PM Mark'
               form.view_only!
               form.add_field :mark_id
-              # form.add_field :packaging_marks
               form.add_field :description
               form.add_field :active
-              rules[:composition_levels].each do |key, _val|
-                form.add_field key.to_s.to_sym
+              rules[:composition_levels].each do |_, v|
+                form.add_field v.to_sym
               end
             end
           end
