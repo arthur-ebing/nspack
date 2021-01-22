@@ -239,26 +239,6 @@ module MasterfilesApp
       success_response("Quantity updated to #{quantity}", quantity: quantity)
     end
 
-    def pm_type_codes(pm_type_ids)
-      DB[:pm_types].where(id: pm_type_ids).select_map(:pm_type_code)
-    end
-
-    def pm_subtype_types(pm_subtype_ids)
-      DB[:pm_subtypes].where(id: pm_subtype_ids).select_map(:pm_type_id)
-    end
-
-    def pm_subtype_codes(pm_subtype_ids)
-      DB[:pm_subtypes].where(id: pm_subtype_ids).select_map(:subtype_code)
-    end
-
-    def pm_product_subtypes(pm_product_ids)
-      DB[:pm_products].where(id: pm_product_ids).select_map(:pm_subtype_id)
-    end
-
-    def find_uom_by_code(uom_code)
-      DB[:uoms].where(uom_code: uom_code).get(:id)
-    end
-
     def delete_pm_bom(id)
       DB[:pm_boms_products].where(pm_bom_id: id).delete
       DB[:pm_boms].where(id: id).delete
