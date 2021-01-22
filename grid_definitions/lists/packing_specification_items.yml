@@ -124,7 +124,7 @@
       :editor: :search_select
       :value_sql: SELECT NULL
                   UNION ALL
-                  SELECTSELECT product_code
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RU_STICKER'
