@@ -2,13 +2,12 @@
 
 module UiRules
   class PmBomRule < Base
-    def generate_rules  # rubocop:disable Metrics/AbcSize
+    def generate_rules
       @repo = MasterfilesApp::BomRepo.new
       make_form_object
       apply_form_values
 
       @rules[:require_extended_packaging] = AppConst::REQUIRE_EXTENDED_PACKAGING
-      @rules[:pm_subtype_ids] = @form_object[:pm_subtype_ids].nil? ? [] : @form_object[:pm_subtype_ids] if %i[select_subtypes add_products].include? @mode
 
       common_values_for_fields common_fields
 
@@ -47,8 +46,10 @@ module UiRules
 
     def set_select_subtypes_fields
       fields[:pm_subtype_ids] = { renderer: :multi,
-                                  options: @repo.for_select_pm_type_subtypes,
-                                  selected: @rules[:pm_subtype_ids],
+                                  options: @repo.for_select_pm_subtypes(
+                                    where: Sequel.lit('pm_bom_id IS NOT NULL')
+                                  ),
+                                  selected: @form_object[:pm_subtype_ids],
                                   caption: 'PM Subtypes' }
     end
 
@@ -86,7 +87,7 @@ module UiRules
                                     description: nil,
                                     label_description: nil,
                                     system_code: nil,
-                                    pm_subtype_ids: nil,
+                                    pm_subtype_ids: [],
                                     gross_weight: nil,
                                     nett_weight: nil)
     end

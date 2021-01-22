@@ -55,7 +55,7 @@ module UiRules
     end
 
     def common_fields
-      pm_subtypes = @repo.for_select_pm_type_subtypes
+      pm_subtypes = @repo.for_select_pm_subtypes(where: Sequel.lit('pm_bom_id IS NOT NULL'))
       pm_subtypes = @repo.for_select_non_fruit_composition_subtypes if @mode == :new
       {
         pm_subtype_id: { renderer: :select,

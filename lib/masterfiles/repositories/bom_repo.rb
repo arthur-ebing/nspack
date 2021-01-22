@@ -175,28 +175,18 @@ module MasterfilesApp
     end
 
     def for_select_pm_subtypes(where: {}, active: true) # rubocop:disable Metrics/AbcSize
-      where.merge!({ Sequel[:pm_subtypes][:id] => where.delete(:id) }) if where[:id]
+      where.merge!({ Sequel[:pm_subtypes][:id] => where.delete(:id) }) if where.is_a?(Hash) && where[:id]
 
       DB[:pm_subtypes]
         .join(:pm_types, id: :pm_type_id)
+        .left_outer_join(:pm_products, pm_subtype_id: Sequel[:pm_subtypes][:id])
+        .left_outer_join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
         .where(Sequel[:pm_subtypes][:active] => active)
         .where(where)
+        .distinct
         .order(:pm_type_code)
         .select(:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id])
         .map { |r| ["#{r[:pm_type_code]} - #{r[:subtype_code]}", r[:id]] }
-    end
-
-    def for_select_pm_type_subtypes(pm_bom_id = nil)
-      where = pm_bom_id.nil? ? '' : " WHERE pm_types.id NOT IN (#{bom_product_types(pm_bom_id).join(',')})"
-      query = <<~SQL
-        SELECT pm_types.pm_type_code || ' - ' || pm_subtypes.subtype_code AS subtype, pm_subtypes.id
-        FROM pm_subtypes
-        JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
-        #{where}
-        ORDER BY 1
-      SQL
-      DB[query]
-        .select_map(%i[subtype id])
     end
 
     def for_select_non_fruit_composition_subtypes
@@ -210,16 +200,6 @@ module MasterfilesApp
       SQL
       DB[query, fruit_composition_level]
         .select_map(%i[subtype id])
-    end
-
-    def bom_product_types(pm_bom_id)
-      DB[:pm_boms_products]
-        .join(:pm_products, id: :pm_product_id)
-        .join(:pm_subtypes, id: :pm_subtype_id)
-        .join(:pm_types, id: :pm_type_id)
-        .where(pm_bom_id: pm_bom_id)
-        .distinct(Sequel[:pm_types][:id])
-        .select_map(Sequel[:pm_types][:id])
     end
 
     def composition_levels
