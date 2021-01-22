@@ -53,63 +53,86 @@
       :width: 200
     pm_mark:
       :editor: :search_select
-      :value_sql: SELECT description
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT mark_code ||'_'|| array_to_string(packaging_marks, '_') pm_mark
                   FROM pm_marks
+                  JOIN marks ON marks.id = pm_marks.mark_id
     pm_bom:
       :editor: :search_select
-      :value_sql: SELECT bom_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT bom_code
                   FROM pm_boms
     tu_labour_product:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'TU_LABOUR'
     ru_labour_product:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RU_LABOUR'
     ri_labour_product:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RI_LABOUR'
     fruit_sticker_1:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'FRUIT_STICKER'
     fruit_sticker_2:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'FRUIT_STICKER'
     tu_sticker_1:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'TU_STICKER'
     tu_sticker_2:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'TU_STICKER'
     ru_sticker_1:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECTSELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RU_STICKER'
     ru_sticker_2:
       :editor: :search_select
-      :value_sql: SELECT product_code
+      :value_sql: SELECT NULL
+                  UNION ALL
+                  SELECT product_code
                   FROM pm_products
                   JOIN pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id
                   WHERE pm_subtypes.subtype_code = 'RU_STICKER'

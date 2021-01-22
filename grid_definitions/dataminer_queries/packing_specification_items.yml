@@ -5,24 +5,26 @@
   \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
   AS product_setup,\r\n    packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
   \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
-  \   pm_marks.description AS pm_mark,\r\n\r\n    pm_products_tu.product_code AS tu_labour_product,\r\n
-  \   pm_products_ru.product_code AS ru_labour_product,\r\n    pm_products_ri.product_code
-  AS ri_labour_product,\r\n\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
-  = fruit_sticker_ids[1] ) AS fruit_sticker_1,\r\n    (SELECT product_code FROM pm_products
-  WHERE pm_products.id = fruit_sticker_ids[2] ) AS fruit_sticker_2,\r\n\r\n    (SELECT
-  product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[1] ) AS tu_sticker_1,\r\n
-  \   (SELECT product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[2]
-  ) AS tu_sticker_2,\r\n\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
-  = ru_sticker_ids[1] ) AS ru_sticker_1,\r\n    (SELECT product_code FROM pm_products
-  WHERE pm_products.id = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
+  \   marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks, '_')  AS pm_mark,\r\n\r\n
+  \   pm_products_tu.product_code AS tu_labour_product,\r\n    pm_products_ru.product_code
+  AS ru_labour_product,\r\n    pm_products_ri.product_code AS ri_labour_product,\r\n\r\n
+  \   (SELECT product_code FROM pm_products WHERE pm_products.id = fruit_sticker_ids[1]
+  ) AS fruit_sticker_1,\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
+  = fruit_sticker_ids[2] ) AS fruit_sticker_2,\r\n\r\n    (SELECT product_code FROM
+  pm_products WHERE pm_products.id = tu_sticker_ids[1] ) AS tu_sticker_1,\r\n    (SELECT
+  product_code FROM pm_products WHERE pm_products.id = tu_sticker_ids[2] ) AS tu_sticker_2,\r\n\r\n
+  \   (SELECT product_code FROM pm_products WHERE pm_products.id = ru_sticker_ids[1]
+  ) AS ru_sticker_1,\r\n    (SELECT product_code FROM pm_products WHERE pm_products.id
+  = ru_sticker_ids[2] ) AS ru_sticker_2,\r\n\r\n    packing_specification_items.active,\r\n
   \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
   AS status\r\n\r\nFROM packing_specification_items\r\nJOIN packing_specifications
   ON packing_specifications.id = packing_specification_items.packing_specification_id\r\nLEFT
   JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
-  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN pm_products
-  pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id\r\nLEFT
-  JOIN pm_products pm_products_ru ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
+  pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN marks
+  ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu ON pm_products_tu.id
+  = packing_specification_items.tu_labour_product_id\r\nLEFT JOIN pm_products pm_products_ru
+  ON pm_products_ru.id = packing_specification_items.ru_labour_product_id\r\nLEFT
   JOIN pm_products pm_products_ri ON pm_products_ri.id = packing_specification_items.ri_labour_product_id\r\nORDER
   BY packing_specification_items.updated_at DESC"
 :limit: 
@@ -177,7 +179,7 @@
     :name: pm_mark
     :sequence_no: 10
     :caption: PM Mark
-    :namespaced_name: pm_marks.description
+    :namespaced_name: 
     :data_type: :string
     :width: 
     :format: 

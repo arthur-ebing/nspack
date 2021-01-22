@@ -82,7 +82,7 @@ module ProductionApp
 
       when 'pm_mark'
         column = 'pm_mark_id'
-        value = get_id(:pm_marks, description: params[:column_value])
+        value = get_pm_mark_id(params[:column_value])
 
       when 'pm_bom'
         column = 'pm_bom_id'
@@ -103,6 +103,14 @@ module ProductionApp
 
       args = Sequel.lit("#{column} #{indexer} = '#{value}'")
       DB[:packing_specification_items].where(id: id).update(args)
+    end
+
+    def get_pm_mark_id(pm_mark_code)
+      return nil if pm_mark_code.nil_or_empty?
+
+      ar = pm_mark_code.split('_')
+      mark_id = get_id(:marks, mark_code: ar.shift)
+      get_id(:pm_marks, mark_id: mark_id, packaging_marks: array_of_text_for_db_col(ar))
     end
 
     def refresh_packing_specification_items(user)
