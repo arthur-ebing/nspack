@@ -641,7 +641,7 @@ module CommonHelpers # rubocop:disable Metrics/ModuleLength
   end
 
   def action_replace_dialog(action)
-    { replace_dialog: { content: action.content } }
+    { replace_dialog: { content: action.content, title: action.title } }
   end
 
   def action_launch_dialog(action)

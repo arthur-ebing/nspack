@@ -299,7 +299,7 @@ class Nspack < Roda
           ]
           acts = [OpenStruct.new(type: :update_grid_row,  ids: id, changes: select_attributes(res.instance, row_keys))]
           content = render_partial { Production::Runs::ProductionRun::Edit.call(id) }
-          acts << OpenStruct.new(type: :replace_dialog,  content: content)
+          acts << OpenStruct.new(type: :replace_dialog,  content: content, title: 'Re-configure')
           json_actions(acts, res.message)
         else
           dialog_error(res.message, error: "Run cannot be re-configured - #{res.message}")

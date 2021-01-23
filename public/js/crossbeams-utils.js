@@ -289,9 +289,13 @@ const crossbeamsUtils = {
    * @param {string} data - the new content.
    * @returns {void}
    */
-  setDialogContent: function setDialogContent(data) {
+  setDialogContent: function setDialogContent(data, title) {
     const dlg = document.getElementById(this.activeDialogContent());
     dlg.innerHTML = data;
+    const head = document.getElementById(this.activeDialogTitle());
+    if (title) {
+      head.innerHTML = title;
+    }
     crossbeamsUtils.makeMultiSelects();
     crossbeamsUtils.makeSearchableSelects();
     crossbeamsUtils.applySelectEvents();
@@ -386,7 +390,7 @@ const crossbeamsUtils = {
           document.getElementById(this.activeDialogTitle()).innerHTML = '<span class="light-red">Error</span>';
         }
         if (data.replaceDialog) {
-          crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+          crossbeamsUtils.setDialogContent(data.replaceDialog.content, data.replaceDialog.title);
           if (data.flash.type && data.flash.type === 'permission') {
             crossbeamsUtils.showWarning(data.flash.error, 20);
           } else {
@@ -408,7 +412,7 @@ const crossbeamsUtils = {
       } else if (data.actions) {
         crossbeamsUtils.processActions(data.actions);
       } else if (data.replaceDialog) {
-        crossbeamsUtils.setDialogContent(data.replaceDialog.content);
+        crossbeamsUtils.setDialogContent(data.replaceDialog.content, data.replaceDialog.title);
       }
     }).catch((data) => {
       crossbeamsUtils.fetchErrorHandler(data);
@@ -965,7 +969,7 @@ const crossbeamsUtils = {
         crossbeamsUtils.deleteGridRow(action);
       }
       if (action.replace_dialog) {
-        crossbeamsUtils.setDialogContent(action.replace_dialog.content);
+        crossbeamsUtils.setDialogContent(action.replace_dialog.content, action.replace_dialog.title);
       }
       if (action.launch_dialog) {
         crossbeamsUtils.launchDialogContent(action.launch_dialog.content, action.launch_dialog.title);

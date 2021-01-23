@@ -161,6 +161,8 @@ type:: `:replace_dialog`.
 
 content:: the content for the dialog.
 
+title:: the title of the dialog.
+
 ==== Launch a new dialog with content
 
 Use this to launch a new dialog with content from the server.
