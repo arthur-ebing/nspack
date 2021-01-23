@@ -4,6 +4,8 @@ require 'socket'
 module MesscadaApp
   module Job
     class ClearMesScadaRobotLogins < BaseQueJob
+      self.maximum_retry_count = 0
+
       def run(system_resource_code, ip_address)
         sock = TCPSocket.open(ip_address, 2071)
         request = '<LogoffMes PID="435" />'
