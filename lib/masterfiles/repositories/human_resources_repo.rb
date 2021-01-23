@@ -142,15 +142,15 @@ module MasterfilesApp
     end
 
     def swap_employees(attrs)
-      from_worker_ids = contract_worker_ids(attrs[:from_shift_type_id])
-      to_worker_ids = contract_worker_ids(attrs[:to_shift_type_id])
+      from_worker_ids = contract_worker_ids_for_shift_type(attrs[:from_shift_type_id])
+      to_worker_ids = contract_worker_ids_for_shift_type(attrs[:to_shift_type_id])
 
       link_employees(attrs[:to_shift_type_id], from_worker_ids)
       link_employees(attrs[:from_shift_type_id], to_worker_ids)
     end
 
     def move_employees(attrs)
-      from_worker_ids = contract_worker_ids(attrs[:from_shift_type_id])
+      from_worker_ids = contract_worker_ids_for_shift_type(attrs[:from_shift_type_id])
       link_employees(attrs[:to_shift_type_id], from_worker_ids)
     end
 
@@ -159,7 +159,7 @@ module MasterfilesApp
       DB[:contract_workers].where(id: contract_worker_ids).update(shift_type_id: shift_type_id)
     end
 
-    def contract_worker_ids(shift_type_id)
+    def contract_worker_ids_for_shift_type(shift_type_id)
       DB[:contract_workers].where(shift_type_id: shift_type_id).select_map(:id)
     end
   end

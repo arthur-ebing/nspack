@@ -119,10 +119,6 @@ module ProductionApp
       DB[qry, carton_id].first
     end
 
-    def cartons_per_pallet(cpp_id)
-      DB[:cartons_per_pallet].where(id: cpp_id).get(:cartons_per_pallet)
-    end
-
     def find_carton_with_run_info(carton_id)
       qry = <<~SQL
         select c.*, r.closed as production_run_closed

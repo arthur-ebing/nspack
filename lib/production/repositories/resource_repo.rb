@@ -146,10 +146,6 @@ module ProductionApp
       id
     end
 
-    def plant_resource_type_code(plant_resource_type_id)
-      DB[:plant_resource_types].where(id: plant_resource_type_id).get(:plant_resource_type_code)
-    end
-
     def plant_resource_type_code_for(plant_resource_id)
       DB[:plant_resources].join(:plant_resource_types, id: :plant_resource_type_id).where(Sequel[:plant_resources][:id] => plant_resource_id).get(:plant_resource_type_code)
     end

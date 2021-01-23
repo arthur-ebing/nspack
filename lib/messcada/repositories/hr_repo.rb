@@ -26,7 +26,7 @@ module MesscadaApp
       DB.get(Sequel.function(:fn_contract_worker_name, id))
     end
 
-    def contract_worker_ids(personnel_identifier)
+    def contract_worker_id_and_identifier_id(personnel_identifier)
       DB[:personnel_identifiers]
         .join(:contract_workers, personnel_identifier_id: :id)
         .where(identifier: personnel_identifier)
