@@ -1,0 +1,132 @@
+---
+:caption: Packer Roles
+:sql: "SELECT\r\n  \"contract_worker_packer_roles\".\"id\",\r\n  \"contract_worker_packer_roles\".\"packer_role\",\r\n
+  \ \"contract_worker_packer_roles\".\"default_role\",\r\n  \"contract_worker_packer_roles\".\"part_of_group_incentive_target\",\r\n
+  \ \"contract_worker_packer_roles\".\"active\",\r\n  \"contract_worker_packer_roles\".\"created_at\",\r\n
+  \ \"contract_worker_packer_roles\".\"updated_at\"\r\nFROM\r\n  \"contract_worker_packer_roles\"\r\n"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: contract_worker_packer_roles.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  packer_role:
+    :name: packer_role
+    :sequence_no: 2
+    :caption: Packer role
+    :namespaced_name: contract_worker_packer_roles.packer_role
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  default_role:
+    :name: default_role
+    :sequence_no: 3
+    :caption: Default role
+    :namespaced_name: contract_worker_packer_roles.default_role
+    :data_type: :boolean
+    :width: 200
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  part_of_group_incentive_target:
+    :name: part_of_group_incentive_target
+    :sequence_no: 4
+    :caption: Part of group incentive target
+    :namespaced_name: contract_worker_packer_roles.part_of_group_incentive_target
+    :data_type: :boolean
+    :width: 300
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 5
+    :caption: Active
+    :namespaced_name: contract_worker_packer_roles.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 6
+    :caption: Created at
+    :namespaced_name: contract_worker_packer_roles.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 7
+    :caption: Updated at
+    :namespaced_name: contract_worker_packer_roles.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: contract_worker_packer_roles.packer_role
+  :caption: Packer role
+  :data_type: :string
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

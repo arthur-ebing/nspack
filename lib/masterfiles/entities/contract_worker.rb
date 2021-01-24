@@ -21,6 +21,9 @@ module MasterfilesApp
     attribute :personnel_number, Types::String
     attribute :start_date, Types::DateTime
     attribute :end_date, Types::DateTime
+    attribute :packer_role_id, Types::Integer
+    attribute :packer_role, Types::String
+    attribute? :from_external_system, Types::Bool
     attribute :active, Types::Bool
   end
 end

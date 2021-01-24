@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UiRules
-  class ContractWorkerRule < Base
+  class ContractWorkerRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
       @print_repo = LabelApp::PrinterRepo.new
@@ -39,6 +39,9 @@ module UiRules
       fields[:start_date] = { renderer: :label }
       fields[:end_date] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
+      fields[:packer_role_id] = { renderer: :label,
+                                  with_value: @form_object.packer_role,
+                                  invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? }
     end
 
     def set_print_fields
@@ -68,6 +71,12 @@ module UiRules
                          caption: 'Shift Type',
                          min_charwidth: 35,
                          prompt: true },
+        packer_role_id: { renderer: :select,
+                          options: @repo.for_select_contract_worker_packer_roles,
+                          caption: 'Packer role',
+                          min_charwidth: 35,
+                          prompt: true,
+                          invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? },
         first_name: { required: true },
         surname: { required: true },
         title: { force_uppercase: true },
@@ -95,6 +104,7 @@ module UiRules
     end
 
     def make_new_form_object
+      default_packer_role = @repo.default_packer_role
       @form_object = OpenStruct.new(employment_type_id: nil,
                                     contract_type_id: nil,
                                     wage_level_id: nil,
@@ -106,6 +116,7 @@ module UiRules
                                     personnel_number: nil,
                                     start_date: nil,
                                     end_date: nil,
+                                    packer_role_id: default_packer_role,
                                     active: true)
     end
   end

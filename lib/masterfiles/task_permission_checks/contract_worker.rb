@@ -4,6 +4,7 @@ module MasterfilesApp
   module TaskPermissionCheck
     class ContractWorker < BaseService
       attr_reader :task, :entity
+
       def initialize(task, contract_worker_id = nil)
         @task = task
         @repo = HumanResourcesRepo.new

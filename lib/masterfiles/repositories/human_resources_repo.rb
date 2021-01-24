@@ -47,6 +47,16 @@ module MasterfilesApp
 
     crud_calls_for :personnel_identifiers, name: :personnel_identifier, wrapper: PersonnelIdentifier
 
+    build_for_select :contract_worker_packer_roles,
+                     label: :packer_role,
+                     value: :id,
+                     order_by: :packer_role
+    build_inactive_select :contract_worker_packer_roles,
+                          label: :packer_role,
+                          value: :id,
+                          order_by: :packer_role
+    crud_calls_for :contract_worker_packer_roles, name: :contract_worker_packer_role, wrapper: ContractWorkerPackerRole
+
     def for_select_unallocated_contract_workers
       DB[:contract_workers]
         .where(active: true, personnel_identifier_id: nil)
@@ -63,6 +73,10 @@ module MasterfilesApp
                                             { parent_table: :contract_types,
                                               columns: [:contract_type_code],
                                               flatten_columns: { contract_type_code: :contract_type_code } },
+                                            { parent_table: :contract_worker_packer_roles,
+                                              foreign_key: :packer_role_id,
+                                              columns: [:packer_role],
+                                              flatten_columns: { packer_role: :packer_role } },
                                             { parent_table: :wage_levels,
                                               columns: [:wage_level],
                                               flatten_columns: { wage_level: :wage_level } }],
@@ -156,11 +170,16 @@ module MasterfilesApp
 
     def link_employees(shift_type_id, contract_worker_ids)
       # Contract workers can always only be assigned to one shift type
-      DB[:contract_workers].where(id: contract_worker_ids).update(shift_type_id: shift_type_id)
+      DB[:contract_workers].where(id: contract_worker_ids).update(shift_type_id: shift_type_id, from_external_system: false)
     end
 
     def contract_worker_ids_for_shift_type(shift_type_id)
       DB[:contract_workers].where(shift_type_id: shift_type_id).select_map(:id)
+    end
+
+    def default_packer_role
+      # Get the first role that has default set to true
+      DB[:contract_worker_packer_roles].where(default_role: true).get(:id)
     end
   end
 end

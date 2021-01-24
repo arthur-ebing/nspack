@@ -20,12 +20,12 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def update_contract_worker(id, params)
+    def update_contract_worker(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_contract_worker_params(params)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_contract_worker(id, res)
+        repo.update_contract_worker(id, res.to_h.merge(from_external_system: true))
         log_transaction
       end
       instance = contract_worker(id)
@@ -60,7 +60,7 @@ module MasterfilesApp
       contract_worker_id = repo.find_contract_worker_id_by_identifier_id(id)
 
       repo.transaction do
-        repo.update_contract_worker(contract_worker_id, personnel_identifier_id: nil)
+        repo.update_contract_worker(contract_worker_id, personnel_identifier_id: nil, from_external_system: false)
         repo.update(:personnel_identifiers, id, in_use: false)
         # log status?
       end
@@ -73,7 +73,7 @@ module MasterfilesApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_contract_worker(params[:contract_worker_id], personnel_identifier_id: id)
+        repo.update_contract_worker(params[:contract_worker_id], personnel_identifier_id: id, from_external_system: false)
         repo.update(:personnel_identifiers, id, in_use: true)
         # log status?
       end

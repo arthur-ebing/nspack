@@ -254,6 +254,7 @@ class Nspack < Roda
               personnel_number
               start_date
               end_date
+              packer_role
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -294,6 +295,7 @@ class Nspack < Roda
             personnel_number
             start_date
             end_date
+            packer_role
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),
@@ -307,6 +309,7 @@ class Nspack < Roda
         end
       end
     end
+
     # SHIFT TYPES
     # --------------------------------------------------------------------------
     r.on 'shift_types', Integer do |id|
@@ -458,6 +461,76 @@ class Nspack < Roda
             update_grid_row(id, changes: { contract_worker: nil, in_use: false }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::HumanResources::PersonnelIdentifier::DeLinkWorker.call(id, form_values: params[:personnel_identifier], form_errors: res.errors) }
+          end
+        end
+      end
+    end
+
+    # CONTRACT WORKER PACKER ROLES
+    # --------------------------------------------------------------------------
+    r.on 'contract_worker_packer_roles', Integer do |id|
+      interactor = MasterfilesApp::ContractWorkerPackerRoleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:contract_worker_packer_roles, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('hr', 'edit')
+        # interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Hr::ContractWorkerPackerRole::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('hr', 'read')
+          show_partial { Masterfiles::Hr::ContractWorkerPackerRole::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_contract_worker_packer_role(id, params[:contract_worker_packer_role])
+          if res.success
+            update_grid_row(id, changes: { packer_role: res.instance[:packer_role], default_role: res.instance[:default_role], part_of_group_incentive_target: res.instance[:part_of_group_incentive_target] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Hr::ContractWorkerPackerRole::Edit.call(id, form_values: params[:contract_worker_packer_role], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('hr', 'delete')
+          res = interactor.delete_contract_worker_packer_role(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'contract_worker_packer_roles' do
+      interactor = MasterfilesApp::ContractWorkerPackerRoleInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('hr', 'new')
+        show_partial_or_page(r) { Masterfiles::Hr::ContractWorkerPackerRole::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_contract_worker_packer_role(params[:contract_worker_packer_role])
+        if res.success
+          row_keys = %i[
+            id
+            packer_role
+            default_role
+            part_of_group_incentive_target
+            active
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/human_resources/contract_worker_packer_roles/new') do
+            Masterfiles::Hr::ContractWorkerPackerRole::New.call(form_values: params[:contract_worker_packer_role],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
           end
         end
       end

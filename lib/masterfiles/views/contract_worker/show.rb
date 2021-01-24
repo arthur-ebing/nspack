@@ -30,6 +30,7 @@ module Masterfiles
                   col.add_field :shift_type_id
                   col.add_field :start_date
                   col.add_field :end_date
+                  col.add_field :packer_role_id
                 end
               end
             end
