@@ -97,7 +97,7 @@ module MasterfilesApp
       default = {
         pm_subtype_id: pm_subtype_id,
         erp_code: Faker::Lorem.unique.word,
-        product_code: Faker::Lorem.word,
+        product_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true,
         material_mass: Faker::Number.decimal,
