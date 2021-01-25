@@ -73,8 +73,6 @@ module ProductionApp
     end
 
     def inline_update_packing_specification_item(id, params) # rubocop:disable Metrics/AbcSize
-      indexer = nil
-
       case params[:column_name]
       when 'description'
         column = 'description'
@@ -93,16 +91,16 @@ module ProductionApp
         value = get_id(:pm_products, product_code: params[:column_value])
 
       when 'fruit_sticker_1', 'tu_sticker_1', 'ru_sticker_1', 'fruit_sticker_2', 'tu_sticker_2', 'ru_sticker_2'
-        column = params[:column_name].gsub('_1', '_ids').gsub('_2', '_ids')
-        value = get_id(:pm_products, product_code: params[:column_value])
-        indexer = [params[:column_name][-1]]
-
+        column = params[:column_name].gsub('_1', '_ids').gsub('_2', '_ids').to_sym
+        indexer = params[:column_name][-1].to_i - 1
+        current_value = get(:packing_specification_items, id, column)
+        current_value[indexer] = get_id(:pm_products, product_code: params[:column_value])
+        value = current_value.uniq
       else
         raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
       end
 
-      args = Sequel.lit("#{column} #{indexer} = #{value}")
-      DB[:packing_specification_items].where(id: id).update(args)
+      DB[:packing_specification_items].where(id: id).update({ column => value })
     end
 
     def get_pm_mark_id(pm_mark_code)

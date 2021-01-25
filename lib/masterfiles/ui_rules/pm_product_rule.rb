@@ -55,14 +55,9 @@ module UiRules
     end
 
     def common_fields
-      pm_subtypes = @repo.for_select_pm_subtypes(exclude: { pm_bom_id: nil })
-      if @mode == :new
-        fruit_composition_level = @repo.get_value(:pm_composition_levels, :composition_level, description: AppConst::PM_TYPE_FRUIT)
-        pm_subtypes = @repo.for_select_pm_subtypes(exclude: { composition_level: fruit_composition_level })
-      end
       {
         pm_subtype_id: { renderer: :select,
-                         options: pm_subtypes,
+                         options: @repo.for_select_pm_subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
                          caption: 'PM Subtype',
                          prompt: true,

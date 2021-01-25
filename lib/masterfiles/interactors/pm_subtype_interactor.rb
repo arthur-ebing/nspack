@@ -9,12 +9,11 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_pm_subtype(res)
-        log_status('pm_subtypes', id, 'CREATED')
+        log_status(:pm_subtypes, id, 'CREATED')
         log_transaction
       end
       instance = pm_subtype(id)
-      success_response("Created pm subtype #{instance.subtype_code}",
-                       instance)
+      success_response("Created pm subtype #{instance.subtype_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { subtype_code: ['This PM Subtype already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -30,8 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_subtype(id)
-      success_response("Updated pm subtype #{instance.subtype_code}",
-                       instance)
+      success_response("Updated pm subtype #{instance.subtype_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -40,7 +38,7 @@ module MasterfilesApp
       name = pm_subtype(id).subtype_code
       repo.transaction do
         repo.delete_pm_subtype(id)
-        log_status('pm_subtypes', id, 'DELETED')
+        log_status(:pm_subtypes, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted pm subtype #{name}")

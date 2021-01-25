@@ -725,6 +725,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.post do
           res = interactor.select_pm_types(params[:pm_bom])
           if res.success
+            store_locally(:pm_subtype_ids, res.instance)
             show_partial_or_page(r) do
               Masterfiles::Packaging::PmBom::AddProducts.call({ pm_subtype_ids: res.instance },
                                                               back_url: back_button_url)
