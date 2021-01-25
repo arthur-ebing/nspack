@@ -211,16 +211,6 @@ module ProductionApp
         .select_map(:id)
     end
 
-    def cultivar_group_id
-      DB[:cultivar_groups]
-        .select(
-          Sequel[:cultivar_groups][:id],
-          Sequel[:cultivar_groups][:cultivar_group_code]
-        )
-        .order(:cultivar_group_code)
-        .first[:id]
-    end
-
     def pm_boms_products(product_setup_id)
       pm_bom = find_product_setup(product_setup_id)
       MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
