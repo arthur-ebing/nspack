@@ -624,6 +624,11 @@ module MethodBuilder
 
         dataset = dataset.where(opts[:where].transform_values { |v| v == '' ? nil : v })
       end
+      if opts[:exclude]
+        raise Crossbeams::FrameworkError, 'WHERE NOT (exclude) clause in "for_select" must be a hash' unless opts[:exclude].is_a?(Hash)
+
+        dataset = dataset.exclude(opts[:exclude].transform_values { |v| v == '' ? nil : v })
+      end
       lbl = options[:label] || options[:value]
       val = options[:value]
       lbl == val ? select_single(dataset, val) : select_two(dataset, lbl, val, options[:label_separator])

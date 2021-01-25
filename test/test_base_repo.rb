@@ -284,6 +284,24 @@ class TestBaseRepo < MiniTestWithHooks
     assert_equal ['User 9', 'usr_9'], users.last
   end
 
+  def test_for_select_where
+    klass = Class.new(BaseRepo)
+    klass.build_for_select(:users, value: :login_name, order_by: :login_name)
+    repo = klass.new
+    users = repo.for_select_users(where: { login_name: %w[usr_0 usr_1 usr_2] })
+    assert_equal 'usr_0', users.first
+    assert_equal 'usr_2', users.last
+  end
+
+  def test_for_select_exclude
+    klass = Class.new(BaseRepo)
+    klass.build_for_select(:users, value: :login_name, order_by: :login_name)
+    repo = klass.new
+    users = repo.for_select_users(exclude: { login_name: %w[usr_0 usr_1 usr_2] })
+    assert_equal 'usr_3', users.first
+    assert_equal 'usr_9', users.last
+  end
+
   def test_crud_calls_without_wrapper
     klass = Class.new(BaseRepo)
     klass.crud_calls_for(:users)
