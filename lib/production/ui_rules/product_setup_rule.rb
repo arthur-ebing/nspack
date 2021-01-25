@@ -34,11 +34,9 @@ module UiRules
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
       target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)&.target_market_name
       mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
-      pm_mark_id_label = MasterfilesApp::BomRepo.new.find_pm_mark(@form_object.pm_mark_id)&.packaging_marks
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
       cartons_per_pallet_id_label = @repo.find_hash(:cartons_per_pallet, @form_object.cartons_per_pallet_id)[:cartons_per_pallet]
-      pm_bom_id_label = MasterfilesApp::BomRepo.new.find_pm_bom(@form_object.pm_bom_id)&.bom_code
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
@@ -61,11 +59,9 @@ module UiRules
       fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed TM Group' }
       fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
-      fields[:pm_mark_id] = { renderer: :label, with_value: pm_mark_id_label, caption: 'PM Mark', hide_on_load: !@rules[:require_packaging_bom] }
       fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
       fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
       fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', hide_on_load: !@rules[:require_packaging_bom] }
       fields[:extended_columns] = { renderer: :label }
       fields[:client_size_reference] = { renderer: :label }
       fields[:client_product_code] = { renderer: :label }
@@ -81,7 +77,7 @@ module UiRules
       fields[:description] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
       fields[:erp_bom_code] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] = { renderer: :label }
-      fields[:gtin_code] = { renderer: :label, hide_on_load: !@rules[:gtins_required] }
+      fields[:gtin_code] = { renderer: :label, caption: 'GTIN Code', hide_on_load: !@rules[:gtins_required] }
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
@@ -197,16 +193,6 @@ module UiRules
                    prompt: 'Select Mark',
                    searchable: true,
                    remove_search_for_small_list: false },
-        pm_mark_id: { renderer: :select,
-                      options: MasterfilesApp::BomRepo.new.for_select_pm_marks(
-                        where: { mark_id: @form_object.mark_id }
-                      ),
-                      disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
-                      caption: 'PM Mark',
-                      prompt: 'Select PM Mark',
-                      searchable: true,
-                      remove_search_for_small_list: false,
-                      hide_on_load: !@rules[:require_packaging_bom] },
         product_chars: {},
         inventory_code_id: { renderer: :select,
                              options: MasterfilesApp::FruitRepo.new.for_select_inventory_codes,
@@ -266,28 +252,18 @@ module UiRules
                                  prompt: 'Select Cartons per Pallet',
                                  searchable: true,
                                  remove_search_for_small_list: false },
-        pm_bom_id: { renderer: :select,
-                     options: MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(
-                       @form_object.commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id
-                     ),
-                     disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_boms,
-                     caption: 'PM BOM',
-                     prompt: 'Select PM BOM',
-                     searchable: true,
-                     remove_search_for_small_list: false,
-                     hide_on_load: !@rules[:require_packaging_bom] },
         description: { readonly: true,
                        hide_on_load: !@rules[:require_packaging_bom] },
         erp_bom_code: { readonly: true,
                         hide_on_load: !@rules[:require_packaging_bom] },
         active: { renderer: :checkbox },
-        # extended_columns: {},
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
                          caption: 'Treatments',
                          hide_on_load: @rules[:hide_some_fields] },
         gtin_code: { renderer: :label,
+                     caption: 'GTIN Code',
                      hide_on_load: !@rules[:gtins_required] }
       }
     end
@@ -314,11 +290,9 @@ module UiRules
                                     packed_tm_group_id: nil,
                                     target_market_id: nil,
                                     mark_id: nil,
-                                    pm_mark_id: nil,
                                     inventory_code_id: nil,
                                     pallet_format_id: nil,
                                     cartons_per_pallet_id: nil,
-                                    pm_bom_id: nil,
                                     extended_columns: nil,
                                     client_size_reference: nil,
                                     client_product_code: nil,
@@ -338,7 +312,7 @@ module UiRules
     private
 
     def add_behaviours
-      behaviours do |behaviour| # rubocop:disable Metrics/BlockLength
+      behaviours do |behaviour|
         behaviour.dropdown_change :commodity_id,
                                   notify: [{ url: '/production/product_setups/product_setups/commodity_changed',
                                              param_keys: %i[product_setup_product_setup_template_id] }]
@@ -362,14 +336,8 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_format_changed',
                                              param_keys: %i[product_setup_basic_pack_code_id] }]
-        behaviour.dropdown_change :pm_bom_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/pm_bom_changed',
-                                             param_keys: %i[product_setup_pm_mark_id] }]
         behaviour.dropdown_change :mark_id,
                                   notify: [{ url: '/production/product_setups/product_setups/mark_changed' }]
-        behaviour.dropdown_change :pm_mark_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/pm_mark_changed',
-                                             param_keys: %i[product_setup_pm_bom_id] }]
       end
     end
   end

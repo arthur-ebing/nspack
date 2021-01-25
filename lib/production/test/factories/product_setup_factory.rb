@@ -24,6 +24,7 @@ module ProductionApp
       marketing_variety_id = create_marketing_variety
       basic_pack_code_id = create_basic_pack_code
       standard_pack_code_id = create_standard_pack_code
+      std_fruit_size_count_id = create_std_fruit_size_count
       fruit_size_reference_id = create_fruit_size_reference
       marketing_org_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_MARKETER)
       packed_tm_group_id = create_target_market_group
@@ -39,7 +40,7 @@ module ProductionApp
         product_setup_template_id: product_setup_template_id,
         marketing_variety_id: marketing_variety_id,
         customer_variety_id: nil,
-        std_fruit_size_count_id: nil,
+        std_fruit_size_count_id: std_fruit_size_count_id,
         basic_pack_code_id: basic_pack_code_id,
         standard_pack_code_id: standard_pack_code_id,
         fruit_actual_counts_for_pack_id: fruit_actual_counts_for_pack_id,
@@ -50,7 +51,6 @@ module ProductionApp
         inventory_code_id: inventory_code_id,
         pallet_format_id: pallet_format_id,
         cartons_per_pallet_id: cartons_per_pallet_id,
-        pm_bom_id: nil,
         extended_columns: '{}',
         client_size_reference: Faker::Lorem.unique.word,
         client_product_code: Faker::Lorem.word,

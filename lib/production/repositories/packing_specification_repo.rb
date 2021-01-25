@@ -31,8 +31,11 @@ module ProductionApp
           packing_specification_items.pm_bom_id,
           pm_boms.bom_code AS pm_bom,
           packing_specification_items.pm_mark_id,
+          product_setups.mark_id AS mark_id,
+          product_setups.std_fruit_size_count_id AS std_fruit_size_count_id,
           pm_marks.description AS pm_mark,
           packing_specification_items.product_setup_id,
+          packing_specifications.product_setup_template_id,
           fn_product_setup_code(packing_specification_items.product_setup_id) AS product_setup,
           packing_specification_items.tu_labour_product_id,
           pm_products_tu.erp_code AS tu_labour_product,
@@ -58,6 +61,7 @@ module ProductionApp
           fn_current_status('packing_specification_items', packing_specification_items.id) AS status
         FROM packing_specification_items
         JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
+        JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
         LEFT JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id
         LEFT JOIN pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id
         LEFT JOIN pm_products pm_products_tu ON pm_products_tu.id = packing_specification_items.tu_labour_product_id

@@ -322,18 +322,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         std_fruit_size_count_id = params[:product_setup_std_fruit_size_count_id]
         if commodity_id.blank? || std_fruit_size_count_id.blank? || params[:changed_value].blank?
           actual_counts = []
-          pm_boms = []
         else
           basic_pack_code_id = params[:changed_value]
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
-          pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_fruit_actual_counts_for_pack_id',
                                      options_array: actual_counts),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'product_setup_pm_bom_id',
-                                     options_array: pm_boms),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',
                                      value: ''),
@@ -350,18 +345,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         basic_pack_code_id = params[:product_setup_basic_pack_code_id]
         if commodity_id.blank? || basic_pack_code_id.blank? || params[:changed_value].blank?
           actual_counts = []
-          pm_boms = []
         else
           std_fruit_size_count_id = params[:changed_value]
           actual_counts = interactor.for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
-          pm_boms = interactor.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
         end
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_fruit_actual_counts_for_pack_id',
                                      options_array: actual_counts),
-                      OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'product_setup_pm_bom_id',
-                                     options_array: pm_boms),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',
                                      value: ''),
@@ -447,48 +437,11 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: cartons_per_pallets)])
       end
 
-      r.on 'pm_bom_changed' do
-        pm_mark_id = params[:product_setup_pm_mark_id]
-        if params[:changed_value].blank? || pm_mark_id.blank?
-          pm_bom_description = nil
-          pm_bom_erp_bom_code = nil
-          pm_bom_products = []
-        else
-          pm_bom_id = params[:changed_value]
-          pm_bom = MasterfilesApp::BomRepo.new.find_pm_bom(pm_bom_id)
-          pm_bom_description = pm_bom&.description
-          pm_bom_erp_bom_code = pm_bom&.erp_bom_code
-          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, pm_mark_id)
-        end
-        json_actions([OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'product_setup_description',
-                                     value: pm_bom_description),
-                      OpenStruct.new(type: :replace_input_value,
-                                     dom_id: 'product_setup_erp_bom_code',
-                                     value: pm_bom_erp_bom_code),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'product_setup_pm_boms_products',
-                                     value: pm_bom_products)])
-      end
-
       r.on 'mark_changed' do
         pm_marks = MasterfilesApp::BomRepo.new.for_select_pm_marks(where: { mark_id: params[:changed_value] })
         json_actions([OpenStruct.new(type: :replace_select_options,
                                      dom_id: 'product_setup_pm_mark_id',
                                      options_array: pm_marks)])
-      end
-
-      r.on 'pm_mark_changed' do
-        pm_bom_id = params[:product_setup_pm_bom_id]
-        if pm_bom_id.blank? || params[:changed_value].blank?
-          pm_bom_products = []
-        else
-          pm_mark_id = params[:changed_value]
-          pm_bom_products = interactor.pm_bom_products_table(pm_bom_id, pm_mark_id)
-        end
-        json_actions([OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'product_setup_pm_boms_products',
-                                     value: pm_bom_products)])
       end
     end
   end

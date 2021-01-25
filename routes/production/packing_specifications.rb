@@ -176,6 +176,31 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'packing_specification_items' do
       interactor = ProductionApp::PackingSpecificationItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'packing_specification_changed' do
+        actions = []
+        unless params[:changed_value].nil_or_empty?
+          repo = MasterfilesApp::BomRepo.new
+          product_setup_template_id = repo.get(:packing_specifications, params[:changed_value], :product_setup_template_id)
+          product_setup_list = ProductionApp::ProductSetupRepo.new.for_select_product_setups(where: { product_setup_template_id: product_setup_template_id })
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'packing_specification_item_product_setup_id', options_array: product_setup_list)
+        end
+        json_actions(actions)
+      end
+
+      r.on 'product_setup_changed' do
+        actions = []
+        unless params[:changed_value].nil_or_empty?
+          repo = MasterfilesApp::BomRepo.new
+          product_setup = repo.where_hash(:product_setups, id: params[:changed_value])
+          pm_bom_list = repo.for_select_pm_boms(where: { std_fruit_size_count_id: product_setup[:std_fruit_size_count_id] })
+          pm_mark_list = repo.for_select_pm_marks(where: { mark_id: product_setup[:mark_id] })
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'packing_specification_item_pm_bom_id', options_array: pm_bom_list)
+          actions << OpenStruct.new(type: :replace_select_options, dom_id: 'packing_specification_item_pm_mark_id', options_array: pm_mark_list)
+        end
+        json_actions(actions)
+      end
+
       r.on 'refresh' do
         res = interactor.refresh_packing_specification_items
         flash[res.success ? :notice : :error] = res.message

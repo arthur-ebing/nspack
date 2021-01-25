@@ -137,6 +137,18 @@ module MasterfilesApp
       DB[query].all unless id.nil?
     end
 
+    def for_select_pm_boms(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
+      DB[:pm_boms]
+        .left_outer_join(:pm_boms_products, pm_bom_id: Sequel[:pm_boms][:id])
+        .left_outer_join(:pm_products, id: Sequel[:pm_boms_products][:pm_product_id])
+        .where(Sequel[:pm_boms][:active] => active)
+        .exclude(exclude)
+        .where(where)
+        .distinct
+        .order(:bom_code)
+        .select_map([:bom_code, Sequel[:pm_boms][:id]])
+    end
+
     def for_select_pm_marks(where: {}, active: true) # rubocop:disable Metrics/AbcSize
       DB[:pm_marks]
         .join(:marks, id: :mark_id)

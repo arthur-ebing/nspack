@@ -9,8 +9,11 @@ module ProductionApp
     attribute :pm_bom_id, Types::Integer
     attribute :pm_bom, Types::String
     attribute :pm_mark_id, Types::Integer
+    attribute :mark_id, Types::Integer
+    attribute :std_fruit_size_count_id, Types::Integer
     attribute :pm_mark, Types::String
     attribute :product_setup_id, Types::Integer
+    attribute :product_setup_template_id, Types::Integer
     attribute :product_setup, Types::String
     attribute :tu_labour_product_id, Types::Integer
     attribute :tu_labour_product, Types::String

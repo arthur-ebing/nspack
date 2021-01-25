@@ -27,6 +27,7 @@ module UiRules
                                      options: ProductionApp::ProductSetupRepo.new.for_select_product_setup_templates,
                                      disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setup_templates,
                                      caption: 'Product Setup Template',
+                                     searchable: true,
                                      required: true },
         packing_specification_code: { required: true },
         description: {}

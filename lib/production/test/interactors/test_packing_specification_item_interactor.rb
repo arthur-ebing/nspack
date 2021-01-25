@@ -74,22 +74,28 @@ module ProductionApp
 
     def packing_specification_item_attrs
       packing_specification_id = create_packing_specification
+      product_setup_template_id = BaseRepo.new.get(:packing_specifications, packing_specification_id, :product_setup_template_id)
       pm_bom_id = create_pm_bom
       pm_mark_id = create_pm_mark
+      mark_id = BaseRepo.new.get(:pm_marks, pm_mark_id, :mark_id)
       product_setup_id = create_product_setup
+      std_fruit_size_count_id = BaseRepo.new.get(:product_setups, product_setup_id, :std_fruit_size_count_id)
       tu_labour_product_id = create_pm_product
       ru_labour_product_id = create_pm_product
 
       {
         id: 1,
         packing_specification_id: packing_specification_id,
+        product_setup_template_id: product_setup_template_id,
         packing_specification: 'ABC',
         description: Faker::Lorem.unique.word,
         pm_bom_id: pm_bom_id,
         pm_bom: 'ABC',
         pm_mark_id: pm_mark_id,
+        mark_id: mark_id,
         pm_mark: 'ABC',
         product_setup_id: product_setup_id,
+        std_fruit_size_count_id: std_fruit_size_count_id,
         product_setup: 'ABC',
         tu_labour_product_id: tu_labour_product_id,
         tu_labour_product: 'ABC',

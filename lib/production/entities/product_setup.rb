@@ -17,8 +17,6 @@ module ProductionApp
     attribute :inventory_code_id, Types::Integer
     attribute :pallet_format_id, Types::Integer
     attribute :cartons_per_pallet_id, Types::Integer
-    attribute :pm_bom_id, Types::Integer
-    # attribute :extended_columns, Types::Hash
     attribute :client_size_reference, Types::String
     attribute :client_product_code, Types::String
     attribute :treatment_ids, Types::Array
@@ -38,7 +36,6 @@ module ProductionApp
     attribute :description, Types::String
     attribute :erp_bom_code, Types::String
     attribute :target_market_id, Types::Integer
-    attribute :pm_mark_id, Types::Integer
     attribute :gtin_code, Types::String
   end
 end

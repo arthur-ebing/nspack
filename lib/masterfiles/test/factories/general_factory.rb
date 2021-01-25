@@ -18,7 +18,7 @@ module MasterfilesApp
         code: AppConst::UOM_TYPE,
         active: true
       }
-      DB[:uom_types].insert(default.merge(opts))
+      DB[:uom_types].where(default.merge(opts)).get(:id) || DB[:uom_types].insert(default.merge(opts))
     end
   end
 end

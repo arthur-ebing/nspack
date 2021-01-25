@@ -22,12 +22,11 @@ module ProductionApp
       id = nil
       repo.transaction do
         id = repo.create_product_setup(res)
-        log_status('product_setups', id, 'CREATED')
+        log_status(:product_setups, id, 'CREATED')
         log_transaction
       end
       instance = product_setup(id)
-      success_response("Created product setup #{instance.product_setup_code}",
-                       instance)
+      success_response("Created product setup #{instance.product_setup_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { product_setup_code: ['This product setup already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -64,12 +63,11 @@ module ProductionApp
 
       repo.transaction do
         repo.update_product_setup(id, res)
-        log_status('product_setups', id, 'UPDATED') if repo.product_setup_in_production?(id)
+        log_status(:product_setups, id, 'UPDATED') if repo.product_setup_in_production?(id)
         log_transaction
       end
       instance = product_setup(id)
-      success_response("Updated product setup #{instance.product_setup_code}",
-                       instance)
+      success_response("Updated product setup #{instance.product_setup_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -80,7 +78,7 @@ module ProductionApp
 
       repo.transaction do
         repo.delete_product_setup(id)
-        log_status('product_setups', id, 'DELETED')
+        log_status(:product_setups, id, 'DELETED')
         log_transaction
       end
       success_response("Deleted product setup #{name}")
@@ -130,10 +128,6 @@ module ProductionApp
                                                                                basic_pack_id: basic_pack_code_id })
     end
 
-    def for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
-      MasterfilesApp::BomRepo.new.for_select_setup_pm_boms(commodity_id, std_fruit_size_count_id, basic_pack_code_id)
-    end
-
     def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)
       pm_bom_products = MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom_id)
       add_pm_bom_products_packaging_marks(pm_bom_products, pm_mark_id) unless pm_mark_id.nil_or_empty?
@@ -160,12 +154,11 @@ module ProductionApp
     def activate_product_setup(id)
       repo.transaction do
         repo.activate_product_setup(id)
-        log_status('product_setups', id, 'ACTIVATED')
+        log_status(:product_setups, id, 'ACTIVATED')
         log_transaction
       end
       instance = product_setup(id)
-      success_response("Activated product setup #{instance.id}",
-                       instance)
+      success_response("Activated product setup #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -173,12 +166,11 @@ module ProductionApp
     def deactivate_product_setup(id)
       repo.transaction do
         repo.deactivate_product_setup(id)
-        log_status('product_setups', id, 'DEACTIVATED')
+        log_status(:product_setups, id, 'DEACTIVATED')
         log_transaction
       end
       instance = product_setup(id)
-      success_response("De-activated product setup  #{instance.id}",
-                       instance)
+      success_response("De-activated product setup  #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -186,12 +178,11 @@ module ProductionApp
     def clone_product_setup(id)
       repo.transaction do
         repo.clone_product_setup(id)
-        log_status('product_setups', id, 'CLONED')
+        log_status(:product_setups, id, 'CLONED')
         log_transaction
       end
       instance = product_setup(id)
-      success_response("Cloned product setup #{instance.id}",
-                       instance)
+      success_response("Cloned product setup #{instance.id}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

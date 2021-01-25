@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProductionApp
-  ProductSetupSchema = Dry::Schema.Params do # rubocop:disable Metrics/BlockLength
+  ProductSetupSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:product_setup_template_id).filled(:integer)
     required(:marketing_variety_id).filled(:integer)
@@ -17,8 +17,6 @@ module ProductionApp
     required(:inventory_code_id).filled(:integer)
     required(:pallet_format_id).filled(:integer)
     required(:cartons_per_pallet_id).filled(:integer)
-    required(:pm_bom_id).maybe(:integer)
-    # required(:extended_columns).maybe(:hash)
     required(:client_size_reference).maybe(Types::StrippedString)
     required(:client_product_code).maybe(Types::StrippedString)
     optional(:treatment_ids).maybe(:array).maybe { each(:integer) }
@@ -27,9 +25,7 @@ module ProductionApp
     required(:pallet_label_name).maybe(Types::StrippedString)
     required(:grade_id).filled(:integer)
     required(:product_chars).maybe(Types::StrippedString)
-    # required(:active).maybe(:bool)
     required(:target_market_id).maybe(:integer)
-    required(:pm_mark_id).maybe(:integer)
     optional(:gtin_code).maybe(Types::StrippedString)
   end
 end
