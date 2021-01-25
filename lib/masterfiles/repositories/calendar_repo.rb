@@ -21,20 +21,42 @@ module MasterfilesApp
                           order_by: :season_code
 
     crud_calls_for :season_groups, name: :season_group, wrapper: SeasonGroup
-    crud_calls_for :seasons, name: :season, wrapper: Season
+    crud_calls_for :seasons, name: :season, exclude: %i[create update]
 
     def find_season(id)
-      hash = find_with_association(:seasons,
-                                   id,
-                                   parent_tables: [{ parent_table: :season_groups,
-                                                     columns: [:season_group_code],
-                                                     flatten_columns: { season_group_code: :season_group_code } },
-                                                   { parent_table: :commodities,
-                                                     columns: [:code],
-                                                     flatten_columns: { code: :commodity_code } }])
-      return nil if hash.nil?
+      find_with_association(:seasons,
+                            id,
+                            parent_tables: [{ parent_table: :season_groups,
+                                              columns: [:season_group_code],
+                                              flatten_columns: { season_group_code: :season_group_code } },
+                                            { parent_table: :commodities,
+                                              columns: [:code],
+                                              flatten_columns: { code: :commodity_code } }],
+                            wrapper: Season)
+    end
 
-      Season.new(hash)
+    def create_season(res)
+      attrs = res.to_h
+      attrs[:season_year] = parse_season_year(attrs[:end_date])
+      attrs[:season_code] = assemble_season_code(attrs[:season_year], attrs[:commodity_id])
+
+      create(:seasons, attrs)
+    end
+
+    def update_season(id, res)
+      attrs = res.to_h
+      attrs[:season_year] = parse_season_year(attrs[:end_date])
+      attrs[:season_code] = assemble_season_code(attrs[:season_year], attrs[:commodity_id])
+
+      update(:seasons, id, attrs)
+    end
+
+    def parse_season_year(end_date)
+      Date.parse(end_date.to_s).year
+    end
+
+    def assemble_season_code(season_year, commodity_id)
+      "#{season_year}_#{DB[:commodities].where(id: commodity_id).get(:code)}"
     end
 
     def get_season_id(cultivar_id, date)
@@ -56,12 +78,10 @@ module MasterfilesApp
     end
 
     def one_year_from_start_date(start_date)
+      return nil if start_date.nil_or_empty?
+
       dte = Date.parse start_date
       UtilityFunctions.days_since(dte, 365)
-    end
-
-    def season_code(season_year, commodity_id)
-      "#{season_year}_#{DB[:commodities].where(id: commodity_id).get(:code)}"
     end
 
     def find_season_by_variant(variant_code, commodity_code)
