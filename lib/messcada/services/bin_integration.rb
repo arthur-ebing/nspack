@@ -36,14 +36,14 @@ module MesscadaApp
       ok_response
     end
 
-    private
-
     def valid_bin_for_kromco_rmt_system?
       res = repo.can_bin_be_tipped?(bin_number)
       return res unless res.success
 
       bintip_criteria_passed?
     end
+
+    private
 
     def bintip_criteria_passed? # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       run = ProductionApp::ProductionRunRepo.new.find_production_run_flat(run_id)

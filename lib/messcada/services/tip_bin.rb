@@ -33,12 +33,23 @@ module MesscadaApp
       success_response('rmt bin tipped successfully', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
     end
 
-    def can_tip_bin?
-      errors = validations
-      return failed_response(errors) unless errors.nil?
+    def can_tip_bin? # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+      run_res = active_run_for_device
+      return run_res unless run_res.success
 
-      run_stats_bins_tipped = repo.get_run_bins_tipped(@run_id)
-      success_response('rmt bin is valid for tipping', @run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: @run_id, bins_tipped: run_stats_bins_tipped))
+      if (is_kr_bin = (AppConst::INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM && AppConst::CLIENT_CODE == 'kr'))
+        res = BinIntegration.new(bin_number, run_res.instance).valid_bin_for_kromco_rmt_system?
+        return res unless res.success
+      end
+
+      if !is_kr_bin || (is_kr_bin && bin_exists?)
+        errors = validations
+        return failed_response(errors) unless errors.nil?
+      end
+
+      run_stats_bins_tipped = repo.get_run_bins_tipped(run_res.instance)
+      run_attrs = repo.get_run_setup_reqs(run_res.instance)
+      success_response('rmt bin is valid for tipping', run_attrs.merge(rmt_bin_id: @rmt_bin_id, run_id: run_res.instance, bins_tipped: run_stats_bins_tipped))
     end
 
     private
