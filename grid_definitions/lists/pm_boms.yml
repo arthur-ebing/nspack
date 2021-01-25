@@ -24,7 +24,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/packaging/pm_boms/select_subtypes"
+  :url: "/masterfiles/packaging/pm_boms/select_pm_types"
   :text: New PM BOM
   :style: :button
 #  :behaviour: :popup

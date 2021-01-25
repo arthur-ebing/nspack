@@ -12,7 +12,7 @@ module MasterfilesApp
     required(:nett_weight).maybe(:decimal)
   end
 
-  PmBomSubtypeSchema = Dry::Schema.Params do
-    required(:pm_subtype_ids).filled(:array).maybe { each(:integer) }
+  PmBomTypeSchema = Dry::Schema.Params do
+    required(:pm_type_ids).filled(:array).maybe { each(:integer) }
   end
 end

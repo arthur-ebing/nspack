@@ -90,18 +90,18 @@ module ProductionApp
 
       when 'tu_labour_product', 'ru_labour_product', 'ri_labour_product'
         column = params[:column_name].gsub('_product', '_product_id')
-        value = get_id(:pm_boms, product_code: params[:column_value])
+        value = get_id(:pm_products, product_code: params[:column_value])
 
       when 'fruit_sticker_1', 'tu_sticker_1', 'ru_sticker_1', 'fruit_sticker_2', 'tu_sticker_2', 'ru_sticker_2'
         column = params[:column_name].gsub('_1', '_ids').gsub('_2', '_ids')
-        value = get_id(:pm_boms, product_code: params[:column_value])
+        value = get_id(:pm_products, product_code: params[:column_value])
         indexer = [params[:column_name][-1]]
 
       else
         raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
       end
 
-      args = Sequel.lit("#{column} #{indexer} = '#{value}'")
+      args = Sequel.lit("#{column} #{indexer} = #{value}")
       DB[:packing_specification_items].where(id: id).update(args)
     end
 

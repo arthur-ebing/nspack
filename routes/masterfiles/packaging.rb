@@ -716,25 +716,24 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial_or_page(r) { Masterfiles::Packaging::PmBom::New.call(remote: fetch?(r)) }
       end
 
-      r.on 'select_subtypes' do
+      r.on 'select_pm_types' do
         r.get do
           show_partial_or_page(r) do
-            Masterfiles::Packaging::PmBom::SelectSubtypes.call(remote: fetch?(r))
+            Masterfiles::Packaging::PmBom::SelectPmTypes.call(remote: fetch?(r))
           end
         end
         r.post do
-          res = interactor.select_subtypes(params[:pm_bom])
+          res = interactor.select_pm_types(params[:pm_bom])
           if res.success
-            store_locally(:pm_subtype_ids, params[:pm_bom][:pm_subtype_ids].map(&:to_i))
             show_partial_or_page(r) do
-              Masterfiles::Packaging::PmBom::AddProducts.call({ pm_subtype_ids: params[:pm_bom][:pm_subtype_ids].map(&:to_i), selected_product_ids: [] },
+              Masterfiles::Packaging::PmBom::AddProducts.call({ pm_subtype_ids: res.instance },
                                                               back_url: back_button_url)
             end
           else
-            re_show_form(r, res, url: '/masterfiles/packaging/pm_boms/select_subtypes') do
-              Masterfiles::Packaging::PmBom::SelectSubtypes.call(form_values: params[:pm_bom],
-                                                                 form_errors: res.errors,
-                                                                 remote: fetch?(r))
+            re_show_form(r, res, url: '/masterfiles/packaging/pm_boms/select_pm_types') do
+              Masterfiles::Packaging::PmBom::SelectPmTypes.call(form_values: params[:pm_bom],
+                                                                form_errors: res.errors,
+                                                                remote: fetch?(r))
             end
           end
         end
