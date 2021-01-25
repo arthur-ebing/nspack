@@ -92,7 +92,7 @@ module UiRules
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id = product_setup_template&.cultivar_id
       cultivar_id_label = product_setup_template&.cultivar_name
-      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
+      commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::DEFAULT_MARKETING_ORG, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
         product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },

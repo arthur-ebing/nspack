@@ -4,7 +4,7 @@ module ProductionApp
   class ProductSetupRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     build_for_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
     build_inactive_select :product_setup_templates, label: :template_name, value: :id, order_by: :template_name
-    crud_calls_for :product_setup_templates, name: :product_setup_template, wrapper: ProductSetupTemplate
+    crud_calls_for :product_setup_templates, name: :product_setup_template
 
     def for_select_product_setups(where: {}, active: true)
       DB[:product_setups]
@@ -18,34 +18,32 @@ module ProductionApp
       for_select_product_setups(where: where, active: false)
     end
 
-    crud_calls_for :product_setups, name: :product_setup, wrapper: ProductSetup
+    crud_calls_for :product_setups, name: :product_setup
 
     def find_product_setup_template(id)
-      hash = find_with_association(:product_setup_templates,
-                                   id,
-                                   parent_tables: [{ parent_table: :cultivar_groups,
-                                                     columns: [:cultivar_group_code],
-                                                     flatten_columns: { cultivar_group_code: :cultivar_group_code } },
-                                                   { parent_table: :cultivars,
-                                                     columns: [:cultivar_name],
-                                                     flatten_columns: { cultivar_name: :cultivar_name } },
-                                                   { parent_table: :plant_resources,
-                                                     columns: [:plant_resource_code],
-                                                     foreign_key: :packhouse_resource_id,
-                                                     flatten_columns: { plant_resource_code: :packhouse_resource_code } },
-                                                   { parent_table: :plant_resources,
-                                                     columns: [:plant_resource_code],
-                                                     foreign_key: :production_line_id,
-                                                     flatten_columns: { plant_resource_code: :production_line_code } },
-                                                   { parent_table: :season_groups,
-                                                     columns: [:season_group_code],
-                                                     flatten_columns: { season_group_code: :season_group_code } },
-                                                   { parent_table: :seasons,
-                                                     columns: [:season_code],
-                                                     flatten_columns: { season_code: :season_code } }])
-      return nil if hash.nil?
-
-      ProductSetupTemplate.new(hash)
+      find_with_association(:product_setup_templates,
+                            id,
+                            parent_tables: [{ parent_table: :cultivar_groups,
+                                              columns: [:cultivar_group_code],
+                                              flatten_columns: { cultivar_group_code: :cultivar_group_code } },
+                                            { parent_table: :cultivars,
+                                              columns: [:cultivar_name],
+                                              flatten_columns: { cultivar_name: :cultivar_name } },
+                                            { parent_table: :plant_resources,
+                                              columns: [:plant_resource_code],
+                                              foreign_key: :packhouse_resource_id,
+                                              flatten_columns: { plant_resource_code: :packhouse_resource_code } },
+                                            { parent_table: :plant_resources,
+                                              columns: [:plant_resource_code],
+                                              foreign_key: :production_line_id,
+                                              flatten_columns: { plant_resource_code: :production_line_code } },
+                                            { parent_table: :season_groups,
+                                              columns: [:season_group_code],
+                                              flatten_columns: { season_group_code: :season_group_code } },
+                                            { parent_table: :seasons,
+                                              columns: [:season_code],
+                                              flatten_columns: { season_code: :season_code } }],
+                            wrapper: ProductSetupTemplate)
     end
 
     def find_product_setup(id)
@@ -107,7 +105,7 @@ module ProductionApp
         .map { |r| [r[:code], r[:id]] }
     end
 
-    def commodity_id(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
+    def get_commodity_id(cultivar_group_id, cultivar_id)  # rubocop:disable Metrics/AbcSize
       DB[:product_setup_templates]
         .join(:cultivar_groups, id: :cultivar_group_id)
         .join(:cultivars, cultivar_group_id: :id)
