@@ -283,7 +283,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.get do
             # set defaults
             form_state = {}
-            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.actual_payload(load_id) if AppConst::VGM_REQUIRED
+            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.calculate_actual_payload(load_id) if AppConst::VGM_REQUIRED
             # checks if load_container exists
             container_id = repo.get_id(:load_containers, load_id: load_id)
             unless container_id.nil?

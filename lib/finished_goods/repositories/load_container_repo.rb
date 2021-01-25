@@ -38,7 +38,7 @@ module FinishedGoodsApp
       DB[query].select_map(%i[code id])
     end
 
-    def actual_payload(load_id)
+    def calculate_calculate_actual_payload(load_id)
       DB[:pallets].where(load_id: load_id).select_map(:nett_weight).map { |w| w.nil? ? AppConst::BIG_ZERO : w }.sum
     end
 

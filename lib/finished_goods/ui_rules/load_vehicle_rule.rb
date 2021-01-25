@@ -110,7 +110,7 @@ module UiRules
                                     max_gross_weight: nil,
                                     tare_weight: nil,
                                     max_payload: nil,
-                                    actual_payload: @container_repo.actual_payload(@options[:load_id]),
+                                    actual_payload: @container_repo.calculate_actual_payload(@options[:load_id]),
                                     cargo_temperature_id: nil,
                                     stack_type_id: nil)
     end
