@@ -56,7 +56,7 @@ module UiRules
                          remove_search_for_small_list: false,
                          required: true },
         uom_id: { renderer: :select,
-                  options: @repo.for_select_pm_uoms(AppConst::UOM_TYPE),
+                  options: MasterfilesApp::GeneralRepo.new.for_select_uoms(where: { code: AppConst::UOM_TYPE }),
                   disabled_options: MasterfilesApp::GeneralRepo.new.for_select_inactive_uoms,
                   caption: 'Unit of Measure',
                   required: true },

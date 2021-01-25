@@ -38,8 +38,14 @@ module UiRules
 
     def common_fields
       {
-        commodity_id: { renderer: :select, options: MasterfilesApp::CommodityRepo.new.for_select_commodities, required: true  },
-        uom_id: { renderer: :select, options: @gen_repo.for_select_uoms(where: { uom_type_id: @gen_repo.default_uom_type_id }), required: true  },
+        commodity_id: { renderer: :select,
+                        options: MasterfilesApp::CommodityRepo.new.for_select_commodities,
+                        disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
+                        required: true  },
+        uom_id: { renderer: :select,
+                  options: @gen_repo.for_select_uoms(where: { code: AppConst::UOM_TYPE }),
+                  disabled_options: @gen_repo.for_select_inactive_uoms,
+                  required: true  },
         size_count_description: {},
         marketing_size_range_mm: {},
         marketing_weight_range: {},
