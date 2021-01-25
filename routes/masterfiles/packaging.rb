@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 class Nspack < Roda # rubocop:disable Metrics/ClassLength
-  route 'packaging', 'masterfiles' do |r| # rubocop:disable Metrics/BlockLength
+  route 'packaging', 'masterfiles' do |r|
     # PALLET BASES
     # --------------------------------------------------------------------------
-    r.on 'pallet_bases', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_bases', Integer do |id|
       interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -18,7 +19,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PalletBase::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PalletBase::Show.call(id) }
@@ -55,7 +56,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pallet_bases' do # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_bases' do
       interactor = MasterfilesApp::PalletBaseInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -90,7 +91,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PALLET STACK TYPES
     # --------------------------------------------------------------------------
-    r.on 'pallet_stack_types', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_stack_types', Integer do |id|
       interactor = MasterfilesApp::PalletStackTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -161,7 +162,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PALLET FORMATS
     # --------------------------------------------------------------------------
-    r.on 'pallet_formats', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pallet_formats', Integer do |id|
       interactor = MasterfilesApp::PalletFormatInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -175,7 +176,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PalletFormat::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PalletFormat::Show.call(id) }
@@ -237,7 +238,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # CARTONS PER PALLET
     # --------------------------------------------------------------------------
-    r.on 'cartons_per_pallet', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'cartons_per_pallet', Integer do |id|
       interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -251,7 +252,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::CartonsPerPallet::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::CartonsPerPallet::Show.call(id) }
@@ -288,7 +289,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'cartons_per_pallet' do # rubocop:disable Metrics/BlockLength
+    r.on 'cartons_per_pallet' do
       interactor = MasterfilesApp::CartonsPerPalletInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -323,7 +324,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM TYPES
     # --------------------------------------------------------------------------
-    r.on 'pm_types', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_types', Integer do |id|
       interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -337,7 +338,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmType::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmType::Show.call(id) }
@@ -372,7 +373,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_types' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_types' do
       interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -404,7 +405,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM SUBTYPES
     # --------------------------------------------------------------------------
-    r.on 'pm_subtypes', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_subtypes', Integer do |id|
       interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -418,7 +419,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmSubtype::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmSubtype::Show.call(id) }
@@ -448,7 +449,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_subtypes' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_subtypes' do
       interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -479,7 +480,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM PRODUCTS
     # --------------------------------------------------------------------------
-    r.on 'pm_products', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_products', Integer do |id|
       interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -493,7 +494,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmProduct::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmProduct::Show.call(id) }
@@ -534,7 +535,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_products' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_products' do
       interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -544,32 +545,35 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       r.on 'pm_subtype_changed' do
         actions = []
         unless params[:changed_value].nil_or_empty?
+          actions = []
           pm_subtype_id = params[:changed_value]
           repo = MasterfilesApp::BomRepo.new
-          show_product_extra_fields = repo.fruit_composition_level?(pm_subtype_id)
+          actions << [OpenStruct.new(type: :replace_inner_html,
+                                     dom_id: 'pm_product_composition_level',
+                                     value: repo.find_pm_subtype(pm_subtype_id).composition_level),
+                      OpenStruct.new(type: repo.can_edit_product_code?(pm_subtype_id) ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_product_code_field_wrapper'),
+                      OpenStruct.new(type: repo.minimum_composition_level?(pm_subtype_id) ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_basic_pack_id_field_wrapper')]
+
           show_one_level_up_fields = repo.one_level_up_fruit_composition?(pm_subtype_id)
-          actions = [OpenStruct.new(type: :replace_inner_html,
-                                    dom_id: 'pm_product_composition_level',
-                                    value: repo.find_pm_subtype(pm_subtype_id).composition_level),
-                     OpenStruct.new(type: repo.can_edit_product_code?(pm_subtype_id) ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_product_code_field_wrapper'),
-                     OpenStruct.new(type: repo.minimum_composition_level?(pm_subtype_id) ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_basic_pack_id_field_wrapper'),
-                     OpenStruct.new(type: show_product_extra_fields ? :hide_element : :show_element,
-                                    dom_id: 'pm_product_material_mass_field_wrapper'),
-                     OpenStruct.new(type: show_product_extra_fields ? :hide_element : :show_element,
-                                    dom_id: 'pm_product_height_mm_field_wrapper'),
-                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
-                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_items_per_unit_field_wrapper'),
-                     OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                    dom_id: 'pm_product_items_per_unit_client_description_field_wrapper')]
+          actions << [OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
+                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_items_per_unit_field_wrapper'),
+                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_items_per_unit_client_description_field_wrapper')]
+          show_product_extra_fields = repo.fruit_composition_level?(pm_subtype_id) # AppConst::REQUIRE_EXTENDED_PACKAGING
+          actions << [OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_material_mass_field_wrapper'),
+                      OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
+                                     dom_id: 'pm_product_height_mm_field_wrapper')]
+
         end
-        json_actions(actions)
+        json_actions(actions.flatten)
       end
 
-      r.post do # rubocop:disable Metrics/BlockLength     # CREATE
+      r.post do     # CREATE
         res = interactor.create_pm_product(params[:pm_product])
         if res.success
           row_keys = %i[
@@ -602,7 +606,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM BOMS
     # --------------------------------------------------------------------------
-    r.on 'pm_boms', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_boms', Integer do |id|
       interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -633,13 +637,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
+      r.on 'pm_boms_products' do
         interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
         r.on 'new' do    # NEW
           check_auth!('packaging', 'new')
           show_partial_or_page(r) { Masterfiles::Packaging::PmBomsProduct::New.call(id, remote: fetch?(r)) }
         end
-        r.post do # rubocop:disable Metrics/BlockLength       # CREATE
+        r.post do       # CREATE
           res = interactor.create_pm_boms_product(params[:pm_boms_product])
           if res.success
             row_keys = %i[
@@ -671,7 +675,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmBom::Show.call(id) }
@@ -705,7 +709,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_boms' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_boms' do
       interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -798,7 +802,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM BOMS PRODUCTS
     # --------------------------------------------------------------------------
-    r.on 'pm_boms_products', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_boms_products', Integer do |id|
       interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -812,7 +816,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Packaging::PmBomsProduct::Edit.call(id) }
       end
 
-      r.is do # rubocop:disable Metrics/BlockLength
+      r.is do
         r.get do       # SHOW
           check_auth!('packaging', 'read')
           show_partial { Masterfiles::Packaging::PmBomsProduct::Show.call(id) }
@@ -863,19 +867,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_boms_products' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_boms_products' do
       interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
-      r.on 'pm_subtype_changed' do
-        pm_products = if params[:changed_value].blank?
-                        []
-                      else
-                        interactor.for_select_subtype_products(params[:changed_value])
-                      end
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'pm_boms_product_pm_product_id',
-                                     options_array: pm_products)])
-      end
 
       r.on 'inline_edit_bom_product', Integer do |bom_product_id|
         res = interactor.inline_edit_bom_product(bom_product_id, params)
@@ -901,7 +894,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PACKING METHODS
     # --------------------------------------------------------------------------
-    r.on 'packing_methods', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'packing_methods', Integer do |id|
       interactor = MasterfilesApp::PackingMethodInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -972,7 +965,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM COMPOSITION LEVELS
     # --------------------------------------------------------------------------
-    r.on 'pm_composition_levels', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_composition_levels', Integer do |id|
       interactor = MasterfilesApp::PmCompositionLevelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -1013,7 +1006,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_composition_levels' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_composition_levels' do
       interactor = MasterfilesApp::PmCompositionLevelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -1053,7 +1046,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     # PM MARKS
     # --------------------------------------------------------------------------
-    r.on 'pm_marks', Integer do |id| # rubocop:disable Metrics/BlockLength
+    r.on 'pm_marks', Integer do |id|
       interactor = MasterfilesApp::PmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
@@ -1094,7 +1087,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    r.on 'pm_marks' do # rubocop:disable Metrics/BlockLength
+    r.on 'pm_marks' do
       interactor = MasterfilesApp::PmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
         check_auth!('packaging', 'new')
@@ -1124,3 +1117,4 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

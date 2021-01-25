@@ -137,7 +137,7 @@ module UiRules
                                       maximum_weight_gm
                                       average_weight_gm]
       (require_extended_packaging & fields.keys).each do |field|
-        fields[field][:hide_on_load] ||= !@rules[:require_extended_packaging]
+        fields[field][:display] ||= @rules[:require_extended_packaging]
       end
 
       not_fruit_composition_level = %i[marketing_size_range_mm
@@ -149,25 +149,29 @@ module UiRules
                                        maximum_weight_gm
                                        average_weight_gm]
       (not_fruit_composition_level & fields.keys).each do |field|
-        fields[field][:hide_on_load] ||= !@rules[:fruit_composition_level]
+        fields[field][:display] ||= @rules[:fruit_composition_level]
       end
 
       fruit_composition_level = %i[material_mass
                                    height_mm]
       (fruit_composition_level & fields.keys).each do |field|
-        fields[field][:hide_on_load] ||= @rules[:fruit_composition_level]
+        fields[field][:display] ||= !@rules[:fruit_composition_level]
       end
 
       show_extra_fields = %i[gross_weight_per_unit
                              items_per_unit
                              items_per_unit_client_description]
       (show_extra_fields & fields.keys).each do |field|
-        fields[field][:hide_on_load] ||= !@rules[:show_extra_fields]
+        fields[field][:display] ||= @rules[:show_extra_fields]
       end
 
       minimum_composition_level = %i[basic_pack_id]
       (minimum_composition_level & fields.keys).each do |field|
-        fields[field][:hide_on_load] ||= !@rules[:minimum_composition_level]
+        fields[field][:display] ||= @rules[:minimum_composition_level]
+      end
+
+      fields.each_key do |key|
+        fields[key][:hide_on_load] = fields[key].delete(:display)
       end
     end
   end
