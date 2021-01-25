@@ -243,7 +243,7 @@ module MasterfilesApp
       DB[query].select_map(:id)
     end
 
-    def standard_carton_nett_weight(commodity_id)
+    def get_standard_carton_nett_weight(commodity_id)
       DB[:standard_product_weights]
         .where(commodity_id: commodity_id)
         .where(is_standard_carton: true)

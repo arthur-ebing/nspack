@@ -99,7 +99,7 @@ module MasterfilesApp
                                    repo.update_same_commodity_ratios(attrs[:commodity_id], attrs[:standard_carton_nett_weight], standard_product_weight_id)
                                    1
                                  else
-                                   std_carton_nett_weight = repo.standard_carton_nett_weight(attrs[:commodity_id])
+                                   std_carton_nett_weight = repo.get_standard_carton_nett_weight(attrs[:commodity_id])
                                    std_carton_nett_weight.nil? ? nil : std_carton_nett_weight / attrs[:standard_carton_nett_weight]
                                  end
       ratio_to_standard_carton.nil? ? nil : ratio_to_standard_carton.to_f.round(5)
