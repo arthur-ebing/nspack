@@ -38,11 +38,34 @@ build_for_select :commodities,
                  value: :id,
                  order_by: :code
 ```
-Which is called like this: `repo.for_select_commodities`.
+Which is called like this:
+[source,ruby]
+----
+repo.for_select_commodities
+----
+Resulting in this SQL:
+[source,sql]
+----
+SELECT "code", "id" FROM "commodities" WHERE "active" ORDER BY "code"
+----
 
-The results can be restricted by providing a where clause:
+The results can be restricted by providing a `:where` and/or an `:exclude` clause:
 
-`repo.for_select_commodities where: { commodity_group_id: 123 }`
+```ruby
+# WHERE
+repo.for_select_commodities where: { commodity_group_id: 123 }
+# Resulting in this SQL:
+# SELECT "code", "id" FROM "commodities"
+#  WHERE ("active" AND ("commodity_group_id" = 123))
+# ORDER BY "code"
+
+# WHERE NOT
+repo.for_select_commodities exclude: { commodity_group_id: [5, 6, 7] }
+# Resulting in this SQL:
+# SELECT "code", "id" FROM "commodities"
+#  WHERE ("active" AND ("commodity_group_id" NOT IN (5, 6, 7)))
+# ORDER BY "code"
+```
 
 ==== for_select_inactive_table_name
 
