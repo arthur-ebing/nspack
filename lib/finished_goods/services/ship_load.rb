@@ -2,13 +2,14 @@
 
 module FinishedGoodsApp
   class ShipLoad < BaseService
-    attr_reader :load_id, :instance, :user, :shipped_at
+    attr_reader :load_id, :instance, :user, :shipped_at, :repo
 
     def initialize(load_id, user)
       @load_id = load_id
       @instance = repo.find_load_flat(load_id)
       @user = user
       @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
+      @repo = LoadRepo.new
     end
 
     def call
@@ -25,8 +26,9 @@ module FinishedGoodsApp
 
     def ship_load # rubocop:disable Metrics/AbcSize
       load_container_id = repo.get_id(:load_containers, load_id: load_id)
-      verified_gross_weight = FinishedGoodsApp::LoadContainerRepo.new.verified_gross_weight(load_container_id)
-      attrs = { verified_gross_weight: verified_gross_weight, verified_gross_weight_date: Time.now }
+      verified_gross_weight = LoadContainerRepo.new.calculate_verified_gross_weight(load_container_id)
+      attrs = { verified_gross_weight: verified_gross_weight,
+                verified_gross_weight_date: Time.now }
       repo.update(:load_containers, load_container_id, attrs) unless load_container_id.nil?
 
       attrs = { shipped: true, shipped_at: shipped_at }
@@ -50,10 +52,6 @@ module FinishedGoodsApp
         repo.log_status(:pallets, pallet_id, 'SHIPPED', user_name: user.user_name)
       end
       ok_response
-    end
-
-    def repo
-      @repo ||= LoadRepo.new
     end
   end
 end
