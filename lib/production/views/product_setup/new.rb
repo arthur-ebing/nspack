@@ -59,7 +59,6 @@ module Production
                     fold.add_field :target_market_id
                     fold.add_field :sell_by_code
                     fold.add_field :mark_id
-                    fold.add_field :pm_mark_id
                     fold.add_field :product_chars
                     fold.add_field :inventory_code_id
                     fold.add_field :customer_variety_id
@@ -79,7 +78,6 @@ module Production
                     fold.add_field :pallet_format_id
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
-                    fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code
                     fold.add_table pm_boms_products,

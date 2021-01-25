@@ -7,9 +7,6 @@ module Production
         def self.call(id, back_url: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:product_setup, :show, id: id)
           rules   = ui_rule.compile
-
-          pm_boms_products = ProductionApp::ProductSetupRepo.new.pm_boms_products(id)
-
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.section do |section|
@@ -79,11 +76,6 @@ module Production
                     fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code
-                    fold.add_table pm_boms_products,
-                                   %i[product_code pm_type_code subtype_code uom_code quantity],
-                                   dom_id: 'product_setup_pm_boms_products',
-                                   alignment: { quantity: :right },
-                                   cell_transformers: { quantity: :decimal }
                   end
                 end
                 row.column do |col|

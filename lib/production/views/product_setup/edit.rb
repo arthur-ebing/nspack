@@ -7,9 +7,6 @@ module Production
         def self.call(id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:product_setup, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
-
-          pm_boms_products = ProductionApp::ProductSetupRepo.new.pm_boms_products(id)
-
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -59,7 +56,6 @@ module Production
                     fold.add_field :target_market_id
                     fold.add_field :sell_by_code
                     fold.add_field :mark_id
-                    fold.add_field :pm_mark_id
                     fold.add_field :product_chars
                     fold.add_field :inventory_code_id
                     fold.add_field :customer_variety_id
@@ -79,14 +75,8 @@ module Production
                     fold.add_field :pallet_format_id
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
-                    fold.add_field :pm_bom_id
                     fold.add_field :description
                     fold.add_field :erp_bom_code
-                    fold.add_table pm_boms_products,
-                                   %i[product_code pm_type_code subtype_code uom_code quantity],
-                                   dom_id: 'product_setup_pm_boms_products',
-                                   alignment: { quantity: :right },
-                                   cell_transformers: { quantity: :decimal }
                   end
                 end
                 row.column do |col|

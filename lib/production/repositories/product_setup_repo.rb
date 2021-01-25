@@ -211,11 +211,6 @@ module ProductionApp
         .select_map(:id)
     end
 
-    def pm_boms_products(product_setup_id)
-      pm_bom = find_product_setup(product_setup_id)
-      MasterfilesApp::BomRepo.new.pm_bom_products(pm_bom.pm_bom_id) unless pm_bom.nil?
-    end
-
     def product_setup_in_production?(id)
       DB[Sequel.function(:fn_product_setup_in_production, id)].single_value
     end
