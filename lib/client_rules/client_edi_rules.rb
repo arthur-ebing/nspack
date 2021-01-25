@@ -22,7 +22,7 @@ module Crossbeams
     }.freeze
 
     def initialize(client_code)
-      super()
+      super
       @settings = CLIENT_SETTINGS.fetch(client_code.to_sym)
     end
 

@@ -4,6 +4,12 @@ module Crossbeams
   # Base class for ClientRules.
   # Implements a way of calling CLIENT_SETTINGS keys from inheriting classes as methods.
   class BaseClientRules
+    attr_reader :client_code
+
+    def initialize(key)
+      @client_code = key
+    end
+
     # Get the setting for a particular key
     def setting(key)
       return @settings[key] unless AppConst.test?
