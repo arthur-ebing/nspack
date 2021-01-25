@@ -11,7 +11,7 @@ module MesscadaApp
     end
 
     def call # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-      if !bin_exists? && AppConst::INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM
+      if !bin_exists? && AppConst::CR_PROD.kromco_rmt_integration?
         res = active_run_for_device
         return res unless res.success
 
@@ -37,7 +37,8 @@ module MesscadaApp
       run_res = active_run_for_device
       return run_res unless run_res.success
 
-      if (is_kr_bin = (AppConst::INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM && AppConst::CLIENT_CODE == 'kr'))
+      is_kr_bin = AppConst::CR_PROD.kromco_rmt_integration?
+      if is_kr_bin
         res = BinIntegration.new(bin_number, run_res.instance).valid_bin_for_kromco_rmt_system?
         return res unless res.success
       end

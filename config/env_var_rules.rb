@@ -23,7 +23,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { BULK_BIN_ASSET_NUMBER_ENTRY: 'create the bin group as per usual, but allocate bin asset numbers from the user provided list inside text area' },
     { CALCULATE_PALLET_DECK_POSITIONS: 'Works out deck position where pallet should go.' },
     { ALLOW_AUTO_BIN_ASSET_NUMBER_ALLOCATION: 'Determines if bins asset_numbers are auto generated or scanned in.' },
-    { INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM: 'Checks if integration with an external system is required.' },
+    # { INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM: 'Checks if integration with an external system is required.' },
     { RMT_INTEGRATION_SERVER_URI: 'HTTP address of the RMT Integration Server in the format http://IP:3000.' },
     { BIN_SCANNING_BATCH_SIZE: 'Can allow so many bins to be scanned at a time at bin reception' },
     { EDIT_BIN_RECEIVED_DATE: 'Allow a user to able to edit received_date_time' },

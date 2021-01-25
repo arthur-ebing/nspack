@@ -89,9 +89,9 @@ class AppConst # rubocop:disable Metrics/ClassLength
   ALLOW_CULTIVAR_GROUP_MIXING = make_boolean('ALLOW_CULTIVAR_GROUP_MIXING')
 
   # Integration
-  INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM = make_boolean('INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM')
+  # INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM = make_boolean('INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM')
   RMT_INTEGRATION_SERVER_URI = ENV['RMT_INTEGRATION_SERVER_URI']
-  raise 'RMT Integration server uri is required' if INTEGRATE_WITH_EXTERNAL_RMT_SYSTEM && !RMT_INTEGRATION_SERVER_URI
+  raise 'RMT Integration server uri is required' if CR_PROD.integrate_with_external_rmt_system && !RMT_INTEGRATION_SERVER_URI
 
   # Deliveries
   DELIVERY_DEFAULT_FARM = ENV['DEFAULT_FARM']
