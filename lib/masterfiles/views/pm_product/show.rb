@@ -15,11 +15,11 @@ module Masterfiles
               form.view_only!
               form.row do |row|
                 row.column do |col|
-                  col.add_field :pm_type_id
+                  col.add_field :pm_type_code
                   col.add_field :composition_level
                   col.add_field :product_code
                   col.add_field :material_mass
-                  col.add_field :basic_pack_id
+                  col.add_field :basic_pack_code
                   col.add_field :items_per_unit
                   col.add_field :items_per_unit_client_description
                   col.add_field :marketing_size_range_mm
@@ -30,7 +30,7 @@ module Masterfiles
                 end
 
                 row.column do |col|
-                  col.add_field :pm_subtype_id
+                  col.add_field :pm_subtype_code
                   col.add_field :erp_code
                   col.add_field :description
                   col.add_field :height_mm

@@ -40,18 +40,23 @@ module MasterfilesApp
     end
 
     def find_pm_subtype(id)
-      find_with_association(:pm_subtypes,
-                            id,
-                            parent_tables: [{ parent_table: :pm_types,
-                                              foreign_key: :pm_type_id,
-                                              columns: %i[pm_type_code pm_composition_level_id],
-                                              flatten_columns: { pm_type_code: :pm_type_code,
-                                                                 pm_composition_level_id: :pm_composition_level_id } },
-                                            { parent_table: :pm_composition_levels,
-                                              foreign_key: :pm_composition_level_id,
-                                              columns: [:composition_level],
-                                              flatten_columns: { composition_level: :composition_level } }],
-                            wrapper: PmSubtype)
+      hash = find_with_association(:pm_subtypes,
+                                   id,
+                                   parent_tables: [{ parent_table: :pm_types,
+                                                     foreign_key: :pm_type_id,
+                                                     columns: %i[pm_type_code pm_composition_level_id],
+                                                     flatten_columns: { pm_type_code: :pm_type_code,
+                                                                        pm_composition_level_id: :pm_composition_level_id } },
+                                                   { parent_table: :pm_composition_levels,
+                                                     foreign_key: :pm_composition_level_id,
+                                                     columns: [:composition_level],
+                                                     flatten_columns: { composition_level: :composition_level,
+                                                                        description: :composition_level_description } }])
+      return nil if hash.nil?
+
+      hash[:minimum_composition_level] = hash[:composition_level] == DB[:pm_composition_levels].min(:composition_level)
+      hash[:fruit_composition_level] = hash[:composition_level_description] == AppConst::PM_TYPE_FRUIT
+      PmSubtype.new(hash)
     end
 
     def find_pm_product(id)
@@ -59,7 +64,7 @@ module MasterfilesApp
                             id,
                             parent_tables: [{ parent_table: :pm_subtypes,
                                               columns: %i[subtype_code pm_type_id],
-                                              flatten_columns: { subtype_code: :subtype_code, pm_type_id: :pm_type_id } },
+                                              flatten_columns: { subtype_code: :pm_subtype_code, pm_type_id: :pm_type_id } },
                                             { parent_table: :pm_types,
                                               foreign_key: :pm_type_id,
                                               columns: %i[pm_type_code pm_composition_level_id],
@@ -68,7 +73,8 @@ module MasterfilesApp
                                             { parent_table: :pm_composition_levels,
                                               foreign_key: :pm_composition_level_id,
                                               columns: [:composition_level],
-                                              flatten_columns: { composition_level: :composition_level } },
+                                              flatten_columns: { composition_level: :composition_level,
+                                                                 description: :composition_level_description } },
                                             { parent_table: :basic_pack_codes,
                                               foreign_key: :basic_pack_id,
                                               columns: [:basic_pack_code],
@@ -267,65 +273,22 @@ module MasterfilesApp
       DB[query, pm_bom_id].first[:system_code]
     end
 
-    def minimum_composition_level?(pm_subtype_id)
-      subtype_composition_description(pm_subtype_id) == composition_level_description(minimum_composition_level)
-    end
-
-    def subtype_composition_description(pm_subtype_id)
-      DB[:pm_subtypes]
-        .join(:pm_types, id: :pm_type_id)
-        .join(:pm_composition_levels, id: :pm_composition_level_id)
-        .where(Sequel[:pm_subtypes][:id] => pm_subtype_id)
-        .get(Sequel[:pm_composition_levels][:description])
-    end
-
-    def minimum_composition_level
-      DB['SELECT MIN(composition_level) FROM pm_composition_levels'].single_value
-    end
-
-    def composition_level_description(composition_level)
-      DB[:pm_composition_levels].where(composition_level: composition_level).get(:description)
-    end
-
-    def fruit_composition_level
-      DB[:pm_composition_levels].where(description: AppConst::PM_TYPE_FRUIT).get(:composition_level)
-    end
-
-    def fruit_composition_level?(pm_subtype_id)
-      subtype_composition_description(pm_subtype_id) == AppConst::PM_TYPE_FRUIT
-    end
-
-    def one_level_up_fruit_composition?(pm_subtype_id)
-      subtype_composition_description(pm_subtype_id) == composition_level_description(fruit_composition_level - 1)
-    end
-
-    def can_edit_product_code?(pm_subtype_id)
-      return true unless pm_subtype_id
-
-      fruit_composition = fruit_composition_level
-      subtype_composition_level = find_pm_subtype(pm_subtype_id).composition_level
-      return false if [minimum_composition_level, fruit_composition, fruit_composition - 1].include?(subtype_composition_level)
-
-      true
-    end
-
     def calculate_bom_weights(pm_bom_id) # rubocop:disable Metrics/AbcSize
       gross_weight = 0.0
       nett_weight = 0.0
-      bom_products(pm_bom_id).each do |pm_product|
-        product_weight = case pm_product[:composition_level]
-                         when minimum_composition_level
-                           pm_product[:quantity] * basic_pack_material_mass(pm_product[:basic_pack_id]).to_f
-                         when fruit_composition_level
-                           nett_weight = pm_product[:quantity] * fruit_average_weight(pm_product[:product_code]).to_f
+      bom_products(pm_bom_id).each do |row|
+        pm_subtype = find_pm_subtype(row[:pm_subtype_id])
+        product_weight = if pm_subtype.minimum_composition_level
+                           row[:quantity] * row[:standard_pack_material_mass].to_f
+                         elsif pm_subtype.fruit_composition_level
+                           nett_weight = row[:quantity] * row[:average_weight_gm].to_f
                            nett_weight
                          else
-                           pm_product[:quantity] * pm_product[:material_mass].to_f
+                           row[:quantity] * row[:material_mass].to_f
                          end
 
         gross_weight += product_weight
       end
-
       update(:pm_boms, pm_bom_id, { gross_weight: gross_weight, nett_weight: nett_weight })
     end
 
@@ -333,63 +296,20 @@ module MasterfilesApp
       query = <<~SQL
         SELECT pm_boms_products.pm_product_id, pm_products.product_code, pm_boms_products.quantity,
                pm_products.material_mass, pm_composition_levels.composition_level,
-               pm_products.basic_pack_id
+               pm_products.basic_pack_id, pm_products.pm_subtype_id,
+               std_fruit_size_counts.average_weight_gm, standard_pack_codes.material_mass AS standard_pack_material_mass
         FROM pm_boms_products
         JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
         JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id
         JOIN pm_types ON pm_types.id = pm_subtypes.pm_type_id
         JOIN pm_composition_levels ON pm_composition_levels.id = pm_types.pm_composition_level_id
+        LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id = pm_products.std_fruit_size_count_id
+        LEFT JOIN standard_pack_codes ON standard_pack_codes.basic_pack_code_id = pm_products.basic_pack_id
         WHERE pm_boms_products.pm_bom_id = #{pm_bom_id}
         ORDER BY pm_composition_levels.composition_level
       SQL
       DB[query]
         .all
-    end
-
-    def basic_pack_material_mass(basic_pack_id)
-      return 0 if basic_pack_id.nil_or_empty?
-
-      DB[:standard_pack_codes]
-        .where(basic_pack_code_id:  basic_pack_id)
-        .get(:material_mass)
-    end
-
-    def fruit_average_weight(product_code)
-      res = product_code.split('_')
-      commodity_id = get_id(:commodities, code: res[0])
-      DB[:std_fruit_size_counts]
-        .where(size_count_value: res[1])
-        .where(commodity_id: commodity_id)
-        .get(:average_weight_gm)
-    end
-
-    def create_pm_product(res)
-      attrs = compile_product_code(res.to_h)
-      create(:pm_products, attrs)
-    end
-
-    def update_pm_product(id, res)
-      existing = find_hash(:pm_products, id).reject { |k, _| %i[id created_at updated_at].include?(k) }
-      attrs = compile_product_code(existing.merge(res.to_h))
-      update(:pm_products, id, attrs)
-    end
-
-    def compile_product_code(attrs) # rubocop:disable Metrics/AbcSize
-      pm_type_id = get(:pm_subtypes, attrs[:pm_subtype_id], :pm_type_id)
-      type_short_code = get(:pm_types, pm_type_id, :short_code)
-      subtype_short_code = get(:pm_subtypes, attrs[:pm_subtype_id], :short_code)
-
-      attrs[:product_code] = case find_pm_type(pm_type_id).composition_level
-                             when minimum_composition_level
-                               "#{type_short_code}_#{attrs[:basic_pack_code]}_#{subtype_short_code}_#{attrs[:height_mm]}"
-                             when fruit_composition_level - 1
-                               gross_weight_per_unit = attrs[:gross_weight_per_unit].nil_or_empty? ? '*' : attrs[:gross_weight_per_unit].to_f
-                               items_per_unit = attrs[:items_per_unit].nil_or_empty? ? '*' : attrs[:items_per_unit]
-                               "#{type_short_code}_#{gross_weight_per_unit}_#{subtype_short_code}_#{items_per_unit}"
-                             else
-                               attrs[:erp_code]
-                             end
-      attrs
     end
 
     def sync_pm_boms # rubocop:disable Metrics/AbcSize

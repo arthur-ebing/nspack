@@ -21,6 +21,8 @@ module MasterfilesApp
     end
 
     def test_create_pm_product
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_type).returns(fake_pm_type)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
       attrs = fake_pm_product.to_h.reject { |k, _| k == :id }
       res = interactor.create_pm_product(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
@@ -29,13 +31,17 @@ module MasterfilesApp
     end
 
     def test_create_pm_product_fail
-      attrs = fake_pm_product(erp_code: nil).to_h.reject { |k, _| k == :id }
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_type).returns(fake_pm_type)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
+      attrs = fake_pm_product(pm_subtype_id: nil).to_h.reject { |k, _| k == :id }
       res = interactor.create_pm_product(attrs)
       refute res.success, 'should fail validation'
-      assert_equal ['must be filled'], res.errors[:erp_code]
+      assert_equal ['must be filled'], res.errors[:pm_subtype_id]
     end
 
     def test_update_pm_product
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_type).returns(fake_pm_type)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
       id = create_pm_product
       attrs = interactor.send(:repo).find_pm_product(id)
       attrs = attrs.to_h
@@ -49,15 +55,17 @@ module MasterfilesApp
     end
 
     def test_update_pm_product_fail
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_type).returns(fake_pm_type)
+      MasterfilesApp::BomRepo.any_instance.stubs(:find_pm_subtype).returns(fake_pm_subtype)
       id = create_pm_product
       attrs = interactor.send(:repo).find_pm_product(id)
       attrs = attrs.to_h
-      attrs.delete(:erp_code)
+      attrs.delete(:pm_subtype_id)
       value = attrs[:description]
       attrs[:description] = 'a_change'
       res = interactor.update_pm_product(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_equal ['is missing'], res.errors[:erp_code]
+      assert_equal ['is missing'], res.errors[:pm_subtype_id]
       after = interactor.send(:repo).find_pm_product(id)
       after = after.to_h
       refute_equal 'a_change', after[:description]
@@ -86,7 +94,7 @@ module MasterfilesApp
         product_code: 'ABC',
         description: 'ABC',
         active: true,
-        subtype_code: 'ABC',
+        pm_subtype_code: 'ABC',
         material_mass: 1.0,
         basic_pack_id: basic_pack_id,
         height_mm: 1,
@@ -95,12 +103,54 @@ module MasterfilesApp
         gross_weight_per_unit: nil,
         items_per_unit: 1,
         items_per_unit_client_description: 'ABC',
-        composition_level: 1
+        composition_level: 1,
+        composition_level_description: 'ABC'
       }
     end
 
     def fake_pm_product(overrides = {})
       PmProduct.new(pm_product_attrs.merge(overrides))
+    end
+
+    def pm_type_attrs
+      pm_composition_level_id = create_pm_composition_level
+
+      {
+        id: 1,
+        pm_composition_level_id: pm_composition_level_id,
+        pm_type_code: Faker::Lorem.unique.word,
+        description: 'ABC',
+        active: true,
+        composition_level: 'ABC',
+        composition_level_description: 'ABC',
+        short_code: 'ABC'
+      }
+    end
+
+    def fake_pm_type(overrides = {})
+      PmType.new(pm_type_attrs.merge(overrides))
+    end
+
+    def pm_subtype_attrs
+      pm_type_id = create_pm_type
+
+      {
+        id: 1,
+        pm_type_id: pm_type_id,
+        subtype_code: Faker::Lorem.unique.word,
+        description: 'ABC',
+        active: true,
+        pm_type_code: 'ABC',
+        short_code: 'ABC',
+        composition_level: 1,
+        composition_level_description: 'ABC',
+        minimum_composition_level: true,
+        fruit_composition_level: false
+      }
+    end
+
+    def fake_pm_subtype(overrides = {})
+      PmSubtype.new(pm_subtype_attrs.merge(overrides))
     end
 
     def interactor

@@ -96,9 +96,9 @@ module MasterfilesApp
         SELECT
           std_fruit_size_counts.*,
           commodities.code AS commodity_code,
-          commodities.code || '_' || std_fruit_size_counts.size_count_value AS product_code,
-          commodities.code || '_' || uoms.uom_code || '_' || std_fruit_size_counts.size_count_value AS system_code,
-          commodities.code || ' - ' || std_fruit_size_counts.size_count_value AS extended_description
+          commodities.code || std_fruit_size_counts.size_count_value AS product_code,
+          commodities.code || uoms.uom_code || std_fruit_size_counts.size_count_value AS system_code,
+          commodities.code || std_fruit_size_counts.size_count_value AS extended_description
         FROM std_fruit_size_counts
         JOIN commodities ON commodities.id = std_fruit_size_counts.commodity_id
         JOIN uoms ON uoms.id = std_fruit_size_counts.uom_id

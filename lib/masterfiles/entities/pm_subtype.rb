@@ -6,9 +6,12 @@ module MasterfilesApp
     attribute :pm_type_id, Types::Integer
     attribute :subtype_code, Types::String
     attribute :description, Types::String
-    attribute? :active, Types::Bool
     attribute :pm_type_code, Types::String
     attribute :short_code, Types::String
-    attribute :composition_level, Types::String
+    attribute :composition_level, Types::Integer
+    attribute :composition_level_description, Types::String
+    attribute :minimum_composition_level, Types::Bool
+    attribute :fruit_composition_level, Types::Bool
+    attribute? :active, Types::Bool
   end
 end
