@@ -40,6 +40,8 @@ module MasterfilesApp
                               else
                                 else_product_code
                               end
+
+      params[:erp_code] = params[:product_code] if params[:erp_code].nil_or_empty?
     end
 
     def minimum_composition_level_product_code # rubocop:disable Metrics/AbcSize
