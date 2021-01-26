@@ -5,12 +5,12 @@
 
 class Nspack < Roda
   route 'empty_bins', 'raw_materials' do |r|
-    @interactor ||= RawMaterialsApp::EmptyBinTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+    interactor = RawMaterialsApp::EmptyBinTransactionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
     # EMPTY BIN TRANSACTIONS
     # --------------------------------------------------------------------------
     r.on 'empty_bin_transactions', Integer do |id|
       # Check for notfound:
-      r.on !@interactor.exists?(:empty_bin_transactions, id) do
+      r.on !interactor.exists?(:empty_bin_transactions, id) do
         handle_not_found(r)
       end
 
@@ -23,17 +23,17 @@ class Nspack < Roda
     end
 
     r.on 'empty_bin_transactions' do # rubocop:disable Metrics/BlockLength
-      stepper = @interactor.stepper
+      stepper = interactor.stepper
       r.on 'empty_bin_transaction_items' do
         r.on 'owner_changed' do
-          rmt_container_material_types = params[:changed_value].blank? ? [] : @interactor.rmt_container_material_types(params[:changed_value])
+          rmt_container_material_types = params[:changed_value].blank? ? [] : interactor.rmt_container_material_types(params[:changed_value])
           json_actions([OpenStruct.new(type: :replace_select_options,
                                        dom_id: 'empty_bin_transaction_item_rmt_container_material_type_id',
                                        options_array: rmt_container_material_types)])
         end
         r.on 'new' do    # NEW
           check_auth!('empty bins', 'new')
-          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(remote: fetch?(r), interactor: @interactor) }
+          show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(remote: fetch?(r), interactor: interactor) }
         end
         r.on 'add' do
           res = stepper.add_bin_set(params[:empty_bin_transaction_item])
@@ -51,7 +51,7 @@ class Nspack < Roda
               RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(form_values: {},
                                                                          form_errors: res.errors,
                                                                          remote: true,
-                                                                         interactor: @interactor)
+                                                                         interactor: interactor)
             end
           end
         end
@@ -67,9 +67,9 @@ class Nspack < Roda
                        keep_dialog_open: true)
         end
         r.on 'done' do
-          res = @interactor.validate_stepper
+          res = interactor.validate_stepper
           if res.success
-            res = @interactor.create_empty_bin_transaction
+            res = interactor.create_empty_bin_transaction
             if res.success
               flash[:notice] = res.message
             else
@@ -81,17 +81,13 @@ class Nspack < Roda
               RawMaterials::EmptyBins::EmptyBinTransactionItem::New.call(form_values: {},
                                                                          form_errors: res.errors,
                                                                          remote: true,
-                                                                         interactor: @interactor)
+                                                                         interactor: interactor)
             end
           end
         end
       end
       r.on 'delivery_id_changed' do
-        truck_registration_number = if params[:changed_value].blank?
-                                      nil
-                                    else
-                                      @interactor.truck_registration_number(params[:changed_value])
-                                    end
+        truck_registration_number = interactor.truck_registration_number_for_delivery(params[:changed_value])
         json_actions([OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'empty_bin_transaction_truck_registration_number',
                                      value: truck_registration_number)])
@@ -103,7 +99,7 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::IssueEmptyBins.call(remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = @interactor.validate_issue_params(params[:empty_bin_transaction])
+          res = interactor.validate_issue_params(params[:empty_bin_transaction])
           if res.success
             stepper.merge(params[:empty_bin_transaction])
             r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
@@ -123,7 +119,7 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::ReceiveEmptyBins.call(remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = @interactor.validate_receive_params(params[:empty_bin_transaction])
+          res = interactor.validate_receive_params(params[:empty_bin_transaction])
           if res.success
             stepper.merge(params[:empty_bin_transaction])
             r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
@@ -143,7 +139,7 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocMove.call(remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = @interactor.validate_adhoc_params(params[:empty_bin_transaction])
+          res = interactor.validate_adhoc_params(params[:empty_bin_transaction])
           if res.success
             stepper.merge(params[:empty_bin_transaction])
             r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
@@ -163,7 +159,7 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocCreate.call(remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = @interactor.validate_adhoc_create_params(params[:empty_bin_transaction])
+          res = interactor.validate_adhoc_create_params(params[:empty_bin_transaction])
           if res.success
             stepper.merge(params[:empty_bin_transaction])
             r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
@@ -183,7 +179,7 @@ class Nspack < Roda
           show_partial_or_page(r) { RawMaterials::EmptyBins::EmptyBinTransaction::AdhocDestroy.call(remote: fetch?(r)) }
         end
         r.post do        # CREATE
-          res = @interactor.validate_adhoc_destroy_params(params[:empty_bin_transaction])
+          res = interactor.validate_adhoc_destroy_params(params[:empty_bin_transaction])
           if res.success
             stepper.merge(params[:empty_bin_transaction])
             r.redirect '/raw_materials/empty_bins/empty_bin_transactions/empty_bin_transaction_items/new'
@@ -201,8 +197,6 @@ class Nspack < Roda
     # EMPTY BIN TRANSACTION ITEMS
     # --------------------------------------------------------------------------
     r.on 'empty_bin_transaction_items', Integer do |id|
-      interactor = RawMaterialsApp::EmptyBinTransactionItemInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-
       # Check for notfound:
       r.on !interactor.exists?(:empty_bin_transaction_items, id) do
         handle_not_found(r)
@@ -249,7 +243,7 @@ class Nspack < Roda
 
     # EMPTY BIN LOCATION TRANSACTION HISTORY
     r.on 'location_transaction_history', Integer do |id|
-      res = @interactor.get_applicable_transaction_item_ids(id)
+      res = interactor.get_applicable_transaction_item_ids(id)
       history_ids = res.instance.join(',')
       r.redirect "/list/transaction_history_items/with_params?key=history&history_ids=#{history_ids}"
     end

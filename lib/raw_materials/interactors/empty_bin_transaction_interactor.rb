@@ -36,7 +36,9 @@ module RawMaterialsApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def truck_registration_number(delivery_id)
+    def truck_registration_number_for_delivery(delivery_id)
+      return nil if delivery_id.nil_or_empty?
+
       repo.truck_registration_number_for_delivery(delivery_id)
     end
 
