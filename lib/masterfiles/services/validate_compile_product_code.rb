@@ -31,8 +31,6 @@ module MasterfilesApp
     private
 
     def compile_product_code # rubocop:disable Metrics/AbcSize
-      raise Crossbeams::InfoError, 'Unable to find PM Subtype' if pm_subtype.nil? || pm_type.nil?
-
       params[:product_code] = if pm_subtype.minimum_composition_level
                                 minimum_composition_level_product_code
                               elsif !(pm_subtype.minimum_composition_level || pm_subtype.fruit_composition_level)
