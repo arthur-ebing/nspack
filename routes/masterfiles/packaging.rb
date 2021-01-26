@@ -544,31 +544,38 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       r.on 'pm_subtype_changed' do
         actions = []
-        unless params[:changed_value].nil_or_empty?
-          actions = []
-          pm_subtype_id = params[:changed_value]
-          repo = MasterfilesApp::BomRepo.new
-          actions << [OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'pm_product_composition_level',
-                                     value: repo.find_pm_subtype(pm_subtype_id).composition_level),
-                      OpenStruct.new(type: repo.can_edit_product_code?(pm_subtype_id) ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_product_code_field_wrapper'),
-                      OpenStruct.new(type: repo.minimum_composition_level?(pm_subtype_id) ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_basic_pack_id_field_wrapper')]
+        if  params[:changed_value].nil_or_empty?
+          field_keys = %i[basic_pack_id
+                          material_mass
+                          height_mm
+                          gross_weight_per_unit
+                          items_per_unit
+                          items_per_unit_client_description]
+          field_keys.each do |key|
+            actions << [OpenStruct.new(type: :hide_element, dom_id: "pm_product_#{key}_field_wrapper")]
+          end
+        else
+          pm_subtype = interactor.pm_subtype(params[:changed_value])
+          unless pm_subtype.composition_level.nil?
+            actions << [OpenStruct.new(type: :replace_inner_html,
+                                       dom_id: 'pm_product_composition_level',
+                                       value: pm_subtype.composition_level),
+                        OpenStruct.new(type: pm_subtype.minimum_composition_level ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_basic_pack_id_field_wrapper')]
 
-          show_one_level_up_fields = repo.one_level_up_fruit_composition?(pm_subtype_id)
-          actions << [OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
-                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_items_per_unit_field_wrapper'),
-                      OpenStruct.new(type: show_one_level_up_fields ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_items_per_unit_client_description_field_wrapper')]
-          show_product_extra_fields = repo.fruit_composition_level?(pm_subtype_id) # AppConst::REQUIRE_EXTENDED_PACKAGING
-          actions << [OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_material_mass_field_wrapper'),
-                      OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
-                                     dom_id: 'pm_product_height_mm_field_wrapper')]
+            actions << [OpenStruct.new(type: pm_subtype.minimum_composition_level ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_material_mass_field_wrapper'),
+                        OpenStruct.new(type: pm_subtype.minimum_composition_level ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_height_mm_field_wrapper')]
 
+            show_product_extra_fields = !(pm_subtype.minimum_composition_level || pm_subtype.fruit_composition_level)
+            actions << [OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_gross_weight_per_unit_field_wrapper'),
+                        OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_items_per_unit_field_wrapper'),
+                        OpenStruct.new(type: show_product_extra_fields ? :show_element : :hide_element,
+                                       dom_id: 'pm_product_items_per_unit_client_description_field_wrapper')]
+          end
         end
         json_actions(actions.flatten)
       end
@@ -579,7 +586,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             pm_type_code
-            subtype_code
+            pm_subtype_code
             erp_code
             product_code
             description
@@ -869,6 +876,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'pm_boms_products' do
       interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'pm_subtype_changed' do
+        pm_products = interactor.for_select_subtype_products(where: { pm_subtype_id: params[:changed_value] })
+        json_actions([OpenStruct.new(type: :replace_select_options,
+                                     dom_id: 'pm_boms_product_pm_product_id',
+                                     options_array: pm_products)])
+      end
 
       r.on 'inline_edit_bom_product', Integer do |bom_product_id|
         res = interactor.inline_edit_bom_product(bom_product_id, params)

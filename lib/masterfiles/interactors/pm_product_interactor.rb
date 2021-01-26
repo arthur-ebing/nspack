@@ -15,13 +15,13 @@ module MasterfilesApp
       instance = pm_product(id)
       success_response("Created PM Product #{instance.product_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { product_code: ['This PM Product already exists'] }))
+      failed_response('This PM Product already exists')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
     def update_pm_product(id, params)
-      res = validate_pm_product_params(params)
+      res = validate_pm_product_params(params, id)
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
@@ -34,7 +34,7 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
-    def delete_pm_product(id)
+    def delete_pm_product(id) # rubocop:disable Metrics/AbcSize
       name = pm_product(id).product_code
       repo.transaction do
         repo.delete_pm_product(id)
@@ -44,11 +44,21 @@ module MasterfilesApp
       success_response("Deleted PM Product #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    rescue Sequel::ForeignKeyConstraintViolation => e
+      failed_response("Unable to delete PM Product. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)
       res = TaskPermissionCheck::PmProduct.call(task, id)
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
+    end
+
+    def pm_product(id)
+      repo.find_pm_product(id)
+    end
+
+    def pm_subtype(id)
+      repo.find_pm_subtype(id)
     end
 
     private
@@ -57,15 +67,8 @@ module MasterfilesApp
       @repo ||= BomRepo.new
     end
 
-    def pm_product(id)
-      repo.find_pm_product(id)
-    end
-
-    def validate_pm_product_params(params)
-      return PmProductSchema.call(params) unless AppConst::REQUIRE_EXTENDED_PACKAGING
-
-      # ExtendedPmProductSchema.call(params)
-      ExtendedPmProductContract.new.call(params)
+    def validate_pm_product_params(params, id = nil)
+      ValidateCompileProductCode.call(params, id)
     end
   end
 end

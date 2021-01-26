@@ -18,6 +18,7 @@ module Masterfiles
               form.remote!
               form.method :update
               form.add_field :pm_subtype_id
+              form.add_field :pm_subtype
               form.add_field :composition_level
               form.add_field :erp_code
               form.add_field :product_code

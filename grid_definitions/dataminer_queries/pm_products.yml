@@ -3,9 +3,9 @@
 :sql: "SELECT \r\n    pm_products.id,\r\n    pm_products.pm_subtype_id,\r\n    pm_products.product_code,\r\n
   \   pm_products.description,\r\n    pm_products.erp_code,\r\n    pm_products.created_at,\r\n
   \   pm_products.updated_at,\r\n    pm_composition_levels.composition_level,\r\n
-  \   pm_types.pm_type_code,\r\n    pm_subtypes.subtype_code,\r\n    basic_pack_codes.basic_pack_code,\r\n
-  \   pm_products.material_mass,\r\n    pm_products.height_mm,\r\n    pm_products.gross_weight_per_unit,\r\n
-  \   pm_products.items_per_unit,\r\n    pm_products.items_per_unit_client_description,\r\n
+  \   pm_types.pm_type_code,\r\n    pm_subtypes.subtype_code AS pm_subtype_code,\r\n
+  \   basic_pack_codes.basic_pack_code,\r\n    pm_products.material_mass,\r\n    pm_products.height_mm,\r\n
+  \   pm_products.gross_weight_per_unit,\r\n    pm_products.items_per_unit,\r\n    pm_products.items_per_unit_client_description,\r\n
   \   pm_products.basic_pack_id,\r\n    pm_products.active\r\nFROM pm_products\r\nLEFT
   JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id\r\nLEFT JOIN pm_types
   ON pm_types.id = pm_subtypes.pm_type_id\r\nLEFT JOIN pm_composition_levels ON pm_composition_levels.id
@@ -146,7 +146,7 @@
   pm_type_code:
     :name: pm_type_code
     :sequence_no: 9
-    :caption: Type
+    :caption: PM Type
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
     :width: 120
@@ -159,17 +159,17 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  subtype_code:
-    :name: subtype_code
+  pm_subtype_code:
+    :name: pm_subtype_code
     :sequence_no: 10
-    :caption: Subtype
+    :caption: Pm subtype code
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
-    :width: 120
+    :width: 
     :format: 
     :hide: false
     :pinned: 
-    :groupable: true
+    :groupable: false
     :group_by_seq: 
     :group_sum: false
     :group_avg: false
@@ -210,7 +210,7 @@
   height_mm:
     :name: height_mm
     :sequence_no: 13
-    :caption: Height mm
+    :caption: Height (mm)
     :namespaced_name: pm_products.height_mm
     :data_type: :integer
     :width: 120

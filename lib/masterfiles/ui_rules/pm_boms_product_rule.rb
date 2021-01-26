@@ -35,10 +35,13 @@ module UiRules
     def common_fields  # rubocop:disable Metrics/AbcSize
       pm_bom_id = @options[:pm_bom_id] || @repo.find_pm_boms_product(@options[:id]).pm_bom_id
       pm_bom_id_label = @repo.find_pm_bom(pm_bom_id)&.bom_code
-      subtypes = @rules[:is_edit] ? @repo.for_select_pm_type_subtypes : @repo.for_select_pm_type_subtypes(pm_bom_id)
+      subtypes = @rules[:is_edit] ? @repo.for_select_pm_subtypes : @repo.for_select_pm_subtypes(exclude: { pm_bom_id: pm_bom_id })
       {
         pm_bom_id: { renderer: :hidden, value: pm_bom_id },
-        pm_bom: { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM', readonly: true },
+        pm_bom: { renderer: :label,
+                  with_value: pm_bom_id_label,
+                  caption: 'PM BOM',
+                  readonly: true },
         pm_subtype_id: { renderer: :select,
                          options: subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,

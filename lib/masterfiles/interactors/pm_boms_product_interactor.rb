@@ -60,8 +60,8 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
-    def for_select_subtype_products(pm_subtype_id)
-      MasterfilesApp::BomRepo.new.for_select_pm_products(where: { pm_subtype_id: pm_subtype_id })
+    def for_select_subtype_products(where: {})
+      MasterfilesApp::BomRepo.new.for_select_pm_products(where: where)
     end
 
     def inline_edit_bom_product(bom_product_id, params)

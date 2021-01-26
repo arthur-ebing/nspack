@@ -15,7 +15,10 @@ module MasterfilesApp
         active: true,
         pm_type_code: 'ABC',
         short_code: 'ABC',
-        composition_level: 1
+        composition_level: 1,
+        composition_level_description: 'ABC',
+        minimum_composition_level: true,
+        fruit_composition_level: false
       }
       MasterfilesApp::PmSubtype.new(base_attrs.merge(attrs))
     end
