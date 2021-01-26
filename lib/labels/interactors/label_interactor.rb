@@ -164,11 +164,6 @@ module LabelApp
       label(id).px_per_mm.to_f / 2.0
     end
 
-    def png_image(id)
-      instance = label(id)
-      instance.png_image
-    end
-
     def label_zip(id)
       instance = label(id)
       LabelFiles.new.make_label_zip(instance)

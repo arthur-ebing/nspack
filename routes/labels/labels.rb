@@ -80,7 +80,7 @@ class Nspack < Roda
 
       r.on 'png' do
         response['Content-Type'] = 'image/png'
-        interactor.png_image(id)
+        interactor.label(id).png_image
       end
 
       r.on 'download' do
