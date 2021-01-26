@@ -91,11 +91,11 @@ module ProductionApp
     end
 
     def for_select_pm_marks(where: {})
-      [''] + MasterfilesApp::BomRepo.new.for_select_pm_marks(where: where).map { |row| row[0] }
+      MasterfilesApp::BomRepo.new.for_select_pm_marks(where: where).map { |row| row[0] }.unshift('')
     end
 
     def for_select_pm_boms(where: {})
-      [''] + MasterfilesApp::BomRepo.new.for_select_pm_boms(where: where).map { |row| row[0] }
+      MasterfilesApp::BomRepo.new.for_select_pm_boms(where: where).map { |row| row[0] }.unshift('')
     end
 
     private
