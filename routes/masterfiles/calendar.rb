@@ -130,7 +130,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       interactor = MasterfilesApp::SeasonInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'start_date_changed' do
-        end_date = CalendarRepo.new.one_year_from_start_date(params[:changed_value])
+        end_date = interactor.one_year_from_start_date(params[:changed_value])
         json_replace_input_value('season_end_date', end_date)
       end
 

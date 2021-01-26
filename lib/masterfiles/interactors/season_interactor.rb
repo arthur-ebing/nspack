@@ -53,6 +53,10 @@ module MasterfilesApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def one_year_from_start_date(start_date)
+      repo.one_year_from_start_date(start_date)
+    end
+
     private
 
     def repo
