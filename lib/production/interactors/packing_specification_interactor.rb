@@ -61,6 +61,10 @@ module ProductionApp
       raise Crossbeams::TaskNotPermittedError, res.message unless res.success
     end
 
+    def find_product_setup_template(id)
+      ProductionApp::ProductSetupRepo.new.find_product_setup_template(id)
+    end
+
     private
 
     def repo

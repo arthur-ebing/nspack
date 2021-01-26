@@ -11,6 +11,8 @@ module UiRules
 
       set_show_fields if %i[show].include? @mode
 
+      add_behaviours if %i[new].include? @mode
+
       form_name 'packing_specification'
     end
 
@@ -27,6 +29,7 @@ module UiRules
                                      options: ProductionApp::ProductSetupRepo.new.for_select_product_setup_templates,
                                      disabled_options: ProductionApp::ProductSetupRepo.new.for_select_inactive_product_setup_templates,
                                      caption: 'Product Setup Template',
+                                     prompt: true,
                                      searchable: true,
                                      required: true },
         packing_specification_code: { required: true },
@@ -47,6 +50,15 @@ module UiRules
       @form_object = OpenStruct.new(product_setup_template_id: nil,
                                     packing_specification_code: nil,
                                     description: nil)
+    end
+
+    private
+
+    def add_behaviours
+      behaviours do |behaviour|
+        behaviour.dropdown_change :product_setup_template_id,
+                                  notify: [{ url: '/production/packing_specifications/packing_specifications/product_setup_template_changed' }]
+      end
     end
   end
 end

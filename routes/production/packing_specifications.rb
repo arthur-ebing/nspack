@@ -40,6 +40,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             re_show_form(r, res) { Production::PackingSpecifications::PackingSpecification::Edit.call(id, form_values: params[:packing_specification], form_errors: res.errors) }
           end
         end
+
         r.delete do    # DELETE
           check_auth!('packing specifications', 'delete')
           interactor.assert_permission!(:delete, id)
@@ -55,10 +56,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
     r.on 'packing_specifications' do
       interactor = ProductionApp::PackingSpecificationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'product_setup_template_changed' do
+        value = "#{interactor.find_product_setup_template(params[:changed_value]).template_name} SPECIFICATION" unless params[:changed_value].nil_or_empty?
+        json_replace_input_value('packing_specification_packing_specification_code', value)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('packing specifications', 'new')
         show_partial_or_page(r) { Production::PackingSpecifications::PackingSpecification::New.call(remote: fetch?(r)) }
       end
+
       r.post do        # CREATE
         res = interactor.create_packing_specification(params[:packing_specification])
         if res.success
@@ -73,6 +81,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
     # PACKING SPECIFICATION ITEMS
     # --------------------------------------------------------------------------
     r.on 'packing_specification_items', Integer do |id|
