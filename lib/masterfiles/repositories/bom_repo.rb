@@ -160,7 +160,7 @@ module MasterfilesApp
         .join(:marks, id: :mark_id)
         .where(Sequel[:pm_marks][:active] => active)
         .where(where)
-        .order
+        .order(:mark_code)
         .select(:mark_code,
                 Sequel.lit("array_to_string(packaging_marks, '_') AS packaging_marks"),
                 Sequel[:pm_marks][:id])
