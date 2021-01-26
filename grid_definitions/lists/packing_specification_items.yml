@@ -53,17 +53,12 @@
       :width: 200
     pm_mark:
       :editor: :search_select
-      :value_sql: SELECT NULL
-                  UNION ALL
-                  SELECT mark_code ||'_'|| array_to_string(packaging_marks, '_') pm_mark
-                  FROM pm_marks
-                  JOIN marks ON marks.id = pm_marks.mark_id
+      :width: 300
+      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_edit_pm_marks"
     pm_bom:
       :editor: :search_select
-      :value_sql: SELECT NULL
-                  UNION ALL
-                  SELECT bom_code
-                  FROM pm_boms
+      :width: 300
+      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_edit_pm_boms"
     tu_labour_product:
       :editor: :search_select
       :value_sql: SELECT NULL

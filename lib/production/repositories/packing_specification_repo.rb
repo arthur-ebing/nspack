@@ -84,7 +84,9 @@ module ProductionApp
 
       when 'pm_mark'
         column = 'pm_mark_id'
-        value = get_pm_mark_id(params[:column_value])
+        ar = params[:column_value].split('_')
+        mark_id = get_id(:marks, mark_code: ar.shift)
+        value = get_id(:pm_marks, mark_id: mark_id, packaging_marks: array_of_text_for_db_col(ar))
 
       when 'pm_bom'
         column = 'pm_bom_id'
@@ -95,24 +97,16 @@ module ProductionApp
         value = get_id(:pm_products, product_code: params[:column_value])
 
       when 'fruit_sticker_1', 'tu_sticker_1', 'ru_sticker_1', 'fruit_sticker_2', 'tu_sticker_2', 'ru_sticker_2'
-        column = params[:column_name].gsub('_1', '_ids').gsub('_2', '_ids').to_sym
+        column = params[:column_name].gsub(/_[12]/, '_ids').to_sym
         indexer = params[:column_name][-1].to_i - 1
         current_value = get(:packing_specification_items, id, column)
         current_value[indexer] = get_id(:pm_products, product_code: params[:column_value])
-        value = current_value.uniq
+        value = current_value
       else
         raise Crossbeams::InfoError, "There is no handler for changed column #{params[:column_name]}"
       end
 
-      DB[:packing_specification_items].where(id: id).update({ column => value })
-    end
-
-    def get_pm_mark_id(pm_mark_code)
-      return nil if pm_mark_code.nil_or_empty?
-
-      ar = pm_mark_code.split('_')
-      mark_id = get_id(:marks, mark_code: ar.shift)
-      get_id(:pm_marks, mark_id: mark_id, packaging_marks: array_of_text_for_db_col(ar))
+      update(:packing_specification_items, id, { column => value })
     end
 
     def refresh_packing_specification_items(user)

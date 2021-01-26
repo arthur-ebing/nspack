@@ -5,7 +5,7 @@
   \   packing_specification_items.product_setup_id,\r\n    fn_product_setup_code(packing_specification_items.product_setup_id)
   AS product_setup,\r\n    packing_specification_items.description,\r\n    packing_specification_items.pm_bom_id,\r\n
   \   pm_boms.bom_code AS pm_bom,\r\n    packing_specification_items.pm_mark_id,\r\n
-  \   marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks, '_')  AS pm_mark,\r\n\r\n
+  \   marks.mark_code ||'_'|| array_to_string(pm_marks.packaging_marks, '_') AS pm_mark,\r\n\r\n
   \   pm_products_tu.product_code AS tu_labour_product,\r\n    pm_products_ru.product_code
   AS ru_labour_product,\r\n    pm_products_ri.product_code AS ri_labour_product,\r\n\r\n
   \   (SELECT product_code FROM pm_products WHERE pm_products.id = fruit_sticker_ids[1]
@@ -19,7 +19,8 @@
   \   packing_specification_items.created_at,\r\n    packing_specification_items.updated_at,\r\n
   \   fn_current_status('packing_specification_items', packing_specification_items.id)
   AS status\r\n\r\nFROM packing_specification_items\r\nJOIN packing_specifications
-  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\nLEFT
+  ON packing_specifications.id = packing_specification_items.packing_specification_id\r\nJOIN
+  product_setups ON packing_specification_items.product_setup_id = product_setups.id\r\nLEFT
   JOIN pm_boms ON pm_boms.id = packing_specification_items.pm_bom_id\r\nLEFT JOIN
   pm_marks ON pm_marks.id = packing_specification_items.pm_mark_id\r\nLEFT JOIN marks
   ON marks.id = pm_marks.mark_id\r\nLEFT JOIN pm_products pm_products_tu ON pm_products_tu.id
@@ -440,7 +441,7 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT erp_code, id FROM pm_products ORDER BY erp_code
+  :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code
 - :column: packing_specification_items.ru_labour_product_id
   :caption: Ru labour product
   :data_type: :integer
@@ -448,4 +449,4 @@
   :default_value: 
   :ordered_list: true
   :ui_priority: 1
-  :list_def: SELECT erp_code, id FROM pm_products ORDER BY erp_code
+  :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code

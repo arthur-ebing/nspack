@@ -90,6 +90,14 @@ module ProductionApp
       repo.find_packing_specification_item(id)
     end
 
+    def for_select_pm_marks(where: {})
+      [''] + MasterfilesApp::BomRepo.new.for_select_pm_marks(where: where).map { |row| row[0] }
+    end
+
+    def for_select_pm_boms(where: {})
+      [''] + MasterfilesApp::BomRepo.new.for_select_pm_boms(where: where).map { |row| row[0] }
+    end
+
     private
 
     def repo

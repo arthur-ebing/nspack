@@ -436,13 +436,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      dom_id: 'product_setup_cartons_per_pallet_id',
                                      options_array: cartons_per_pallets)])
       end
-
-      r.on 'mark_changed' do
-        pm_marks = MasterfilesApp::BomRepo.new.for_select_pm_marks(where: { mark_id: params[:changed_value] })
-        json_actions([OpenStruct.new(type: :replace_select_options,
-                                     dom_id: 'product_setup_pm_mark_id',
-                                     options_array: pm_marks)])
-      end
     end
   end
 end

@@ -336,8 +336,6 @@ module UiRules
         behaviour.dropdown_change :pallet_format_id,
                                   notify: [{ url: '/production/product_setups/product_setups/pallet_format_changed',
                                              param_keys: %i[product_setup_basic_pack_code_id] }]
-        behaviour.dropdown_change :mark_id,
-                                  notify: [{ url: '/production/product_setups/product_setups/mark_changed' }]
       end
     end
   end
