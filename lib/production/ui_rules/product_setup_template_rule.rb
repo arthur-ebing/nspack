@@ -121,7 +121,8 @@ module UiRules
         make_new_form_object
         return
       elsif @mode == :clone
-        @form_object = @repo.find_product_setup_template(@options[:id]).to_h.reject { |k, _| k == :template_name }
+        hash = @repo.find_product_setup_template(@options[:id]).to_h.reject { |k, _| k == :template_name }
+        @form_object = OpenStruct.new(hash)
         return
       end
       @form_object = @repo.find_product_setup_template(@options[:id])
