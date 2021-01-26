@@ -21,7 +21,8 @@ module MasterfilesApp
       return res unless res.errors[:pm_subtype_id].nil?
       return res unless res.failure?
 
-      compile_product_code
+      params[:product_code] = compile_product_code
+      params[:erp_code] = params[:product_code] if params[:erp_code].nil_or_empty?
 
       ExtendedPmProductContract.new.call(params)
     rescue Crossbeams::FrameworkError
@@ -30,16 +31,12 @@ module MasterfilesApp
 
     private
 
-    def compile_product_code # rubocop:disable Metrics/AbcSize
-      params[:product_code] = if pm_subtype.minimum_composition_level
-                                minimum_composition_level_product_code
-                              elsif !(pm_subtype.minimum_composition_level || pm_subtype.fruit_composition_level)
-                                mid_composition_level_product_code
-                              else
-                                else_product_code
-                              end
+    def compile_product_code
+      return minimum_composition_level_product_code if pm_subtype.minimum_composition_level
 
-      params[:erp_code] = params[:product_code] if params[:erp_code].nil_or_empty?
+      return mid_composition_level_product_code unless pm_subtype.minimum_composition_level || pm_subtype.fruit_composition_level
+
+      erp_product_code
     end
 
     def minimum_composition_level_product_code # rubocop:disable Metrics/AbcSize
@@ -69,7 +66,7 @@ module MasterfilesApp
       "#{args[:pm_type_short_code]}#{args[:gross_weight_per_unit]}#{args[:pm_subtype_short_code]}#{args[:items_per_unit]}"
     end
 
-    def else_product_code
+    def erp_product_code
       @res = PmProductErpSchema.call(params)
       raise Crossbeams::FrameworkError if res.failure?
 
