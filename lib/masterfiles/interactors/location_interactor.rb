@@ -74,10 +74,6 @@ module MasterfilesApp
       validation_failed_response(OpenStruct.new(messages: { receiving_bay_type_location: [e.message] }))
     end
 
-    def location_type_code(params)
-      repo.find_location_type(params[:location_type_id])&.location_type_code
-    end
-
     def update_location(id, params)
       res = validate_location_params(params)
       return validation_failed_response(res) if res.failure?
@@ -239,14 +235,14 @@ module MasterfilesApp
       }.to_json
     end
 
+    def location_type(id)
+      repo.find_location_type(id)
+    end
+
     private
 
     def repo
       @repo ||= LocationRepo.new
-    end
-
-    def location_type(id)
-      repo.find_location_type(id)
     end
 
     def validate_location_type_params(params)
