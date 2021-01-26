@@ -54,11 +54,11 @@
     pm_mark:
       :editor: :search_select
       :width: 300
-      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_edit_pm_marks"
+      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_select_pm_marks"
     pm_bom:
       :editor: :search_select
       :width: 300
-      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_edit_pm_boms"
+      :lookup_url: "/production/packing_specifications/packing_specification_items/$:id$/inline_select_pm_boms"
     tu_labour_product:
       :editor: :search_select
       :value_sql: SELECT NULL

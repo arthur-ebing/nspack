@@ -97,13 +97,13 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
-      r.on 'inline_edit_pm_marks' do
+      r.on 'inline_select_pm_marks' do
         specification_item = interactor.packing_specification_item(id)
         items = interactor.for_select_pm_marks(where: { mark_id: specification_item.mark_id })
         { items: items }.to_json
       end
 
-      r.on 'inline_edit_pm_boms' do
+      r.on 'inline_select_pm_boms' do
         specification_item = interactor.packing_specification_item(id)
         items = interactor.for_select_pm_boms(where: { std_fruit_size_count_id: specification_item.std_fruit_size_count_id })
         { items: items }.to_json
