@@ -193,4 +193,12 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pallet_sequence_id).filled(:integer)
     required(:no_of_clones).filled(:integer, gt?: 0)
   end
+
+  ReworksRunCloneSequenceSchema = Dry::Schema.Params do
+    required(:reworks_run_type_id).filled(:integer)
+    required(:pallet_id).filled(:integer)
+    required(:pallet_sequence_id).filled(:integer)
+    required(:cultivar_id).filled(:integer)
+    optional(:allow_cultivar_mixing).maybe(:bool)
+  end
 end

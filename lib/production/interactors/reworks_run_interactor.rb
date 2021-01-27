@@ -461,25 +461,34 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def clone_pallet_sequence(sequence_id, reworks_run_type_id)  # rubocop:disable Metrics/AbcSize
-      old_sequence_instance = pallet_sequence(sequence_id)
+    def clone_pallet_sequence(params)  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+      res = validate_clone_sequence_params(params)
+      return validation_failed_response(res) if res.failure?
+
+      return failed_response('Marketing Varieties Error. Cultivar change invalidates existing marketing_varieties') if res[:allow_cultivar_mixing] && invalidates_marketing_varieties?(res)
+
+      old_sequence_instance = pallet_sequence(res[:pallet_sequence_id])
       return failed_response('Sequence cannot be cloned', pallet_number: old_sequence_instance[:pallet_number]) if AppConst::CARTON_EQUALS_PALLET
 
       instance = nil
       repo.transaction do
-        new_id = repo.clone_pallet_sequence(sequence_id)
-        reworks_run_attrs = reworks_run_attrs(new_id, reworks_run_type_id)
+        new_id = repo.clone_pallet_sequence(res)
+        reworks_run_attrs = reworks_run_attrs(new_id, res[:reworks_run_type_id])
         instance = pallet_sequence(new_id)
         rw_res = create_reworks_run_record(reworks_run_attrs,
                                            AppConst::REWORKS_ACTION_CLONE,
                                            before: {}, after: instance)
         return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
 
-        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], sequence_id, AppConst::REWORKS_ACTION_CLONE)
+        log_reworks_runs_status_and_transaction(rw_res.instance[:reworks_run_id], instance[:pallet_id], res[:pallet_sequence_id], AppConst::REWORKS_ACTION_CLONE)
       end
       success_response('Pallet Sequence cloned successfully', instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def invalidates_marketing_varieties?(args)
+      repo.invalidates_sequence_marketing_varieties?(args)
     end
 
     def reworks_run_attrs(sequence_id, reworks_run_type_id)
@@ -1232,6 +1241,10 @@ module ProductionApp
       repo.get(:production_runs, production_run_id, :orchard_id)
     end
 
+    def pallet_sequence_pallet_number(sequence_id)
+      repo.selected_pallet_numbers(sequence_id)
+    end
+
     private
 
     def repo
@@ -1280,10 +1293,6 @@ module ProductionApp
 
     def selected_deliveries(rmt_deliveries_ids)
       repo.selected_deliveries(rmt_deliveries_ids)
-    end
-
-    def pallet_sequence_pallet_number(sequence_id)
-      repo.selected_pallet_numbers(sequence_id)
     end
 
     def affected_pallet_numbers(sequence_id, attrs)
@@ -1625,6 +1634,10 @@ module ProductionApp
 
     def validate_clone_carton_params(params)
       ReworksRunCloneCartonSchema.call(params)
+    end
+
+    def validate_clone_sequence_params(params)
+      ReworksRunCloneSequenceSchema.call(params)
     end
   end
 end

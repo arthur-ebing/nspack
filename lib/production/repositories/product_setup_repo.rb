@@ -183,14 +183,13 @@ module ProductionApp
       deactivate(:product_setups, id)
     end
 
-    def clone_product_setup_template(id, product_setup_template_id)
+    def clone_product_setup_template(id, args)
       product_setup_ids = product_setup_template_product_setup_ids(id)
       return if product_setup_ids.empty?
 
       product_setup_ids.each do |product_setup_id|
-        attrs = find_hash(:product_setups, product_setup_id).reject { |k, _| %i[id product_setup_template_id].include?(k) }
-        attrs[:product_setup_template_id] = product_setup_template_id
-        create(:product_setups, attrs)
+        attrs = find_hash(:product_setups, product_setup_id).reject { |k, _| %i[id product_setup_template_id marketing_variety_id].include?(k) }
+        create(:product_setups, attrs.merge(args))
       end
     end
 
@@ -314,6 +313,25 @@ module ProductionApp
 
     def find_gtin_code(id)
       DB[:gtins].where(id: id).get(:gtin_code)
+    end
+
+    def for_select_cultivar_group_marketing_varieties(cultivar_group_id)  # rubocop:disable Metrics/AbcSize
+      DB[:marketing_varieties]
+        .join(:marketing_varieties_for_cultivars, marketing_variety_id: :id)
+        .join(:cultivars, id: :cultivar_id)
+        .join(:cultivar_groups, id: :cultivar_group_id)
+        .where(Sequel[:cultivar_groups][:id] => cultivar_group_id)
+        .distinct(Sequel[:marketing_varieties][:id])
+        .select(
+          Sequel[:marketing_varieties][:id],
+          Sequel[:marketing_varieties][:marketing_variety_code]
+        ).map { |r| [r[:marketing_variety_code], r[:id]] }
+    end
+
+    def find_template_marketing_variety(product_setup_template_id)
+      DB[:product_setups]
+        .where(product_setup_template_id: product_setup_template_id)
+        .get(:marketing_variety_id)
     end
   end
 end

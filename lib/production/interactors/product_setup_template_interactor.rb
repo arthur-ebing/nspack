@@ -97,9 +97,13 @@ module ProductionApp
       res = validate_product_setup_template_params(params.to_h.reject { |k, _| k == :id })
       return validation_failed_response(res) if res.failure?
 
+      attrs = res.to_h
+      marketing_variety_id = attrs.delete(:marketing_variety_id)
+
       repo.transaction do
         new_product_setup_template_id = repo.create_product_setup_template(res)
-        repo.clone_product_setup_template(id, new_product_setup_template_id)
+        args = { product_setup_template_id: new_product_setup_template_id, marketing_variety_id: marketing_variety_id }
+        repo.clone_product_setup_template(id, args)
         log_status('product_setup_templates', id, 'CLONED')
         log_transaction
       end
