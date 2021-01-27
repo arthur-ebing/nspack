@@ -115,12 +115,13 @@ module Crossbeams
       success_response('ok')
     end
 
-    # Return a basic successful validation response
-    # - use this when the message does not matter.
+    # Return a basic successful validation response.
+    # - use this when calling code needs a result that responds to `failure?` or `success?`.
     #
-    # @return [OpenStruct] the success response object.
-    def valid_response
-      OpenStruct.new(failure?: false, success?: true)
+    # @param instance [Hash] an optional instance hash (defaults to {}).
+    # @return [OpenStruct] a successful validation response object.
+    def valid_response(instance = {})
+      OpenStruct.new(failure?: false, success?: true, to_h: instance)
     end
 
     # Take a Crossbeams::Response and present it as an error message.
