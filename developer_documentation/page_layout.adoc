@@ -212,6 +212,10 @@ These are the methods used in building a page layout.
 |column_size (Symbol) - optional -- `:full/:half/:third/:quarter`. Currently ignored.
 |Add a column within the row.
 
+|blank_column
+|
+|Add a blank column within the row. Use this to make the other column in the row take up half this row's width.
+
 |render
 |
 |Renders the row and all columns within it.
