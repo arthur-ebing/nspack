@@ -18,8 +18,8 @@ module MasterfilesApp
 
     def call # rubocop:disable Metrics/AbcSize
       @res = ExtendedPmProductContract.new.call(params)
-      return res unless res.errors[:pm_subtype_id].nil?
-      return res unless res.failure?
+      return res if res.success?  # Return if validation passed
+      return res unless res.errors[:pm_subtype_id].nil? # Return validation failed. pm_subtype_id is required to compile product_code
 
       params[:product_code] = compile_product_code
       params[:erp_code] = params[:product_code] if params[:erp_code].nil_or_empty?
@@ -41,14 +41,14 @@ module MasterfilesApp
 
     def minimum_composition_level_product_code # rubocop:disable Metrics/AbcSize
       @res = MinimumPmProductSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure?
+      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
 
       params[:basic_pack_code] = repo.get(:basic_pack_codes, params[:basic_pack_id], :basic_pack_code)
       params[:pm_subtype_short_code] = pm_subtype.short_code
       params[:pm_type_short_code] = pm_type.short_code
 
       @res = ProductCodeMinimumCompositionLevelSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure?
+      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
 
       "#{params[:pm_type_short_code]}#{params[:basic_pack_code]}#{params[:pm_subtype_short_code]}#{params[:height_mm]}"
     end
@@ -61,14 +61,14 @@ module MasterfilesApp
       args[:items_per_unit] = params[:items_per_unit].nil_or_empty? ? '*' : params[:items_per_unit].to_i.to_s
 
       @res = ProductCodeMidCompositionLevelSchema.call(args)
-      raise Crossbeams::FrameworkError if res.failure?
+      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
 
       "#{args[:pm_type_short_code]}#{args[:gross_weight_per_unit]}#{args[:pm_subtype_short_code]}#{args[:items_per_unit]}"
     end
 
     def erp_product_code
       @res = PmProductErpSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure?
+      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
 
       params[:erp_code]
     end
