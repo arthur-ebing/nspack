@@ -321,7 +321,7 @@ module ProductionApp
         .join(:cultivars, id: :cultivar_id)
         .join(:cultivar_groups, id: :cultivar_group_id)
         .where(Sequel[:cultivar_groups][:id] => cultivar_group_id)
-        .distinct(Sequel[:marketing_varieties][:id])
+        .distinct
         .select(
           Sequel[:marketing_varieties][:id],
           Sequel[:marketing_varieties][:marketing_variety_code]
