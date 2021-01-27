@@ -436,7 +436,7 @@ module MasterfilesApp
     end
 
     def associate_farm_puc_orgs(organization_id, farm_pucs)
-      return { error: 'Choose at least one farm_puc record' } if farm_pucs.empty?
+      return { error: 'Choose at least one farm PUC record' } if farm_pucs.empty?
 
       existing_farm_pucs = DB[:farm_puc_orgs]
                            .where(organization_id: organization_id)

@@ -615,7 +615,7 @@
   puc:
     :name: puc
     :sequence_no: 36
-    :caption: Puc
+    :caption: PUC
     :namespaced_name: puc
     :data_type: :string
     :width: 80
@@ -2728,7 +2728,7 @@
   :ui_priority: 26
   :list_def: SELECT farm_code FROM farms ORDER BY farm_code
 - :column: puc
-  :caption: Puc
+  :caption: PUC
   :data_type: :string
   :control_type: :list
   :default_value: 

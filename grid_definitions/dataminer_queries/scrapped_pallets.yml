@@ -523,7 +523,7 @@
   puc:
     :name: puc
     :sequence_no: 31
-    :caption: Puc
+    :caption: PUC
     :namespaced_name: puc
     :data_type: :string
     :width: 80

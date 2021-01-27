@@ -33,14 +33,10 @@ module MasterfilesApp
       end
 
       def edit_check
-        # return failed_response 'Puc has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'Puc has been completed' if completed?
-
         all_ok
       end
     end

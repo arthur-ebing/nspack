@@ -24,6 +24,6 @@
 :page_controls:
   - :control_type: :link
     :url: "/masterfiles/farms/pucs/new"
-    :text: New Puc
+    :text: New PUC
     :style: :button
     :behaviour: :popup

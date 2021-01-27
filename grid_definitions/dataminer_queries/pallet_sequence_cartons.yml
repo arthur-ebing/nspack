@@ -734,7 +734,7 @@
   :ui_priority: 11
   :list_def: SELECT farm_code FROM farms ORDER BY farm_code
 - :column: pucs.puc_code
-  :caption: Puc
+  :caption: PUC
   :data_type: :string
   :control_type: :list
   :default_value: 

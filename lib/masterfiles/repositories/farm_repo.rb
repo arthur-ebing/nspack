@@ -129,7 +129,7 @@ module MasterfilesApp
     end
 
     def associate_farms_pucs(id, farms_pucs_ids)
-      return { error: 'Choose at least one puc' } if farms_pucs_ids.empty?
+      return { error: 'Choose at least one PUC' } if farms_pucs_ids.empty?
 
       existing_farms_pucs_ids = DB[:farms_pucs].where(farm_id: id).select_map(:puc_id)
       removed_farms_pucs_ids = existing_farms_pucs_ids - farms_pucs_ids

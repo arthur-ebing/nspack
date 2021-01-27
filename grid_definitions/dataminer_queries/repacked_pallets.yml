@@ -616,7 +616,7 @@
   puc:
     :name: puc
     :sequence_no: 37
-    :caption: Puc
+    :caption: PUC
     :namespaced_name: puc
     :data_type: :string
     :width: 80

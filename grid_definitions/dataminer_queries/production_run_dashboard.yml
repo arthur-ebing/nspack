@@ -272,7 +272,7 @@
   puc_code:
     :name: puc_code
     :sequence_no: 17
-    :caption: Puc code
+    :caption: PUC code
     :namespaced_name: pucs.puc_code
     :data_type: :string
     :width: 

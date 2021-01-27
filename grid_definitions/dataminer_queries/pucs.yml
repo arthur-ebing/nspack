@@ -1,5 +1,5 @@
 ---
-:caption: Pucs
+:caption: PUCs
 :sql: "SELECT pucs.id,\r\n       pucs.puc_code,\r\n       fn_masterfile_variants('pucs',
   pucs.id) AS variant_codes,\r\n       pucs.gap_code,\r\n       array_agg(farms.farm_code
   order by farms.farm_code) AS farm_codes,\r\n       pucs.active,\r\n       pucs.created_at,\r\n
@@ -28,7 +28,7 @@
   puc_code:
     :name: puc_code
     :sequence_no: 2
-    :caption: Puc code
+    :caption: PUC code
     :namespaced_name: pucs.puc_code
     :data_type: :string
     :width: 

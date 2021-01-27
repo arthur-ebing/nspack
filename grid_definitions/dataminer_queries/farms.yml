@@ -150,7 +150,7 @@
   puc_codes:
     :name: puc_codes
     :sequence_no: 7
-    :caption: Puc codes
+    :caption: PUC codes
     :namespaced_name: 
     :data_type: :string
     :width: 

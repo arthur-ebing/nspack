@@ -1514,7 +1514,7 @@
   puc_ids:
     :name: puc_ids
     :sequence_no: 89
-    :caption: Puc ids
+    :caption: PUC ids
     :namespaced_name: aggregated.puc_ids
     :data_type: :integer_array
     :width: 

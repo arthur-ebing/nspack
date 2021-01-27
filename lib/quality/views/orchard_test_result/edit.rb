@@ -16,7 +16,7 @@ module Quality
             page.section do |section|
               if ui_rule.form_object.api_name == AppConst::PHYT_CLEAN_STANDARD && !ui_rule.form_object.freeze_result
                 section.add_control(control_type: :link,
-                                    text: 'Puc PhytClean Call',
+                                    text: 'PUC PhytClean Call',
                                     url: "/quality/test_results/orchard_test_results/#{id}/phyt_clean_request/#{ui_rule.form_object.puc_id}",
                                     style: :button)
               end

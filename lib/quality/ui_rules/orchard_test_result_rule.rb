@@ -104,7 +104,7 @@ module UiRules
         update_all: { renderer: :checkbox },
         group_ids: { renderer: :multi,
                      options: @repo.for_select_orchard_test_results(@form_object.orchard_test_type_id),
-                     caption: 'Puc / Orchard / Cultivar' },
+                     caption: 'PUC / Orchard / Cultivar' },
         passed: { renderer: :label,
                   with_value: @form_object.passed ? 'Passed' : 'Failed',
                   caption: 'Result',
