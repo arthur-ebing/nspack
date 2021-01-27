@@ -34,7 +34,6 @@ module ProductionApp
     attribute :pm_type_id, Types::Integer
     attribute :pm_subtype_id, Types::Integer
     attribute :description, Types::String
-    attribute :erp_bom_code, Types::String
     attribute :target_market_id, Types::Integer
     attribute :gtin_code, Types::String
   end

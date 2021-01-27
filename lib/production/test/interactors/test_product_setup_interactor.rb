@@ -90,7 +90,6 @@ module ProductionApp
       packed_tm_group_id = create_target_market_group
       target_market_id = create_target_market
       mark_id = create_mark
-      pm_mark_id = create_pm_mark
       pallet_format_id = create_pallet_format
       cartons_per_pallet_id = create_cartons_per_pallet
       grade_id = create_grade
@@ -110,11 +109,9 @@ module ProductionApp
         marketing_org_party_role_id: marketing_org_party_role_id,
         packed_tm_group_id: packed_tm_group_id,
         mark_id: mark_id,
-        pm_mark_id: pm_mark_id,
         inventory_code_id: inventory_code_id,
         pallet_format_id: pallet_format_id,
         cartons_per_pallet_id: cartons_per_pallet_id,
-        pm_bom_id: nil,
         extended_columns: {},
         client_size_reference: Faker::Lorem.unique.word,
         client_product_code: 'ABC',
@@ -134,7 +131,6 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: target_market_id,
         description: 'ABC',
-        erp_bom_code: 'ABC',
         gtin_code: 'ABC'
       }
     end

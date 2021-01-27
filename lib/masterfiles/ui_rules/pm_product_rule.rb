@@ -46,20 +46,19 @@ module UiRules
     def common_fields
       {
         pm_subtype_id: { renderer: :select,
-                         options: @repo.for_select_pm_subtypes,
+                         options: @repo.for_select_pm_subtypes(grouped: true),
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
                          caption: 'PM Subtype',
                          prompt: true,
                          searchable: true,
-                         hide_on_load: @mode == :edit,
                          required: true },
         pm_subtype: { renderer: :label,
                       with_value: @form_object.subtype_code,
                       caption: 'PM Subtype' },
-        erp_code: { caption: 'ERP Code', hide_on_load: false },
+        erp_code: { caption: 'ERP Code' },
         product_code: { renderer: :label },
-        description: { hide_on_load: false },
-        composition_level: { renderer: :label, hide_on_load: false },
+        description: {},
+        composition_level: { renderer: :label },
         basic_pack_id: { renderer: :select,
                          options: @fruit_size_repo.for_select_basic_pack_codes,
                          disabled_options: @fruit_size_repo.for_select_inactive_basic_pack_codes,
@@ -84,9 +83,9 @@ module UiRules
       pm_product = @repo.find_pm_product(@options[:id])
       pm_subtype = @repo.find_pm_subtype(pm_product.pm_subtype_id)
       std_fruit_size_count = @fruit_size_repo.find_std_fruit_size_count(pm_product.std_fruit_size_count_id)
-      @form_object = OpenStruct.new(pm_product
+      @form_object = OpenStruct.new(pm_product.to_h
                                       .merge(@options[:form_values].to_h)
-                                      .to_h.merge(pm_subtype.to_h)
+                                      .merge(pm_subtype.to_h)
                                       .merge(std_fruit_size_count.to_h))
     end
 
@@ -123,10 +122,15 @@ module UiRules
     end
 
     def set_hide_on_load # rubocop:disable Metrics/AbcSize
-      fields.each_key do |key|
-        fields[key][:hide_on_load] = fields[key][:hide_on_load].nil?
-        fields[key][:show_element] = !fields[key][:hide_on_load]
+      field_keys = %i[composition_level
+                      description
+                      pm_subtype
+                      erp_code]
+      (field_keys & fields.keys).each do |field|
+        fields[field][:show_element] ||= true
       end
+
+      fields[:pm_subtype_id][:show_element] = @mode != :edit
 
       field_keys = %i[marketing_size_range_mm
                       minimum_size_mm

@@ -504,7 +504,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           if res.success
             row_keys = %i[
               pm_type_code
-              subtype_code
+              pm_subtype_code
               erp_code
               product_code
               description

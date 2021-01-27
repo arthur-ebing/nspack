@@ -56,5 +56,27 @@ module ProductionApp
       }
       DB[:production_regions].insert(default.merge(opts))
     end
+
+    def create_product_resource_allocation(opts = {})
+      production_run_id = create_production_run
+      product_setup_id = create_product_setup
+      label_template_id = create_label_template
+      packing_method_id = create_packing_method
+      plant_resource_id = create_plant_resource
+      target_customer_party_role_id = create_party_role('O', AppConst::ROLE_TARGET_CUSTOMER)
+
+      default = {
+        production_run_id: production_run_id,
+        plant_resource_id: plant_resource_id,
+        product_setup_id: product_setup_id,
+        label_template_id: label_template_id,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00',
+        packing_method_id: packing_method_id,
+        target_customer_party_role_id: target_customer_party_role_id
+      }
+      DB[:product_resource_allocations].insert(default.merge(opts))
+    end
   end
 end

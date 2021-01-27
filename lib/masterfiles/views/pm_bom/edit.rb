@@ -22,7 +22,7 @@ module Masterfiles
                                   style: :back_button)
 
                   col.add_control(control_type: :link,
-                                  text: 'suggest weights',
+                                  text: 'Suggest Weights',
                                   url: "/masterfiles/packaging/pm_boms/#{id}/calculate_bom_weights",
                                   style: :button,
                                   visible: rules[:require_extended_packaging])

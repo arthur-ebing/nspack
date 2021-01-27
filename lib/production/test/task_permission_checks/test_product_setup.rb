@@ -20,11 +20,9 @@ module ProductionApp
         marketing_org_party_role_id: 1,
         packed_tm_group_id: 1,
         mark_id: 1,
-        pm_mark_id: 1,
         inventory_code_id: 1,
         pallet_format_id: 1,
         cartons_per_pallet_id: 1,
-        pm_bom_id: 1,
         extended_columns: {},
         client_size_reference: Faker::Lorem.unique.word,
         client_product_code: 'ABC',
@@ -44,7 +42,6 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: 1,
         description: 'ABC',
-        erp_bom_code: 'ABC',
         gtin_code: 'ABC'
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))

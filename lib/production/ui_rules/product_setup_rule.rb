@@ -75,7 +75,6 @@ module UiRules
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
       fields[:description] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
-      fields[:erp_bom_code] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] = { renderer: :label }
       fields[:gtin_code] = { renderer: :label, caption: 'GTIN Code', hide_on_load: !@rules[:gtins_required] }
     end
@@ -254,8 +253,6 @@ module UiRules
                                  remove_search_for_small_list: false },
         description: { readonly: true,
                        hide_on_load: !@rules[:require_packaging_bom] },
-        erp_bom_code: { readonly: true,
-                        hide_on_load: !@rules[:require_packaging_bom] },
         active: { renderer: :checkbox },
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,

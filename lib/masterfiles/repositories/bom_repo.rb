@@ -199,19 +199,21 @@ module MasterfilesApp
         .select_map([:pm_type_code, Sequel[:pm_types][:id]])
     end
 
-    def for_select_pm_subtypes(where: {}, exclude: {}, active: true) # rubocop:disable Metrics/AbcSize
-      DB[:pm_subtypes]
-        .join(:pm_types, id: :pm_type_id)
-        .left_outer_join(:pm_products, pm_subtype_id: Sequel[:pm_subtypes][:id])
-        .left_outer_join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
-        .left_outer_join(:pm_composition_levels, id: Sequel[:pm_types][:pm_composition_level_id])
-        .where(Sequel[:pm_subtypes][:active] => active)
-        .where(where)
-        .exclude(exclude)
-        .distinct
-        .order(:pm_type_code)
-        .select_map([:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id]])
-        .group_by { |rec| rec.shift.to_sym }
+    def for_select_pm_subtypes(where: {}, exclude: {}, active: true, grouped: false) # rubocop:disable Metrics/AbcSize
+      ds = DB[:pm_subtypes]
+           .join(:pm_types, id: :pm_type_id)
+           .left_outer_join(:pm_products, pm_subtype_id: Sequel[:pm_subtypes][:id])
+           .left_outer_join(:pm_boms_products, pm_product_id: Sequel[:pm_products][:id])
+           .left_outer_join(:pm_composition_levels, id: Sequel[:pm_types][:pm_composition_level_id])
+           .where(Sequel[:pm_subtypes][:active] => active)
+           .where(where)
+           .exclude(exclude)
+           .distinct
+      if grouped
+        ds.order(:pm_type_code).select_map([:pm_type_code, :subtype_code, Sequel[:pm_subtypes][:id]]).group_by { |rec| rec.shift.to_sym }
+      else
+        ds.order(:subtype_code).select_map([:subtype_code, Sequel[:pm_subtypes][:id]])
+      end
     end
 
     def composition_levels
