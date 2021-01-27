@@ -226,7 +226,7 @@
   allow_puc_mix:
     :name: allow_puc_mix
     :sequence_no: 14
-    :caption: Allow puc mix
+    :caption: Allow PUC mix
     :namespaced_name: pallet_mix_rules.allow_puc_mix
     :data_type: :boolean
     :width:

@@ -14,7 +14,7 @@
 :offset: 
 :external_settings:
   :colour_key:
-    error: Missing orchard and/or puc masterfile
+    error: Missing orchard and/or PUC masterfile
     warning: Missing cultivar masterfile
 :columns:
   id:

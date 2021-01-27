@@ -9,15 +9,13 @@ module MasterfilesApp
       id = nil
       repo.transaction do
         id = repo.create_puc(res)
-        # repo.create_farms_pucs(id,@puc_id)
-        log_status('pucs', id, 'CREATED')
+        log_status(:pucs, id, 'CREATED')
         log_transaction
       end
       instance = puc(id)
-      success_response("Created puc #{instance.puc_code}",
-                       instance)
+      success_response("Created PUC #{instance.puc_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { puc_code: ['This puc already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { puc_code: ['This PUC already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -31,8 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = puc(id)
-      success_response("Updated puc #{instance.puc_code}",
-                       instance)
+      success_response("Updated PUC #{instance.puc_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -42,10 +39,10 @@ module MasterfilesApp
       repo.transaction do
         repo.delete_farms_pucs(id)
         repo.delete_puc(id)
-        log_status('pucs', id, 'DELETED')
+        log_status(:pucs, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted puc #{name}")
+      success_response("Deleted PUC #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

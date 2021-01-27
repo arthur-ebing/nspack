@@ -29,7 +29,7 @@
   :popup: false
 - :separator: true
 - :url: "/list/farm_puc_orgs/multi?key=farm_puc_orgs&id=$:id$"
-  :text: farm puc orgs
+  :text: farm PUC orgs
   :icon: list
   :popup: true
   :show_if_env_var: USE_MARKETING_PUC:true
