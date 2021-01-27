@@ -102,7 +102,7 @@ module UiRules
                                 prompt: 'Select Marketing Variety',
                                 searchable: true,
                                 remove_search_for_small_list: false,
-                                hide_on_load: @rules[:hide_clone_fields] }
+                                invisible: @rules[:hide_clone_fields] }
       }
     end
 
