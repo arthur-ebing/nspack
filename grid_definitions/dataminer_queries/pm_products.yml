@@ -10,7 +10,7 @@
   JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id\r\nLEFT JOIN pm_types
   ON pm_types.id = pm_subtypes.pm_type_id\r\nLEFT JOIN pm_composition_levels ON pm_composition_levels.id
   = pm_types.pm_composition_level_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
-  = pm_products.basic_pack_id\r\nORDER BY pm_products.product_code"
+  = pm_products.basic_pack_id\r\nORDER BY pm_types.pm_type_code, pm_subtypes.subtype_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -162,10 +162,10 @@
   pm_subtype_code:
     :name: pm_subtype_code
     :sequence_no: 10
-    :caption: Pm subtype code
+    :caption: PM Subtype
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
