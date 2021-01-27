@@ -95,6 +95,25 @@ class Nspack < Roda
         Crossbeams::RobotResponder.new(feedback).render
       end
     end
+
+    # CHANGE LOGIN ROLE
+    # --------------------------------------------------------------------------
+    r.on 'change_packer_role' do
+      params = xml_interpreter.params_for_packer_role
+      res = hr_interactor.change_packer_role(params)
+
+      feedback = if res.success
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: true,
+                                                  line1: res.message)
+                 else
+                   MesscadaApp::RobotFeedback.new(device: params[:device],
+                                                  status: false,
+                                                  line1: 'Cannot change packer role',
+                                                  line4: res.message)
+                 end
+      Crossbeams::RobotResponder.new(feedback).render
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

@@ -113,7 +113,7 @@ module MesscadaApp
       failed_response(e.message, current_bay_attributes(state_machine))
     end
 
-    def complete(params) # rubocop:disable Metrics/AbcSize
+    def request_complete(params) # rubocop:disable Metrics/AbcSize
       res = validate_button(params)
       return validation_failed_response(res) if res.failure?
 

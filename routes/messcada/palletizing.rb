@@ -57,7 +57,7 @@ class Nspack < Roda
     # COMPLETE - Complete the current pallet and empty the bay
     # --------------------------------------------------------------------------
     r.on 'complete' do
-      res = interactor.complete(params)
+      res = interactor.request_complete(params)
       feedback = interactor.palletizing_robot_feedback(params[:device], res)
       Crossbeams::RobotResponder.new(feedback).render
     end

@@ -58,7 +58,7 @@ module MesscadaApp
       success_response('Changed to individual login mode')
     end
 
-    def login(params) # rubocop:disable Metrics/AbcSize
+    def login_with_identifier(params) # rubocop:disable Metrics/AbcSize
       return ok_response unless params[:system_resource][:login]
 
       name = repo.contract_worker_name(params[:identifier])
@@ -191,6 +191,16 @@ module MesscadaApp
       puts e.message
       puts e.backtrace.join("\n")
       failed_response(e.message)
+    end
+
+    def change_packer_role(params)
+      # params: device, identifier, role
+      # Update contract_worker.packer_role_id
+      # If part of an active group (match on device???? - or just any active group???)
+      #   copy group, where new one has exactly same workers
+      #   update takes care of new role - check this is ok within transaction...
+      #   make old group inactive
+      # end
     end
 
     private
