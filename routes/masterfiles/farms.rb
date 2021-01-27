@@ -143,6 +143,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     # FARMS
+    # --------------------------------------------------------------------------
     r.on 'farms', Integer do |id|
       interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
@@ -264,6 +265,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
     r.on 'farms' do
       interactor = MasterfilesApp::FarmInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       r.on 'new' do    # NEW
@@ -296,7 +298,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
     # ORCHARDS
+    # --------------------------------------------------------------------------
     r.on 'orchards', Integer do |id|
       interactor = MasterfilesApp::OrchardInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
@@ -352,6 +356,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
     end
 
     # PUCS
+    # --------------------------------------------------------------------------
     r.on 'pucs', Integer do |id|
       interactor = MasterfilesApp::PucInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       # Check for notfound:
@@ -434,60 +439,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         show_partial { Masterfiles::Farms::RmtContainerType::Edit.call(id) }
       end
 
-      # r.on 'complete' do
-      #   r.get do
-      #     check_auth!('farms', 'edit')
-      #     interactor.assert_permission!(:complete, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerType::Complete.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.complete_a_rmt_container_type(id, params[:rmt_container_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerType::Complete.call(id, params[:rmt_container_type], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'approve' do
-      #   r.get do
-      #     check_auth!('farms', 'approve')
-      #     interactor.assert_permission!(:approve, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerType::Approve.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.approve_or_reject_a_rmt_container_type(id, params[:rmt_container_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerType::Approve.call(id, params[:rmt_container_type], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('farms', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerType::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_rmt_container_type(id, params[:rmt_container_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerType::Reopen.call(id, params[:rmt_container_type], res.errors) }
-      #     end
-      #   end
-      # end
-
       r.is do
         r.get do       # SHOW
           check_auth!('farms', 'read')
@@ -556,60 +507,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         interactor.assert_permission!(:edit, id)
         show_partial { Masterfiles::Farms::RmtContainerMaterialType::Edit.call(id) }
       end
-
-      # r.on 'complete' do
-      #   r.get do
-      #     check_auth!('farms', 'edit')
-      #     interactor.assert_permission!(:complete, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerMaterialType::Complete.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.complete_a_rmt_container_material_type(id, params[:rmt_container_material_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerMaterialType::Complete.call(id, params[:rmt_container_material_type], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'approve' do
-      #   r.get do
-      #     check_auth!('farms', 'approve')
-      #     interactor.assert_permission!(:approve, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerMaterialType::Approve.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.approve_or_reject_a_rmt_container_material_type(id, params[:rmt_container_material_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerMaterialType::Approve.call(id, params[:rmt_container_material_type], res.errors) }
-      #     end
-      #   end
-      # end
-
-      # r.on 'reopen' do
-      #   r.get do
-      #     check_auth!('farms', 'edit')
-      #     interactor.assert_permission!(:reopen, id)
-      #     show_partial { Masterfiles::Farms::RmtContainerMaterialType::Reopen.call(id) }
-      #   end
-
-      #   r.post do
-      #     res = interactor.reopen_a_rmt_container_material_type(id, params[:rmt_container_material_type])
-      #     if res.success
-      #       flash[:notice] = res.message
-      #       redirect_to_last_grid(r)
-      #     else
-      #       re_show_form(r, res) { Masterfiles::Farms::RmtContainerMaterialType::Reopen.call(id, params[:rmt_container_material_type], res.errors) }
-      #     end
-      #   end
-      # end
 
       r.is do
         r.get do       # SHOW
