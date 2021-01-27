@@ -3,7 +3,7 @@
 module MasterfilesApp
   class ValidateCompileProductCode < BaseService
     attr_reader :repo, :pm_subtype, :pm_type
-    attr_accessor :params, :res
+    attr_accessor :params
 
     def initialize(params, id = nil)
       @repo = BomRepo.new
@@ -17,16 +17,16 @@ module MasterfilesApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      @res = ExtendedPmProductContract.new.call(params)
+      res = ExtendedPmProductContract.new.call(params)
       return res if res.success?  # Return if validation passed
       return res unless res.errors[:pm_subtype_id].nil? # Return validation failed. pm_subtype_id is required to compile product_code
 
-      params[:product_code] = compile_product_code
+      res = compile_product_code
+      return res if res.failure?
+
       params[:erp_code] = params[:product_code] if params[:erp_code].nil_or_empty?
 
       ExtendedPmProductContract.new.call(params)
-    rescue Crossbeams::FrameworkError
-      res
     end
 
     private
@@ -40,17 +40,18 @@ module MasterfilesApp
     end
 
     def minimum_composition_level_product_code # rubocop:disable Metrics/AbcSize
-      @res = MinimumPmProductSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
+      res = MinimumPmProductSchema.call(params)
+      return res if res.failure?
 
       params[:basic_pack_code] = repo.get(:basic_pack_codes, params[:basic_pack_id], :basic_pack_code)
       params[:pm_subtype_short_code] = pm_subtype.short_code
       params[:pm_type_short_code] = pm_type.short_code
 
-      @res = ProductCodeMinimumCompositionLevelSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
+      res = ProductCodeMinimumCompositionLevelSchema.call(params)
+      return res if res.failure?
 
-      "#{params[:pm_type_short_code]}#{params[:basic_pack_code]}#{params[:pm_subtype_short_code]}#{params[:height_mm]}"
+      params[:product_code] = "#{params[:pm_type_short_code]}#{params[:basic_pack_code]}#{params[:pm_subtype_short_code]}#{params[:height_mm]}"
+      valid_response
     end
 
     def mid_composition_level_product_code # rubocop:disable Metrics/AbcSize
@@ -60,17 +61,19 @@ module MasterfilesApp
       args[:gross_weight_per_unit] = params[:gross_weight_per_unit].nil_or_empty? ? '*' : params[:gross_weight_per_unit].to_f.to_s
       args[:items_per_unit] = params[:items_per_unit].nil_or_empty? ? '*' : params[:items_per_unit].to_i.to_s
 
-      @res = ProductCodeMidCompositionLevelSchema.call(args)
-      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
+      res = ProductCodeMidCompositionLevelSchema.call(args)
+      return res if res.failure?
 
-      "#{args[:pm_type_short_code]}#{args[:gross_weight_per_unit]}#{args[:pm_subtype_short_code]}#{args[:items_per_unit]}"
+      params[:product_code] = "#{args[:pm_type_short_code]}#{args[:gross_weight_per_unit]}#{args[:pm_subtype_short_code]}#{args[:items_per_unit]}"
+      valid_response
     end
 
     def erp_product_code
-      @res = PmProductErpSchema.call(params)
-      raise Crossbeams::FrameworkError if res.failure? # Returns @res from rescue
+      res = PmProductErpSchema.call(params)
+      return res if res.failure?
 
-      params[:erp_code]
+      params[:product_code] = params[:erp_code]
+      valid_response
     end
   end
 end
