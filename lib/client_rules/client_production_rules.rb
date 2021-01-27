@@ -14,6 +14,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -24,6 +25,7 @@ module Crossbeams
             provide_pack_type_at_verification: true,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
@@ -34,6 +36,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: true,
             integrate_with_external_rmt_system: true,
+            default_marketing_org: 'KR',
             allow_cultivar_group_mix: false },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
@@ -44,6 +47,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            default_marketing_org: 'UI',
             allow_cultivar_group_mix: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -54,6 +58,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            default_marketing_org: 'UI',
             allow_cultivar_group_mix: true },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
@@ -64,6 +69,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            default_marketing_org: 'SY',
             allow_cultivar_group_mix: false },
       sr2: { run_allocations: true }
     }.freeze
@@ -76,7 +82,6 @@ module Crossbeams
     # CARTON_VERIFICATION_REQUIRED
     # COMBINE_CARTON_AND_PALLET_VERIFICATION
     # DEFAULT_FG_PACKAGING_TYPE
-    # DEFAULT_MARKETING_ORG
     # DEFAULT_PACKING_METHOD
     # DEFAULT_PALLET_LABEL_NAME
     # NO_RUN_ALLOCATION

@@ -234,9 +234,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Target Market Type: 'PACKED'
   PACKED_TM_GROUP = 'PACKED'
 
-  # Product Setup default marketing organization
-  DEFAULT_MARKETING_ORG = ENV['DEFAULT_MARKETING_ORG']
-
   # Defaults for Packaging
   DEFAULT_FG_PACKAGING_TYPE = ENV.fetch('DEFAULT_FG_PACKAGING_TYPE', 'CARTON') # Can be BIN or CARTON
   REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
