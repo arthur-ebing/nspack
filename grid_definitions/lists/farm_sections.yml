@@ -18,7 +18,7 @@
   :popup: true
 :page_controls:
 - :control_type: :link
-  :url: "/masterfiles/farms/farm_sections/$:farm_sections.farm_id$/new"
+  :url: "/masterfiles/farms/farms/$:farm_sections.farm_id$/new_farm_section"
   :text: New Farm Section
   :style: :button
   :behaviour: :popup
