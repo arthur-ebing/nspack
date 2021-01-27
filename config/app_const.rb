@@ -55,6 +55,12 @@ class AppConst # rubocop:disable Metrics/ClassLength
   URL_BASE_IP = ENV.fetch('URL_BASE_IP')
   APP_CAPTION = ENV.fetch('APP_CAPTION')
 
+  NEW_FEATURE_LBL_PREPROCESS = make_boolean('NEW_FEATURE_LBL_PREPROCESS')
+  if NEW_FEATURE_LBL_PREPROCESS
+    puts '>>> NB. MesServer version MUST be GREATER than or equal to 3.57d.............'
+  else
+    puts '>>> NB. MesServer version MUST be LESS than or equal to 3.55.............'
+  end
   # A struct that can be used to alter the client code while tests are running.
   # All the CB_ classes will use this value as the client_code, which allows
   # for testing different values for a setting.

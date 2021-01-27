@@ -382,10 +382,15 @@ class Nspack < Roda
       r.on :id do |id|
         r.post do
           repo = LabelApp::LabelRepo.new
+          img = if AppConst::NEW_FEATURE_LBL_PREPROCESS
+                  Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString]))
+                else
+                  Sequel.blob(interactor.image_from_param(params[:imageString]))
+                end
+
           changeset = { label_json: params[:label],
                         variable_xml: params[:XMLString],
-                        png_image: Sequel.blob(interactor.image_from_param(params[:imageString])) }
-          # png_image: Sequel.blob(interactor.image_from_param_without_alpha(params[:imageString])) }
+                        png_image: img }
 
           DB.transaction do
             repo.update_label(id, interactor.include_updated_by_in_changeset(changeset))
