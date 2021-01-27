@@ -7,6 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:hide_clone_fields] = @mode != :clone
+
       common_values_for_fields common_fields
       set_clone_fields if %i[clone].include? @mode
 
@@ -91,7 +93,16 @@ module UiRules
                      caption: 'Season',
                      prompt: 'Select Season',
                      searchable: true,
-                     remove_search_for_small_list: false }
+                     remove_search_for_small_list: false },
+        marketing_variety_id: { renderer: :select,
+                                options: @repo.for_select_cultivar_group_marketing_varieties(@form_object[:cultivar_group_id]),
+                                selected: @repo.find_template_marketing_variety(@options[:id]),
+                                disabled_options: MasterfilesApp::CultivarRepo.new.for_select_inactive_marketing_varieties,
+                                caption: 'Marketing Variety',
+                                prompt: 'Select Marketing Variety',
+                                searchable: true,
+                                remove_search_for_small_list: false,
+                                hide_on_load: @rules[:hide_clone_fields] }
       }
     end
 

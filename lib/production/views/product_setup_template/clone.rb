@@ -33,6 +33,7 @@ module Production
                   col.add_field :cultivar_group_code
                   col.add_field :cultivar_id
                   col.add_field :cultivar_name
+                  col.add_field :marketing_variety_id
                 end
                 row.column do |col|
                   col.add_field :packhouse_resource_id

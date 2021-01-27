@@ -12,5 +12,6 @@ module ProductionApp
     required(:season_group_id).maybe(:integer)
     required(:season_id).maybe(:integer)
     # required(:active).maybe(:bool)
+    optional(:marketing_variety_id).filled(:integer)
   end
 end

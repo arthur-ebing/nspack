@@ -790,6 +790,17 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      value: pm_bom_products)])
       end
 
+      r.on 'allow_cultivar_mixing_changed' do
+        actions = if params[:changed_value] == 't'
+                    [OpenStruct.new(type: :show_element,
+                                    dom_id: 'reworks_run_sequence_cultivar_id_field_wrapper')]
+                  else
+                    [OpenStruct.new(type: :hide_element,
+                                    dom_id: 'reworks_run_sequence_cultivar_id_field_wrapper')]
+                  end
+        json_actions(actions)
+      end
+
       r.on 'print_reworks_carton_label' do # Print Carton Label
         r.get do
           show_partial { Production::Reworks::ReworksRun::PrintReworksLabel.call(id, nil, true) }
@@ -811,10 +822,29 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
 
       r.on 'clone_sequence' do
-        check_auth!('reworks', 'edit')
-        res = interactor.clone_pallet_sequence(id, reworks_run_type_id)
-        flash[:notice] = res.message
-        r.redirect "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+        r.get do
+          pallet_numbers = interactor.pallet_sequence_pallet_number(id)
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::CloneSequence.call(id,
+                                                                reworks_run_type_id,
+                                                                back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{pallet_numbers.first}/edit_pallet")
+          end
+        end
+        r.post do
+          res = interactor.clone_pallet_sequence(params[:reworks_run_sequence])
+          if res.success
+            flash[:notice] = res.message
+            redirect_via_json "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet"
+          else
+            re_show_form(r, res) do
+              Production::Reworks::ReworksRun::CloneSequence.call(id,
+                                                                  reworks_run_type_id,
+                                                                  back_url: "/production/reworks/reworks_run_types/#{reworks_run_type_id}/pallets/#{res.instance[:pallet_number]}/edit_pallet",
+                                                                  form_values: params[:reworks_run_sequence],
+                                                                  form_errors: res.errors)
+            end
+          end
+        end
       end
 
       r.on 'remove_sequence' do

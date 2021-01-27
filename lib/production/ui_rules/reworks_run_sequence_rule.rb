@@ -28,11 +28,17 @@ module UiRules
         set_pallet_sequence_fields
       end
 
+      if @mode == :clone_sequence
+        make_reworks_run_pallet_header_table(nil, 2)
+        set_clone_sequence_fields
+      end
+
       edit_sequence_fields if @mode == :edit_pallet_sequence
 
       add_behaviours if %i[change_production_run].include? @mode
       edit_farm_details_behaviours if %i[edit_farm_details].include? @mode
       edit_sequence_behaviours if %i[edit_pallet_sequence].include? @mode
+      clone_sequence_behaviours if %i[clone_sequence].include? @mode
 
       form_name 'reworks_run_sequence'
     end
@@ -40,6 +46,19 @@ module UiRules
     def make_reworks_run_pallet_header_table(columns = nil, display_columns = 3)
       compact_header(columns: columns || %i[pallet_number pallet_sequence_number production_run_id packhouse line farm puc orchard cultivar_group cultivar],
                      display_columns: display_columns)
+    end
+
+    def set_clone_sequence_fields
+      fields[:reworks_run_type_id] = { renderer: :hidden }
+      fields[:pallet_id] = { renderer: :hidden }
+      fields[:pallet_sequence_id] = { renderer: :hidden }
+      fields[:allow_cultivar_mixing] = { renderer: :checkbox }
+      fields[:cultivar_id] = { renderer: :select,
+                               options: @cultivar_repo.for_select_cultivars(where: { cultivar_group_id: @form_object.cultivar_group_id }),
+                               disabled_options: @cultivar_repo.for_select_inactive_cultivars,
+                               caption: 'Cultivar',
+                               hide_on_load: true }
+      fields[:spacer] = { renderer: :hidden }
     end
 
     def set_change_production_run_fields
@@ -316,14 +335,21 @@ module UiRules
                              hide_on_load: !@rules[:gtins_required] }
     end
 
-    def make_form_object
+    def make_form_object # rubocop:disable Metrics/AbcSize
       if @mode == :edit_farm_details
         make_farm_details_form_object
         return
       end
 
-      if @mode == :edit_pallet_sequence
-        @form_object = @repo.find_pallet_sequence_setup_data(@options[:pallet_sequence_id])
+      if %i[edit_pallet_sequence clone_sequence].include? @mode
+        attrs = if @mode == :clone_sequence
+                  { pallet_sequence_id: @options[:pallet_sequence_id],
+                    reworks_run_type_id: @options[:reworks_run_type_id] }
+                else
+                  {}
+                end
+        hash = @repo.find_pallet_sequence_setup_data(@options[:pallet_sequence_id]).to_h.merge(attrs)
+        @form_object = OpenStruct.new(hash)
         return
       end
 
@@ -412,6 +438,12 @@ module UiRules
         behaviour.dropdown_change :pm_mark_id,
                                   notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/pm_mark_changed",
                                              param_keys: %i[reworks_run_sequence_pm_bom_id] }]
+      end
+    end
+
+    def clone_sequence_behaviours
+      behaviours do |behaviour|
+        behaviour.input_change :allow_cultivar_mixing, notify: [{ url: "/production/reworks/pallet_sequences/#{@options[:pallet_sequence_id]}/allow_cultivar_mixing_changed" }]
       end
     end
   end

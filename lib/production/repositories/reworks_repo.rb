@@ -296,9 +296,10 @@ module ProductionApp
       end
     end
 
-    def clone_pallet_sequence(id)
+    def clone_pallet_sequence(args)
       ps_rejected_fields = %i[id pallet_sequence_number]
-      attrs = find_hash(:pallet_sequences, id).reject { |k, _| ps_rejected_fields.include?(k) }
+      attrs = find_hash(:pallet_sequences, args[:pallet_sequence_id]).reject { |k, _| ps_rejected_fields.include?(k) }
+      attrs[:cultivar_id] = args[:cultivar_id] if args[:allow_cultivar_mixing]
       create(:pallet_sequences, attrs)
     end
 
@@ -572,13 +573,22 @@ module ProductionApp
         ps.marketing_org_party_role_id, ps.packed_tm_group_id, ps.target_market_id, ps.mark_id, ps.pm_mark_id, ps.inventory_code_id, ps.pallet_format_id, ps.cartons_per_pallet_id,
         ps.pm_bom_id, ps.client_size_reference, ps.client_product_code, ps.treatment_ids, ps.marketing_order_number, ps.sell_by_code,
         cultivar_groups.commodity_id, ps.grade_id, ps.product_chars, pallet_formats.pallet_base_id, pallet_formats.pallet_stack_type_id,
-        ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code
+        ps.pm_type_id, ps.pm_subtype_id, pm_boms.description, pm_boms.erp_bom_code, ps.pallet_id, ps.cultivar_group_id, ps.cultivar_id, ps.production_run_id,
+        packhouses.plant_resource_code AS packhouse, lines.plant_resource_code AS line, farms.farm_code AS farm,
+        pucs.puc_code AS puc, orchards.orchard_code AS orchard, cultivar_groups.cultivar_group_code AS cultivar_group,
+        cultivars.cultivar_name AS cultivar
         FROM pallet_sequences ps
         JOIN cultivar_groups ON cultivar_groups.id = ps.cultivar_group_id
+        JOIN cultivars ON cultivars.id = ps.cultivar_id
+        JOIN farms ON farms.id = ps.farm_id
+        JOIN pucs ON pucs.id = ps.puc_id
+        JOIN orchards ON orchards.id = ps.orchard_id
         JOIN pallet_formats ON pallet_formats.id = ps.pallet_format_id
         LEFT JOIN pm_boms ON pm_boms.id = ps.pm_bom_id
         LEFT JOIN pm_boms_products ON pm_boms_products.pm_bom_id = ps.pm_bom_id
         LEFT JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+        LEFT JOIN plant_resources packhouses ON packhouses.id = ps.packhouse_resource_id
+        LEFT JOIN plant_resources lines ON lines.id = ps.production_line_id
         WHERE ps.id = #{sequence_id}
       SQL
       hash = DB[query].first
@@ -914,6 +924,24 @@ module ProductionApp
         WHERE pallet_sequences.id = ?
       SQL
       DB[query, sequence_id].first
+    end
+
+    def invalidates_sequence_marketing_varieties?(args)
+      query = <<~SQL
+        SELECT EXISTS(
+           SELECT pallet_sequences.id FROM pallet_sequences
+           WHERE pallet_sequences.id = #{args[:pallet_sequence_id]}
+           AND marketing_variety_id NOT IN (
+              SELECT DISTINCT marketing_varieties.id
+              FROM marketing_varieties
+              JOIN marketing_varieties_for_cultivars ON marketing_varieties_for_cultivars.marketing_variety_id = marketing_varieties.id
+              JOIN cultivars ON cultivars.id = marketing_varieties_for_cultivars.cultivar_id
+              JOIN cultivar_groups ON cultivar_groups.id = cultivars.cultivar_group_id
+              WHERE cultivars.id = #{args[:cultivar_id]}
+           )
+        )
+      SQL
+      DB[query].single_value
     end
   end
 end
