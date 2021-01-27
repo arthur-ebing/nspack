@@ -483,7 +483,7 @@ class Nspack < Roda
         actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_internal_container_code_field_wrapper')
         actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_max_gross_weight_field_wrapper')
         actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_max_gross_weight', required: switch)
-        if AppConst::VGM_REQUIRED
+        if AppConst::CR_FG.verified_gross_mass_required_for_loads?
           actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_tare_weight_field_wrapper')
           actions << OpenStruct.new(type: :set_required, dom_id: 'load_vehicle_tare_weight', required: switch)
           actions << OpenStruct.new(type: action, dom_id: 'load_vehicle_max_payload_field_wrapper')

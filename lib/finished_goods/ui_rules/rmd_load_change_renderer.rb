@@ -16,7 +16,7 @@ module UiRules
                    truck_arrival_max_gross_weight_row
                    truck_arrival_cargo_temperature_id_row
                    truck_arrival_stack_type_id_row]
-      if AppConst::VGM_REQUIRED
+      if AppConst::CR_FG.verified_gross_mass_required_for_loads?
         row_ids << 'truck_arrival_tare_weight_row'
         row_ids << 'truck_arrival_max_payload_row'
         row_ids << 'truck_arrival_actual_payload_row'
@@ -41,7 +41,7 @@ module UiRules
                    truck_arrival_max_gross_weight
                    truck_arrival_cargo_temperature_id
                    truck_arrival_stack_type_id]
-      if AppConst::VGM_REQUIRED
+      if AppConst::CR_FG.verified_gross_mass_required_for_loads?
         req_ids << 'truck_arrival_tare_weight'
         req_ids << 'truck_arrival_max_payload'
         req_ids << 'truck_arrival_actual_payload'

@@ -456,7 +456,6 @@ class AppConst # rubocop:disable Metrics/ClassLength
   SCRAP_LOCATION = 'SCRAP_PACKHSE'
   UNSCRAP_LOCATION = 'UNSCRAP_PACKHSE'
   UNTIP_LOCATION = 'UNTIPPED_BIN'
-  VGM_REQUIRED = make_boolean('VGM_REQUIRED')
   MAX_PALLETS_ON_LOAD = ENV['MAX_PALLETS_ON_LOAD'].to_i || 50
   TEMP_TAIL_REQUIRED_TO_SHIP = make_boolean('TEMP_TAIL_REQUIRED_TO_SHIP')
   # Constants for port types:

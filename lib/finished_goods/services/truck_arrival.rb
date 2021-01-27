@@ -68,12 +68,12 @@ module FinishedGoodsApp
       messages << 'Created load container'
     end
 
-    def update_container
+    def update_container # rubocop:disable Metrics/AbcSize
       return if @container_id.nil?
 
       # compare instance with container_params
       ignore = %i[id active tare_weight max_payload actual_payload]
-      ignore = %i[id active] if AppConst::VGM_REQUIRED
+      ignore = %i[id active] if AppConst::CR_FG.verified_gross_mass_required_for_loads?
 
       instance = container_repo.find_load_container(@container_id).to_h.reject { |k, _| ignore.include?(k) }
       # update date field if weight changed

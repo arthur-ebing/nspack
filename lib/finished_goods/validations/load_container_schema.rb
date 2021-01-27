@@ -17,7 +17,7 @@ module FinishedGoodsApp
     required(:cargo_temperature_id).filled(:integer)
     required(:stack_type_id).filled(:integer)
     optional(:actual_payload).maybe(:decimal)
-    if AppConst::VGM_REQUIRED
+    if AppConst::CR_FG.verified_gross_mass_required_for_loads?
       required(:tare_weight).filled(:decimal)
       required(:max_payload).filled(:decimal)
     else

@@ -36,7 +36,7 @@ module FinishedGoods
               form.add_field :container_temperature_rhine2
               form.add_field :internal_container_code
               form.add_field :max_gross_weight
-              if AppConst::VGM_REQUIRED
+              if AppConst::CR_FG.verified_gross_mass_required_for_loads?
                 form.add_field :tare_weight
                 form.add_field :max_payload
                 form.add_field :actual_payload

@@ -283,7 +283,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           r.get do
             # set defaults
             form_state = {}
-            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.calculate_actual_payload(load_id) if AppConst::VGM_REQUIRED
+            form_state[:actual_payload] = FinishedGoodsApp::LoadContainerRepo.new.calculate_actual_payload(load_id) if AppConst::CR_FG.verified_gross_mass_required_for_loads?
             # checks if load_container exists
             container_id = repo.get_id(:load_containers, load_id: load_id)
             unless container_id.nil?
@@ -388,7 +388,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                            allow_decimals: true,
                            required: false,
                            hide_on_load: !has_container)
-            if AppConst::VGM_REQUIRED
+            if AppConst::CR_FG.verified_gross_mass_required_for_loads?
               form.add_field(:tare_weight,
                              'Tare Weight',
                              data_type: 'number',
