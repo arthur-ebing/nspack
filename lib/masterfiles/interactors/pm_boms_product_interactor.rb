@@ -39,8 +39,9 @@ module MasterfilesApp
     end
 
     def delete_pm_boms_product(id)  # rubocop:disable Metrics/AbcSize
-      name = pm_boms_product(id).id
-      pm_bom_id = DB[:pm_boms_products].where(id: id).get(:pm_bom_id)
+      instance = pm_boms_product(id)
+      name = instance.id
+      pm_bom_id = instance.pm_bom_id
 
       repo.transaction do
         repo.delete_pm_boms_product(id)
