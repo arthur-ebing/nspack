@@ -171,9 +171,14 @@ a|* :p
 |None
 
 |options - :hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the text will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |`true` or `false`
 |`false`
+
+|options - :initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|`true` or `false`
+|`true`
 
 |options - :css_classes
 |CSS Classes separated by spaces. e.g. `"b orange"` for bold, orange text.

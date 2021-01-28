@@ -25,7 +25,7 @@ module MasterfilesApp
       return validation_failed_response(res) if res.failure?
 
       repo.transaction do
-        repo.update_contract_worker(id, res.to_h.merge(from_external_system: true))
+        repo.update_contract_worker(id, res.to_h.merge(from_external_system: false))
         log_transaction
       end
       instance = contract_worker(id)

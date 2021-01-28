@@ -189,9 +189,14 @@ Must start with ".".
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -280,9 +285,14 @@ and all words start with initial capital letter.
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -335,9 +345,14 @@ and all words start with initial capital letter.
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -385,9 +400,14 @@ and all words start with initial capital letter.
 |None
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -452,9 +472,14 @@ and all words start with initial capital letter.
 |None.
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -520,9 +545,14 @@ and all words start with initial capital letter.
 |None. Optional.
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -565,9 +595,14 @@ and all words start with initial capital letter.
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -678,9 +713,14 @@ To display `optgroup` elements, use a Hash and the format must be: `{ group => [
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.
@@ -758,9 +798,14 @@ and all words start with initial capital letter.
 |false
 
 |:hide_on_load
-|HTML `hidden` attribute for the field wrapper. If true, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour.
+|HTML `hidden` attribute for the field wrapper. If `true`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `initially_visible`.
 |true or false
 |false
+
+|:initially_visible
+|HTML `hidden` attribute for the field wrapper. If `false`, the field and label will be hidden, but can be shown again e.g. by a `:show_element` behaviour. Opposite behaviour of `hide_on_load`.
+|true or false
+|true
 
 |:invisible
 |If true, the field will not render in the form at all.

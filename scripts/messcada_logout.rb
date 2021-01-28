@@ -27,10 +27,12 @@ class MesScadaLogout < BaseScript
             puts err
             return failed_response(err)
           end
+    sys_id = DB[:system_resources].where(system_resource_code: 'LBL-3A').get(:id)
+    raise 'No system resource found with code LBL-3A' if sys_id.nil?
 
     DB.transaction do
       DB[:system_resource_logins].where(contract_worker_id: rec[:id], active: true).update(last_logout_at: Time.now, from_external_system: false, active: false)
-      Que.enqueue 1089, 'LBL-3A', '192.168.50.215', rec[:id], job_class: 'MesscadaApp::Job::LogoutFromMesScadaRobot', queue: 'nspack'
+      Que.enqueue sys_id, 'LBL-3A', '192.168.50.215', rec[:id], job_class: 'MesscadaApp::Job::LogoutFromMesScadaRobot', queue: 'nspack'
     end
 
     if debug_mode

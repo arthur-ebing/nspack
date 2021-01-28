@@ -274,6 +274,8 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   # @param rjust [Array] optional array of Symbols for all columns to be right-justified
   # @return [Array] an array representing rows in a text table.
   def make_text_table(recs, heads: {}, times: [], numbers: [], rjust: []) # rubocop:disable Metrics/AbcSize
+    return [] if recs.length.zero?
+
     heads = mt_calculate_col_widths_and_headings(recs, heads, times, numbers)
     out = []
     line = mt_make_line(heads)
@@ -322,6 +324,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
 
   def mt_col_headings(recs, heads)
     headings = {}
+
     recs.first.each_key do |col|
       headings[col] = {
         head: heads[col] || col.to_s.capitalize.gsub('_', ' '),
