@@ -13,7 +13,8 @@ module MasterfilesApp
         description: 'ABC',
         length_mm: 1,
         width_mm: 1,
-        height_mm: 1
+        height_mm: 1,
+        footprint_code: 'ABC'
       }
       MasterfilesApp::BasicPackCode.new(base_attrs.merge(attrs))
     end

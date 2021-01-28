@@ -20,6 +20,7 @@ module Masterfiles
               form.add_field :length_mm
               form.add_field :width_mm
               form.add_field :height_mm
+              form.add_field :footprint_code
             end
           end
 

@@ -51,7 +51,8 @@ module MasterfilesApp
         length_mm: Faker::Number.number(digits: 4),
         width_mm: Faker::Number.number(digits: 4),
         height_mm: Faker::Number.number(digits: 4),
-        active: true
+        active: true,
+        footprint_code: Faker::Lorem.word
       }
       DB[:basic_pack_codes].insert(default.merge(opts))
     end

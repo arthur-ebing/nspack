@@ -8,5 +8,6 @@ module MasterfilesApp
     required(:length_mm).maybe(:integer)
     required(:width_mm).maybe(:integer)
     required(:height_mm).maybe(:integer)
+    required(:footprint_code).maybe(Types::StrippedString)
   end
 end

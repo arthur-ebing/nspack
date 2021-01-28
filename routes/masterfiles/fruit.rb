@@ -392,7 +392,8 @@ class Nspack < Roda
                                        description: res.instance[:description],
                                        length_mm: res.instance[:length_mm],
                                        width_mm: res.instance[:width_mm],
-                                       height_mm: res.instance[:height_mm] },
+                                       height_mm: res.instance[:height_mm],
+                                       footprint_code: res.instance[:footprint_code] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Fruit::BasicPackCode::Edit.call(id, params[:basic_pack_code], res.errors) }
@@ -412,6 +413,27 @@ class Nspack < Roda
 
     r.on 'basic_pack_codes' do
       interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'height_changed' do
+        footprint_code = params[:basic_pack_code_footprint_code]
+        basic_pack_code = if footprint_code.blank? || params[:changed_value].blank?
+                            params[:basic_pack_code_basic_pack_code]
+                          else
+                            footprint_code + ' ' + params[:changed_value]
+                          end
+        json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
+      end
+
+      r.on 'footprint_code_changed' do
+        height_mm = params[:basic_pack_code_height_mm]
+        basic_pack_code = if height_mm.blank? || params[:changed_value].blank?
+                            params[:basic_pack_code_basic_pack_code]
+                          else
+                            params[:changed_value] + ' ' + height_mm
+                          end
+        json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         interactor.assert_permission!(:create)
