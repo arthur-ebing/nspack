@@ -35,6 +35,7 @@ module ProductionApp
       grade_id = create_grade
       inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
+      rmt_class_id = create_rmt_class
 
       default = {
         product_setup_template_id: product_setup_template_id,
@@ -61,7 +62,8 @@ module ProductionApp
         grade_id: grade_id,
         product_chars: Faker::Lorem.unique.word,
         active: true,
-        gtin_code: Faker::Lorem.word
+        gtin_code: Faker::Lorem.word,
+        rmt_class_id: rmt_class_id
       }
       DB[:product_setups].insert(default.merge(opts))
     end

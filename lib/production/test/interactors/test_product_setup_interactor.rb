@@ -14,6 +14,7 @@ module ProductionApp
     include MasterfilesApp::PackagingFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::TargetMarketFactory
+    include RawMaterialsApp::RmtBinFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -95,6 +96,7 @@ module ProductionApp
       grade_id = create_grade
       inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
+      rmt_class_id = create_rmt_class
 
       {
         id: 1,
@@ -131,7 +133,9 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: target_market_id,
         description: 'ABC',
-        gtin_code: 'ABC'
+        gtin_code: 'ABC',
+        rmt_class_id: rmt_class_id
+
       }
     end
 

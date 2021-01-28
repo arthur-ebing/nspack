@@ -44,6 +44,7 @@ module UiRules
       product_setup_template = @repo.find_product_setup_template(@form_object.product_setup_template_id)
       cultivar_group_id_label = product_setup_template&.cultivar_group_code
       cultivar_id_label = product_setup_template&.cultivar_name
+      rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
 
       fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
       fields[:cultivar_group] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
@@ -71,6 +72,7 @@ module UiRules
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments', hide_on_load: @rules[:hide_some_fields]  }
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
+      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Class' }
       fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
       fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
       fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
@@ -150,6 +152,13 @@ module UiRules
                                    prompt: 'Select Size Reference',
                                    searchable: true,
                                    remove_search_for_small_list: false },
+        rmt_class_id: { renderer: :select,
+                        options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
+                        disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_rmt_classes,
+                        caption: 'Class',
+                        prompt: 'Select Class',
+                        searchable: true,
+                        remove_search_for_small_list: false },
         grade_id: { renderer: :select,
                     options: MasterfilesApp::FruitRepo.new.for_select_grades,
                     disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_grades,
@@ -299,7 +308,8 @@ module UiRules
                                     pallet_label_name: nil,
                                     grade_id: nil,
                                     product_chars: nil,
-                                    gtin_code: nil)
+                                    gtin_code: nil,
+                                    rmt_class_id: nil)
     end
 
     def treatment_codes

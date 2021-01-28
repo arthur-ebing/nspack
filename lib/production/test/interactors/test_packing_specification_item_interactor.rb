@@ -15,6 +15,7 @@ module ProductionApp
     include MasterfilesApp::FruitFactory
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::GeneralFactory
+    include RawMaterialsApp::RmtBinFactory
 
     def test_repo
       repo = interactor.send(:repo)

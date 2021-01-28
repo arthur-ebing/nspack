@@ -36,5 +36,6 @@ module ProductionApp
     attribute :description, Types::String
     attribute :target_market_id, Types::Integer
     attribute :gtin_code, Types::String
+    attribute :rmt_class_id, Types::Integer
   end
 end

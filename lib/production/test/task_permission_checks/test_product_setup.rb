@@ -42,7 +42,9 @@ module ProductionApp
         pm_subtype_id: 1,
         target_market_id: 1,
         description: 'ABC',
-        gtin_code: 'ABC'
+        gtin_code: 'ABC',
+        rmt_class_id: 1
+
       }
       ProductionApp::ProductSetup.new(base_attrs.merge(attrs))
     end
