@@ -856,7 +856,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         r.delete do    # DELETE
           check_auth!('packaging', 'delete')
           interactor.assert_permission!(:delete, id)
-          interactor.assert_permission!(:only_bom_product, id)
           res = interactor.delete_pm_boms_product(id)
           if res.success
             acts = [OpenStruct.new(type: :delete_grid_row,

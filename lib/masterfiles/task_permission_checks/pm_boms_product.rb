@@ -14,8 +14,7 @@ module MasterfilesApp
       CHECKS = {
         create: :create_check,
         edit: :edit_check,
-        delete: :delete_check,
-        only_bom_product: :only_bom_product_check
+        delete: :delete_check
       }.freeze
 
       def call
@@ -38,10 +37,6 @@ module MasterfilesApp
       end
 
       def delete_check
-        all_ok
-      end
-
-      def only_bom_product_check
         pm_bom_product_ids = @repo.select_values(:pm_boms_products, :id, pm_bom_id: @entity.pm_bom_id)
         return failed_response('PM BOM must have at least one product') if pm_bom_product_ids.length <= 1
 
