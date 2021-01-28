@@ -39,9 +39,7 @@ module Production
                   col.add_text rules[:compact_header]
                   col.add_field :affected_deliveries
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

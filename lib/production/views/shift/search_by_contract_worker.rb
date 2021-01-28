@@ -4,7 +4,7 @@ module Production
   module Production
     module Shift
       class SearchByContractWorker
-        def self.call(form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:shift, :search, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -20,9 +20,7 @@ module Production
                 row.column do |col|
                   col.add_field :contract_worker_id
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

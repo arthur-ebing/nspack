@@ -20,9 +20,7 @@ module Production
                   col.add_field :employment_type_id
                   col.add_field :employment_type
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

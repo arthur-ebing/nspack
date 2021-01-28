@@ -4,7 +4,7 @@ module Production
   module Reworks
     module ReworksRun
       class SearchByPalletNumber
-        def self.call(form_values: nil, form_errors: nil) # rubocop:disable Metrics/AbcSize
+        def self.call(form_values: nil, form_errors: nil)
           ui_rule = UiRules::Compiler.new(:reworks_run, :search, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -20,9 +20,7 @@ module Production
                 row.column do |col|
                   col.add_field :pallet_number
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

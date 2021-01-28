@@ -189,7 +189,6 @@ module UiRules
         pallet_number: { renderer: :input,
                          subtype: :integer,
                          required: true },
-        spacer: { hide_on_load: true },
         gross_weight: { renderer: :numeric,
                         caption: @rules[:tip_bins] ? 'Average Gross Weight' : 'Gross Weight',
                         hide_on_load: @rules[:bulk_weigh_bins] || @rules[:tip_bins] ? false : true,

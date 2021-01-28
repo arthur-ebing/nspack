@@ -49,9 +49,7 @@ module Production
                   col.add_field :pallets_selected
                 end
                 if rules[:single_edit] || rules[:bulk_production_run_update]
-                  row.column do |col|
-                    col.add_field :spacer
-                  end
+                  row.blank_column
                 else
                   row.column do |col|
                     col.add_notice "Click button to select multiple reworks #{multi_select_caption}"
@@ -70,36 +68,28 @@ module Production
                   col.add_field :allow_cultivar_group_mixing
                   col.add_field :allow_cultivar_mixing
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
               form.row do |row|
                 row.column do |col|
                   col.add_field :from_production_run_id
                   col.add_field :to_production_run_id
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
               form.row do |row|
                 row.column do |col|
                   col.add_field :gross_weight
                   col.add_field :avg_gross_weight
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
               if rules[:bulk_update_pallet_dates]
                 form.row do |row|
                   row.column do |col|
                     col.add_field :first_cold_storage_at
                   end
-                  row.column do |col|
-                    col.add_field :spacer
-                  end
+                  row.blank_column
                 end
               end
             end

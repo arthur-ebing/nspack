@@ -58,7 +58,6 @@ module UiRules
                                disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                                caption: 'Cultivar',
                                hide_on_load: true }
-      fields[:spacer] = { renderer: :hidden }
     end
 
     def set_change_production_run_fields

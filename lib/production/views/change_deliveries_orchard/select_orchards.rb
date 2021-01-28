@@ -26,9 +26,7 @@ module Production
                   col.add_field :to_cultivar
                   col.add_field :ignore_runs_that_allow_mixing
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

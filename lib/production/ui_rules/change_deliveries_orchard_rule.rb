@@ -20,8 +20,7 @@ module UiRules
         from_cultivar: { renderer: :select, options: [], required: true, prompt: true },
         to_orchard: { renderer: :select, options: [], required: true, prompt: true },
         to_cultivar: { renderer: :select, options: [], required: true, prompt: true },
-        ignore_runs_that_allow_mixing: { renderer: :checkbox },
-        spacer: { hide_on_load: true }
+        ignore_runs_that_allow_mixing: { renderer: :checkbox }
 
       }
 

@@ -25,9 +25,7 @@ module Production
                   col.add_field :orchard_id
                   col.add_field :cultivar_id
                 end
-                row.column do |col|
-                  col.add_field :spacer
-                end
+                row.blank_column
               end
             end
           end

@@ -43,7 +43,6 @@ module UiRules
                            required: true }
       fields[:employment_type_id] = { renderer: :hidden }
       fields[:employment_type] = { renderer: :hidden }
-      fields[:spacer] = { renderer: :hidden }
     end
 
     def set_summary_report_fields
@@ -59,7 +58,6 @@ module UiRules
       fields[:to_date] = { renderer: :hidden }
       fields[:employment_type_id] = { renderer: :hidden }
       fields[:employment_type] = { renderer: :hidden }
-      fields[:spacer] = { renderer: :hidden }
     end
 
     def edit_fields
@@ -104,8 +102,7 @@ module UiRules
           min_charwidth: 30,
           required: true,
           prompt: true
-        },
-        spacer: { hide_on_load: true }
+        }
       }
     end
 

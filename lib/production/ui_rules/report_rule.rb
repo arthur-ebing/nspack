@@ -49,8 +49,7 @@ module UiRules
                        options: @cultivar_repo.for_select_cultivars,
                        disabled_options: @cultivar_repo.for_select_inactive_cultivars,
                        prompt: 'Select Cultivar',
-                       caption: 'Cultivar' },
-        spacer: { renderer: :hidden }
+                       caption: 'Cultivar' }
       }
     end
 

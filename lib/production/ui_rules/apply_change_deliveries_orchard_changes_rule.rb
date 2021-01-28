@@ -64,8 +64,7 @@ module UiRules
         affected_deliveries: { renderer: :textarea,
                                rows: 15,
                                disabled: true,
-                               caption: 'Deliveries' },
-        spacer: { hide_on_load: true }
+                               caption: 'Deliveries' }
       }
     end
 
