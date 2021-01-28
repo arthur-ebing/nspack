@@ -24,12 +24,14 @@ module MasterfilesApp
       end
 
     else
-      optional(:id).filled(:integer)
-      required(:pm_subtype_id).filled(:integer)
-      required(:erp_code).filled(Types::StrippedString)
-      required(:product_code).maybe(Types::StrippedString)
-      required(:description).maybe(Types::StrippedString)
-      required(:items_per_unit_client_description).maybe(Types::StrippedString)
+      params do
+        optional(:id).filled(:integer)
+        required(:pm_subtype_id).filled(:integer)
+        required(:erp_code).filled(Types::StrippedString)
+        required(:product_code).maybe(Types::StrippedString)
+        required(:description).maybe(Types::StrippedString)
+        required(:items_per_unit_client_description).maybe(Types::StrippedString)
+      end
     end
   end
 
