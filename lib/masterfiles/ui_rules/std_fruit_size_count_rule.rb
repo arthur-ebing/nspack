@@ -21,7 +21,7 @@ module UiRules
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       uom_label = @gen_repo.find_uom(@form_object.uom_id)&.uom_code
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label }
-      fields[:uom_id] = { renderer: :label, with_value: uom_label }
+      fields[:uom_id] = { renderer: :label, with_value: uom_label, caption: 'Unit Of Measure' }
       fields[:size_count_description] = { renderer: :label }
       fields[:marketing_size_range_mm] = { renderer: :label }
       fields[:marketing_weight_range] = { renderer: :label }
@@ -45,6 +45,7 @@ module UiRules
         uom_id: { renderer: :select,
                   options: @gen_repo.for_select_uoms(where: { code: AppConst::UOM_TYPE }),
                   disabled_options: @gen_repo.for_select_inactive_uoms,
+                  caption: 'Unit of Measure',
                   required: true  },
         size_count_description: {},
         marketing_size_range_mm: {},
