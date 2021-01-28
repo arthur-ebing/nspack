@@ -27,6 +27,7 @@ root = File.expand_path('..', __dir__)
 require_relative '../config/environment'
 Dir["#{root}/lib/client_rules/*.rb"].sort.each { |f| require f }
 require_relative '../config/app_const'
+require_relative '../helpers/utility_functions'
 require_relative '../lib/crossbeams_errors'
 require_relative '../lib/crossbeams_responses'
 require_relative '../lib/error_mailer'

@@ -183,75 +183,14 @@ module Crossbeams
       setting(:clm_button_caption_format) || setting(:provide_pack_type_at_verification)
     end
 
-    def sequences_label_variable_for_pallet(pallet_id, explain: false) # rubocop:disable Metrics/AbcSize
+    def sequences_label_variable_for_pallet(pallet_id, explain: false)
       return 'Prepare a table of sequence information for printing as a single label variable.' if explain
 
       query = setting(:pallet_label_seqs_sql)
       return [] unless query
 
       recs = DB[query, pallet_id].all
-      heads = calculate_col_widths_and_headings(recs)
-
-      out = []
-      line = make_line(heads)
-      out << line
-      cols = heads.map { |_, value| " #{value[:head].ljust(value[:width])} |" }
-      out << "|#{cols.join}"
-      out << line
-      recs.each do |rec|
-        cols = rec.map do |key, value|
-          v = case key
-              when :nett_weight
-                UtilityFunction.delimited_number(value).rjust(heads[key][:width])
-              when :carton_quantity
-                value.to_s.rjust(heads[key][:width])
-              else
-                value.to_s.ljust(heads[key][:width])
-              end
-          " #{v} |"
-        end
-        out << "|#{cols.join}"
-      end
-      out << line
-      out
-    end
-
-    private
-
-    def calculate_col_widths_and_headings(recs)
-      heads = col_headings(recs)
-
-      recs.each do |rec|
-        rec.each do |key, val|
-          v = case key
-              when :nett_weight
-                UtilityFunction.delimited_number(val)
-              when :carton_quantity
-                val.to_s
-              else
-                val.to_s
-              end
-          heads[key][:width] = v.length if v.length > heads[key][:width]
-        end
-      end
-      heads
-    end
-
-    def col_headings(recs)
-      heads = {}
-      recs.first.each_key do |col|
-        heads[col] = {
-          head: PALLET_LBL_PSEQ_HEADS[col] || col.capitalize.gsub('_', ' '),
-          width: (PALLET_LBL_PSEQ_HEADS[col] || col).length
-        }
-      end
-      heads
-    end
-
-    def make_line(heads)
-      headline = ['+']
-      heads.each { |_, value| headline << "-#{'-' * value[:width]}-+" }
-      headline.join
+      UtilityFunctions.make_text_table(recs, heads: PALLET_LBL_PSEQ_HEADS, numbers: [:nett_weight], rjust: [:carton_quantity])
     end
   end
 end
