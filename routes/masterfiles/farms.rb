@@ -621,7 +621,6 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             update_grid_row(id, changes: { farm_manager_party_role: res.instance[:farm_manager_party_role],
                                            farm_section_name: res.instance[:farm_section_name],
                                            orchards: res.instance[:orchards],
-                                           status: res.instance[:status],
                                            description: res.instance[:description] },
                                 notice: res.message)
           else
