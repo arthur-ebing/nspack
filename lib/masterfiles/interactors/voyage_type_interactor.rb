@@ -12,8 +12,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = voyage_type(id)
-      success_response("Created voyage type #{instance.voyage_type_code}",
-                       instance)
+      success_response("Created voyage type #{instance.voyage_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { voyage_type_code: ['This voyage type already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -29,13 +28,12 @@ module MasterfilesApp
         log_transaction
       end
       instance = voyage_type(id)
-      success_response("Updated voyage type #{instance.voyage_type_code}",
-                       instance)
+      success_response("Updated voyage type #{instance.voyage_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
 
-    def delete_voyage_type(id) # rubocop:disable Metrics/AbcSize
+    def delete_voyage_type(id)
       name = voyage_type(id).voyage_type_code
       repo.transaction do
         repo.delete_voyage_type(id)
@@ -45,7 +43,6 @@ module MasterfilesApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      puts e.message
       failed_response("Unable to delete voyage type. It is still referenced#{e.message.partition('referenced').last}")
     end
 

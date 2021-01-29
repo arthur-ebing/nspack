@@ -18,6 +18,7 @@ module Masterfiles
               form.remote! if remote
               form.add_field :voyage_type_code
               form.add_field :description
+              form.add_field :industry_description
             end
           end
 

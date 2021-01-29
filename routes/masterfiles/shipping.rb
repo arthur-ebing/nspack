@@ -99,6 +99,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           res = interactor.update_voyage_type(id, params[:voyage_type])
           if res.success
             update_grid_row(id, changes: { voyage_type_code: res.instance[:voyage_type_code],
+                                           industry_description: res.instance[:industry_description],
                                            description: res.instance[:description] }, notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::Shipping::VoyageType::Edit.call(id, form_values: params[:voyage_type], form_errors: res.errors) }
@@ -129,6 +130,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           row_keys = %i[
             id
             voyage_type_code
+            industry_description
             description
             active
           ]

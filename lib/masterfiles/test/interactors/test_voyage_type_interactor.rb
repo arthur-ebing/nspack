@@ -67,6 +67,7 @@ module MasterfilesApp
         id: 1,
         voyage_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
+        industry_description: 'ABC',
         active: true
       }
     end

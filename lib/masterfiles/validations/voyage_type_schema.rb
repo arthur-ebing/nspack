@@ -5,5 +5,6 @@ module MasterfilesApp
     optional(:id).filled(:integer)
     required(:voyage_type_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
+    required(:industry_description).maybe(Types::StrippedString)
   end
 end

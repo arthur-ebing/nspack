@@ -17,13 +17,15 @@ module UiRules
     def set_show_fields
       fields[:voyage_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
+      fields[:industry_description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
       {
         voyage_type_code: { required: true, force_uppercase: true },
-        description: {}
+        description: {},
+        industry_description: {}
       }
     end
 
@@ -38,7 +40,8 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(voyage_type_code: nil,
-                                    description: nil)
+                                    description: nil,
+                                    industry_description: nil)
     end
   end
 end

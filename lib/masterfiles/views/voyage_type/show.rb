@@ -15,6 +15,7 @@ module Masterfiles
               form.view_only!
               form.add_field :voyage_type_code
               form.add_field :description
+              form.add_field :industry_description
               form.add_field :active
             end
           end
