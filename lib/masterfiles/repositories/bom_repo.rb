@@ -60,8 +60,7 @@ module MasterfilesApp
     end
 
     def find_pm_product(id)
-      find_with_association(:pm_products,
-                            id,
+      find_with_association(:pm_products, id,
                             parent_tables: [{ parent_table: :pm_subtypes,
                                               columns: %i[subtype_code pm_type_id],
                                               flatten_columns: { subtype_code: :pm_subtype_code, pm_type_id: :pm_type_id } },
@@ -83,19 +82,21 @@ module MasterfilesApp
     end
 
     def find_pm_boms_product(id)
-      find_with_association(:pm_boms_products,
-                            id,
-                            parent_tables: [{ parent_table: :pm_products,
-                                              columns: [:product_code],
-                                              flatten_columns: { product_code: :product_code } },
-                                            { parent_table: :pm_boms,
-                                              columns: [:bom_code],
-                                              flatten_columns: { bom_code: :bom_code } },
-                                            { parent_table: :uoms,
-                                              columns: [:uom_code],
-                                              foreign_key: :uom_id,
-                                              flatten_columns: { uom_code: :uom_code } }],
-                            wrapper: PmBomsProduct)
+      hash = find_with_association(:pm_boms_products, id,
+                                   parent_tables: [{ parent_table: :pm_products,
+                                                     columns: [:product_code],
+                                                     flatten_columns: { product_code: :product_code } },
+                                                   { parent_table: :pm_boms,
+                                                     columns: [:bom_code],
+                                                     flatten_columns: { bom_code: :bom_code } },
+                                                   { parent_table: :uoms,
+                                                     columns: [:uom_code],
+                                                     foreign_key: :uom_id,
+                                                     flatten_columns: { uom_code: :uom_code } }])
+      return nil if hash.nil?
+
+      hash[:last_product] = select_values(:pm_boms_products, :id, pm_bom_id: hash[:pm_bom_id]).length <= 1
+      PmBomsProduct.new(hash)
     end
 
     def find_pm_mark(id)

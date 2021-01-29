@@ -63,13 +63,26 @@ module MasterfilesApp
       assert_equal value, after[:quantity]
     end
 
-    # def test_delete_pm_boms_product
-    #   id = create_pm_boms_product
-    #   assert_count_changed(:pm_boms_products, -1) do
-    #     res = interactor.delete_pm_boms_product(id)
-    #     assert res.success, res.message
-    #   end
-    # end
+    def test_delete_pm_boms_product
+      pm_bom_id = create_pm_bom
+      create_pm_boms_product(pm_bom_id: pm_bom_id)
+      id = create_pm_boms_product(pm_bom_id: pm_bom_id)
+
+      assert_count_changed(:pm_boms_products, -1) do
+        res = interactor.delete_pm_boms_product(id)
+        assert res.success, res.message
+      end
+    end
+
+    def test_delete_pm_boms_product_fail
+      id = create_pm_boms_product
+      assert_count_changed(:pm_boms_products, 0) do
+        res = interactor.delete_pm_boms_product(id)
+        refute res.success, res.message
+      end
+    rescue Sequel::NotNullConstraintViolation
+      failed_response('PM BOM cannot have no products')
+    end
 
     private
 
@@ -87,6 +100,7 @@ module MasterfilesApp
         product_code: 'ABC',
         bom_code: 'ABC',
         uom_code: 'ABC',
+        last_product: false,
         active: true
       }
     end

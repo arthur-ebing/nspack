@@ -37,8 +37,7 @@ module MasterfilesApp
       end
 
       def delete_check
-        pm_bom_product_ids = @repo.select_values(:pm_boms_products, :id, pm_bom_id: @entity.pm_bom_id)
-        return failed_response('PM BOM must have at least one product') if pm_bom_product_ids.length <= 1
+        return failed_response('PM BOM cannot have no products') if @entity.last_product
 
         all_ok
       end
