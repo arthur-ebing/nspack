@@ -20,12 +20,12 @@ module UiRules
                                         caption: 'Composition Level',
                                         hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
       fields[:pm_type_code] = { renderer: :label,
-                                caption: 'PM Type Code' }
+                                caption: 'PKG Type Code' }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pm_subtypes] = { renderer: :list,
                                items: @repo.for_select_pm_subtypes(where: { pm_type_id: @options[:id] }),
-                               caption: 'PM Subtypes' }
+                               caption: 'PKG Subtypes' }
       fields[:short_code] = { renderer: :label,
                               hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING }
     end
@@ -41,7 +41,7 @@ module UiRules
                                    remove_search_for_small_list: false,
                                    required: false,
                                    hide_on_load: !AppConst::REQUIRE_EXTENDED_PACKAGING },
-        pm_type_code: { caption: 'PM Type Code',
+        pm_type_code: { caption: 'PKG Type Code',
                         required: true,
                         force_uppercase: true },
         description: { required: true },

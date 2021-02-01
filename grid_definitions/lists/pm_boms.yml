@@ -19,13 +19,13 @@
 - :separator: true
 - :url: "/list/pm_boms_products/with_params?key=standard&pm_boms_products.pm_bom_id=$:id$"
   :text: bom products
-  :title: PM BOM products for bom $:bom_code$
+  :title: PKG BOM products for bom $:bom_code$
   :icon: list
   :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/pm_boms/select_pm_types"
-  :text: New PM BOM
+  :text: New PKG BOM
   :style: :button
 #  :behaviour: :popup
 #- :control_type: :link

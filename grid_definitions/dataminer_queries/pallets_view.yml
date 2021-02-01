@@ -2234,7 +2234,7 @@
   pm_bom_ids:
     :name: pm_bom_ids
     :sequence_no: 134
-    :caption: PM BOM ids
+    :caption: PKG BOM ids
     :namespaced_name: aggregated.pm_bom_ids
     :data_type: :integer_array
     :width: 
@@ -2330,7 +2330,7 @@
   pm_type_ids:
     :name: pm_type_ids
     :sequence_no: 140
-    :caption: PM Type ids
+    :caption: PKG Type ids
     :namespaced_name: aggregated.pm_type_ids
     :data_type: :integer_array
     :width: 
@@ -2346,7 +2346,7 @@
   pm_type_codes:
     :name: pm_type_codes
     :sequence_no: 141
-    :caption: PM Type codes
+    :caption: PKG Type codes
     :namespaced_name: aggregated.pm_type_codes
     :data_type: :string
     :width: 
@@ -2362,7 +2362,7 @@
   pm_subtype_ids:
     :name: pm_subtype_ids
     :sequence_no: 142
-    :caption: PM Subtype ids
+    :caption: PKG Subtype ids
     :namespaced_name: aggregated.pm_subtype_ids
     :data_type: :integer_array
     :width: 

@@ -1619,7 +1619,7 @@
   pm_type:
     :name: pm_type
     :sequence_no: 99
-    :caption: PM Type
+    :caption: PKG Type
     :namespaced_name: pm_type
     :data_type: :string
     :width: 100
@@ -1635,7 +1635,7 @@
   pm_subtype:
     :name: pm_subtype
     :sequence_no: 100
-    :caption: PM Subtype
+    :caption: PKG Subtype
     :namespaced_name: pm_subtype
     :data_type: :string
     :width: 100

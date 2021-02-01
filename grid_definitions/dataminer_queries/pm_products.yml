@@ -1,5 +1,5 @@
 ---
-:caption: PM Products
+:caption: PKG Products
 :sql: "SELECT \r\n    pm_products.id,\r\n    pm_products.pm_subtype_id,\r\n    pm_products.product_code,\r\n
   \   pm_products.description,\r\n    pm_products.erp_code,\r\n    pm_products.created_at,\r\n
   \   pm_products.updated_at,\r\n    pm_composition_levels.composition_level,\r\n
@@ -34,7 +34,7 @@
   pm_subtype_id:
     :name: pm_subtype_id
     :sequence_no: 2
-    :caption: PM Subtype
+    :caption: PKG Subtype
     :namespaced_name: pm_products.pm_subtype_id
     :data_type: :integer
     :width: 
@@ -146,7 +146,7 @@
   pm_type_code:
     :name: pm_type_code
     :sequence_no: 9
-    :caption: PM Type
+    :caption: PKG Type
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
     :width: 120
@@ -162,7 +162,7 @@
   pm_subtype_code:
     :name: pm_subtype_code
     :sequence_no: 10
-    :caption: PM Subtype
+    :caption: PKG Subtype
     :namespaced_name: pm_subtypes.subtype_code
     :data_type: :string
     :width: 120
@@ -305,7 +305,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_products.pm_subtype_id
-  :caption: PM Subtype
+  :caption: PKG Subtype
   :data_type: :integer
   :control_type: :list
   :default_value: 

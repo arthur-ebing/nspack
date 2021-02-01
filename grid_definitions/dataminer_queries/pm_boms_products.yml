@@ -1,5 +1,5 @@
 ---
-:caption: PM BOMs Products
+:caption: PKG BOMs Products
 :sql: "SELECT \"pm_boms_products\".\"id\", \"pm_boms_products\".\"pm_product_id\",
   \"pm_boms_products\".\"pm_bom_id\", \"pm_boms_products\".\"uom_id\", \r\n\"pm_products\".\"product_code\",
   \"uom_code\", \"quantity\", \"pm_boms_products\".\"created_at\", \"pm_boms_products\".\"updated_at\",
@@ -34,7 +34,7 @@
   pm_product_id:
     :name: pm_product_id
     :sequence_no: 2
-    :caption: PM Product
+    :caption: PKG Product
     :namespaced_name: pm_boms_products.pm_product_id
     :data_type: :integer
     :width: 
@@ -50,7 +50,7 @@
   pm_bom_id:
     :name: pm_bom_id
     :sequence_no: 3
-    :caption: PM BOM
+    :caption: PKG BOM
     :namespaced_name: pm_boms_products.pm_bom_id
     :data_type: :integer
     :width: 
@@ -193,7 +193,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_boms_products.pm_product_id
-  :caption: PM Product
+  :caption: PKG Product
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -201,7 +201,7 @@
   :ui_priority: 1
   :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code
 - :column: pm_boms_products.pm_bom_id
-  :caption: PM BOM
+  :caption: PKG BOM
   :data_type: :integer
   :control_type: :list
   :default_value: 

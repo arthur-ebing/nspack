@@ -19,19 +19,19 @@
 - :separator: true
 - :url: "/list/pm_boms_products/with_params?key=pm_product&pm_boms_products.pm_product_id=$:id$"
   :text: bom products
-  :title: PM BOM products for product $:product_code$
+  :title: PKG BOM products for product $:product_code$
   :icon: list
   :popup: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/pm_products/new"
-  :text: New PM Product
+  :text: New PKG Product
   :style: :button
   :behaviour: :popup
   :hide_for_key: standard
 :captions:
   :conditions:
-    :available_products: Available PM Products
+    :available_products: Available PKG Products
 :conditions:
   :standard:
     - :col: pm_products.pm_subtype_id
