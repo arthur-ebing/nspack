@@ -617,7 +617,7 @@
   pm_bom:
     :name: pm_bom
     :sequence_no: 34
-    :caption: PM BOM
+    :caption: PKG BOM
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
     :width: 120
@@ -745,7 +745,7 @@
   pm_type_code:
     :name: pm_type_code
     :sequence_no: 42
-    :caption: PM Type code
+    :caption: PKG Type code
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
     :width: 120

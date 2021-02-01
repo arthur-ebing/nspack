@@ -22,7 +22,7 @@ module UiRules
                             items: @repo.for_select_pm_types(
                               where: { pm_composition_level_id: @options[:id] }
                             ),
-                            caption: 'PM Types' }
+                            caption: 'PKG Types' }
     end
 
     def common_fields

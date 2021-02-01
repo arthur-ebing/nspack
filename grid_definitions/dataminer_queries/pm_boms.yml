@@ -1,5 +1,5 @@
 ---
-:caption: PM BOMs
+:caption: PKG BOMs
 :sql: "SELECT \r\n    pm_boms.id,\r\n    pm_boms.bom_code,\r\n    pm_boms.erp_bom_code,\r\n
   \   pm_boms.description,\r\n    pm_boms.label_description,\r\n    pm_boms.gross_weight,\r\n
   \   pm_boms.nett_weight,\r\n    pm_boms.active,\r\n    pm_boms.created_at,\r\n    pm_boms.updated_at

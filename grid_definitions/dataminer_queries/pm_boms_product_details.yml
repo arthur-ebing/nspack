@@ -1,5 +1,5 @@
 ---
-:caption: PM BOMs Products Details
+:caption: PKG BOMs Products Details
 :sql: SELECT pm_boms_products.id, pm_boms_products.pm_product_id, pm_boms_products.pm_bom_id,
   pm_boms_products.uom_id, pm_boms_products.quantity, pm_boms_products.created_at, "pm_boms_products"."active",
   pm_boms_products.updated_at, pm_products.product_code, pm_products.erp_code, pm_products.description
@@ -34,7 +34,7 @@
   pm_product_id:
     :name: pm_product_id
     :sequence_no: 2
-    :caption: PM Product
+    :caption: PKG Product
     :namespaced_name: pm_boms_products.pm_product_id
     :data_type: :integer
     :width: 
@@ -50,7 +50,7 @@
   pm_bom_id:
     :name: pm_bom_id
     :sequence_no: 3
-    :caption: PM BOM
+    :caption: PKG BOM
     :namespaced_name: pm_boms_products.pm_bom_id
     :data_type: :integer
     :width: 
@@ -210,7 +210,7 @@
   pm_type_code:
     :name: pm_type_code
     :sequence_no: 13
-    :caption: PM Type code
+    :caption: PKG Type code
     :namespaced_name: pm_types.pm_type_code
     :data_type: :string
     :width: 
@@ -226,7 +226,7 @@
   pm_type_description:
     :name: pm_type_description
     :sequence_no: 14
-    :caption: PM Type description
+    :caption: PKG Type description
     :namespaced_name: pm_types.description
     :data_type: :string
     :width: 
@@ -274,7 +274,7 @@
   pm_bom_description:
     :name: pm_bom_description
     :sequence_no: 17
-    :caption: PM BOM description
+    :caption: PKG BOM description
     :namespaced_name: pm_boms.description
     :data_type: :string
     :width: 
@@ -321,7 +321,7 @@
     :group_max: false
 :query_parameter_definitions:
 - :column: pm_boms_products.pm_product_id
-  :caption: PM Product
+  :caption: PKG Product
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -329,7 +329,7 @@
   :ui_priority: 1
   :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code
 - :column: pm_boms_products.pm_bom_id
-  :caption: PM BOM
+  :caption: PKG BOM
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -346,7 +346,7 @@
   :list_def: SELECT uom_code, uoms.id FROM uoms JOIN uom_types ON uom_types.id = uoms.uom_type_id
     WHERE uom_types.code = 'INVENTORY' ORDER BY uom_code
 - :column: pm_products.pm_subtype_id
-  :caption: PM Subtype
+  :caption: PKG Subtype
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -354,7 +354,7 @@
   :ui_priority: 3
   :list_def: SELECT subtype_code, id FROM pm_subtypes ORDER BY subtype_code
 - :column: pm_subtypes.pm_type_id
-  :caption: PM Type
+  :caption: PKG Type
   :data_type: :integer
   :control_type: :list
   :default_value: 

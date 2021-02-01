@@ -24,9 +24,9 @@ module UiRules
       pm_product_id_label = @repo.find_hash(:pm_products,  @form_object.pm_product_id)[:erp_code]
       pm_bom_id_label = @repo.find_hash(:pm_boms, @form_object.pm_bom_id)[:bom_code]
       uom_id_label = @repo.find_hash(:uoms, @form_object.uom_id)[:uom_code]
-      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PM Subtype' }
-      fields[:pm_product_id] = { renderer: :label, with_value: pm_product_id_label, caption: 'PM Product' }
-      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PM BOM' }
+      fields[:pm_subtype_id] = { renderer: :label, with_value: pm_subtype_id_label, caption: 'PKG Subtype' }
+      fields[:pm_product_id] = { renderer: :label, with_value: pm_product_id_label, caption: 'PKG Product' }
+      fields[:pm_bom_id] = { renderer: :label, with_value: pm_bom_id_label, caption: 'PKG BOM' }
       fields[:uom_id] = { renderer: :label, with_value: uom_id_label, caption: 'Unit Of Measure' }
       fields[:quantity] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -40,12 +40,12 @@ module UiRules
         pm_bom_id: { renderer: :hidden, value: pm_bom_id },
         pm_bom: { renderer: :label,
                   with_value: pm_bom_id_label,
-                  caption: 'PM BOM',
+                  caption: 'PKG BOM',
                   readonly: true },
         pm_subtype_id: { renderer: :select,
                          options: subtypes,
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
-                         caption: 'PM Subtype',
+                         caption: 'PKG Subtype',
                          prompt: 'Select Subtype',
                          searchable: true,
                          remove_search_for_small_list: false,
@@ -53,7 +53,7 @@ module UiRules
         pm_product_id: { renderer: :select,
                          options: @repo.for_select_pm_products,
                          disabled_options: @repo.for_select_inactive_pm_products,
-                         caption: 'PM Product',
+                         caption: 'PKG Product',
                          prompt: 'Select Product',
                          searchable: true,
                          remove_search_for_small_list: false,

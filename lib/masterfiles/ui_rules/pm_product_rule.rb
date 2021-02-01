@@ -20,8 +20,8 @@ module UiRules
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      fields[:pm_type_code] = { renderer: :label, caption: 'PM Type' }
-      fields[:pm_subtype_code] = { renderer: :label, caption: 'PM Subtype' }
+      fields[:pm_type_code] = { renderer: :label, caption: 'PKG Type' }
+      fields[:pm_subtype_code] = { renderer: :label, caption: 'PKG Subtype' }
       fields[:erp_code] = { renderer: :label, caption: 'ERP Code' }
       fields[:product_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
@@ -48,13 +48,13 @@ module UiRules
         pm_subtype_id: { renderer: :select,
                          options: @repo.for_select_pm_subtypes(grouped: true),
                          disabled_options: @repo.for_select_inactive_pm_subtypes,
-                         caption: 'PM Subtype',
+                         caption: 'PKG Subtype',
                          prompt: true,
                          searchable: true,
                          required: true },
         pm_subtype: { renderer: :label,
                       with_value: @form_object.subtype_code,
-                      caption: 'PM Subtype' },
+                      caption: 'PKG Subtype' },
         erp_code: { caption: 'ERP Code' },
         product_code: { renderer: :label },
         description: {},

@@ -16,13 +16,13 @@ module UiRules
 
     def set_show_fields
       pm_type_id_label = @repo.find_hash(:pm_types, @form_object.pm_type_id)[:pm_type_code]
-      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PM Type' }
+      fields[:pm_type_id] = { renderer: :label, with_value: pm_type_id_label, caption: 'PKG Type' }
       fields[:subtype_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:pm_products] = { renderer: :list,
                                items: @repo.for_select_pm_products(where: { pm_subtype_id: @options[:id] }),
-                               caption: 'PM Products' }
+                               caption: 'PKG Products' }
       fields[:short_code] = { renderer: :label }
     end
 
@@ -31,7 +31,7 @@ module UiRules
         pm_type_id: { renderer: :select,
                       options: @repo.for_select_pm_types,
                       disabled_options: @repo.for_select_inactive_pm_types,
-                      caption: 'PM Type',
+                      caption: 'PKG Type',
                       required: true },
         subtype_code: { required: true,
                         force_uppercase: true },

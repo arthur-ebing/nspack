@@ -131,7 +131,7 @@
   pm_bom_id:
     :name: pm_bom_id
     :sequence_no: 7
-    :caption: PM BOM id
+    :caption: PKG BOM id
     :namespaced_name: packing_specification_items.pm_bom_id
     :data_type: :integer
     :width: 
@@ -147,7 +147,7 @@
   pm_bom:
     :name: pm_bom
     :sequence_no: 8
-    :caption: PM BOM
+    :caption: PKG BOM
     :namespaced_name: pm_boms.bom_code
     :data_type: :string
     :width: 
@@ -163,7 +163,7 @@
   pm_mark_id:
     :name: pm_mark_id
     :sequence_no: 9
-    :caption: PM Mark id
+    :caption: PKG Mark id
     :namespaced_name: packing_specification_items.pm_mark_id
     :data_type: :integer
     :width: 
@@ -179,7 +179,7 @@
   pm_mark:
     :name: pm_mark
     :sequence_no: 10
-    :caption: PM Mark
+    :caption: PKG Mark
     :namespaced_name: 
     :data_type: :string
     :width: 

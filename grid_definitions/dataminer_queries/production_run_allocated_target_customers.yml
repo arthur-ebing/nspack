@@ -120,7 +120,7 @@
   system_code:
     :name: system_code
     :sequence_no: 7
-    :caption: PM BOM Code
+    :caption: PKG BOM Code
     :namespaced_name: pm_boms.system_code
     :data_type: :string
     :width: 250

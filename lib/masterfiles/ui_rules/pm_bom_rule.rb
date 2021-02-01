@@ -27,7 +27,7 @@ module UiRules
       fields[:system_code] = { renderer: :label }
       fields[:pm_boms_products] = { renderer: :list,
                                     items: @repo.for_select_pm_boms_products(where: { pm_bom_id: @options[:id] }),
-                                    caption: 'PM BOM Products' }
+                                    caption: 'PKG BOM Products' }
       fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
     end
@@ -48,7 +48,7 @@ module UiRules
       fields[:pm_type_ids] = { renderer: :multi,
                                options: @repo.for_select_pm_types(exclude: { Sequel[:pm_products][:id] => nil }),
                                selected: @form_object[:pm_subtype_ids],
-                               caption: 'PM types' }
+                               caption: 'PKG types' }
     end
 
     def set_add_products_fields
@@ -58,7 +58,7 @@ module UiRules
                                  where: { Sequel[:pm_subtypes][:id] => @options[:attrs][:pm_subtype_ids] }
                                ),
                                filled_background: true,
-                               caption: 'PM Subtypes' }
+                               caption: 'PKG Subtypes' }
     end
 
     def make_form_object
