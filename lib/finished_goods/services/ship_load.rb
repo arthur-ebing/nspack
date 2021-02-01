@@ -5,11 +5,11 @@ module FinishedGoodsApp
     attr_reader :load_id, :instance, :user, :shipped_at, :repo
 
     def initialize(load_id, user)
+      @repo = LoadRepo.new
       @load_id = load_id
       @instance = repo.find_load_flat(load_id)
       @user = user
       @shipped_at = repo.get(:loads, load_id, :shipped_at) || Time.now
-      @repo = LoadRepo.new
     end
 
     def call
