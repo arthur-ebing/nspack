@@ -23,7 +23,7 @@ module FinishedGoodsApp
 
       hash[:load_container_id] = id
       hash[:container] = true
-      hash[:stack_type_id] ||= repo.get_id(:container_stack_types, stack_type_code: 'S')
+      hash[:stack_type_id] ||= get_id(:container_stack_types, stack_type_code: 'S')
       hash[:cargo_temperature_id] ||= get_id(:cargo_temperatures, temperature_code: AppConst::DEFAULT_CARGO_TEMP_ON_ARRIVAL)
       %i[max_gross_weight tare_weight max_payload actual_payload set_point_temperature verified_gross_weight].each do |k|
         hash[k] = UtilityFunctions.delimited_number(hash[k])
@@ -38,7 +38,7 @@ module FinishedGoodsApp
       DB[query].select_map(%i[code id])
     end
 
-    def calculate_calculate_actual_payload(load_id)
+    def calculate_actual_payload(load_id)
       DB[:pallets].where(load_id: load_id).select_map(:nett_weight).map { |w| w.nil? ? AppConst::BIG_ZERO : w }.sum
     end
 
