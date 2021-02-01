@@ -40,8 +40,10 @@ module UiRules
       }
       rules[:composition_levels].each do |k, v|
         fields[v.to_sym] = { force_uppercase: true,
+                             renderer: :select,
+                             options: @repo.inner_pm_marks_for_level(k.to_s),
                              caption: "#{v} Mark",
-                             value: @form_object.packaging_marks[k - 1].to_s }
+                             prompt: "Select #{v} Mark" }
       end
       fields
     end

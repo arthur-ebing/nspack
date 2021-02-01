@@ -1,0 +1,58 @@
+---
+:dataminer_definition: inner_pm_marks
+:actions:
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$/complete"
+  :text: Complete
+  :icon: toggle-on
+  :popup: true
+  :hide_if_true: completed
+  :auth:
+    :function: Masterfiles
+    :program: packaging
+    :permission: edit
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$/approve"
+  :text: Approve/Reject
+  :icon: gavel
+  :popup: true
+  :hide_if_false: completed
+  :hide_if_true: approved
+  :auth:
+    :function: Masterfiles
+    :program: packaging
+    :permission: approve
+- :url: "/masterfiles/packaging/inner_pm_marks/$:id$/reopen"
+  :text: Re-open for editing
+  :icon: toggle-off
+  :popup: true
+  :hide_if_false: approved
+  :auth:
+    :function: Masterfiles
+    :program: packaging
+    :permission: edit
+- :separator: true
+- :url: "/development/statuses/list/inner_pm_marks/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/masterfiles/packaging/inner_pm_marks/new"
+  :text: New Inner Pm Mark
+  :style: :button
+  :behaviour: :popup

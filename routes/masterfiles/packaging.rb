@@ -1130,6 +1130,84 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
     end
+
+    # INNER PM MARKS
+    # --------------------------------------------------------------------------
+    r.on 'inner_pm_marks', Integer do |id|
+      interactor = MasterfilesApp::InnerPmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:inner_pm_marks, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('packaging', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Packaging::InnerPmMark::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('packaging', 'read')
+          show_partial { Masterfiles::Packaging::InnerPmMark::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_inner_pm_mark(id, params[:inner_pm_mark])
+          if res.success
+            row_keys = %i[
+              inner_pm_mark_code
+              description
+              tu_mark
+              ri_mark
+              ru_mark
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::Packaging::InnerPmMark::Edit.call(id, form_values: params[:inner_pm_mark], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('packaging', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_inner_pm_mark(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'inner_pm_marks' do
+      interactor = MasterfilesApp::InnerPmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('packaging', 'new')
+        show_partial_or_page(r) { Masterfiles::Packaging::InnerPmMark::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_inner_pm_mark(params[:inner_pm_mark])
+        if res.success
+          row_keys = %i[
+            id
+            inner_pm_mark_code
+            description
+            tu_mark
+            ri_mark
+            ru_mark
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/packaging/inner_pm_marks/new') do
+            Masterfiles::Packaging::InnerPmMark::New.call(form_values: params[:inner_pm_mark],
+                                                          form_errors: res.errors,
+                                                          remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

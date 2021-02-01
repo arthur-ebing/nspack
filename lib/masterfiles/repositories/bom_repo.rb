@@ -229,6 +229,12 @@ module MasterfilesApp
         .select_map(%i[composition_level description])
     end
 
+    def inner_pm_marks_for_level(level)
+      map = { '1': 'tu_mark', '2': 'ru_mark', '3': 'ri_mark' }
+      DB[:inner_pm_marks]
+        .where({ "#{map[level.to_sym]}": true }).select_map(%i[inner_pm_mark_code]).unshift('NONE')
+    end
+
     def find_packaging_marks_by_fruitspec_mark(pm_mark_id)
       DB[:pm_marks].where(id: pm_mark_id).get(:packaging_marks)
     end
