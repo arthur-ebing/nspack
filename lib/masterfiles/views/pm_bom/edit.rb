@@ -17,7 +17,7 @@ module Masterfiles
               section.row do |row|
                 row.column do |col|
                   col.add_control(control_type: :link,
-                                  text: 'Back to PM BOMs',
+                                  text: 'Back to PKG BOMs',
                                   url: '/list/pm_boms',
                                   style: :back_button)
 
@@ -31,7 +31,7 @@ module Masterfiles
             end
 
             page.form do |form|
-              form.caption 'Edit PM BOM'
+              form.caption 'Edit PKG BOM'
               form.action "/masterfiles/packaging/pm_boms/#{id}"
               form.remote!
               form.method :update
@@ -54,14 +54,14 @@ module Masterfiles
 
               page.section do |section|
                 section.add_control(control_type: :link,
-                                    text: 'New PM BOMs Products',
+                                    text: 'New PKG BOMs Products',
                                     url: "/masterfiles/packaging/pm_boms/#{id}/pm_boms_products/new",
                                     behaviour: :popup,
                                     style: :button)
                 section.add_grid('pm_boms_products',
                                  "/list/pm_boms_products/grid?key=standard&pm_boms_products.pm_bom_id=#{id}",
                                  height: 25,
-                                 caption: 'PM BOM Products')
+                                 caption: 'PKG BOM Products')
               end
             end
           end

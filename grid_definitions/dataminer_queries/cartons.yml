@@ -1018,7 +1018,7 @@
   gtin_code:
     :name: gtin_code
     :sequence_no: 63
-    :caption: Gtin code
+    :caption: GTIN Code
     :namespaced_name: gtin_code
     :data_type: :string
     :width: 200

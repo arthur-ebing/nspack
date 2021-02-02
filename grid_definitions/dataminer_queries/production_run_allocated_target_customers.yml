@@ -136,7 +136,7 @@
   fg_marks:
     :name: fg_marks
     :sequence_no: 8
-    :caption: Fg marks
+    :caption: FG Marks
     :namespaced_name: 
     :data_type: :string
     :width: 200

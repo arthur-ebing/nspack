@@ -1,5 +1,5 @@
 ---
-:caption: Inner Pm Marks
+:caption: Inner PKG Marks
 :sql: SELECT "inner_pm_marks"."id", "inner_pm_marks"."inner_pm_mark_code", "inner_pm_marks"."description",
   "inner_pm_marks"."tu_mark", "inner_pm_marks"."ri_mark", "inner_pm_marks"."ru_mark",
   fn_current_status('inner_pm_marks', "inner_pm_marks"."id") AS status FROM "inner_pm_marks"
@@ -26,7 +26,7 @@
   inner_pm_mark_code:
     :name: inner_pm_mark_code
     :sequence_no: 2
-    :caption: Inner pm mark code
+    :caption: Inner PKG Mark Code
     :namespaced_name: inner_pm_marks.inner_pm_mark_code
     :data_type: :string
     :width:
@@ -58,7 +58,7 @@
   tu_mark:
     :name: tu_mark
     :sequence_no: 4
-    :caption: Tu mark
+    :caption: TU mark
     :namespaced_name: inner_pm_marks.tu_mark
     :data_type: :boolean
     :width:
@@ -74,7 +74,7 @@
   ri_mark:
     :name: ri_mark
     :sequence_no: 5
-    :caption: Ri mark
+    :caption: Fruit mark
     :namespaced_name: inner_pm_marks.ri_mark
     :data_type: :boolean
     :width:
@@ -90,7 +90,7 @@
   ru_mark:
     :name: ru_mark
     :sequence_no: 6
-    :caption: Ru mark
+    :caption: RU Mark
     :namespaced_name: inner_pm_marks.ru_mark
     :data_type: :boolean
     :width:
@@ -121,7 +121,7 @@
     :group_max: false
 :query_parameter_definitions:
   - :column: inner_pm_marks.inner_pm_mark_code
-    :caption: Inner pm mark code
+    :caption: Inner PKG Mark Code
     :data_type: :string
     :control_type: :text
     :default_value:

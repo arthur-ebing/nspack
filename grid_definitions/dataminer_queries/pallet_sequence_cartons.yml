@@ -598,7 +598,7 @@
   gtin_code:
     :name: gtin_code
     :sequence_no: 35
-    :caption: Gtin code
+    :caption: GTIN Code
     :namespaced_name: carton_labels.gtin_code
     :data_type: :string
     :width: 200

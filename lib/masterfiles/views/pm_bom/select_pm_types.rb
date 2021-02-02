@@ -14,12 +14,12 @@ module Masterfiles
             page.form_errors form_errors
             page.section do |section|
               section.add_control(control_type: :link,
-                                  text: 'Back to PM BOMs',
+                                  text: 'Back to PKG BOMs',
                                   url: '/list/pm_boms',
                                   style: :back_button)
             end
             page.form do |form|
-              form.caption 'Select PM Types'
+              form.caption 'Select PKG Types'
               form.submit_captions 'Next'
               form.action '/masterfiles/packaging/pm_boms/select_pm_types'
               form.remote! if remote

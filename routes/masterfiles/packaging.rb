@@ -322,7 +322,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM TYPES
+    # PKG TYPES
     # --------------------------------------------------------------------------
     r.on 'pm_types', Integer do |id|
       interactor = MasterfilesApp::PmTypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -403,7 +403,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM SUBTYPES
+    # PKG SUBTYPES
     # --------------------------------------------------------------------------
     r.on 'pm_subtypes', Integer do |id|
       interactor = MasterfilesApp::PmSubtypeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -478,7 +478,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM PRODUCTS
+    # PKG PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pm_products', Integer do |id|
       interactor = MasterfilesApp::PmProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -611,7 +611,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM BOMS
+    # PKG BOMS
     # --------------------------------------------------------------------------
     r.on 'pm_boms', Integer do |id|
       interactor = MasterfilesApp::PmBomInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -808,7 +808,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM BOMS PRODUCTS
+    # PKG BOMS PRODUCTS
     # --------------------------------------------------------------------------
     r.on 'pm_boms_products', Integer do |id|
       interactor = MasterfilesApp::PmBomsProductInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -978,7 +978,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM COMPOSITION LEVELS
+    # PKG COMPOSITION LEVELS
     # --------------------------------------------------------------------------
     r.on 'pm_composition_levels', Integer do |id|
       interactor = MasterfilesApp::PmCompositionLevelInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -1059,7 +1059,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # PM MARKS
+    # PKG MARKS
     # --------------------------------------------------------------------------
     r.on 'pm_marks', Integer do |id|
       interactor = MasterfilesApp::PmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
@@ -1131,7 +1131,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
       end
     end
 
-    # INNER PM MARKS
+    # INNER PKG MARKS
     # --------------------------------------------------------------------------
     r.on 'inner_pm_marks', Integer do |id|
       interactor = MasterfilesApp::InnerPmMarkInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})

@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = inner_pm_mark(id)
-      success_response("Created inner pm mark #{instance.description}", instance)
+      success_response("Created Inner PKG Mark #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { inner_pm_mark_code: ['This inner pm mark already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { inner_pm_mark_code: ['This Inner PKG Mark already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,7 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = inner_pm_mark(id)
-      success_response("Updated inner pm mark #{instance.description}", instance)
+      success_response("Updated Inner PKG Mark #{instance.description}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -41,12 +41,12 @@ module MasterfilesApp
         log_status(:inner_pm_marks, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted inner pm mark #{name}")
+      success_response("Deleted Inner PKG Mark #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       puts e.message
-      failed_response("Unable to delete inner pm mark. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete Inner PKG Mark. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     # def complete_a_inner_pm_mark(id, params)

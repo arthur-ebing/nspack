@@ -37,7 +37,7 @@ module MasterfilesApp
       end
 
       def delete_check
-        return failed_response('PM BOM cannot have no products') if @entity.last_product
+        return failed_response('PKG BOM cannot have no products') if @entity.last_product
 
         all_ok
       end

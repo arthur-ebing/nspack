@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'PM Composition Level'
+              # form.caption 'PKG Composition Level'
               form.view_only!
               form.add_field :composition_level
               form.add_field :description

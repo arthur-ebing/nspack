@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New PM Subtype'
+              form.caption 'New PKG Subtype'
               form.action '/masterfiles/packaging/pm_subtypes'
               form.remote! if remote
               form.add_field :pm_type_id

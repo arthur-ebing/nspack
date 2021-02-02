@@ -141,7 +141,7 @@
   fg_marks:
     :name: fg_marks
     :sequence_no: 8
-    :caption: Fg marks
+    :caption: FG Marks
     :namespaced_name: 
     :data_type: :string
     :width: 200
@@ -157,7 +157,7 @@
   gtin_code:
     :name: gtin_code
     :sequence_no: 9
-    :caption: Gtin code
+    :caption: GTIN Code
     :namespaced_name: s.gtin_code
     :data_type: :string
     :width: 200

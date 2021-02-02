@@ -326,7 +326,7 @@ module MasterfilesApp
     def sync_pm_boms # rubocop:disable Metrics/AbcSize
       pm_type_id = get_id(:pm_types, pm_type_code: AppConst::PM_TYPE_FRUIT)
       pm_composition_level_id = get(:pm_types, pm_type_id, :pm_composition_level_id)
-      raise Crossbeams::InfoError, "Please define a PM Type with a composition level for #{AppConst::PM_TYPE_FRUIT}" if pm_type_id.nil? || pm_composition_level_id.nil?
+      raise Crossbeams::InfoError, "Please define a PKG Type with a composition level for #{AppConst::PM_TYPE_FRUIT}" if pm_type_id.nil? || pm_composition_level_id.nil?
 
       select_values(:std_fruit_size_counts, :id).each do |id|
         rec = FruitSizeRepo.new.find_std_fruit_size_count(id).to_h

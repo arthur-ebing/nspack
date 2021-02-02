@@ -15,20 +15,20 @@ module UiRules
     end
 
     def set_show_fields
-      fields[:inner_pm_mark_code] = { renderer: :label, caption: 'Inner PM Mark' }
+      fields[:inner_pm_mark_code] = { renderer: :label, caption: 'Inner PKG Mark' }
       fields[:description] = { renderer: :label }
-      fields[:tu_mark] = { renderer: :label, as_boolean: true }
-      fields[:ri_mark] = { renderer: :label, as_boolean: true }
-      fields[:ru_mark] = { renderer: :label, as_boolean: true }
+      fields[:tu_mark] = { renderer: :label, as_boolean: true, caption: 'TU Mark' }
+      fields[:ri_mark] = { renderer: :label, as_boolean: true, caption: 'Fruit Mark' }
+      fields[:ru_mark] = { renderer: :label, as_boolean: true, caption: 'RU Mark' }
     end
 
     def common_fields
       {
-        inner_pm_mark_code: { caption: 'Inner PM Mark', required: true },
+        inner_pm_mark_code: { caption: 'Inner PKG Mark', required: true, force_uppercase: true },
         description: { required: true },
-        tu_mark: { renderer: :checkbox },
-        ri_mark: { renderer: :checkbox },
-        ru_mark: { renderer: :checkbox }
+        tu_mark: { renderer: :checkbox, caption: 'TU Mark' },
+        ri_mark: { renderer: :checkbox, caption: 'Fruit Mark' },
+        ru_mark: { renderer: :checkbox, caption: 'RU Mark' }
       }
     end
 
@@ -44,9 +44,9 @@ module UiRules
     def make_new_form_object
       @form_object = OpenStruct.new(inner_pm_mark_code: nil,
                                     description: nil,
-                                    tu_mark: true,
-                                    ri_mark: true,
-                                    ru_mark: true)
+                                    tu_mark: false,
+                                    ri_mark: false,
+                                    ru_mark: false)
     end
   end
 end

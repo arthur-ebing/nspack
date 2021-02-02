@@ -20,8 +20,8 @@ module UiRules
       fields[:packing_specification] = { renderer: :label, caption: 'Packing Specification' }
       fields[:product_setup] = { renderer: :label,  caption: 'Product Setup' }
       fields[:description] = { renderer: :label }
-      fields[:pm_bom] = { renderer: :label,  caption: 'PM BOM' }
-      fields[:pm_mark] = { renderer: :label,  caption: 'PM Mark' }
+      fields[:pm_bom] = { renderer: :label,  caption: 'PKG BOM' }
+      fields[:pm_mark] = { renderer: :label,  caption: 'PKG Mark' }
       fields[:tu_labour_product] = { renderer: :label, caption: 'TU Labour Product' }
       fields[:ru_labour_product] = { renderer: :label, caption: 'RU Labour Product' }
       fields[:ri_labour_product] = { renderer: :label, caption: 'RI Labour Product' }
@@ -55,14 +55,14 @@ module UiRules
                             hide_on_load: @mode == :edit },
         description: {},
         pm_bom_id: { renderer: :select,
-                     caption: 'PM BOM',
+                     caption: 'PKG BOM',
                      options: @bom_repo.for_select_pm_boms(where: { std_fruit_size_count_id: @form_object.std_fruit_size_count_id }),
                      disabled_options: @bom_repo.for_select_inactive_pm_boms,
                      searchable: true,
                      prompt: true,
                      required: false },
         pm_mark_id: { renderer: :select,
-                      caption: 'PM Mark',
+                      caption: 'PKG Mark',
                       options: @bom_repo.for_select_pm_marks(
                         where: { mark_id: @form_object.mark_id }
                       ),

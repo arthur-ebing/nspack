@@ -13,10 +13,10 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_composition_level(id)
-      success_response("Created pm composition level #{instance.description}",
+      success_response("Created PKG Composition Level #{instance.description}",
                        instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { description: ['This PM Composition level already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { description: ['This PKG Composition level already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -30,7 +30,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_composition_level(id)
-      success_response("Updated pm composition level #{instance.description}",
+      success_response("Updated PKG Composition Level #{instance.description}",
                        instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
@@ -43,12 +43,12 @@ module MasterfilesApp
         log_status(:pm_composition_levels, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted pm composition level #{name}")
+      success_response("Deleted PKG Composition Level #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       puts e.message
-      failed_response("Unable to delete pm composition level. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete PKG Composition Level. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)

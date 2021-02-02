@@ -754,7 +754,7 @@
   inner_container_type_code:
     :name: inner_container_type_code
     :sequence_no: 45
-    :caption: Inner container type code
+    :caption: Inner Container Type
     :namespaced_name: inner_container_type_code
     :data_type: :string
     :width: 120
@@ -786,7 +786,7 @@
   inner_container_material_type_code:
     :name: inner_container_material_type_code
     :sequence_no: 47
-    :caption: Inner container material type code
+    :caption: Inner Container Material
     :namespaced_name: inner_container_material_type_code
     :data_type: :string
     :width: 120

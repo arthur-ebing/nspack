@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'New PM Composition Level'
+              form.caption 'New PKG Composition Level'
               form.action '/masterfiles/packaging/pm_composition_levels'
               form.remote! if remote
               form.add_field :composition_level

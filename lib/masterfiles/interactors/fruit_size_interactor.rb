@@ -59,7 +59,7 @@ module MasterfilesApp
       repo.transaction do
         boms_repo.sync_pm_boms
       end
-      success_response('Successfully synced PM BOMs')
+      success_response('Successfully synced PKG BOMs')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

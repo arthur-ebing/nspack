@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit PM Type'
+              form.caption 'Edit PKG Type'
               form.action "/masterfiles/packaging/pm_types/#{id}"
               form.remote!
               form.method :update

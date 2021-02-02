@@ -13,7 +13,7 @@ module Masterfiles
             page.form_values form_values
             page.form_errors form_errors
             page.form do |form|
-              form.caption 'Edit Inner Pm Mark'
+              form.caption 'Edit Inner PKG Mark'
               form.action "/masterfiles/packaging/inner_pm_marks/#{id}"
               form.remote!
               form.method :update

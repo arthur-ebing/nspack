@@ -842,7 +842,7 @@
   fruit_sticker_pm_product_id:
     :name: fruit_sticker_pm_product_id
     :sequence_no: 47
-    :caption: Fruit sticker pm product
+    :caption: Fruit sticker PKG product
     :namespaced_name: vw_pallets.fruit_sticker_pm_product_id
     :data_type: :integer
     :width: 
@@ -874,7 +874,7 @@
   fruit_sticker_pm_product_2_id:
     :name: fruit_sticker_pm_product_2_id
     :sequence_no: 49
-    :caption: Fruit sticker pm product 2
+    :caption: Fruit sticker PKG product 2
     :namespaced_name: vw_pallets.fruit_sticker_pm_product_2_id
     :data_type: :integer
     :width: 

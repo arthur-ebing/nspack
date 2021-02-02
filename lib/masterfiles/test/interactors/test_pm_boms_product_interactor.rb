@@ -81,7 +81,7 @@ module MasterfilesApp
         refute res.success, res.message
       end
     rescue Sequel::NotNullConstraintViolation
-      failed_response('PM BOM cannot have no products')
+      failed_response('PKG BOM cannot have no products')
     end
 
     private

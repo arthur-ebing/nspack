@@ -177,13 +177,13 @@ class AppConst # rubocop:disable Metrics/ClassLength
   RMT_BIN_RECEIPT_DATE_OVERRIDE = 'RECEIPT DATE OVERRIDE'
   RMT_BIN_UNTIPPED_MANUALLY = 'UNTIPPED MANUALLY'
 
-  # Constants for PM Types
+  # Constants for PKG Types
   PM_TYPE_STICKER = 'STICKER'
   PM_TYPE_LABOUR = 'LABOUR'
   PM_TYPE_BIN = 'BIN'
   PM_TYPE_CARTON = 'CARTON'
 
-  # Constants for PM Subtypes
+  # Constants for PKG Subtypes
   PM_SUBTYPE_FRUIT_STICKER = 'FRUIT_STICKER'
   PM_SUBTYPE_TU_STICKER = 'TU_STICKER'
   PM_SUBTYPE_RU_STICKER = 'RU_STICKER'

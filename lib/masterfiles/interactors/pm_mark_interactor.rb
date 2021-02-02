@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_mark(id)
-      success_response("Created PM Mark #{instance.description}", instance)
+      success_response("Created PKG Mark #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { mark_id: ['This PM Mark already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { mark_id: ['This PKG Mark already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,9 +29,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_mark(id)
-      success_response("Updated PM Mark #{instance.description}", instance)
+      success_response("Updated PKG Mark #{instance.description}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { mark_id: ['This PM Mark already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { mark_id: ['This PKG Mark already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -43,12 +43,12 @@ module MasterfilesApp
         log_status(:pm_marks, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted PM Mark #{name}")
+      success_response("Deleted PKG Mark #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
       puts e.message
-      failed_response("Unable to delete PM Mark. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete PKG Mark. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)

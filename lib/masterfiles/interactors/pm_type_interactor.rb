@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_type(id)
-      success_response("Created PM Type #{instance.pm_type_code}", instance)
+      success_response("Created PKG Type #{instance.pm_type_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { pm_type_code: ['This PM Type already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { pm_type_code: ['This PKG Type already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,7 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_type(id)
-      success_response("Updated PM Type #{instance.pm_type_code}", instance)
+      success_response("Updated PKG Type #{instance.pm_type_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -41,9 +41,9 @@ module MasterfilesApp
         log_status(:pm_types, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted PM Type #{name}")
+      success_response("Deleted PKG Type #{name}")
     rescue Sequel::ForeignKeyConstraintViolation => e
-      failed_response("Unable to delete PM Type. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete PKG Type. It is still referenced#{e.message.partition('referenced').last}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end

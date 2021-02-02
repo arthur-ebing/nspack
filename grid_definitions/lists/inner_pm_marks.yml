@@ -53,6 +53,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/packaging/inner_pm_marks/new"
-  :text: New Inner Pm Mark
+  :text: New Inner PKG Mark
   :style: :button
   :behaviour: :popup

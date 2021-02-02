@@ -411,7 +411,7 @@
   :list_def: SELECT packing_specification_code, id FROM packing_specifications ORDER
     BY packing_specification_code
 - :column: packing_specification_items.pm_bom_id
-  :caption: Pm bom
+  :caption: PKG BOM
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -419,7 +419,7 @@
   :ui_priority: 1
   :list_def: SELECT bom_code, id FROM pm_boms ORDER BY bom_code
 - :column: packing_specification_items.pm_mark_id
-  :caption: Pm mark
+  :caption: PKG Mark
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -435,7 +435,7 @@
   :ui_priority: 1
   :list_def: SELECT client_size_reference, id FROM product_setups ORDER BY client_size_reference
 - :column: packing_specification_items.tu_labour_product_id
-  :caption: Tu labour product
+  :caption: TU labour product
   :data_type: :integer
   :control_type: :list
   :default_value: 
@@ -443,7 +443,7 @@
   :ui_priority: 1
   :list_def: SELECT product_code, id FROM pm_products ORDER BY product_code
 - :column: packing_specification_items.ru_labour_product_id
-  :caption: Ru labour product
+  :caption: RU labour product
   :data_type: :integer
   :control_type: :list
   :default_value: 

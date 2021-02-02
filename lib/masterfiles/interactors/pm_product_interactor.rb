@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_product(id)
-      success_response("Created PM Product #{instance.product_code}", instance)
+      success_response("Created PKG Product #{instance.product_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      failed_response('This PM Product already exists')
+      failed_response('This PKG Product already exists')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -29,7 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_product(id)
-      success_response("Updated PM Product #{instance.product_code}", instance)
+      success_response("Updated PKG Product #{instance.product_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -41,11 +41,11 @@ module MasterfilesApp
         log_status(:pm_products, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted PM Product #{name}")
+      success_response("Deleted PKG Product #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      failed_response("Unable to delete PM Product. It is still referenced#{e.message.partition('referenced').last}")
+      failed_response("Unable to delete PKG Product. It is still referenced#{e.message.partition('referenced').last}")
     end
 
     def assert_permission!(task, id = nil)
