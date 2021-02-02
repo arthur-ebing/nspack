@@ -79,6 +79,7 @@ namespace :menu do
       end
       key = match[1]
       raise "Invalid filename prefix: #{key} for #{file}" if key.length != 12
+      raise "Invalid filename: #{file} (must be all lowercase)" if file != file.downcase
 
       begin
         Time.parse(key)
