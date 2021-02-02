@@ -21,7 +21,7 @@ class MesScadaLogout < BaseScript
           when 'hans'
             DB[:contract_workers].where(surname: 'Zietsman').first
           when 'rupert'
-            DB[:contract_workers].where(surname: 'Swanepoel').first
+            DB[:contract_workers].where(surname: 'Swanepoel', first_name: 'Rupert').first
           else
             err = "UNKNOWN arg: '#{args[0]}'"
             puts err
