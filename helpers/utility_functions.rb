@@ -269,7 +269,7 @@ module UtilityFunctions # rubocop:disable Metrics/ModuleLength
   #    puts make_text_table(recs).join("\n")
   #
   # @param recs [Array] an array of hashes (e.g. from DB query)
-  # @param times [Array] optional array of Symbols for all Time columns
+  # @param times [Array] optional array of Symbols for all Time columns to be stripped of timezone offset
   # @param numbers [Array] optional array of Symbols for all numeric columns to be formatted with commas and decimals
   # @param rjust [Array] optional array of Symbols for all columns to be right-justified
   # @return [Array] an array representing rows in a text table.

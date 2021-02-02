@@ -161,3 +161,33 @@ Render a loading message (glyph optionally with a message)
 UtilityFunctions.loading_message('Something is busy')
 # => renders a "loading" glyph and the text next to it.
 ----
+
+Render a table of data as a text table.
+The table is returned as an array so that it can be further manipulated if required.
+[source,ruby]
+----
+recs = [
+  {id: 1, str: 'String', long_str: 'str', date: Date.parse('2020-01-01'),
+   time: Time.parse('2020-01-01 01:01:01'),
+   bool: true, number: 8123.45, int: 123456 }
+]
+puts UtilityFunctions.make_text_table(recs).join("\n")
+#  =>
+# +----+--------+----------+------------+---------------------------+------+---------+--------+
+# | Id | Str    | Long str | Date       | Time                      | Bool | Number  | Int    |
+# +----+--------+----------+------------+---------------------------+------+---------+--------+
+# | 1  | String | str      | 2020-01-01 | 2020-01-01 01:01:01 +0200 | true | 8123.45 | 123456 |
+# +----+--------+----------+------------+---------------------------+------+---------+--------+
+
+puts UtilityFunctions.make_text_table(recs,
+                                      heads: { str: 'STRING', int: 'INTEGER' },
+                                      times: [:time],
+                                      numbers: [:number],
+                                      rjust: [:id, :int]).join("\n")
+# =>
+# +----+--------+----------+------------+---------------------+------+----------+---------+
+# | Id | STRING | Long str | Date       | Time                | Bool | Number   | INTEGER |
+# +----+--------+----------+------------+---------------------+------+----------+---------+
+# |  1 | String | str      | 2020-01-01 | 2020-01-01 01:01:01 | true | 8,123.45 |  123456 |
+# +----+--------+----------+------------+---------------------+------+----------+---------+
+----
