@@ -11,7 +11,7 @@ module Masterfiles
           layout = Crossbeams::Layout::Page.build(rules) do |page|
             page.form_object ui_rule.form_object
             page.form do |form|
-              # form.caption 'Inner Pm Mark'
+              # form.caption 'Inner PKG Mark'
               form.view_only!
               form.add_field :inner_pm_mark_code
               form.add_field :description

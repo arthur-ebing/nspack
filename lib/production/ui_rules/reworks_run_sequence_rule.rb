@@ -226,8 +226,8 @@ module UiRules
                                  where: { mark_id: @form_object.mark_id }
                                ),
                                disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_marks,
-                               caption: 'PM Mark',
-                               prompt: 'Select PM Mark',
+                               caption: 'PKG Mark',
+                               prompt: 'Select PKG Mark',
                                searchable: true,
                                remove_search_for_small_list: false,
                                hide_on_load: !@rules[:require_packaging_bom] }
@@ -294,8 +294,8 @@ module UiRules
                               options: MasterfilesApp::BomRepo.new.for_select_pm_types,
                               disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_types,
                               selected: default_pm_type_id,
-                              caption: 'PM Type',
-                              prompt: 'Select PM Type',
+                              caption: 'PKG Type',
+                              prompt: 'Select PKG Type',
                               searchable: true,
                               remove_search_for_small_list: false,
                               hide_on_load: !@rules[:require_packaging_bom] }
@@ -304,8 +304,8 @@ module UiRules
                                     where: { pm_type_id: default_pm_type_id }
                                   ),
                                   disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_subtypes,
-                                  caption: 'PM Subtype',
-                                  prompt: 'Select PM Subtype',
+                                  caption: 'PKG Subtype',
+                                  prompt: 'Select PKG Subtype',
                                   searchable: true,
                                   remove_search_for_small_list: false,
                                   hide_on_load: !@rules[:require_packaging_bom] }
@@ -315,8 +315,8 @@ module UiRules
                                 commodity_id, @form_object.std_fruit_size_count_id, @form_object.basic_pack_code_id
                               ),
                               disabled_options: MasterfilesApp::BomRepo.new.for_select_inactive_pm_boms,
-                              caption: 'PM BOM',
-                              prompt: 'Select PM BOM',
+                              caption: 'PKG BOM',
+                              prompt: 'Select PKG BOM',
                               searchable: true,
                               remove_search_for_small_list: false,
                               hide_on_load: !@rules[:require_packaging_bom] }

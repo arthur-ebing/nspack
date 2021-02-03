@@ -13,9 +13,9 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_bom(id)
-      success_response("Created PM BOM #{instance.bom_code}", instance)
+      success_response("Created PKG BOM #{instance.bom_code}", instance)
     rescue Sequel::UniqueConstraintViolation
-      validation_failed_response(OpenStruct.new(messages: { bom_code: ['This PM BOM already exists'] }))
+      validation_failed_response(OpenStruct.new(messages: { bom_code: ['This PKG BOM already exists'] }))
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -32,7 +32,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = pm_bom(id)
-      success_response("Updated PM BOM #{instance.bom_code}", instance)
+      success_response("Updated PKG BOM #{instance.bom_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -44,7 +44,7 @@ module MasterfilesApp
         log_status(:pm_boms, id, 'DELETED')
         log_transaction
       end
-      success_response("Deleted PM BOM #{name}")
+      success_response("Deleted PKG BOM #{name}")
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -83,9 +83,9 @@ module MasterfilesApp
         repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
       end
       instance = pm_bom(pm_bom_id)
-      success_response("PM BOM #{instance.system_code} created successfully", instance)
+      success_response("PKG BOM #{instance.system_code} created successfully", instance)
     rescue Sequel::UniqueConstraintViolation
-      failed_response('This PM BOM already exists')
+      failed_response('This PKG BOM already exists')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -99,7 +99,7 @@ module MasterfilesApp
         end
       end
 
-      success_response('PM BOM system codes were updated successfully')
+      success_response('PKG BOM system codes were updated successfully')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -134,18 +134,18 @@ module MasterfilesApp
     end
 
     def validate_multiselect_pm_products(multiselect_list) # rubocop:disable Metrics/AbcSize
-      return failed_response('PM Product selection cannot be empty') if multiselect_list.nil_or_empty?
+      return failed_response('PKG Product selection cannot be empty') if multiselect_list.nil_or_empty?
 
       pm_subtype_ids = repo.select_values(:pm_products, :pm_subtype_id, id: multiselect_list)
 
       pm_type_ids = repo.select_values(:pm_subtypes, :pm_type_id, id: pm_subtype_ids)
       duplicate_types = pm_type_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
       pm_type_codes = repo.select_values(:pm_types, :pm_type_code, id: duplicate_types)
-      return failed_response("Duplicate PM Types: #{pm_type_codes.join(', ')}") unless duplicate_types.nil_or_empty?
+      return failed_response("Duplicate PKG Types: #{pm_type_codes.join(', ')}") unless duplicate_types.nil_or_empty?
 
       duplicate_subtypes = pm_subtype_ids.group_by { |a| a }.keep_if { |_, a| a.length > 1 }.keys
       pm_subtype_codes = repo.select_values(:pm_subtypes, :subtype_code, id: duplicate_subtypes)
-      return failed_response("Duplicate PM Subtypes: #{pm_subtype_codes.join(', ')}") unless duplicate_subtypes.nil_or_empty?
+      return failed_response("Duplicate PKG Subtypes: #{pm_subtype_codes.join(', ')}") unless duplicate_subtypes.nil_or_empty?
 
       ok_response
     end
