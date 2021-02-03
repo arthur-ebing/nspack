@@ -61,6 +61,8 @@ class LibraryVersions
   end
 
   def jasper(_)
+    return { library: 'Jruby Jasper', version: 'not checked during test' } if AppConst.test?
+
     repo = DevelopmentApp::JasperReportRepo.new
     { library: 'Jruby Jasper', version: repo.jasper_version }
   rescue StandardError => e

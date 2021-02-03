@@ -155,6 +155,8 @@ GEM
       minitest (~> 5.0)
     minitest-stub-const (0.6)
     minitest-stub_any_instance (1.0.2)
+    minitest-test_profile (0.2.2)
+      minitest
     mocha (1.8.0)
       metaclass (~> 0.0.1)
     net-ping (2.0.8)
@@ -278,6 +280,7 @@ DEPENDENCIES
   minitest-rg
   minitest-stub-const
   minitest-stub_any_instance (~> 1.0.1)
+  minitest-test_profile
   mocha (~> 1.5)
   net-ping
   nokogiri

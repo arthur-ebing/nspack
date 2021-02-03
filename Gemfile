@@ -52,6 +52,7 @@ group :test do
   gem 'minitest-rg'
   gem 'minitest-stub-const'
   gem 'minitest-stub_any_instance', '~>1.0.1'
+  gem 'minitest-test_profile'
   gem 'mocha', '~>1.5'
   gem 'rack-test'
 end
