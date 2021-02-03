@@ -8,8 +8,6 @@ module Production
           ui_rule = UiRules::Compiler.new(:product_setup, :new, product_setup_template_id: product_setup_template_id, form_values: form_values)
           rules   = ui_rule.compile
 
-          pm_boms_products = []
-
           layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
@@ -80,11 +78,6 @@ module Production
                     fold.add_field :pallet_label_name
                     fold.add_field :cartons_per_pallet_id
                     fold.add_field :description
-                    fold.add_table pm_boms_products,
-                                   %i[product_code pm_type_code subtype_code uom_code quantity],
-                                   dom_id: 'product_setup_pm_boms_products',
-                                   alignment: { quantity: :right },
-                                   cell_transformers: { quantity: :decimal }
                   end
                 end
                 row.column do |col|
@@ -94,10 +87,6 @@ module Production
                   end
                 end
               end
-              # form.fold_up do |fold|
-              #   fold.caption 'Custom fields'
-              #   fold.add_field :extended_columns
-              # end
             end
           end
 

@@ -331,10 +331,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: actual_counts),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'product_setup_pm_boms_products',
-                                     value: [])])
+                                     value: '')])
       end
 
       r.on 'std_fruit_size_count_changed' do
@@ -351,10 +348,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                                      options_array: actual_counts),
                       OpenStruct.new(type: :replace_input_value,
                                      dom_id: 'product_setup_description',
-                                     value: ''),
-                      OpenStruct.new(type: :replace_inner_html,
-                                     dom_id: 'product_setup_pm_boms_products',
-                                     value: [])])
+                                     value: '')])
       end
 
       r.on 'actual_count_changed' do

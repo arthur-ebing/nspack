@@ -8,7 +8,6 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
 
@@ -52,11 +51,11 @@ module UiRules
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack Code' }
-      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack Code', hide_on_load: @rules[:hide_some_fields] }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack' }
+      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack' }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
-      fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org Party Role' }
+      fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org' }
       fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed TM Group' }
       fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
       fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
@@ -70,7 +69,7 @@ module UiRules
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_label_name] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments', hide_on_load: @rules[:hide_some_fields]  }
+      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments' }
       fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
       fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Class' }
       fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
@@ -133,8 +132,7 @@ module UiRules
                                  required: true,
                                  prompt: 'Select Standard Pack',
                                  searchable: true,
-                                 remove_search_for_small_list: false,
-                                 hide_on_load: @rules[:hide_some_fields] },
+                                 remove_search_for_small_list: false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
                                            options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs(
                                              where: { basic_pack_code_id: @form_object.basic_pack_code_id,
@@ -170,9 +168,9 @@ module UiRules
         marketing_org_party_role_id: { renderer: :select,
                                        options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
                                        selected: default_mkting_org_id,
-                                       caption: 'Marketing Org.',
+                                       caption: 'Marketing Org',
                                        required: true,
-                                       prompt: 'Select Marketing Org.',
+                                       prompt: 'Select Marketing Org',
                                        searchable: true,
                                        remove_search_for_small_list: false },
         packed_tm_group_id: { renderer: :select,
@@ -266,8 +264,7 @@ module UiRules
         treatment_ids: { renderer: :multi,
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
-                         caption: 'Treatments',
-                         hide_on_load: @rules[:hide_some_fields] },
+                         caption: 'Treatments' },
         gtin_code: { renderer: :label,
                      caption: 'GTIN Code',
                      hide_on_load: !@rules[:gtins_required] }

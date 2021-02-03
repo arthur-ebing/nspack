@@ -12,7 +12,6 @@ module UiRules
       make_form_object
       apply_form_values
 
-      @rules[:hide_some_fields] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
@@ -159,8 +158,7 @@ module UiRules
                                           required: true,
                                           prompt: 'Select Standard Pack',
                                           searchable: true,
-                                          remove_search_for_small_list: false,
-                                          hide_on_load: @rules[:hide_some_fields] }
+                                          remove_search_for_small_list: false }
       fields[:fruit_actual_counts_for_pack_id] =  { renderer: :select,
                                                     options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs(
                                                       where: { basic_pack_code_id: @form_object.basic_pack_code_id,
@@ -328,8 +326,7 @@ module UiRules
       fields[:treatment_ids] =  { renderer: :multi,
                                   options: @fruit_repo.for_select_treatments,
                                   selected: @form_object.treatment_ids,
-                                  caption: 'Treatments',
-                                  hide_on_load: @rules[:hide_some_fields] }
+                                  caption: 'Treatments' }
       fields[:gtin_code] = { renderer: :label,
                              hide_on_load: !@rules[:gtins_required] }
     end
