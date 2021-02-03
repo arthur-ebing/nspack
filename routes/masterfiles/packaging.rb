@@ -580,6 +580,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         json_actions(actions.flatten)
       end
 
+      r.on 'basic_pack_changed' do
+        height_mm = if params[:changed_value].blank?
+                      nil
+                    else
+                      interactor.basic_pack_height(params[:changed_value])
+                    end
+        json_replace_input_value('pm_product_height_mm', height_mm)
+      end
+
       r.post do     # CREATE
         res = interactor.create_pm_product(params[:pm_product])
         if res.success

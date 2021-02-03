@@ -344,5 +344,11 @@ module MasterfilesApp
         )
       end
     end
+
+    def find_basic_pack_height(basic_pack_id)
+      DB[:basic_pack_codes]
+        .where(id: basic_pack_id)
+        .get(:height_mm)
+    end
   end
 end

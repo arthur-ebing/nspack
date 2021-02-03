@@ -18,8 +18,8 @@ module Masterfiles
                   col.add_field :pm_type_code
                   col.add_field :composition_level
                   col.add_field :product_code
-                  col.add_field :material_mass
                   col.add_field :basic_pack_code
+                  col.add_field :material_mass
                   col.add_field :items_per_unit
                   col.add_field :items_per_unit_client_description
                   col.add_field :marketing_size_range_mm

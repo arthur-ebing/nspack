@@ -61,6 +61,10 @@ module MasterfilesApp
       repo.find_pm_subtype(id)
     end
 
+    def basic_pack_height(basic_pack_id)
+      repo.find_basic_pack_height(basic_pack_id)
+    end
+
     private
 
     def repo

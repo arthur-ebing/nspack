@@ -111,6 +111,7 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.dropdown_change :pm_subtype_id, notify: [{ url: '/masterfiles/packaging/pm_products/pm_subtype_changed' }]
+        behaviour.dropdown_change :basic_pack_id, notify: [{ url: '/masterfiles/packaging/pm_products/basic_pack_changed' }]
       end
     end
 
