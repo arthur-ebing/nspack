@@ -255,9 +255,8 @@ module MasterfilesApp
     end
 
     def update_quantity(bom_product_id, quantity)
+      quantity = 0 if quantity.empty?
       update(:pm_boms_products, bom_product_id, quantity: quantity)
-
-      success_response("Quantity updated to #{quantity}", quantity: quantity)
     end
 
     def delete_pm_bom(id)

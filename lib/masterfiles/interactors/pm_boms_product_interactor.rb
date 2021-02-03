@@ -84,19 +84,22 @@ module MasterfilesApp
     def update_quantity(bom_product_id, params)  # rubocop:disable Metrics/AbcSize
       pm_bom_id = DB[:pm_boms_products].where(id: bom_product_id).get(:pm_bom_id)
 
-      res = nil
       repo.transaction do
-        res = repo.update_quantity(bom_product_id, params[:column_value])
+        repo.update_quantity(bom_product_id, params[:column_value])
         system_code = repo.pm_bom_system_code(pm_bom_id)
         repo.update_pm_bom(pm_bom_id, { bom_code: system_code, system_code: system_code })
       end
 
-      instance = pm_bom(pm_bom_id)
-      res.instance = { refresh_bom_code: true,
-                       bom_code: instance[:bom_code],
-                       system_code: instance[:system_code],
-                       changes: { quantity: res.instance[:quantity] } }
-      res
+      bom = pm_bom(pm_bom_id)
+      product = pm_boms_product(bom_product_id)
+      instance = { refresh_bom_code: true,
+                   bom_code: bom.bom_code,
+                   system_code: bom.system_code,
+                   changes: { quantity: product.quantity } }
+
+      success_response('Quantity updated.', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
     end
 
     private
