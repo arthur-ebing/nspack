@@ -4,11 +4,13 @@ namespace :app do
   namespace :masterfiles do
     desc 'Update Phytclean Standard Data'
     task update_phytclean_standard_data: [:load_app] do
-      res = QualityApp::PhytCleanStandardData.call
-      if res.success
-        puts "SUCCESS: #{res.message}"
-      else
-        puts "FAILURE: #{res.message}"
+      if Date.today <= Date.parse(AppConst::PHYT_CLEAN_SEASON_END_DATE || Date.today.to_s)
+        res = QualityApp::PhytCleanStandardData.call
+        if res.success
+          puts "SUCCESS: #{res.message}"
+        else
+          puts "FAILURE: #{res.message}"
+        end
       end
     end
 

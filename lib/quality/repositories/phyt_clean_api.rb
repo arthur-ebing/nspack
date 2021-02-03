@@ -28,10 +28,10 @@ module QualityApp
       success_response('Received seasons', instance)
     end
 
-    def request_phyt_clean_glossary(season_id)
+    def request_phyt_clean_glossary(phyt_clean_season_id)
       auth_token_call if header.nil?
 
-      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/glossary?seasonID=#{season_id}"
+      url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/glossary?seasonID=#{phyt_clean_season_id}"
       res = http.request_get(url, header)
       return failed_response(res.message) unless res.success
 
@@ -39,15 +39,12 @@ module QualityApp
       success_response('Received glossary', instance)
     end
 
-    def request_phyt_clean_standard_data(season_id, puc_ids) # rubocop:disable Metrics/AbcSize
+    def request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids) # rubocop:disable Metrics/AbcSize
       auth_token_call if header.nil?
-
-      season = find(:seasons, Seasons, season_id)
-      raise Crossbeams::InfoError, "Season #{season[:season_code]}, ended: #{season[:end_date]}, unable to fetch standard phytodata" if  Date.today > season[:end_date]
 
       url = "#{AppConst::PHYT_CLEAN_ENVIRONMENT}/api/standardphytodata"
       fbo_xml = "<?xml version=\"1.0\"?><Request><Fbo><FboCode>#{select_values(:pucs, :puc_code, id: puc_ids).join('</FboCode></Fbo><Fbo><FboCode>')}</FboCode></Fbo></Request>"
-      params = { seasonID: season_id, outputType: 'json', fboXML: fbo_xml }
+      params = { seasonID: phyt_clean_season_id, outputType: 'json', fboXML: fbo_xml }
       res = http.request_post(url, params, header)
       return failed_response(res.message) unless res.success
 

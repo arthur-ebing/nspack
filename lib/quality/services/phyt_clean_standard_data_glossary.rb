@@ -8,14 +8,14 @@ module QualityApp
     def initialize
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
-      @season_id = AppConst::PHYT_CLEAN_SEASON_ID
+      @phyt_clean_season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @glossary = {}
     end
 
     def call
-      raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
+      raise ArgumentError, 'PhytClean Season not set' if phyt_clean_season_id.nil?
 
-      res = api.request_phyt_clean_glossary(season_id)
+      res = api.request_phyt_clean_glossary(phyt_clean_season_id)
       return failed_response(res.message) unless res.success
 
       parse_glossary(res)

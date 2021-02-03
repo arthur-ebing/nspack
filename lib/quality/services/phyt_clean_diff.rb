@@ -2,14 +2,14 @@
 
 module QualityApp
   class PhytCleanDiff < BaseService
-    attr_reader :repo, :api, :season_id, :puc_ids
+    attr_reader :repo, :api, :phyt_clean_season_id, :puc_ids
     attr_accessor :attrs, :puc_id
 
     def initialize(mode)
       @mode = mode.to_sym
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
-      @season_id = AppConst::PHYT_CLEAN_SEASON_ID
+      @phyt_clean_season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @attrs = {}
       @puc_ids = if @mode == :orchards
                    @repo.select_values(:orchards, :puc_id).uniq
@@ -19,9 +19,9 @@ module QualityApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
+      raise ArgumentError, 'PhytClean Season not set' if phyt_clean_season_id.nil?
 
-      res = api.request_phyt_clean_standard_data(season_id, puc_ids)
+      res = api.request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids)
       return failed_response(res.message) unless res.success
 
       parse_standard_data(res)

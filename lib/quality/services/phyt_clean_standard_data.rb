@@ -3,13 +3,13 @@
 # rubocop:disable Metrics/BlockLength
 module QualityApp
   class PhytCleanStandardData < BaseService
-    attr_reader :repo, :api, :season_id, :puc_ids
+    attr_reader :repo, :api, :phyt_clean_season_id, :puc_ids
     attr_accessor :attrs, :glossary
 
     def initialize(puc_ids = nil)
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
-      @season_id = AppConst::PHYT_CLEAN_SEASON_ID
+      @phyt_clean_season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @puc_ids = Array(puc_ids)
       @puc_ids = repo.select_values(:orchard_test_results, :puc_id).uniq if @puc_ids.empty?
       @attrs = {}
@@ -18,11 +18,11 @@ module QualityApp
     end
 
     def call # rubocop:disable Metrics/AbcSize
-      raise ArgumentError, 'PhytClean Season not set' if season_id.nil?
+      raise ArgumentError, 'PhytClean Season not set' if phyt_clean_season_id.nil?
 
       QualityApp::CreateOrchardTestResults.call(@user)
 
-      res = api.request_phyt_clean_standard_data(season_id, puc_ids)
+      res = api.request_phyt_clean_standard_data(phyt_clean_season_id, puc_ids)
       raise Crossbeams::InfoError, res.message unless res.success
 
       parse_standard_data(res)

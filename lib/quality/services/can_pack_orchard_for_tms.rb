@@ -2,19 +2,19 @@
 
 module QualityApp
   class CanPackOrchardForTms < BaseService
-    attr_reader :repo, :api, :season_id, :puc_id, :orchard_id, :cultivar_id, :tm_group_id
+    attr_reader :repo, :api, :phyt_clean_season_id, :puc_id, :orchard_id, :cultivar_id, :tm_group_id
 
     def initialize(orchard_id:, cultivar_id:, tm_group_ids:)
       return if AppConst::BYPASS_QUALITY_TEST_PRE_RUN_CHECK
 
       @repo = OrchardTestRepo.new
       @api = PhytCleanApi.new
-      @season_id = AppConst::PHYT_CLEAN_SEASON_ID
+      @phyt_clean_season_id = AppConst::PHYT_CLEAN_SEASON_ID
       @puc_id = repo.get(:orchards, orchard_id, :puc_id)
       @orchard_id = orchard_id
       @cultivar_id = cultivar_id
       @tm_group_id = Array(tm_group_ids)
-      raise ArgumentError, 'PhytClean Season not set.' if season_id.nil?
+      raise ArgumentError, 'PhytClean Season not set.' if phyt_clean_season_id.nil?
 
       orchard_cultivar_exists = repo.exists?(:orchards, Sequel.lit(" id = #{orchard_id} AND ARRAY[#{cultivar_id}] && cultivar_ids"))
       raise Crossbeams::InfoError, 'Cultivar not associated with Orchard.' unless orchard_cultivar_exists
