@@ -419,7 +419,7 @@ class Nspack < Roda
         basic_pack_code = if footprint_code.blank? || params[:changed_value].blank?
                             params[:basic_pack_code_basic_pack_code]
                           else
-                            footprint_code + ' ' + params[:changed_value]
+                            footprint_code + params[:changed_value]
                           end
         json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
       end
@@ -429,7 +429,7 @@ class Nspack < Roda
         basic_pack_code = if height_mm.blank? || params[:changed_value].blank?
                             params[:basic_pack_code_basic_pack_code]
                           else
-                            params[:changed_value] + ' ' + height_mm
+                            params[:changed_value] + height_mm
                           end
         json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
       end
