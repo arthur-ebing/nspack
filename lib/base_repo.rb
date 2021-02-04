@@ -412,8 +412,12 @@ class BaseRepo # rubocop:disable Metrics/ClassLength
   # @return [symbol] the column's data type
   def column_type(table_name, column)
     if table_name.is_a?(Symbol)
+      raise Crossbeams::FrameworkError, "BaseRepo#column_type: There is no table named #{table_name}" if DB_TABLE_COLS[table_name].nil?
+
       DB_TABLE_COLS[table_name][column]
     else
+      raise Crossbeams::FrameworkError, "BaseRepo#column_type: There is no table named #{table_name}" if DB_AUDIT_COLS[table_name].nil?
+
       DB_AUDIT_COLS[table_name.table][column]
     end
   end
