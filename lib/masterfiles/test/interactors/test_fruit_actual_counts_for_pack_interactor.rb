@@ -77,8 +77,8 @@ module MasterfilesApp
 
     def fruit_actual_counts_for_pack_attrs
       std_fruit_size_count_id = create_std_fruit_size_count
-      basic_pack_code_id = create_basic_pack_code
-      standard_pack_code_ids = create_standard_pack_code
+      basic_pack_code_id = create_basic_pack
+      standard_pack_code_ids = create_standard_pack
       size_reference_ids = create_fruit_size_reference
 
       {

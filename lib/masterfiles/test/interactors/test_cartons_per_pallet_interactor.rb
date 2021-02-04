@@ -74,7 +74,7 @@ module MasterfilesApp
 
     def cartons_per_pallet_attrs
       pallet_format_id = create_pallet_format
-      basic_pack_code_id = create_basic_pack_code
+      basic_pack_code_id = create_basic_pack
 
       {
         id: 1,

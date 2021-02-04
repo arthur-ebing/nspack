@@ -84,7 +84,7 @@ module MasterfilesApp
 
     def pm_product_attrs
       pm_subtype_id = create_pm_subtype
-      basic_pack_id = create_basic_pack_code
+      basic_pack_id = create_basic_pack
       std_fruit_size_count_id = create_std_fruit_size_count
       {
         id: 1,

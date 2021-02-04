@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module UiRules
-  class BasicPackCodeRule < Base
+  class BasicPackRule < Base
     def generate_rules
-      @this_repo = MasterfilesApp::FruitSizeRepo.new
+      @repo = MasterfilesApp::FruitSizeRepo.new
       make_form_object
       apply_form_values
 
@@ -16,34 +16,44 @@ module UiRules
 
       add_basic_pack_behaviours if calculate_basic_pack_code
 
-      form_name 'basic_pack_code'
+      form_name 'basic_pack'
     end
 
     def set_show_fields
       fields[:basic_pack_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
-      fields[:length_mm] = { renderer: :label }
-      fields[:width_mm] = { renderer: :label }
-      fields[:height_mm] = { renderer: :label }
+      fields[:length_mm] = { renderer: :label, caption: 'Length (mm)' }
+      fields[:width_mm] = { renderer: :label, caption: 'Width (mm)' }
+      fields[:height_mm] = { renderer: :label, caption: 'Height (mm)' }
       fields[:active] = { renderer: :label, as_boolean: true }
       fields[:footprint_code] = { renderer: :label }
+      fields[:standard_pack_codes] = { renderer: :list,
+                                       caption: 'Standard Packs',
+                                       hide_on_load: @form_object.standard_pack_codes.empty?,
+                                       items: @form_object.standard_pack_codes }
     end
 
     def common_fields
       {
         basic_pack_code: { required: true },
         description: {},
-        length_mm: { renderer: :integer },
-        width_mm: { renderer: :integer },
-        height_mm: { renderer: :integer },
-        footprint_code: {}
+        length_mm: { renderer: :integer, caption: 'Length (mm)' },
+        width_mm: { renderer: :integer, caption: 'Width (mm)' },
+        height_mm: { renderer: :integer, caption: 'Height (mm)' },
+        footprint_code: {},
+        standard_pack_ids: { renderer: :multi,
+                             caption: 'Standard Packs',
+                             options: @repo.for_select_standard_packs,
+                             selected: @form_object.standard_pack_ids,
+                             hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK,
+                             required: false }
       }
     end
 
     def make_form_object
       make_new_form_object && return if @mode == :new
 
-      @form_object = @this_repo.find_basic_pack_code(@options[:id])
+      @form_object = @repo.find_basic_pack(@options[:id])
     end
 
     def make_new_form_object
@@ -52,7 +62,8 @@ module UiRules
                                     length_mm: nil,
                                     width_mm: nil,
                                     height_mm: nil,
-                                    footprint_code: nil)
+                                    footprint_code: nil,
+                                    standard_pack_ids: [])
     end
 
     private

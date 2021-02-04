@@ -87,11 +87,11 @@ module UiRules
       fields[:reworks_run_type_id] = { renderer: :hidden }
       fields[:standard_pack_code_id] = if rules[:provide_pack_type]
                                          { renderer: :select,
-                                           options: @repo.for_select_standard_pack_codes,
-                                           disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
-                                           caption: 'Standard Pack Code',
+                                           options: @repo.for_select_standard_packs,
+                                           disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_packs,
+                                           caption: 'Standard Pack',
                                            required: true,
-                                           prompt: 'Select Standard Pack Code',
+                                           prompt: 'Select Standard Pack',
                                            searchable: true,
                                            remove_search_for_small_list: false }
                                        else

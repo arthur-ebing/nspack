@@ -796,14 +796,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             form.add_select(:basic_pack_id,
                             'Basic Pack',
                             prompt: true,
-                            items: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes,
+                            items: MasterfilesApp::FruitSizeRepo.new.for_select_basic_packs,
                             required: true)
           end
 
           form.add_select(:standard_pack_id,
                           'Std Basic Pack',
                           prompt: true,
-                          items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
+                          items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs,
                           required: true)
           form.add_select(:grade_id,
                           'Grade',
@@ -894,14 +894,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           form.add_select(:basic_pack_id,
                           'Basic Pack',
                           value: pallet_sequence[:basic_pack_code_id],
-                          items: MasterfilesApp::FruitSizeRepo.new.for_select_basic_pack_codes,
+                          items: MasterfilesApp::FruitSizeRepo.new.for_select_basic_packs,
                           required: true)
         end
 
         form.add_select(:standard_pack_id,
                         'Std Basic Pack',
                         value: pallet_sequence[:standard_pack_code_id],
-                        items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
+                        items: MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs,
                         required: true)
 
         form.add_select(:grade_id,

@@ -1,22 +1,27 @@
 ---
-:caption: Standard Pack Codes
+:caption: Standard Packs
 :sql: "SELECT\r\n    standard_pack_codes.id,\r\n    standard_pack_codes.standard_pack_code,\r\n
   \   fn_masterfile_variants('standard_pack_codes', standard_pack_codes.id) AS variant_codes,\r\n
   \   standard_pack_codes.description,\r\n    standard_pack_codes.std_pack_label_code,\r\n
   \   standard_pack_codes.material_mass,\r\n    standard_pack_codes.plant_resource_button_indicator,\r\n
-  \   basic_pack_codes.basic_pack_code,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
+  \   ARRAY_AGG(basic_pack_codes.basic_pack_code) AS basic_pack_codes,\r\n    standard_pack_codes.use_size_ref_for_edi,\r\n
   \   standard_pack_codes.palletizer_incentive_rate,\r\n    standard_pack_codes.bin,\r\n
   \   standard_pack_codes.rmt_container_type_id,\r\n    rmt_container_types.container_type_code
   AS container_type,\r\n    standard_pack_codes.rmt_container_material_type_id,\r\n
   \   rmt_container_material_types.container_material_type_code AS material_type,\r\n
   \   standard_pack_codes.created_at,\r\n    standard_pack_codes.updated_at,\r\n    standard_pack_codes.active\r\nFROM
-  standard_pack_codes\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id = standard_pack_codes.basic_pack_code_id\r\nLEFT
-  JOIN rmt_container_material_types ON rmt_container_material_types.id = standard_pack_codes.rmt_container_material_type_id\r\nLEFT
-  JOIN rmt_container_types ON rmt_container_types.id = standard_pack_codes.rmt_container_type_id\r\nORDER
-  BY\r\n    standard_pack_codes.standard_pack_code\r\n\r\n\r\n\r\n\r\n\r\n"
+  standard_pack_codes\r\nLEFT JOIN basic_packs_standard_packs ON standard_pack_codes.id
+  = basic_packs_standard_packs.standard_pack_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
+  = basic_packs_standard_packs.basic_pack_id\r\nLEFT JOIN rmt_container_material_types
+  ON rmt_container_material_types.id = standard_pack_codes.rmt_container_material_type_id\r\nLEFT
+  JOIN rmt_container_types ON rmt_container_types.id = standard_pack_codes.rmt_container_type_id\r\nGROUP
+  BY\r\n    standard_pack_codes.id,\r\n    standard_pack_codes.standard_pack_code,\r\n
+  \   rmt_container_types.id,\r\n    rmt_container_material_types.id\r\n\r\nORDER
+  BY\r\n    standard_pack_codes.standard_pack_code"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id
@@ -130,13 +135,13 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  basic_pack_code:
-    :name: basic_pack_code
+  basic_pack_codes:
+    :name: basic_pack_codes
     :sequence_no: 8
-    :caption: Basic pack code
-    :namespaced_name: basic_pack_codes.basic_pack_code
+    :caption: Basic pack codes
+    :namespaced_name: 
     :data_type: :string
-    :width: 150
+    :width: 
     :format: 
     :hide: false
     :pinned: 

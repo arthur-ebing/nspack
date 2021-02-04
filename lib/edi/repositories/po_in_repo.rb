@@ -23,14 +23,14 @@ module EdiApp
         .get([:pallet_format_id, Sequel[:cartons_per_pallet][:id]])
     end
 
-    def find_standard_pack_code_id(code)
+    def find_standard_pack_id(code)
       id = DB[:standard_pack_codes].where(standard_pack_code: code).get(:id)
       return id unless id.nil?
 
       find_variant_id(:standard_pack_codes, code)
     end
 
-    def find_basic_pack_code_id(standard_pack_code_id)
+    def find_basic_pack_id(standard_pack_code_id)
       DB[:standard_pack_codes].where(id: standard_pack_code_id).get(:basic_pack_code_id)
     end
 

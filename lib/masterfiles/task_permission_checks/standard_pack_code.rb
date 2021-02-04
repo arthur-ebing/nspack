@@ -2,13 +2,13 @@
 
 module MasterfilesApp
   module TaskPermissionCheck
-    class StandardPackCode < BaseService
+    class StandardPack < BaseService
       attr_reader :task, :entity
-      def initialize(task, standard_pack_code_id = nil)
+      def initialize(task, standard_pack_id = nil)
         @task = task
         @repo = FruitSizeRepo.new
-        @id = standard_pack_code_id
-        @entity = @id ? @repo.find_standard_pack_code(@id) : nil
+        @id = standard_pack_id
+        @entity = @id ? @repo.find_standard_pack(@id) : nil
       end
 
       CHECKS = {
@@ -33,14 +33,10 @@ module MasterfilesApp
       end
 
       def edit_check
-        # return failed_response 'StandardPackCode has been completed' if completed?
-
         all_ok
       end
 
       def delete_check
-        # return failed_response 'StandardPackCode has been completed' if completed?
-
         all_ok
       end
     end

@@ -19,6 +19,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/basic_pack_codes/new"
-  :text: New Basic Pack Code
+  :text: New Basic Pack
   :style: :button
   :behaviour: :popup

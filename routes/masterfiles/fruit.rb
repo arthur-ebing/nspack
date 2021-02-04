@@ -368,7 +368,7 @@ class Nspack < Roda
     # BASIC PACK CODES
     # --------------------------------------------------------------------------
     r.on 'basic_pack_codes', Integer do |id|
-      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::BasicPackInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:basic_pack_codes, id) do
@@ -377,31 +377,33 @@ class Nspack < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('fruit', 'edit')
-        show_partial { Masterfiles::Fruit::BasicPackCode::Edit.call(id) }
+        show_partial { Masterfiles::Fruit::BasicPack::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
           check_auth!('fruit', 'read')
-          show_partial { Masterfiles::Fruit::BasicPackCode::Show.call(id) }
+          show_partial { Masterfiles::Fruit::BasicPack::Show.call(id) }
         end
         r.patch do     # UPDATE
-          res = interactor.update_basic_pack_code(id, params[:basic_pack_code])
+          res = interactor.update_basic_pack(id, params[:basic_pack])
           if res.success
-            update_grid_row(id,
-                            changes: { basic_pack_code: res.instance[:basic_pack_code],
-                                       description: res.instance[:description],
-                                       length_mm: res.instance[:length_mm],
-                                       width_mm: res.instance[:width_mm],
-                                       height_mm: res.instance[:height_mm],
-                                       footprint_code: res.instance[:footprint_code] },
-                            notice: res.message)
+            row_keys = %i[
+              basic_pack_code
+              description
+              length_mm
+              width_mm
+              height_mm
+              footprint_code
+              standard_pack_codes
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { Masterfiles::Fruit::BasicPackCode::Edit.call(id, params[:basic_pack_code], res.errors) }
+            re_show_form(r, res) { Masterfiles::Fruit::BasicPack::Edit.call(id, params[:basic_pack], res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
-          res = interactor.delete_basic_pack_code(id)
+          res = interactor.delete_basic_pack(id)
           if res.success
             delete_grid_row(id, notice: res.message)
           else
@@ -412,43 +414,54 @@ class Nspack < Roda
     end
 
     r.on 'basic_pack_codes' do
-      interactor = MasterfilesApp::BasicPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::BasicPackInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'height_changed' do
-        footprint_code = params[:basic_pack_code_footprint_code]
+        footprint_code = params[:basic_pack_footprint_code]
         basic_pack_code = if footprint_code.blank? || params[:changed_value].blank?
-                            params[:basic_pack_code_basic_pack_code]
+                            params[:basic_pack_basic_pack_code]
                           else
                             footprint_code + params[:changed_value]
                           end
-        json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
+        json_replace_input_value('basic_pack_basic_pack_code', basic_pack_code)
       end
 
       r.on 'footprint_code_changed' do
-        height_mm = params[:basic_pack_code_height_mm]
+        height_mm = params[:basic_pack_height_mm]
         basic_pack_code = if height_mm.blank? || params[:changed_value].blank?
-                            params[:basic_pack_code_basic_pack_code]
+                            params[:basic_pack_basic_pack_code]
                           else
                             params[:changed_value] + height_mm
                           end
-        json_replace_input_value('basic_pack_code_basic_pack_code', basic_pack_code)
+        json_replace_input_value('basic_pack_basic_pack_code', basic_pack_code)
       end
 
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
         interactor.assert_permission!(:create)
-        show_partial_or_page(r) { Masterfiles::Fruit::BasicPackCode::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Masterfiles::Fruit::BasicPack::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
-        res = interactor.create_basic_pack_code(params[:basic_pack_code])
+        res = interactor.create_basic_pack(params[:basic_pack])
         if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          row_keys = %i[
+            id
+            basic_pack_code
+            description
+            length_mm
+            width_mm
+            height_mm
+            active
+            footprint_code
+            standard_pack_codes
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
         else
           re_show_form(r, res, url: '/masterfiles/fruit/basic_pack_codes/new') do
-            Masterfiles::Fruit::BasicPackCode::New.call(form_values: params[:basic_pack_code],
-                                                        form_errors: res.errors,
-                                                        remote: fetch?(r))
+            Masterfiles::Fruit::BasicPack::New.call(form_values: params[:basic_pack],
+                                                    form_errors: res.errors,
+                                                    remote: fetch?(r))
           end
         end
       end
@@ -457,7 +470,7 @@ class Nspack < Roda
     # STANDARD PACK CODES
     # --------------------------------------------------------------------------
     r.on 'standard_pack_codes', Integer do |id|
-      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::StandardPackInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       # Check for notfound:
       r.on !interactor.exists?(:standard_pack_codes, id) do
@@ -466,15 +479,15 @@ class Nspack < Roda
 
       r.on 'edit' do   # EDIT
         check_auth!('fruit', 'edit')
-        show_partial { Masterfiles::Fruit::StandardPackCode::Edit.call(id) }
+        show_partial { Masterfiles::Fruit::StandardPack::Edit.call(id) }
       end
       r.is do
         r.get do       # SHOW
           check_auth!('fruit', 'read')
-          show_partial { Masterfiles::Fruit::StandardPackCode::Show.call(id) }
+          show_partial { Masterfiles::Fruit::StandardPack::Show.call(id) }
         end
         r.patch do     # UPDATE
-          res = interactor.update_standard_pack_code(id, params[:standard_pack_code])
+          res = interactor.update_standard_pack(id, params[:standard_pack])
           if res.success
             row_keys = %i[
               standard_pack_code
@@ -482,22 +495,24 @@ class Nspack < Roda
               plant_resource_button_indicator
               description
               std_pack_label_code
-              basic_pack_code
               use_size_ref_for_edi
               palletizer_incentive_rate
               bin
+              container_type
+              material_type
+              basic_pack_codes
               container_type
               material_type
               active
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
-            re_show_form(r, res) { Masterfiles::Fruit::StandardPackCode::Edit.call(id, params[:standard_pack_code], res.errors) }
+            re_show_form(r, res) { Masterfiles::Fruit::StandardPack::Edit.call(id, params[:standard_pack], res.errors) }
           end
         end
         r.delete do    # DELETE
           check_auth!('fruit', 'delete')
-          res = interactor.delete_standard_pack_code(id)
+          res = interactor.delete_standard_pack(id)
           if res.success
             delete_grid_row(id, notice: res.message)
           else
@@ -508,17 +523,17 @@ class Nspack < Roda
     end
 
     r.on 'standard_pack_codes' do
-      interactor = MasterfilesApp::StandardPackCodeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      interactor = MasterfilesApp::StandardPackInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
 
       r.on 'bin_changed' do
         actions = []
         if params[:changed_value] == 't'
-          actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_code_rmt_container_type_id_field_wrapper')
+          actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_rmt_container_type_id_field_wrapper')
         else
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_code_rmt_container_type_id_field_wrapper')
-          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_code_rmt_container_material_type_id_field_wrapper')
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_code_rmt_container_type_id', value: '')
-          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_code_rmt_container_material_type_id', value: '')
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_rmt_container_type_id_field_wrapper')
+          actions << OpenStruct.new(type: :hide_element, dom_id: 'standard_pack_rmt_container_material_type_id_field_wrapper')
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_rmt_container_type_id', value: '')
+          actions << OpenStruct.new(type: :change_select_value, dom_id: 'standard_pack_rmt_container_material_type_id', value: '')
         end
         json_actions(actions)
       end
@@ -526,25 +541,42 @@ class Nspack < Roda
       r.on 'container_type_changed' do
         actions = []
         material_types = MasterfilesApp::RmtContainerMaterialTypeRepo.new.for_select_rmt_container_material_types(where: { rmt_container_type_id: params[:changed_value] })
-        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'standard_pack_code_rmt_container_material_type_id', options_array: material_types)
-        actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_code_rmt_container_material_type_id_field_wrapper')
+        actions << OpenStruct.new(type: :replace_select_options, dom_id: 'standard_pack_rmt_container_material_type_id', options_array: material_types)
+        actions << OpenStruct.new(type: :show_element, dom_id: 'standard_pack_rmt_container_material_type_id_field_wrapper')
         json_actions(actions)
       end
 
       r.on 'new' do    # NEW
         check_auth!('fruit', 'new')
-        show_partial_or_page(r) { Masterfiles::Fruit::StandardPackCode::New.call(remote: fetch?(r)) }
+        show_partial_or_page(r) { Masterfiles::Fruit::StandardPack::New.call(remote: fetch?(r)) }
       end
       r.post do        # CREATE
-        res = interactor.create_standard_pack_code(params[:standard_pack_code])
+        res = interactor.create_standard_pack(params[:standard_pack])
         if res.success
-          flash[:notice] = res.message
-          redirect_to_last_grid(r)
+          row_keys = %i[
+            id
+            standard_pack_code
+            active
+            material_mass
+            plant_resource_button_indicator
+            description
+            std_pack_label_code
+            use_size_ref_for_edi
+            bin
+            palletizer_incentive_rate
+            rmt_container_type_id
+            rmt_container_material_type_id
+            basic_pack_codes
+            container_type
+            material_type
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
         else
           re_show_form(r, res, url: '/masterfiles/fruit/standard_pack_codes/new') do
-            Masterfiles::Fruit::StandardPackCode::New.call(form_values: params[:standard_pack_code],
-                                                           form_errors: res.errors,
-                                                           remote: fetch?(r))
+            Masterfiles::Fruit::StandardPack::New.call(form_values: params[:standard_pack],
+                                                       form_errors: res.errors,
+                                                       remote: fetch?(r))
           end
         end
       end
@@ -728,9 +760,10 @@ class Nspack < Roda
 
     r.on 'std_fruit_size_counts' do
       interactor = MasterfilesApp::FruitSizeInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
-      r.on 'new' do    # NEW
-        check_auth!('fruit', 'new')
-        show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
+
+      r.on 'basic_pack_changed' do
+        standard_packs = interactor.for_select_standard_packs(where: { basic_pack_id: params[:changed_value] })
+        json_replace_multi_options('fruit_actual_counts_for_pack_standard_pack_code_ids', standard_packs)
       end
 
       r.on 'sync_pm_boms' do
@@ -738,6 +771,11 @@ class Nspack < Roda
         res = interactor.sync_pm_boms
         flash[:notice] = res.message
         redirect_to_last_grid(r)
+      end
+
+      r.on 'new' do    # NEW
+        check_auth!('fruit', 'new')
+        show_partial_or_page(r) { Masterfiles::Fruit::StdFruitSizeCount::New.call(remote: fetch?(r)) }
       end
 
       r.post do        # CREATE

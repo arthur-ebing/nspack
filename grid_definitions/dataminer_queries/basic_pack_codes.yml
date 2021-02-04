@@ -1,12 +1,18 @@
 ---
-:caption: Basic Pack Codes
-:sql: SELECT "basic_pack_codes"."id", "basic_pack_codes"."basic_pack_code", "basic_pack_codes"."description",
-  "basic_pack_codes"."length_mm", "basic_pack_codes"."width_mm", "basic_pack_codes"."height_mm",
-  "basic_pack_codes"."footprint_code", "basic_pack_codes"."created_at", "basic_pack_codes"."updated_at",
-  "basic_pack_codes"."active" FROM "basic_pack_codes"
+:caption: Basic Packs
+:sql: "SELECT basic_pack_codes.id,\r\n       basic_pack_codes.basic_pack_code,\r\n
+  \      basic_pack_codes.description,\r\n       basic_pack_codes.length_mm,\r\n       basic_pack_codes.width_mm,\r\n
+  \      basic_pack_codes.height_mm,\r\n       basic_pack_codes.footprint_code,\r\n
+  \      ARRAY_AGG(standard_pack_codes.standard_pack_code) AS standard_pack_codes,\r\n
+  \      basic_pack_codes.created_at,\r\n       basic_pack_codes.updated_at,\r\n       basic_pack_codes.active\r\n\r\nFROM
+  basic_pack_codes\r\nLEFT JOIN basic_packs_standard_packs ON basic_pack_codes.id
+  = basic_packs_standard_packs.basic_pack_id\r\nLEFT JOIN standard_pack_codes ON standard_pack_codes.id
+  = basic_packs_standard_packs.standard_pack_id\r\n\r\nGROUP BY basic_pack_codes.id,\r\n
+  \        basic_pack_codes.basic_pack_code\r\nORDER BY basic_pack_codes.basic_pack_code\r\n"
 :limit: 
 :offset: 
-:external_settings: {}
+:external_settings:
+  :render_url: 
 :columns:
   id:
     :name: id
@@ -59,7 +65,7 @@
   length_mm:
     :name: length_mm
     :sequence_no: 4
-    :caption: Length mm
+    :caption: Length (mm)
     :namespaced_name: basic_pack_codes.length_mm
     :data_type: :integer
     :width: 120
@@ -75,10 +81,10 @@
   width_mm:
     :name: width_mm
     :sequence_no: 5
-    :caption: Width mm
+    :caption: Width (mm)
     :namespaced_name: basic_pack_codes.width_mm
     :data_type: :integer
-    :width: 
+    :width: 120
     :format: 
     :hide: false
     :pinned: 
@@ -91,7 +97,7 @@
   height_mm:
     :name: height_mm
     :sequence_no: 6
-    :caption: Height mm
+    :caption: Height (mm)
     :namespaced_name: basic_pack_codes.height_mm
     :data_type: :integer
     :width: 120
@@ -120,9 +126,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  standard_pack_codes:
+    :name: standard_pack_codes
+    :sequence_no: 8
+    :caption: Standard pack codes
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 8
+    :sequence_no: 9
     :caption: Created at
     :namespaced_name: basic_pack_codes.created_at
     :data_type: :datetime
@@ -138,7 +160,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 9
+    :sequence_no: 10
     :caption: Updated at
     :namespaced_name: basic_pack_codes.updated_at
     :data_type: :datetime
@@ -154,7 +176,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 10
+    :sequence_no: 11
     :caption: Active
     :namespaced_name: basic_pack_codes.active
     :data_type: :boolean

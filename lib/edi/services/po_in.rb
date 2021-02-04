@@ -163,7 +163,7 @@ module EdiApp
       weighed_date = time_from_date_and_time(seq[:weighing_date], seq[:weighing_time])
       reinspect_at = orig_inspec_date != inspec_date && !inspec_date.nil? ? inspec_date : nil
 
-      standard_pack_code_id = po_repo.find_standard_pack_code_id(seq[:pack])
+      standard_pack_code_id = po_repo.find_standard_pack_id(seq[:pack])
       rec[:lookup_data][:standard_pack_code_id] = standard_pack_code_id
       rec[:missing_mf][:standard_pack_code_id] = { mode: :direct, raise: false, keys: { pack: seq[:pack] } } if standard_pack_code_id.nil?
 
@@ -171,7 +171,7 @@ module EdiApp
       rec[:lookup_data][:fruit_size_reference_id] = fruit_size_reference_id
       rec[:missing_mf][:fruit_size_reference_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if fruit_size_reference_id.nil?
 
-      basic_pack_code_id = po_repo.find_basic_pack_code_id(standard_pack_code_id)
+      basic_pack_code_id = po_repo.find_basic_pack_id(standard_pack_code_id)
       rec[:lookup_data][:basic_pack_code_id] = basic_pack_code_id
       rec[:missing_mf][:basic_pack_code_id] = { mode: :direct, raise: false, keys: { size_count: seq[:size_count] } } if basic_pack_code_id.nil?
 

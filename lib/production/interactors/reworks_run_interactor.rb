@@ -1145,10 +1145,10 @@ module ProductionApp
       MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id })
     end
 
-    def for_select_actual_count_standard_pack_codes(standard_pack_code_ids)
-      return [] if standard_pack_code_ids.empty?
+    def for_select_actual_count_standard_pack_codes(standard_pack_ids)
+      return [] if standard_pack_ids.empty?
 
-      MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: { id: standard_pack_code_ids })
+      MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs(where: { id: standard_pack_ids })
     end
 
     def for_select_actual_count_size_references(size_reference_ids)

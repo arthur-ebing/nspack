@@ -558,7 +558,7 @@ module ProductionApp
       DB[:pallet_sequences].where(id: pallet_sequence_id).get(:carton_quantity)
     end
 
-    def for_select_standard_pack_codes
+    def for_select_standard_packs
       DB[:standard_pack_codes]
         .where(Sequel.lit('material_mass').> 0) # rubocop:disable Style/NumericPredicate
         .order(:standard_pack_code)

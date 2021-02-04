@@ -2,70 +2,139 @@
 
 module MasterfilesApp
   class FruitSizeRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :basic_pack_codes,
-                     label: :basic_pack_code,
-                     value: :id,
-                     order_by: :basic_pack_code
-    build_inactive_select :basic_pack_codes,
-                          label: :basic_pack_code,
-                          value: :id,
-                          order_by: :basic_pack_code
+    def for_select_basic_packs(where: {}, exclude: {}, active: true)
+      DB[:basic_pack_codes]
+        .join(:basic_packs_standard_packs, basic_pack_id: :id)
+        .where(active: active)
+        .where(where)
+        .exclude(exclude)
+        .order(:basic_pack_code)
+        .distinct
+        .select_map(%i[basic_pack_code id])
+    end
 
-    build_for_select :standard_pack_codes,
-                     label: :standard_pack_code,
-                     value: :id,
-                     order_by: :standard_pack_code
-    build_inactive_select :standard_pack_codes,
-                          label: :standard_pack_code,
-                          value: :id,
-                          order_by: :standard_pack_code
+    build_inactive_select :basic_pack_codes, alias: :basic_packs,  label: :basic_pack_code, value: :id, order_by: :basic_pack_code
 
-    build_for_select :standard_product_weights,
-                     label: :id,
-                     value: :id,
-                     order_by: :id
-    build_inactive_select :standard_product_weights,
-                          label: :id,
-                          value: :id,
-                          order_by: :id
+    def find_basic_pack(id)
+      hash = find_with_association(:basic_pack_codes, id)
+      return nil if hash.nil?
 
-    build_for_select :std_fruit_size_counts,
-                     label: :size_count_value,
-                     value: :id,
-                     order_by: :size_count_value
-    build_inactive_select :std_fruit_size_counts,
-                          label: :size_count_value,
-                          value: :id,
-                          order_by: :size_count_value
+      hash[:standard_pack_ids] = select_values(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: id)
+      hash[:standard_pack_codes] = select_values(:standard_pack_codes, :standard_pack_code, id: hash[:standard_pack_ids])
+      BasicPack.new(hash)
+    end
 
-    build_for_select :fruit_actual_counts_for_packs,
-                     label: :actual_count_for_pack,
-                     value: :id,
-                     order_by: :actual_count_for_pack
-    build_inactive_select :fruit_actual_counts_for_packs,
-                          label: :actual_count_for_pack,
-                          value: :id,
-                          order_by: :actual_count_for_pack
+    def create_basic_pack(res)
+      attrs = res.to_h
+      standard_pack_ids = attrs.delete(:standard_pack_ids) || []
+      basic_pack_id = create(:basic_pack_codes, attrs)
+      standard_pack_ids.each do |standard_pack_id|
+        DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: standard_pack_id)
+      end
+      return basic_pack_id unless AppConst::BASE_PACK_EQUALS_STD_PACK
 
-    build_for_select :fruit_size_references,
-                     label: :size_reference,
-                     value: :id,
-                     order_by: :size_reference
-    build_inactive_select :fruit_size_references,
-                          label: :size_reference,
-                          value: :id,
-                          order_by: :size_reference
+      standard_pack_id = create(:standard_pack_codes, standard_pack_code: attrs[:basic_pack_code], material_mass: 0)
+      create(:basic_packs_standard_packs, standard_pack_id: standard_pack_id, basic_pack_id: basic_pack_id)
+      basic_pack_id
+    end
 
-    crud_calls_for :basic_pack_codes, name: :basic_pack_code, wrapper: BasicPackCode
-    crud_calls_for :standard_pack_codes, name: :standard_pack_code, wrapper: StandardPackCode
+    def update_basic_pack(id, res)
+      attrs = res.to_h
+      new_standard_pack_ids = attrs.delete(:standard_pack_ids) || []
+      old_standard_pack_ids = select_values(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: id)
+
+      (new_standard_pack_ids - old_standard_pack_ids).each do |standard_pack_id|
+        DB[:basic_packs_standard_packs].insert(basic_pack_id: id, standard_pack_id: standard_pack_id)
+      end
+      (old_standard_pack_ids - new_standard_pack_ids).each do |standard_pack_id|
+        DB[:basic_packs_standard_packs].where(basic_pack_id: id, standard_pack_id: standard_pack_id).delete
+      end
+
+      update(:basic_pack_codes, id, attrs)
+    end
+
+    def delete_basic_pack(id)
+      standard_pack_ids = select_values(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: id)
+      DB[:basic_packs_standard_packs].where(basic_pack_id: id).delete
+      delete(:standard_pack_codes, standard_pack_ids.first) if standard_pack_ids.length == 1
+      delete(:basic_pack_codes, id)
+    end
+
+    def for_select_standard_packs(where: {}, exclude: {}, active: true)
+      DB[:standard_pack_codes]
+        .join(:basic_packs_standard_packs, standard_pack_id: :id)
+        .where(active: active)
+        .where(where)
+        .exclude(exclude)
+        .order(:standard_pack_code)
+        .distinct
+        .select_map(%i[standard_pack_code id])
+    end
+
+    build_inactive_select :standard_pack_codes, alias: :standard_packs, label: :standard_pack_code, value: :id, order_by: :standard_pack_code
+
+    def find_standard_pack(id)
+      hash = find_with_association(:standard_pack_codes, id,
+                                   parent_tables: [{ parent_table: :rmt_container_types,
+                                                     columns: %i[container_type_code],
+                                                     flatten_columns: { container_type_code: :container_type } },
+                                                   { parent_table: :rmt_container_material_types,
+                                                     columns: %i[container_material_type_code],
+                                                     flatten_columns: { container_material_type_code: :material_type } }])
+      return nil if hash.nil?
+
+      hash[:basic_pack_ids] = select_values(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: id)
+      hash[:basic_pack_codes] = select_values(:basic_pack_codes, :basic_pack_code, id: hash[:basic_pack_ids])
+      StandardPack.new(hash)
+    end
+
+    def create_standard_pack(res)
+      attrs = res.to_h
+      basic_pack_ids = attrs.delete(:basic_pack_ids) || []
+      standard_pack_id = create(:standard_pack_codes, attrs)
+      basic_pack_ids.each do |basic_pack_id|
+        DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: standard_pack_id)
+      end
+      return standard_pack_id unless AppConst::BASE_PACK_EQUALS_STD_PACK
+
+      basic_pack_id = create(:basic_pack_codes, basic_pack_code: attrs[:standard_pack_code])
+      create(:basic_packs_standard_packs, standard_pack_id: standard_pack_id, basic_pack_id: basic_pack_id)
+      standard_pack_id
+    end
+
+    def update_standard_pack(id, res) # rubocop:disable Metrics/AbcSize
+      attrs = res.to_h
+      new_basic_pack_ids = attrs.delete(:basic_pack_ids) || []
+      old_basic_pack_ids = select_values(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: id)
+
+      (new_basic_pack_ids - old_basic_pack_ids).each do |basic_pack_id|
+        DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: id)
+      end
+      (old_basic_pack_ids - new_basic_pack_ids).each do |basic_pack_id|
+        DB[:basic_packs_standard_packs].where(basic_pack_id: basic_pack_id, standard_pack_id: id).delete
+      end
+
+      if AppConst::BASE_PACK_EQUALS_STD_PACK && attrs.key?(:standard_pack_code)
+        basic_pack_id = DB[:basic_packs_standard_packs].where(standard_pack_id: id).get(:basic_pack_id)
+        update(:basic_pack_codes, basic_pack_id, basic_pack_code: attrs[:standard_pack_code])
+      end
+
+      update(:standard_pack_codes, id, attrs)
+    end
+
+    def delete_standard_pack(id)
+      basic_pack_ids = select_values(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: id)
+      DB[:basic_packs_standard_packs].where(standard_pack_id: id).delete
+      delete(:basic_pack_codes, basic_pack_ids.first) if basic_pack_ids.length == 1
+      delete(:standard_pack_codes, id)
+    end
+
+    build_for_select :standard_product_weights,  label: :id, value: :id, order_by: :id
+    build_inactive_select :standard_product_weights, label: :id, value: :id, order_by: :id
     crud_calls_for :standard_product_weights, name: :standard_product_weight, wrapper: StandardProductWeight
-    crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, wrapper: StdFruitSizeCount
-    crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack, wrapper: FruitActualCountsForPack
-    crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
 
     def find_standard_product_weight_flat(id)
-      find_with_association(:standard_product_weights,
-                            id,
+      find_with_association(:standard_product_weights, id,
                             parent_tables: [{ parent_table: :commodities,
                                               columns: %i[code],
                                               flatten_columns: { code: :commodity_code } },
@@ -76,20 +145,9 @@ module MasterfilesApp
                             wrapper: StandardProductWeightFlat)
     end
 
-    def find_standard_pack_code_flat(id)
-      find_with_association(:standard_pack_codes,
-                            id,
-                            parent_tables: [{ parent_table: :basic_pack_codes,
-                                              columns: %i[basic_pack_code],
-                                              flatten_columns: { basic_pack_code: :basic_pack_code } },
-                                            { parent_table: :rmt_container_types,
-                                              columns: %i[container_type_code],
-                                              flatten_columns: { container_type_code: :container_type } },
-                                            { parent_table: :rmt_container_material_types,
-                                              columns: %i[container_material_type_code],
-                                              flatten_columns: { container_material_type_code: :material_type } }],
-                            wrapper: StandardPackCodeFlat)
-    end
+    build_for_select :std_fruit_size_counts, label: :size_count_value, value: :id, order_by: :size_count_value
+    build_inactive_select :std_fruit_size_counts, label: :size_count_value, value: :id, order_by: :size_count_value
+    crud_calls_for :std_fruit_size_counts, name: :std_fruit_size_count, exclude: %i[delete]
 
     def find_std_fruit_size_count(id)
       query = <<~SQL
@@ -110,59 +168,17 @@ module MasterfilesApp
       StdFruitSizeCount.new(hash)
     end
 
-    def delete_basic_pack_code(id)
-      dependents = DB[:fruit_actual_counts_for_packs].where(basic_pack_code_id: id).select_map(:id)
-      return { error: 'This pack code is in use.' } unless dependents.empty?
-
-      DB[:basic_pack_codes].where(id: id).delete
-      { success: true }
-    end
-
-    def create_standard_pack_code(attrs)
-      if AppConst::BASE_PACK_EQUALS_STD_PACK
-        base_pack_id = DB[:basic_pack_codes].insert(basic_pack_code: attrs[:standard_pack_code])
-        DB[:standard_pack_codes].insert(attrs.to_h.merge(basic_pack_code_id: base_pack_id))
-      else
-        DB[:standard_pack_codes].insert(attrs.to_h)
-      end
-    end
-
-    def update_standard_pack_code(id, attrs)
-      if AppConst::BASE_PACK_EQUALS_STD_PACK && attrs.to_h.key?(:standard_pack_code)
-        bp_id = DB[:standard_pack_codes].where(id: id).get(:basic_pack_code_id)
-        DB[:basic_pack_codes].where(id: bp_id).update(basic_pack_code: attrs[:standard_pack_code])
-      end
-      DB[:standard_pack_codes].where(id: id).update(attrs.to_h)
-    end
-
-    def delete_standard_pack_code(id) # rubocop:disable Metrics/AbcSize
-      dependents = standard_pack_code_dependents(id)
-      return failed_response('This pack code is in use.') unless dependents.empty?
-
-      bp_id = nil
-      if AppConst::BASE_PACK_EQUALS_STD_PACK
-        bp_id = DB[:standard_pack_codes].where(id: id).get(:basic_pack_code_id)
-        cnt = DB[:standard_pack_codes].where(basic_pack_code_id: bp_id).count
-        bp_id = nil if cnt > 1
-      end
-
-      DB[:standard_pack_codes].where(id: id).delete
-      DB[:basic_pack_codes].where(id: bp_id).delete if bp_id
-      ok_response
-    end
-
     def delete_std_fruit_size_count(id)
       DB[:fruit_actual_counts_for_packs].where(std_fruit_size_count_id: id).delete
       DB[:std_fruit_size_counts].where(id: id).delete
     end
 
-    def delete_fruit_actual_counts_for_pack(id)
-      DB[:fruit_actual_counts_for_packs].where(id: id).delete
-    end
+    build_for_select :fruit_actual_counts_for_packs, label: :actual_count_for_pack, value: :id, order_by: :actual_count_for_pack
+    build_inactive_select :fruit_actual_counts_for_packs, label: :actual_count_for_pack, value: :id, order_by: :actual_count_for_pack
+    crud_calls_for :fruit_actual_counts_for_packs, name: :fruit_actual_counts_for_pack
 
     def find_fruit_actual_counts_for_pack(id)
-      hash = find_with_association(:fruit_actual_counts_for_packs,
-                                   id,
+      hash = find_with_association(:fruit_actual_counts_for_packs, id,
                                    parent_tables: [{ parent_table: :std_fruit_size_counts,
                                                      columns: [:size_count_description],
                                                      flatten_columns: { size_count_description: :std_fruit_size_count } },
@@ -175,8 +191,7 @@ module MasterfilesApp
                                                 { sub_table: :standard_pack_codes,
                                                   id_keys_column: :standard_pack_code_ids,
                                                   columns: %i[id standard_pack_code] }],
-                                   lookup_functions: [],
-                                   wrapper: nil)
+                                   lookup_functions: [])
       return nil if hash.nil?
 
       hash[:standard_packs] = hash[:standard_pack_codes].map { |r| r[:standard_pack_code] }.sort.join(',')
@@ -184,7 +199,11 @@ module MasterfilesApp
       FruitActualCountsForPack.new(hash)
     end
 
-    def standard_pack_codes(id)
+    build_for_select :fruit_size_references, label: :size_reference, value: :id, order_by: :size_reference
+    build_inactive_select :fruit_size_references, label: :size_reference, value: :id, order_by: :size_reference
+    crud_calls_for :fruit_size_references, name: :fruit_size_reference, wrapper: FruitSizeReference
+
+    def list_standard_pack_codes(id)
       query = <<~SQL
         SELECT standard_pack_codes.standard_pack_code
         FROM standard_pack_codes
@@ -194,7 +213,7 @@ module MasterfilesApp
       DB[query].order(:standard_pack_code).select_map(:standard_pack_code)
     end
 
-    def size_references(id)
+    def list_size_references(id)
       query = <<~SQL
         SELECT fruit_size_references.size_reference
         FROM fruit_size_references
@@ -202,15 +221,6 @@ module MasterfilesApp
         WHERE fruit_actual_counts_for_packs.id = #{id}
       SQL
       DB[query].order(:size_reference).select_map(:size_reference)
-    end
-
-    def standard_pack_code_dependents(id)
-      query = <<~SQL
-        SELECT id
-        FROM fruit_actual_counts_for_packs
-        WHERE #{id} = ANY (standard_pack_code_ids)
-      SQL
-      DB[query].select_map(:id)
     end
 
     def for_select_plant_resource_button_indicator(plant_resource_type_code)

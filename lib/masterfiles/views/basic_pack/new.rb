@@ -2,10 +2,10 @@
 
 module Masterfiles
   module Fruit
-    module BasicPackCode
+    module BasicPack
       class New
         def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
-          ui_rule = UiRules::Compiler.new(:basic_pack_code, :new, form_values: form_values)
+          ui_rule = UiRules::Compiler.new(:basic_pack, :new, form_values: form_values)
           rules   = ui_rule.compile
 
           layout = Crossbeams::Layout::Page.build(rules) do |page|
@@ -21,6 +21,7 @@ module Masterfiles
               form.add_field :width_mm
               form.add_field :height_mm
               form.add_field :footprint_code
+              form.add_field :standard_pack_ids
             end
           end
 

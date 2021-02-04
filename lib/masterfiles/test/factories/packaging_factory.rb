@@ -42,7 +42,7 @@ module MasterfilesApp
 
     def create_cartons_per_pallet(opts = {})
       pallet_format_id = create_pallet_format
-      basic_pack_code_id = create_basic_pack_code
+      basic_pack_code_id = create_basic_pack
 
       default = {
         description: Faker::Lorem.unique.word,
@@ -92,7 +92,7 @@ module MasterfilesApp
 
     def create_pm_product(opts = {})
       pm_subtype_id = create_pm_subtype
-      basic_pack_code_id = create_basic_pack_code
+      basic_pack_code_id = create_basic_pack
 
       default = {
         pm_subtype_id: pm_subtype_id,

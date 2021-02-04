@@ -16,13 +16,13 @@ module UiRules
 
     def set_show_fields  # rubocop:disable Metrics/AbcSize
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
-      standard_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_standard_pack_code(@form_object.standard_pack_id)&.standard_pack_code
+      standard_pack_id_label = MasterfilesApp::FruitSizeRepo.new.find_standard_pack(@form_object.standard_pack_id)&.standard_pack_code
       fields[:commodity_id] = { renderer: :label,
                                 with_value: commodity_id_label,
                                 caption: 'Commodity Code' }
       fields[:standard_pack_id] = { renderer: :label,
                                     with_value: standard_pack_id_label,
-                                    caption: 'Standard Pack Code' }
+                                    caption: 'Standard Pack' }
       fields[:gross_weight] = { renderer: :label }
       fields[:nett_weight] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
@@ -37,9 +37,9 @@ module UiRules
                         disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
                         caption: 'Commodity Code',
                         required: true },
-        standard_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes,
-                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_pack_codes,
-                            caption: 'Standard Pack Code',
+        standard_pack_id: { renderer: :select, options: MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs,
+                            disabled_options: MasterfilesApp::FruitSizeRepo.new.for_select_inactive_standard_packs,
+                            caption: 'Standard Pack',
                             required: true },
         gross_weight: { renderer: :numeric,
                         required: true },

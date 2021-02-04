@@ -24,6 +24,6 @@
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/fruit/standard_pack_codes/new"
-  :text: New Standard Pack Code
+  :text: New Standard Pack
   :style: :button
   :behaviour: :popup

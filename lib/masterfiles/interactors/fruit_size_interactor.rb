@@ -64,6 +64,10 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def for_select_standard_packs(where: {})
+      repo.for_select_standard_packs(where: where)
+    end
+
     private
 
     def repo

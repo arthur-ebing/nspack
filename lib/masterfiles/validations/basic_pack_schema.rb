@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MasterfilesApp
-  BasicPackCodeSchema = Dry::Schema.Params do
+  BasicPackSchema = Dry::Schema.Params do
     optional(:id).filled(:integer)
     required(:basic_pack_code).filled(Types::StrippedString)
     required(:description).maybe(Types::StrippedString)
@@ -9,5 +9,6 @@ module MasterfilesApp
     required(:width_mm).maybe(:integer)
     required(:height_mm).maybe(:integer)
     required(:footprint_code).maybe(Types::StrippedString)
+    optional(:standard_pack_ids).maybe(:array).maybe { each(:integer) }
   end
 end

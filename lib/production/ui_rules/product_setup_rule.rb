@@ -51,7 +51,7 @@ module UiRules
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack' }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack', hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK }
       fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack' }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
@@ -111,23 +111,26 @@ module UiRules
                                 searchable: true,
                                 remove_search_for_small_list: false },
         std_fruit_size_count_id: { renderer: :select,
-                                   options: @fruit_size_repo.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id }),
+                                   options: @fruit_size_repo.for_select_std_fruit_size_counts(
+                                     where: { commodity_id: commodity_id }
+                                   ),
                                    disabled_options: @fruit_size_repo.for_select_inactive_std_fruit_size_counts,
                                    caption: 'Std Size Count',
                                    prompt: 'Select Size Count',
                                    searchable: true,
                                    remove_search_for_small_list: false },
         basic_pack_code_id: { renderer: :select,
-                              options: @fruit_size_repo.for_select_basic_pack_codes,
-                              disabled_options: @fruit_size_repo.for_select_inactive_basic_pack_codes,
+                              options: @fruit_size_repo.for_select_basic_packs,
+                              disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               caption: 'Basic Pack',
-                              required: true,
+                              required: !AppConst::BASE_PACK_EQUALS_STD_PACK,
                               prompt: 'Select Basic Pack',
                               searchable: true,
+                              hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK,
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
-                                 options: @fruit_size_repo.for_select_standard_pack_codes,
-                                 disabled_options: @fruit_size_repo.for_select_inactive_standard_pack_codes,
+                                 options: @fruit_size_repo.for_select_standard_packs,
+                                 disabled_options: @fruit_size_repo.for_select_inactive_standard_packs,
                                  caption: 'Standard Pack',
                                  required: true,
                                  prompt: 'Select Standard Pack',

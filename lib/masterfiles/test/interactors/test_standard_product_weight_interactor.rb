@@ -65,7 +65,7 @@ module MasterfilesApp
 
     def standard_product_weight_attrs
       commodity_id = create_commodity
-      standard_pack_code_id = create_standard_pack_code
+      standard_pack_code_id = create_standard_pack
 
       {
         id: 1,

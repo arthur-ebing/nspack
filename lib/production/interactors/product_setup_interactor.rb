@@ -1,20 +1,8 @@
-# rubocop:disable Metrics/CyclomaticComplexity
-# rubocop:disable Metrics/PerceivedComplexity
 # frozen_string_literal: true
 
 module ProductionApp
   class ProductSetupInteractor < BaseInteractor # rubocop:disable Metrics/ClassLength
     def create_product_setup(params)  # rubocop:disable Metrics/AbcSize
-      if AppConst::CLIENT_CODE == 'kr'
-        if params[:standard_pack_code_id].to_i.nonzero?.nil?
-          standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
-          return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
-
-          params = params.merge(standard_pack_code_id: standard_pack_code_id)
-        end
-      end
-
-      params = params.merge({ gtin_code: gtin_code(params) }) if AppConst::CR_PROD.use_gtins?
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -33,30 +21,7 @@ module ProductionApp
       failed_response(e.message)
     end
 
-    def standard_pack_code_id(fruit_actual_counts_for_pack_id, basic_pack_code_id) # rubocop:disable Metrics/AbcSize
-      if fruit_actual_counts_for_pack_id.to_i.nonzero?.nil?
-        standard_pack_code_id = repo.basic_pack_standard_pack_code_id(basic_pack_code_id) unless basic_pack_code_id.to_i.nonzero?.nil?
-        return 'Cannot find Standard Pack' if standard_pack_code_id.nil?
-      else
-        standard_pack_code_ids = MasterfilesApp::FruitSizeRepo.new.find_fruit_actual_counts_for_pack(fruit_actual_counts_for_pack_id).standard_pack_code_ids
-        return 'There is a 1 to many relationship between the Actual Count and Standard Pack' unless standard_pack_code_ids.size.==1
-
-        standard_pack_code_id = standard_pack_code_ids[0]
-      end
-      standard_pack_code_id
-    end
-
-    def update_product_setup(id, params)  # rubocop:disable Metrics/AbcSize
-      if AppConst::CLIENT_CODE == 'kr'
-        # if params[:standard_pack_code_id].to_i.nonzero?.nil?
-        standard_pack_code_id = standard_pack_code_id(params[:fruit_actual_counts_for_pack_id], params[:basic_pack_code_id])
-        return failed_response(standard_pack_code_id) if standard_pack_code_id.is_a? String
-
-        params = params.merge(standard_pack_code_id: standard_pack_code_id)
-        # end
-      end
-
-      params = params.merge({ gtin_code: gtin_code(params) }) if AppConst::CR_PROD.use_gtins?
+    def update_product_setup(id, params) # rubocop:disable Metrics/AbcSize
       res = validate_product_setup_params(params)
       return validation_failed_response(res) if res.failure?
       return failed_response('You did not choose a Size Reference or Actual Count') if params[:fruit_size_reference_id].to_i.nonzero?.nil? && params[:fruit_actual_counts_for_pack_id].to_i.nonzero?.nil?
@@ -96,36 +61,43 @@ module ProductionApp
     end
 
     def for_select_template_commodity_size_counts(commodity_id)
-      MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts(where: { commodity_id: commodity_id })
+      MasterfilesApp::FruitSizeRepo.new.for_select_std_fruit_size_counts(
+        where: { commodity_id: commodity_id }
+      )
     end
 
     def for_select_basic_pack_actual_counts(basic_pack_code_id, std_fruit_size_count_id)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(where: { basic_pack_code_id: basic_pack_code_id,
-                                                                                          std_fruit_size_count_id: std_fruit_size_count_id })
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_actual_counts_for_packs(
+        where: { basic_pack_code_id: basic_pack_code_id, std_fruit_size_count_id: std_fruit_size_count_id }
+      )
     end
 
     def for_select_actual_count_standard_pack_codes(standard_pack_code_ids)
-      return [] if standard_pack_code_ids.empty?
-
-      MasterfilesApp::FruitSizeRepo.new.for_select_standard_pack_codes(where: { id: standard_pack_code_ids })
+      MasterfilesApp::FruitSizeRepo.new.for_select_standard_packs(where: { id: standard_pack_code_ids })
     end
 
     def for_select_actual_count_size_references(size_reference_ids)
-      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(where: { id: size_reference_ids }) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
+      MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references(
+        where: { id: size_reference_ids }
+      ) || MasterfilesApp::FruitSizeRepo.new.for_select_fruit_size_references
     end
 
     def for_select_customer_varieties(packed_tm_group_id, marketing_variety_id)
-      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(where: { packed_tm_group_id: packed_tm_group_id, marketing_variety_id: marketing_variety_id })
+      MasterfilesApp::MarketingRepo.new.for_select_customer_varieties(
+        where: { packed_tm_group_id: packed_tm_group_id, marketing_variety_id: marketing_variety_id }
+      )
     end
 
     def for_select_pallet_formats(pallet_base_id, pallet_stack_type_id)
-      MasterfilesApp::PackagingRepo.new.for_select_pallet_formats(where: { pallet_base_id: pallet_base_id,
-                                                                           pallet_stack_type_id: pallet_stack_type_id })
+      MasterfilesApp::PackagingRepo.new.for_select_pallet_formats(
+        where: { pallet_base_id: pallet_base_id, pallet_stack_type_id: pallet_stack_type_id }
+      )
     end
 
     def for_select_cartons_per_pallets(pallet_format_id, basic_pack_code_id)
-      MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet(where: { pallet_format_id: pallet_format_id,
-                                                                               basic_pack_id: basic_pack_code_id })
+      MasterfilesApp::PackagingRepo.new.for_select_cartons_per_pallet(
+        where: { pallet_format_id: pallet_format_id, basic_pack_id: basic_pack_code_id }
+      )
     end
 
     def pm_bom_products_table(pm_bom_id, pm_mark_id = nil)
@@ -202,9 +174,12 @@ module ProductionApp
     end
 
     def validate_product_setup_params(params)
+      params.merge!({ gtin_code: gtin_code(params) }) if AppConst::CR_PROD.use_gtins?
+      if AppConst::BASE_PACK_EQUALS_STD_PACK
+        basic_pack_id = repo.get_value(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: params[:standard_pack_code_id])
+        params.merge!({ basic_pack_code_id: basic_pack_id })
+      end
       ProductSetupSchema.call(params)
     end
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/PerceivedComplexity

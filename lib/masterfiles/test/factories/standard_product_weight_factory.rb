@@ -4,7 +4,7 @@ module MasterfilesApp
   module StandardProductWeightFactory
     def create_standard_product_weight(opts = {})
       commodity_id = create_commodity
-      standard_pack_code_id = create_standard_pack_code
+      standard_pack_code_id = create_standard_pack
 
       default = {
         commodity_id: commodity_id,
@@ -21,7 +21,7 @@ module MasterfilesApp
       DB[:standard_product_weights].insert(default.merge(opts))
     end
 
-    def create_standard_pack_code(opts = {})
+    def create_standard_pack(opts = {})
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
         created_at: '2010-01-01 12:00',
