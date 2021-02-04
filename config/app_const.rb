@@ -65,6 +65,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # All the CB_ classes will use this value as the client_code, which allows
   # for testing different values for a setting.
   TEST_SETTINGS = OpenStruct.new(client_code: CLIENT_CODE)
+  VERBOSE_ROBOT_FEEDBACK_LOGGING = make_boolean('VERBOSE_ROBOT_FEEDBACK_LOGGING')
 
   # Load client-specific rules:
   # NB: these must start with CR_ and the class must start with "Client".

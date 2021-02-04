@@ -3,6 +3,7 @@
 module Crossbeams
   class RobotResponder
     attr_accessor :display_lines
+    attr_reader :robot_feedback
 
     def initialize(robot_feedback)
       @robot_feedback = robot_feedback
@@ -13,6 +14,9 @@ module Crossbeams
     end
 
     def render
+      log_feedback
+      log_confirmation
+
       if @display_lines == 4
         render_4_lines
       else
@@ -21,6 +25,20 @@ module Crossbeams
     end
 
     private
+
+    def log_feedback
+      return unless AppConst::VERBOSE_ROBOT_FEEDBACK_LOGGING
+
+      msgs = %i[msg short1 short2 short3 short4 line1 line2 line3 line4 line5 line6].map { |a| robot_feedback.send(a) }.compact.join('; ')
+      puts "DEVICE: #{robot_feedback.device} RDR: #{robot_feedback.reader_id} FEEDBACK: #{msgs}"
+    end
+
+    def log_confirmation
+      return unless AppConst::VERBOSE_ROBOT_FEEDBACK_LOGGING
+      return if robot_feedback.confirm_text.nil?
+
+      puts "CONFIRM: #{robot_feedback.confirm_text} - Y: #{robot_feedback.confirm_url} - N: #{robot_feedback.cancel_url}"
+    end
 
     def lookup_display_lines
       MesscadaApp::MesscadaRepo.new.display_lines_for(@robot_feedback.device)

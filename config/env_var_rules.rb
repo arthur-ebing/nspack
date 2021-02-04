@@ -6,6 +6,7 @@ class EnvVarRules # rubocop:disable Metrics/ClassLength
     { DONOTLOGSQL: 'Dev mode: do not log SQL calls' },
     { LOGSQLTOFILE: 'Dev mode: separate SQL calls out of logs and write to file "log/sql.log"' },
     { LOGFULLMESSERVERCALLS: 'Dev mode: Log full payload of HTTP calls to MesServer. Only do this if debugging.' },
+    { VERBOSE_ROBOT_FEEDBACK_LOGGING: 'Log full XML robot feedback response messages.' },
     { RUN_FOR_RMD: 'Dev mode: Force the server to act as if it is being called from a Registered Mobile Device' },
     { NO_ERR_HANDLE: 'Dev mode: Do not use the error handling built into the framework. Can be useful to debug without mail sending in the output.' },
     { DEFAULT_FARM: 'Many pack houses will receive fruit from only one farm. System should therefore allow for a default value.' },
