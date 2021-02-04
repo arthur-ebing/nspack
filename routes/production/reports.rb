@@ -67,10 +67,10 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
 
       jasper_params = JasperParams.new('packout_summary',
                                        current_user.login_name,
-                                       FromDate: "#{attrs[:from_date]} 00:00:00",
-                                       ToDate: "#{attrs[:to_date]} 00:00:00",
+                                       FromDate: Time.parse(attrs[:from_date]),
+                                       ToDate: Time.parse(attrs[:to_date]),
                                        detail_level: attrs[:detail_level] == 't' ? 'Detail' : 'Summary',
-                                       dispatched_only: attrs[:dispatched_only] == 't' ? 'true|boolean' : 'false|boolean',
+                                       dispatched_only: attrs[:dispatched_only] == 't',
                                        line: line,
                                        puc: puc,
                                        orchard: orchard.nil_or_empty? ? nil : orchard,

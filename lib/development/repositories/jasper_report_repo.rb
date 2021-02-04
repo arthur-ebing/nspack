@@ -21,13 +21,14 @@ module DevelopmentApp
       DRb.stop_service
       res
     rescue DRb::DRbConnError => e
-      DRb.stop_service # as ensure?
       msg = if e.cause
               e.cause.message
             else
               e.message
             end
       raise Crossbeams::FrameworkError, "The Jasper service is not reachable at #{AppConst::JRUBY_JASPER_HOST_PORT} : #{msg}"
+    ensure
+      DRb.stop_service # as ensure?
     end
 
     def print_report(user, report, path, printer, params)
