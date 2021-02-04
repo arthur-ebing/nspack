@@ -48,9 +48,9 @@ module Crossbeams
       return msg if msg.nil_or_empty?
 
       if msg.include?(AppConst::ROBOT_MSG_SEP)
-        msg.split(AppConst::ROBOT_MSG_SEP).first
+        msg.split(AppConst::ROBOT_MSG_SEP).first.sub('Validation error - ', '')
       else
-        msg
+        msg.sub('Validation error - ', '')
       end
     end
 
@@ -58,9 +58,9 @@ module Crossbeams
       return msg if msg.nil_or_empty?
 
       if msg.include?(AppConst::ROBOT_MSG_SEP)
-        msg.split(AppConst::ROBOT_MSG_SEP).last
+        msg.split(AppConst::ROBOT_MSG_SEP).last.sub('Validation error - ', '')
       else
-        msg
+        msg.sub('Validation error - ', '')
       end
     end
 
