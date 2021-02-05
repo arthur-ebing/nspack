@@ -39,7 +39,6 @@ module MasterfilesApp
     required(:pm_type_short_code).filled(Types::StrippedString)
     required(:basic_pack_code).filled(Types::StrippedString)
     required(:pm_subtype_short_code).filled(Types::StrippedString)
-    required(:height_mm).filled(Types::StrippedString)
   end
 
   MinimumPmProductSchema = Dry::Schema.Params do

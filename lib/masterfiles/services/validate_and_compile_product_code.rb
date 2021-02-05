@@ -18,7 +18,6 @@ module MasterfilesApp
 
     def call # rubocop:disable Metrics/AbcSize
       res = ExtendedPmProductContract.new.call(params)
-      # return res if res.success?  # Return if validation passed
       return res unless res.errors[:pm_subtype_id].nil? # Return validation failed. pm_subtype_id is required to compile product_code
 
       res = compile_product_code
