@@ -44,7 +44,8 @@ class Nspack < Roda
       r.on 'set_bin_tipping_criteria' do
         r.get do
           run = interactor.production_run(id)
-          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingCriteria.call(id, form_values: run.legacy_bintip_criteria, remote: fetch?(r)) }
+          form_values = run.legacy_bintip_criteria || { commodity_code: true, rmt_variety_code: true, treatment_code: true, rmt_size: true, product_class_code: true }
+          show_partial_or_page(r) { Production::Runs::ProductionRun::BinTippingCriteria.call(id, form_values: form_values, remote: fetch?(r)) }
         end
 
         r.post do
@@ -841,6 +842,7 @@ class Nspack < Roda
     r.on 'toggle_bin_tipping_criteria' do
       toggle = params[:changed_value] != 'f'
       json_actions([
+                     OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_farm_code', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_commodity_code', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_rmt_variety_code', checked: toggle),
                      OpenStruct.new(type: :set_checked, dom_id: 'bin_tipping_criteria_treatment_code', checked: toggle),
