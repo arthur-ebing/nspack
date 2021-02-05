@@ -4,6 +4,7 @@ module UiRules
   class ContractWorkerRule < Base # rubocop:disable Metrics/ClassLength
     def generate_rules
       @repo = MasterfilesApp::HumanResourcesRepo.new
+      @hr_messcada_repo = MesscadaApp::HrRepo.new
       @print_repo = LabelApp::PrinterRepo.new
       make_form_object
       apply_form_values
@@ -12,8 +13,20 @@ module UiRules
 
       set_show_fields if %i[show reopen].include? @mode
       set_print_fields if @mode == :print_barcode
+      set_packer_role_fields if @mode == :packer_role
 
       form_name 'contract_worker'
+    end
+
+    def set_packer_role_fields
+      fields[:first_name] = { renderer: :label }
+      fields[:surname] = { renderer: :label }
+      fields[:title] = { renderer: :label }
+      fields[:personnel_number] = { renderer: :label }
+      fields[:packer_role_id] = { renderer: :select,
+                                  options: @repo.for_select_contract_worker_packer_roles,
+                                  caption: 'Packer role',
+                                  min_charwidth: 35 }
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
@@ -42,6 +55,8 @@ module UiRules
       fields[:packer_role_id] = { renderer: :label,
                                   with_value: @form_object.packer_role,
                                   invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? }
+      fields[:personnel_identifier_id] = { renderer: :label,
+                                           with_value: identifier_label }
     end
 
     def set_print_fields
@@ -53,6 +68,19 @@ module UiRules
     end
 
     def common_fields
+      packer_role_renderer = if worker_in_active_group
+                               { renderer: :label,
+                                 with_value: @form_object.packer_role,
+                                 invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? }
+                             else
+                               { renderer: :select,
+                                 options: @repo.for_select_contract_worker_packer_roles,
+                                 caption: 'Packer role',
+                                 min_charwidth: 35,
+                                 prompt: true,
+                                 invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? }
+                             end
+
       {
         employment_type_id: { renderer: :select,
                               options: @repo.for_select_employment_types,
@@ -71,12 +99,7 @@ module UiRules
                          caption: 'Shift Type',
                          min_charwidth: 35,
                          prompt: true },
-        packer_role_id: { renderer: :select,
-                          options: @repo.for_select_contract_worker_packer_roles,
-                          caption: 'Packer role',
-                          min_charwidth: 35,
-                          prompt: true,
-                          invisible: !AppConst::CR_PROD.group_incentive_has_packer_roles? },
+        packer_role_id: packer_role_renderer,
         first_name: { required: true },
         surname: { required: true },
         title: { force_uppercase: true },
@@ -118,6 +141,16 @@ module UiRules
                                     end_date: nil,
                                     packer_role_id: default_packer_role,
                                     active: true)
+    end
+
+    def worker_in_active_group
+      return false if @mode == :new
+
+      @hr_messcada_repo.packer_belongs_to_active_incentive_group?(@form_object.id)
+    end
+
+    def identifier_label
+      @repo.find_personnel_identifier(@form_object.personnel_identifier_id)&.identifier
     end
   end
 end

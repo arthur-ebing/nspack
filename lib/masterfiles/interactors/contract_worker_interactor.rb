@@ -13,7 +13,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_worker(id)
-      success_response("Created contract worker #{instance.first_name}", instance)
+      success_response("Created contract worker #{instance.first_name} #{instance.surname}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { first_name: ['This contract worker already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -29,7 +29,7 @@ module MasterfilesApp
         log_transaction
       end
       instance = contract_worker(id)
-      success_response("Updated contract worker #{instance.first_name}", instance)
+      success_response("Updated contract worker #{instance.first_name} #{instance.surname}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
@@ -87,10 +87,30 @@ module MasterfilesApp
       LabelPrintingApp::PrintLabel.call(AppConst::LABEL_PERSONNEL_BARCODE, instance.to_h.merge(identifier: ident, personnel_name: "#{instance.first_name} #{instance.surname}"), params)
     end
 
+    def change_packer_role(id, params) # rubocop:disable Metrics/AbcSize
+      role = repo.get_value(:contract_worker_packer_roles, :packer_role, id: params[:packer_role_id])
+      instance = contract_worker(id)
+      return success_response('Role has not changed', { packer_role: role }) if params[:packer_role_id].to_i == instance.packer_role_id
+
+      repo.transaction do
+        repo.update_contract_worker(id, params)
+        messcada_hr_repo.apply_changed_role_to_group(id)
+        log_status(:contract_workers, id, 'ROLE CHANGE', comment: role)
+      end
+
+      success_response("Changed role to #{role} for contract worker #{instance.first_name} #{instance.surname}", instance.to_h.merge(packer_role: role))
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo
       @repo ||= HumanResourcesRepo.new
+    end
+
+    def messcada_hr_repo
+      @messcada_hr_repo ||= MesscadaApp::HrRepo.new
     end
 
     def contract_worker(id)

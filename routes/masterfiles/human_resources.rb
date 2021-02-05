@@ -228,6 +228,23 @@ class Nspack < Roda
         end
       end
 
+      r.on 'change_packer_role' do
+        r.get do
+          check_auth!('hr', 'edit')
+          interactor.assert_permission!(:edit, id)
+          show_partial { Masterfiles::HumanResources::ContractWorker::ChangePackerRole.call(id) }
+        end
+
+        r.patch do
+          res = interactor.change_packer_role(id, params[:contract_worker])
+          if res.success
+            update_grid_row(id, changes: { packer_role: res.instance[:packer_role] }, notice: res.message)
+          else
+            re_show_form(r, res) { Masterfiles::HumanResources::ContractWorker::ChangePackerRole.call(id, form_values: params[:contract_worker], form_errors: res.errors) }
+          end
+        end
+      end
+
       r.on 'edit' do   # EDIT
         check_auth!('hr', 'edit')
         interactor.assert_permission!(:edit, id)

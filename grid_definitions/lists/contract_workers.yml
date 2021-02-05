@@ -17,6 +17,11 @@
   :is_delete: true
   :popup: true
 - :separator: true
+- :url: "/masterfiles/human_resources/contract_workers/$:id$/change_packer_role"
+  :text: Change packer role
+  :icon: toggle-on
+  :title: Edit
+  :popup: true
 - :url: "/masterfiles/human_resources/contract_workers/$:id$/print_barcode"
   :text: Print barcode
   :icon: printer

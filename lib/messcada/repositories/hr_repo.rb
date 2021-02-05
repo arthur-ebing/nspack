@@ -86,12 +86,12 @@ module MesscadaApp
                 from_external_system: false,
                 active: false)
 
-      logout_from_messcada(system_resource_id, contract_worker_id)
+      logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
 
       ok_response
     end
 
-    def logout_device(device)
+    def logout_device(device) # rubocop:disable Metrics/AbcSize
       # 1. find the logged-in worker idS
       contract_worker_ids = DB[:system_resource_logins].where(system_resource_id: system_resource_id, active: true).select_map(:contract_worker_id)
 
@@ -104,7 +104,7 @@ module MesscadaApp
                 active: false)
 
       contract_worker_ids.each do |contract_worker_id|
-        logout_from_messcada(system_resource_id, contract_worker_id)
+        logout_from_messcada(system_resource_id, contract_worker_id) unless system_resource_id.nil?
       end
 
       ok_response
@@ -162,19 +162,18 @@ module MesscadaApp
 
     def create_group_incentive(params)
       attrs = params.to_h
-      attrs[:contract_worker_ids] = array_for_db_col(attrs[:contract_worker_ids]) if attrs.key?(:contract_worker_ids)
       append_worker_targets(attrs)
-      DB[:group_incentives].insert(attrs)
+
+      create(:group_incentives, attrs)
     end
 
     def update_group_incentive(group_incentive_id, params)
       attrs = params.to_h
-      attrs[:contract_worker_ids] = array_for_db_col(attrs[:contract_worker_ids]) if attrs.key?(:contract_worker_ids)
       # calculate targets if active, but ignore if a group is just being made inactive.
       append_worker_targets(attrs) if attrs.key?(:active) && !attrs[:active]
 
       attrs[:from_external_system] = false
-      DB[:group_incentives].where(id: group_incentive_id).update(attrs)
+      update(:group_incentives, group_incentive_id, attrs)
     end
 
     def append_worker_targets(attrs) # rubocop:disable Metrics/AbcSize
@@ -184,7 +183,7 @@ module MesscadaApp
       # partition ids based on contract_worker_packer_roles.part_of_group_incentive_target
       ar = DB[:contract_workers]
            .join(:contract_worker_packer_roles, id: :packer_role_id)
-           .where(Sequel[:contract_workers][:id] => contract_worker_ids)
+           .where(Sequel[:contract_workers][:id] => attrs[:contract_worker_ids].to_a)
            .select_map([Sequel[:contract_workers][:id], :part_of_group_incentive_target])
       yes, no = ar.partition(&:last)
       attrs[:incentive_target_worker_ids] = yes.map(&:first)
@@ -202,6 +201,17 @@ module MesscadaApp
     def add_contract_worker_to_group(params)
       arr = Array(group_incentive_contract_worker_ids(params[:group_incentive_id]))
       arr.push(params[:contract_worker_id])
+    end
+
+    def apply_changed_role_to_group(contract_worker_id)
+      return unless packer_belongs_to_active_incentive_group?(contract_worker_id)
+
+      group_id = contract_worker_active_group_incentive_id(contract_worker_id)
+      attrs = find_hash(:group_incentives, group_id).reject { |k, _| k == :id }
+      update(:group_incentives, group_id, active: false, from_external_system: false)
+      create_group_incentive(attrs)
+      # new_group_id = create_group_incentive(attrs)
+      # Do TCP call if device is legacy messcada
     end
 
     def group_incentive_contract_worker_ids(group_incentive_id)

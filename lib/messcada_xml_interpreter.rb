@@ -29,7 +29,7 @@ class MesscadaXMLInterpreter
   end
 
   def params_for_packer_role
-    # <XMLData device="LBL-3A", identifier="1234" role=Pakker"" />
+    # <XMLData device="LBL-3A" identifier="1234" role="Pakker" />
     root = 'XMLData'
     validate_root_and_attributes(root)
     device = schema.xpath(".//#{root}").attribute('device').value

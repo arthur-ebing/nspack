@@ -39,7 +39,7 @@ class MesScadaLoginState < BaseScript
       ORDER BY c.updated_at DESC LIMIT 3
     SQL
     puts "\nNSpack workers"
-    table = UtilityFunctions.make_text_table(DB[query].all, times: [:updated_at], numbers: [:id])
+    table = UtilityFunctions.make_text_table(DB[query].all, times: [:updated_at], rjust: [:id])
     puts table.join("\n")
   end
 
@@ -97,7 +97,7 @@ class MesScadaLoginState < BaseScript
     query = <<~SQL
       SELECT p.id, p.first_name, p.last_name, p.industry_number, p.is_logged_on, p.logged_onto_module, p.logged_onoff_time, p.reader_id,
       p.selected_role AS role, p.from_external_system AS ext, p.updated_at
-      FROM kromco_legacy.people p ORDER BY p.updated_at DESC LIMIT 3
+      FROM kromco_legacy.people p ORDER BY p.updated_at DESC LIMIT 30
     SQL
     puts "\nMesScada people"
     table = UtilityFunctions.make_text_table(DB[query].all, times: %i[logged_onoff_time updated_at], rjust: %i[id])

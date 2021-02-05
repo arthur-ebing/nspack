@@ -99,8 +99,10 @@ class Nspack < Roda
     # CHANGE LOGIN ROLE
     # --------------------------------------------------------------------------
     r.on 'change_packer_role' do
+      hr_interactor = MesscadaApp::HrInteractor.new(system_user, {}, { route_url: request.path, request_ip: request.ip }, {})
       params = xml_interpreter.params_for_packer_role
-      res = hr_interactor.change_packer_role(params)
+      res = MesscadaApp::AddSystemResourceIncentiveToParams.call(params)
+      res = hr_interactor.change_packer_role(res.instance) if res.success
 
       feedback = if res.success
                    MesscadaApp::RobotFeedback.new(device: params[:device],

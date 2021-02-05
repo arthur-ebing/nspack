@@ -194,13 +194,22 @@ module MesscadaApp
     end
 
     def change_packer_role(params)
+      # p params
+      # {:device=>"LBL-3A", :identifier=>"1234", :role=>"Pakker", :system_resource=>#<ProductionApp::SystemResourceWithIncentive id=1089 system_resource_code="LBL-3A" login=true logoff=false group_incentive=true packpoint="LBL-3A" card_reader="1" contract_worker_id=nil personnel_identifier_id=nil group_incentive_id=71 identifier=nil>}
+
+      res = ChangePackerRoleSchema.call(params)
+      return validation_failed_response(res) if res.failure?
+
+      # update & launch job to update GUI
       # params: device, identifier, role
+      #
       # Update contract_worker.packer_role_id
       # If part of an active group (match on device???? - or just any active group???)
       #   copy group, where new one has exactly same workers
       #   update takes care of new role - check this is ok within transaction...
       #   make old group inactive
       # end
+      ok_response
     end
 
     private
