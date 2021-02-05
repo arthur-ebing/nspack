@@ -1,0 +1,333 @@
+---
+:caption: Package BOM details
+:sql: "SELECT\r\n  pm_boms.bom_code,\r\n  pm_products.product_code,\r\n  pm_subtypes.subtype_code,\r\n
+  \ pm_subtypes.short_code,\r\n  pm_subtypes.description AS sub_type_desc,\r\n  pm_boms_products.quantity,\r\n
+  \ pm_types.pm_type_code,\r\n  pm_types.description AS pm_type_desc,\r\n  pm_products.erp_code,\r\n
+  \ pm_products.description AS pm_product_desc,\r\n  pm_products.material_mass,\r\n
+  \ pm_products.height_mm,\r\n  pm_products.gross_weight_per_unit,\r\n  pm_products.items_per_unit,\r\n
+  \ pm_products.items_per_unit_client_description,\r\n  std_fruit_size_counts.size_count_value,\r\n
+  \ basic_pack_codes.basic_pack_code,\r\n  pm_composition_levels.composition_level\r\nFROM\r\n
+  \ pm_boms\r\n  JOIN pm_boms_products ON pm_boms_products.pm_bom_id = pm_boms.id\r\n
+  \ JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id\r\n  JOIN
+  pm_subtypes ON pm_products.pm_subtype_id = pm_subtypes.id\r\n  JOIN pm_types ON
+  pm_subtypes.pm_type_id = pm_types.id\r\n  LEFT JOIN std_fruit_size_counts ON std_fruit_size_counts.id
+  = pm_products.std_fruit_size_count_id\r\n  LEFT JOIN basic_pack_codes ON pm_products.basic_pack_id
+  = basic_pack_codes.id\r\n  LEFT JOIN pm_composition_levels ON pm_types.pm_composition_level_id
+  = pm_composition_levels.id\r\nORDER BY\r\n  pm_boms.id\r\n"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  bom_code:
+    :name: bom_code
+    :sequence_no: 1
+    :caption: Bom code
+    :namespaced_name: pm_boms.bom_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  product_code:
+    :name: product_code
+    :sequence_no: 2
+    :caption: Product code
+    :namespaced_name: pm_products.product_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  subtype_code:
+    :name: subtype_code
+    :sequence_no: 3
+    :caption: Subtype code
+    :namespaced_name: pm_subtypes.subtype_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  short_code:
+    :name: short_code
+    :sequence_no: 4
+    :caption: Short code
+    :namespaced_name: pm_subtypes.short_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  sub_type_desc:
+    :name: sub_type_desc
+    :sequence_no: 5
+    :caption: Sub type desc
+    :namespaced_name: pm_subtypes.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  quantity:
+    :name: quantity
+    :sequence_no: 6
+    :caption: Quantity
+    :namespaced_name: pm_boms_products.quantity
+    :data_type: :number
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_type_code:
+    :name: pm_type_code
+    :sequence_no: 7
+    :caption: Pm type code
+    :namespaced_name: pm_types.pm_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_type_desc:
+    :name: pm_type_desc
+    :sequence_no: 8
+    :caption: Pm type desc
+    :namespaced_name: pm_types.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  erp_code:
+    :name: erp_code
+    :sequence_no: 9
+    :caption: Erp code
+    :namespaced_name: pm_products.erp_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_product_desc:
+    :name: pm_product_desc
+    :sequence_no: 10
+    :caption: Pm product desc
+    :namespaced_name: pm_products.description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  material_mass:
+    :name: material_mass
+    :sequence_no: 11
+    :caption: Material mass
+    :namespaced_name: pm_products.material_mass
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  height_mm:
+    :name: height_mm
+    :sequence_no: 12
+    :caption: Height mm
+    :namespaced_name: pm_products.height_mm
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  gross_weight_per_unit:
+    :name: gross_weight_per_unit
+    :sequence_no: 13
+    :caption: Gross weight per unit
+    :namespaced_name: pm_products.gross_weight_per_unit
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  items_per_unit:
+    :name: items_per_unit
+    :sequence_no: 14
+    :caption: Items per unit
+    :namespaced_name: pm_products.items_per_unit
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  items_per_unit_client_description:
+    :name: items_per_unit_client_description
+    :sequence_no: 15
+    :caption: Items per unit client description
+    :namespaced_name: pm_products.items_per_unit_client_description
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  size_count_value:
+    :name: size_count_value
+    :sequence_no: 16
+    :caption: Size count value
+    :namespaced_name: std_fruit_size_counts.size_count_value
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  basic_pack_code:
+    :name: basic_pack_code
+    :sequence_no: 17
+    :caption: Basic pack code
+    :namespaced_name: basic_pack_codes.basic_pack_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  composition_level:
+    :name: composition_level
+    :sequence_no: 18
+    :caption: Composition level
+    :namespaced_name: pm_composition_levels.composition_level
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: pm_boms.id
+  :caption: PKG BOM Code
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT bom_code, id FROM pm_boms ORDER BY bom_code
+- :column: pm_types.id
+  :caption: PKG Type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pm_type_code, id FROM pm_types ORDER BY pm_type_code
+- :column: pm_subtypes.id
+  :caption: PKG Subtype
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT subtype_code, id FROM pm_subtypes ORDER BY subtype_code

@@ -28,6 +28,7 @@ Handy Rake prep tasks
 +
 Pictoral overview of application.
 * link:/developer_documentation/development_guide.adoc[Development Guide]
+* link:/developer_documentation/coding_principles.adoc[Coding principles]
 * link:/developer_documentation/cron.adoc[cron jobs]
 * link:/developer_documentation/aliases.adoc[Bash aliases]
 
