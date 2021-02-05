@@ -80,7 +80,7 @@ module UiRules
                           caption: 'Basic Packs',
                           options: @repo.for_select_basic_packs,
                           selected: @form_object.basic_pack_ids,
-                          hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK,
+                          hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack?,
                           required: false }
 
       }

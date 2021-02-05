@@ -31,7 +31,7 @@ module MasterfilesApp
       standard_pack_ids.each do |standard_pack_id|
         DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: standard_pack_id)
       end
-      return basic_pack_id unless AppConst::BASE_PACK_EQUALS_STD_PACK
+      return basic_pack_id unless AppConst::CR_MF.basic_pack_equals_standard_pack?
 
       standard_pack_id = create(:standard_pack_codes, standard_pack_code: attrs[:basic_pack_code], material_mass: 0)
       create(:basic_packs_standard_packs, standard_pack_id: standard_pack_id, basic_pack_id: basic_pack_id)
@@ -95,7 +95,7 @@ module MasterfilesApp
       basic_pack_ids.each do |basic_pack_id|
         DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: standard_pack_id)
       end
-      return standard_pack_id unless AppConst::BASE_PACK_EQUALS_STD_PACK
+      return standard_pack_id unless AppConst::CR_MF.basic_pack_equals_standard_pack?
 
       basic_pack_id = create(:basic_pack_codes, basic_pack_code: attrs[:standard_pack_code])
       create(:basic_packs_standard_packs, standard_pack_id: standard_pack_id, basic_pack_id: basic_pack_id)
@@ -114,7 +114,7 @@ module MasterfilesApp
         DB[:basic_packs_standard_packs].where(basic_pack_id: basic_pack_id, standard_pack_id: id).delete
       end
 
-      if AppConst::BASE_PACK_EQUALS_STD_PACK && attrs.key?(:standard_pack_code)
+      if AppConst::CR_MF.basic_pack_equals_standard_pack? && attrs.key?(:standard_pack_code)
         basic_pack_id = DB[:basic_packs_standard_packs].where(standard_pack_id: id).get(:basic_pack_id)
         update(:basic_pack_codes, basic_pack_id, basic_pack_code: attrs[:standard_pack_code])
       end

@@ -175,7 +175,7 @@ module ProductionApp
 
     def validate_product_setup_params(params)
       params.merge!({ gtin_code: gtin_code(params) }) if AppConst::CR_PROD.use_gtins?
-      if AppConst::BASE_PACK_EQUALS_STD_PACK
+      if AppConst::CR_MF.basic_pack_equals_standard_pack?
         basic_pack_id = repo.get_value(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: params[:standard_pack_code_id])
         params.merge!({ basic_pack_code_id: basic_pack_id })
       end

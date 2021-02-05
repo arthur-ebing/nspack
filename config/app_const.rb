@@ -239,7 +239,7 @@ class AppConst # rubocop:disable Metrics/ClassLength
   # Defaults for Packaging
   DEFAULT_FG_PACKAGING_TYPE = ENV.fetch('DEFAULT_FG_PACKAGING_TYPE', 'CARTON') # Can be BIN or CARTON
   REQUIRE_PACKAGING_BOM = make_boolean('REQUIRE_PACKAGING_BOM')
-  BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
+  # BASE_PACK_EQUALS_STD_PACK = make_boolean('BASE_PACK_EQUALS_STD_PACK')
   REQUIRE_EXTENDED_PACKAGING = make_boolean('REQUIRE_EXTENDED_PACKAGING')
   PM_TYPE_FRUIT = 'FRUIT'
 
@@ -613,8 +613,8 @@ class AppConst # rubocop:disable Metrics/ClassLength
                                 column_name: 'farm_code' },
                        Orchards: { table_name: 'orchards',
                                    column_name: 'orchard_code' },
-                       RmClasses: { table_name: 'rmt_classes',
-                                    column_name: 'rmt_class_code' },
+                       RmtClasses: { table_name: 'rmt_classes',
+                                     column_name: 'rmt_class_code' },
                        Commodities: { table_name: 'commodities',
                                       column_name: 'code' },
                        Cultivars: { table_name: 'cultivars',

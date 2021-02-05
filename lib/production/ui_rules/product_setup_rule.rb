@@ -51,7 +51,7 @@ module UiRules
       fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
       fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
       fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack', hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK }
+      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack', hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack? }
       fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack' }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
       fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
@@ -91,10 +91,20 @@ module UiRules
       commodity_id = @form_object[:commodity_id].nil_or_empty? ? @repo.get_commodity_id(cultivar_group_id, cultivar_id) : @form_object.commodity_id
       default_mkting_org_id = @form_object[:marketing_org_party_role_id].nil_or_empty? ? MasterfilesApp::PartyRepo.new.find_party_role_from_party_name_for_role(AppConst::CR_PROD.default_marketing_org, AppConst::ROLE_MARKETER) : @form_object[:marketing_org_party_role_id]
       {
-        product_setup_template: { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template', readonly: true },
-        product_setup_template_id: { renderer: :hidden, value: product_setup_template_id },
-        cultivar_group: { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group', readonly: true },
-        cultivar: { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar', readonly: true },
+        product_setup_template: { renderer: :label,
+                                  with_value: product_setup_template_id_label,
+                                  caption: 'Product Setup Template',
+                                  readonly: true },
+        product_setup_template_id: { renderer: :hidden,
+                                     value: product_setup_template_id },
+        cultivar_group: { renderer: :label,
+                          with_value: cultivar_group_id_label,
+                          caption: 'Cultivar Group',
+                          readonly: true },
+        cultivar: { renderer: :label,
+                    with_value: cultivar_id_label,
+                    caption: 'Cultivar',
+                    readonly: true },
         commodity_id: { renderer: :select,
                         options: @repo.for_select_template_cultivar_commodities(cultivar_group_id, cultivar_id),
                         disabled_options: MasterfilesApp::CommodityRepo.new.for_select_inactive_commodities,
@@ -123,10 +133,10 @@ module UiRules
                               options: @fruit_size_repo.for_select_basic_packs,
                               disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               caption: 'Basic Pack',
-                              required: !AppConst::BASE_PACK_EQUALS_STD_PACK,
+                              required: !AppConst::CR_MF.basic_pack_equals_standard_pack?,
                               prompt: 'Select Basic Pack',
                               searchable: true,
-                              hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK,
+                              hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack?,
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
                                  options: @fruit_size_repo.for_select_standard_packs,

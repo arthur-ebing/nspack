@@ -74,7 +74,6 @@ module Crossbeams
       sr2: { run_allocations: true }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
-    # BASE_PACK_EQUALS_STD_PACK
     # BYPASS_QUALITY_TEST_LOAD_CHECK
     # BYPASS_QUALITY_TEST_PRE_RUN_CHECK
     # CAPTURE_PALLET_WEIGHT_AT_VERIFICATION
@@ -130,7 +129,7 @@ module Crossbeams
     end
 
     def group_incentive_has_packer_roles?(explain: false)
-      return 'Do packers have different roles for participation in group incetives?' if explain
+      return 'Do packers have different roles for participation in group incentives?' if explain
 
       setting(:group_incentive_packer_roles)
     end

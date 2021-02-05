@@ -792,7 +792,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
                          prompt: true,
                          data_type: :number)
 
-          unless AppConst::BASE_PACK_EQUALS_STD_PACK
+          unless AppConst::CR_MF.basic_pack_equals_standard_pack?
             form.add_select(:basic_pack_id,
                             'Basic Pack',
                             prompt: true,
@@ -889,7 +889,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         form.add_prev_next_nav('/rmd/production/palletizing/direct_edit_pallet_nav_view/$:id$', ps_ids, id)
 
         hide_fields = %i[carton_quantity std_pack]
-        unless AppConst::BASE_PACK_EQUALS_STD_PACK
+        unless AppConst::CR_MF.basic_pack_equals_standard_pack?
           hide_fields << :basic_pack
           form.add_select(:basic_pack_id,
                           'Basic Pack',

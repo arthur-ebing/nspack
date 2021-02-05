@@ -11,10 +11,7 @@ module UiRules
 
       set_show_fields if @mode == :show
 
-      calculate_basic_pack_code = AppConst::CR_MF.kromco_calculate_basic_pack_code?
-      calculate_basic_pack_code = false unless %i[new edit].include? @mode
-
-      add_basic_pack_behaviours if calculate_basic_pack_code
+      add_behaviours if %i[new edit].include? @mode
 
       form_name 'basic_pack'
     end
@@ -45,7 +42,7 @@ module UiRules
                              caption: 'Standard Packs',
                              options: @repo.for_select_standard_packs,
                              selected: @form_object.standard_pack_ids,
-                             hide_on_load: AppConst::BASE_PACK_EQUALS_STD_PACK,
+                             hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack?,
                              required: false }
       }
     end
@@ -68,14 +65,16 @@ module UiRules
 
     private
 
-    def add_basic_pack_behaviours
+    def add_behaviours
       behaviours do |behaviour|
-        behaviour.lose_focus :height_mm,
-                             notify: [{ url: '/masterfiles/fruit/basic_pack_codes/height_changed',
-                                        param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_footprint_code] }]
-        behaviour.lose_focus :footprint_code,
-                             notify: [{ url: '/masterfiles/fruit/basic_pack_codes/footprint_code_changed',
-                                        param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_height_mm] }]
+        if AppConst::CR_MF.kromco_calculate_basic_pack_code?
+          behaviour.lose_focus :height_mm,
+                               notify: [{ url: '/masterfiles/fruit/basic_pack_codes/height_changed',
+                                          param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_footprint_code] }]
+          behaviour.lose_focus :footprint_code,
+                               notify: [{ url: '/masterfiles/fruit/basic_pack_codes/footprint_code_changed',
+                                          param_keys: %i[basic_pack_code_basic_pack_code basic_pack_code_height_mm] }]
+        end
       end
     end
   end
