@@ -255,7 +255,7 @@ module MasterfilesApp
     end
 
     def update_quantity(bom_product_id, quantity)
-      quantity = 0 if quantity.empty?
+      quantity = nil if quantity.empty?
       update(:pm_boms_products, bom_product_id, quantity: quantity)
     end
 
@@ -269,7 +269,7 @@ module MasterfilesApp
         SELECT string_agg(product_codes.product_code, '_'::text) AS system_code
         FROM (
           SELECT CASE WHEN pm_composition_levels.composition_level = 1 THEN pm_products.product_code::text
-                 ELSE concat(pm_boms_products.quantity::text, 'x'::text, pm_products.product_code::text)
+                 ELSE CONCAT(COALESCE(pm_boms_products.quantity::text, '*'), 'x'::text, pm_products.product_code::text)
                  END AS product_code
           FROM pm_boms_products
           JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id

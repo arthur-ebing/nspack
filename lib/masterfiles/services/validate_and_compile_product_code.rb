@@ -18,7 +18,7 @@ module MasterfilesApp
 
     def call # rubocop:disable Metrics/AbcSize
       res = ExtendedPmProductContract.new.call(params)
-      return res if res.success?  # Return if validation passed
+      # return res if res.success?  # Return if validation passed
       return res unless res.errors[:pm_subtype_id].nil? # Return validation failed. pm_subtype_id is required to compile product_code
 
       res = compile_product_code
@@ -50,7 +50,7 @@ module MasterfilesApp
       res = ProductCodeMinimumCompositionLevelSchema.call(params)
       return res if res.failure?
 
-      params[:product_code] = "#{params[:pm_type_short_code]}#{params[:basic_pack_code]}#{params[:pm_subtype_short_code]}#{params[:height_mm]}"
+      params[:product_code] = "#{params[:pm_type_short_code]}#{params[:basic_pack_code]}#{params[:pm_subtype_short_code]}"
       valid_response
     end
 
