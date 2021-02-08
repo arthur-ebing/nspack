@@ -21,22 +21,21 @@ module UiRules
     end
 
     def set_show_fields  # rubocop:disable Metrics/AbcSize
-      product_setup_template_id_label = @repo.find_hash(:product_setup_templates, @form_object.product_setup_template_id)[:template_name]
-      marketing_variety_id_label = @repo.find_hash(:marketing_varieties, @form_object.marketing_variety_id)[:marketing_variety_code]
+      product_setup_template_id_label = @repo.get(:product_setup_templates, @form_object.product_setup_template_id, :template_name)
+      marketing_variety_id_label = @repo.get(:marketing_varieties, @form_object.marketing_variety_id, :marketing_variety_code)
       customer_variety_id_label = MasterfilesApp::MarketingRepo.new.find_customer_variety(@form_object.customer_variety_id)&.variety_as_customer_variety
       std_fruit_size_count_id_label = @fruit_size_repo.find_std_fruit_size_count(@form_object.std_fruit_size_count_id)&.size_count_value
-      basic_pack_code_id_label = @repo.find_hash(:basic_pack_codes, @form_object.basic_pack_code_id)[:basic_pack_code]
-      standard_pack_code_id_label = @repo.find_hash(:standard_pack_codes, @form_object.standard_pack_code_id)[:standard_pack_code]
+      basic_pack_code_id_label = @repo.get(:basic_pack_codes, @form_object.basic_pack_code_id, :basic_pack_code)
+      standard_pack_code_id_label = @repo.get(:standard_pack_codes, @form_object.standard_pack_code_id, :standard_pack_code)
       fruit_actual_counts_for_pack_id_label = @fruit_size_repo.find_fruit_actual_counts_for_pack(@form_object.fruit_actual_counts_for_pack_id)&.actual_count_for_pack
       fruit_size_reference_id_label = @fruit_size_repo.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
       marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
-      packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
-      # target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)[:target_market_name]
-      target_market_id_label = @repo.get_value(:target_markets, :target_market_name, id: @form_object.target_market_id)
-      mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
+      packed_tm_group_id_label = @repo.get(:target_market_groups, @form_object.packed_tm_group_id, :target_market_group_name)
+      target_market_id_label = @repo.get(:target_markets, @form_object.target_market_id, :target_market_name)
+      mark_id_label = @repo.get(:marks, @form_object.mark_id, :mark_code)
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
-      pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
-      cartons_per_pallet_id_label = @repo.find_hash(:cartons_per_pallet, @form_object.cartons_per_pallet_id)[:cartons_per_pallet]
+      pallet_format_id_label = @repo.get(:pallet_formats, @form_object.pallet_format_id, :description)
+      cartons_per_pallet_id_label = @repo.get(:cartons_per_pallet, @form_object.cartons_per_pallet_id, :cartons_per_pallet)
       commodity_id_label = MasterfilesApp::CommodityRepo.new.find_commodity(@form_object.commodity_id)&.code
       grade_id_label = MasterfilesApp::FruitRepo.new.find_grade(@form_object.grade_id)&.grade_code
       pallet_base_id_label = MasterfilesApp::PackagingRepo.new.find_pallet_base(@form_object.pallet_base_id)&.pallet_base_code
@@ -46,39 +45,90 @@ module UiRules
       cultivar_id_label = product_setup_template&.cultivar_name
       rmt_class_id_label = MasterfilesApp::FruitRepo.new.find_rmt_class(@form_object.rmt_class_id)&.rmt_class_code
 
-      fields[:product_setup_template_id] = { renderer: :label, with_value: product_setup_template_id_label, caption: 'Product Setup Template' }
-      fields[:cultivar_group] = { renderer: :label, with_value: cultivar_group_id_label, caption: 'Cultivar Group' }
-      fields[:cultivar] = { renderer: :label, with_value: cultivar_id_label, caption: 'Cultivar' }
-      fields[:marketing_variety_id] = { renderer: :label, with_value: marketing_variety_id_label, caption: 'Marketing Variety' }
-      fields[:customer_variety_id] = { renderer: :label, with_value: customer_variety_id_label, caption: 'Customer Variety' }
-      fields[:std_fruit_size_count_id] = { renderer: :label, with_value: std_fruit_size_count_id_label, caption: 'Std Fruit Size Count' }
-      fields[:basic_pack_code_id] = { renderer: :label, with_value: basic_pack_code_id_label, caption: 'Basic Pack', hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack? }
-      fields[:standard_pack_code_id] = { renderer: :label, with_value: standard_pack_code_id_label, caption: 'Standard Pack' }
-      fields[:fruit_actual_counts_for_pack_id] = { renderer: :label, with_value: fruit_actual_counts_for_pack_id_label, caption: 'Actual Count' }
-      fields[:fruit_size_reference_id] = { renderer: :label, with_value: fruit_size_reference_id_label, caption: 'Size Reference' }
-      fields[:marketing_org_party_role_id] = { renderer: :label, with_value: marketing_org_party_role_id_label, caption: 'Marketing Org' }
-      fields[:packed_tm_group_id] = { renderer: :label, with_value: packed_tm_group_id_label, caption: 'Packed TM Group' }
-      fields[:target_market_id] = { renderer: :label, with_value: target_market_id_label, caption: 'Target Market' }
-      fields[:mark_id] = { renderer: :label, with_value: mark_id_label, caption: 'Mark' }
-      fields[:inventory_code_id] = { renderer: :label, with_value: inventory_code_id_label, caption: 'Inventory Code' }
-      fields[:pallet_format_id] = { renderer: :label, with_value: pallet_format_id_label, caption: 'Pallet Format' }
-      fields[:cartons_per_pallet_id] = { renderer: :label, with_value: cartons_per_pallet_id_label, caption: 'Cartons Per Pallet' }
+      fields[:product_setup_template_id] = { renderer: :label,
+                                             with_value: product_setup_template_id_label,
+                                             caption: 'Product Setup Template' }
+      fields[:cultivar_group] = { renderer: :label,
+                                  with_value: cultivar_group_id_label,
+                                  caption: 'Cultivar Group' }
+      fields[:cultivar] = { renderer: :label,
+                            with_value: cultivar_id_label,
+                            caption: 'Cultivar' }
+      fields[:marketing_variety_id] = { renderer: :label,
+                                        with_value: marketing_variety_id_label,
+                                        caption: 'Marketing Variety' }
+      fields[:customer_variety_id] = { renderer: :label,
+                                       with_value: customer_variety_id_label,
+                                       caption: 'Customer Variety' }
+      fields[:std_fruit_size_count_id] = { renderer: :label,
+                                           with_value: std_fruit_size_count_id_label,
+                                           caption: 'Std Fruit Size Count' }
+      fields[:basic_pack_code_id] = { renderer: :label,
+                                      with_value: basic_pack_code_id_label,
+                                      caption: 'Basic Pack',
+                                      hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack? }
+      fields[:standard_pack_code_id] = { renderer: :label,
+                                         with_value: standard_pack_code_id_label,
+                                         caption: 'Standard Pack' }
+      fields[:fruit_actual_counts_for_pack_id] = { renderer: :label,
+                                                   with_value: fruit_actual_counts_for_pack_id_label,
+                                                   caption: 'Actual Count' }
+      fields[:fruit_size_reference_id] = { renderer: :label,
+                                           with_value: fruit_size_reference_id_label,
+                                           caption: 'Size Reference' }
+      fields[:marketing_org_party_role_id] = { renderer: :label,
+                                               with_value: marketing_org_party_role_id_label,
+                                               caption: 'Marketing Org' }
+      fields[:packed_tm_group_id] = { renderer: :label,
+                                      with_value: packed_tm_group_id_label,
+                                      caption: 'Packed TM Group' }
+      fields[:target_market_id] = { renderer: :label,
+                                    with_value: target_market_id_label,
+                                    caption: 'Target Market' }
+      fields[:mark_id] = { renderer: :label,
+                           with_value: mark_id_label,
+                           caption: 'Mark' }
+      fields[:inventory_code_id] = { renderer: :label,
+                                     with_value: inventory_code_id_label,
+                                     caption: 'Inventory Code' }
+      fields[:pallet_format_id] = { renderer: :label,
+                                    with_value: pallet_format_id_label,
+                                    caption: 'Pallet Format' }
+      fields[:cartons_per_pallet_id] = { renderer: :label,
+                                         with_value: cartons_per_pallet_id_label,
+                                         caption: 'Cartons Per Pallet' }
       fields[:extended_columns] = { renderer: :label }
       fields[:client_size_reference] = { renderer: :label }
       fields[:client_product_code] = { renderer: :label }
       fields[:marketing_order_number] = { renderer: :label }
       fields[:sell_by_code] = { renderer: :label }
       fields[:pallet_label_name] = { renderer: :label }
-      fields[:active] = { renderer: :label, as_boolean: true }
-      fields[:treatment_ids] = { renderer: :list, items: treatment_codes, caption: 'Treatments' }
-      fields[:commodity_id] = { renderer: :label, with_value: commodity_id_label, caption: 'Commodity' }
-      fields[:rmt_class_id] = { renderer: :label, with_value: rmt_class_id_label, caption: 'Class' }
-      fields[:grade_id] = { renderer: :label, with_value: grade_id_label, caption: 'Grade' }
-      fields[:pallet_base_id] = { renderer: :label, with_value: pallet_base_id_label, caption: 'Pallet Base' }
-      fields[:pallet_stack_type_id] = { renderer: :label, with_value: pallet_stack_type_id_label, caption: 'Pallet Stack Type' }
-      fields[:description] = { renderer: :label, hide_on_load: !@rules[:require_packaging_bom] }
+      fields[:active] = { renderer: :label,
+                          as_boolean: true,
+                          hide_on_load: true }
+      fields[:treatment_ids] = { renderer: :list, items: treatment_codes,
+                                 caption: 'Treatments' }
+      fields[:commodity_id] = { renderer: :label,
+                                with_value: commodity_id_label,
+                                caption: 'Commodity' }
+      fields[:rmt_class_id] = { renderer: :label,
+                                with_value: rmt_class_id_label,
+                                caption: 'Class' }
+      fields[:grade_id] = { renderer: :label,
+                            with_value: grade_id_label,
+                            caption: 'Grade' }
+      fields[:pallet_base_id] = { renderer: :label,
+                                  with_value: pallet_base_id_label,
+                                  caption: 'Pallet Base' }
+      fields[:pallet_stack_type_id] = { renderer: :label,
+                                        with_value: pallet_stack_type_id_label,
+                                        caption: 'Pallet Stack Type' }
+      fields[:description] = { renderer: :label,
+                               hide_on_load: !@rules[:require_packaging_bom] }
       fields[:product_chars] = { renderer: :label }
-      fields[:gtin_code] = { renderer: :label, caption: 'GTIN Code', hide_on_load: !@rules[:gtins_required] }
+      fields[:gtin_code] = { renderer: :label,
+                             caption: 'GTIN Code',
+                             hide_on_load: !@rules[:gtins_required] }
     end
 
     def common_fields  # rubocop:disable Metrics/AbcSize
