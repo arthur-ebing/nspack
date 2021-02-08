@@ -21,6 +21,10 @@ class Nspack < Roda
             end
         puts "MESSCADA XML - response: #{s}"
         s
+      rescue Crossbeams::FrameworkError => e
+        s = %(<ContainerMove PID="200" Mode="5" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
+        puts "MESSCADA XML - response: #{s}"
+        s
       end
 
       r.post 'dump' do
@@ -31,6 +35,10 @@ class Nspack < Roda
             else
               %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{unwrap_failed_response(res)}" />)
             end
+        puts "MESSCADA XML - response: #{s}"
+        s
+      rescue Crossbeams::FrameworkError => e
+        s = %(<ContainerMove PID="200" Mode="6" Status="false" RunNumber="" Red="true" Yellow="false" Green="false" Msg="#{e.message}" />)
         puts "MESSCADA XML - response: #{s}"
         s
       end
