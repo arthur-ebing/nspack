@@ -1153,7 +1153,8 @@ module DevelopmentApp
           fk_repo = "#{opts.classnames[:module]}::#{klassname}Repo"
           code = tm.likely_label_field
           flds << "# #{f}_label = #{fk_repo}.new.find_#{singlename}(@form_object.#{f})&.#{code}"
-          flds << "#{f}_label = @repo.find(:#{fk[:table]}, #{opts.classnames[:module]}::#{klassname}, @form_object.#{f})&.#{code}"
+          flds << "# #{f}_label = @repo.find(:#{fk[:table]}, #{opts.classnames[:module]}::#{klassname}, @form_object.#{f})&.#{code}"
+          flds << "#{f}_label = @repo.get_value(:#{fk[:table]}, :#{code}, id: @form_object.#{f})"
         end
 
         flds + fields_to_use(true).map do |f|

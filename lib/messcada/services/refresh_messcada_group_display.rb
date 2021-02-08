@@ -26,7 +26,7 @@ module MesscadaApp
     end
 
     def make_tcp_call(opts, new_group)
-      request = %(<RefreshGroupDisplayMes PID="430" Type="local" Group="#{new_group}" />)
+      request = %(<RefreshGroupDisplay PID="436" Group="#{new_group}" />)
 
       sock = TCPSocket.open(opts[:ip_address], 2071)
       puts "MESSCADA REFRESH GROUP AT #{opts[:system_resource_code]} (#{opts[:ip_address]}) : #{new_group}"
