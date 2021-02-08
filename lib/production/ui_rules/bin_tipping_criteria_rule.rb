@@ -32,7 +32,8 @@ module UiRules
     end
 
     def make_form_object
-      @form_object = OpenStruct.new
+      run = @repo.find_production_run(@options[:production_run_id])
+      @form_object = OpenStruct.new(run.legacy_bintip_criteria || { commodity_code: true, rmt_variety_code: true, treatment_code: true, rmt_size: true, product_class_code: true })
     end
 
     def add_behaviours
