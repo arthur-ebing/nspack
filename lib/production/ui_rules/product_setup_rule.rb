@@ -31,7 +31,7 @@ module UiRules
       fruit_size_reference_id_label = @fruit_size_repo.find_fruit_size_reference(@form_object.fruit_size_reference_id)&.size_reference
       marketing_org_party_role_id_label = MasterfilesApp::PartyRepo.new.find_party_role(@form_object.marketing_org_party_role_id)&.party_name
       packed_tm_group_id_label = @repo.find_hash(:target_market_groups, @form_object.packed_tm_group_id)[:target_market_group_name]
-      target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)&.target_market_name
+      target_market_id_label = @repo.find_hash(:target_markets, @form_object.target_market_id)[:target_market_name]
       mark_id_label = @repo.find_hash(:marks, @form_object.mark_id)[:mark_code]
       inventory_code_id_label = MasterfilesApp::FruitRepo.new.find_inventory_code(@form_object.inventory_code_id)&.inventory_code
       pallet_format_id_label = @repo.find_hash(:pallet_formats, @form_object.pallet_format_id)[:description]
