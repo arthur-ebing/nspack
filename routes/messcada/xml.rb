@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 # rubocop:disable Metrics/BlockLength
 class Nspack < Roda
   route 'xml', 'messcada' do |r|
@@ -127,3 +128,4 @@ class Nspack < Roda
   end
 end
 # rubocop:enable Metrics/BlockLength
+# rubocop:enable Metrics/ClassLength
