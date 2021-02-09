@@ -1,0 +1,35 @@
+---
+:dataminer_definition: inspections
+:actions:
+- :url: "/finished_goods/inspection/inspections/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/finished_goods/inspection/inspections/$:id$/edit"
+  :text: edit
+  :icon: edit
+  :title: Edit
+  :popup: true
+- :url: "/finished_goods/inspection/inspections/$:id$"
+  :text: delete
+  :icon: delete
+  :is_delete: true
+  :popup: true
+- :separator: true
+- :url: "/development/statuses/list/inspections/$:id$"
+  :text: status
+  :icon: information-solid
+  :title: Status
+  :popup: true
+:page_controls:
+- :control_type: :link
+  :url: "/finished_goods/inspection/inspections/new"
+  :text: New Inspection
+  :style: :button
+  :behaviour: :popup
+:conditions:
+  :standard:
+    - :col: inspections.pallet_id
+      :op: =
+      :val: $:pallet_id$

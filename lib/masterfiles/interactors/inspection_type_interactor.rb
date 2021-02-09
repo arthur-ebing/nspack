@@ -65,6 +65,10 @@ module MasterfilesApp
     end
 
     def validate_inspection_type_params(params)
+      params[:applicable_tm_group_ids] = nil if params[:applicable_tm_group_ids].nil_or_empty?
+      params[:applicable_cultivar_ids] = nil if params[:applicable_cultivar_ids].nil_or_empty?
+      params[:applicable_orchard_ids] = nil if params[:applicable_orchard_ids].nil_or_empty?
+      params[:applicable_grade_ids] = nil if params[:applicable_grade_ids].nil_or_empty?
       InspectionTypeSchema.call(params)
     end
   end

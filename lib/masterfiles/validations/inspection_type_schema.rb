@@ -7,12 +7,12 @@ module MasterfilesApp
     required(:description).maybe(Types::StrippedString)
     required(:inspection_failure_type_id).filled(:integer)
     required(:applies_to_all_tm_groups).maybe(:bool)
-    optional(:applicable_tm_group_ids).maybe(:array).maybe { each(:integer) }
+    required(:applicable_tm_group_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_cultivars).maybe(:bool)
-    optional(:applicable_cultivar_ids).maybe(:array).maybe { each(:integer) }
+    required(:applicable_cultivar_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_orchards).maybe(:bool)
-    optional(:applicable_orchard_ids).maybe(:array).maybe { each(:integer) }
+    required(:applicable_orchard_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_grades).maybe(:bool)
-    optional(:applicable_grade_ids).maybe(:array).maybe { each(:integer) }
+    required(:applicable_grade_ids).maybe(:array).maybe { each(:integer) }
   end
 end

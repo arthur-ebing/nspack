@@ -399,6 +399,82 @@ class Nspack < Roda
       end
     end
 
+    # INSPECTIONS
+    # --------------------------------------------------------------------------
+    r.on 'inspections', Integer do |id|
+      interactor = FinishedGoodsApp::InspectionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:inspections, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('inspection', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { FinishedGoods::Inspection::Inspection::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('inspection', 'read')
+          show_partial { FinishedGoods::Inspection::Inspection::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_inspection(id, params[:inspection])
+          if res.success
+            row_keys = %i[
+              inspection_type_id
+              inspection_type_code
+              pallet_id
+              pallet_number
+              inspector_id
+              inspector
+              inspected
+              inspection_failure_reason_ids
+              failure_reasons
+              passed
+              remarks
+            ]
+            update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
+          else
+            re_show_form(r, res) { FinishedGoods::Inspection::Inspection::Edit.call(id, form_values: params[:inspection], form_errors: res.errors) }
+          end
+        end
+        r.delete do    # DELETE
+          check_auth!('inspection', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_inspection(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+
+    r.on 'inspections' do
+      interactor = FinishedGoodsApp::InspectionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('inspection', 'new')
+        show_partial_or_page(r) { FinishedGoods::Inspection::Inspection::New.call(remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_inspection(params[:inspection])
+        if res.success
+          flash[:notice] = res.message
+          redirect_via_json "/list/inspections/with_params?key=standard&pallet_id=#{res.instance}"
+        else
+          re_show_form(r, res, url: '/finished_goods/inspection/inspections/new') do
+            FinishedGoods::Inspection::Inspection::New.call(form_values: params[:inspection],
+                                                            form_errors: res.errors,
+                                                            remote: fetch?(r))
+          end
+        end
+      end
+    end
+
     # REJECT TO REPACK PALLETS
     # --------------------------------------------------------------------------
     r.on 'reject_to_repack', Integer do |id|

@@ -1,0 +1,307 @@
+---
+:caption: Inspections
+:sql: "SELECT\r\n    inspections.id,\r\n    inspections.inspection_type_id,\r\n    inspection_types.inspection_type_code,\r\n
+  \   inspections.pallet_id,\r\n    pallets.pallet_number,\r\n    inspections.inspector_id,\r\n
+  \   inspections.inspector_id IS NOT NULL AS inspected,\r\n    fn_party_role_name(inspector_party_role_id)
+  AS inspector,\r\n    inspections.inspection_failure_reason_ids,\r\n    (SELECT array_agg(ifr.failure_reason
+  ORDER BY ifr.failure_reason)\r\n     FROM inspection_failure_reasons ifr\r\n     WHERE
+  ifr.id = ANY(inspections.inspection_failure_reason_ids)\r\n    ) AS failure_reasons,\r\n
+  \   inspections.passed,\r\n    inspections.remarks,\r\n    inspections.active,\r\n
+  \   inspections.created_at,\r\n    inspections.updated_at,\r\n    fn_current_status('inspections',
+  inspections.id) AS status\r\nFROM inspections\r\nJOIN inspection_types ON inspection_types.id
+  = inspections.inspection_type_id\r\nLEFT JOIN inspectors ON inspectors.id = inspections.inspector_id\r\nJOIN
+  pallets ON pallets.id = inspections.pallet_id\r\n\r\nORDER BY inspections.updated_at
+  DESC"
+:limit: 
+:offset: 
+:external_settings: {}
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: inspections.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_id:
+    :name: inspection_type_id
+    :sequence_no: 2
+    :caption: Inspection type
+    :namespaced_name: inspections.inspection_type_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_type_code:
+    :name: inspection_type_code
+    :sequence_no: 3
+    :caption: Inspection type
+    :namespaced_name: inspection_types.inspection_type_code
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_id:
+    :name: pallet_id
+    :sequence_no: 4
+    :caption: Pallet id
+    :namespaced_name: inspections.pallet_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pallet_number:
+    :name: pallet_number
+    :sequence_no: 5
+    :caption: Pallet number
+    :namespaced_name: pallets.pallet_number
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector_id:
+    :name: inspector_id
+    :sequence_no: 6
+    :caption: Inspector
+    :namespaced_name: inspections.inspector_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspected:
+    :name: inspected
+    :sequence_no: 7
+    :caption: Inspected
+    :namespaced_name: 
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector:
+    :name: inspector
+    :sequence_no: 8
+    :caption: Inspector
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_failure_reason_ids:
+    :name: inspection_failure_reason_ids
+    :sequence_no: 9
+    :caption: Inspection failure reason ids
+    :namespaced_name: inspections.inspection_failure_reason_ids
+    :data_type: :integer_array
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_reasons:
+    :name: failure_reasons
+    :sequence_no: 10
+    :caption: Failure reasons
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 11
+    :caption: Passed
+    :namespaced_name: inspections.passed
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 12
+    :caption: Remarks
+    :namespaced_name: inspections.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  active:
+    :name: active
+    :sequence_no: 13
+    :caption: Active
+    :namespaced_name: inspections.active
+    :data_type: :boolean
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 14
+    :caption: Created at
+    :namespaced_name: inspections.created_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 15
+    :caption: Updated at
+    :namespaced_name: inspections.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 16
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: inspections.inspection_type_id
+  :caption: Inspection type
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT inspection_type_code, id FROM inspection_types ORDER BY inspection_type_code
+- :column: inspections.pallet_id
+  :caption: Pallet
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT pallet_number, id FROM pallets ORDER BY pallet_number
+- :column: inspections.carton_id
+  :caption: Carton
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT scrapped_reason, id FROM cartons ORDER BY scrapped_reason
+- :column: inspections.inspector_id
+  :caption: Inspector
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: true
+  :ui_priority: 1
+  :list_def: SELECT tablet_ip_address, id FROM inspectors ORDER BY tablet_ip_address

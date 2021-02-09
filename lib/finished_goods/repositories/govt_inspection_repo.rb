@@ -21,8 +21,7 @@ module FinishedGoodsApp
     crud_calls_for :vehicle_job_units, name: :vehicle_job_unit, wrapper: VehicleJobUnit
 
     def find_govt_inspection_sheet(id) # rubocop:disable Metrics/AbcSize
-      hash = find_with_association(:govt_inspection_sheets,
-                                   id,
+      hash = find_with_association(:govt_inspection_sheets, id,
                                    parent_tables: [{ parent_table: :target_market_groups,
                                                      columns: %i[target_market_group_name],
                                                      foreign_key: :packed_tm_group_id,
@@ -142,8 +141,8 @@ module FinishedGoodsApp
       end
     end
 
-    def get_last(table_name, column)
-      DB[table_name].reverse(:id).limit(1).get(column)
+    def get_last(table_name, column, order = nil)
+      DB[table_name].exclude(column => nil).reverse(order || :id).get(column)
     end
 
     def find_govt_inspection_pallet_flat(id)

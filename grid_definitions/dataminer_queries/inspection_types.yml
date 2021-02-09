@@ -16,15 +16,18 @@
   \      inspection_types.updated_at,\r\n       fn_current_status('inspection_types',
   inspection_types.id) AS status\r\nFROM inspection_types\r\n         JOIN inspection_failure_types
   ON inspection_failure_types.id = inspection_types.inspection_failure_type_id\r\n
-  \        JOIN (\r\n    SELECT inspection_types.id,\r\n           COALESCE(inspection_types.applicable_tm_group_ids,
-  (\r\n               SELECT array_agg(id)\r\n               FROM target_market_groups))
-  applicable_tm_group_ids,\r\n           COALESCE(inspection_types.applicable_grade_ids,
-  (\r\n               SELECT array_agg(id)\r\n               FROM grades)) applicable_grade_ids,\r\n
-  \          COALESCE(inspection_types.applicable_cultivar_ids, (\r\n               SELECT
-  array_agg(id)\r\n               FROM cultivars))            applicable_cultivar_ids,\r\n
-  \          COALESCE(inspection_types.applicable_orchard_ids, (\r\n               SELECT
-  array_agg(id)\r\n               FROM orchards))             applicable_orchard_ids\r\n
-  \   FROM inspection_types) coalesced ON coalesced.id = inspection_types.id"
+  \        JOIN (\r\n    SELECT inspection_types.id,\r\n            CASE\r\n               WHEN
+  inspection_types.applies_to_all_tm_groups THEN (SELECT array_agg(id) FROM target_market_groups)\r\n
+  \              ELSE inspection_types.applicable_tm_group_ids\r\n            END
+  applicable_tm_group_ids,\r\n            CASE\r\n               WHEN inspection_types.applies_to_all_grades
+  THEN (SELECT array_agg(id) FROM grades)\r\n               ELSE inspection_types.applicable_grade_ids\r\n
+  \           END applicable_grade_ids,\r\n           CASE\r\n               WHEN
+  inspection_types.applies_to_all_cultivars THEN (SELECT array_agg(id) FROM cultivars)\r\n
+  \              ELSE inspection_types.applicable_cultivar_ids\r\n           END applicable_cultivar_ids,\r\n
+  \          CASE\r\n               WHEN inspection_types.applies_to_all_orchards
+  THEN (SELECT array_agg(id) FROM orchards)\r\n               ELSE inspection_types.applicable_orchard_ids\r\n
+  \          END applicable_orchard_ids\r\n    FROM inspection_types) coalesced ON
+  coalesced.id = inspection_types.id"
 :limit: 
 :offset: 
 :external_settings: {}
