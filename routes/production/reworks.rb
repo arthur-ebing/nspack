@@ -203,6 +203,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
           end
         end
 
+        r.on 'recalc_all_bins_nett_weight' do
+          res = interactor.recalc_all_bins_nett_weight
+          if res.success
+            flash[:notice] = res.message
+            redirect_to_last_grid(r)
+          end
+        end
+
         r.on 'display_reworks_multiselect_grid', String, String do |grid, grid_key|
           r.redirect "/list/#{grid}/multi?key=#{grid_key}&id=#{id}"
         end

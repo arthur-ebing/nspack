@@ -943,5 +943,13 @@ module ProductionApp
       SQL
       DB[query].single_value
     end
+
+    def find_all_rmt_bins
+      query = <<~SQL
+        SELECT qty_inner_bins, rmt_inner_container_material_id, rmt_inner_container_type_id, gross_weight
+        FROM rmt_bins
+      SQL
+      DB[query].all
+    end
   end
 end
