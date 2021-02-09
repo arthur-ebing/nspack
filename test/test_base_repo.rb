@@ -163,6 +163,11 @@ class TestBaseRepo < MiniTestWithHooks
     actual = BaseRepo.new.select_values_in_order(:users, :id, order: :id, where: { id: [1, 2] }, descending: true)
     expect = DB[:users].where(id: [1, 2]).reverse(:id).select_map(:id)
     assert_equal expect, actual
+
+    # Handle nil order_by gracefully as no order_by
+    actual = BaseRepo.new.select_values_in_order(:users, :id, order: nil, where: { id: [1, 2] })
+    expect = DB[:users].where(id: [1, 2]).select_map(:id)
+    assert_equal expect, actual
   end
 
   def test_hash_for_jsonb_col
