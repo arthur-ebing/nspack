@@ -17,7 +17,7 @@ module UiRules
 
     def common_fields # rubocop:disable Metrics/AbcSize
       {
-        rmt_product_type: { renderer: :select, options: %w[presort orchard_run rebin], required: true, prompt: true },
+        rmt_product_type: { renderer: :select, options: %w[presort orchard_run rebin], required: true, prompt: true, min_charwidth: 30 },
         treatment_code: { renderer: :select, options: repo.run_treatment_codes, required: true, prompt: true },
         rmt_size: { renderer: :select, caption: 'Size Code', options: MasterfilesApp::RmtSizeRepo.new.for_select_rmt_sizes.map { |s| s[0] }.uniq, required: true, prompt: true },
         ripe_point_code: { renderer: :select, options: repo.ripe_point_codes.map { |s| s[0] }.uniq, required: true, prompt: true },
