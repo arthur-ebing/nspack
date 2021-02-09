@@ -96,7 +96,13 @@ module MesscadaApp
     def validate_setup_requirements(rmt_bin_id, run_id) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       bin_attrs = repo.get_rmt_bin_setup_reqs(rmt_bin_id)
       @run_attrs = repo.get_run_setup_reqs(run_id)
-      return "INVALID FARM: Run requires: #{run_attrs[:farm_code]}. Bin is: #{bin_attrs[:farm_code]}" unless bin_attrs[:farm_id] == run_attrs[:farm_id]
+
+      if bin_attrs[:farm_id] != run_attrs[:farm_id]
+        grp_ids = repo.select_values(:farms, :farm_group_id, id: [bin_attrs[:farm_id], run_attrs[:farm_id]])
+        # If the rule allows us to match on farm group, make sure both groups are the same and neither of them are nil:
+        return "INVALID FARM: Run requires: #{run_attrs[:farm_code]}. Bin is: #{bin_attrs[:farm_code]}" unless AppConst::CR_PROD.bintip_allow_farms_of_same_group_to_match? && grp_ids.compact.length > 1 && grp_ids.first == grp_ids.last
+      end
+
       return "INVALID ORCHARD: Run requires: #{run_attrs[:orchard_code]}. Bin is: #{bin_attrs[:orchard_code]}" if !run_attrs[:allow_orchard_mixing] && (bin_attrs[:orchard_id] != run_attrs[:orchard_id])
       return "INVALID CULTIVAR GROUP: Run requires: #{run_attrs[:cultivar_group_code]}. Bin is: #{bin_attrs[:cultivar_group_code]}" if !run_attrs[:allow_cultivar_group_mixing] && (bin_attrs[:cultivar_group_id] != run_attrs[:cultivar_group_id])
       return "INVALID CULTIVAR: Run requires: #{run_attrs[:cultivar_name]}. Bin is: #{bin_attrs[:cultivar_name]}" if !run_attrs[:allow_cultivar_mixing] && (bin_attrs[:cultivar_id] != run_attrs[:cultivar_id])

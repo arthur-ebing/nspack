@@ -14,6 +14,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true },
       hl: { run_allocations: true,
@@ -25,6 +26,7 @@ module Crossbeams
             provide_pack_type_at_verification: true,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
             default_marketing_org: 'HABATA',
             allow_cultivar_group_mix: true },
       kr: { run_allocations: true,
@@ -36,6 +38,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: true,
             integrate_with_external_rmt_system: true,
+            bin_tip_match_farm_on_group: true,
             default_marketing_org: 'KR',
             allow_cultivar_group_mix: false },
       um: { run_allocations: true,
@@ -47,6 +50,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: false },
       ud: { run_allocations: true,
@@ -58,6 +62,7 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
             default_marketing_org: 'UI',
             allow_cultivar_group_mix: true },
       sr: { run_allocations: true,
@@ -69,9 +74,11 @@ module Crossbeams
             provide_pack_type_at_verification: false,
             group_incentive_packer_roles: false,
             integrate_with_external_rmt_system: false,
+            bin_tip_match_farm_on_group: false,
             default_marketing_org: 'SY',
             allow_cultivar_group_mix: false },
-      sr2: { run_allocations: true }
+      sr2: { run_allocations: true,
+             bin_tip_match_farm_on_group: false }
     }.freeze
     # ALLOW_OVERFULL_REWORKS_PALLETIZING
     # BYPASS_QUALITY_TEST_LOAD_CHECK
@@ -126,6 +133,12 @@ module Crossbeams
       return 'Is the client Kromco, and do they need to integrate with an external RMT system?' if explain
 
       setting(:integrate_with_external_rmt_system) && client_code == 'kr'
+    end
+
+    def bintip_allow_farms_of_same_group_to_match?(explain: false)
+      return 'When tipping a bin against a run and the run farm is not the same as the bin farm, should the bin be allowed to tip if both farms belong to the same farm group?' if explain
+
+      setting(:bin_tip_match_farm_on_group)
     end
 
     def group_incentive_has_packer_roles?(explain: false)
