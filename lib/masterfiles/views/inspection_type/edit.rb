@@ -8,7 +8,7 @@ module Masterfiles
           ui_rule = UiRules::Compiler.new(:inspection_type, :edit, id: id, form_values: form_values)
           rules   = ui_rule.compile
 
-          layout = Crossbeams::Layout::Page.build(rules) do |page|
+          layout = Crossbeams::Layout::Page.build(rules) do |page| # rubocop:disable Metrics/BlockLength
             page.form_object ui_rule.form_object
             page.form_values form_values
             page.form_errors form_errors
@@ -26,6 +26,9 @@ module Masterfiles
                 row.column do |col|
                   col.add_field :applies_to_all_tm_groups
                   col.add_field :applicable_tm_group_ids
+
+                  col.add_field :applies_to_all_grades
+                  col.add_field :applicable_grade_ids
 
                   col.add_field :applies_to_all_cultivars
                   col.add_field :applicable_cultivar_ids

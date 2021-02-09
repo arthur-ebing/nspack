@@ -12,7 +12,7 @@ module MasterfilesApp
     end
 
     def test_inspection_type
-      MasterfilesApp::QualityRepo.any_instance.stubs(:find_inspection_type_flat).returns(fake_inspection_type)
+      MasterfilesApp::QualityRepo.any_instance.stubs(:find_inspection_type).returns(fake_inspection_type)
       entity = interactor.send(:inspection_type, 1)
       assert entity.is_a?(InspectionType)
     end
@@ -21,7 +21,7 @@ module MasterfilesApp
       attrs = fake_inspection_type.to_h.reject { |k, _| k == :id }
       res = interactor.create_inspection_type(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(InspectionTypeFlat, res.instance)
+      assert_instance_of(InspectionType, res.instance)
       assert res.instance.id.nonzero?
     end
 
@@ -39,7 +39,7 @@ module MasterfilesApp
       attrs[:inspection_type_code] = 'a_change'
       res = interactor.update_inspection_type(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
-      assert_instance_of(InspectionTypeFlat, res.instance)
+      assert_instance_of(InspectionType, res.instance)
       assert_equal 'a_change', res.instance.inspection_type_code
       refute_equal value, res.instance.inspection_type_code
     end
@@ -70,12 +70,19 @@ module MasterfilesApp
         inspection_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
         inspection_failure_type_id: inspection_failure_type_id,
+        failure_type_code: 'ABC',
         applies_to_all_tm_groups: false,
         applicable_tm_group_ids: [1, 2, 3],
+        applicable_tm_groups: %w[A B C],
         applies_to_all_cultivars: false,
         applicable_cultivar_ids: [1, 2, 3],
+        applicable_cultivars: %w[A B C],
         applies_to_all_orchards: false,
         applicable_orchard_ids: [1, 2, 3],
+        applicable_orchards: %w[A B C],
+        applies_to_all_grades: false,
+        applicable_grade_ids: [1, 2, 3],
+        applicable_grades: %w[A B C],
         active: true
       }
     end

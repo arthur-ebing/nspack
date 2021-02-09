@@ -61,7 +61,7 @@ module MasterfilesApp
     end
 
     def inspection_type(id)
-      repo.find_inspection_type_flat(id)
+      repo.find_inspection_type(id)
     end
 
     def validate_inspection_type_params(params)

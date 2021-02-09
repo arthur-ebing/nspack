@@ -13,12 +13,19 @@ module MasterfilesApp
         inspection_type_code: Faker::Lorem.unique.word,
         description: 'ABC',
         inspection_failure_type_id: 1,
+        failure_type_code: 'ABC',
         applies_to_all_tm_groups: false,
         applicable_tm_group_ids: [1, 2, 3],
+        applicable_tm_groups: %w[A B C],
         applies_to_all_cultivars: false,
         applicable_cultivar_ids: [1, 2, 3],
+        applicable_cultivars: %w[A B C],
         applies_to_all_orchards: false,
         applicable_orchard_ids: [1, 2, 3],
+        applicable_orchards: %w[A B C],
+        applies_to_all_grades: false,
+        applicable_grade_ids: [1, 2, 3],
+        applicable_grades: %w[A B C],
         active: true
       }
       MasterfilesApp::InspectionType.new(base_attrs.merge(attrs))

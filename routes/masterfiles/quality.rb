@@ -428,6 +428,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               applicable_cultivars
               applicable_orchard_ids
               applicable_orchards
+              applicable_grade_ids
+              applicable_grades
             ]
             update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
           else
@@ -474,6 +476,14 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         json_actions(actions)
       end
 
+      r.on 'applies_to_all_grades' do
+        actions = []
+        actions << OpenStruct.new(type: params[:changed_value] == 'f' ? :show_element : :hide_element,
+                                  dom_id: 'inspection_type_applicable_grade_ids_field_wrapper')
+        actions << OpenStruct.new(type: :replace_input_value, dom_id: 'inspection_type_applicable_grade_ids', value: [])
+        json_actions(actions)
+      end
+
       r.on 'new' do    # NEW
         check_auth!('quality', 'new')
         show_partial_or_page(r) { Masterfiles::Quality::InspectionType::New.call(remote: fetch?(r)) }
@@ -494,6 +504,8 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             applicable_cultivars
             applicable_orchard_ids
             applicable_orchards
+            applicable_grade_ids
+            applicable_grades
             active
           ]
           add_grid_row(attrs: select_attributes(res.instance, row_keys),

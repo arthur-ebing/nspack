@@ -12,5 +12,7 @@ module MasterfilesApp
     optional(:applicable_cultivar_ids).maybe(:array).maybe { each(:integer) }
     required(:applies_to_all_orchards).maybe(:bool)
     optional(:applicable_orchard_ids).maybe(:array).maybe { each(:integer) }
+    required(:applies_to_all_grades).maybe(:bool)
+    optional(:applicable_grade_ids).maybe(:array).maybe { each(:integer) }
   end
 end
