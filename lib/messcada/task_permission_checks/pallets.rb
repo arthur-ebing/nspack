@@ -158,7 +158,7 @@ module MesscadaApp
       end
 
       def verification_passed_check
-        failed_pallets = @repo.select_values(:pallet_sequences, :pallet_number, where: { pallet_number: pallet_numbers, verification_passed: false }).uniq
+        failed_pallets = @repo.select_values(:pallet_sequences, :pallet_number, pallet_number: pallet_numbers, verification_passed: false).uniq
         return failed_response "Pallet: #{failed_pallets.join(', ')}, verification not passed." unless failed_pallets.empty?
 
         all_ok
