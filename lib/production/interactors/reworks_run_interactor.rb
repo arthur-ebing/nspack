@@ -1245,22 +1245,14 @@ module ProductionApp
       repo.selected_pallet_numbers(sequence_id)
     end
 
-    def recalc_all_bins_nett_weight # rubocop:disable Metrics/AbcSize
+    def recalc_bins_nett_weight
       reworks_run_type_id = repo.get_reworks_run_type_id(AppConst::RUN_TYPE_RECALC_BIN_NETT_WEIGHT)
       reworks_run_attrs = { user: @user.user_name,
                             reworks_run_type_id: reworks_run_type_id,
                             pallets_selected: '{ }',
                             pallets_affected: '{ }' }
-      rw_res = nil
-      repo.transaction do
-        rw_res = ProductionApp::RecalcBinsNettWeight.call
-        return failed_response(unwrap_failed_response(rw_res)) unless rw_res.success
-
-        reworks_run_id = repo.create_reworks_run(reworks_run_attrs)
-        log_status(:reworks_runs, reworks_run_id, 'CREATED')
-        log_transaction
-      end
-      success_response('Re-calculated nett weight for all bins successfully', reworks_run_type_id: reworks_run_type_id)
+      Job::RecalculateBinNettWeight.enqueue(reworks_run_attrs)
+      success_response('Recalculate bin nett_weight has been enqued.')
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue StandardError => e

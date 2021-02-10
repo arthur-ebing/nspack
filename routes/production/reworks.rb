@@ -204,7 +204,18 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
 
         r.on 'recalc_all_bins_nett_weight' do
-          res = interactor.recalc_all_bins_nett_weight
+          show_partial_or_page(r) do
+            Production::Reworks::ReworksRun::Confirm.call
+          end
+        end
+
+        r.on 'cancel_recalc' do
+          flash[:error] = 'Re-calculation cancelled successfully'
+          redirect_to_last_grid(r)
+        end
+
+        r.on 'recalc_bins_nett_weight' do
+          res = interactor.recalc_bins_nett_weight
           if res.success
             flash[:notice] = res.message
             redirect_to_last_grid(r)
