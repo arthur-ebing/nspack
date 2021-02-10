@@ -200,6 +200,11 @@
   :icon: play
   :popup: false
 - :separator: true
+- :url: "/production/runs/production_runs/$:id$/view_bin_tipping_criteria"
+  :text: view bin tipping criteria
+  :icon: view-show
+  :popup: true
+  :show_if_env_var: CLIENT_CODE:kr
 :conditions:
   :standard:
     - :col: production_runs.id

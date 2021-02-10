@@ -524,6 +524,9 @@ class Nspack < Roda
         end
         redirect_to_last_grid(r)
       end
+      r.on 'view_bin_tipping_criteria' do
+        show_partial { Production::Runs::ProductionRun::ShowBinTippingCriteria.call(id) }
+      end
 
       r.is do
         r.get do       # SHOW
