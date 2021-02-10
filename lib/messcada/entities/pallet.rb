@@ -13,8 +13,6 @@ module MesscadaApp
     attribute :shipped_at, Types::DateTime
     attribute :govt_first_inspection_at, Types::DateTime
     attribute :govt_reinspection_at, Types::DateTime
-    attribute :internal_inspection_at, Types::DateTime
-    attribute :internal_reinspection_at, Types::DateTime
     attribute :stock_created_at, Types::DateTime
     attribute :phc, Types::String
     attribute :intake_created_at, Types::DateTime
@@ -35,7 +33,6 @@ module MesscadaApp
     attribute :pallet_format_id, Types::Integer
     attribute :carton_quantity, Types::Integer
     attribute? :govt_inspection_passed, Types::Bool
-    attribute? :internal_inspection_passed, Types::Bool
     attribute :plt_packhouse_resource_id, Types::Integer
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
@@ -64,8 +61,6 @@ module MesscadaApp
     attribute :last_govt_inspection_pallet_id, Types::Integer
     attribute :last_govt_inspection_sheet_id, Types::Integer
 
-    attribute :internal_inspection_at, Types::DateTime
-    attribute :internal_reinspection_at, Types::DateTime
     attribute :stock_created_at, Types::DateTime
     attribute :phc, Types::String
     attribute :intake_created_at, Types::DateTime
@@ -84,7 +79,6 @@ module MesscadaApp
     attribute :scrapped, Types::Bool
     attribute :pallet_format_id, Types::Integer
     attribute :carton_quantity, Types::Integer
-    attribute :internal_inspection_passed, Types::Bool
     attribute :plt_packhouse_resource_id, Types::Integer
     attribute :plt_line_resource_id, Types::Integer
     attribute :nett_weight, Types::Decimal
