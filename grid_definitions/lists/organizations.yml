@@ -32,7 +32,7 @@
   :text: farm PUC orgs
   :icon: list
   :popup: true
-  :show_if_env_var: USE_MARKETING_PUC:true
+  :show_if_env_var: USE_MARKETING_PUC:y
   :hide_if_false: has_marketing_role
 :page_controls:
 - :control_type: :link
