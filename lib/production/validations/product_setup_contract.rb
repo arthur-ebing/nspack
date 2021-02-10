@@ -31,14 +31,13 @@ module ProductionApp
       optional(:basic_pack_code_id).maybe(:integer)
     end
     rule(:basic_pack_code_id) do
-      unless AppConst::CR_MF.basic_pack_equals_standard_pack?
-        key.failure 'must be filled' if values[:basic_pack_code_id].nil_or_empty?
-      end
+      key.failure 'must be filled' if values[:basic_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
     end
     rule(:gtin_code) do
-      if AppConst::CR_PROD.use_gtins?
-        key.failure 'must be filled' if values[:gtin_code].nil_or_empty?
-      end
+      key.failure 'must be filled' if AppConst::CR_PROD.use_gtins? && values[:gtin_code].nil_or_empty?
+    end
+    rule(:fruit_actual_counts_for_pack_id, :fruit_size_reference_id) do
+      key.failure 'Please choose either an Actual Count or Size Reference' if values[:fruit_size_reference_id].nil_or_empty? && values[:fruit_actual_counts_for_pack_id].nil_or_empty?
     end
   end
 end
