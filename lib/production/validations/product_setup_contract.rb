@@ -36,7 +36,7 @@ module ProductionApp
       end
     end
     rule(:gtin_code) do
-      unless AppConst::CR_PROD.use_gtins?
+      if AppConst::CR_PROD.use_gtins?
         key.failure 'must be filled' if values[:gtin_code].nil_or_empty?
       end
     end
