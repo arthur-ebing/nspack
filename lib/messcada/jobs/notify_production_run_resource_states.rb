@@ -88,7 +88,7 @@ module MesscadaApp
 
       def clm_modules
         # return {} unless AppConst::CLM_BUTTON_CAPTION_FORMAT
-        return {} unless CR_PROD.button_caption_spec
+        return {} unless AppConst::CR_PROD.button_caption_spec
 
         lbl_modules = repo.button_allocations(production_run_id)
         lbl_modules.group_by { |r| [r[:module], r[:alias]] }
