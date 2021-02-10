@@ -245,7 +245,10 @@ module ProductionApp
                                               flatten_columns: { packing_method_code: :packing_method_code } }],
                             lookup_functions: [{ function: :fn_product_setup_code,
                                                  args: [:product_setup_id],
-                                                 col_name: :product_setup_code }],
+                                                 col_name: :product_setup_code },
+                                               { function: :fn_party_role_name,
+                                                 args: [:target_customer_party_role_id],
+                                                 col_name: :target_customer }],
                             wrapper: ProductResourceAllocationFlat)
     end
 
