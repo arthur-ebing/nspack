@@ -329,7 +329,8 @@ module UiRules
                          options: MasterfilesApp::FruitRepo.new.for_select_treatments,
                          selected: @form_object.treatment_ids,
                          caption: 'Treatments' },
-        gtin_code: { caption: 'GTIN Code',
+        gtin_code: { renderer: :label,
+                     caption: 'GTIN Code',
                      hide_on_load: !@rules[:gtins_required] }
       }
     end

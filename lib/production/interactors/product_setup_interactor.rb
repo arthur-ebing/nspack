@@ -172,15 +172,14 @@ module ProductionApp
     end
 
     def validate_product_setup_params(params)
-      params[:gtin_code] ||= gtin_code(params) if AppConst::CR_PROD.use_gtins?
+      res = ProductSetupContract.new.call(params)
+      return res if res.failure?
 
       if AppConst::CR_MF.basic_pack_equals_standard_pack?
-        res = ProductSetupContract.new.call(params)
-        return res if res.failure?
-
         basic_pack_id = repo.get_value(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: params[:standard_pack_code_id])
         params[:basic_pack_code_id] = basic_pack_id
       end
+      params[:gtin_code] = gtin_code(params) if AppConst::CR_PROD.use_gtins?
       ProductSetupContract.new.call(params)
     end
   end
