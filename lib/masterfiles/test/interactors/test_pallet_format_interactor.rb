@@ -47,18 +47,14 @@ module MasterfilesApp
 
     def test_update_pallet_format_fail
       id = create_pallet_format
-      attrs = interactor.send(:repo).find_pallet_format(id)
-      attrs = attrs.to_h
-      attrs.delete(:description)
-      value = attrs[:id]
-      attrs[:id] = 22
+      attrs = interactor.send(:repo).find_pallet_format(id).to_h
+      value = attrs.delete(:description)
       res = interactor.update_pallet_format(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:description]
-      after = interactor.send(:repo).find_pallet_format(id)
-      after = after.to_h
-      refute_equal 22, after[:id]
-      assert_equal value, after[:id]
+      after = interactor.send(:repo).find_pallet_format(id).to_h
+      refute_equal 'a_change', after[:description]
+      assert_equal value, after[:description]
     end
 
     def test_delete_pallet_format
