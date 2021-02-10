@@ -29,7 +29,7 @@ module FinishedGoodsApp
     end
 
     def repack_pallet  # rubocop:disable Metrics/AbcSize
-      res = repo.repack_pallet(pallet_id)
+      res = repo.repack_pallet(pallet_id, user_name)
       return res unless res.success
 
       new_pallet_id = res.instance[:new_pallet_id]

@@ -247,18 +247,18 @@ module ProductionApp
       DB[upd].update unless pallet_format_id.nil_or_empty?
     end
 
-    def repacking_reworks_run(pallet_numbers, _attrs)
+    def repacking_reworks_run(pallet_numbers, user_name, _attrs)
       pallet_numbers.each do |pallet_number|
-        repack_pallet(pallet_number)
+        repack_pallet(pallet_number, user_name)
       end
     end
 
-    def repack_pallet(pallet_id)
+    def repack_pallet(pallet_id, user_name)
       pallet = pallet(pallet_id)
       sequence_ids = pallet_sequence_ids(pallet_id)
       return failed_response("Pallet number #{pallet[:pallet_number]} is missing sequences") if sequence_ids.empty?
 
-      new_pallet_id = clone_pallet(pallet, sequence_ids)
+      new_pallet_id = clone_pallet(pallet, sequence_ids, user_name)
       scrapped_pallet_attrs = { scrapped: true, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_REPACKED }
       scrapped_pallet_sequence_attrs = { pallet_id: nil, scrapped_from_pallet_id: pallet_id, scrapped_at: Time.now, exit_ref: AppConst::PALLET_EXIT_REF_REPACKED }
 
@@ -276,19 +276,25 @@ module ProductionApp
       DB[:pallet_sequences].where(pallet_id: pallet_id).select_map(:id)
     end
 
-    def clone_pallet(pallet, sequence_ids)
-      pallet_rejected_fields = %i[id pallet_number build_status]
-      repack_attrs = { repacked: true, repacked_at: Time.now }
+    def clone_pallet(pallet, sequence_ids, user_name)
+      pallet_rejected_fields = %i[id pallet_number build_status shipped in_stock inspected cooled depot_pallet allocated
+                                  partially_palletized reinspected scrapped shipped_at scrapped_at govt_first_inspection_at
+                                  govt_reinspection_at stock_created_at gross_weight_measured_at allocated_at intake_created_at
+                                  first_cold_storage_at nett_weight gross_weight]
+      repack_attrs = { repacked: true, palletized: true, repacked_at: Time.now, created_at: Time.now, updated_at: Time.now }
       attrs = pallet.to_h.merge(repack_attrs.to_h).reject { |k, _| pallet_rejected_fields.include?(k) }
       new_pallet_id = create(:pallets, attrs)
-      clone_pallet_sequences(pallet[:id], new_pallet_id, sequence_ids)
+      clone_pallet_sequences(pallet[:id], new_pallet_id, sequence_ids, user_name)
       new_pallet_id
     end
 
-    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids)  # rubocop:disable Metrics/AbcSize
+    def clone_pallet_sequences(old_pallet_id, pallet_id, sequence_ids, user_name)  # rubocop:disable Metrics/AbcSize
       pallet = pallet(pallet_id)
-      repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id, repacked_at: Time.now }
-      ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number]
+      repack_attrs = { pallet_id: pallet[:id], pallet_number: pallet[:pallet_number], repacked_from_pallet_id: old_pallet_id,
+                       repacked_at: Time.now, created_at: Time.now, updated_at: Time.now, created_by: user_name }
+      ps_rejected_fields = %i[id pallet_id pallet_number pallet_sequence_number depot_pallet verified verification_passed
+                              removed_from_pallet verified_by scrapped_at verification_result verified_at
+                              removed_from_pallet_at nett_weight]
       sequence_ids.each do |sequence_id|
         attrs = find_hash(:pallet_sequences, sequence_id).to_h.reject { |k, _| ps_rejected_fields.include?(k) }
         new_sequence_id = create(:pallet_sequences, attrs.merge(repack_attrs.to_h))
