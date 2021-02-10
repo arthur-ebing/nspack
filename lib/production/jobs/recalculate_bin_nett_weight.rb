@@ -16,7 +16,7 @@ module ProductionApp
             res = ProductionApp::RecalcBinsNettWeight.call(params)
 
             if res.success
-              send_bus_message('Re-calculated bins nett weight successfully', message_type: :success, target_user: user_name)
+              send_bus_message('Re-calculated bins nett weight successfully', message_type: :information, target_user: user_name)
             else
               msg = res.instance.empty? ? res.message : "\n#{res.message}\n#{res.instance}"
               ErrorMailer.send_error_email(subject: 'Re-calculate bins nett weight failed',
@@ -26,7 +26,6 @@ module ProductionApp
             finish
           end
         rescue StandardError => e
-          log_err(e.message)
           ErrorMailer.send_exception_email(e, subject: 'Re-calculate bins nett weight')
           send_bus_message("Failed to re-calculate bins nett weight - #{e.message}", message_type: :error, target_user: user_name)
           expire

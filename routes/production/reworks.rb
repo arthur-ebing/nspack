@@ -216,7 +216,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             res = interactor.recalc_bins_nett_weight
             if res.success
               flash[:notice] = res.message
-              redirect_to_last_grid(r)
+              redirect_via_json '/'
             end
           end
         end

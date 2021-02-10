@@ -5,7 +5,7 @@ module ProductionApp
     attr_reader :repo, :messcada_repo, :reworks_run_attrs, :rmt_bins
 
     def initialize(params, rmt_bins = nil)
-      @reworks_run_attrs = params
+      @reworks_run_attrs = params.dup
       @repo = ProductionApp::ReworksRepo.new
       @delivery_repo = RawMaterialsApp::RmtDeliveryRepo.new
       @rmt_bins = rmt_bins.nil? ? find_bins_for_nett_recalculation : rmt_bins

@@ -28,7 +28,6 @@ module ProductionApp
             finish
           end
         rescue StandardError => e
-          log_err(e.message)
           ErrorMailer.send_exception_email(e, subject: 'Apply Deliveries Orchard Changes')
           send_bus_message("Failed to Apply Deliveries Orchard Changes - #{e.message}", message_type: :error, target_user: user_name)
           expire
