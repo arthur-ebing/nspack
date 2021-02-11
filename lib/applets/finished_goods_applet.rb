@@ -7,7 +7,7 @@ require "#{root_dir}/finished_goods/services/find_or_create_voyage.rb"
 
 Dir["#{root_dir}/finished_goods/entities/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/finished_goods/interactors/*.rb"].sort.each { |f| require f }
-# Dir["#{root_dir}/finished_goods/jobs/*.rb"].sort.each { |f| require f }
+Dir["#{root_dir}/finished_goods/jobs/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/finished_goods/repositories/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/finished_goods/services/*.rb"].sort.each { |f| require f }
 Dir["#{root_dir}/finished_goods/task_permission_checks/*.rb"].sort.each { |f| require f }
