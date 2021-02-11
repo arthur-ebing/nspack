@@ -98,6 +98,8 @@ These classes must follow the following rules:
 AppConst implements a constant named `TEST_SETTINGS` with an attribute named `client_code` defaulted to the current `CLIENT_CODE`.
 When a test is run, this client code can be changed to test different behaviour for another client.
 
+NOTE: You can set the client code back to the boot client code at the end of your test with an `ensure` block.
+
 e.g. This code expects different values for `allocation_required` for two different clients:
 [source,ruby]
 ----
@@ -112,6 +114,8 @@ def test_create_production_run
   id = repo.create_production_run(attrs)
   alloc = repo.get(:production_runs, id, :allocation_required)
   refute alloc
+ensure
+  AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
 end
 ----
 

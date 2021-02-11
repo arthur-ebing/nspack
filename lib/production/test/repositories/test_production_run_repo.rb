@@ -28,6 +28,8 @@ module ProductionApp
       id = repo.create_production_run(attrs)
       alloc = repo.get(:production_runs, id, :allocation_required)
       refute alloc
+    ensure
+      AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
     end
 
     private
