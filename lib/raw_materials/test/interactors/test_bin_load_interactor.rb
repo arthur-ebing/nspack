@@ -49,7 +49,7 @@ module RawMaterialsApp
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(BinLoadFlat, res.instance)
       assert_equal bin_load_purpose_id, res.instance.bin_load_purpose_id
-      refute_equal value, res.instance.id
+      refute_equal value, bin_load_purpose_id
     end
 
     def test_update_bin_load_fail
