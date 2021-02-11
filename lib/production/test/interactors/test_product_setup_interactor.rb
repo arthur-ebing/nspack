@@ -15,6 +15,7 @@ module ProductionApp
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::TargetMarketFactory
     include RawMaterialsApp::RmtBinFactory
+    include GtinFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -140,6 +141,7 @@ module ProductionApp
     end
 
     def fake_product_setup(overrides = {})
+      create_gtin(product_setup_attrs.merge(overrides))
       ProductSetup.new(product_setup_attrs.merge(overrides))
     end
 
