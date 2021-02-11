@@ -54,6 +54,7 @@ module MesscadaApp
     attribute :created_by, Types::String
     attribute :target_market_id, Types::Integer
     attribute :pm_mark_id, Types::Integer
+    attribute? :legacy_data, Types::Hash.optional
   end
 
   class PalletSequenceFlat < Dry::Struct

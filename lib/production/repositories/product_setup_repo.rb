@@ -333,5 +333,65 @@ module ProductionApp
         .where(product_setup_template_id: product_setup_template_id)
         .get(:marketing_variety_id)
     end
+
+    def packing_specification_item_prod_setup(packing_specification_item_id)
+      DB[:product_setups]
+        .join(:packing_specification_items, product_setup_id: :id)
+        .select(Sequel.lit('product_setups.*'))
+        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id).first
+    end
+
+    def prod_setup_commodity_code(prod_setup_id)
+      DB[:product_setups]
+        .join(:product_setup_templates, id: :product_setup_template_id)
+        .join(:cultivars, id: :cultivar_id)
+        .join(:commodities, id: :commodity_id)
+        .where(Sequel[:product_setups][:id] => prod_setup_id).first[:code]
+    end
+
+    def packing_specification_item_units_per_carton(packing_specification_item_id)
+      DB[:packing_specification_items]
+        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+        .join(:pm_products, id: :pm_product_id)
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .join(:pm_types, id: :pm_type_id)
+        .select(Sequel.lit('*'))
+        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2).first[:quantity]
+    end
+
+    def packing_specification_item_unit_pack_product(packing_specification_item_id)
+      DB[:packing_specification_items]
+        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+        .join(:pm_products, id: :pm_product_id)
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .join(:pm_types, id: :pm_type_id)
+        .select(Sequel.lit('*'))
+        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 2).first[:product_code]
+    end
+
+    def packing_specification_item_carton_pack_product(packing_specification_item_id)
+      DB[:packing_specification_items]
+        .join(:pm_boms_products, pm_bom_id: :pm_bom_id)
+        .join(:pm_products, id: :pm_product_id)
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .join(:pm_types, id: :pm_type_id)
+        .select(Sequel.lit('*'))
+        .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id, pm_composition_level_id: 1).first[:product_code]
+    end
+
+    def prod_setup_organisation(prod_setup_id)
+      DB[:product_setups]
+        .join(:party_roles, id: :marketing_org_party_role_id)
+        .join(:organizations, id: :organization_id)
+        .where(Sequel[:product_setups][:id] => prod_setup_id).first[:short_description]
+    end
+
+    def packing_specification_item_fg_marks(packing_specification_item_id)
+      pm_marks = DB[:packing_specification_items]
+                 .join(:pm_marks, id: :pm_mark_id)
+                 .where(Sequel[:packing_specification_items][:id] => packing_specification_item_id)&.first
+
+      pm_marks ? pm_marks[:packaging_marks].join('_') : nil
+    end
   end
 end
