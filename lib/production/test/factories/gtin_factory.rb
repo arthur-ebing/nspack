@@ -2,7 +2,7 @@
 
 module ProductionApp
   module GtinFactory
-    def create_gtin(opts = {})
+    def create_gtin(opts = {}) # rubocop:disable Metrics/AbcSize
       default = {
         transaction_number: Faker::Lorem.unique.word,
         gtin_code: Faker::Lorem.word,
