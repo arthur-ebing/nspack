@@ -15,7 +15,6 @@ module ProductionApp
     include MasterfilesApp::PartyFactory
     include MasterfilesApp::TargetMarketFactory
     include RawMaterialsApp::RmtBinFactory
-    include GtinFactory
 
     def test_repo
       repo = interactor.send(:repo)
@@ -29,11 +28,21 @@ module ProductionApp
     end
 
     def test_create_product_setup
+      AppConst::TEST_SETTINGS.client_code = 'kr'
       attrs = fake_product_setup.to_h.reject { |k, _| k == :id }
       res = interactor.create_product_setup(attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(ProductSetup, res.instance)
       assert res.instance.id.nonzero?
+
+      AppConst::TEST_SETTINGS.client_code = 'um'
+      attrs = fake_product_setup.to_h.reject { |k, _| k == :id }
+      res = interactor.create_product_setup(attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(ProductSetup, res.instance)
+      assert res.instance.id.nonzero?
+    ensure
+      AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
     end
 
     def test_create_product_setup_fail
@@ -44,9 +53,11 @@ module ProductionApp
     end
 
     def test_update_product_setup
+      AppConst::TEST_SETTINGS.client_code = 'kr'
       id = create_product_setup
       attrs = interactor.send(:repo).find_product_setup(id)
       attrs = attrs.to_h
+      attrs.delete(:commodity_id)
       value = attrs[:client_size_reference]
       attrs[:client_size_reference] = 'a_change'
       res = interactor.update_product_setup(id, attrs)
@@ -54,6 +65,21 @@ module ProductionApp
       assert_instance_of(ProductSetup, res.instance)
       assert_equal 'a_change', res.instance.client_size_reference
       refute_equal value, res.instance.client_size_reference
+
+      AppConst::TEST_SETTINGS.client_code = 'um'
+      id = create_product_setup
+      attrs = interactor.send(:repo).find_product_setup(id)
+      attrs = attrs.to_h
+      attrs.delete(:commodity_id)
+      value = attrs[:client_size_reference]
+      attrs[:client_size_reference] = 'a_change'
+      res = interactor.update_product_setup(id, attrs)
+      assert res.success, "#{res.message} : #{res.errors.inspect}"
+      assert_instance_of(ProductSetup, res.instance)
+      assert_equal 'a_change', res.instance.client_size_reference
+      refute_equal value, res.instance.client_size_reference
+    ensure
+      AppConst::TEST_SETTINGS.client_code = AppConst::TEST_SETTINGS.boot_client_code
     end
 
     def test_update_product_setup_fail
@@ -98,13 +124,14 @@ module ProductionApp
       inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       rmt_class_id = create_rmt_class
+      std_fruit_size_count_id = create_std_fruit_size_count
 
       {
         id: 1,
         product_setup_template_id: product_setup_template_id,
         marketing_variety_id: marketing_variety_id,
         customer_variety_id: nil,
-        std_fruit_size_count_id: nil,
+        std_fruit_size_count_id: std_fruit_size_count_id,
         basic_pack_code_id: basic_pack_code_id,
         standard_pack_code_id: standard_pack_code_id,
         fruit_actual_counts_for_pack_id: fruit_actual_counts_for_pack_id,
@@ -125,7 +152,7 @@ module ProductionApp
         active: true,
         product_setup_code: 'ABC',
         in_production: true,
-        commodity_id: 1,
+        commodity_id: DB[:std_fruit_size_counts].where(id: std_fruit_size_count_id).get(:commodity_id),
         grade_id: grade_id,
         product_chars: 'ABC',
         pallet_base_id: 1,
@@ -136,13 +163,13 @@ module ProductionApp
         description: 'ABC',
         gtin_code: 'ABC',
         rmt_class_id: rmt_class_id
-
       }
     end
 
     def fake_product_setup(overrides = {})
-      create_gtin(product_setup_attrs.merge(overrides))
-      ProductSetup.new(product_setup_attrs.merge(overrides))
+      hash = product_setup_attrs.merge(overrides)
+      create_gtin(hash)
+      ProductSetup.new(hash)
     end
 
     def interactor

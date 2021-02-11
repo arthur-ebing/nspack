@@ -307,7 +307,7 @@ module ProductionApp
     def get_gtin_id(attrs)
       DB[:gtins]
         .where(attrs)
-        .where(Sequel.lit('? between date_to and date_from', Time.now))
+        .where(Sequel.lit('? between date_from and date_to', Time.now)) # value BETWEEN low AND high
         .get(:id)
     end
 

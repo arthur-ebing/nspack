@@ -60,7 +60,7 @@ module RawMaterialsApp
 
     def create_rmt_class(opts = {})
       default = {
-        rmt_class_code: Faker::Lorem.word,
+        rmt_class_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         active: true,
         created_at: '2010-01-01 12:00',

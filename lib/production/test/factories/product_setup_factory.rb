@@ -65,7 +65,39 @@ module ProductionApp
         gtin_code: Faker::Lorem.word,
         rmt_class_id: rmt_class_id
       }
+      create_gtin(default.merge(opts))
       DB[:product_setups].insert(default.merge(opts))
+    end
+
+    def create_gtin(opts = {}) # rubocop:disable Metrics/AbcSize
+      default = {
+        transaction_number: Faker::Lorem.unique.word,
+        gtin_code: Faker::Lorem.word,
+        date_to: '2030-01-01 12:00',
+        date_from: '2010-01-01 12:00',
+        org_code: Faker::Lorem.word,
+        commodity_code: Faker::Lorem.word,
+        marketing_variety_code: Faker::Lorem.word,
+        standard_pack_code: Faker::Lorem.word,
+        grade_code: Faker::Lorem.word,
+        mark_code: Faker::Lorem.word,
+        size_count_code: Faker::Lorem.word,
+        inventory_code: Faker::Lorem.word,
+        target_market_code: Faker::Lorem.word,
+        active: true,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00',
+        commodity_id: DB[:std_fruit_size_counts].where(id: opts[:std_fruit_size_count_id]).get(:commodity_id),
+        marketing_variety_id: opts[:marketing_variety_id],
+        marketing_org_party_role_id: opts[:marketing_org_party_role_id],
+        standard_pack_code_id: opts[:standard_pack_code_id],
+        mark_id: opts[:mark_id],
+        grade_id: opts[:grade_id],
+        inventory_code_id: opts[:inventory_code_id],
+        packed_tm_group_id: opts[:packed_tm_group_id],
+        std_fruit_size_count_id: opts[:std_fruit_size_count_id]
+      }
+      DB[:gtins].insert(default)
     end
   end
 end
