@@ -354,7 +354,7 @@ module MesscadaApp
     end
 
     def update_pallet_sequence_extended_fg(id, extended_fg_code, extended_fg_id)
-      legacy_data = DB[:pallet_sequences].where(id: id).first[:legacy_data]
+      legacy_data = get(:pallet_sequences, id, :legacy_data)
       set = legacy_data ? " legacy_data - 'extended_fg_code' - 'extended_fg_id' || " : ''
       upd = <<~SQL
         UPDATE pallet_sequences
