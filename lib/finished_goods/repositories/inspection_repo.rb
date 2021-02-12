@@ -4,8 +4,14 @@ module FinishedGoodsApp
   class InspectionRepo < BaseRepo
     # INSPECTIONS
     # --------------------------------------------------------------------------
-    build_for_select :inspections, abel: :remarks,  value: :id, order_by: :remarks
-    build_inactive_select :inspections, label: :remarks, value: :id, order_by: :remarks
+    build_for_select :inspections,
+                     label: :remarks,
+                     value: :id,
+                     order_by: :remarks
+    build_inactive_select :inspections,
+                          label: :remarks,
+                          value: :id,
+                          order_by: :remarks
     crud_calls_for :inspections, name: :inspection, wrapper: Inspection, exclude: %i[create]
 
     def find_inspection(id)

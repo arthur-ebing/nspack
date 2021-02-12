@@ -2,10 +2,23 @@
 
 module FinishedGoodsApp
   class LoadContainerRepo < BaseRepo
-    build_for_select :load_containers, label: :container_code, value: :id, order_by: :container_code
-    build_for_select :container_stack_types, label: :stack_type_code, value: :id, order_by: :stack_type_code
-    build_inactive_select :load_containers, label: :container_code, value: :id, order_by: :container_code
-    build_inactive_select :container_stack_types, label: :stack_type_code, value: :id, order_by: :stack_type_code
+    build_for_select :container_stack_types,
+                     label: :stack_type_code,
+                     value: :id,
+                     order_by: :stack_type_code
+    build_inactive_select :container_stack_types,
+                          label: :stack_type_code,
+                          value: :id,
+                          order_by: :stack_type_code
+
+    build_for_select :load_containers,
+                     label: :container_code,
+                     value: :id,
+                     order_by: :container_code
+    build_inactive_select :load_containers,
+                          label: :container_code,
+                          value: :id,
+                          order_by: :container_code
     crud_calls_for :load_containers, name: :load_container, wrapper: LoadContainer
 
     def find_load_container_flat(id)

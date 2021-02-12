@@ -2,8 +2,14 @@
 
 module FinishedGoodsApp
   class LoadRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :loads, label: :order_number, value: :id, order_by: :order_number
-    build_inactive_select :loads, label: :order_number, value: :id, order_by: :order_number
+    build_for_select :loads,
+                     label: :order_number,
+                     value: :id,
+                     order_by: :order_number
+    build_inactive_select :loads,
+                          label: :order_number,
+                          value: :id,
+                          order_by: :order_number
     crud_calls_for :loads, name: :load, wrapper: Load
 
     def find_load_flat(id) # rubocop:disable Metrics/AbcSize
