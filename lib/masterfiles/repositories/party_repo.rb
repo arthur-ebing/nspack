@@ -21,12 +21,13 @@ module MasterfilesApp
         .select_map(%i[name id])
     end
 
-    crud_calls_for :organizations, name: :organization, wrapper: Organization
-    crud_calls_for :people, name: :person, wrapper: Person
-    crud_calls_for :addresses, name: :address, wrapper: Address
-    crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
-    crud_calls_for :party_roles, name: :party_role, wrapper: PartyRole
-    crud_calls_for :parties, name: :party, wrapper: Party
+    crud_calls_for :organizations, name: :organization
+    crud_calls_for :people, name: :person
+    crud_calls_for :addresses, name: :address
+    crud_calls_for :contact_methods, name: :contact_method
+    crud_calls_for :party_roles, name: :party_role
+    crud_calls_for :parties, name: :party
+    crud_calls_for :registrations, name: :registration
 
     def for_select_contact_method_types
       DevelopmentApp::ContactMethodTypeRepo.new.for_select_contact_method_types
@@ -44,7 +45,16 @@ module MasterfilesApp
     end
 
     def find_party_role(id)
-      hash = DB['SELECT party_roles.* , fn_party_role_name(?) AS party_name FROM party_roles WHERE party_roles.id = ?', id, id].first
+      query = <<~SQL
+        SELECT
+          party_roles.* ,
+          fn_party_role_name(?) AS party_name,
+          roles.name AS role_name
+        FROM party_roles
+        JOIN roles ON party_roles.role_id = roles.id
+        WHERE party_roles.id = ?
+      SQL
+      hash = DB[query, id, id].first
       return nil if hash.nil?
 
       PartyRole.new(hash)
@@ -61,6 +71,14 @@ module MasterfilesApp
       hash[:parent_organization] = get(:organizations, hash[:parent_id], :medium_description)
       hash[:variant_codes] = fn_masterfile_variants('organizations', id)
       Organization.new(hash)
+    end
+
+    def find_registration(id)
+      hash = DB[:registrations].where(id: id).first
+      return nil if hash.nil?
+
+      hash.merge!(find_party_role(hash[:party_role_id]).to_h)
+      Registration.new(hash)
     end
 
     def org_code_for_party_role(id)
@@ -161,6 +179,14 @@ module MasterfilesApp
       contact_method_type_hash = DB[:contact_method_types].where(id: contact_method_type_id).first
       hash[:contact_method_type] = contact_method_type_hash[:contact_method_type]
       ContactMethod.new(hash)
+    end
+
+    def find_address_for_party_role(address_type, party_role_id)
+      party_id = get(:party_roles, party_role_id, :party_id)
+      address_type_id = get_id(:address_types, address_type: address_type)
+      address_id = DB[:party_addresses].where(address_type_id: address_type_id, party_id: party_id).get(:address_id)
+
+      find_address(address_id)
     end
 
     def find_address(id)
@@ -289,7 +315,7 @@ module MasterfilesApp
     #
     def implementation_owner_party_role
       query = <<~SQL
-        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active, fn_party_role_name(pr.id) AS party_name
+        SELECT pr.id, pr.party_id, role_id, organization_id, person_id, pr.active, fn_party_role_name(pr.id) AS party_name, r.name AS role_name
         FROM public.party_roles pr
         JOIN roles r ON r.id = pr.role_id
         LEFT OUTER JOIN organizations o ON o.id = pr.organization_id
@@ -467,6 +493,10 @@ module MasterfilesApp
                                   farm_id: arr[1].to_i,
                                   organization_id: organization_id)
       end
+    end
+
+    def find_registration_code_for_party_role(type, party_role_id)
+      DB[:registrations].where(registration_type: type, party_role_id: party_role_id).get(:registration_code)
     end
 
     private

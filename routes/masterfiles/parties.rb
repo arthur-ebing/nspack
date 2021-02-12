@@ -464,6 +464,82 @@ class Nspack < Roda
         end
       end
     end
+
+    r.on 'registrations', Integer do |id|
+      interactor = MasterfilesApp::RegistrationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      # Check for notfound:
+      r.on !interactor.exists?(:registrations, id) do
+        handle_not_found(r)
+      end
+
+      r.on 'edit' do   # EDIT
+        check_auth!('parties', 'edit')
+        interactor.assert_permission!(:edit, id)
+        show_partial { Masterfiles::Parties::Registration::Edit.call(id) }
+      end
+
+      r.is do
+        r.get do       # SHOW
+          check_auth!('parties', 'read')
+          show_partial { Masterfiles::Parties::Registration::Show.call(id) }
+        end
+        r.patch do     # UPDATE
+          res = interactor.update_registration(id, params[:registration])
+          if res.success
+            update_grid_row(id, changes: { party_role_id: res.instance[:party_role_id],
+                                           registration_type: res.instance[:registration_type],
+                                           registration_code: res.instance[:registration_code] },
+                                notice: res.message)
+          else
+            re_show_form(r, res) do
+              Masterfiles::Parties::Registration::Edit.call(id,
+                                                            form_values: params[:registration],
+                                                            form_errors: res.errors)
+            end
+          end
+        end
+
+        r.delete do    # DELETE
+          check_auth!('parties', 'delete')
+          interactor.assert_permission!(:delete, id)
+          res = interactor.delete_registration(id)
+          if res.success
+            delete_grid_row(id, notice: res.message)
+          else
+            show_json_error(res.message, status: 200)
+          end
+        end
+      end
+    end
+    r.on 'registrations' do
+      interactor = MasterfilesApp::RegistrationInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+      r.on 'new' do    # NEW
+        check_auth!('parties', 'new')
+        show_partial_or_page(r) { Masterfiles::Parties::Registration::New.call(party_id: params[:party_id], remote: fetch?(r)) }
+      end
+      r.post do        # CREATE
+        res = interactor.create_registration(params[:registration])
+        if res.success
+          row_keys = %i[
+            id
+            party_role_id
+            party_name
+            role_name
+            registration_type
+            registration_code
+          ]
+          add_grid_row(attrs: select_attributes(res.instance, row_keys),
+                       notice: res.message)
+        else
+          re_show_form(r, res, url: '/masterfiles/parties/registrations/new') do
+            Masterfiles::Parties::Registration::New.call(form_values: params[:registration],
+                                                         form_errors: res.errors,
+                                                         remote: fetch?(r))
+          end
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/ClassLength, Metrics/BlockLength

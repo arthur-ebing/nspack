@@ -5,7 +5,12 @@
   AS organization_code,\r\n    organizations.short_description,\r\n    organizations.long_description,\r\n
   \   organizations.vat_number,\r\n    organizations.company_reg_no,\r\n    array_agg(distinct
   roles.name order by roles.name) AS roles,\r\n    fn_masterfile_variants('organizations',
-  organizations.id) AS variant_codes,\r\n    organizations.active,\r\n    organizations.created_at,\r\n
+  organizations.id) AS variant_codes,
+  (SELECT ARRAY_AGG(CONCAT(roles.name,' [', registrations.registration_type,' -
+                                       ', registrations.registration_code, ']'))\r\n    FROM roles\r\n             JOIN
+                                       party_roles ON roles.id = party_roles.role_id\r\n             JOIN registrations
+                                       ON party_role_id = party_roles.id\r\n    WHERE party_id = organizations.party_id)
+                                       AS registrations,\r\n    organizations.active,\r\n    organizations.created_at,\r\n
   \   organizations.updated_at,\r\n    EXISTS(SELECT pr.id FROM party_roles pr\r\n
   \                JOIN roles r ON r.id = pr.role_id \r\n                 WHERE r.name
   = 'MARKETER' AND organizations.id = pr.organization_id) AS has_marketing_role\r\nFROM\r\n
@@ -13,7 +18,7 @@
   \       LEFT JOIN party_roles ON organizations.id = party_roles.organization_id\r\n
   \       LEFT JOIN roles ON party_roles.role_id = roles.id\r\nGROUP BY organizations.id,\r\n
   \        parent.id\r\nORDER BY parent.medium_description, organizations.medium_description\r\n"
-:limit: 
+:limit:
 :offset: 
 :external_settings: {}
 :columns:
@@ -152,11 +157,11 @@
     :namespaced_name: organizations.company_reg_no
     :data_type: :string
     :width: 150
-    :format: 
+    :format:
     :hide: false
-    :pinned: 
+    :pinned:
     :groupable: true
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -184,7 +189,23 @@
     :namespaced_name: 
     :data_type: :string
     :width: 500
-    :format: 
+    :format:
+    :hide: false
+    :pinned:
+    :groupable: false
+    :group_by_seq:
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  registrations:
+    :name: registrations
+    :sequence_no: 11
+    :caption: Registrations
+    :namespaced_name:
+    :data_type: :string
+    :width:
+    :format:
     :hide: false
     :pinned: 
     :groupable: false
@@ -234,9 +255,9 @@
     :width: 
     :format: :datetime_with_secs
     :hide: true
-    :pinned: 
+    :pinned:
     :groupable: false
-    :group_by_seq: 
+    :group_by_seq:
     :group_sum: false
     :group_avg: false
     :group_min: false
@@ -245,10 +266,10 @@
     :name: has_marketing_role
     :sequence_no: 15
     :caption: Has marketing role
-    :namespaced_name: 
+    :namespaced_name:
     :data_type: :boolean
-    :width: 
-    :format: 
+    :width:
+    :format:
     :hide: true
     :pinned: 
     :groupable: false

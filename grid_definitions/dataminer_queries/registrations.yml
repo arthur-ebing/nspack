@@ -1,0 +1,191 @@
+---
+:caption: Registrations
+:sql: "SELECT\r\n    registrations.id,\r\n    registrations.party_role_id,\r\n    fn_party_role_name(registrations.party_role_id)
+  AS party_name,\r\n    party_roles.party_id,\r\n    roles.name AS role_name,\r\n
+  \   registrations.registration_type,\r\n    registrations.registration_code,\r\n
+  \   registrations.created_at,\r\n    registrations.updated_at,\r\n    fn_current_status('registrations',
+  registrations.id) AS status\r\nFROM registrations\r\nJOIN party_roles ON registrations.party_role_id
+  = party_roles.id\r\nJOIN roles ON party_roles.role_id = roles.id"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  id:
+    :name: id
+    :sequence_no: 1
+    :caption: Id
+    :namespaced_name: registrations.id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_role_id:
+    :name: party_role_id
+    :sequence_no: 2
+    :caption: Party role
+    :namespaced_name: registrations.party_role_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_name:
+    :name: party_name
+    :sequence_no: 3
+    :caption: Party name
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  party_id:
+    :name: party_id
+    :sequence_no: 4
+    :caption: Party
+    :namespaced_name: party_roles.party_id
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  role_name:
+    :name: role_name
+    :sequence_no: 5
+    :caption: Role name
+    :namespaced_name: roles.name
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  registration_type:
+    :name: registration_type
+    :sequence_no: 6
+    :caption: Registration type
+    :namespaced_name: registrations.registration_type
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  registration_code:
+    :name: registration_code
+    :sequence_no: 7
+    :caption: Registration code
+    :namespaced_name: registrations.registration_code
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  created_at:
+    :name: created_at
+    :sequence_no: 8
+    :caption: Created at
+    :namespaced_name: registrations.created_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  updated_at:
+    :name: updated_at
+    :sequence_no: 9
+    :caption: Updated at
+    :namespaced_name: registrations.updated_at
+    :data_type: :datetime
+    :width: 
+    :format: :datetime_with_secs
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  status:
+    :name: status
+    :sequence_no: 10
+    :caption: Status
+    :namespaced_name: 
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: registrations.party_role_id
+  :caption: Party role
+  :data_type: :integer
+  :control_type: :list
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: SELECT fn_party_role_name(id), id FROM party_roles WHERE role_id = (SELECT
+    id FROM roles WHERE name = 'ROLE_NAME_GOES_HERE')
+- :column: party_roles.party_id
+  :caption: party Id
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

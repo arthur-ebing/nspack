@@ -21,6 +21,7 @@ module MasterfilesApp
       test_crud_calls_for :people, name: :person, wrapper: Person
       test_crud_calls_for :addresses, name: :address, wrapper: Address
       test_crud_calls_for :contact_methods, name: :contact_method, wrapper: ContactMethod
+      test_crud_calls_for :registrations, name: :registration, wrapper: Registration
     end
 
     def test_create_organization

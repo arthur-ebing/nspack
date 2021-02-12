@@ -27,13 +27,18 @@
   :icon: list
   :title: Variants
   :popup: false
-- :separator: true
+- :url: "/list/registrations/new/party_id=$:party_id$"
+  :text: registrations
+  :icon: list
+  :title: Registrations
+  :popup: true
 - :url: "/list/farm_puc_orgs/multi?key=farm_puc_orgs&id=$:id$"
   :text: farm PUC orgs
   :icon: list
   :popup: true
   :show_if_env_var: USE_MARKETING_PUC:y
   :hide_if_false: has_marketing_role
+- :separator: true
 :page_controls:
 - :control_type: :link
   :url: "/masterfiles/parties/organizations/new"

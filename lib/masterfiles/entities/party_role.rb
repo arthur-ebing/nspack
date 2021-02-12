@@ -6,6 +6,7 @@ module MasterfilesApp
     attribute :party_id, Types::Integer
     attribute :party_name, Types::String
     attribute :role_id, Types::Integer
+    attribute :role_name, Types::String
     attribute :organization_id, Types::Integer
     attribute :person_id, Types::Integer
     attribute :active, Types::Bool

@@ -140,5 +140,18 @@ module MasterfilesApp
     def party_role_ids(party_id)
       DB[:party_roles].where(party_id: party_id).select_map(:role_id).sort
     end
+
+    def create_registration(opts = {})
+      party_role_id = create_party_role
+
+      default = {
+        party_role_id: party_role_id,
+        registration_type: Faker::Lorem.unique.word,
+        registration_code: Faker::Lorem.word,
+        created_at: '2010-01-01 12:00',
+        updated_at: '2010-01-01 12:00'
+      }
+      DB[:registrations].insert(default.merge(opts))
+    end
   end
 end
