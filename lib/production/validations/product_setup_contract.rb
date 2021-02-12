@@ -8,7 +8,6 @@ module ProductionApp
       required(:marketing_variety_id).filled(:integer)
       required(:customer_variety_id).maybe(:integer)
       required(:std_fruit_size_count_id).maybe(:integer)
-      required(:standard_pack_code_id).filled(:integer)
       required(:fruit_actual_counts_for_pack_id).maybe(:integer)
       required(:fruit_size_reference_id).maybe(:integer)
       required(:marketing_org_party_role_id).filled(:integer)
@@ -28,9 +27,10 @@ module ProductionApp
       required(:target_market_id).maybe(:integer)
       optional(:gtin_code).maybe(Types::StrippedString)
       required(:rmt_class_id).maybe(:integer)
-      optional(:basic_pack_code_id).maybe(:integer)
+      optional(:standard_pack_code_id).maybe(:integer)
+      required(:basic_pack_code_id).filled(:integer)
     end
-    rule(:basic_pack_code_id) do
+    rule(:standard_pack_code_id) do
       key.failure 'must be filled' if values[:basic_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
     end
     rule(:gtin_code) do

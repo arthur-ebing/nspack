@@ -22,8 +22,6 @@ module ProductionApp
     def create_product_setup(opts = {})  # rubocop:disable Metrics/AbcSize
       product_setup_template_id = create_product_setup_template
       marketing_variety_id = create_marketing_variety
-      basic_pack_code_id = create_basic_pack
-      standard_pack_code_id = create_standard_pack
       std_fruit_size_count_id = create_std_fruit_size_count
       fruit_size_reference_id = create_fruit_size_reference
       marketing_org_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_MARKETER)
@@ -36,6 +34,10 @@ module ProductionApp
       inventory_code_id = create_inventory_code
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       rmt_class_id = create_rmt_class
+      basic_pack_code_id = create_basic_pack
+      standard_pack_code_id = create_standard_pack
+      create_basic_packs_standard_packs(standard_pack_id: standard_pack_code_id,
+                                        basic_pack_id: basic_pack_code_id)
 
       default = {
         product_setup_template_id: product_setup_template_id,

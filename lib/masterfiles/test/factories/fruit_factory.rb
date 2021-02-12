@@ -58,7 +58,6 @@ module MasterfilesApp
     end
 
     def create_standard_pack(opts = {})
-      basic_pack_id = create_basic_pack
       default = {
         standard_pack_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
@@ -69,9 +68,18 @@ module MasterfilesApp
         use_size_ref_for_edi: false,
         palletizer_incentive_rate: Faker::Number.decimal
       }
-      standard_pack_id = DB[:standard_pack_codes].insert(default.merge(opts))
-      DB[:basic_packs_standard_packs].insert(basic_pack_id: basic_pack_id, standard_pack_id: standard_pack_id)
-      standard_pack_id
+      DB[:standard_pack_codes].insert(default.merge(opts))
+    end
+
+    def create_basic_packs_standard_packs(opts = {})
+      standard_pack_id = create_standard_pack
+      basic_pack_id = create_basic_pack
+
+      default = {
+        standard_pack_id: standard_pack_id,
+        basic_pack_id: basic_pack_id
+      }
+      DB[:basic_packs_standard_packs].insert(default.merge(opts))
     end
 
     def create_std_fruit_size_count(opts = {})

@@ -111,8 +111,6 @@ module ProductionApp
     def product_setup_attrs
       product_setup_template_id = create_product_setup_template
       marketing_variety_id = create_marketing_variety
-      basic_pack_code_id = create_basic_pack
-      standard_pack_code_id = create_standard_pack
       fruit_size_reference_id = create_fruit_size_reference
       marketing_org_party_role_id = create_party_role(party_type: 'O', name: AppConst::ROLE_MARKETER)
       packed_tm_group_id = create_target_market_group
@@ -125,6 +123,10 @@ module ProductionApp
       fruit_actual_counts_for_pack_id = create_fruit_actual_counts_for_pack
       rmt_class_id = create_rmt_class
       std_fruit_size_count_id = create_std_fruit_size_count
+      basic_pack_code_id = create_basic_pack
+      standard_pack_code_id = create_standard_pack
+      create_basic_packs_standard_packs(standard_pack_id: standard_pack_code_id,
+                                        basic_pack_id: basic_pack_code_id)
 
       {
         id: 1,

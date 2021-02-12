@@ -10,6 +10,7 @@ module UiRules
 
       @rules[:require_packaging_bom] = AppConst::REQUIRE_PACKAGING_BOM
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
+      @rules[:basic_pack_equals_standard_pack] = AppConst::CR_MF.basic_pack_equals_standard_pack?
 
       common_values_for_fields common_fields
 
@@ -66,7 +67,7 @@ module UiRules
       fields[:basic_pack_code_id] = { renderer: :label,
                                       with_value: basic_pack_code_id_label,
                                       caption: 'Basic Pack',
-                                      hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack? }
+                                      hide_on_load: @rules[:basic_pack_equals_standard_pack] }
       fields[:standard_pack_code_id] = { renderer: :label,
                                          with_value: standard_pack_code_id_label,
                                          caption: 'Standard Pack' }
@@ -184,18 +185,18 @@ module UiRules
                               options: @fruit_size_repo.for_select_basic_packs,
                               disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               caption: 'Basic Pack',
-                              required: !AppConst::CR_MF.basic_pack_equals_standard_pack?,
+                              required: @rules[:basic_pack_equals_standard_pack],
                               prompt: 'Select Basic Pack',
                               searchable: true,
-                              hide_on_load: AppConst::CR_MF.basic_pack_equals_standard_pack?,
                               remove_search_for_small_list: false },
         standard_pack_code_id: { renderer: :select,
                                  options: @fruit_size_repo.for_select_standard_packs,
                                  disabled_options: @fruit_size_repo.for_select_inactive_standard_packs,
                                  caption: 'Standard Pack',
-                                 required: true,
+                                 required: !@rules[:basic_pack_equals_standard_pack],
                                  prompt: 'Select Standard Pack',
                                  searchable: true,
+                                 hide_on_load: @rules[:basic_pack_equals_standard_pack],
                                  remove_search_for_small_list: false },
         fruit_actual_counts_for_pack_id: { renderer: :select,
                                            options: @fruit_size_repo.for_select_fruit_actual_counts_for_packs(
