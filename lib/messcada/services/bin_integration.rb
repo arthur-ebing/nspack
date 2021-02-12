@@ -61,7 +61,7 @@ module MesscadaApp
                                          location_code: res.instance['location_code'], commodity_code: res.instance['commodity_code'], puc_code: res.instance['puc_code'] })
       return bin_mfs_res unless bin_mfs_res.success
 
-      bin_legacy_data = { 'rmt_size' => res.instance['size_code'], 'treatment_code' => res.instance['treatment_code'], 'pc_code' => res.instance['pc_name'],
+      bin_legacy_data = { 'rmt_size' => res.instance['size_code'], 'treatment_code' => res.instance['rmtp_treatment_code'], 'pc_code' => res.instance['pc_name'],
                           'track_indicator_code' => res.instance['track_slms_indicator_1_code'], 'ripe_point_code' => res.instance['ripe_point_code'], 'rmt_product_type' => res.instance['rmt_product_type_code'],
                           'farm_code' => bin_mfs_res.instance[:farm_id], 'commodity_code' => bin_mfs_res.instance[:commodity_id], 'rmt_variety_code' => bin_mfs_res.instance[:cultivar_id], 'season_code' => bin_mfs_res.instance[:season_id],
                           'product_class_code' => res.instance['product_class_code'], 'cold_store_type' => res.instance['cold_store_type_code'] }
