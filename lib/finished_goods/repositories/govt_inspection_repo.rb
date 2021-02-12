@@ -2,21 +2,51 @@
 
 module FinishedGoodsApp
   class GovtInspectionRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :govt_inspection_sheets, label: :id, value: :id, order_by: :id
-    build_for_select :govt_inspection_pallets, label: :failure_remarks, value: :id, order_by: :failure_remarks
-    build_for_select :pallets, label: :pallet_number, value: :id, order_by: :pallet_number
-    build_for_select :govt_inspection_api_results, label: :upn_number, value: :id, order_by: :upn_number
-    build_for_select :govt_inspection_pallet_api_results, label: :id, value: :id, order_by: :id
+    build_for_select :pallets,
+                     label: :pallet_number,
+                     value: :id,
+                     order_by: :pallet_number
 
-    build_inactive_select :govt_inspection_sheets, label: :id, value: :id, order_by: :id
-    build_inactive_select :govt_inspection_pallets, label: :failure_remarks, value: :id, order_by: :failure_remarks
-    build_inactive_select :govt_inspection_api_results, label: :upn_number, value: :id, order_by: :upn_number
-    build_inactive_select :govt_inspection_pallet_api_results, label: :id, value: :id, order_by: :id
-
+    build_for_select :govt_inspection_sheets,
+                     label: :id,
+                     value: :id,
+                     order_by: :id
+    build_inactive_select :govt_inspection_sheets,
+                          label: :id,
+                          value: :id,
+                          order_by: :id
     crud_calls_for :govt_inspection_sheets, name: :govt_inspection_sheet, wrapper: GovtInspectionSheet
+
+    build_for_select :govt_inspection_pallets,
+                     label: :failure_remarks,
+                     value: :id,
+                     order_by: :failure_remarks
+    build_inactive_select :govt_inspection_pallets,
+                          label: :failure_remarks,
+                          value: :id,
+                          order_by: :failure_remarks
     crud_calls_for :govt_inspection_pallets, name: :govt_inspection_pallet, wrapper: GovtInspectionPallet
+
+    build_for_select :govt_inspection_api_results,
+                     label: :upn_number,
+                     value: :id,
+                     order_by: :upn_number
+    build_inactive_select :govt_inspection_api_results,
+                          label: :upn_number,
+                          value: :id,
+                          order_by: :upn_number
     crud_calls_for :govt_inspection_api_results, name: :govt_inspection_api_result, wrapper: GovtInspectionApiResult
+
+    build_for_select :govt_inspection_pallet_api_results,
+                     label: :id,
+                     value: :id,
+                     order_by: :id
+    build_inactive_select :govt_inspection_pallet_api_results,
+                          label: :id,
+                          value: :id,
+                          order_by: :id
     crud_calls_for :govt_inspection_pallet_api_results, name: :govt_inspection_pallet_api_result, wrapper: GovtInspectionPalletApiResult
+
     crud_calls_for :vehicle_jobs, name: :vehicle_job, wrapper: VehicleJob
     crud_calls_for :vehicle_job_units, name: :vehicle_job_unit, wrapper: VehicleJobUnit
 
