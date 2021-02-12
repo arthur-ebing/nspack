@@ -66,7 +66,7 @@ module MasterfilesApp
     # crud_calls_for :farm_sections, name: :farm_section, exclude: %i[create update delete]
     crud_calls_for :registered_orchards, name: :registered_orchard, wrapper: RegisteredOrchard
 
-    def for_select_pucs(where = {})
+    def for_select_pucs(where: {})
       DB[:pucs]
         .join(:farms_pucs, puc_id: :id)
         .where(active: true)
@@ -140,6 +140,14 @@ module MasterfilesApp
     end
 
     def delete_farm(id)
+      query = <<~SQL
+        SELECT suppliers.id
+        FROM farms
+        JOIN suppliers ON farms.id = ANY(suppliers.farm_ids)
+        WHERE farms.id = ?
+      SQL
+      raise Sequel::ForeignKeyConstraintViolation, OpenStruct.new(message: "Key (id)=(#{id}) is still referenced from table suppliers") unless DB[query, id].first.nil?
+
       DB[:farms_pucs].where(farm_id: id).delete
       delete(:farms, id)
     end
