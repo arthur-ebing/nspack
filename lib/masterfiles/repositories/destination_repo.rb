@@ -2,6 +2,8 @@
 
 module MasterfilesApp
   class DestinationRepo < BaseRepo
+    # REGIONS
+    # --------------------------------------------------------------------------
     def for_select_destination_regions(where: {}, active: true)
       DB[:destination_regions]
         .join(:destination_regions_tm_groups, destination_region_id: :id)
@@ -10,11 +12,21 @@ module MasterfilesApp
         .where(where)
         .select_map(%i[destination_region_name id])
     end
-    build_inactive_select :destination_regions,
-                          label: :destination_region_name,
-                          value: :id,
-                          order_by: :destination_region_name
+    build_inactive_select :destination_regions, label: :destination_region_name, value: :id, order_by: :destination_region_name
+    crud_calls_for :destination_regions, name: :region, wrapper: Region, exclude: %i[delete]
 
+    def delete_region(id)
+      countries = DB[:destination_countries].where(destination_region_id: id)
+      country_ids = countries.select_map(:id).sort
+
+      DB[:destination_cities].where(destination_country_id: country_ids).delete
+      countries.delete
+      DB[:destination_regions_tm_groups].where(destination_region_id: id).delete
+      DB[:destination_regions].where(id: id).delete
+    end
+
+    # COUNTRIES
+    # --------------------------------------------------------------------------
     def for_select_destination_countries(where: {}, active: true)
       DB[:destination_countries]
         .join(:destination_regions, id: :destination_region_id)
@@ -23,36 +35,8 @@ module MasterfilesApp
         .distinct
         .select_map([:country_name, Sequel[:destination_countries][:id]])
     end
-    build_inactive_select :destination_countries,
-                          label: :country_name,
-                          value: :id,
-                          order_by: :country_name
-
-    build_for_select :destination_cities,
-                     label: :city_name,
-                     value: :id,
-                     order_by: :city_name
-    build_inactive_select :destination_cities,
-                          label: :city_name,
-                          value: :id,
-                          order_by: :city_name
-
-    crud_calls_for :destination_regions, name: :region, wrapper: Region
-    crud_calls_for :destination_countries, name: :country, wrapper: Country
-    crud_calls_for :destination_cities, name: :city, wrapper: City
-
-    def delete_region(id) # rubocop:disable Metrics/AbcSize
-      countries = DB[:destination_countries].where(destination_region_id: id)
-      country_ids = countries.select_map(:id).sort
-      dependents = DB[:target_markets_for_countries].where(destination_country_id: country_ids).select_map(:id)
-      return { error: 'Some countries are associated to Target Markets' } unless dependents.empty?
-
-      DB[:destination_cities].where(destination_country_id: country_ids).delete
-      countries.delete
-      DB[:destination_regions_tm_groups].where(destination_region_id: id).delete
-      DB[:destination_regions].where(id: id).delete
-      { success: true }
-    end
+    build_inactive_select :destination_countries, label: :country_name, value: :id, order_by: :country_name
+    crud_calls_for :destination_countries, name: :country, exclude: %i[create delete]
 
     def find_country(id)
       hash = find_hash(:destination_countries, id)
@@ -81,6 +65,12 @@ module MasterfilesApp
       end
     end
 
+    # CITIES
+    # --------------------------------------------------------------------------
+    build_for_select :destination_cities, label: :city_name, value: :id,  order_by: :city_name
+    build_inactive_select :destination_cities, label: :city_name, value: :id, order_by: :city_name
+    crud_calls_for :destination_cities, name: :city, exclude: [:create]
+
     def find_city(id)
       hash = find_hash(:destination_cities, id)
       return nil if hash.nil?
@@ -99,6 +89,7 @@ module MasterfilesApp
       DB[:destination_cities].insert(attrs.to_h.merge(destination_country_id: id))
     end
 
+    # --------------------------------------------------------------------------
     def find_region_tm_group_names(id)
       DB[:target_market_groups]
         .join(:destination_regions_tm_groups, target_market_group_id: :id)
