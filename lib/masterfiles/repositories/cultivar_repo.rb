@@ -40,9 +40,9 @@ module MasterfilesApp
                           value: :id,
                           order_by: :marketing_variety_code
 
-    crud_calls_for :cultivar_groups, name: :cultivar_group, wrapper: CultivarGroup
-    crud_calls_for :cultivars, name: :cultivar, wrapper: Cultivar
-    crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety
+    crud_calls_for :cultivar_groups, name: :cultivar_group
+    crud_calls_for :cultivars, name: :cultivar, exclude: %i[delete]
+    crud_calls_for :marketing_varieties, name: :marketing_variety, wrapper: MarketingVariety, exclude: %i[create delete]
 
     def find_cultivar_group(id)
       hash = find_hash(:cultivar_groups, id)
@@ -98,10 +98,6 @@ module MasterfilesApp
          WHERE cultivar_name = ? and commodities.code= ? and orchards.id = ?", cultivar_name, commodity_code, orchard_id].first
 
       hash.nil? ? nil : hash[:id]
-    end
-
-    def delete_cultivar_group(id)
-      DB[:cultivar_groups].where(id: id).delete
     end
 
     def delete_cultivar(id)

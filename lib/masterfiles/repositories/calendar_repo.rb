@@ -24,8 +24,7 @@ module MasterfilesApp
     crud_calls_for :seasons, name: :season, exclude: %i[create update]
 
     def find_season(id)
-      find_with_association(:seasons,
-                            id,
+      find_with_association(:seasons, id,
                             parent_tables: [{ parent_table: :season_groups,
                                               columns: [:season_group_code],
                                               flatten_columns: { season_group_code: :season_group_code } },

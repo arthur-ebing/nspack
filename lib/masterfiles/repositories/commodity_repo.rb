@@ -18,8 +18,8 @@ module MasterfilesApp
                           label: :code,
                           value: :id
 
-    crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup
-    crud_calls_for :commodities, name: :commodity, wrapper: Commodity
+    crud_calls_for :commodity_groups, name: :commodity_group, wrapper: CommodityGroup, exclude: %i[delete]
+    crud_calls_for :commodities, name: :commodity, exclude: %i[delete]
 
     def delete_commodity(id)
       dependents = DB[:cultivars].where(commodity_id: id).select_map(:id)

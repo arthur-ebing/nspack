@@ -6,31 +6,26 @@ module MasterfilesApp
                           label: :pm_type_code,
                           value: :id,
                           order_by: :pm_type_code
-    crud_calls_for :pm_types, name: :pm_type
 
     build_inactive_select :pm_subtypes,
                           label: :subtype_code,
                           value: :id,
                           order_by: :subtype_code
-    crud_calls_for :pm_subtypes, name: :pm_subtype
 
     build_inactive_select :pm_products,
                           label: :product_code,
                           value: :id,
                           order_by: :product_code
-    crud_calls_for :pm_products, name: :pm_product
 
     build_inactive_select :pm_boms,
                           label: :bom_code,
                           value: :id,
                           order_by: :bom_code
-    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom, exclude: %i[delete]
 
     build_inactive_select :pm_boms_products,
                           label: :quantity,
                           value: :id,
                           order_by: :quantity
-    crud_calls_for :pm_boms_products, name: :pm_boms_product
 
     build_for_select :pm_composition_levels,
                      label: :description,
@@ -40,12 +35,18 @@ module MasterfilesApp
                           label: :description,
                           value: :id,
                           order_by: :description
-    crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
 
     build_inactive_select :pm_marks,
                           label: :packaging_marks,
                           value: :id,
                           order_by: :packaging_marks
+
+    crud_calls_for :pm_types, name: :pm_type
+    crud_calls_for :pm_subtypes, name: :pm_subtype
+    crud_calls_for :pm_products, name: :pm_product
+    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom, exclude: %i[delete]
+    crud_calls_for :pm_boms_products, name: :pm_boms_product
+    crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
     crud_calls_for :pm_marks, name: :pm_mark
 
     def find_pm_type(id)

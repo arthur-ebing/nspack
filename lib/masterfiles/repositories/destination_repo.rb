@@ -6,13 +6,11 @@ module MasterfilesApp
                           label: :destination_region_name,
                           value: :id,
                           order_by: :destination_region_name
-    crud_calls_for :destination_regions, name: :region, wrapper: Region, exclude: %i[delete]
 
     build_inactive_select :destination_countries,
                           label: :country_name,
                           value: :id,
                           order_by: :country_name
-    crud_calls_for :destination_countries, name: :country, exclude: %i[create delete]
 
     build_for_select :destination_cities,
                      label: :city_name,
@@ -22,6 +20,9 @@ module MasterfilesApp
                           label: :city_name,
                           value: :id,
                           order_by: :city_name
+
+    crud_calls_for :destination_regions, name: :region, wrapper: Region, exclude: %i[delete]
+    crud_calls_for :destination_countries, name: :country, exclude: %i[create delete]
     crud_calls_for :destination_cities, name: :city, exclude: [:create]
 
     # REGIONS
