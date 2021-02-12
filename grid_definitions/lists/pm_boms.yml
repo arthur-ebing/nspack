@@ -11,6 +11,11 @@
   :icon: edit
   :title: Edit
 #  :popup: true
+- :url: "/masterfiles/packaging/pm_boms/$:id$/clone"
+  :text: Clone to counts
+  :icon: copy
+  :title: Clone to counts
+  :hide_if_false: has_fruit_product
 - :url: "/masterfiles/packaging/pm_boms/$:id$"
   :text: delete
   :icon: delete

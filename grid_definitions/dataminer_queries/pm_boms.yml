@@ -2,8 +2,13 @@
 :caption: PKG BOMs
 :sql: "SELECT \r\n    pm_boms.id,\r\n    pm_boms.bom_code,\r\n    pm_boms.erp_bom_code,\r\n
   \   pm_boms.description,\r\n    pm_boms.label_description,\r\n    pm_boms.gross_weight,\r\n
-  \   pm_boms.nett_weight,\r\n    pm_boms.active,\r\n    pm_boms.created_at,\r\n    pm_boms.updated_at
-  \r\nFROM pm_boms"
+  \   pm_boms.nett_weight,\r\n    pm_boms.active,\r\n    pm_boms.created_at,\r\n    pm_boms.updated_at,\r\n\tEXISTS(SELECT
+  pm_boms_products.id \r\n\t\t   FROM pm_boms_products \r\n\t\t   JOIN pm_products
+  ON pm_products.id = pm_boms_products.pm_product_id\r\n                   JOIN pm_subtypes
+  ON pm_subtypes.id = pm_products.pm_subtype_id\r\n\t\t   JOIN pm_types ON pm_types.id
+  = pm_subtypes.pm_type_id\r\n\t\t   WHERE pm_boms_products.pm_bom_id = pm_boms.id\r\n\t\t
+  \  AND pm_types.pm_type_code = 'FRUIT') AS has_fruit_product\r\nFROM pm_boms\r\nORDER
+  BY bom_code"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -158,6 +163,22 @@
     :caption: Updated at
     :namespaced_name: pm_boms.updated_at
     :data_type: :datetime
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  has_fruit_product:
+    :name: has_fruit_product
+    :sequence_no: 11
+    :caption: Has fruit product?
+    :namespaced_name: 
+    :data_type: :boolean
     :width: 
     :format: 
     :hide: true

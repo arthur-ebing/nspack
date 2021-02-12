@@ -638,6 +638,15 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         end
       end
 
+      r.on 'clone' do
+        check_auth!('packaging', 'edit')
+        res = interactor.resolve_pm_bom_clone_attrs(id)
+        store_locally(:pm_bom_clone_attrs, res.instance)
+        show_partial_or_page(r) do
+          Masterfiles::Packaging::PmBom::Clone.call(id, res.instance)
+        end
+      end
+
       r.on 'calculate_bom_weights' do
         res = interactor.calculate_bom_weights(id)
         flash[:notice] = res.message
@@ -791,6 +800,21 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         res = interactor.refresh_system_codes
         flash[:notice] = res.message
         redirect_to_last_grid(r)
+      end
+
+      r.on 'clone_bom_to_counts' do
+        bom_attrs = retrieve_from_local_store(:pm_bom_clone_attrs)
+        res = interactor.clone_bom_to_counts(bom_attrs, multiselect_grid_choices(params))
+        if res.success
+          flash[:notice] = res.message
+          redirect_to_last_grid(r)
+        else
+          re_show_form(r, res) do
+            Masterfiles::Packaging::PmBom::Clone.call(bom_attrs[:pm_bom_id],
+                                                      form_values: bom_attrs,
+                                                      form_errors: res.errors)
+          end
+        end
       end
 
       r.post do        # CREATE

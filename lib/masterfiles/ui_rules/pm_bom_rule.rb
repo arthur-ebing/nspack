@@ -11,7 +11,7 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show].include? @mode
+      set_show_fields if %i[show clone].include? @mode
       set_select_pm_types_fields if @mode == :select_pm_types
       set_add_products_fields if @mode == :add_products
 

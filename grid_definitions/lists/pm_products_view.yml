@@ -6,9 +6,18 @@
     :url: "/masterfiles/packaging/pm_boms/multiselect_pm_products"
     :section_caption: "Choose PKG Products"
     :conditions: standard
+  :clone_bom_to_counts:
+    :url: "/masterfiles/packaging/pm_boms/clone_bom_to_counts"
+    :section_caption: "Choose PKG Products"
+    :conditions: available_fruit_count_products
 :conditions:
   :standard:
     - :col: pm_products.pm_subtype_id
       :op: IN
       :val: $:pm_subtype_ids$
+  :available_fruit_count_products:
+    - :col: pm_products.id
+      :op: IN
+      :val: $:fruit_count_product_ids$
+
 

@@ -10,7 +10,8 @@
   JOIN pm_subtypes ON pm_subtypes.id = pm_products.pm_subtype_id\r\nLEFT JOIN pm_types
   ON pm_types.id = pm_subtypes.pm_type_id\r\nLEFT JOIN pm_composition_levels ON pm_composition_levels.id
   = pm_types.pm_composition_level_id\r\nLEFT JOIN basic_pack_codes ON basic_pack_codes.id
-  = pm_products.basic_pack_id\r\nORDER BY pm_types.pm_type_code, pm_subtypes.subtype_code"
+  = pm_products.basic_pack_id\r\nORDER BY pm_types.pm_type_code ASC, pm_subtypes.subtype_code
+  ASC, pm_products.product_code ASC"
 :limit: 
 :offset: 
 :external_settings: {}
@@ -328,3 +329,11 @@
   :ordered_list: true
   :ui_priority: 3
   :list_def: SELECT basic_pack_code, id FROM basic_pack_codes ORDER BY basic_pack_code
+- :column: pm_products.id
+  :caption: Id
+  :data_type: :integer
+  :control_type: :integer
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 4
+  :list_def: 

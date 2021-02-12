@@ -115,6 +115,26 @@ module MasterfilesApp
       failed_response(e.message)
     end
 
+    def resolve_pm_bom_clone_attrs(pm_bom_id)
+      instance = repo.resolve_pm_bom_clone_attrs(pm_bom_id)
+      success_response('ok', instance)
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
+    def clone_bom_to_counts(bom_attrs, fruit_count_product_ids)
+      return failed_response('Fruit count product selection cannot be empty') if fruit_count_product_ids.nil_or_empty?
+
+      repo.transaction do
+        fruit_count_product_ids.each do |fruit_count_product_id|
+          repo.clone_bom_to_count(bom_attrs, fruit_count_product_id)
+        end
+      end
+      success_response('PKG Bom cloned successfully')
+    rescue Crossbeams::InfoError => e
+      failed_response(e.message)
+    end
+
     private
 
     def repo

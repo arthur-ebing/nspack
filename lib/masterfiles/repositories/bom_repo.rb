@@ -368,5 +368,65 @@ module MasterfilesApp
         .where(id: basic_pack_id)
         .get(:height_mm)
     end
+
+    def resolve_pm_bom_clone_attrs(pm_bom_id)
+      pm_bom = find_hash(:pm_boms, pm_bom_id)
+      fruit_product = find_pm_bom_fruit_product(pm_bom_id)
+
+      { pm_bom_id: pm_bom_id,
+        gross_weight: pm_bom[:gross_weight],
+        nett_weight: pm_bom[:nett_weight],
+        fruit_product_id: fruit_product[:id],
+        pm_subtype_id: fruit_product[:pm_subtype_id],
+        uom_id: fruit_product[:uom_id],
+        quantity: fruit_product[:quantity],
+        fruit_count_product_ids: available_for_clone_fruit_count_products(fruit_product[:pm_subtype_id]) }
+    end
+
+    def find_pm_bom_fruit_product(pm_bom_id)
+      DB[:pm_boms_products]
+        .join(:pm_products, id: :pm_product_id)
+        .join(:pm_subtypes, id: :pm_subtype_id)
+        .where(pm_bom_id: pm_bom_id)
+        .where(pm_type_id: get_id(:pm_types, pm_type_code: AppConst::PM_TYPE_FRUIT))
+        .select(Sequel[:pm_boms_products][:id],
+                :pm_subtype_id,
+                :uom_id,
+                :quantity)
+        .first
+    end
+
+    def available_for_clone_fruit_count_products(pm_subtype_id)
+      return nil if pm_subtype_id.nil_or_empty?
+
+      DB[:pm_products]
+        .where(pm_subtype_id: pm_subtype_id)
+        .exclude(id: DB[:pm_boms_products]
+                       .join(:pm_products, id: :pm_product_id)
+                       .where(pm_subtype_id: pm_subtype_id)
+                       .distinct
+                       .select_map(:pm_product_id))
+        .select_map(:id)
+    end
+
+    def clone_bom_to_count(attrs, fruit_count_product_id)
+      new_pm_bom_id = create(:pm_boms, { bom_code: 'TEST',
+                                         gross_weight: attrs[:gross_weight],
+                                         nett_weight: attrs[:nett_weight] })
+
+      DB.execute(<<~SQL)
+        INSERT INTO pm_boms_products (pm_product_id, pm_bom_id, uom_id, quantity)
+        SELECT pm_product_id, #{new_pm_bom_id}, uom_id, quantity
+        FROM pm_boms_products
+        JOIN pm_products ON pm_products.id = pm_boms_products.pm_product_id
+        WHERE pm_bom_id = #{attrs[:pm_bom_id]}
+        AND pm_subtype_id != #{attrs[:pm_subtype_id]}
+        UNION ALL
+        SELECT #{fruit_count_product_id}, #{new_pm_bom_id}, #{attrs[:uom_id]}, #{attrs[:quantity]};
+      SQL
+
+      system_code = pm_bom_system_code(new_pm_bom_id)
+      update(:pm_boms, new_pm_bom_id, { bom_code: system_code, system_code: system_code })
+    end
   end
 end
