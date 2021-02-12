@@ -31,7 +31,7 @@ module ProductionApp
       required(:basic_pack_code_id).filled(:integer)
     end
     rule(:standard_pack_code_id) do
-      key.failure 'must be filled' if values[:basic_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
+      key.failure 'must be filled' if values[:standard_pack_code_id].nil_or_empty? && !AppConst::CR_MF.basic_pack_equals_standard_pack?
     end
     rule(:gtin_code) do
       base.failure 'GTIN Code not found' if AppConst::CR_PROD.use_gtins? && values[:gtin_code].nil_or_empty?

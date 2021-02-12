@@ -66,11 +66,11 @@ module UiRules
                                            caption: 'Std Fruit Size Count' }
       fields[:basic_pack_code_id] = { renderer: :label,
                                       with_value: basic_pack_code_id_label,
-                                      caption: 'Basic Pack',
-                                      hide_on_load: @rules[:basic_pack_equals_standard_pack] }
+                                      caption: 'Basic Pack' }
       fields[:standard_pack_code_id] = { renderer: :label,
                                          with_value: standard_pack_code_id_label,
-                                         caption: 'Standard Pack' }
+                                         caption: 'Standard Pack',
+                                         hide_on_load: @rules[:basic_pack_equals_standard_pack] }
       fields[:fruit_actual_counts_for_pack_id] = { renderer: :label,
                                                    with_value: fruit_actual_counts_for_pack_id_label,
                                                    caption: 'Actual Count' }
@@ -185,7 +185,7 @@ module UiRules
                               options: @fruit_size_repo.for_select_basic_packs,
                               disabled_options: @fruit_size_repo.for_select_inactive_basic_packs,
                               caption: 'Basic Pack',
-                              required: @rules[:basic_pack_equals_standard_pack],
+                              required: true,
                               prompt: 'Select Basic Pack',
                               searchable: true,
                               remove_search_for_small_list: false },
