@@ -53,19 +53,6 @@ module MasterfilesApp
                           value: :id,
                           order_by: :orchard_code
 
-    crud_calls_for :farm_sections, name: :farm_section, wrapper: FarmSection
-    crud_calls_for :registered_orchards, name: :registered_orchard, wrapper: RegisteredOrchard
-
-    def for_select_pucs(opts = {})
-      dataset = DB[:pucs].join(:farms_pucs, puc_id: :id).where(active: true).order(:puc_code)
-      if opts[:where]
-        raise Crossbeams::FrameworkError, 'WHERE clause in "for_select" must be a hash' unless opts[:where].is_a?(Hash)
-
-        dataset = dataset.where(opts[:where].transform_values { |v| v == '' ? nil : v })
-      end
-      dataset.select_map(%i[puc_code id])
-    end
-
     build_inactive_select :pucs,
                           label: :puc_code,
                           value: :id,
@@ -73,9 +60,20 @@ module MasterfilesApp
 
     crud_calls_for :production_regions, name: :production_region, wrapper: ProductionRegion
     crud_calls_for :farm_groups, name: :farm_group, wrapper: FarmGroup
-    crud_calls_for :farms, name: :farm, wrapper: Farm
-    crud_calls_for :orchards, name: :orchard, wrapper: Orchard
-    crud_calls_for :pucs, name: :puc, wrapper: Puc
+    crud_calls_for :farms, name: :farm, exclude: %i[create delete]
+    crud_calls_for :orchards, name: :orchard
+    crud_calls_for :pucs, name: :puc, wrapper: Puc, exclude: %i[delete]
+    # crud_calls_for :farm_sections, name: :farm_section, exclude: %i[create update delete]
+    crud_calls_for :registered_orchards, name: :registered_orchard, wrapper: RegisteredOrchard
+
+    def for_select_pucs(where = {})
+      DB[:pucs]
+        .join(:farms_pucs, puc_id: :id)
+        .where(active: true)
+        .where(where)
+        .order(:puc_code)
+        .select_map(%i[puc_code id])
+    end
 
     def find_farm(id)
       hash = find_with_association(:farms,
@@ -142,20 +140,13 @@ module MasterfilesApp
     end
 
     def delete_farm(id)
-      query = <<~SQL
-        SELECT suppliers.id
-        FROM farms
-        JOIN suppliers ON farms.id = ANY(suppliers.farm_ids)
-        WHERE farms.id = ?
-      SQL
-      raise Sequel::ForeignKeyConstraintViolation, OpenStruct.new(message: "Key (id)=(#{id}) is still referenced from table suppliers") unless DB[query, id].first.nil?
-
       DB[:farms_pucs].where(farm_id: id).delete
       delete(:farms, id)
     end
 
-    def delete_farms_pucs(puc_id)
-      DB[:farms_pucs].where(puc_id: puc_id).delete
+    def delete_puc(id)
+      DB[:farms_pucs].where(puc_id: id).delete
+      delete(:pucs, id)
     end
 
     def find_puc_farm_codes(id)
@@ -291,7 +282,7 @@ module MasterfilesApp
       return nil if hash.nil?
 
       hash[:orchard_ids] = orchard_ids(hash[:id])
-      FarmSectionFlat.new(hash)
+      FarmSection.new(hash)
     end
 
     def orchard_ids(id)

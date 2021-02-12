@@ -37,7 +37,6 @@ module MasterfilesApp
     def delete_puc(id)
       name = puc(id).puc_code
       repo.transaction do
-        repo.delete_farms_pucs(id)
         repo.delete_puc(id)
         log_status(:pucs, id, 'DELETED')
         log_transaction

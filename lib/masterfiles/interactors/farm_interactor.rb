@@ -26,7 +26,6 @@ module MasterfilesApp
       return validation_failed_response(res) if res.failure?
 
       attrs = res.to_h
-
       repo.transaction do
         repo.update_farm(id, attrs)
         log_transaction
@@ -48,7 +47,6 @@ module MasterfilesApp
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     rescue Sequel::ForeignKeyConstraintViolation => e
-      puts e.message
       failed_response("Unable to delete farm. It is still referenced#{e.message.partition('referenced').last}")
     end
 
