@@ -2,31 +2,50 @@
 
 module MasterfilesApp
   class BomRepo < BaseRepo # rubocop:disable Metrics/ClassLength
-    build_for_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
-    build_inactive_select :pm_types, label: :pm_type_code, value: :id, order_by: :pm_type_code
+    build_inactive_select :pm_types,
+                          label: :pm_type_code,
+                          value: :id,
+                          order_by: :pm_type_code
     crud_calls_for :pm_types, name: :pm_type
 
-    build_inactive_select :pm_subtypes, label: :subtype_code, value: :id, order_by: :subtype_code
+    build_inactive_select :pm_subtypes,
+                          label: :subtype_code,
+                          value: :id,
+                          order_by: :subtype_code
     crud_calls_for :pm_subtypes, name: :pm_subtype
 
-    build_for_select :pm_products, label: :product_code, value: :id, order_by: :product_code
-    build_inactive_select :pm_products, label: :product_code, value: :id, order_by: :product_code
+    build_inactive_select :pm_products,
+                          label: :product_code,
+                          value: :id,
+                          order_by: :product_code
     crud_calls_for :pm_products, name: :pm_product
 
-    build_for_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
-    build_inactive_select :pm_boms, label: :bom_code, value: :id, order_by: :bom_code
-    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom
+    build_inactive_select :pm_boms,
+                          label: :bom_code,
+                          value: :id,
+                          order_by: :bom_code
+    crud_calls_for :pm_boms, name: :pm_bom, wrapper: PmBom, exclude: %i[delete]
 
-    build_for_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
-    build_inactive_select :pm_boms_products, label: :quantity, value: :id, order_by: :quantity
+    build_inactive_select :pm_boms_products,
+                          label: :quantity,
+                          value: :id,
+                          order_by: :quantity
     crud_calls_for :pm_boms_products, name: :pm_boms_product
 
-    build_for_select :pm_composition_levels, label: :description, value: :id, order_by: :description
-    build_inactive_select :pm_composition_levels, label: :description, value: :id, order_by: :description
+    build_for_select :pm_composition_levels,
+                     label: :description,
+                     value: :id,
+                     order_by: :description
+    build_inactive_select :pm_composition_levels,
+                          label: :description,
+                          value: :id,
+                          order_by: :description
     crud_calls_for :pm_composition_levels, name: :pm_composition_level, wrapper: PmCompositionLevel
 
-    build_for_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
-    build_inactive_select :pm_marks, label: :packaging_marks, value: :id, order_by: :packaging_marks
+    build_inactive_select :pm_marks,
+                          label: :packaging_marks,
+                          value: :id,
+                          order_by: :packaging_marks
     crud_calls_for :pm_marks, name: :pm_mark
 
     def find_pm_type(id)
@@ -40,8 +59,7 @@ module MasterfilesApp
     end
 
     def find_pm_subtype(id)
-      hash = find_with_association(:pm_subtypes,
-                                   id,
+      hash = find_with_association(:pm_subtypes, id,
                                    parent_tables: [{ parent_table: :pm_types,
                                                      foreign_key: :pm_type_id,
                                                      columns: %i[pm_type_code pm_composition_level_id],
@@ -100,8 +118,7 @@ module MasterfilesApp
     end
 
     def find_pm_mark(id)
-      find_with_association(:pm_marks,
-                            id,
+      find_with_association(:pm_marks, id,
                             parent_tables: [{ parent_table: :marks,
                                               columns: [:mark_code],
                                               flatten_columns: { mark_code: :mark_code } }],
