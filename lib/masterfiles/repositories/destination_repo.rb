@@ -2,6 +2,28 @@
 
 module MasterfilesApp
   class DestinationRepo < BaseRepo
+    build_inactive_select :destination_regions,
+                          label: :destination_region_name,
+                          value: :id,
+                          order_by: :destination_region_name
+    crud_calls_for :destination_regions, name: :region, wrapper: Region, exclude: %i[delete]
+
+    build_inactive_select :destination_countries,
+                          label: :country_name,
+                          value: :id,
+                          order_by: :country_name
+    crud_calls_for :destination_countries, name: :country, exclude: %i[create delete]
+
+    build_for_select :destination_cities,
+                     label: :city_name,
+                     value: :id,
+                     order_by: :city_name
+    build_inactive_select :destination_cities,
+                          label: :city_name,
+                          value: :id,
+                          order_by: :city_name
+    crud_calls_for :destination_cities, name: :city, exclude: [:create]
+
     # REGIONS
     # --------------------------------------------------------------------------
     def for_select_destination_regions(where: {}, active: true)
@@ -12,8 +34,6 @@ module MasterfilesApp
         .where(where)
         .select_map(%i[destination_region_name id])
     end
-    build_inactive_select :destination_regions, label: :destination_region_name, value: :id, order_by: :destination_region_name
-    crud_calls_for :destination_regions, name: :region, wrapper: Region, exclude: %i[delete]
 
     def delete_region(id)
       countries = DB[:destination_countries].where(destination_region_id: id)
@@ -35,8 +55,6 @@ module MasterfilesApp
         .distinct
         .select_map([:country_name, Sequel[:destination_countries][:id]])
     end
-    build_inactive_select :destination_countries, label: :country_name, value: :id, order_by: :country_name
-    crud_calls_for :destination_countries, name: :country, exclude: %i[create delete]
 
     def find_country(id)
       hash = find_hash(:destination_countries, id)
@@ -67,10 +85,6 @@ module MasterfilesApp
 
     # CITIES
     # --------------------------------------------------------------------------
-    build_for_select :destination_cities, label: :city_name, value: :id,  order_by: :city_name
-    build_inactive_select :destination_cities, label: :city_name, value: :id, order_by: :city_name
-    crud_calls_for :destination_cities, name: :city, exclude: [:create]
-
     def find_city(id)
       hash = find_hash(:destination_cities, id)
       return nil if hash.nil?
