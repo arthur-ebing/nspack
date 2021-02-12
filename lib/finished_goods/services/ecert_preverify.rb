@@ -5,8 +5,8 @@ module FinishedGoodsApp
     attr_accessor :params, :agreement_id, :agreement_code, :business_id, :industry, :pallet_numbers, :create_units, :update_units
 
     def initialize(params)
-      @params = params
-      @agreement_id = params[:ecert_agreement_id]
+      @params = params.to_h
+      @agreement_id = @params[:ecert_agreement_id]
       @agreement_code = FinishedGoodsApp::EcertRepo.new.find_ecert_agreement(@agreement_id)&.code
       @business_id = AppConst::E_CERT_BUSINESS_ID
       @industry = AppConst::E_CERT_INDUSTRY

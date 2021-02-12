@@ -2,13 +2,13 @@
 
 module FinishedGoodsApp
   class EcertTrackingUnitInteractor < BaseInteractor
-    def elot_preverify(params) # rubocop:disable Metrics/AbcSize
+    def elot_preverify(params)
       res = EcertElotSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
       service_res = nil
       repo.transaction do
-        service_res = ECertPreverify.call(res.to_h)
+        service_res = ECertPreverify.call(res)
         raise Crossbeams::InfoError, service_res.message unless service_res.success
 
         log_transaction
