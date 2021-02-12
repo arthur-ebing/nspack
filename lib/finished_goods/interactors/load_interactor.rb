@@ -18,13 +18,13 @@ module FinishedGoodsApp
       failed_response(e.message)
     end
 
-    def update_load(params)
+    def update_load(id, params)
       res = LoadServiceSchema.call(params)
       return validation_failed_response(res) if res.failure?
 
       load_res = nil
       repo.transaction do
-        load_res = UpdateLoad.call(res, @user)
+        load_res = UpdateLoad.call(id, res, @user)
         raise Crossbeams::InfoError, load_res.message unless load_res.success
 
         log_transaction

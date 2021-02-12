@@ -392,7 +392,7 @@ class Nspack < Roda
         end
 
         r.patch do     # UPDATE
-          res = interactor.update_load(params[:load])
+          res = interactor.update_load(id, params[:load])
           if res.success
             flash[:notice] = res.message
             r.redirect "/finished_goods/dispatch/loads/#{id}"

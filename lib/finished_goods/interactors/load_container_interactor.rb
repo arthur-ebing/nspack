@@ -13,8 +13,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_container(id)
-      success_response("Created container #{instance.container_code}",
-                       instance)
+      success_response("Created container #{instance.container_code}", instance)
     rescue Sequel::UniqueConstraintViolation
       validation_failed_response(OpenStruct.new(messages: { container_code: ['This container already exists'] }))
     rescue Crossbeams::InfoError => e
@@ -37,8 +36,7 @@ module FinishedGoodsApp
         log_transaction
       end
       instance = load_container(id)
-      success_response("Updated container #{instance.container_code}",
-                       instance)
+      success_response("Updated container #{instance.container_code}", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
     end
