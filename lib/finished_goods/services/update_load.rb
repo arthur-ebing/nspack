@@ -6,9 +6,9 @@ module FinishedGoodsApp
     attr_reader :load_id, :load_voyage_id
     attr_accessor :params
 
-    def initialize(params, user)
+    def initialize(id, params, user)
       @params = params.to_h
-      @load_id = @params[:load_id]
+      @load_id = id
       @user = user
     end
 

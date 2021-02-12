@@ -13,7 +13,9 @@ module FinishedGoodsApp
         load_id: 1,
         voyage_id: 1,
         shipping_line_party_role_id: 1,
+        shipping_line: 'ABC',
         shipper_party_role_id: 1,
+        shipper: 'ABC',
         booking_reference: Faker::Lorem.unique.word,
         memo_pad: 'ABC',
         active: true

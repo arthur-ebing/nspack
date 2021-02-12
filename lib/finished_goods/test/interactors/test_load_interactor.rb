@@ -45,7 +45,7 @@ module FinishedGoodsApp
       attrs[:load_id] = id
       value = attrs[:order_number]
       attrs[:order_number] = 'a_change'
-      res = interactor.update_load(attrs)
+      res = interactor.update_load(id, attrs)
       assert res.success, "#{res.message} : #{res.errors.inspect}"
       assert_instance_of(LoadFlat, res.instance)
       assert_equal 'a_change', res.instance.order_number
@@ -55,7 +55,7 @@ module FinishedGoodsApp
     def test_update_load_fail
       id = create_load
       attrs = interactor.send(:repo).find_hash(:loads, id).reject { |k, _| %i[id depot_id].include?(k) }
-      res = interactor.update_load(attrs)
+      res = interactor.update_load(id, attrs)
       refute res.success, "#{res.message} : #{res.errors.inspect}"
       assert_equal ['is missing'], res.errors[:depot_id]
     end
@@ -92,13 +92,23 @@ module FinishedGoodsApp
       {
         id: 1,
         load_id: 1,
+        rmt_load: false,
         customer_party_role_id: customer_party_role_id,
+        customer: 'ABC',
         consignee_party_role_id: consignee_party_role_id,
+        consignee: 'ABC',
         billing_client_party_role_id: billing_client_party_role_id,
+        billing_client: 'ABC',
         exporter_party_role_id: exporter_party_role_id,
+        exporter: 'ABC',
         final_receiver_party_role_id: final_receiver_party_role_id,
+        final_receiver: 'ABC',
         final_destination_id: destination_city_id,
+        destination_city: 'ABC',
+        destination_country: 'ABC',
+        destination_region: 'ABC',
         depot_id: depot_id,
+        depot_code: 'ABC',
         pol_voyage_port_id: pol_voyage_port_id,
         pod_voyage_port_id: pod_voyage_port_id,
         order_number: Faker::Lorem.unique.word,
@@ -111,32 +121,59 @@ module FinishedGoodsApp
         allocated_at: '2010-01-01',
         allocated: false,
         transfer_load: false,
+        loaded: false,
+        requires_temp_tail: false,
+        edi: false,
         active: true,
+        status: Faker::Lorem.word,
+
+        # voyage
         voyage_type_id: voyage_type_id,
         vessel_id: vessel_id,
+        vessel_code: 'ABC',
         voyage_id: voyage_id,
         voyage_number: Faker::Lorem.word,
         voyage_code: Faker::Lorem.unique.word,
         year: 2019,
         pol_port_id: pol_port_id,
+        pol_port_code: 'ABC',
         eta: '2010-01-01',
         ata: '2010-01-01',
         pod_port_id: pod_port_id,
+        pod_port_code: 'ABC',
         etd: '2010-01-01',
         atd: '2010-01-01',
+
+        # load_voyage
+        load_voyage_id: 1,
         shipping_line_party_role_id: shipping_line_party_role_id,
+        shipping_line: 'ABC',
         shipper_party_role_id: shipper_party_role_id,
+        shipper: 'ABC',
         booking_reference: Faker::Lorem.word,
         memo_pad: Faker::Lorem.word,
+
+        # load_vehicle
+        vehicle: true,
+        load_vehicle_id: 1,
         vehicle_number: Faker::Lorem.word,
+
+        # load_container
+        container: true,
+        load_container_id: 1,
+        verified_gross_weight: 0.1,
+        temperature_code: 'ABC',
         container_code: Faker::Lorem.word,
-        status: Faker::Lorem.word,
-        edi: false,
-        rmt_load: false,
-        vehicle: false,
-        container: false,
-        loaded: false,
-        requires_temp_tail: false
+
+        # pallets
+        temp_tail: '123',
+        temp_tail_pallet_number: '123',
+        pallet_count: 1,
+        nett_weight: 1.0,
+
+        # addendum
+        addendum: true
+
       }
     end
 
