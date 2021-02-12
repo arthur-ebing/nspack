@@ -9,23 +9,21 @@ module UiRules
 
       common_values_for_fields common_fields
 
-      set_show_fields if %i[show reopen].include? @mode
+      set_show_fields if %i[show].include? @mode
 
       form_name 'ecert_tracking_unit'
     end
 
     def set_show_fields # rubocop:disable Metrics/AbcSize
-      pallet_id_label = @repo.get(:pallets, @form_object.pallet_id, :pallet_number)
-      ecert_agreement_id_label = @repo.get(:ecert_agreements, @form_object.ecert_agreement_id, :code)
-      fields[:pallet_id] = { renderer: :label, with_value: pallet_id_label, caption: 'Pallet' }
-      fields[:ecert_agreement_id] = { renderer: :label, with_value: ecert_agreement_id_label, caption: 'Ecert Agreement' }
+      fields[:pallet_id] = { renderer: :label, with_value: @form_object.pallet_number, caption: 'Pallet' }
+      fields[:ecert_agreement_id] = { renderer: :label, with_value: @form_object.ecert_agreement_code, caption: 'Ecert Agreement' }
       fields[:business_id] = { renderer: :label }
       fields[:industry] = { renderer: :label }
       fields[:elot_key] = { renderer: :label }
       fields[:verification_key] = { renderer: :label }
       fields[:passed] = { renderer: :label, as_boolean: true }
-      fields[:process_result] = { renderer: :label, with_value: @form_object.process_result.to_s.gsub('\\n', '') }
-      fields[:rejection_reasons] = { renderer: :label, with_value: @form_object.rejection_reasons.uniq }
+      fields[:process_result] = { renderer: :label }
+      fields[:rejection_reasons] = { renderer: :label }
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 

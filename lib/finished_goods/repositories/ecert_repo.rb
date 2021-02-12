@@ -2,17 +2,25 @@
 
 module FinishedGoodsApp
   class EcertRepo < BaseRepo
-    build_for_select :ecert_agreements,
-                     label: %i[code name],
-                     value: :id,
-                     order_by: :code
-    build_inactive_select :ecert_agreements,
-                          label: %i[code name],
-                          value: :id,
-                          order_by: :code
-
+    build_for_select :ecert_agreements, label: %i[code name], value: :id, order_by: :code
+    build_inactive_select :ecert_agreements, label: %i[code name], value: :id, order_by: :code
     crud_calls_for :ecert_agreements, name: :ecert_agreement, wrapper: EcertAgreement
-    crud_calls_for :ecert_tracking_units, name: :ecert_tracking_unit, wrapper: EcertTrackingUnit
+
+    crud_calls_for :ecert_tracking_units, name: :ecert_tracking_unit
+
+    def find_ecert_tracking_unit(id)
+      hash = find_with_association(:ecert_tracking_units, id,
+                                   parent_tables: [{ parent_table: :ecert_agreements,
+                                                     columns: %i[code name],
+                                                     flatten_columns: { code: :ecert_agreement_code, name: :ecert_agreement_name } }])
+
+      return nil if hash.nil?
+
+      hash[:pallet_number] = get(:pallets, hash[:pallet_id], :pallet_number)
+      hash[:process_result] = hash[:process_result].uniq.join(' ')
+      hash[:rejection_reasons] = hash[:rejection_reasons].uniq.join(' ')
+      EcertTrackingUnit.new(hash)
+    end
 
     def flatten_hash(hash) # rubocop:disable Metrics/AbcSize
       return {} if hash.nil?

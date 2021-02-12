@@ -5,6 +5,9 @@ module FinishedGoodsApp
     attribute :id, Types::Integer
     attribute :pallet_id, Types::Integer
     attribute :ecert_agreement_id, Types::Integer
+    attribute :ecert_agreement_code, Types::String
+    attribute :ecert_agreement_name, Types::String
+    attribute :pallet_number, Types::String
     attribute :business_id, Types::Integer
     attribute :industry, Types::String
     attribute :elot_key, Types::String
