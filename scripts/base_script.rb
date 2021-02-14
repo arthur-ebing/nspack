@@ -186,8 +186,10 @@ class EgScript < BaseScript
   end
 end
 
-Dir['./scripts/*.rb'].sort.each { |f| require f unless f.match?(/base_script/) }
+if __FILE__ == $PROGRAM_NAME
+  Dir['./scripts/*.rb'].sort.each { |f| require f unless f.match?(/base_script/) }
 
-klass = ARGV.shift
-script = Module.const_get(klass).send(:new, ARGV)
-script.exec
+  klass = ARGV.shift
+  script = Module.const_get(klass).send(:new, ARGV)
+  script.exec
+end

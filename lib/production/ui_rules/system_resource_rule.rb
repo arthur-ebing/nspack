@@ -96,7 +96,7 @@ module UiRules
     end
 
     def robot_functions
-      %w[Server HTTP-CartonLabel HTTP-BinTip HTTP-RmtBinWeighing HTTP-PalletBuildup-SplitScreen]
+      %w[Server HTTP-CartonLabel HTTP-BinTip HTTP-RmtBinWeighing HTTP-PalletBuildup HTTP-PalletBuildup-SplitScreen]
     end
 
     def peripheral_models
