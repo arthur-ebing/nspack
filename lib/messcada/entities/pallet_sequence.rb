@@ -45,16 +45,29 @@ module MesscadaApp
     attribute :pallet_verification_failure_reason_id, Types::Integer
     attribute :verified_at, Types::DateTime
     attribute :nett_weight, Types::Decimal
-    attribute? :verified, Types::Bool
-    attribute? :verification_passed, Types::Bool
+    attribute :verified, Types::Bool
+    attribute :verification_passed, Types::Bool
     attribute :pick_ref, Types::String
-    attribute? :active, Types::Bool
     attribute :grade_id, Types::Integer
     attribute :verified_by, Types::String
+    attribute :scrapped_from_pallet_id, Types::Integer
+    attribute :removed_from_pallet, Types::Bool
+    attribute :removed_from_pallet_id, Types::Integer
+    attribute :removed_from_pallet_at, Types::DateTime
+    attribute :sell_by_code, Types::String
+    attribute :product_chars, Types::String
+    attribute :depot_pallet, Types::Bool
+    attribute :personnel_identifier_id, Types::Integer
+    attribute :contract_worker_id, Types::Integer
+    attribute :repacked_at, Types::DateTime
+    attribute :repacked_from_pallet_id, Types::Integer
+    attribute :failed_otmc_results, Types::Array
+    attribute :phyto_data, Types::String
     attribute :created_by, Types::String
     attribute :target_market_id, Types::Integer
     attribute :pm_mark_id, Types::Integer
     attribute? :legacy_data, Types::Hash.optional
+    attribute? :active, Types::Bool
   end
 
   class PalletSequenceFlat < Dry::Struct
@@ -137,11 +150,10 @@ module MesscadaApp
     attribute :phyto_data, Types::String
     attribute :created_by, Types::String
     attribute :verified_by, Types::String
-    attribute? :active, Types::Bool
-
     attribute :pm_mark_id, Types::Integer
     attribute :target_market_id, Types::Integer
     attribute :target_market_name, Types::String
     attribute :gtin_code, Types::String
+    attribute? :active, Types::Bool
   end
 end

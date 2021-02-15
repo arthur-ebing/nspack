@@ -152,7 +152,7 @@ module FinishedGoodsApp
       return failed_response("#{stock_type} current location has not been set") unless @stock_item[:location_id]
 
       @location_from_id = @stock_item[:location_id]
-      @stock_item_number = stock_type == AppConst::PALLET_STOCK_TYPE ? @stock_item.pallet_number : @stock_item[:id]
+      @stock_item_number = stock_type == AppConst::PALLET_STOCK_TYPE ? @stock_item[:pallet_number] : @stock_item[:id]
 
       success_response('ok')
     end

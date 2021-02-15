@@ -14,7 +14,7 @@ module MesscadaApp
       return nil if hash.nil?
 
       hash[:last_govt_inspection_sheet_id] = get(:govt_inspection_pallets, hash[:last_govt_inspection_pallet_id], :govt_inspection_sheet_id)
-      hash[:oldest_pallets_sequence_id] = DB[:pallet_sequences].where(pallet_id: id).order(:created_at).select_map(:id).first
+      hash[:oldest_pallet_sequence_id] = DB[:pallet_sequences].where(pallet_id: id).order(:created_at).get(:id)
       hash[:pallet_sequence_ids] = DB[:pallet_sequences].where(pallet_id: id).order(:created_at).select_map(:id)
       hash[:nett_weight] = hash[:nett_weight].to_f.round(2)
       hash[:gross_weight] = hash[:gross_weight].to_f.round(2)
@@ -125,7 +125,7 @@ module MesscadaApp
     end
 
     def find_stock_item(stock_item_id, stock_type)
-      return find_pallet(stock_item_id) if stock_type == AppConst::PALLET_STOCK_TYPE
+      return DB[:pallets].where(id: stock_item_id).first if stock_type == AppConst::PALLET_STOCK_TYPE
 
       DB[:rmt_bins].where(id: stock_item_id).first
     end

@@ -513,6 +513,14 @@ module MesscadaApp
       @locations_repo ||= MasterfilesApp::LocationRepo.new
     end
 
+    def pallet(id)
+      repo.find_pallet(id)
+    end
+
+    def pallet_flat(id)
+      repo.find_pallet_flat(id)
+    end
+
     # TODO: split validation if using asset no or not (string asset vs int id)
     def validate_update_rmt_bin_weights_params(params)
       # For now: bin asset is integer, so strip Habata's SK prefix. LATER make this a string.
