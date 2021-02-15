@@ -28,54 +28,12 @@ module MasterfilesApp
       MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:edit, 1)
       assert res.success, 'Should be able to edit a cargo_temperature'
-
-      # MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true))
-      # res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:edit, 1)
-      # refute res.success, 'Should not be able to edit a completed cargo_temperature'
     end
 
     def test_delete
       MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity)
       res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:delete, 1)
       assert res.success, 'Should be able to delete a cargo_temperature'
-
-      # MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true))
-      # res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:delete, 1)
-      # refute res.success, 'Should not be able to delete a completed cargo_temperature'
     end
-
-    # def test_complete
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:complete, 1)
-    #   assert res.success, 'Should be able to complete a cargo_temperature'
-
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:complete, 1)
-    #   refute res.success, 'Should not be able to complete an already completed cargo_temperature'
-    # end
-
-    # def test_approve
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true, approved: false))
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:approve, 1)
-    #   assert res.success, 'Should be able to approve a completed cargo_temperature'
-
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve a non-completed cargo_temperature'
-
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true, approved: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:approve, 1)
-    #   refute res.success, 'Should not be able to approve an already approved cargo_temperature'
-    # end
-
-    # def test_reopen
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity)
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:reopen, 1)
-    #   refute res.success, 'Should not be able to reopen a cargo_temperature that has not been approved'
-
-    #   MasterfilesApp::CargoTemperatureRepo.any_instance.stubs(:find_cargo_temperature).returns(entity(completed: true, approved: true))
-    #   res = MasterfilesApp::TaskPermissionCheck::CargoTemperature.call(:reopen, 1)
-    #   assert res.success, 'Should be able to reopen an approved cargo_temperature'
-    # end
   end
 end
