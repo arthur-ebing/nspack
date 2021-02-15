@@ -8,6 +8,7 @@ module UiRules
       @cultivar_repo = MasterfilesApp::CultivarRepo.new
       @fruit_size_repo = MasterfilesApp::FruitSizeRepo.new
       @fruit_repo = MasterfilesApp::FruitRepo.new
+      @bom_repo = MasterfilesApp::BomRepo.new
 
       make_form_object
       apply_form_values
@@ -16,6 +17,7 @@ module UiRules
       @rules[:pm_boms_products] = pm_boms_products(@form_object[:pm_bom_id]) unless @form_object[:pm_bom_id].nil_or_empty?
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
       @rules[:gtins_required] = AppConst::CR_PROD.use_gtins?
+      @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
 
       if @mode == :change_production_run
         make_reworks_run_pallet_header_table
@@ -176,14 +178,21 @@ module UiRules
                                             prompt: 'Select Size Reference',
                                             searchable: true,
                                             remove_search_for_small_list: false }
-      fields[:grade_id] =  { renderer: :select,
-                             options: @fruit_repo.for_select_grades,
-                             disabled_options: @fruit_repo.for_select_inactive_grades,
-                             caption: 'Grade',
-                             required: true,
-                             prompt: 'Select Grade',
-                             searchable: true,
-                             remove_search_for_small_list: false }
+      fields[:rmt_class_id] = { renderer: :select,
+                                options: MasterfilesApp::FruitRepo.new.for_select_rmt_classes,
+                                disabled_options: MasterfilesApp::FruitRepo.new.for_select_inactive_rmt_classes,
+                                caption: 'Class',
+                                prompt: 'Select Class',
+                                searchable: true,
+                                remove_search_for_small_list: false }
+      fields[:grade_id] = { renderer: :select,
+                            options: @fruit_repo.for_select_grades,
+                            disabled_options: @fruit_repo.for_select_inactive_grades,
+                            caption: 'Grade',
+                            required: true,
+                            prompt: 'Select Grade',
+                            searchable: true,
+                            remove_search_for_small_list: false }
       fields[:marketing_org_party_role_id] =  { renderer: :select,
                                                 options: MasterfilesApp::PartyRepo.new.for_select_party_roles(AppConst::ROLE_MARKETER),
                                                 selected: default_mkting_org_id,
@@ -329,6 +338,37 @@ module UiRules
                                   caption: 'Treatments' }
       fields[:gtin_code] = { renderer: :label,
                              hide_on_load: !@rules[:gtins_required] }
+
+      fields[:tu_labour_product_id] =  { renderer: :select,
+                                         caption: 'TU Labour Product',
+                                         options: @bom_repo.for_select_pm_products(
+                                           where: { subtype_code: AppConst::PM_SUBTYPE_TU_LABOUR }
+                                         ),
+                                         disabled_options: @bom_repo.for_select_inactive_pm_products,
+                                         prompt: true,
+                                         required: false }
+      fields[:ru_labour_product_id] =  { renderer: :select,
+                                         caption: 'RU Labour Product',
+                                         options: @bom_repo.for_select_pm_products(
+                                           where: { subtype_code: AppConst::PM_SUBTYPE_RU_LABOUR }
+                                         ),
+                                         disabled_options: @bom_repo.for_select_inactive_pm_products,
+                                         prompt: true,
+                                         required: false }
+      fields[:fruit_sticker_ids] =  { renderer: :multi,
+                                      caption: 'Fruit Stickers',
+                                      options: @bom_repo.for_select_pm_products(
+                                        where: { subtype_code: AppConst::PM_SUBTYPE_FRUIT_STICKER }
+                                      ),
+                                      selected: @form_object.fruit_sticker_ids,
+                                      required: false }
+      fields[:tu_sticker_ids] =  { renderer: :multi,
+                                   caption: 'TU Stickers',
+                                   options: @bom_repo.for_select_pm_products(
+                                     where: { subtype_code: AppConst::PM_SUBTYPE_TU_STICKER }
+                                   ),
+                                   selected: @form_object.tu_sticker_ids,
+                                   required: false }
     end
 
     def make_form_object # rubocop:disable Metrics/AbcSize

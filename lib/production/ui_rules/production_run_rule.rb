@@ -14,6 +14,7 @@ module UiRules
       @rules[:allow_cultivar_group_mixing] = AppConst::ALLOW_CULTIVAR_GROUP_MIXING
       @rules[:show_bin_tipping_control_data] = (AppConst::CLIENT_CODE == 'kr')
       @rules[:show_bin_tipping_criteria] = (AppConst::CLIENT_CODE == 'kr')
+      @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
 
       common_values_for_fields common_fields unless %i[allocate_setups allocate_target_customers complete_stage confirm].include?(@mode)
 
@@ -87,7 +88,16 @@ module UiRules
                                              param_values: { run_id: @options[:id] },
                                              hidden_fields: %i[product_setup_template_id],
                                              show_field: :template_name,
-                                             caption: 'Select Template' }
+                                             caption: 'Select Template',
+                                             initially_visible: !@rules[:use_packing_specifications] }
+      fields[:packing_specification_id] = { renderer: :lookup,
+                                            lookup_name: :packing_specifications_for_runs,
+                                            lookup_key: :standard,
+                                            param_values: { run_id: @options[:id] },
+                                            hidden_fields: %i[packing_specification_id],
+                                            show_field: :packing_specification_code,
+                                            caption: 'Select Packing Specification',
+                                            initially_visible: @rules[:use_packing_specifications]  }
     end
 
     def set_stage_fields
@@ -183,6 +193,10 @@ module UiRules
         product_setup_template_id: { renderer: :label,
                                      with_value: product_setup_template_name,
                                      caption: 'Product setup template' },
+        packing_specification_id: { renderer: :label,
+                                    with_value: packing_specification_code,
+                                    caption: 'Packing Specification',
+                                    initially_visible: @rules[:use_packing_specifications] },
         cloned_from_run_id: { renderer: :label,
                               with_value: cloned_run_label,
                               caption: 'Cloned from run' },
@@ -312,6 +326,12 @@ module UiRules
       return '' if @form_object.product_setup_template_id.nil_or_empty?
 
       @form_object.template_name
+    end
+
+    def packing_specification_code
+      return '' if @form_object.packing_specification_id.nil_or_empty?
+
+      @form_object.packing_specification_code
     end
 
     def add_new_behaviours

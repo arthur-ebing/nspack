@@ -117,6 +117,12 @@ module ProductionApp  # rubocop:disable Metrics/ModuleLength
     required(:pm_subtype_id).maybe(:integer)
     required(:target_market_id).maybe(:integer)
     required(:pm_mark_id).maybe(:integer)
+    optional(:rmt_class_id).maybe(:integer)
+    optional(:packing_specification_item_id).maybe(:integer)
+    optional(:tu_labour_product_id).maybe(:integer)
+    optional(:ru_labour_product_id).maybe(:integer)
+    optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
+    optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
   end
 
   ReworksRunUpdatePalletSchema = Dry::Schema.Params do

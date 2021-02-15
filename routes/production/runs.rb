@@ -622,6 +622,27 @@ class Nspack < Roda
         end
       end
 
+      r.on 'selected_packing_specification', Integer do |id|
+        res = interactor.selected_packing_specification(id)
+        if res.success
+          json_actions(
+            [
+              OpenStruct.new(type: :replace_input_value,
+                             dom_id: 'production_run_product_setup_template_id',
+                             value: res.instance[:product_setup_template_id]),
+              OpenStruct.new(type: :replace_input_value,
+                             dom_id: 'production_run_packing_specification_id',
+                             value: res.instance[:id]),
+              OpenStruct.new(type: :replace_input_value,
+                             dom_id: 'production_run_packing_specification_code',
+                             value: res.instance[:packing_specification_code])
+            ]
+          )
+        else
+          show_json_error(res.message)
+        end
+      end
+
       r.on 'search' do
         r.get do
           show_page { Production::Reports::Packout::SearchProductionRuns.call(mode: :list) }

@@ -78,6 +78,12 @@ module MesscadaApp
     attribute :rmt_bin_id, Types::Integer
     attribute? :dp_carton, Types::Bool
     attribute :gtin_code, Types::String
+    attribute :rmt_class_id, Types::Integer
+    attribute :packing_specification_item_id, Types::Integer
+    attribute :tu_labour_product_id, Types::Integer
+    attribute :ru_labour_product_id, Types::Integer
+    attribute :fruit_sticker_ids, Types::Array
+    attribute :tu_sticker_ids, Types::Array
   end
 
   class ScannedCartonNumber < Dry::Struct

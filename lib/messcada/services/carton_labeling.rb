@@ -173,8 +173,10 @@ module MesscadaApp
 
     def create_carton_label(params) # rubocop:disable Metrics/AbcSize
       attrs = params.to_h
-      treatment_ids = attrs.delete(:treatment_ids)
-      attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
+
+      attrs[:treatment_ids] = resolve_col_array(attrs.delete(:treatment_ids)) if attrs.key?(:treatment_ids)
+      attrs[:fruit_sticker_ids] = resolve_col_array(attrs.delete(:fruit_sticker_ids)) if attrs.key?(:fruit_sticker_ids)
+      attrs[:tu_sticker_ids] = resolve_col_array(attrs.delete(:tu_sticker_ids)) if attrs.key?(:tu_sticker_ids)
 
       repo.transaction do
         @carton_label_id = repo.create_carton_label(attrs.merge(carton_equals_pallet: AppConst::CARTON_EQUALS_PALLET, phc: phc))
@@ -185,6 +187,10 @@ module MesscadaApp
       ok_response
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def resolve_col_array(ids)
+      repo.array_for_db_col(ids) unless ids.nil?
     end
   end
 end

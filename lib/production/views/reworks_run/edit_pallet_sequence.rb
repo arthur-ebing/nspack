@@ -3,7 +3,7 @@
 module Production
   module Reworks
     module ReworksRun
-      class EditPalletSequence
+      class EditPalletSequence # rubocop:disable Metrics/ClassLength
         def self.call(id, back_url:, form_values: nil, form_errors: nil)  # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:reworks_run_sequence, :edit_pallet_sequence, pallet_sequence_id: id, form_values: form_values)
           rules   = ui_rule.compile
@@ -44,6 +44,7 @@ module Production
                     fold.add_field :fruit_actual_counts_for_pack_id
                     fold.add_field :standard_pack_code_id
                     fold.add_field :fruit_size_reference_id
+                    fold.add_field :rmt_class_id
                     fold.add_field :grade_id
                   end
                 end
@@ -92,6 +93,20 @@ module Production
                     fold.caption 'Treatment Details'
                     fold.add_field :treatment_ids
                   end
+                end
+              end
+              if rules[:use_packing_specifications]
+                form.row do |row|
+                  row.column do |col|
+                    col.fold_up do |fold|
+                      fold.caption 'Packing Specifications'
+                      fold.add_field :tu_labour_product_id
+                      fold.add_field :ru_labour_product_id
+                      fold.add_field :fruit_sticker_ids
+                      fold.add_field :tu_sticker_ids
+                    end
+                  end
+                  row.blank_column
                 end
               end
               # form.fold_up do |fold|

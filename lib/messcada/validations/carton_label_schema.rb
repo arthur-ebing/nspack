@@ -56,6 +56,12 @@ module MesscadaApp
       optional(:rmt_bin_id).maybe(:integer)
       optional(:dp_carton).maybe(:bool)
       optional(:gtin_code).maybe(Types::StrippedString)
+      optional(:rmt_class_id).maybe(:integer)
+      optional(:packing_specification_item_id).maybe(:integer)
+      optional(:tu_labour_product_id).maybe(:integer)
+      optional(:ru_labour_product_id).maybe(:integer)
+      optional(:fruit_sticker_ids).maybe(:array).maybe { each(:integer) }
+      optional(:tu_sticker_ids).maybe(:array).maybe { each(:integer) }
     end
 
     rule(:fruit_size_reference_id, :fruit_actual_counts_for_pack_id) do

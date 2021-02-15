@@ -231,7 +231,27 @@ module MesscadaApp
           pallets.has_individual_cartons,
           marketing_pucs.puc_code AS marketing_puc,
           registered_orchards.orchard_code AS marketing_orchard,
-          pallet_sequences.gtin_code
+          pallet_sequences.gtin_code,
+          pallet_sequences.rmt_class_id,
+          rmt_classes.rmt_class_code,
+          pallet_sequences.packing_specification_item_id,
+          fn_packing_specification_code(pallet_sequences.packing_specification_item_id) AS packing_specification_code,
+          pallet_sequences.tu_labour_product_id,
+          tu_pm_products.product_code AS tu_labour_product,
+          pallet_sequences.ru_labour_product_id,
+          ru_pm_products.product_code AS ru_labour_product,
+          pallet_sequences.fruit_sticker_ids,
+          ( SELECT array_agg(t.product_code ORDER BY t.product_code) AS array_agg
+             FROM pm_products t
+               JOIN pallet_sequences sq ON t.id = ANY (sq.fruit_sticker_ids)
+            WHERE sq.id = pallet_sequences.id
+            GROUP BY sq.id) AS fruit_stickers,
+         pallet_sequences.tu_sticker_ids,
+        ( SELECT array_agg(t.product_code ORDER BY t.product_code) AS array_agg
+           FROM pm_products t
+             JOIN pallet_sequences sq ON t.id = ANY (sq.tu_sticker_ids)
+          WHERE sq.id = pallet_sequences.id
+          GROUP BY sq.id) AS tu_stickers
 
         FROM pallet_sequences
         JOIN pallets ON pallets.id = pallet_sequences.pallet_id
@@ -302,6 +322,9 @@ module MesscadaApp
              GROUP BY sq.id) otmc ON otmc.id = pallet_sequences.id
         LEFT JOIN pucs marketing_pucs ON marketing_pucs.id = pallet_sequences.marketing_puc_id
         LEFT JOIN registered_orchards ON registered_orchards.id = pallet_sequences.marketing_orchard_id
+        LEFT JOIN rmt_classes ON rmt_classes.id = pallet_sequences.rmt_class_id
+        LEFT JOIN pm_products tu_pm_products ON tu_pm_products.id = pallet_sequences.tu_labour_product_id
+        LEFT JOIN pm_products ru_pm_products ON ru_pm_products.id = pallet_sequences.ru_labour_product_id
 
       SQL
     end

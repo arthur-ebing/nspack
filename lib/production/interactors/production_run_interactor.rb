@@ -328,8 +328,17 @@ module ProductionApp
       success_response('ok', repo.find_hash(:product_setup_templates, id))
     end
 
+    def selected_packing_specification(id)
+      success_response('ok', repo.find_hash(:packing_specifications, id))
+    end
+
     def update_template(id, params) # rubocop:disable Metrics/AbcSize
-      res = validate_production_run_template_params(params)
+      res = if AppConst::CR_PROD.use_packing_specifications?
+              validate_production_run_packing_specification_params(params)
+            else
+              validate_production_run_template_params(params)
+            end
+
       return validation_failed_response(res) if res.failure?
 
       current_template = production_run(id).product_setup_template_id
@@ -353,6 +362,12 @@ module ProductionApp
     def allocate_product_setup(product_resource_allocation_id, params)
       res = repo.allocate_product_setup(product_resource_allocation_id, params[:column_value])
       res.instance = { changes: { product_setup_id: res.instance[:product_setup_id] } }
+      res
+    end
+
+    def allocate_packing_specification(product_resource_allocation_id, params)
+      res = repo.allocate_packing_specification(product_resource_allocation_id, params[:column_value])
+      res.instance = { changes: { packing_specification_code: res.instance[:packing_specification_code] } }
       res
     end
 
@@ -382,7 +397,7 @@ module ProductionApp
       res
     end
 
-    def inline_edit_alloc(product_resource_allocation_id, params)
+    def inline_edit_alloc(product_resource_allocation_id, params) # rubocop:disable Metrics/AbcSize
       if params[:column_name] == 'product_setup_code'
         allocate_product_setup(product_resource_allocation_id, params)
       elsif params[:column_name] == 'label_template_name'
@@ -391,6 +406,8 @@ module ProductionApp
         packing_method_for_allocation(product_resource_allocation_id, params)
       elsif params[:column_name] == 'target_customer'
         allocate_target_customer(product_resource_allocation_id, params)
+      elsif params[:column_name] == 'packing_specification_code'
+        allocate_packing_specification(product_resource_allocation_id, params)
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))
       end
@@ -708,6 +725,10 @@ module ProductionApp
 
     def validate_production_run_template_params(params)
       ProductionRunTemplateSchema.call(params)
+    end
+
+    def validate_production_run_packing_specification_params(params)
+      ProductionRunPackingSpecificationSchema.call(params)
     end
 
     def validate_product_resource_allocation(params)

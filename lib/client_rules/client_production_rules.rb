@@ -16,7 +16,8 @@ module Crossbeams
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
             default_marketing_org: 'HABATA',
-            allow_cultivar_group_mix: true },
+            allow_cultivar_group_mix: true,
+            use_packing_specifications: false },
       hl: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -28,7 +29,8 @@ module Crossbeams
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
             default_marketing_org: 'HABATA',
-            allow_cultivar_group_mix: true },
+            allow_cultivar_group_mix: true,
+            use_packing_specifications: false },
       kr: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT p.puc_code, p.gap_code, ps.gtin_code, ps.carton_quantity FROM pallet_sequences ps JOIN pucs p ON p.id = ps.puc_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: true,
@@ -40,7 +42,8 @@ module Crossbeams
             integrate_with_external_rmt_system: true,
             bin_tip_match_farm_on_group: true,
             default_marketing_org: 'KR',
-            allow_cultivar_group_mix: false },
+            allow_cultivar_group_mix: false,
+            use_packing_specifications: true },
       um: { run_allocations: true,
             pallet_label_seqs_sql: 'SELECT o.orchard_code, m.marketing_variety_code, s.size_reference, ps.carton_quantity FROM pallet_sequences ps JOIN orchards o ON o.id = ps.orchard_id JOIN marketing_varieties m ON m.id = ps.marketing_variety_id JOIN fruit_size_references s ON s.id = ps.fruit_size_reference_id WHERE ps.pallet_id = ? ORDER BY ps.pallet_sequence_number',
             use_gtins: false,
@@ -52,7 +55,8 @@ module Crossbeams
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
             default_marketing_org: 'UI',
-            allow_cultivar_group_mix: false },
+            allow_cultivar_group_mix: false,
+            use_packing_specifications: false },
       ud: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -64,7 +68,8 @@ module Crossbeams
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
             default_marketing_org: 'UI',
-            allow_cultivar_group_mix: true },
+            allow_cultivar_group_mix: true,
+            use_packing_specifications: false },
       sr: { run_allocations: true,
             pallet_label_seqs_sql: nil,
             use_gtins: false,
@@ -76,7 +81,8 @@ module Crossbeams
             integrate_with_external_rmt_system: false,
             bin_tip_match_farm_on_group: false,
             default_marketing_org: 'SY',
-            allow_cultivar_group_mix: false },
+            allow_cultivar_group_mix: false,
+            use_packing_specifications: false },
       sr2: { run_allocations: true,
              bin_tip_match_farm_on_group: false }
     }.freeze
@@ -203,6 +209,12 @@ module Crossbeams
 
       recs = DB[query, pallet_id].all
       UtilityFunctions.make_text_table(recs, heads: PALLET_LBL_PSEQ_HEADS, numbers: [:nett_weight], rjust: [:carton_quantity])
+    end
+
+    def use_packing_specifications?(explain: false)
+      return 'Use packing specifications instead of product setup templates for extended packaging details.' if explain
+
+      setting(:use_packing_specifications)
     end
   end
 end

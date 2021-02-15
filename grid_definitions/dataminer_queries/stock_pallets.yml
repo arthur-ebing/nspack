@@ -13,18 +13,18 @@
   \   marketing_puc,\r\n    marketing_orchard,\r\n    commodity,\r\n    marketing_variety,\r\n
   \   grade,\r\n    rmt_grade,\r\n    std_size,\r\n    actual_count,\r\n    size_ref,\r\n
   \   count_group,\r\n    std_pack,\r\n    packed_tm_group,\r\n    target_market,\r\n
-  \   mark,\r\n    inventory_code,\r\n    fruit_sticker,\r\n    fruit_sticker_2,\r\n
-  \   marketing_org,\r\n    pallet_base,\r\n    stack_type,\r\n    gross_weight,\r\n
-  \   nett_weight,\r\n    sequence_nett_weight,\r\n    basic_pack,\r\n    packhouse,\r\n
-  \   line,\r\n    palletizing_bay,\r\n    pick_ref,\r\n    phc,\r\n    verification_result,\r\n
-  \   scrapped_at,\r\n    scrapped,\r\n    partially_palletized,\r\n    reinspected,\r\n
-  \   verified,\r\n    verification_passed,\r\n    build_status,\r\n    zero_load_id,\r\n
-  \   temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n    edi_in_consignment_note_number,\r\n
-  \   packed_at,\r\n    packed_date,\r\n    packed_week,\r\n    repacked,\r\n    repacked_at,\r\n
-  \   repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n    failed_otmc,\r\n
-  \   created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n    target_customer_party_role_id,\r\n
-  \   target_customer,\r\n    consignment_note_number,\r\n    sequence_count,\r\n
-  \   active,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
+  \   bom,\r\n    pm_bom_system_code,\r\n    mark,\r\n    packaging_marks,\r\n    inventory_code,\r\n
+  \   fruit_sticker,\r\n    fruit_sticker_2,\r\n    marketing_org,\r\n    pallet_base,\r\n
+  \   stack_type,\r\n    gross_weight,\r\n    nett_weight,\r\n    sequence_nett_weight,\r\n
+  \   basic_pack,\r\n    packhouse,\r\n    line,\r\n    palletizing_bay,\r\n    pick_ref,\r\n
+  \   phc,\r\n    verification_result,\r\n    scrapped_at,\r\n    scrapped,\r\n    partially_palletized,\r\n
+  \   reinspected,\r\n    verified,\r\n    verification_passed,\r\n    build_status,\r\n
+  \   zero_load_id,\r\n    temp_tail,\r\n    depot_pallet,\r\n    edi_in_file,\r\n
+  \   edi_in_consignment_note_number,\r\n    packed_at,\r\n    packed_date,\r\n    packed_week,\r\n
+  \   repacked,\r\n    repacked_at,\r\n    repacked_from_pallet_id,\r\n    failed_otmc_results,\r\n
+  \   failed_otmc,\r\n    created_by,\r\n    verified_by,\r\n    edi_size_count,\r\n
+  \   target_customer_party_role_id,\r\n    target_customer,\r\n    consignment_note_number,\r\n
+  \   sequence_count,\r\n    active,\r\n    CASE\r\n        WHEN fn_pallet_verification_failed(pallet_id)
   THEN 'error'\r\n        ELSE colour_rule\r\n        END AS colour_rule\r\nFROM vw_pallet_sequence_flat\r\nORDER
   BY zero_load_id DESC, pallet_number DESC"
 :limit: 
@@ -32,7 +32,12 @@
 :external_settings:
   :render_url: 
   :colour_key:
+    ok: In Stock Pallets
+    ready: Allocated Pallets
+    inactive: Shipped Pallets
+    warning: Scrapped Pallets
     error: Failed inspection and/or failed verifications Pallets
+    inprogress: Palletized and/or partially palletized Pallets
 :columns:
   id:
     :name: id
@@ -866,9 +871,41 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  bom:
+    :name: bom
+    :sequence_no: 53
+    :caption: Bom
+    :namespaced_name: bom
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  pm_bom_system_code:
+    :name: pm_bom_system_code
+    :sequence_no: 54
+    :caption: Bom system code
+    :namespaced_name: pm_bom_system_code
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   mark:
     :name: mark
-    :sequence_no: 53
+    :sequence_no: 55
     :caption: Mark
     :namespaced_name: mark
     :data_type: :string
@@ -882,9 +919,25 @@
     :group_avg: false
     :group_min: false
     :group_max: false
+  packaging_marks:
+    :name: packaging_marks
+    :sequence_no: 56
+    :caption: Packaging marks
+    :namespaced_name: packaging_marks
+    :data_type: :string
+    :width: 120
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
   inventory_code:
     :name: inventory_code
-    :sequence_no: 54
+    :sequence_no: 57
     :caption: Inv Code
     :namespaced_name: inventory_code
     :data_type: :string
@@ -900,7 +953,7 @@
     :group_max: false
   fruit_sticker:
     :name: fruit_sticker
-    :sequence_no: 55
+    :sequence_no: 58
     :caption: Fruit sticker
     :namespaced_name: fruit_sticker
     :data_type: :string
@@ -916,7 +969,7 @@
     :group_max: false
   fruit_sticker_2:
     :name: fruit_sticker_2
-    :sequence_no: 56
+    :sequence_no: 59
     :caption: Fruit sticker 2
     :namespaced_name: fruit_sticker_2
     :data_type: :string
@@ -932,7 +985,7 @@
     :group_max: false
   marketing_org:
     :name: marketing_org
-    :sequence_no: 57
+    :sequence_no: 60
     :caption: Mkting Org
     :namespaced_name: marketing_org
     :data_type: :string
@@ -948,7 +1001,7 @@
     :group_max: false
   pallet_base:
     :name: pallet_base
-    :sequence_no: 58
+    :sequence_no: 61
     :caption: Base
     :namespaced_name: pallet_base
     :data_type: :string
@@ -964,7 +1017,7 @@
     :group_max: false
   stack_type:
     :name: stack_type
-    :sequence_no: 59
+    :sequence_no: 62
     :caption: Stack
     :namespaced_name: stack_type
     :data_type: :string
@@ -980,7 +1033,7 @@
     :group_max: false
   gross_weight:
     :name: gross_weight
-    :sequence_no: 60
+    :sequence_no: 63
     :caption: Gross weight
     :namespaced_name: gross_weight
     :data_type: :number
@@ -996,7 +1049,7 @@
     :group_max: false
   nett_weight:
     :name: nett_weight
-    :sequence_no: 61
+    :sequence_no: 64
     :caption: Nett weight
     :namespaced_name: nett_weight
     :data_type: :number
@@ -1012,7 +1065,7 @@
     :group_max: false
   sequence_nett_weight:
     :name: sequence_nett_weight
-    :sequence_no: 62
+    :sequence_no: 65
     :caption: Seq nett weight
     :namespaced_name: sequence_nett_weight
     :data_type: :number
@@ -1028,7 +1081,7 @@
     :group_max: false
   basic_pack:
     :name: basic_pack
-    :sequence_no: 63
+    :sequence_no: 66
     :caption: Basic pack
     :namespaced_name: basic_pack
     :data_type: :string
@@ -1044,7 +1097,7 @@
     :group_max: false
   packhouse:
     :name: packhouse
-    :sequence_no: 64
+    :sequence_no: 67
     :caption: Packhouse
     :namespaced_name: packhouse
     :data_type: :string
@@ -1060,7 +1113,7 @@
     :group_max: false
   line:
     :name: line
-    :sequence_no: 65
+    :sequence_no: 68
     :caption: Line
     :namespaced_name: line
     :data_type: :string
@@ -1076,7 +1129,7 @@
     :group_max: false
   palletizing_bay:
     :name: palletizing_bay
-    :sequence_no: 66
+    :sequence_no: 69
     :caption: Palletizing bay
     :namespaced_name: palletizing_bay
     :data_type: :string
@@ -1092,7 +1145,7 @@
     :group_max: false
   pick_ref:
     :name: pick_ref
-    :sequence_no: 67
+    :sequence_no: 70
     :caption: Pick ref
     :namespaced_name: pick_ref
     :data_type: :string
@@ -1108,7 +1161,7 @@
     :group_max: false
   phc:
     :name: phc
-    :sequence_no: 68
+    :sequence_no: 71
     :caption: PHC
     :namespaced_name: phc
     :data_type: :string
@@ -1124,7 +1177,7 @@
     :group_max: false
   verification_result:
     :name: verification_result
-    :sequence_no: 69
+    :sequence_no: 72
     :caption: Verification result
     :namespaced_name: verification_result
     :data_type: :string
@@ -1140,7 +1193,7 @@
     :group_max: false
   scrapped_at:
     :name: scrapped_at
-    :sequence_no: 70
+    :sequence_no: 73
     :caption: Scrapped at
     :namespaced_name: scrapped_at
     :data_type: :datetime
@@ -1156,7 +1209,7 @@
     :group_max: false
   scrapped:
     :name: scrapped
-    :sequence_no: 71
+    :sequence_no: 74
     :caption: Scrapped
     :namespaced_name: scrapped
     :data_type: :boolean
@@ -1172,7 +1225,7 @@
     :group_max: false
   partially_palletized:
     :name: partially_palletized
-    :sequence_no: 72
+    :sequence_no: 75
     :caption: Partially palletized
     :namespaced_name: partially_palletized
     :data_type: :boolean
@@ -1188,7 +1241,7 @@
     :group_max: false
   reinspected:
     :name: reinspected
-    :sequence_no: 73
+    :sequence_no: 76
     :caption: Reinspected
     :namespaced_name: reinspected
     :data_type: :boolean
@@ -1204,7 +1257,7 @@
     :group_max: false
   verified:
     :name: verified
-    :sequence_no: 74
+    :sequence_no: 77
     :caption: Verified
     :namespaced_name: verified
     :data_type: :boolean
@@ -1220,7 +1273,7 @@
     :group_max: false
   verification_passed:
     :name: verification_passed
-    :sequence_no: 75
+    :sequence_no: 78
     :caption: Verification passed
     :namespaced_name: verification_passed
     :data_type: :boolean
@@ -1236,7 +1289,7 @@
     :group_max: false
   build_status:
     :name: build_status
-    :sequence_no: 76
+    :sequence_no: 79
     :caption: Build status
     :namespaced_name: build_status
     :data_type: :string
@@ -1252,7 +1305,7 @@
     :group_max: false
   zero_load_id:
     :name: zero_load_id
-    :sequence_no: 77
+    :sequence_no: 80
     :caption: Zero load
     :namespaced_name: zero_load_id
     :data_type: :string
@@ -1268,7 +1321,7 @@
     :group_max: false
   temp_tail:
     :name: temp_tail
-    :sequence_no: 78
+    :sequence_no: 81
     :caption: Temp tail
     :namespaced_name: temp_tail
     :data_type: :string
@@ -1284,7 +1337,7 @@
     :group_max: false
   depot_pallet:
     :name: depot_pallet
-    :sequence_no: 79
+    :sequence_no: 82
     :caption: Depot pallet
     :namespaced_name: depot_pallet
     :data_type: :boolean
@@ -1300,7 +1353,7 @@
     :group_max: false
   edi_in_file:
     :name: edi_in_file
-    :sequence_no: 80
+    :sequence_no: 83
     :caption: EDI in file
     :namespaced_name: edi_in_file
     :data_type: :string
@@ -1316,7 +1369,7 @@
     :group_max: false
   edi_in_consignment_note_number:
     :name: edi_in_consignment_note_number
-    :sequence_no: 81
+    :sequence_no: 84
     :caption: EDI Cons
     :namespaced_name: edi_in_consignment_note_number
     :data_type: :string
@@ -1332,7 +1385,7 @@
     :group_max: false
   packed_at:
     :name: packed_at
-    :sequence_no: 82
+    :sequence_no: 85
     :caption: Packed at
     :namespaced_name: packed_at
     :data_type: :datetime
@@ -1348,7 +1401,7 @@
     :group_max: false
   packed_date:
     :name: packed_date
-    :sequence_no: 83
+    :sequence_no: 86
     :caption: Packed date
     :namespaced_name: packed_date
     :data_type: :date
@@ -1364,7 +1417,7 @@
     :group_max: false
   packed_week:
     :name: packed_week
-    :sequence_no: 84
+    :sequence_no: 87
     :caption: Packed week
     :namespaced_name: packed_week
     :data_type: :string
@@ -1380,7 +1433,7 @@
     :group_max: false
   repacked:
     :name: repacked
-    :sequence_no: 85
+    :sequence_no: 88
     :caption: Repacked
     :namespaced_name: repacked
     :data_type: :boolean
@@ -1396,7 +1449,7 @@
     :group_max: false
   repacked_at:
     :name: repacked_at
-    :sequence_no: 86
+    :sequence_no: 89
     :caption: Repacked at
     :namespaced_name: repacked_at
     :data_type: :datetime
@@ -1412,7 +1465,7 @@
     :group_max: false
   repacked_from_pallet_id:
     :name: repacked_from_pallet_id
-    :sequence_no: 87
+    :sequence_no: 90
     :caption: Repacked from pallet
     :namespaced_name: repacked_from_pallet_id
     :data_type: :integer
@@ -1428,7 +1481,7 @@
     :group_max: false
   failed_otmc_results:
     :name: failed_otmc_results
-    :sequence_no: 88
+    :sequence_no: 91
     :caption: Failed otmc results
     :namespaced_name: failed_otmc_results
     :data_type: :string
@@ -1444,7 +1497,7 @@
     :group_max: false
   failed_otmc:
     :name: failed_otmc
-    :sequence_no: 89
+    :sequence_no: 92
     :caption: Failed otmc
     :namespaced_name: failed_otmc
     :data_type: :string
@@ -1460,7 +1513,7 @@
     :group_max: false
   created_by:
     :name: created_by
-    :sequence_no: 90
+    :sequence_no: 93
     :caption: Created by
     :namespaced_name: created_by
     :data_type: :string
@@ -1476,7 +1529,7 @@
     :group_max: false
   verified_by:
     :name: verified_by
-    :sequence_no: 91
+    :sequence_no: 94
     :caption: Verified by
     :namespaced_name: verified_by
     :data_type: :string
@@ -1492,7 +1545,7 @@
     :group_max: false
   edi_size_count:
     :name: edi_size_count
-    :sequence_no: 92
+    :sequence_no: 95
     :caption: EDI size count
     :namespaced_name: edi_size_count
     :data_type: :string
@@ -1508,7 +1561,7 @@
     :group_max: false
   target_customer_party_role_id:
     :name: target_customer_party_role_id
-    :sequence_no: 93
+    :sequence_no: 96
     :caption: Target customer party role
     :namespaced_name: target_customer_party_role_id
     :data_type: :integer
@@ -1524,7 +1577,7 @@
     :group_max: false
   target_customer:
     :name: target_customer
-    :sequence_no: 94
+    :sequence_no: 97
     :caption: Target customer
     :namespaced_name: target_customer
     :data_type: :string
@@ -1540,7 +1593,7 @@
     :group_max: false
   consignment_note_number:
     :name: consignment_note_number
-    :sequence_no: 95
+    :sequence_no: 98
     :caption: Cons Note number
     :namespaced_name: consignment_note_number
     :data_type: :string
@@ -1556,7 +1609,7 @@
     :group_max: false
   sequence_count:
     :name: sequence_count
-    :sequence_no: 96
+    :sequence_no: 99
     :caption: Sequence count
     :namespaced_name: sequence_count
     :data_type: :string
@@ -1572,7 +1625,7 @@
     :group_max: false
   active:
     :name: active
-    :sequence_no: 97
+    :sequence_no: 100
     :caption: Active
     :namespaced_name: active
     :data_type: :boolean
@@ -1588,7 +1641,7 @@
     :group_max: false
   colour_rule:
     :name: colour_rule
-    :sequence_no: 98
+    :sequence_no: 101
     :caption: Colour rule
     :namespaced_name: 
     :data_type: :string

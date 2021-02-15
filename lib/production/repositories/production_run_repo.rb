@@ -215,7 +215,11 @@ module ProductionApp
                                                    { parent_table: :plant_resources,
                                                      foreign_key: :production_line_id,
                                                      columns: [:plant_resource_code],
-                                                     flatten_columns: { plant_resource_code: :line_code } }],
+                                                     flatten_columns: { plant_resource_code: :line_code } },
+                                                   { parent_table: :packing_specifications,
+                                                     foreign_key: :packing_specification_id,
+                                                     columns: [:packing_specification_code],
+                                                     flatten_columns: { packing_specification_code: :packing_specification_code } }],
                                    lookup_functions: [{ function: :fn_production_run_code,
                                                         args: [:id],
                                                         col_name: :production_run_code },
@@ -308,7 +312,23 @@ module ProductionApp
       product_setup_id = DB[qry].get(:id)
       update(:product_resource_allocations, product_resource_allocation_id, product_setup_id: product_setup_id)
 
-      success_response("Allocted #{product_setup_code}", product_setup_id: product_setup_id)
+      success_response("Allocated #{product_setup_code}", product_setup_id: product_setup_id)
+    end
+
+    def allocate_packing_specification(product_resource_allocation_id, packing_specification_code)
+      run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
+      qry = <<~SQL
+        SELECT packing_specification_items.id, product_setup_id
+        FROM packing_specification_items
+        JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
+        WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
+         AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_code}'
+      SQL
+      rec = DB[qry].first
+      attrs = { packing_specification_item_id: rec[:id], product_setup_id: rec[:product_setup_id] }
+      update(:product_resource_allocations, product_resource_allocation_id, attrs)
+
+      success_response("Allocated #{packing_specification_code}", packing_specification_code: packing_specification_code)
     end
 
     def label_for_allocation(product_resource_allocation_id, label_template_name)
@@ -379,7 +399,7 @@ module ProductionApp
       query = <<~SQL
         SELECT a.id AS product_resource_allocation_id, plant_resource_id AS resource_id,
                a.product_setup_id, a.label_template_id, COALESCE(s.system_resource_code, p.plant_resource_code) AS packpoint,
-               t.label_template_name, a.packing_method_id
+               t.label_template_name, a.packing_method_id, a.packing_specification_item_id
           FROM product_resource_allocations a
           JOIN plant_resources p ON p.id = a.plant_resource_id
           LEFT JOIN system_resources s ON s.id = p.system_resource_id
@@ -391,8 +411,28 @@ module ProductionApp
       SQL
       recs = DB[query, production_run_id].all
       recs.map do |rec|
-        rec.merge(setup_data: setup_data_for(rec[:product_setup_id]))
+        packing_spec = packing_specification_keys(rec[:packing_specification_item_id])
+        rec.merge(setup_data: setup_data_for(rec[:product_setup_id]).to_h.merge(packing_spec))
       end
+    end
+
+    def packing_specification_keys(packing_specification_item_id)
+      lookup_packing_specs = AppConst::CR_PROD.use_packing_specifications?
+      lookup_packing_specs = false if packing_specification_item_id.to_s.nil_or_empty?
+
+      return {} unless lookup_packing_specs
+
+      query = <<~SQL
+        SELECT psi.id AS packing_specification_item_id, psi.tu_labour_product_id, psi.ru_labour_product_id,
+               psi.pm_mark_id, psi.fruit_sticker_ids, psi.tu_sticker_ids, psi.pm_bom_id
+          FROM packing_specification_items psi
+          WHERE psi.id = ?
+      SQL
+      rec = DB[query, packing_specification_item_id].first
+
+      rec[:fruit_sticker_ids] = rec[:fruit_sticker_ids]&.to_ary
+      rec[:tu_sticker_ids] = rec[:tu_sticker_ids]&.to_ary
+      rec
     end
 
     def setup_data_for(product_setup_id)

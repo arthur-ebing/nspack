@@ -10,6 +10,7 @@ module ProductionApp
     attribute :packing_method_id, Types::Integer
     attribute? :active, Types::Bool
     attribute :target_customer_party_role_id, Types::Integer
+    attribute :packing_specification_item_id, Types::Integer
   end
 
   class ProductResourceAllocationFlat < Dry::Struct
@@ -25,5 +26,7 @@ module ProductionApp
     attribute :packing_method_code, Types::String
     attribute :target_customer_party_role_id, Types::Integer
     attribute :target_customer, Types::String
+    attribute :packing_specification_item_id, Types::Integer
+    attribute :packing_specification_code, Types::String
   end
 end

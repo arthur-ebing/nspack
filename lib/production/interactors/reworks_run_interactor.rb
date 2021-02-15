@@ -608,14 +608,17 @@ module ProductionApp
 
       attrs = res.to_h
       changed_attrs = attrs.reject { |k, v|  before_attrs.key?(k) && before_attrs[k] == v }
-      changed_treatment_ids = changed_attrs.delete(:treatment_ids)
-      changed_attrs = changed_attrs.merge(treatment_ids: "{#{changed_treatment_ids.join(',')}}") unless changed_treatment_ids.nil?
+      changed_attrs = changed_attrs.merge(treatment_ids: resolve_col_array(changed_attrs.delete(:treatment_ids)))
+      attrs = attrs.merge(treatment_ids: resolve_col_array(attrs.delete(:treatment_ids))) if attrs.key?(:treatment_ids)
+
+      if AppConst::CR_PROD.use_packing_specifications?
+        changed_attrs = changed_attrs.merge(resolve_packing_spec_ids(changed_attrs))
+        attrs = attrs.merge(resolve_packing_spec_ids(attrs))
+      end
+
       changed_attrs = changed_attrs.merge(marketing_attrs(attrs.merge(repo.find_sequence_farm_attrs(sequence_id)))) if recalc_marketing_attrs?(changed_attrs)
       changed_attrs = changed_attrs.merge(gtin_code: prod_setup_repo.find_gtin_code_for_update(pallet_sequence(sequence_id))) if recalc_gtin_code?(changed_attrs)
       return failed_response('Changed attributes cannot be empty') if changed_attrs.nil_or_empty?
-
-      treatment_ids = attrs.delete(:treatment_ids)
-      attrs = attrs.merge(treatment_ids: "{#{treatment_ids.join(',')}}") unless treatment_ids.nil?
 
       before_descriptions_state = sequence_setup_data(sequence_id)
       before_changed_attrs = {}
@@ -661,6 +664,17 @@ module ProductionApp
       success_response("#{msg}.", instance)
     rescue Crossbeams::InfoError => e
       failed_response(e.message)
+    end
+
+    def resolve_col_array(ids)
+      repo.array_for_db_col(ids) unless ids.nil?
+    end
+
+    def resolve_packing_spec_ids(attrs)
+      {
+        fruit_sticker_ids: resolve_col_array(attrs.delete(:fruit_sticker_ids)),
+        tu_sticker_ids: resolve_col_array(attrs.delete(:tu_sticker_ids))
+      }
     end
 
     def reject_pallet_sequence_changes(sequence_id)

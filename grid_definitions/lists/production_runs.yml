@@ -78,7 +78,7 @@
 - :url: "/production/runs/production_runs/$:id$/select_template"
   :text: select product setup template
   :icon: arrow-left
-  :title: Select Product Setup Template
+#  :title: Select Product Setup Template
   :popup: true
   :hide_if_true: setup_complete,reconfiguring
 - :url: "/production/runs/production_runs/$:id$/allocate_setups"
