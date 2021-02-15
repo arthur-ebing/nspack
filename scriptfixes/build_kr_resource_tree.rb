@@ -47,12 +47,16 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     else
       DB.transaction do
         if reverse
+          puts "\nDropping logoff ITPC"
+          plant_id = repo.get_id(:plant_resources, plant_resource_code: 'DPK-40')
+          repo.delete_plant_resource(plant_id)
           %w[41 42 43 44 45 46].each { |line| drop_dp_line(line) }
           drop_old_line(1)
           drop_old_line(2)
           drop_palletizers
         else
           # # Logoff ITPC - HAS TO BE ON A LINE.... - is this valid? or should we allow on PH?
+          puts "\nBuilding logoff ITPC"
           res = plant_res(itpc_type, 'DPK-40', 'Logoff ITPC')
           itpc_id = repo.create_child_plant_resource(ph_id, res, sys_code: 'DPK-40')
           sysres_id = repo.get(:plant_resources, itpc_id, :system_resource_id)
@@ -66,7 +70,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
           build_old_line(2)
           build_palletizers
           # Rebin
-          # Bin tip
+          # Bin tip (ITPC & old lines)
         end
       end
     end
