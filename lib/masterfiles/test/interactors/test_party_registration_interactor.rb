@@ -63,11 +63,13 @@ module MasterfilesApp
     private
 
     def registration_attrs
-      party_role_id = create_party_role
+      party_id = create_party
+      party_role_id = create_party_role(party_id: party_id)
 
       {
         id: 1,
         party_role_id: party_role_id,
+        party_id: party_id,
         registration_type: Faker::Lorem.unique.word,
         registration_code: 'ABC',
         role_name: 'ABC',

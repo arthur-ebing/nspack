@@ -378,6 +378,19 @@ module MasterfilesApp
       details
     end
 
+    def for_select_roles_for_party_roles(where: {}, active: true)
+      DB[:party_roles]
+        .join(:roles, id: :role_id)
+        .where(Sequel[:party_roles][:active] => active)
+        .where(where)
+        .order(:name)
+        .select_map([:name, Sequel[:party_roles][:id]])
+    end
+
+    def for_select_inactive_roles_for_party_roles
+      for_select_roles_for_party_roles(active: false)
+    end
+
     def for_select_inactive_party_roles(role)
       for_select_party_roles(role, active: false)
     end

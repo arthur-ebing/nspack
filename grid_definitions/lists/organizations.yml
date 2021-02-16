@@ -27,11 +27,10 @@
   :icon: list
   :title: Variants
   :popup: false
-- :url: "/list/registrations/new/party_id=$:party_id$"
+- :url: "/list/registrations?key=parties&party_id=$:party_id$"
   :text: registrations
   :icon: list
   :title: Registrations
-  :popup: true
 - :url: "/list/farm_puc_orgs/multi?key=farm_puc_orgs&id=$:id$"
   :text: farm PUC orgs
   :icon: list

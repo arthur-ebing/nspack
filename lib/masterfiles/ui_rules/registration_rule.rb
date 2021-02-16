@@ -15,24 +15,19 @@ module UiRules
     end
 
     def set_show_fields
-      party_role_id_label = @repo.find_party_role(@form_object.party_role_id)&.role_name
-      fields[:party_role_id] = { renderer: :label,
-                                 with_value: party_role_id_label,
-                                 caption: 'Role' }
+      fields[:party_role_id] = { renderer: :label, caption: 'Role',
+                                 with_value: @form_object.role_name }
       fields[:registration_type] = { renderer: :label }
       fields[:registration_code] = { renderer: :label }
     end
 
     def common_fields
-      party_role_options = if @mode == :new
-                             @repo.for_select_party_roles_role(where: { party_id: @options[:party_id] })
-                           else
-                             @repo.for_select_party_roles_role(where: { party_role_id: @form_object.party_role_id })
-                           end
       {
         party_role_id: { renderer: :select,
-                         options: party_role_options,
-                         disabled_options: @repo.for_select_inactive_party_roles_role,
+                         options: @repo.for_select_roles_for_party_roles(
+                           where: { party_id: @form_object.party_id }
+                         ),
+                         disabled_options: @repo.for_select_inactive_roles_for_party_roles,
                          caption: 'Role',
                          required: true },
         registration_type: { renderer: :select,
@@ -53,6 +48,7 @@ module UiRules
 
     def make_new_form_object
       @form_object = OpenStruct.new(party_role_id: nil,
+                                    party_id: @options[:party_id],
                                     registration_type: nil,
                                     registration_code: nil)
     end

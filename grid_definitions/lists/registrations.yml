@@ -29,7 +29,7 @@
   :style: :button
   :behaviour: :popup
 :conditions:
-  :standard:
+  :parties:
     - :col: party_roles.party_id
       :op: =
       :val: $:party_id$

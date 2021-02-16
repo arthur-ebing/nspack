@@ -11,6 +11,7 @@ module MasterfilesApp
       base_attrs = {
         id: 1,
         party_role_id: 1,
+        party_id: 1,
         registration_type: Faker::Lorem.unique.word,
         registration_code: 'ABC',
         role_name: 'ABC',
