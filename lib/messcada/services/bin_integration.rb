@@ -8,7 +8,7 @@ module MesscadaApp
       @run_id = run_id
     end
 
-    def call # rubocop:disable Metrics/AbcSize
+    def call # rubocop:disable Metrics/AbcSize,  Metrics/CyclomaticComplexity
       if AppConst::CLIENT_CODE == 'kr'
         res = valid_bin_for_kromco_rmt_system?
         return res unless res.success
@@ -18,7 +18,7 @@ module MesscadaApp
       return bin_attrs_res unless bin_attrs_res.success
 
       repo.transaction do
-        unless (delivery_id = repo.find_external_bin_delivery(bin_attrs_res.instance[:delivery_number]))
+        unless bin_attrs_res.instance[:delivery_number].nil_or_empty? || (delivery_id = repo.find_external_bin_delivery(bin_attrs_res.instance[:delivery_number]))
           delivery_attrs_res = delivery_attributes(bin_attrs_res.instance[:delivery_number])
           return delivery_attrs_res unless delivery_attrs_res.success
 
