@@ -1,0 +1,7 @@
+---
+:dataminer_definition: inspection_audit
+:conditions:
+  :standard:
+    - :col: inspection_id
+      :op: =
+      :val: $:id$

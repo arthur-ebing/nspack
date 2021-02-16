@@ -1,0 +1,210 @@
+---
+:caption: Inspection Audit
+:sql: "SELECT\r\n    changed.actioned_at,\r\n    action,\r\n    inspection_id,\r\n
+  \   event_id,\r\n    changed.inspector_id AS inspector_id,\r\n    (select inspector_code
+  from inspectors where id = changed.inspector_id::int) AS inspector_code,\r\n    (select
+  fn_party_role_name (inspector_party_role_id)  from inspectors where id = changed.inspector_id::int)
+  AS inspector,\r\n    changed.passed AS passed,\r\n    (\r\n        SELECT array_agg(failure_reason)\r\n
+  \       FROM inspection_failure_reasons\r\n        WHERE id = ANY(changed.inspection_failure_reason_ids::int[])\r\n
+  \   ) AS failure_reasons,\r\n    changed.remarks,\r\n    user_name\r\nFROM (\r\n
+  \    SELECT\r\n         row_data_id AS inspection_id,\r\n         event_id,\r\n
+  \        changed_fields,\r\n         changed_fields -> 'passed' = 't' AS passed,\r\n
+  \        changed_fields -> 'remarks' AS remarks,\r\n         changed_fields -> 'inspector_id'
+  AS inspector_id,\r\n         changed_fields -> 'inspection_failure_reason_ids' AS
+  inspection_failure_reason_ids,\r\n         logged_actions.action_tstamp_tx AS actioned_at,\r\n
+  \           user_name,\r\n         CASE action\r\n             WHEN 'I' THEN 'INS'\r\n
+  \            WHEN 'U' THEN 'UPD'\r\n             WHEN 'D' THEN 'DEL'\r\n             ELSE
+  'TRUNC'\r\n             END AS action\r\n     FROM audit.logged_actions\r\n     JOIN
+  audit.logged_action_details ON logged_actions.transaction_id = logged_action_details.transaction_id\r\n
+  \    WHERE table_name = 'inspections') changed\r\nJOIN inspections ON inspections.id
+  = changed.inspection_id"
+:limit: 
+:offset: 
+:external_settings:
+  :render_url: 
+:columns:
+  actioned_at:
+    :name: actioned_at
+    :sequence_no: 1
+    :caption: Actioned at
+    :namespaced_name: changed.actioned_at
+    :data_type: :datetime
+    :width: 
+    :format: :delimited_1000
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  action:
+    :name: action
+    :sequence_no: 2
+    :caption: Action
+    :namespaced_name: action
+    :data_type: :string
+    :width: 90
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspection_id:
+    :name: inspection_id
+    :sequence_no: 3
+    :caption: Inspection
+    :namespaced_name: inspection_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  event_id:
+    :name: event_id
+    :sequence_no: 4
+    :caption: Event
+    :namespaced_name: event_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector_id:
+    :name: inspector_id
+    :sequence_no: 5
+    :caption: Inspector
+    :namespaced_name: changed.inspector_id
+    :data_type: :integer
+    :width: 
+    :format: 
+    :hide: true
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector_code:
+    :name: inspector_code
+    :sequence_no: 6
+    :caption: Inspector code
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: true
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  inspector:
+    :name: inspector
+    :sequence_no: 7
+    :caption: Inspector
+    :namespaced_name: 
+    :data_type: :string
+    :width: 150
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  passed:
+    :name: passed
+    :sequence_no: 8
+    :caption: Passed
+    :namespaced_name: changed.passed
+    :data_type: :string
+    :width: 100
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  failure_reasons:
+    :name: failure_reasons
+    :sequence_no: 9
+    :caption: Failure reasons
+    :namespaced_name: 
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  remarks:
+    :name: remarks
+    :sequence_no: 10
+    :caption: Remarks
+    :namespaced_name: changed.remarks
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  user_name:
+    :name: user_name
+    :sequence_no: 11
+    :caption: User name
+    :namespaced_name: user_name
+    :data_type: :string
+    :width: 
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+:query_parameter_definitions:
+- :column: inspection_id
+  :caption: inspection
+  :data_type: :integer
+  :control_type: :text
+  :default_value: 
+  :ordered_list: false
+  :ui_priority: 1
+  :list_def: 

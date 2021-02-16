@@ -11,12 +11,12 @@
   :icon: edit
   :title: Edit
   :popup: true
-- :url: "/finished_goods/inspection/inspections/$:id$"
-  :text: delete
-  :icon: delete
-  :is_delete: true
-  :popup: true
 - :separator: true
+- :url: "/list/inspection_audit/with_params?key=standard&id=$:id$"
+  :text: audit
+  :icon: information-solid
+  :title: Audit
+  :popup: true
 - :url: "/development/statuses/list/inspections/$:id$"
   :text: status
   :icon: information-solid
