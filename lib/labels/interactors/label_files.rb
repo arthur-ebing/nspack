@@ -2,8 +2,11 @@
 
 module LabelApp
   class LabelFiles # rubocop:disable Metrics/ClassLength
-    def repo
-      @repo ||= LabelRepo.new
+    attr_reader :rotation
+
+    def initialize(rotation = 0)
+      @rotation = rotation
+      raise Crossbeams::FrameworkError, "Label rotation can only be 0, 90 or -90. #{rotation} is not valid." unless [0, 90, -90].include?(rotation)
     end
 
     def make_label_zip(label, vars = nil)
@@ -90,15 +93,70 @@ module LabelApp
       end
     end
 
-    def zip_single_label(label, fname, label_properties)
-      Zip::OutputStream.write_buffer do |zio|
-        zio.put_next_entry("#{fname}_1.png")
-        zio.write label.png_image
-        zio.put_next_entry("#{fname}.xml")
-        zio.write label.variable_xml.chomp << "\n" # Ensure newline at end of file.
-        zio.put_next_entry("#{fname}.properties")
-        zio.write label_properties
+    def zip_single_label(label, fname, label_properties) # rubocop:disable Metrics/AbcSize
+      if rotation != 0
+        new_image = rotate_image(label)
+        new_xml = rotate_xml(label.variable_xml, (label.px_per_mm || '8').to_i)
+        Zip::OutputStream.write_buffer do |zio|
+          zio.put_next_entry("#{fname}_1.png")
+          zio.write new_image
+          zio.put_next_entry("#{fname}.xml")
+          zio.write new_xml.chomp << "\n" # Ensure newline at end of file.
+          zio.put_next_entry("#{fname}.properties")
+          zio.write label_properties
+        end
+      else
+        Zip::OutputStream.write_buffer do |zio|
+          zio.put_next_entry("#{fname}_1.png")
+          zio.write label.png_image
+          zio.put_next_entry("#{fname}.xml")
+          zio.write label.variable_xml.chomp << "\n" # Ensure newline at end of file.
+          zio.put_next_entry("#{fname}.properties")
+          zio.write label_properties
+        end
       end
+    end
+
+    def rotate_image(label)
+      outfile = Tempfile.new(['lbl', '.png'])
+
+      Tempfile.open(['lbl', '.png']) do |f|
+        f.write(label.png_image)
+        f.flush
+        res = system("convert #{f.path} -rotate #{rotation} #{outfile.path}")
+        raise Crossbeams::InfoError, 'Unable to rotate image' unless res
+      end
+
+      File.read(outfile.path)
+    ensure
+      outfile.close
+    end
+
+    def rotate_xml(xml, px_mm) # rubocop:disable Metrics/AbcSize
+      raise Crossbeams::FrameworkError, "Rotation of #{rotation} degrees has not been implemented yet." unless rotation == 90
+
+      doc = Nokogiri::XML(xml)
+      image_height = doc.at_xpath('//image_height').content.to_i
+      doc.xpath('//variable').each do |var|
+        rot_angle = var.at_xpath('rotation_angle')
+        startx = var.at_xpath('startx')
+        starty = var.at_xpath('starty')
+        width = var.at_xpath('width')
+        height = var.at_xpath('height')
+
+        new_h = width.content.to_i
+        new_w = height.content.to_i
+
+        new_x = image_height - new_w - starty.content.to_i + px_mm
+        new_y = startx.content.to_i
+        rot_angle.content = 90
+        startx.content = new_x
+        starty.content = new_y
+        width.content = new_w
+        height.content = new_h
+      end
+      # puts doc.to_xml
+      doc.to_xml.gsub(/>\s+</, '><')
     end
 
     # Create a zip file of zipped labels for publishing.
@@ -115,6 +173,10 @@ module LabelApp
 
     def combined_zip_filename
       "ld_publish_#{Date.today.strftime('%Y_%m_%d')}"
+    end
+
+    def repo
+      @repo ||= LabelRepo.new
     end
   end
 end
