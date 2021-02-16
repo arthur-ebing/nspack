@@ -34,58 +34,43 @@ module FinishedGoodsApp
       Inspection.new(hash)
     end
 
+    def find_pallet_for_inspection(pallet_number) # rubocop:disable Metrics/AbcSize
+      pallet_id = get_id(:pallets, pallet_number: pallet_number)
+      return nil unless pallet_id
+
+      hash = { pallet_id: pallet_id, pallet_number: pallet_number }
+      hash[:tm_group_ids] = select_values(:pallet_sequences, :packed_tm_group_id, pallet_id: hash[:pallet_id])
+      hash[:grade_ids] = select_values(:pallet_sequences, :grade_id, pallet_id: hash[:pallet_id])
+      hash[:inspection_type_ids] = []
+      hash[:passed_default] = []
+
+      select_values(:inspection_types, :id, active: true).each do |inspection_type_id|
+        inspection_type = MasterfilesApp::QualityRepo.new.find_inspection_type(inspection_type_id)
+        match_tm = (inspection_type.applicable_tm_group_ids & hash[:tm_group_ids]).any?
+        match_grade = (inspection_type.applicable_grade_ids & hash[:grade_ids]).any?
+        if match_tm & match_grade
+          hash[:inspection_type_ids] << inspection_type_id
+          hash[:passed_default] << inspection_type.passed_default
+        end
+      end
+      PalletForInspection.new(hash)
+    end
+
     def create_inspection(params)
-      pallet_id = get_id(:pallets, pallet_number: params[:pallet_number] || params)
-      inspection_type_ids = select_values(:inspection_types, :id, active: true)
+      pallet = find_pallet_for_inspection(params[:pallet_number] || params)
+      raise Crossbeams::InfoError, 'Pallet not found' unless pallet
 
       ids = []
-      inspection_type_ids.each do |inspection_type_id|
-        args = { pallet_id: pallet_id, inspection_type_id: inspection_type_id }
+      pallet.inspection_type_ids.each do |inspection_type_id|
+        inspection_type = MasterfilesApp::QualityRepo.new.find_inspection_type(inspection_type_id)
+
+        args = { pallet_id: pallet.pallet_id, inspection_type_id: inspection_type_id }
         next if exists?(:inspections, args)
 
-        id = create_inspection_for_tm_group(args)
-        id ||= create_inspection_for_grades(args)
-        id ||= create_inspection_for_cultivars(args)
-        id ||= create_inspection_for_orchards(args)
-        ids << id
+        args[:passed] = inspection_type.passed_default
+        ids << create(:inspections, args)
       end
       ids
-    end
-
-    def create_inspection_for_tm_group(params)
-      applies_to_all_tm_groups = get(:inspection_types, params[:inspection_type_id], :applies_to_all_tm_groups)
-      return create(:inspections, params) if applies_to_all_tm_groups
-
-      applicable_tm_group_ids = get(:inspection_types, params[:inspection_type_id], :applicable_tm_group_ids).to_a
-      tm_group_ids = select_values(:pallet_sequences, :packed_tm_group_id, pallet_id: params[:pallet_id])
-      create(:inspections, params) if tm_group_ids.any? { |tm_group_id| applicable_tm_group_ids.include?(tm_group_id) }
-    end
-
-    def create_inspection_for_grades(params)
-      applies_to_all_grades = get(:inspection_types, params[:inspection_type_id], :applies_to_all_grades)
-      return create(:inspections, params) if applies_to_all_grades
-
-      applicable_grade_ids = get(:inspection_types, params[:inspection_type_id], :applicable_grade_ids).to_a
-      grade_ids = select_values(:pallet_sequences, :grade_id, pallet_id: params[:pallet_id])
-      create(:inspections, params) if grade_ids.any? { |grade_id| applicable_grade_ids.include?(grade_id) }
-    end
-
-    def create_inspection_for_cultivars(params)
-      applies_to_all_cultivars = get(:inspection_types, params[:inspection_type_id], :applies_to_all_cultivars)
-      return create(:inspections, params) if applies_to_all_cultivars
-
-      applicable_cultivar_ids = get(:inspection_types, params[:inspection_type_id], :applicable_cultivar_ids).to_a
-      cultivar_ids = select_values(:pallet_sequences, :cultivar_id, pallet_id: params[:pallet_id])
-      create(:inspections, params) if cultivar_ids.any? { |cultivar_id| applicable_cultivar_ids.include?(cultivar_id) }
-    end
-
-    def create_inspection_for_orchards(params)
-      applies_to_all_orchards = get(:inspection_types, params[:inspection_type_id], :applies_to_all_orchards)
-      return create(:inspections, params) if applies_to_all_orchards
-
-      applicable_orchard_ids = get(:inspection_types, params[:inspection_type_id], :applicable_orchard_ids).to_a
-      orchard_ids = select_values(:pallet_sequences, :orchard_id, pallet_id: params[:pallet_id])
-      create(:inspections, params) if orchard_ids.any? { |orchard_id| applicable_orchard_ids.include?(orchard_id) }
     end
   end
 end

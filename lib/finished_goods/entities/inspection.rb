@@ -17,4 +17,13 @@ module FinishedGoodsApp
     attribute :remarks, Types::String
     attribute? :active, Types::Bool
   end
+
+  class PalletForInspection < Dry::Struct
+    attribute :pallet_id, Types::Integer
+    attribute :pallet_number, Types::String
+    attribute :inspection_type_ids, Types::Array
+    attribute :passed_default, Types::Array
+    attribute :tm_group_ids, Types::Array
+    attribute :grade_ids, Types::Array
+  end
 end

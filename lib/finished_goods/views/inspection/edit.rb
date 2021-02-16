@@ -20,8 +20,8 @@ module FinishedGoods
               form.add_field :inspection_type_code
               form.add_field :pallet_number
               form.add_field :inspector_id
-              form.add_field :inspection_failure_reason_ids
               form.add_field :passed
+              form.add_field :inspection_failure_reason_ids
               form.add_field :remarks
             end
           end

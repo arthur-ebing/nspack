@@ -20,7 +20,7 @@ module MasterfilesApp
     build_inactive_select :inspection_types, label: :inspection_type_code, value: :id, order_by: :inspection_type_code
     crud_calls_for :inspection_types, name: :inspection_type
 
-    def find_inspection_type(id) # rubocop:disable Metrics/AbcSize
+    def find_inspection_type(id)
       hash = find_with_association(:inspection_types,
                                    id,
                                    parent_tables: [{ parent_table: :inspection_failure_types,
@@ -32,10 +32,6 @@ module MasterfilesApp
 
       hash[:applicable_tm_group_ids] = select_values(:target_market_groups, :id) if hash[:applies_to_all_tm_groups]
       hash[:applicable_tm_groups] = select_values(:target_market_groups, :target_market_group_name, id: hash[:applicable_tm_group_ids].to_a)
-      hash[:applicable_cultivar_ids] = select_values(:cultivars, :id) if hash[:applies_to_all_cultivars]
-      hash[:applicable_cultivars] = select_values(:cultivars, :cultivar_name, id: hash[:applicable_cultivar_ids].to_a)
-      hash[:applicable_orchard_ids] = select_values(:orchards, :id) if hash[:applies_to_all_orchards]
-      hash[:applicable_orchards] = select_values(:orchards, :orchard_code, id: hash[:applicable_orchard_ids].to_a)
       hash[:applicable_grade_ids] = select_values(:grades, :id) if hash[:applies_to_all_grades]
       hash[:applicable_grades] = select_values(:grades, :grade_code, id: hash[:applicable_grade_ids].to_a)
 

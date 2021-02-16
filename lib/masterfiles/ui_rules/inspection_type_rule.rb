@@ -20,6 +20,7 @@ module UiRules
       fields[:inspection_type_code] = { renderer: :label }
       fields[:description] = { renderer: :label }
       fields[:failure_type_code] = { renderer: :label, caption: 'Inspection Failure Type' }
+      fields[:passed_default] = { renderer: :label, as_boolean: true }
 
       fields[:applies_to_all_tm_groups] = { renderer: :label, caption: 'Applies To All TM Groups',
                                             as_boolean: true }
@@ -29,16 +30,10 @@ module UiRules
       fields[:applies_to_all_grades] = { renderer: :label, as_boolean: true }
       fields[:applicable_grades] = { renderer: :label, with_value: @form_object.applicable_grades.join(', ') }
 
-      fields[:applies_to_all_cultivars] = { renderer: :label, as_boolean: true }
-      fields[:applicable_cultivars] = { renderer: :label, with_value: @form_object.applicable_cultivars.join(', ') }
-
-      fields[:applies_to_all_orchards] = { renderer: :label, as_boolean: true }
-      fields[:applicable_orchards] = { renderer: :label, with_value: @form_object.applicable_orchards.join(', ') }
-
       fields[:active] = { renderer: :label, as_boolean: true }
     end
 
-    def common_fields # rubocop:disable Metrics/AbcSize
+    def common_fields
       {
         inspection_type_code: { required: true },
         description: {},
@@ -46,6 +41,7 @@ module UiRules
                                       options: MasterfilesApp::QualityRepo.new.for_select_inspection_failure_types,
                                       disabled_options: MasterfilesApp::QualityRepo.new.for_select_inactive_inspection_failure_types,
                                       required: true },
+        passed_default: { renderer: :checkbox },
 
         applies_to_all_tm_groups: { renderer: :checkbox, caption: 'Applies to all TM Groups' },
         applicable_tm_group_ids: { renderer: :multi, caption: 'Target Market Groups',
@@ -57,19 +53,7 @@ module UiRules
         applicable_grade_ids: { renderer: :multi, caption: 'Grades',
                                 options: MasterfilesApp::FruitRepo.new.for_select_grades,
                                 selected: @form_object.applicable_grade_ids,
-                                hide_on_load: @form_object.applies_to_all_grades },
-
-        applies_to_all_cultivars: { renderer: :checkbox, caption: 'Applies to all Cultivars' },
-        applicable_cultivar_ids: { renderer: :multi, caption: 'Cultivars',
-                                   options: MasterfilesApp::CultivarRepo.new.for_select_cultivar_codes,
-                                   selected: @form_object.applicable_cultivar_ids,
-                                   hide_on_load: @form_object.applies_to_all_cultivars },
-
-        applies_to_all_orchards: { renderer: :checkbox, caption: 'Applies to all Orchards' },
-        applicable_orchard_ids: { renderer: :multi, caption: 'Orchards',
-                                  options: MasterfilesApp::FarmRepo.new.for_select_orchards,
-                                  selected: @form_object.applicable_orchard_ids,
-                                  hide_on_load: @form_object.applies_to_all_orchards }
+                                hide_on_load: @form_object.applies_to_all_grades }
       }
     end
 
@@ -86,14 +70,12 @@ module UiRules
       @form_object = OpenStruct.new(inspection_type_code: nil,
                                     description: nil,
                                     inspection_failure_type_id: nil,
+                                    match_all: true,
+                                    passed_default: false,
                                     applies_to_all_tm_groups: true,
                                     applicable_tm_group_ids: nil,
                                     applies_to_all_grades: true,
-                                    applicable_grade_ids: nil,
-                                    applies_to_all_cultivars: true,
-                                    applicable_cultivar_ids: nil,
-                                    applies_to_all_orchards: true,
-                                    applicable_orchard_ids: nil)
+                                    applicable_grade_ids: nil)
     end
 
     private
@@ -101,8 +83,6 @@ module UiRules
     def add_behaviours
       behaviours do |behaviour|
         behaviour.input_change :applies_to_all_tm_groups, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_tm_groups' }]
-        behaviour.input_change :applies_to_all_cultivars, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_cultivars' }]
-        behaviour.input_change :applies_to_all_orchards, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_orchards' }]
         behaviour.input_change :applies_to_all_grades, notify: [{ url: '/masterfiles/quality/inspection_types/applies_to_all_grades' }]
       end
     end

@@ -9,9 +9,11 @@ module MasterfilesApp
         inspection_type_code: Faker::Lorem.unique.word,
         description: Faker::Lorem.word,
         inspection_failure_type_id: inspection_failure_type_id,
+        applies_to_all_tm_groups: false,
         applicable_tm_group_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
-        applicable_cultivar_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
-        applicable_orchard_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
+        applies_to_all_grades: false,
+        applicable_grade_ids: BaseRepo.new.array_for_db_col([1, 2, 3]),
+        passed_default: false,
         active: true,
         created_at: '2010-01-01 12:00',
         updated_at: '2010-01-01 12:00'

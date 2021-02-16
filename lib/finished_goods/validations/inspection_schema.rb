@@ -4,7 +4,7 @@ module FinishedGoodsApp
   class InspectionContract < Dry::Validation::Contract
     params do
       optional(:id).filled(:integer)
-      required(:inspector_id).maybe(:integer)
+      required(:inspector_id).filled(:integer)
       optional(:inspection_failure_reason_ids).maybe(:array).maybe { each(:integer) }
       required(:passed).maybe(:bool)
       required(:remarks).maybe(Types::StrippedString)

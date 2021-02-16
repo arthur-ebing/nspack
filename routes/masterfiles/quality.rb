@@ -422,12 +422,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
               description
               inspection_failure_type_id
               failure_type_code
+              passed_default
               applicable_tm_group_ids
               applicable_tm_groups
-              applicable_cultivar_ids
-              applicable_cultivars
-              applicable_orchard_ids
-              applicable_orchards
               applicable_grade_ids
               applicable_grades
             ]
@@ -498,12 +495,9 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
             description
             inspection_failure_type_id
             failure_type_code
+            passed_default
             applicable_tm_group_ids
             applicable_tm_groups
-            applicable_cultivar_ids
-            applicable_cultivars
-            applicable_orchard_ids
-            applicable_orchards
             applicable_grade_ids
             applicable_grades
             active

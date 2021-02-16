@@ -25,7 +25,7 @@
 :page_controls:
 - :control_type: :link
   :url: "/finished_goods/inspection/inspections/new"
-  :text: New Inspection
+  :text: Inspection
   :style: :button
   :behaviour: :popup
 :conditions:

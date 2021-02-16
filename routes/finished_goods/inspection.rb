@@ -456,10 +456,22 @@ class Nspack < Roda
 
     r.on 'inspections' do
       interactor = FinishedGoodsApp::InspectionInteractor.new(current_user, {}, { route_url: request.path, request_ip: request.ip }, {})
+
+      r.on 'passed_changed' do
+        passed = params[:changed_value] == 'f'
+        json_actions([
+                       OpenStruct.new(type: passed ? :show_element : :hide_element,
+                                      dom_id: 'inspection_inspection_failure_reason_ids_field_wrapper'),
+                       OpenStruct.new(type: passed ? :show_element : :hide_element,
+                                      dom_id: 'inspection_remarks_field_wrapper')
+                     ])
+      end
+
       r.on 'new' do    # NEW
         check_auth!('inspection', 'new')
         show_partial_or_page(r) { FinishedGoods::Inspection::Inspection::New.call(remote: fetch?(r)) }
       end
+
       r.post do        # CREATE
         res = interactor.create_inspection(params[:inspection])
         if res.success

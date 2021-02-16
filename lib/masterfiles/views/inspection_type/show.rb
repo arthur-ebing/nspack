@@ -18,6 +18,7 @@ module Masterfiles
                   col.add_field :inspection_type_code
                   col.add_field :description
                   col.add_field :failure_type_code
+                  col.add_field :passed_default
                   col.add_field :active
                 end
                 row.column do |col|
@@ -26,12 +27,6 @@ module Masterfiles
 
                   col.add_field :applies_to_all_grades
                   col.add_field :applicable_grades
-
-                  col.add_field :applies_to_all_cultivars
-                  col.add_field :applicable_cultivars
-
-                  col.add_field :applies_to_all_orchards
-                  col.add_field :applicable_orchards
                 end
               end
             end
