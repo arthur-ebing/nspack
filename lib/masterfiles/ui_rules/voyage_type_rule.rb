@@ -25,7 +25,9 @@ module UiRules
       {
         voyage_type_code: { required: true, force_uppercase: true },
         description: {},
-        industry_description: {}
+        industry_description: { renderer: :select,
+                                prompt: '',
+                                options: %w[MARINE RAIL ROAD AIR MAIL MULTIMODAL FIXED_TRANSPORT_INSTALLATION INLAND_WATER_TRANSPORT] }
       }
     end
 
