@@ -174,7 +174,7 @@ module Crossbeams
       CARTON_SCALE_ROBOT = 'CARTON_SCALE_ROBOT'
       PALLET_SCALE_ROBOT = 'PALLET_SCALE_ROBOT'
       BIN_FORKLIFT_ROBOT = 'BIN_FORKLIFT_ROBOT'
-      PALLETIZING_STATION = 'PALLETIZING_STATION'
+      PALLETIZING_SHIP = 'PALLETIZING_SHIP'
       PALLETIZING_BAY = 'PALLETIZING_BAY'
       AUTOPACK_PALLET_BAY = 'AUTOPACK_PALLET_BAY'
       PALLET_FORKLIFT_ROBOT = 'PALLET_FORKLIFT_ROBOT'
@@ -194,6 +194,7 @@ module Crossbeams
       MES_SERVER = 'MES_SERVER'
       CMS_SERVER = 'CMS_SERVER'
       ITPC = 'ITPC'
+      SUB_LINE = 'SUB_LINE'
 
       # Peripherals
       SCALE = 'SCALE'
@@ -261,7 +262,7 @@ module Crossbeams
                                           CARTON_SCALE_ROBOT,
                                           PALLET_SCALE_ROBOT,
                                           QC_ROBOT,
-                                          PALLETIZING_STATION,
+                                          PALLETIZING_SHIP,
                                           PALLETIZING_BAY,
                                           AUTOPACK_PALLET_BAY,
                                           SCALE,
@@ -274,8 +275,11 @@ module Crossbeams
                   allowed_children: [QC_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER, WEIGHING_STATION],
                   icon: { file: 'home', colour: CLR_K } },
         LINE => { description: 'Line',
-                  allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_STATION, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION, ITPC],
+                  allowed_children: [SUB_LINE, DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_SHIP, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, BIN_TIPPING_STATION, SCALE, PRINTER, PRINT_STATION, ITPC],
                   icon: { file: 'packline', colour: CLR_S } },
+        SUB_LINE => { description: 'Sub-Line',
+                      allowed_children: [DROP, DROP_STATION, DROP_TABLE, CLM_ROBOT, QC_ROBOT, PALLETIZING_SHIP, AUTOPACK_PALLET_BAY, PALLETIZING_BAY, SCALE, PRINTER, PRINT_STATION, ITPC],
+                      icon: { file: 'packline', colour: CLR_D } },
         DROP => { description: 'Drop',
                   allowed_children: [DROP_STATION, DROP_TABLE, CLM_ROBOT, BIN_SCALE_ROBOT, CARTON_SCALE_ROBOT, PALLET_SCALE_ROBOT, SCALE, PRINTER],
                   icon: { file: 'packing', colour: CLR_D } },
@@ -365,9 +369,9 @@ module Crossbeams
         PALLET_FORKLIFT => { description: 'Pallet Forklift',
                              allowed_children: [PALLET_FORKLIFT_ROBOT],
                              icon: { file: 'forkishlift', colour: CLR_M } },
-        PALLETIZING_STATION => { description: 'Palletizing Station',
-                                 allowed_children: [AUTOPACK_PALLET_BAY, PALLETIZING_BAY, PALLETIZING_ROBOT],
-                                 icon: { file: 'cubes', colour: CLR_W } },
+        PALLETIZING_SHIP => { description: 'Palletizing Ship',
+                              allowed_children: [AUTOPACK_PALLET_BAY, PALLETIZING_BAY, PALLETIZING_ROBOT],
+                              icon: { file: 'cubes', colour: CLR_W } },
         PALLETIZING_BAY => { description: 'Palletizing Bay',
                              allowed_children: [PALLETIZING_ROBOT, SCALE, PRINTER],
                              icon: { file: 'cube', colour: CLR_G } },

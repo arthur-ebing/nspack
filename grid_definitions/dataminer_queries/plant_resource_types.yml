@@ -3,7 +3,7 @@
 :sql: "SELECT \"plant_resource_types\".\"id\", \"plant_resource_types\".\"plant_resource_type_code\",
   \"plant_resource_types\".\"description\",\r\n\"plant_resource_types\".\"icon\",\r\n\"plant_resource_types\".\"packpoint\",\r\n\"plant_resource_types\".\"active\",
   \"plant_resource_types\".\"created_at\", \"plant_resource_types\".\"updated_at\"\r\nFROM
-  \"plant_resource_types\""
+  \"plant_resource_types\" ORDER BY \"plant_resource_types\".\"plant_resource_type_code\""
 :limit: 
 :offset: 
 :external_settings: {}
