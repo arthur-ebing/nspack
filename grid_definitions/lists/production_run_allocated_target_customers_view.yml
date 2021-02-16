@@ -9,15 +9,24 @@
   hb:
   - system_code
   - fg_marks
+  - packing_specification_code
   um:
   - system_code
   - fg_marks
+  - packing_specification_code
   ud:
   - system_code
   - fg_marks
+  - packing_specification_code
   sr:
   - system_code
   - fg_marks
+  - packing_specification_code
   srp:
   - system_code
   - fg_marks
+  - packing_specification_code
+  hl:
+  - packing_specification_code
+  kr:
+  - product_setup_code

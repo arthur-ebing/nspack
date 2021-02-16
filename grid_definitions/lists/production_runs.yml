@@ -76,7 +76,7 @@
   :hide_if_true: reconfiguring
 - :separator: true
 - :url: "/production/runs/production_runs/$:id$/select_template"
-  :text: select product setup template
+  :text: select template
   :icon: arrow-left
 #  :title: Select Product Setup Template
   :popup: true

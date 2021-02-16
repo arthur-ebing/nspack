@@ -252,7 +252,10 @@ module ProductionApp
                                                  col_name: :product_setup_code },
                                                { function: :fn_party_role_name,
                                                  args: [:target_customer_party_role_id],
-                                                 col_name: :target_customer }],
+                                                 col_name: :target_customer },
+                                               { function: :fn_packing_specification_code,
+                                                 args: [:packing_specification_item_id],
+                                                 col_name: :packing_specification_item_code }],
                             wrapper: ProductResourceAllocationFlat)
     end
 
@@ -420,7 +423,14 @@ module ProductionApp
       lookup_packing_specs = AppConst::CR_PROD.use_packing_specifications?
       lookup_packing_specs = false if packing_specification_item_id.to_s.nil_or_empty?
 
-      return {} unless lookup_packing_specs
+      attrs = { packing_specification_item_id: nil,
+                tu_labour_product_id: nil,
+                ru_labour_product_id: nil,
+                pm_mark_id: nil,
+                fruit_sticker_ids: nil,
+                tu_sticker_ids: nil,
+                pm_bom_id: nil }
+      return attrs unless lookup_packing_specs
 
       query = <<~SQL
         SELECT psi.id AS packing_specification_item_id, psi.tu_labour_product_id, psi.ru_labour_product_id,
@@ -429,6 +439,7 @@ module ProductionApp
           WHERE psi.id = ?
       SQL
       rec = DB[query, packing_specification_item_id].first
+      return attrs if rec.nil?
 
       rec[:fruit_sticker_ids] = rec[:fruit_sticker_ids]&.to_ary
       rec[:tu_sticker_ids] = rec[:tu_sticker_ids]&.to_ary

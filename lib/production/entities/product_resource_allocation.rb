@@ -27,6 +27,6 @@ module ProductionApp
     attribute :target_customer_party_role_id, Types::Integer
     attribute :target_customer, Types::String
     attribute :packing_specification_item_id, Types::Integer
-    attribute :packing_specification_code, Types::String
+    attribute :packing_specification_item_code, Types::String
   end
 end

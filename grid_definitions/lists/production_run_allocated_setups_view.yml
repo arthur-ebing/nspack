@@ -57,3 +57,5 @@
   kr:
   - id
   - product_setup_code
+  - system_code
+  - fg_marks
