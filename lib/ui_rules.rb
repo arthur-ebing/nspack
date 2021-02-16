@@ -158,7 +158,7 @@ module UiRules
       @rules[:behaviours] = behaviour.rules
     end
 
-    def apply_form_values
+    def apply_form_values # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       return unless @options && @options[:form_values]
 
       # We need to apply values to the form object, so make sure it is not immutable first.
@@ -169,6 +169,8 @@ module UiRules
                             v.transform_keys(&:to_s)
                           elsif v.is_a?(String) && v.empty?
                             nil
+                          elsif v.is_a?(String) && (@form_object[k].is_a?(TrueClass) || @form_object[k].is_a?(FalseClass))
+                            v == 't'
                           else
                             v
                           end
