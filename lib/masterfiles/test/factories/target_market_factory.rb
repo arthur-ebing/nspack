@@ -35,7 +35,8 @@ module MasterfilesApp
       default = {
         target_market_name: Faker::Lorem.unique.word,
         active: true,
-        description: Faker::Lorem.word
+        description: Faker::Lorem.word,
+        is_inspection_tm: false
       }
       DB[:target_markets].insert(default.merge(opts))
     end

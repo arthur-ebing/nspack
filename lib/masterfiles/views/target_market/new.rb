@@ -4,7 +4,7 @@ module Masterfiles
   module TargetMarkets
     module TargetMarket
       class New
-        def self.call(form_values: nil, form_errors: nil, remote: true)
+        def self.call(form_values: nil, form_errors: nil, remote: true) # rubocop:disable Metrics/AbcSize
           ui_rule = UiRules::Compiler.new(:target_market, :new, form_values: form_values)
           rules   = ui_rule.compile
 
@@ -19,6 +19,7 @@ module Masterfiles
               form.add_field :tm_group_ids
               form.add_field :country_ids
               form.add_field :description
+              form.add_field :is_inspection_tm
             end
           end
 

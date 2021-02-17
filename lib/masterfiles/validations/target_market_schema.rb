@@ -7,5 +7,6 @@ module MasterfilesApp
     required(:country_ids).filled(:array).each(:integer)
     required(:tm_group_ids).filled(:array).each(:integer)
     required(:description).maybe(Types::StrippedString)
+    required(:is_inspection_tm).maybe(:bool)
   end
 end

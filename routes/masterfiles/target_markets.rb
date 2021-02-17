@@ -181,7 +181,7 @@ class Nspack < Roda
           if res.success
             update_grid_row(id,
                             changes: { target_market_name: res.instance[:target_market_name],
-                                       description: res.instance[:description] },
+                                       description: res.instance[:description], is_inspection_tm: res.instance[:is_inspection_tm] },
                             notice: res.message)
           else
             re_show_form(r, res) { Masterfiles::TargetMarkets::TargetMarket::Edit.call(id, params[:target_market], res.errors) }

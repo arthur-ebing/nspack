@@ -9,7 +9,8 @@
   '; ')\r\n    FROM (\r\n      SELECT\r\n        g.target_market_group_name\r\n      FROM\r\n
   \       target_market_groups g\r\n      JOIN target_markets_for_groups t ON t.target_market_group_id
   = g.id\r\n        AND t.target_market_id = target_markets.id\r\n        AND g.active)
-  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
+  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"is_inspection_tm\",\r\n
+  \ \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
   \ \"target_markets\""
 :limit: 
 :offset: 
@@ -37,7 +38,7 @@
     :caption: Target market name
     :namespaced_name: target_markets.target_market_name
     :data_type: :string
-    :width: 
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -53,7 +54,7 @@
     :caption: Description
     :namespaced_name: target_markets.description
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: 
@@ -69,7 +70,7 @@
     :caption: Countries
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 250
     :format: 
     :hide: false
     :pinned: 
@@ -85,7 +86,23 @@
     :caption: Target market groups
     :namespaced_name: 
     :data_type: :string
-    :width: 
+    :width: 250
+    :format: 
+    :hide: false
+    :pinned: 
+    :groupable: false
+    :group_by_seq: 
+    :group_sum: false
+    :group_avg: false
+    :group_min: false
+    :group_max: false
+  is_inspection_tm:
+    :name: is_inspection_tm
+    :sequence_no: 6
+    :caption: Is inspection tm?
+    :namespaced_name: target_markets.is_inspection_tm
+    :data_type: :boolean
+    :width: 150
     :format: 
     :hide: false
     :pinned: 
@@ -97,7 +114,7 @@
     :group_max: false
   created_at:
     :name: created_at
-    :sequence_no: 6
+    :sequence_no: 7
     :caption: Created at
     :namespaced_name: target_markets.created_at
     :data_type: :datetime
@@ -113,7 +130,7 @@
     :group_max: false
   updated_at:
     :name: updated_at
-    :sequence_no: 7
+    :sequence_no: 8
     :caption: Updated at
     :namespaced_name: target_markets.updated_at
     :data_type: :datetime

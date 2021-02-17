@@ -16,6 +16,7 @@ module Masterfiles
               form.add_field :tm_group_ids
               form.add_field :country_ids
               form.add_field :description
+              form.add_field :is_inspection_tm
             end
           end
 
