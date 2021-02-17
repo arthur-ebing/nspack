@@ -7,6 +7,8 @@ module UiRules
       make_form_object
       apply_form_values
 
+      @rules[:use_packing_specifications] = AppConst::CR_PROD.use_packing_specifications?
+
       common_values_for_fields common_fields
 
       form_name 'product_resource_allocation'
@@ -16,7 +18,12 @@ module UiRules
       {
         product_setup_id: { renderer: :select,
                             options: @repo.for_select_product_setups_for_allocation(@options[:id]),
-                            prompt: true },
+                            prompt: true,
+                            invisible: @rules[:use_packing_specifications] },
+        packing_specification_item_id: { renderer: :select,
+                                         options: @repo.for_select_packing_specification_items_for_allocation(@options[:id]),
+                                         prompt: true,
+                                         invisible: !@rules[:use_packing_specifications] },
         label_template_id: { renderer: :select,
                              options: MasterfilesApp::LabelTemplateRepo.new.for_select_label_templates(where: { application: AppConst::PRINT_APP_CARTON }),
                              prompt: true,

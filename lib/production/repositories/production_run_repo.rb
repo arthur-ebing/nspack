@@ -476,6 +476,20 @@ module ProductionApp
       DB[query, run_id].select_map(%i[code id])
     end
 
+    def for_select_packing_specification_items_for_allocation(product_resource_allocation_id)
+      run_id = get_value(:product_resource_allocations, :production_run_id, id: product_resource_allocation_id)
+      query = <<~SQL
+        SELECT fn_packing_specification_code(packing_specification_items.id) AS code, packing_specification_items.id
+        FROM packing_specification_items
+        JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id
+        WHERE product_setup_template_id = (SELECT product_setup_template_id
+                                           FROM production_runs
+                                           WHERE id = ?)
+        ORDER BY 1
+      SQL
+      DB[query, run_id].select_map(%i[code id])
+    end
+
     # Is there an active tipping run on this line?
     def line_has_active_tipping_run?(production_line_id)
       DB[:production_runs].where(production_line_id: production_line_id, running: true, tipping: true).count.positive?
@@ -620,6 +634,12 @@ module ProductionApp
          AND #{table_name}.#{column_name} IS NULL;
 
       SQL
+    end
+
+    def find_packing_spec_item_setup_id(packing_specification_item_id)
+      DB[:packing_specification_items]
+        .where(id: packing_specification_item_id)
+        .get(:product_setup_id)
     end
   end
 end

@@ -371,7 +371,9 @@ module ProductionApp
       res
     end
 
-    def update_product_resource_allocation(id, params)
+    def update_product_resource_allocation(id, params) # rubocop:disable Metrics/AbcSize
+      params[:product_setup_id] = repo.find_packing_spec_item_setup_id(params[:packing_specification_item_id]) if AppConst::CR_PROD.use_packing_specifications?
+
       res = validate_product_resource_allocation(params)
       return validation_failed_response(res) if res.failure?
 

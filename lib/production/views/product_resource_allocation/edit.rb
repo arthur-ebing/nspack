@@ -18,6 +18,7 @@ module Production
               form.method :update
               form.remote!
               form.add_field :product_setup_id
+              form.add_field :packing_specification_item_id
               form.add_field :label_template_id
               form.add_field :packing_method_id
             end
