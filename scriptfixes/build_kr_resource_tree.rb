@@ -371,7 +371,7 @@ class BuildKrResourceTree < BaseScript # rubocop:disable Metrics/ClassLength
     }
 
     ptz.each do |ship, bays|
-      res = plant_res(ship_type, ship.to_s.upcase, ship.to_s.upcase)
+      res = plant_res(ship_type, ship.to_s.upcase, "Palletizing #{ship.to_s.gsub('_', ' ').reverse.capitalize.reverse}")
       ship_id = repo.create_child_plant_resource(ph_id, res)
 
       bays.each do |node|
