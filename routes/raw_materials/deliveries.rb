@@ -52,7 +52,7 @@ class Nspack < Roda # rubocop:disable Metrics/ClassLength
         else
           flash[:error] = res.message
         end
-        r.redirect(" /raw_materials/deliveries/rmt_deliveries/#{id}/edit")
+        r.redirect(" /raw_materials/deliveries/rmt_deliveries/#{id}")
       end
 
       r.on 'set_current_delivery' do
