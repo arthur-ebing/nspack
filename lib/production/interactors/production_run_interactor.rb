@@ -367,7 +367,7 @@ module ProductionApp
 
     def allocate_packing_specification(product_resource_allocation_id, params)
       res = repo.allocate_packing_specification(product_resource_allocation_id, params[:column_value])
-      res.instance = { changes: { packing_specification_code: res.instance[:packing_specification_code] } }
+      res.instance = { changes: { packing_specification_item_code: res.instance[:packing_specification_item_code] } }
       res
     end
 
@@ -408,7 +408,7 @@ module ProductionApp
         packing_method_for_allocation(product_resource_allocation_id, params)
       elsif params[:column_name] == 'target_customer'
         allocate_target_customer(product_resource_allocation_id, params)
-      elsif params[:column_name] == 'packing_specification_code'
+      elsif params[:column_name] == 'packing_specification_item_code'
         allocate_packing_specification(product_resource_allocation_id, params)
       else
         failed_response(%(There is no handler for changed column "#{params[:column_name]}"))

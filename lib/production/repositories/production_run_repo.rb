@@ -318,20 +318,20 @@ module ProductionApp
       success_response("Allocated #{product_setup_code}", product_setup_id: product_setup_id)
     end
 
-    def allocate_packing_specification(product_resource_allocation_id, packing_specification_code)
+    def allocate_packing_specification(product_resource_allocation_id, packing_specification_item_code)
       run_id = DB[:product_resource_allocations].where(id: product_resource_allocation_id).get(:production_run_id)
       qry = <<~SQL
         SELECT packing_specification_items.id, product_setup_id
         FROM packing_specification_items
         JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
         WHERE product_setup_template_id = (SELECT product_setup_template_id FROM production_runs WHERE id = #{run_id})
-         AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_code}'
+         AND fn_packing_specification_code(packing_specification_items.id) = '#{packing_specification_item_code}'
       SQL
       rec = DB[qry].first
       attrs = { packing_specification_item_id: rec[:id], product_setup_id: rec[:product_setup_id] }
       update(:product_resource_allocations, product_resource_allocation_id, attrs)
 
-      success_response("Allocated #{packing_specification_code}", packing_specification_code: packing_specification_code)
+      success_response("Allocated #{packing_specification_item_code}", packing_specification_item_code: packing_specification_item_code)
     end
 
     def label_for_allocation(product_resource_allocation_id, label_template_name)

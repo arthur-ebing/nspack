@@ -2,7 +2,7 @@
 :caption: Allocated setups for production run
 :sql: "SELECT\r\n  a.id,\r\n  parent.plant_resource_code AS pack_station,\r\n  sysres.system_resource_code
   AS module,\r\n  p.plant_resource_code,\r\n  a.product_setup_id,\r\n  fn_product_setup_code
-  (s.id) AS product_setup_code,\r\n  fn_packing_specification_code (psi.id) AS packing_specification_code,\r\n
+  (s.id) AS product_setup_code,\r\n  fn_packing_specification_code (psi.id) AS packing_specification_item_code,\r\n
   \ pm_boms.system_code,\r\n  CONCAT(marks.mark_code, '_', COALESCE(array_to_string(pm_marks.packaging_marks,
   '_'), ' ')) AS fg_marks,\r\n  s.gtin_code,\r\n  a.label_template_id,\r\n  l.label_template_name,\r\n
   \ a.packing_method_id,\r\n  pm.packing_method_code,\r\n  a. active,\r\n  a.production_run_id\r\nFROM\r\n
@@ -123,18 +123,18 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  packing_specification_code:
-    :name: packing_specification_code
+  packing_specification_item_code:
+    :name: packing_specification_item_code
     :sequence_no: 7
-    :caption: Packing specification code
-    :namespaced_name:
+    :caption: Packing specification item code
+    :namespaced_name: 
     :data_type: :string
     :width: 600
-    :format:
+    :format: 
     :hide: false
-    :pinned:
+    :pinned: 
     :groupable: false
-    :group_by_seq:
+    :group_by_seq: 
     :group_sum: false
     :group_avg: false
     :group_min: false

@@ -963,10 +963,16 @@ class Nspack < Roda
       r.patch do # UPDATE
         res = interactor.update_product_resource_allocation(id, params[:product_resource_allocation])
         if res.success
-          update_grid_row(id, changes: { product_setup_code: res.instance[:product_setup_code],
-                                         label_template_name: res.instance[:label_template_name],
-                                         packing_specification_code: res.instance[:packing_specification_item_code] },
-                              notice: res.message)
+          row_keys = %i[
+            product_setup_id
+            label_template_id
+            packing_method_id
+            product_setup_code
+            label_template_name
+            packing_method_code
+            packing_specification_item_code
+          ]
+          update_grid_row(id, changes: select_attributes(res.instance, row_keys), notice: res.message)
         else
           re_show_form(r, res) { Production::Runs::ProductionRun::SelectProductSetup.call(id, form_values: params[:product_resource_allocation], form_errors: res.errors) }
         end

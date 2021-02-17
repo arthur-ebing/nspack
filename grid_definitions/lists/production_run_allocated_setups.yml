@@ -45,7 +45,7 @@
       :editor: :select
       :width: 300
       :value_sql: SELECT packing_method_code, id FROM packing_methods
-    packing_specification_code:
+    packing_specification_item_code:
       :editor: :search_select
       :value_sql: SELECT NULL UNION SELECT fn_packing_specification_code(packing_specification_items.id)
         FROM packing_specification_items JOIN packing_specifications ON packing_specifications.id
@@ -57,29 +57,29 @@
   - system_code
   - fg_marks
   - gtin_code
-  - packing_specification_code
+  - packing_specification_item_code
   um:
   - system_code
   - fg_marks
   - gtin_code
-  - packing_specification_code
+  - packing_specification_item_code
   ud:
   - system_code
   - fg_marks
   - gtin_code
-  - packing_specification_code
+  - packing_specification_item_code
   sr:
   - system_code
   - fg_marks
   - gtin_code
-  - packing_specification_code
+  - packing_specification_item_code
   srp:
   - system_code
   - fg_marks
   - gtin_code
-  - packing_specification_code
+  - packing_specification_item_code
   hl:
-  - packing_specification_code
+  - packing_specification_item_code
   kr:
   - product_setup_code
   - system_code
