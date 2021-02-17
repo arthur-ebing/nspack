@@ -4,7 +4,7 @@ module MasterfilesApp
   class FruitSizeRepo < BaseRepo # rubocop:disable Metrics/ClassLength
     def for_select_basic_packs(where: {}, exclude: {}, active: true)
       DB[:basic_pack_codes]
-        .join(:basic_packs_standard_packs, basic_pack_id: :id)
+        .left_join(:basic_packs_standard_packs, basic_pack_id: :id)
         .where(active: active)
         .where(where)
         .exclude(exclude)
@@ -56,13 +56,13 @@ module MasterfilesApp
     def delete_basic_pack(id)
       standard_pack_ids = select_values(:basic_packs_standard_packs, :standard_pack_id, basic_pack_id: id)
       DB[:basic_packs_standard_packs].where(basic_pack_id: id).delete
-      delete(:standard_pack_codes, standard_pack_ids.first) if standard_pack_ids.length == 1
+      delete(:standard_pack_codes, standard_pack_ids.first) if AppConst::CR_MF.basic_pack_equals_standard_pack?
       delete(:basic_pack_codes, id)
     end
 
     def for_select_standard_packs(where: {}, exclude: {}, active: true)
       DB[:standard_pack_codes]
-        .join(:basic_packs_standard_packs, standard_pack_id: :id)
+        .left_join(:basic_packs_standard_packs, standard_pack_id: :id)
         .where(active: active)
         .where(where)
         .exclude(exclude)
@@ -125,7 +125,7 @@ module MasterfilesApp
     def delete_standard_pack(id)
       basic_pack_ids = select_values(:basic_packs_standard_packs, :basic_pack_id, standard_pack_id: id)
       DB[:basic_packs_standard_packs].where(standard_pack_id: id).delete
-      delete(:basic_pack_codes, basic_pack_ids.first) if basic_pack_ids.length == 1
+      delete(:basic_pack_codes, basic_pack_ids.first) if AppConst::CR_MF.basic_pack_equals_standard_pack?
       delete(:standard_pack_codes, id)
     end
 
