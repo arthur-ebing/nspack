@@ -9,7 +9,7 @@
   '; ')\r\n    FROM (\r\n      SELECT\r\n        g.target_market_group_name\r\n      FROM\r\n
   \       target_market_groups g\r\n      JOIN target_markets_for_groups t ON t.target_market_group_id
   = g.id\r\n        AND t.target_market_id = target_markets.id\r\n        AND g.active)
-  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"is_inspection_tm\",\r\n
+  AS tab) AS target_market_groups,\r\n  \"target_markets\".\"inspection_tm\",\r\n
   \ \"target_markets\".\"created_at\",\r\n  \"target_markets\".\"updated_at\"\r\nFROM\r\n
   \ \"target_markets\""
 :limit: 
@@ -96,11 +96,11 @@
     :group_avg: false
     :group_min: false
     :group_max: false
-  is_inspection_tm:
-    :name: is_inspection_tm
+  inspection_tm:
+    :name: inspection_tm
     :sequence_no: 6
-    :caption: Is inspection tm?
-    :namespaced_name: target_markets.is_inspection_tm
+    :caption: Inspection tm?
+    :namespaced_name: target_markets.inspection_tm
     :data_type: :boolean
     :width: 150
     :format: 

@@ -20,7 +20,7 @@ module UiRules
       fields[:tm_group_ids] = { renderer: :list, caption: 'Groups', items: @repo.target_market_group_names_for(@options[:id]) }
       fields[:country_ids] = { renderer: :list, caption: 'Countries', items: @repo.destination_country_names_for(@options[:id]) }
       fields[:description] = { renderer: :label }
-      fields[:is_inspection_tm] = { renderer: :label, as_boolean: true }
+      fields[:inspection_tm] = { renderer: :label, as_boolean: true }
     end
 
     def common_fields
@@ -29,7 +29,7 @@ module UiRules
         tm_group_ids: { renderer: :multi, options: @repo.for_select_tm_groups, selected: @form_object.tm_group_ids, caption: 'Groups', required: true },
         country_ids: { renderer: :multi, options: @destination_repo.for_select_destination_countries, selected: @form_object.country_ids, caption: 'Countries', required: true },
         description: {},
-        is_inspection_tm: { renderer: :checkbox }
+        inspection_tm: { renderer: :checkbox }
       }
     end
 
@@ -44,7 +44,7 @@ module UiRules
                                     country_ids: [],
                                     tm_group_ids: [],
                                     description: nil,
-                                    is_inspection_tm: nil)
+                                    inspection_tm: nil)
     end
   end
 end
