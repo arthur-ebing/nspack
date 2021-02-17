@@ -177,7 +177,7 @@ module RawMaterialsApp
       failed_response(e.message)
     end
 
-    def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize, Metrics/PerceivedComplexity
+    def recalc_rmt_bin_nett_weight(id) # rubocop:disable Metrics/AbcSize
       repo.transaction do
         rmt_bins = repo.find_bins_by_delivery_id(id)
         rmt_bins.each do |rmt_bin|
@@ -185,9 +185,6 @@ module RawMaterialsApp
 
           if !rmt_bin[:bin_tipped] && rmt_bin[:gross_weight] && tare_weight
             # override nett_weight
-            repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight))
-          elsif rmt_bin[:bin_tipped] && rmt_bin[:gross_weight] && tare_weight && !rmt_bin[:nett_weight]
-            # only set nett weight if it is null
             repo.update_rmt_bin(rmt_bin[:id], nett_weight: (rmt_bin[:gross_weight] - tare_weight))
           end
         end
