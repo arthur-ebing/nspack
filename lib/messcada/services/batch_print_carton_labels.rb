@@ -3,17 +3,28 @@
 module MesscadaApp
   class BatchPrintCartonLabels < BaseService
     attr_reader :repo, :production_run_id, :product_setup_id, :request_ip,
-                :label_name, :printer_id, :no_of_prints, :run_repo, :label_template_id
+                :label_name, :printer_id, :no_of_prints, :run_repo, :label_template_id,
+                :packing_specification_item_id, :production_repo
 
-    def initialize(production_run_id, product_setup_id, label_template_id, request_ip, params)
-      @production_run_id = production_run_id
-      @product_setup_id = product_setup_id
+    def initialize(args, label_template_id, request_ip, params)
+      @production_run_id = args[:id]
       @no_of_prints = params[:no_of_prints]
       @printer_id = params[:printer]
       @label_template_id = label_template_id
       @repo = MesscadaApp::MesscadaRepo.new
+      @production_repo = ProductionApp::ProductionRunRepo.new
       @request_ip = LabelApp::PrinterRepo.new.print_to_robot?(request_ip) ? request_ip : nil
       @label_name = repo.get(:label_templates, label_template_id, :label_template_name)
+      resolve_product_setup_id(args)
+    end
+
+    def resolve_product_setup_id(args)
+      if AppConst::CR_PROD.use_packing_specifications?
+        @packing_specification_item_id = args[:packing_specification_item_id]
+        @product_setup_id = DB[:packing_specification_items].where(id: packing_specification_item_id).get(:product_setup_id)
+      else
+        @product_setup_id = args[:product_setup_id]
+      end
     end
 
     def call
@@ -36,7 +47,8 @@ module MesscadaApp
       default_packing_method_id = MasterfilesApp::PackagingRepo.new.find_packing_method_by_code(AppConst::DEFAULT_PACKING_METHOD)&.id
       raise Crossbeams::FrameworkError, "Default Packing Method: #{AppConst::DEFAULT_PACKING_METHOD} does not exist." if default_packing_method_id.nil_or_empty?
 
-      attrs.merge(pr).merge(production_run_id: production_run_id, label_name: label_name, phc: phc, packing_method_id: default_packing_method_id)
+      packing_spec = production_repo.packing_specification_keys(packing_specification_item_id)
+      attrs.merge(pr).merge(packing_spec.to_h).merge(production_run_id: production_run_id, label_name: label_name, phc: phc, packing_method_id: default_packing_method_id)
     end
   end
 end

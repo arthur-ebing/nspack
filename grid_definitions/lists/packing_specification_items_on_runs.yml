@@ -1,0 +1,42 @@
+---
+:dataminer_definition: packing_specification_items_on_runs
+:captions:
+  :conditions:
+    :standard: Packing Specification Items for run $:production_run_id$
+:actions:
+- :url: "/production/packing_specifications/packing_specification_items/$:id$"
+  :text: view
+  :icon: view-show
+  :title: View
+  :popup: true
+- :url: "/production/runs/production_runs/$:production_run_id$/packing_specification_item/$:id$/print_label"
+  :text: Print carton label
+  :icon: printer
+  :title: Print carton label
+  :popup: true
+:conditions:
+  :standard:
+  - :col: production_runs.id
+    :op: "="
+    :val: "$:production_run_id$"
+:hide_for_client:
+  hb:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  um:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  ud:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  sr:
+  - bom_code
+  - fg_marks
+  - gtin_code
+  srp:
+  - bom_code
+  - fg_marks
+  - gtin_code

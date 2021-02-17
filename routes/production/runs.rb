@@ -493,19 +493,58 @@ class Nspack < Roda
         show_page { Production::Runs::ProductionRun::AllocateTargetCustomers.call(id) }
       end
 
+      r.on 'view_setups' do
+        check_auth!('runs', 'edit')
+        if AppConst::CR_PROD.use_packing_specifications?
+          r.redirect("/list/packing_specification_items_on_runs/with_params?key=standard&production_run_id=#{id}")
+        else
+          r.redirect("/list/product_setups_on_runs/with_params?key=standard&production_run_id=#{id}")
+        end
+      end
+
       r.on 'product_setup', Integer do |product_setup_id|
         r.on 'print_label' do
           r.get do
-            show_partial { Production::Runs::ProductionRun::PrintCarton.call(id, product_setup_id, request.ip) }
+            show_partial do
+              Production::Runs::ProductionRun::PrintCarton.call({ id: id, product_setup_id: product_setup_id },
+                                                                request.ip)
+            end
           end
           r.patch do
-            res = interactor.print_carton_label(id, product_setup_id, request.ip, params[:product_setup])
+            res = interactor.print_carton_label({ id: id, product_setup_id: product_setup_id },
+                                                request.ip,
+                                                params[:product_setup])
             if res.success
               show_json_notice(res.message)
             else
               re_show_form(r, res) do
-                Production::Runs::ProductionRun::PrintCarton.call(id,
-                                                                  product_setup_id,
+                Production::Runs::ProductionRun::PrintCarton.call({ id: id, product_setup_id: product_setup_id },
+                                                                  request.ip,
+                                                                  form_values: params[:product_setup],
+                                                                  form_errors: res.errors)
+              end
+            end
+          end
+        end
+      end
+
+      r.on 'packing_specification_item', Integer do |packing_specification_item_id|
+        r.on 'print_label' do
+          r.get do
+            show_partial do
+              Production::Runs::ProductionRun::PrintCarton.call({ id: id, packing_specification_item_id: packing_specification_item_id },
+                                                                request.ip)
+            end
+          end
+          r.patch do
+            res = interactor.print_carton_label({ id: id, packing_specification_item_id: packing_specification_item_id },
+                                                request.ip,
+                                                params[:product_setup])
+            if res.success
+              show_json_notice(res.message)
+            else
+              re_show_form(r, res) do
+                Production::Runs::ProductionRun::PrintCarton.call({ id: id, packing_specification_item_id: packing_specification_item_id },
                                                                   request.ip,
                                                                   form_values: params[:product_setup],
                                                                   form_errors: res.errors)

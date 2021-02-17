@@ -116,7 +116,8 @@ module ProductionApp
         ru_stickers: %w[A B C],
         ru_sticker_1: 'ABC',
         ru_sticker_2: 'ABC',
-        active: true
+        active: true,
+        packing_specification_item_code: 'ABC'
       }
     end
 

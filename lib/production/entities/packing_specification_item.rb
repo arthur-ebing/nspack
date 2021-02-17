@@ -35,5 +35,6 @@ module ProductionApp
     attribute :ru_sticker_2, Types::String
     attribute? :status, Types::Bool
     attribute? :active, Types::Bool
+    attribute :packing_specification_item_code, Types::String
   end
 end

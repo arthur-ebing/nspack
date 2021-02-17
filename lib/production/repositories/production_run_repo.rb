@@ -359,11 +359,17 @@ module ProductionApp
       success_response("Allocated Target Customer #{target_customer}", target_customer: target_customer)
     end
 
-    def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, label_template_id)
-      xtra = label_template_id.nil? ? '' : ", label_template_id = #{label_template_id}"
+    def copy_allocations_for_run(product_resource_allocation_id, allocation_ids, product_setup_id, args) # rubocop:disable Metrics/AbcSize
+      xtra = []
+      xtra << ", label_template_id = #{args[:label_template_id]}" unless args[:label_template_id].to_s.nil_or_empty?
+
+      use_packing_specs = AppConst::CR_PROD.use_packing_specifications?
+      use_packing_specs = false if args[:packing_specification_item_id].to_s.nil_or_empty?
+      xtra << ", packing_specification_item_id = #{args[:packing_specification_item_id]}" if use_packing_specs
+
       qry = <<~SQL
         UPDATE product_resource_allocations
-        SET product_setup_id = #{product_setup_id} #{xtra}
+        SET product_setup_id = #{product_setup_id} #{xtra.join('')}
         WHERE id IN (#{allocation_ids.join(', ')})
           AND id <> #{product_resource_allocation_id}
       SQL

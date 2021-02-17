@@ -91,8 +91,8 @@
   :text: view allocated product setups
   :icon: list
   :hide_if_false: view_allocs
-- :url: "/list/product_setups_on_runs/with_params?key=standard&production_run_id=$:id$"
-  :text: view product setups
+- :url: "/production/runs/production_runs/$:id$/view_setups"
+  :text: view setups
   :icon: list
   :title: Select Product Setup Template
   :hide_if_null: product_setup_template_id

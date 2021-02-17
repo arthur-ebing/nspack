@@ -58,7 +58,8 @@ module ProductionApp
           packing_specification_items.active,
           packing_specification_items.created_at,
           packing_specification_items.updated_at,
-          fn_current_status('packing_specification_items', packing_specification_items.id) AS status
+          fn_current_status('packing_specification_items', packing_specification_items.id) AS status,
+          fn_packing_specification_code(packing_specification_items.id) AS packing_specification_item_code
         FROM packing_specification_items
         JOIN packing_specifications ON packing_specifications.id = packing_specification_items.packing_specification_id
         JOIN product_setups ON product_setups.id = packing_specification_items.product_setup_id

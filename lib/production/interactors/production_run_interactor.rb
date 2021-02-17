@@ -552,7 +552,8 @@ module ProductionApp
 
     def copy_run_allocation(product_resource_allocation_id, allocation_ids)
       alloc = repo.find_hash(:product_resource_allocations, product_resource_allocation_id)
-      repo.copy_allocations_for_run(product_resource_allocation_id, allocation_ids, alloc[:product_setup_id], alloc[:label_template_id])
+      extras = { label_template_id: alloc[:label_template_id], packing_specification_item_id: alloc[:packing_specification_item_id] }
+      repo.copy_allocations_for_run(product_resource_allocation_id, allocation_ids, alloc[:product_setup_id], extras)
       success_response('Allocation copied', alloc[:production_run_id])
     end
 
@@ -567,13 +568,13 @@ module ProductionApp
     end
 
     # create carton_print_repo?
-    def print_carton_label(id, product_setup_id, request_ip, params)
+    def print_carton_label(args, request_ip, params)
       res = validate_print_carton(params)
       return validation_failed_response(res) if res.failure?
       return mixed_validation_failed_response(res, messages: { no_of_prints: ["cannot be more than #{AppConst::BATCH_PRINT_MAX_LABELS}"] }) if res[:no_of_prints] > AppConst::BATCH_PRINT_MAX_LABELS
 
-      MesscadaApp::BatchPrintCartonLabels.call(id, product_setup_id, res[:label_template_id], request_ip, params)
-      success_response('Label sent to printer', id: id, product_setup_id: product_setup_id)
+      MesscadaApp::BatchPrintCartonLabels.call(args, res[:label_template_id], request_ip, params)
+      success_response('Label sent to printer', args)
     end
 
     def mark_setup_as_complete(id)
