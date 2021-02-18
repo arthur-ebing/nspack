@@ -57,7 +57,7 @@ module MasterfilesApp
       args = {}
       args[:pm_subtype_short_code] = pm_subtype.short_code
       args[:pm_type_short_code] = pm_type.short_code
-      args[:gross_weight_per_unit] = params[:gross_weight_per_unit].nil_or_empty? ? '*' : params[:gross_weight_per_unit].to_f.to_s
+      args[:gross_weight_per_unit] = params[:gross_weight_per_unit].nil_or_empty? ? '*' : UtilityFunctions.format_without_trailing_zeroes(params[:gross_weight_per_unit].to_f).to_s
       args[:items_per_unit] = params[:items_per_unit].nil_or_empty? ? '*' : params[:items_per_unit].to_i.to_s
 
       res = ProductCodeMidCompositionLevelSchema.call(args)
